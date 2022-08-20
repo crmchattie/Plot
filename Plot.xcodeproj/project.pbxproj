@@ -152,6 +152,9 @@
 		108C37FD28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37FC28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift */; };
 		108C37FF28A28B0F00DC4998 /* ScheduleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37FE28A28B0F00DC4998 /* ScheduleListViewController.swift */; };
 		108C380128A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380028A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift */; };
+		108C380328AC483E00DC4998 /* TaskViewController+UpdateInvitees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380228AC483900DC4998 /* TaskViewController+UpdateInvitees.swift */; };
+		108C380528AC485300DC4998 /* TaskViewController+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380428AC485300DC4998 /* TaskViewController+Functions.swift */; };
+		108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -167,6 +170,16 @@
 		10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAA257ACC7200E3A798 /* Scheduler.swift */; };
 		10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAE257ACC9000E3A798 /* Mood.swift */; };
 		10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BC05257D38BA00E3A798 /* MoodViewController.swift */; };
+		10B3E4FB28AE9CD100E1713D /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E4FA28AE9CD100E1713D /* Task.swift */; };
+		10B3E4FD28AE9F7000E1713D /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E4FC28AE9F7000E1713D /* Event.swift */; };
+		10B3E4FF28AEAC4E00E1713D /* ListType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E4FE28AEAC4E00E1713D /* ListType.swift */; };
+		10B3E50128B10F4500E1713D /* SubtaskListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50028B10F4500E1713D /* SubtaskListViewController.swift */; };
+		10B3E50328B10FC100E1713D /* SubtaskRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50228B10FC100E1713D /* SubtaskRow.swift */; };
+		10B3E50528B1105600E1713D /* SubtaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50428B1105600E1713D /* SubtaskViewController.swift */; };
+		10B3E50828B146DC00E1713D /* ChooseListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50728B146DC00E1713D /* ChooseListViewController.swift */; };
+		10B3E50A28B1478A00E1713D /* ListDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50928B1478A00E1713D /* ListDetailViewController.swift */; };
+		10B3E50C28B168D700E1713D /* ListFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50B28B168D700E1713D /* ListFetcher.swift */; };
+		10B3E50E28B168E600E1713D /* ListActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50D28B168E600E1713D /* ListActions.swift */; };
 		10B4AE3324FE9CBA005B967B /* FinancialAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */; };
 		10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */; };
 		10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541C925476D8B00CC9023 /* GroceryProduct.swift */; };
@@ -205,7 +218,6 @@
 		10CA911925367D9E003CEAF7 /* FinancialAccountActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */; };
 		10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CD68782486AEE400DC02E0 /* PLNotification.swift */; };
 		10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */; };
-		10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D340FF24ABD741009269B7 /* ActivityContainer.swift */; };
 		10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */; };
 		10D420AD24787AD500CBAFA7 /* ChecklistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */; };
 		10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */; };
@@ -717,6 +729,9 @@
 		108C37FC28A1C08E00DC4998 /* MindfulnessViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MindfulnessViewController+Extensions.swift"; sourceTree = "<group>"; };
 		108C37FE28A28B0F00DC4998 /* ScheduleListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListViewController.swift; sourceTree = "<group>"; };
 		108C380028A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FinanceTransactionViewController+Extensions.swift"; sourceTree = "<group>"; };
+		108C380228AC483900DC4998 /* TaskViewController+UpdateInvitees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+UpdateInvitees.swift"; sourceTree = "<group>"; };
+		108C380428AC485300DC4998 /* TaskViewController+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+Functions.swift"; sourceTree = "<group>"; };
+		108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+Extensions.swift"; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -732,6 +747,16 @@
 		10B2BBAA257ACC7200E3A798 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		10B2BBAE257ACC9000E3A798 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
 		10B2BC05257D38BA00E3A798 /* MoodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodViewController.swift; sourceTree = "<group>"; };
+		10B3E4FA28AE9CD100E1713D /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		10B3E4FC28AE9F7000E1713D /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		10B3E4FE28AEAC4E00E1713D /* ListType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListType.swift; sourceTree = "<group>"; };
+		10B3E50028B10F4500E1713D /* SubtaskListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtaskListViewController.swift; sourceTree = "<group>"; };
+		10B3E50228B10FC100E1713D /* SubtaskRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtaskRow.swift; sourceTree = "<group>"; };
+		10B3E50428B1105600E1713D /* SubtaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtaskViewController.swift; sourceTree = "<group>"; };
+		10B3E50728B146DC00E1713D /* ChooseListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseListViewController.swift; sourceTree = "<group>"; };
+		10B3E50928B1478A00E1713D /* ListDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailViewController.swift; sourceTree = "<group>"; };
+		10B3E50B28B168D700E1713D /* ListFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListFetcher.swift; sourceTree = "<group>"; };
+		10B3E50D28B168E600E1713D /* ListActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListActions.swift; sourceTree = "<group>"; };
 		10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountCell.swift; sourceTree = "<group>"; };
 		10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountViewController.swift; sourceTree = "<group>"; };
 		10B541C925476D8B00CC9023 /* GroceryProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryProduct.swift; sourceTree = "<group>"; };
@@ -770,7 +795,6 @@
 		10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountActions.swift; sourceTree = "<group>"; };
 		10CD68782486AEE400DC02E0 /* PLNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLNotification.swift; sourceTree = "<group>"; };
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
-		10D340FF24ABD741009269B7 /* ActivityContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityContainer.swift; sourceTree = "<group>"; };
 		10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistFetcher.swift; sourceTree = "<group>"; };
 		10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistActions.swift; sourceTree = "<group>"; };
 		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
@@ -1141,13 +1165,15 @@
 				106D758A2442447C0039B534 /* ActivityActions.swift */,
 				108C37FE28A28B0F00DC4998 /* ScheduleListViewController.swift */,
 				10196EF324411B5600B6AFDF /* ScheduleViewController.swift */,
+				10B3E50028B10F4500E1713D /* SubtaskListViewController.swift */,
+				10B3E50428B1105600E1713D /* SubtaskViewController.swift */,
 				10196EF724411B5600B6AFDF /* SelectActivityMembersViewController.swift */,
+				108C37F228997CBF00DC4998 /* ActivityListViewController.swift */,
 				102618C825771FE300CF6F0A /* ActivityLevelViewController.swift */,
 				102618CC257721D100CF6F0A /* ActivityNewLevelViewController.swift */,
 				10196F0C24411C2800B6AFDF /* ChooseActivityTableViewController.swift */,
 				10196EF224411B5500B6AFDF /* MapActivityViewController.swift */,
 				10196EF024411B5500B6AFDF /* PlacesAnnotation.swift */,
-				108C37F228997CBF00DC4998 /* ActivityListViewController.swift */,
 				26B975EC2365374A003BFBE3 /* InvitationsFetcher.swift */,
 			);
 			path = Support;
@@ -1335,14 +1361,10 @@
 				100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */,
 				105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */,
 				1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */,
-				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
-				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
-				108C380028A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift */,
-				106774F725DAF76E002F78E7 /* FinanceHoldingViewController.swift */,
-				10B6B31525410D37008037AD /* FinanceTagsViewController.swift */,
-				103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */,
-				10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */,
-				10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */,
+				108C380D28AC829F00DC4998 /* TransactionRule */,
+				108C380828AC81C100DC4998 /* Transaction */,
+				108C380C28AC821B00DC4998 /* Holding */,
+				108C380B28AC821100DC4998 /* Account */,
 				10DFC3EF255CC55600565DAD /* Cells */,
 				10DFC3EE255CC53600565DAD /* Support */,
 			);
@@ -1467,6 +1489,9 @@
 			isa = PBXGroup;
 			children = (
 				108C37ED2899708B00DC4998 /* TaskViewController.swift */,
+				108C380228AC483900DC4998 /* TaskViewController+UpdateInvitees.swift */,
+				108C380428AC485300DC4998 /* TaskViewController+Functions.swift */,
+				108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */,
 			);
 			path = Task;
 			sourceTree = "<group>";
@@ -1477,6 +1502,39 @@
 				1011466825A8E6C5007B51AF /* TimeZoneFinderViewController.swift */,
 			);
 			path = TimeZone;
+			sourceTree = "<group>";
+		};
+		108C380828AC81C100DC4998 /* Transaction */ = {
+			isa = PBXGroup;
+			children = (
+				105CB18B25129F130000D3D8 /* FinanceTransactionViewController.swift */,
+				108C380028A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift */,
+			);
+			path = Transaction;
+			sourceTree = "<group>";
+		};
+		108C380B28AC821100DC4998 /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+		108C380C28AC821B00DC4998 /* Holding */ = {
+			isa = PBXGroup;
+			children = (
+				106774F725DAF76E002F78E7 /* FinanceHoldingViewController.swift */,
+			);
+			path = Holding;
+			sourceTree = "<group>";
+		};
+		108C380D28AC829F00DC4998 /* TransactionRule */ = {
+			isa = PBXGroup;
+			children = (
+				10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */,
+			);
+			path = TransactionRule;
 			sourceTree = "<group>";
 		};
 		10970B122580605D0027A9EF /* Mindfulness */ = {
@@ -1513,12 +1571,23 @@
 			path = Mood;
 			sourceTree = "<group>";
 		};
+		10B3E50628B1462600E1713D /* Lists */ = {
+			isa = PBXGroup;
+			children = (
+				10B3E50728B146DC00E1713D /* ChooseListViewController.swift */,
+				10B3E50928B1478A00E1713D /* ListDetailViewController.swift */,
+				10B3E50B28B168D700E1713D /* ListFetcher.swift */,
+				10B3E50D28B168E600E1713D /* ListActions.swift */,
+			);
+			path = Lists;
+			sourceTree = "<group>";
+		};
 		10C50F932273818D00111033 /* Activity */ = {
 			isa = PBXGroup;
 			children = (
 				26E8EFE5237F38D500B9067E /* Map */,
 				10C50F982274E7C300111033 /* ActivityTableView */,
-				10C50F9C2274E87500111033 /* Activity */,
+				10C50F9C2274E87500111033 /* Event */,
 				108C37EC28996FC000DC4998 /* Task */,
 				100FE70F28945B2900D3124C /* Support */,
 				10C50F992274E7D500111033 /* Cells */,
@@ -1547,12 +1616,13 @@
 				109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */,
 				103E968922C2B309007D6668 /* PurchaseRow.swift */,
 				10DFAFCB2877775800D38016 /* HealthRow.swift */,
+				10B3E50228B10FC100E1713D /* SubtaskRow.swift */,
 				101B90962458DA2D00EDDB90 /* WeatherRow.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
 		};
-		10C50F9C2274E87500111033 /* Activity */ = {
+		10C50F9C2274E87500111033 /* Event */ = {
 			isa = PBXGroup;
 			children = (
 				10196EF524411B5600B6AFDF /* EventViewController.swift */,
@@ -1561,7 +1631,7 @@
 				10DFAFC72877753D00D38016 /* EventViewController+Extensions.swift */,
 				10196EF424411B5600B6AFDF /* EventViewController+AvatarOpenerDelegate.swift */,
 			);
-			path = Activity;
+			path = Event;
 			sourceTree = "<group>";
 		};
 		10DFC3B0255A142000565DAD /* Workout */ = {
@@ -1578,6 +1648,9 @@
 		10DFC3EE255CC53600565DAD /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				10B6B31525410D37008037AD /* FinanceTagsViewController.swift */,
+				103CB7DF25363DF9005752B2 /* FinanceTransactionLevelViewController.swift */,
+				10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */,
 				100458942517D50D00065872 /* FinancialTransactionFetcher.swift */,
 				10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */,
 				10173605251924120073D283 /* FinancialAccountFetcher.swift */,
@@ -1854,12 +1927,13 @@
 				1082C89224F0A8B000CF6491 /* Finance */,
 				4BAEE44D21272B380045AB10 /* Settings */,
 				10E93D5B24BE47A600F6EE18 /* Map */,
-				1051AC99244F8C470066761C /* List */,
+				10B3E50628B1462600E1713D /* Lists */,
 				100FE7042892D95700D3124C /* Calendar */,
 				108C37EF2899712800DC4998 /* TimeZone */,
 				108C37EB28995C9900DC4998 /* Location */,
 				108C37EA289951E400DC4998 /* Media */,
 				105F345A2885EB2F007531EB /* Repeat */,
+				1051AC99244F8C470066761C /* List */,
 				4BAEE4A421272D880045AB10 /* Chats */,
 				4BAEE4AB21272D880045AB10 /* ChatLog */,
 				4BAEE541212735200045AB10 /* SplashScreen */,
@@ -2346,6 +2420,9 @@
 			children = (
 				F983298F2602AB3200EB51F7 /* Activity */,
 				109FEB3C22A7003000621D2F /* CalendarType.swift */,
+				10B3E4FC28AE9F7000E1713D /* Event.swift */,
+				10B3E4FE28AEAC4E00E1713D /* ListType.swift */,
+				10B3E4FA28AE9CD100E1713D /* Task.swift */,
 				108C37FA28A14F6E00DC4998 /* Container.swift */,
 				105F66EA2415942B00F6EDB6 /* Workout.swift */,
 				10B541D3254780B800CC9023 /* Meal.swift */,
@@ -2374,7 +2451,6 @@
 				10B2BBAE257ACC9000E3A798 /* Mood.swift */,
 				2680A0332360C0BD00C4C287 /* Invitation.swift */,
 				10CD68782486AEE400DC02E0 /* PLNotification.swift */,
-				10D340FF24ABD741009269B7 /* ActivityContainer.swift */,
 				26A5DDD72394CB2400771DC1 /* RecipeSearchResult.swift */,
 				10B541C925476D8B00CC9023 /* GroceryProduct.swift */,
 				10B541CF25476DA700CC9023 /* MenuProduct.swift */,
@@ -3060,6 +3136,7 @@
 				10DFAFCA287776BE00D38016 /* HealthContainer.swift in Sources */,
 				10DFAFC82877753D00D38016 /* EventViewController+Extensions.swift in Sources */,
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,
+				10B3E50A28B1478A00E1713D /* ListDetailViewController.swift in Sources */,
 				4BAEE50121272D890045AB10 /* OutgoingPhotoMessageCell.swift in Sources */,
 				100B9F632564539300A80C87 /* FinanceDetailService.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,
@@ -3086,6 +3163,7 @@
 				4BAEE4F621272D890045AB10 /* GroupPictureAvatarOpenerDelegate.swift in Sources */,
 				4BAEE4FB21272D890045AB10 /* InputBlockerContainerView.swift in Sources */,
 				10C50F972274E21900111033 /* ActivityViewController+SearchHandlers.swift in Sources */,
+				10B3E4FB28AE9CD100E1713D /* Task.swift in Sources */,
 				4BAEE4F321272D890045AB10 /* GroupProfileTableHeaderContainer.swift in Sources */,
 				1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */,
 				4BAEE46421272B380045AB10 /* AccountSettingsTableViewCell.swift in Sources */,
@@ -3098,7 +3176,6 @@
 				103F492C286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift in Sources */,
 				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
 				260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */,
-				10D3410024ABD741009269B7 /* ActivityContainer.swift in Sources */,
 				26958553255A7355008FEE9B /* NutritionOperation.swift in Sources */,
 				4BAEE5E5212735E50045AB10 /* EnterVerificationCodeController.swift in Sources */,
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
@@ -3129,6 +3206,7 @@
 				4BAEE4FF21272D890045AB10 /* VoiceRecordingContainerView.swift in Sources */,
 				10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */,
 				10DFC3F9255CC64000565DAD /* MealFetcher.swift in Sources */,
+				108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */,
 				10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */,
 				1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */,
 				4BAEE5EC212735E50045AB10 /* SelectNewAdminTableViewController.swift in Sources */,
@@ -3142,6 +3220,7 @@
 				4BAEE49821272C5E0045AB10 /* ViewPlaceholder.swift in Sources */,
 				4BAEE5D2212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift in Sources */,
 				4BAEE46821272B380045AB10 /* ChangeNumberVerificationController.swift in Sources */,
+				10B3E50528B1105600E1713D /* SubtaskViewController.swift in Sources */,
 				269105EF253E8DD700A02C5F /* XYMarkerView.swift in Sources */,
 				4BAEE46721272B380045AB10 /* ChangePhoneNumberController.swift in Sources */,
 				4BAEE52221272D890045AB10 /* InformationMessageCell.swift in Sources */,
@@ -3171,6 +3250,7 @@
 				1067753E25E1AE01002F78E7 /* ChangeEmailView.swift in Sources */,
 				10E8E50325923C070076BE42 /* BaseContainerCell.swift in Sources */,
 				4BAEE54E212735880045AB10 /* Message.swift in Sources */,
+				10B3E50828B146DC00E1713D /* ChooseListViewController.swift in Sources */,
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
 				109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */,
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
@@ -3246,6 +3326,7 @@
 				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				103F492E286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
+				10B3E50C28B168D700E1713D /* ListFetcher.swift in Sources */,
 				4BAEE5CD212735E50045AB10 /* SelectParticipantsTableView.swift in Sources */,
 				10196F0424411B5600B6AFDF /* EventViewController+AvatarOpenerDelegate.swift in Sources */,
 				4BAEE50221272D890045AB10 /* ChatsTableViewController.swift in Sources */,
@@ -3282,6 +3363,7 @@
 				4BAEE5D4212735E50045AB10 /* UIView+Extensions.swift in Sources */,
 				10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */,
 				26B975ED2365374A003BFBE3 /* InvitationsFetcher.swift in Sources */,
+				10B3E50328B10FC100E1713D /* SubtaskRow.swift in Sources */,
 				4BAEE47121272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift in Sources */,
 				105F34AD2885EF7A007531EB /* MonthOrDaySelectorCell.swift in Sources */,
 				10B6B31625410D37008037AD /* FinanceTagsViewController.swift in Sources */,
@@ -3290,11 +3372,13 @@
 				1067750025DD665C002F78E7 /* FinanceDetailViewController.swift in Sources */,
 				26E8E3A6238B2CA9000F30C8 /* NotificationsViewController.swift in Sources */,
 				10F3032C24EC6FD300C04B8F /* MXInstitution.swift in Sources */,
+				10B3E4FF28AEAC4E00E1713D /* ListType.swift in Sources */,
 				10E0F616259A727000A1D86E /* ListService.swift in Sources */,
 				10ED76C426403CA7002838F5 /* TrackingService.swift in Sources */,
 				4BAEE5F0212735E50045AB10 /* RevealableView.swift in Sources */,
 				10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */,
 				4BAEE50021272D890045AB10 /* UserInfoTableViewController.swift in Sources */,
+				108C380328AC483E00DC4998 /* TaskViewController+UpdateInvitees.swift in Sources */,
 				10B541D025476DA700CC9023 /* MenuProduct.swift in Sources */,
 				10F3032A24EC6FBC00C04B8F /* MXUser.swift in Sources */,
 				4BAEE5D6212735E50045AB10 /* Announcement.swift in Sources */,
@@ -3311,6 +3395,7 @@
 				4BAEE5D0212735E50045AB10 /* SelectParticipantsViewController.swift in Sources */,
 				4BAEE51621272D890045AB10 /* GroupAdminControlsTableViewCell.swift in Sources */,
 				107BC99B258FB32B008E6DD5 /* ActiveDaysRow.swift in Sources */,
+				10B3E4FD28AE9F7000E1713D /* Event.swift in Sources */,
 				10196F0324411B5600B6AFDF /* ScheduleViewController.swift in Sources */,
 				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
@@ -3321,6 +3406,7 @@
 				10DFC3B2255A148F00565DAD /* WorkoutViewController.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
 				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
+				10B3E50E28B168E600E1713D /* ListActions.swift in Sources */,
 				260C87D22500C0D400715A64 /* StepsGroupOperation.swift in Sources */,
 				10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
@@ -3393,6 +3479,7 @@
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,
 				10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */,
 				F9DD16C52613D57A00B8374D /* MonthAxisValueFormatter.swift in Sources */,
+				10B3E50128B10F4500E1713D /* SubtaskListViewController.swift in Sources */,
 				105F34B12885EF7A007531EB /* RecurrencePicker.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
 				2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */,
@@ -3471,6 +3558,7 @@
 				106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */,
 				10E0D7C925959EF600B0F83C /* HealthService.swift in Sources */,
 				10E8E5312592C7D30076BE42 /* BackEnabledNavigationController.swift in Sources */,
+				108C380528AC485300DC4998 /* TaskViewController+Functions.swift in Sources */,
 				4BAEE5BD212735E50045AB10 /* INSPhoto.swift in Sources */,
 				4BAEE49921272C5E0045AB10 /* ContactsController+SearchHandlers.swift in Sources */,
 				F9C05FA825F7D608009E892A /* NotificationConstants.swift in Sources */,

@@ -66,7 +66,8 @@ class ActivitiesFetcher: NSObject {
                                 activity.calendarExport = userActivity.calendarExport
                                 activity.calendarSource = userActivity.calendarSource
                                 activity.externalActivityID = userActivity.externalActivityID
-                                activity.isComplete = userActivity.isComplete
+                                activity.userIsCompleted = userActivity.userIsCompleted
+                                activity.userCompletedDate = userActivity.userCompletedDate
                                 activity.reminder = userActivity.reminder
                                 activity.badge = userActivity.badge
                                 activity.muted = userActivity.muted
@@ -113,7 +114,8 @@ class ActivitiesFetcher: NSObject {
                                     activity.calendarExport = userActivity.calendarExport
                                     activity.calendarSource = userActivity.calendarSource
                                     activity.externalActivityID = userActivity.externalActivityID
-                                    activity.isComplete = userActivity.isComplete
+                                    activity.userIsCompleted = userActivity.userIsCompleted
+                                    activity.userCompletedDate = userActivity.userCompletedDate
                                     activity.reminder = userActivity.reminder
                                     activity.badge = userActivity.badge
                                     activity.muted = userActivity.muted
@@ -167,7 +169,8 @@ class ActivitiesFetcher: NSObject {
                         activity.calendarExport = userActivity.calendarExport
                         activity.calendarSource = userActivity.calendarSource
                         activity.externalActivityID = userActivity.externalActivityID
-                        activity.isComplete = userActivity.isComplete
+                        activity.userIsCompleted = userActivity.userIsCompleted
+                        activity.userCompletedDate = userActivity.userCompletedDate
                         activity.reminder = userActivity.reminder
                         activity.badge = userActivity.badge
                         activity.muted = userActivity.muted

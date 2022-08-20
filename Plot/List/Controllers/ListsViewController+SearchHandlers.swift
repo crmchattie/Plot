@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {}
     
@@ -36,7 +36,7 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     }
 }
 
-extension ListsViewController { /* hiding keyboard */
+extension ListViewController { /* hiding keyboard */
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.searchBar?.endEditing(true)

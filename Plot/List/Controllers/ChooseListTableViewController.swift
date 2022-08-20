@@ -61,7 +61,7 @@ class ChooseListTableViewController: UITableViewController {
     var list: ListContainer?
     var listID: String?
     var recipe: Recipe!
-    var event: Event!
+    var event: TicketMasterEvent!
     var workout: PreBuiltWorkout!
     var fsVenue: FSVenue!
     var sygicPlace: SygicPlace!

@@ -941,7 +941,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     
     func handleReloadTable() {
         activities.sort { (activity1, activity2) -> Bool in
-            return activity1.startDateTime!.int64Value < activity2.startDateTime!.int64Value
+            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
         }
         
         tableView.reloadData()

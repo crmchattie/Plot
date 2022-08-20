@@ -689,8 +689,8 @@ class GrocerylistViewController: FormViewController {
                             }.cellUpdate { cell, row in
                                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                 cell.tintColor = FalconPalette.defaultBlue
+                                cell.accessoryType = .checkmark
                                 if row.value == false {
-                                    cell.accessoryType = .checkmark
                                     cell.tintAdjustmentMode = .dimmed
                                 } else {
                                     cell.tintAdjustmentMode = .automatic
@@ -741,8 +741,8 @@ class GrocerylistViewController: FormViewController {
                             }.cellUpdate { cell, row in
                                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                 cell.tintColor = FalconPalette.defaultBlue
+                                cell.accessoryType = .checkmark
                                 if row.value == false {
-                                    cell.accessoryType = .checkmark
                                     cell.tintAdjustmentMode = .dimmed
                                 } else {
                                     cell.tintAdjustmentMode = .automatic
@@ -788,8 +788,8 @@ class GrocerylistViewController: FormViewController {
                             }.cellUpdate { cell, row in
                                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                 cell.tintColor = FalconPalette.defaultBlue
+                                cell.accessoryType = .checkmark
                                 if row.value == false {
-                                    cell.accessoryType = .checkmark
                                     cell.tintAdjustmentMode = .dimmed
                                 } else {
                                     cell.tintAdjustmentMode = .automatic
@@ -840,8 +840,8 @@ class GrocerylistViewController: FormViewController {
                             }.cellUpdate { cell, row in
                                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                 cell.tintColor = FalconPalette.defaultBlue
+                                cell.accessoryType = .checkmark
                                 if row.value == false {
-                                    cell.accessoryType = .checkmark
                                     cell.tintAdjustmentMode = .dimmed
                                 } else {
                                     cell.tintAdjustmentMode = .automatic
@@ -1210,49 +1210,6 @@ extension GrocerylistViewController: UpdateFoodProductContainerDelegate {
                 addIngredients()
             }
         }
-    }
-}
-
-extension GrocerylistViewController: UpdateListDelegate {
-    func updateRecipe(recipe: Recipe?) {
-        if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "recipefields") as? MultivaluedSection {
-            mvs.remove(at: mvs.count - 2)
-        }
-        
-        if let recipe = recipe {
-            if recipeID != "", let mvs = self.form.sectionBy(tag: "recipefields") as? MultivaluedSection {
-                let recipeRow = mvs.allRows[recipeIndex]
-                recipeRow.title = recipe.title
-            } else if let recipes = self.grocerylist.recipes, recipes["\(recipe.id)"] != nil {
-                print("recipe exists")
-                return
-            } else {
-                var mvs = (form.sectionBy(tag: "recipefields") as! MultivaluedSection)
-                mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.title = recipe.title
-                }.onCellSelection({ cell, row in
-                    self.recipeIndex = row.indexPath!.row
-                    self.recipeID = "\(recipe.id)"
-                    self.openRecipe()
-                }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.textLabel?.textAlignment = .left
-                }, at: mvs.count - 1)
-            }
-            
-            if let _ = recipe.extendedIngredients {
-                updateGrocerylist(recipe: recipe, add: true)
-            } else {
-                lookupRecipe(recipeID: recipe.id, add: true)
-            }
-        }
-    }
-    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
-        
     }
 }
 

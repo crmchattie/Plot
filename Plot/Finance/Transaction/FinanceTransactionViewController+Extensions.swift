@@ -152,7 +152,7 @@ extension FinanceTransactionViewController {
     
     func sortSchedule() {
         eventList.sort { (schedule1, schedule2) -> Bool in
-            return schedule1.startDateTime!.int64Value < schedule2.startDateTime!.int64Value
+            return schedule1.startDateTime?.int64Value ?? 0 < schedule2.startDateTime?.int64Value ?? 0
         }
         if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             if mvs.count == 1 {

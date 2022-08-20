@@ -57,11 +57,23 @@ class Activity: NSObject, NSCopying, Codable {
     var conversationID: String?
     var calendarExport: Bool?
     var showExtras: Bool?
-    //task will key off of isTask and isComplete
+    var isEvent: Bool?
+    //task will key off of isTask and isCompleted
     var isTask: Bool?
-    var isComplete: Bool?
+    var isCompleted: Bool?
+    var completedDate: Date?
+    var userIsCompleted: Bool?
+    var userCompletedDate: Date?
     var scheduleIDs: [String]?
     var isSchedule: Bool?
+    var listID: String?
+    var listName: String?
+    var listColor: String?
+    var listSource: String?
+    var startDateTimeComponents: DateComponents?
+    var deadlineDateTimeComponents: DateComponents?
+    var subtaskIDs: [String]?
+    var isSubtask: Bool?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -93,13 +105,23 @@ class Activity: NSObject, NSCopying, Codable {
         case containerID
         case calendarExport
         case showExtras
-        case isComplete
+        case isCompleted
+        case userIsCompleted
         case isTask
+        case isEvent
         case isSchedule
         case scheduleIDs
+        case listID
+        case listName
+        case listColor
+        case listSource
+        case startDateTimeComponents
+        case deadlineDateTimeComponents
+        case subtaskIDs
+        case isSubtask
     }
     
-    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String) {
+    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool) {
         self.activityID = activityID
         self.admin = admin
         self.calendarID = calendarID
@@ -111,6 +133,18 @@ class Activity: NSObject, NSCopying, Codable {
         self.startTimeZone = startTimeZone
         self.endDateTime = endDateTime
         self.endTimeZone = endTimeZone
+        self.isEvent = isEvent
+    }
+    
+    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, isTask: Bool, isCompleted: Bool) {
+        self.activityID = activityID
+        self.admin = admin
+        self.isTask = isTask
+        self.isCompleted = isCompleted
+        self.listID = listID
+        self.listName = listName
+        self.listColor = listColor
+        self.listSource = listSource
     }
     
     init(dictionary: [String: AnyObject]?) {
@@ -163,10 +197,22 @@ class Activity: NSObject, NSCopying, Codable {
         calendarExport = dictionary?["calendarExport"] as? Bool
         containerID = dictionary?["containerID"] as? String
         showExtras = dictionary?["showExtras"] as? Bool
-        isComplete = dictionary?["isComplete"] as? Bool
+        isCompleted = dictionary?["isCompleted"] as? Bool
+        completedDate = dictionary?["completedDate"] as? Date
+        userIsCompleted = dictionary?["userIsCompleted"] as? Bool
+        userCompletedDate = dictionary?["userCompletedDate"] as? Date
         isTask = dictionary?["isTask"] as? Bool
+        isEvent = dictionary?["isEvent"] as? Bool
         isSchedule = dictionary?["isSchedule"] as? Bool
         scheduleIDs = dictionary?["scheduleIDs"] as? [String]
+        listID = dictionary?["listID"] as? String
+        listName = dictionary?["listName"] as? String
+        listColor = dictionary?["listColor"] as? String
+        listSource = dictionary?["listSource"] as? String
+        subtaskIDs = dictionary?["subtaskIDs"] as? [String]
+        isSubtask = dictionary?["isSubtask"] as? Bool
+        startDateTimeComponents = dictionary?["startDateTimeComponents"] as? DateComponents
+        deadlineDateTimeComponents = dictionary?["deadlineDateTimeComponents"] as? DateComponents
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -308,12 +354,28 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["showExtras"] = value
         }
         
-        if let value = self.isComplete as AnyObject? {
-            dictionary["isComplete"] = value
+        if let value = self.isCompleted as AnyObject? {
+            dictionary["isCompleted"] = value
+        }
+        
+        if let value = self.completedDate as AnyObject? {
+            dictionary["completedDate"] = value
+        }
+        
+        if let value = self.userIsCompleted as AnyObject? {
+            dictionary["userIsCompleted"] = value
+        }
+        
+        if let value = self.userCompletedDate as AnyObject? {
+            dictionary["userCompletedDate"] = value
         }
         
         if let value = self.isTask as AnyObject? {
             dictionary["isTask"] = value
+        }
+        
+        if let value = self.isEvent as AnyObject? {
+            dictionary["isEvent"] = value
         }
         
         if let value = self.isSchedule as AnyObject? {
@@ -322,6 +384,38 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.scheduleIDs as AnyObject? {
             dictionary["scheduleIDs"] = value
+        }
+        
+        if let value = self.listID as AnyObject? {
+            dictionary["listID"] = value
+        }
+        
+        if let value = self.listName as AnyObject? {
+            dictionary["listName"] = value
+        }
+        
+        if let value = self.listColor as AnyObject? {
+            dictionary["listColor"] = value
+        }
+        
+        if let value = self.listSource as AnyObject? {
+            dictionary["listSource"] = value
+        }
+        
+        if let value = self.subtaskIDs as AnyObject? {
+            dictionary["subtaskIDs"] = value
+        }
+        
+        if let value = self.isSubtask as AnyObject? {
+            dictionary["isSubtask"] = value
+        }
+        
+        if let value = self.startDateTimeComponents as AnyObject? {
+            dictionary["startDateTimeComponents"] = value
+        }
+        
+        if let value = self.deadlineDateTimeComponents as AnyObject? {
+            dictionary["deadlineDateTimeComponents"] = value
         }
         
         return dictionary
@@ -333,15 +427,14 @@ class Activity: NSObject, NSCopying, Codable {
 }
 
 enum CustomType: String, Equatable, Hashable {
-    case basic, complex, meal, workout, event, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar, googleCalendarEvent, investment
+    case event, task, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, iOSCalendarEvent, mindfulness, calendar, googleCalendarEvent, investment
     
     var name: String {
         switch self {
-        case .basic: return "Event"
-        case .complex: return "Complex"
+        case .event: return "Event"
+        case .task: return "Task"
         case .meal: return "Meal"
         case .workout: return "Workout"
-        case .event: return "Event"
         case .flight: return "Flight"
         case .transaction: return "Transaction"
         case .financialAccount: return "Account"
@@ -359,11 +452,10 @@ enum CustomType: String, Equatable, Hashable {
     
     var categoryText: String {
         switch self {
-        case .basic: return "Build your own basic event"
-        case .complex: return "Build your own complex event"
+        case .event: return "Build your own event"
+        case .task: return "Build your own task"
         case .meal: return "Build your own meal"
         case .workout: return "Build your own workout"
-        case .event: return "Build your own event"
         case .flight: return "Look up your flight"
         case .transaction: return "Create a transaction"
         case .financialAccount: return "Create a financial account"
@@ -381,11 +473,10 @@ enum CustomType: String, Equatable, Hashable {
     
     var subcategoryText: String {
         switch self {
-        case .basic: return "Includes basic calendar event fields"
-        case .complex: return "Includes basic event fields plus a schedule, a checklist and purchases fields"
+        case .event: return "Includes basic event fields plus a schedule, health and transaction fields"
+        case .task: return "Includes basic event fields plus a checklist, health and transaction fields"
         case .meal: return "Build a meal by looking up grocery products and/or restaurant menu items"
         case .workout: return "Build a workout by setting type, duration and intensity"
-        case .event: return ""
         case .flight: return "Look up your flight details based on flight number, airline or airport"
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
@@ -395,11 +486,10 @@ enum CustomType: String, Equatable, Hashable {
     
     var image: String {
         switch self {
-        case .basic: return "activityLarge"
-        case .complex: return "activityLarge"
+        case .event: return "event"
+        case .task: return "task"
         case .meal: return "food"
         case .workout: return "workout"
-        case .event: return "event"
         case .flight: return "plane"
         case .transaction: return "transaction"
         case .financialAccount: return "financialAccount"
@@ -569,19 +659,23 @@ func activityListStats(
 
 extension Activity {
     var startDate: Date? {
-        guard let startDateTime = startDateTime?.doubleValue else {
-            return nil
+        if let startDateTime = startDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: startDateTime)
+        } else if let startDateTime = startDateTimeComponents {
+            let calendar = Calendar.current
+            return calendar.date(from: startDateTime)
         }
-        
-        return Date(timeIntervalSince1970: startDateTime)
+        return nil
     }
     
     var endDate: Date? {
-        guard let endDateTime = endDateTime?.doubleValue else {
-            return nil
+        if let endDateTime = endDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: endDateTime)
+        } else if let endDateTime = deadlineDateTimeComponents {
+            let calendar = Calendar.current
+            return calendar.date(from: endDateTime)
         }
-        
-        return Date(timeIntervalSince1970: endDateTime)
+        return nil
     }
 }
 

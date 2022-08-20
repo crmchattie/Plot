@@ -58,7 +58,6 @@ class EventViewController: FormViewController {
     var purchaseDict = [User: Double]()
     var listList = [ListContainer]()
     var healthList = [HealthContainer]()
-    var scheduleIndex: Int = 0
     var purchaseIndex: Int = 0
     var listIndex: Int = 0
     var healthIndex: Int = 0
@@ -74,9 +73,7 @@ class EventViewController: FormViewController {
     // Participants with accepted invites
     var acceptedParticipant: [User] = []
     var weather: [DailyWeatherElement]!
-    
-    fileprivate var reminderDate: Date?
-    
+        
     var active = false
     var sectionChanged: Bool = false
     
@@ -86,7 +83,7 @@ class EventViewController: FormViewController {
     
     var activityAvatarURL = String() {
         didSet {
-            let viewRow: ViewRow<UIImageView> = form.rowBy(tag: "Activity Image")!
+            let viewRow: ViewRow<UIImageView> = form.rowBy(tag: "Event Image")!
             viewRow.cell.view!.showActivityIndicator()
             viewRow.cell.view!.sd_setImage(with: URL(string:activityAvatarURL), placeholderImage: nil, options: [.continueInBackground, .scaleDownLargeImages], completed: { (image, error, cacheType, url) in
                 viewRow.cell.view!.hideActivityIndicator()
@@ -102,7 +99,7 @@ class EventViewController: FormViewController {
         if activity != nil {
             title = "Event"
             active = true
-            activityOld = activity.copy() as! Activity
+            activityOld = activity.copy() as? Activity
             if activity.activityID != nil {
                 activityID = activity.activityID!
                 print(activityID)
@@ -122,11 +119,11 @@ class EventViewController: FormViewController {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                let defaultCalendar = calendars[CalendarOptions.plot.name]?.first { $0.name == "Default"}
+                let calendarDefault = calendars[CalendarOptions.plot.name]?.first { $0.name == "Default"}
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
                                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                activity = Activity(activityID: activityID, admin: currentUserID, calendarID: defaultCalendar?.id ?? "", calendarName: defaultCalendar?.name ?? "", calendarColor: defaultCalendar?.color ?? "", calendarSource: defaultCalendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier)
+                activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendarDefault?.id ?? "", calendarName: calendarDefault?.name ?? "", calendarColor: calendarDefault?.color ?? "", calendarSource: calendarDefault?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
             }
         }
         
@@ -170,13 +167,6 @@ class EventViewController: FormViewController {
                 self.purchaseDict[user] = 0.00
             }
         }
-        
-        //        if let showExtras = activity.showExtras, !showExtras, let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
-        //            segmentRow.value = "Hidden"
-        //        } else if let segmentRow : SegmentedRow<String> = self.form.rowBy(tag: "sections") {
-        //            segmentRow.value = "Health"
-        //        }
-        
     }
     
     fileprivate func setupMainView() {
@@ -395,7 +385,7 @@ class EventViewController: FormViewController {
             self!.activity.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
             self!.startDateTime = row.value
             if self!.active {
-                self!.scheduleReminder()
+                self!.updateRepeatReminder()
             }
             //                    self!.weatherRow()
         }.onExpandInlineRow { [weak self] cell, row, inlineRow in
@@ -721,7 +711,7 @@ class EventViewController: FormViewController {
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         
-        <<< ButtonRow("Schedule") { row in
+        <<< ButtonRow("Sub-Events") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textAlignment = .left
             row.cell.accessoryType = .disclosureIndicator

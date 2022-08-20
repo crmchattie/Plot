@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import EventKit
 
 class ActivityActions: NSObject {
     
@@ -38,7 +39,7 @@ class ActivityActions: NSObject {
             return
         }
         
-        guard let _ = active, let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
+        guard let _ = active, let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
                                   
@@ -48,10 +49,26 @@ class ActivityActions: NSObject {
             Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
             Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).removeValue()
         }
-                
+        
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
         
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+        
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let value = snapshot.value as? String {
+                if value == CalendarOptions.apple.name {
+                    self.eventKitService.deleteEvent(for: activity)
+                } else if value == CalendarOptions.google.name {
+                    self.googleCalService.deleteEvent(for: activity)
+                }
+            }
+        })
+                        
     }
     
     func createNewActivity() {
@@ -91,7 +108,7 @@ class ActivityActions: NSObject {
         }
     }
     
-    func createSchedule() {
+    func createSubActivity() {
         guard let activity = activity, let _ = activityID, let _ = selectedFalconUsers else {
             return
         }
@@ -119,12 +136,28 @@ class ActivityActions: NSObject {
     }
     
     func updateActivity(firebaseDictionary: [String: AnyObject]) {
-        guard let activityID = activityID else {
+        guard let activity = activity, let activityID = activityID else {
             return
         }
         
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(firebaseDictionary)
+        
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+        
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let value = snapshot.value as? String {
+                if value == CalendarOptions.apple.name {
+                    self.eventKitService.updateEvent(for: activity)
+                } else if value == CalendarOptions.google.name {
+                    self.googleCalService.updateEvent(for: activity)
+                }
+            }
+        })
         
         
     }
@@ -158,14 +191,14 @@ class ActivityActions: NSObject {
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                     reference.updateChildValues(calendarEventActivityValue)
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                    let values:[String : Any] = ["calendarExport": true]
+                    let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.calendarItemIdentifier as Any]
                     userReference.updateChildValues(values)
                 } else if value == CalendarOptions.google.name, let event = self.googleCalService.storeEvent(for: activity), let id = event.identifier {
                     reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                     reference.updateChildValues(calendarEventActivityValue)
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                    let values:[String : Any] = ["calendarExport": true]
+                    let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.identifier as Any]
                     userReference.updateChildValues(values)
                 }
             }
@@ -273,7 +306,7 @@ class ActivityActions: NSObject {
     }
     
     func scheduleReminder() {
-        guard let activity = activity, let activityID = activityID else {
+        guard let activity = activity, let activityReminder = activity.reminder, let activityID = activityID, let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
             return
         }
         let center = UNUserNotificationCenter.current()
@@ -286,24 +319,23 @@ class ActivityActions: NSObject {
         content.title = "\(String(describing: activity.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        if let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
-            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
-            content.subtitle = formattedDate.0
+        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        content.subtitle = formattedDate.0
+        if let reminder = EventAlert(rawValue: activityReminder) {
+            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(identifier: startTimeZone)!
+            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                        repeats: false)
+            let identifier = "\(activityID)_Reminder"
+            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+            center.add(request, withCompletionHandler: { (error) in
+                if let error = error {
+                    print(error)
+                }
+            })
         }
-        let reminder = EventAlert(rawValue: activity.reminder!)
-        let reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")!
-        let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                    repeats: false)
-        let identifier = "\(activityID)_Reminder"
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        center.add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print(error)
-            }
-        })
     }
     
     func incrementBadgeForReciever(activityID: String?, participantsIDs: [String]) {

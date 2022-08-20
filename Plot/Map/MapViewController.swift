@@ -116,7 +116,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             var latitude = Double()
             var longitude = Double()
             
-            if let events = locations[section] as? [Event] {
+            if let events = locations[section] as? [TicketMasterEvent] {
                 for event in events {
                     if let add = event.embedded?.venues?[0].address?.line1, let lat = event.embedded?.venues?[0].location?.latitude, let lon = event.embedded?.venues?[0].location?.longitude {
                         name = event.name

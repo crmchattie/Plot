@@ -102,22 +102,6 @@ class FilterViewController: FormViewController {
                     self.initializeForm()
                 })
         
-//        form +++ Section("Only include \(filters[0].activity) you have favorited")
-//            <<< CheckRow("Favorited \(filters[0].activity)") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.title = $0.tag
-//                $0.value = Bool(self.filterDictionary["favorites"]?[0] ?? "false")
-//                }.onCellSelection({ _,row in
-//                    if row.value == true {
-//                        self.filterDictionary["favorites"] = ["\(row.value!)"]
-//                        print(self.filterDictionary)
-//                    } else {
-//                        self.filterDictionary["favorites"] = nil
-//                        print(self.filterDictionary)
-//                    }
-//                })
-        
         for filter in filters {
             if filter.typeOfSection == "single" {
                 form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .singleSelection(enableDeselection: true))

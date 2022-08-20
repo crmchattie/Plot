@@ -321,9 +321,9 @@ extension EventViewController {
     
     func sortSchedule() {
         scheduleList.sort { (schedule1, schedule2) -> Bool in
-            return schedule1.startDateTime!.int64Value < schedule2.startDateTime!.int64Value
+            return schedule1.startDateTime?.int64Value ?? 0 < schedule2.startDateTime?.int64Value ?? 0
         }
-        if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "Sub-Events") as? MultivaluedSection {
             if mvs.count == 1 {
                 return
             }
@@ -417,9 +417,35 @@ extension EventViewController {
         }
     }
     
+    func updateRepeatReminder() {
+        if let _ = activity.recurrences {
+            scheduleRecurrences()
+        }
+        if let _ = activity.reminder {
+            scheduleReminder()
+        }
+        
+    }
+    
+    func scheduleRecurrences() {
+        guard let activity = activity, let recurrences = activity.recurrences, let startDate = activity.startDate else {
+            return
+        }
+        if let recurranceIndex = recurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+            var recurrenceRule = RecurrenceRule(rruleString: recurrences[recurranceIndex])
+            recurrenceRule?.startDate = startDate
+            var newRecurrences = recurrences
+            newRecurrences[recurranceIndex] = recurrenceRule!.toRRuleString()
+            self.activity.recurrences = newRecurrences
+        }
+    }
+    
     func scheduleReminder() {
+        guard let activity = activity, let activityReminder = activity.reminder, let startDate = activity.startDate, let endDate = activity.endDate, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
+            return
+        }
         let center = UNUserNotificationCenter.current()
-        guard activity.reminder! != "None" else {
+        guard activityReminder != "None" else {
             center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
             return
         }
@@ -427,25 +453,23 @@ extension EventViewController {
         content.title = "\(String(describing: activity.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        if let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
-            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
-            content.subtitle = formattedDate.0
+        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        content.subtitle = formattedDate.0
+        if let reminder = EventAlert(rawValue: activityReminder) {
+            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(identifier: startTimeZone)!
+            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                        repeats: false)
+            let identifier = "\(activityID)_Reminder"
+            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+            center.add(request, withCompletionHandler: { (error) in
+                if let error = error {
+                    print(error)
+                }
+            })
         }
-        let reminder = EventAlert(rawValue: activity.reminder!)
-        let reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")!
-        let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                    repeats: false)
-        let identifier = "\(activityID)_Reminder"
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        
-        center.add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print(error)
-            }
-        })
     }
     
     func openLevel(value: String, level: String) {
@@ -473,20 +497,17 @@ extension EventViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-//        let destination = RepeatViewController()
-//        destination.delegate = self
-//        self.navigationController?.pushViewController(destination, animated: true)
         
         // prepare a recurrence rule and an occurrence date
         // occurrence date is the date which the repeat event occurs this time
         let recurrences = activity.recurrences
-        let occurrenceDate = activity.startDate!
+        let occurrenceDate = activity.startDate
 
         // initialization and configuration
         // RecurrencePicker can be initialized with a recurrence rule or nil, nil means "never repeat"
         var recurrencePicker = RecurrencePicker(recurrenceRule: nil)
-        if let recurrences = recurrences {
-            let recurrenceRule = RecurrenceRule(rruleString: recurrences[0])
+        if let recurrences = recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
+            let recurrenceRule = RecurrenceRule(rruleString: recurrence)
             recurrencePicker = RecurrencePicker(recurrenceRule: recurrenceRule)
         }        
         recurrencePicker.language = .english
@@ -697,6 +718,7 @@ extension EventViewController {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
+        
         let destination = ActivityListViewController()
         destination.delegate = self
         destination.listList = listList
@@ -908,14 +930,14 @@ extension EventViewController {
         }
         
         let destination = MapViewController()
-        destination.sections = [.activity]
+        destination.sections = [.event]
         var locations = [activity]
         
         if locationAddress.count > 1 {
             locations.append(contentsOf: scheduleList)
-            destination.locations = [.activity: locations]
+            destination.locations = [.event: locations]
         } else {
-            destination.locations = [.activity: locations]
+            destination.locations = [.event: locations]
         }
         navigationController?.pushViewController(destination, animated: true)
     }

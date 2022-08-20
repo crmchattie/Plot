@@ -15,8 +15,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     var umbrellaActivity: Activity!
     
     weak var delegate : UpdateActivityDelegate?
-    weak var listDelegate : UpdateListDelegate?
-
     var activity: Activity!
     
     var sections = [String]()
@@ -215,9 +213,11 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     }
     
     func scheduleReminder() {
+        guard let activity = activity, let activityReminder = activity.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
+            return
+        }
         let center = UNUserNotificationCenter.current()
-        guard activity.reminder != nil else { return }
-        guard activity.reminder != "None" else {
+        guard activityReminder != "None" else {
             center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
             return
         }
@@ -225,25 +225,23 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         content.title = "\(String(describing: activity.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        if let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
-            formattedDate = timestampOfActivity(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
-            content.subtitle = formattedDate.0
+        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        content.subtitle = formattedDate.0
+        if let reminder = EventAlert(rawValue: activityReminder) {
+            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(identifier: startTimeZone)!
+            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                        repeats: false)
+            let identifier = "\(activityID)_Reminder"
+            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+            center.add(request, withCompletionHandler: { (error) in
+                if let error = error {
+                    print(error)
+                }
+            })
         }
-        let reminder = EventAlert(rawValue: activity.reminder!)
-        let reminderDate = startDateTime!.addingTimeInterval(reminder!.timeInterval)
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")!
-        let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                    repeats: false)
-        let identifier = "\(activityID)_Reminder"
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        
-        center.add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print(error)
-            }
-        })
     }
     
     fileprivate func resetBadgeForSelf() {
@@ -335,8 +333,8 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             return
         }
         let destination = MapViewController()
-        destination.sections = [.activity]
-        destination.locations = [.activity: activity]
+        destination.sections = [.event]
+        destination.locations = [.event: activity]
         navigationController?.pushViewController(destination, animated: true)
     }
     

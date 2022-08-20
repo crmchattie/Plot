@@ -67,7 +67,7 @@ class EventKitService {
     }
     
     func storeEvent(for activity: Activity) -> EKEvent? {
-        guard let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name else {
+        guard let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name, let allDay = activity.allDay else {
             return nil
         }
         
@@ -75,8 +75,10 @@ class EventKitService {
         event.title = name
         event.startDate = startDate
         event.endDate = endDate
+        event.isAllDay = allDay
         event.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
         event.notes = activity.activityDescription ?? ""
+        
         if let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let frequency = EKRecurrenceFrequency(rawValue: recurrenceRule.frequency.number) {
             var daysOfTheWeek = [EKRecurrenceDayOfWeek]()
             for dayy in recurrenceRule.byweekday {
@@ -109,26 +111,97 @@ class EventKitService {
             }
                         
             event.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
+            if let value = UserDefaults.standard.string(forKey: "PlotCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
+                event.calendar = calendar
+                do {
+                    try eventStore.save(event, span: .thisEvent)
+                }
+                catch let error as NSError {
+                    print("Failed to save iOS calendar event with error : \(error)")
+                }
+            } else if let calendar = createPlotCalendar() {
+                event.calendar = calendar
+                do {
+                    try eventStore.save(event, span: .thisEvent)
+                }
+                catch let error as NSError {
+                    print("Failed to save iOS calendar event with error : \(error)")
+                }
+            }
+                        
         }
-        if let value = UserDefaults.standard.string(forKey: "PlotCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
-            event.calendar = calendar
-            do {
-                try eventStore.save(event, span: .thisEvent)
-            }
-            catch let error as NSError {
-                print("Failed to save iOS calendar event with error : \(error)")
-            }
-        } else if let calendar = createPlotCalendar() {
-            event.calendar = calendar
-            do {
-                try eventStore.save(event, span: .thisEvent)
-            }
-            catch let error as NSError {
-                print("Failed to save iOS calendar event with error : \(error)")
-            }
+        return event
+    }
+    
+    func updateEvent(for activity: Activity) {
+        guard let eventID = activity.externalActivityID, let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name, let allDay = activity.allDay else {
+            return
         }
         
-        return event
+        let existingEvent = eventStore.event(withIdentifier: eventID)
+        if let event = existingEvent {
+            event.title = name
+            event.startDate = startDate
+            event.endDate = endDate
+            event.isAllDay = allDay
+            event.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
+            event.notes = activity.activityDescription ?? ""
+            if let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let frequency = EKRecurrenceFrequency(rawValue: recurrenceRule.frequency.number) {
+                var daysOfTheWeek = [EKRecurrenceDayOfWeek]()
+                for dayy in recurrenceRule.byweekday {
+                    daysOfTheWeek.append(EKRecurrenceDayOfWeek.init(dayy))
+                }
+                
+                var daysOfTheMonth = [NSNumber]()
+                for dayy in recurrenceRule.bymonthday {
+                    daysOfTheMonth.append(NSNumber(value: dayy))
+                }
+                
+                var monthsOfTheYear = [NSNumber]()
+                for month in recurrenceRule.bymonth {
+                    monthsOfTheYear.append(NSNumber(value: month))
+                }
+                
+                var weeksOfTheYear = [NSNumber]()
+                for week in recurrenceRule.byweekno {
+                    weeksOfTheYear.append(NSNumber(value: week))
+                }
+                
+                var daysOfTheYear = [NSNumber]()
+                for dayy in recurrenceRule.byyearday {
+                    daysOfTheYear.append(NSNumber(value: dayy))
+                }
+                
+                var setPositions = [NSNumber]()
+                for setPos in recurrenceRule.bysetpos {
+                    setPositions.append(NSNumber(value: setPos))
+                }
+                            
+                event.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
+            }
+            
+            do {
+                try eventStore.save(event, span: .futureEvents)
+            }
+            catch let error as NSError {
+                print("Failed to save iOS calendar event with error : \(error)")
+            }
+        }
+    }
+    
+    func deleteEvent(for activity: Activity) {
+        guard let eventID = activity.externalActivityID else {
+            return
+        }
+        
+        if let event = eventStore.event(withIdentifier: eventID) {
+            do {
+                try eventStore.save(event, span: .futureEvents)
+            }
+            catch let error as NSError {
+                print("Failed to save iOS calendar event with error : \(error)")
+            }
+        }
     }
     
     func createPlotCalendar() -> EKCalendar? {

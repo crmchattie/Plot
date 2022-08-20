@@ -25,8 +25,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
-    var customTypes: [CustomType] = [.basic, .workout, .mindfulness, .transaction, .investment, .financialAccount, .transactionRule]
-    var sections: [SectionType] = [.activity, .customWorkout, .mindfulness, .customTransaction, .investment, .customFinancialAccount, .customTransactionRule]
+    var customTypes: [CustomType] = [.event, .task, .workout, .mindfulness, .transaction, .investment, .financialAccount, .transactionRule]
+    var sections: [SectionType] = [.event, .task, .customWorkout, .mindfulness, .customTransaction, .investment, .customFinancialAccount, .customTransactionRule]
     var groups = [SectionType: [AnyHashable]]()
     
     var intColor: Int = 0
@@ -153,7 +153,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             customTypes.removeAll(where: {$0 == .calendar})
             sections.removeAll(where: {$0 == .calendar})
             fetchData()
-        } else if (!networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name)) && !sections.contains(.calendar) {
+        } else if !sections.contains(.calendar) {
             customTypes.insert(.calendar, at: 1)
             sections.insert(.calendar, at: 1)
             fetchData()
@@ -185,8 +185,12 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         let object = diffableDataSource.itemIdentifier(for: indexPath)
         if let activityType = object as? CustomType {
             switch activityType {
-            case .basic:
+            case .event:
                 let destination = EventViewController(networkController: networkController)
+                destination.updateDiscoverDelegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
+            case .task:
+                let destination = TaskViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             case .calendar:

@@ -357,21 +357,24 @@ class FinanceHoldingViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.accessoryType = .checkmark
-                if self.holding.should_link ?? true {
+                $0.value = self.holding.should_link ?? true
+                if $0.value ?? false {
                     $0.title = "Included in Financial Profile"
-                    $0.value = true
+                    $0.cell.tintAdjustmentMode = .automatic
                 } else {
                     $0.title = "Not Included in Financial Profile"
-                    $0.value = false
+                    $0.cell.tintAdjustmentMode = .dimmed
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.tintColor = FalconPalette.defaultBlue
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.accessoryType = .checkmark
+                row.cell.tintAdjustmentMode = row.value ?? false ? .automatic : .dimmed
             }.onChange { row in
-                row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
-                row.updateCell()
+                row.title = row.value ?? false ? "Included in Financial Profile" : "Not Included in Financial Profile"
+                row.cell.tintAdjustmentMode = row.value ?? false ? .automatic : .dimmed
                 if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("should_link")
                     reference.setValue(row.value!)

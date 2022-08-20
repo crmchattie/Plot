@@ -115,6 +115,48 @@ class GoogleCalService {
         return event
     }
     
+    func updateEvent(for activity: Activity) {
+        guard let service = self.calendarService, let eventID = activity.externalActivityID, let calendarID = activity.calendarID, let startDate = activity.startDate, let endDate = activity.endDate, let start = dateToGLTRDate(date: startDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")), let end = dateToGLTRDate(date: endDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.endTimeZone ?? "UTC")), let name = activity.name else {
+            return
+        }
+        
+        let eventQuery = GTLRCalendarQuery_EventsGet.query(withCalendarId: calendarID, eventId: eventID)
+        
+        service.executeQuery(eventQuery, completionHandler: { (ticket, result, error) in
+            guard error == nil, let event = result as? GTLRCalendar_Event else {
+                print("failed to grab events \(String(describing: error))")
+                return
+            }
+            
+            event.summary = name
+            event.start = start
+            event.end = end
+            event.recurrence = activity.recurrences
+            
+            let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: calendarID)
+            service.executeQuery(query, completionHandler: { (ticket, result, error) in
+                if error != nil {
+                    print("Failed to save google calendar event with error : \(String(describing: error))")
+                }
+            })
+        })
+    }
+    
+    func deleteEvent(for activity: Activity) {
+        guard let service = self.calendarService, let eventID = activity.externalActivityID, let calendarID = activity.calendarID else {
+            return
+        }
+        
+        let eventQuery = GTLRCalendarQuery_EventsDelete.query(withCalendarId: calendarID, eventId: eventID)
+        
+        service.executeQuery(eventQuery, completionHandler: { (_, _, error) in
+            guard error == nil else {
+                print("failed to grab events \(String(describing: error))")
+                return
+            }
+        })
+    }
+    
     func createPlotCalendar(completion: @escaping (String?) -> Swift.Void) {
         guard let service = self.calendarService else {
             completion(nil)

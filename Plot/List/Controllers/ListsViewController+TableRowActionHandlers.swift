@@ -1,5 +1,5 @@
 //
-//  ListsViewControllerwActionHandlers.swift
+//  ListViewControllerwActionHandlers.swift
 //  Plot
 //
 //  Created by Cory McHattie on 5/26/20.
@@ -34,7 +34,7 @@ private let pinErrorMessage = "Changes won't be saved across app restarts. Check
 private let muteErrorTitle = "Error muting/unmuting"
 private let muteErrorMessage = "Check your internet connection and try again."
 
-extension ListsViewController {
+extension ListViewController {
     
     fileprivate func delayWithSeconds(_ seconds: Double, completion: @escaping () -> ()) {
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {

@@ -43,13 +43,13 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
     }
 }
 
-let prebuiltCalendars: [CalendarType] = [calendarDefault, personal, home, work, social]
+let prebuiltCalendars: [CalendarType] = [defaultCalendar, personalCalendar, homeCalendar, workCalendar, socialCalendar]
 
-let calendarDefault = CalendarType(id: UUID().uuidString, name: "Default", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
-let home = CalendarType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
-let personal = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarOptions.plot.name)
-let social = CalendarType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarOptions.plot.name)
-let work = CalendarType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarOptions.plot.name)
+let defaultCalendar = CalendarType(id: UUID().uuidString, name: "Default", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
+let homeCalendar = CalendarType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
+let personalCalendar = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarOptions.plot.name)
+let socialCalendar = CalendarType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarOptions.plot.name)
+let workCalendar = CalendarType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarOptions.plot.name)
 
 enum CalendarOptions:String, CaseIterable {
     case plot = "Plot"

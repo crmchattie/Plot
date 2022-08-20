@@ -1,8 +1,8 @@
 //
-//  ScheduleListViewController.swift
+//  SubtaskListViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/9/22.
+//  Created by Cory McHattie on 8/20/22.
 //  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
@@ -14,21 +14,20 @@ import Contacts
 import EventKit
 
 
-protocol UpdateScheduleListDelegate: AnyObject {
-    func updateScheduleList(scheduleList: [Activity])
+protocol UpdateSubtaskListDelegate: AnyObject {
+    func updateSubtaskList(subtaskList: [Activity])
 }
 
-class ScheduleListViewController: FormViewController {
+class SubtaskListViewController: FormViewController {
     
-    weak var delegate : UpdateScheduleListDelegate?
+    weak var delegate : UpdateSubtaskListDelegate?
     
-    var scheduleList: [Activity]!
-    var scheduleIndex: Int = 0
+    var subtaskList: [Activity]!
+    var subtaskIndex: Int = 0
     
     var acceptedParticipant = [User]()
     var startDateTime: Date?
     var endDateTime: Date?
-    var locationAddress = [String : [Double]]()
     
     var activities = [Activity]()
     var activity: Activity!
@@ -43,7 +42,7 @@ class ScheduleListViewController: FormViewController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Sub-Events"
+        title = "Sub-Task"
         setupMainView()
         initializeForm()
         
@@ -67,13 +66,13 @@ class ScheduleListViewController: FormViewController {
         
         form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Sub-Events",
-                               footer: "Add a sub-event") {
-                                $0.tag = "Events"
+                               header: "Sub-Tasks",
+                               footer: "Add a sub-task") {
+                                $0.tag = "Tasks"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
                                         $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        $0.title = "Add Sub-Event"
+                                        $0.title = "Add Sub-Task"
                                         }.cellUpdate { cell, row in
                                             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                                             cell.textLabel?.textAlignment = .left
@@ -81,22 +80,22 @@ class ScheduleListViewController: FormViewController {
                                         }
                                 }
                                 $0.multivaluedRowToInsertAt = { index in
-                                    self.scheduleIndex = index
-                                    self.openSchedule()
-                                    return ScheduleRow("label"){
+                                    self.subtaskIndex = index
+                                    self.openSubtask()
+                                    return SubtaskRow("label"){
                                         $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
                                     }
                                 }
 
                             }
         
-        for schedule in scheduleList {
-            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
-            mvs.insert(ScheduleRow() {
-                $0.value = schedule
+        for subtask in subtaskList {
+            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+            mvs.insert(SubtaskRow() {
+                $0.value = subtask
                 }.onCellSelection() { cell, row in
-                    self.scheduleIndex = row.indexPath!.row
-                    self.openSchedule()
+                    self.subtaskIndex = row.indexPath!.row
+                    self.openSubtask()
                     cell.cellResignFirstResponder()
             }, at: mvs.count - 1)
             
@@ -104,39 +103,34 @@ class ScheduleListViewController: FormViewController {
     }
     
     @objc fileprivate func rightBarButtonTapped() {
-        delegate?.updateScheduleList(scheduleList: scheduleList)
+        delegate?.updateSubtaskList(subtaskList: subtaskList)
         self.navigationController?.popViewController(animated: true)
     }
     
-    func openSchedule() {
+    func openSubtask() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        if scheduleList.indices.contains(scheduleIndex) {
+        if subtaskList.indices.contains(subtaskIndex) {
             showActivityIndicator()
-            let scheduleItem = scheduleList[scheduleIndex]
-            let destination = ScheduleViewController()
-            destination.schedule = scheduleItem
+            let subtaskItem = subtaskList[subtaskIndex]
+            let destination = SubtaskViewController()
+            destination.subtask = subtaskItem
             destination.users = acceptedParticipant
             destination.filteredUsers = acceptedParticipant
             destination.startDateTime = startDateTime
             destination.endDateTime = endDateTime
-            if let scheduleLocationAddress = scheduleList[scheduleIndex].locationAddress {
-                for (key, _) in scheduleLocationAddress {
-                    locationAddress[key] = nil
-                }
-            }
             destination.delegate = self
             self.hideActivityIndicator()
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Sub-Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+            alert.addAction(UIAlertAction(title: "New Sub-Task", style: .default, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ScheduleViewController()
+                let destination = SubtaskViewController()
                 destination.users = self.acceptedParticipant
                 destination.filteredUsers = self.acceptedParticipant
                 destination.delegate = self
@@ -144,8 +138,8 @@ class ScheduleListViewController: FormViewController {
                 destination.endDateTime = self.endDateTime
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
-            alert.addAction(UIAlertAction(title: "Merge Existing Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+            alert.addAction(UIAlertAction(title: "Merge Existing Task", style: .default, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = ChooseActivityTableViewController()
@@ -158,7 +152,7 @@ class ScheduleListViewController: FormViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
             }))
@@ -172,32 +166,27 @@ class ScheduleListViewController: FormViewController {
         let rowType = rows[0].self
                     
         DispatchQueue.main.async { [weak self] in
-            if rowType is ScheduleRow {
-                if self!.scheduleList.indices.contains(self!.scheduleIndex) {
-                    if let scheduleLocationAddress = self!.scheduleList[rowNumber].locationAddress {
-                        for (key, _) in scheduleLocationAddress {
-                            self!.locationAddress[key] = nil
-                        }
-                    }
-                    self!.scheduleList.remove(at: rowNumber)
-                    self!.sortSchedule()
+            if rowType is SubtaskRow {
+                if self!.subtaskList.indices.contains(self!.subtaskIndex) {
+                    self!.subtaskList.remove(at: rowNumber)
+                    self!.sortSubtask()
                 }
             }
         }
     }
     
-    func sortSchedule() {
-        scheduleList.sort { (schedule1, schedule2) -> Bool in
-            return schedule1.startDateTime?.int64Value ?? 0 < schedule2.startDateTime?.int64Value ?? 0
+    func sortSubtask() {
+        subtaskList.sort { (subtask1, subtask2) -> Bool in
+            return subtask1.startDateTime?.int64Value ?? 0 < subtask2.startDateTime?.int64Value ?? 0
         }
-        if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+        if let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
             if mvs.count == 1 {
                 return
             }
             for index in 0...mvs.count - 2 {
-                let scheduleRow = mvs.allRows[index]
-                scheduleRow.baseValue = scheduleList[index]
-                scheduleRow.reload()
+                let subtaskRow = mvs.allRows[index]
+                subtaskRow.baseValue = subtaskList[index]
+                subtaskRow.reload()
             }
         }
     }
@@ -217,42 +206,37 @@ class ScheduleListViewController: FormViewController {
     }
 }
 
-extension ScheduleListViewController: UpdateActivityDelegate {
+extension SubtaskListViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
         if let _ = activity.name {
-            if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
-                let scheduleRow = mvs.allRows[scheduleIndex]
-                scheduleRow.baseValue = activity
-                scheduleRow.reload()
-                scheduleList[scheduleIndex] = activity
+            if subtaskList.indices.contains(subtaskIndex), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                let subtaskRow = mvs.allRows[subtaskIndex]
+                subtaskRow.baseValue = activity
+                subtaskRow.reload()
+                subtaskList[subtaskIndex] = activity
             } else {
-                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
-                mvs.insert(ScheduleRow() {
+                var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+                mvs.insert(SubtaskRow() {
                     $0.value = activity
                     }.onCellSelection() { cell, row in
-                        self.scheduleIndex = row.indexPath!.row
-                        self.openSchedule()
+                        self.subtaskIndex = row.indexPath!.row
+                        self.openSubtask()
                         cell.cellResignFirstResponder()
                 }, at: mvs.count - 1)
                 
-                Analytics.logEvent("new_schedule", parameters: [
-                    "schedule_name": activity.name ?? "name" as NSObject,
-                    "schedule_type": activity.activityType ?? "basic" as NSObject
+                Analytics.logEvent("new_subtask", parameters: [
+                    "subtask_name": activity.name ?? "name" as NSObject,
+                    "subtask_type": activity.activityType ?? "basic" as NSObject
                 ])
-                scheduleList.append(activity)
+                subtaskList.append(activity)
             }
             
-            sortSchedule()
-            if let localAddress = activity.locationAddress {
-                for (key, value) in localAddress {
-                    locationAddress[key] = value
-                }
-            }
+            sortSubtask()
         }
     }
 }
 
-extension ScheduleListViewController: ChooseActivityDelegate {
+extension SubtaskListViewController: ChooseActivityDelegate {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -285,7 +269,7 @@ extension ScheduleListViewController: ChooseActivityDelegate {
     }
     
     func chosenActivity(mergeActivity: Activity) {
-        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+        if let _: SubtaskRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }
         if let _ = mergeActivity.name, let currentUserID = Auth.auth().currentUser?.uid {
@@ -297,28 +281,23 @@ extension ScheduleListViewController: ChooseActivityDelegate {
             mergeActivity.participantsIDs = [currentUserID]
             mergeActivity.admin = currentUserID
             
-            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
-            mvs.insert(ScheduleRow() {
+            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+            mvs.insert(SubtaskRow() {
                 $0.value = mergeActivity
                 }.onCellSelection() { cell, row in
-                    self.scheduleIndex = row.indexPath!.row
-                    self.openSchedule()
+                    self.subtaskIndex = row.indexPath!.row
+                    self.openSubtask()
                     cell.cellResignFirstResponder()
             }, at: mvs.count - 1)
             
-            Analytics.logEvent("new_schedule", parameters: [
-                "schedule_name": mergeActivity.name ?? "name" as NSObject,
-                "schedule_type": mergeActivity.activityType ?? "basic" as NSObject
+            Analytics.logEvent("new_subtask", parameters: [
+                "subtask_name": mergeActivity.name ?? "name" as NSObject,
+                "subtask_type": mergeActivity.activityType ?? "basic" as NSObject
             ])
             
-            scheduleList.append(mergeActivity)
+            subtaskList.append(mergeActivity)
             
-            sortSchedule()
-            if let localAddress = mergeActivity.locationAddress {
-                for (key, value) in localAddress {
-                    locationAddress[key] = value
-                }
-            }
+            sortSubtask()
         }
     }
 }

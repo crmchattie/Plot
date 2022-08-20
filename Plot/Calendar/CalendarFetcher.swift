@@ -31,7 +31,7 @@ class CalendarFetcher: NSObject {
         userCalendarDatabaseRef = ref.child(userCalendarEntity).child(currentUserID)
         
         var calendars: [CalendarType] = []
-        
+                
         userCalendarDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists() {
                 let group = DispatchGroup()
@@ -43,6 +43,7 @@ class CalendarFetcher: NSObject {
                             if snapshot.exists(), let snapshotValue = snapshot.value {
                                 if let calendar = try? FirebaseDecoder().decode(CalendarType.self, from: snapshotValue) {
                                     var _calendar = calendar
+                                    _calendar.color = userCalendar.color
                                     _calendar.badge = userCalendar.badge
                                     _calendar.muted = userCalendar.muted
                                     _calendar.pinned = userCalendar.pinned
@@ -80,8 +81,11 @@ class CalendarFetcher: NSObject {
         var userCalendars: [String: CalendarType] = [:]
         
         userCalendarDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+            print("observeCalendarForCurrentUser")
+            print(snapshot.exists())
             guard snapshot.exists() else {
-                calendarInitialAdd([])
+                self.uploadInitialPlotCalendars()
+                calendarInitialAdd(prebuiltCalendars)
                 return
             }
             
@@ -101,6 +105,7 @@ class CalendarFetcher: NSObject {
                             if snapshot.exists(), let snapshotValue = snapshot.value {
                                 if let calendar = try? FirebaseDecoder().decode(CalendarType.self, from: snapshotValue), let userCalendar = userCalendars[ID] {
                                     var _calendar = calendar
+                                    _calendar.color = userCalendar.color
                                     _calendar.badge = userCalendar.badge
                                     _calendar.muted = userCalendar.muted
                                     _calendar.pinned = userCalendar.pinned
@@ -141,6 +146,7 @@ class CalendarFetcher: NSObject {
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let calendar = try? FirebaseDecoder().decode(CalendarType.self, from: snapshotValue), let userCalendar = userCalendars[ID] {
                                         var _calendar = calendar
+                                        _calendar.color = userCalendar.color
                                         _calendar.badge = userCalendar.badge
                                         _calendar.muted = userCalendar.muted
                                         _calendar.pinned = userCalendar.pinned
@@ -234,6 +240,16 @@ class CalendarFetcher: NSObject {
         })
         group.notify(queue: .main) {
             completion(calendars)
+        }
+    }
+    
+    func uploadInitialPlotCalendars() {
+        guard let _ = Auth.auth().currentUser?.uid else {
+            return
+        }
+        for calendar in prebuiltCalendars {
+            let createCalendar = CalendarActions(calendar: calendar, active: false, selectedFalconUsers: [])
+            createCalendar.createNewCalendar()
         }
     }
 }

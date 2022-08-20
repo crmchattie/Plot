@@ -30,7 +30,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         }
     }
     
-    var event: Event! {
+    var event: TicketMasterEvent! {
         didSet {
             if let event = event {
                 nameLabel.text = "\(event.name)"
@@ -51,7 +51,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
         }
     }
     
-    var attraction: Attraction! {
+    var attraction: TicketMasterAttraction! {
         didSet {
             if let attraction = attraction {
                 nameLabel.text = "\(attraction.name)"

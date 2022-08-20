@@ -22,12 +22,12 @@ struct TicketMasterSearchResult: Codable, Equatable, Hashable {
 
 // MARK: - Embedded
 struct Embedded: Codable, Equatable, Hashable {
-    let events: [Event]?
-    let attractions: [Attraction]?
+    let events: [TicketMasterEvent]?
+    let attractions: [TicketMasterAttraction]?
 }
 
 // MARK: - Event
-struct Event: Codable, Equatable, Hashable {
+struct TicketMasterEvent: Codable, Equatable, Hashable {
     let uuid = UUID().uuidString
     var name: String
     let type: EventType?
@@ -67,7 +67,7 @@ struct Event: Codable, Equatable, Hashable {
     
 }
 
-func ==(lhs: Event, rhs: Event) -> Bool {
+func ==(lhs: TicketMasterEvent, rhs: TicketMasterEvent) -> Bool {
     return lhs.uuid == rhs.uuid
 }
 
@@ -115,11 +115,11 @@ struct StatusUpdate: Codable, Equatable, Hashable {
 // MARK: - EventEmbedded
 struct EventEmbedded: Codable, Equatable, Hashable {
     let venues: [Venue]?
-    let attractions: [Attraction]?
+    let attractions: [TicketMasterAttraction]?
 }
 
 // MARK: - Attraction
-struct Attraction: Codable, Equatable, Hashable {
+struct TicketMasterAttraction: Codable, Equatable, Hashable {
     let name: String
     let type: String?
     let id: String
@@ -140,7 +140,7 @@ struct Attraction: Codable, Equatable, Hashable {
     }
 }
 
-func ==(lhs: Attraction, rhs: Attraction) -> Bool {
+func ==(lhs: TicketMasterAttraction, rhs: TicketMasterAttraction) -> Bool {
     return lhs.id == rhs.id
 }
 
@@ -370,7 +370,7 @@ struct Page: Codable, Equatable, Hashable {
     let size, totalElements, totalPages, number: Int?
 }
 
-func sortEvents(events: [Event]) -> [Event] {
+func sortEvents(events: [TicketMasterEvent]) -> [TicketMasterEvent] {
     return events.sorted { (event1, event2) -> Bool in
         if let firstDateString = event1.dates?.start?.localDate, let firstDate = firstDateString.toDate(), let secondDateString = event2.dates?.start?.localDate, let secondDate = secondDateString.toDate() {
             return firstDate < secondDate

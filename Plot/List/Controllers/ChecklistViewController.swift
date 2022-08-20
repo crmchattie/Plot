@@ -587,8 +587,8 @@ class ChecklistViewController: FormViewController {
                         }.cellUpdate { cell, row in
                             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                             cell.tintColor = FalconPalette.defaultBlue
+                            cell.accessoryType = .checkmark
                             if row.value == false {
-                                cell.accessoryType = .checkmark
                                 cell.tintAdjustmentMode = .dimmed
                             } else {
                                 cell.tintAdjustmentMode = .automatic

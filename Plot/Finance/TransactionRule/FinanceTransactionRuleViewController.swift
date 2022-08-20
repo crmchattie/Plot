@@ -184,17 +184,28 @@ class FinanceTransactionRuleViewController: FormViewController {
                     transactionRule.should_link = should_link
                 } else {
                     $0.title = "Not Included in Financial Profile"
-                    $0.value = true
-                    transactionRule.should_link = true
+                    $0.value = false
+                    transactionRule.should_link = false
+                }
+                if $0.value ?? false {
+                    $0.cell.tintAdjustmentMode = .automatic
+                } else {
+                    $0.cell.tintAdjustmentMode = .dimmed
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.tintColor = FalconPalette.defaultBlue
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.accessoryType = .checkmark
+                if row.value == false {
+                    cell.tintAdjustmentMode = .dimmed
+                } else {
+                    cell.tintAdjustmentMode = .automatic
+                }
             }.onChange { row in
-                row.title = row.value! ? "Included in Financial Profile" : "Not Included in Financial Profile"
-                row.updateCell()
+                row.title = row.value ?? false ? "Included in Financial Profile" : "Not Included in Financial Profile"
+                row.cell.tintAdjustmentMode = row.value ?? false ? .automatic : .dimmed
                 self.transactionRule.should_link = row.value!
             }
             

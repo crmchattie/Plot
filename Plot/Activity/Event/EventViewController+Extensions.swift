@@ -141,7 +141,7 @@ extension EventViewController: UpdateTimeZoneDelegate {
 
 extension EventViewController: UpdateScheduleListDelegate {
     func updateScheduleList(scheduleList: [Activity]) {
-        if let row: ButtonRow = form.rowBy(tag: "Schedule") {
+        if let row: ButtonRow = form.rowBy(tag: "Sub-Events") {
             if scheduleList.isEmpty {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {

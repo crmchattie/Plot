@@ -605,8 +605,8 @@ class ActivitylistViewController: FormViewController {
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.tintColor = FalconPalette.defaultBlue
+                        cell.accessoryType = .checkmark
                         if row.value == false {
-                            cell.accessoryType = .checkmark
                             cell.tintAdjustmentMode = .dimmed
                         } else {
                             cell.tintAdjustmentMode = .automatic
@@ -631,7 +631,6 @@ class ActivitylistViewController: FormViewController {
             }
         } else {
             let destination = ActivityTypeViewController()
-            destination.listDelegate = self
             destination.activeList = true
             self.hideActivityIndicator()
             self.navigationController?.pushViewController(destination, animated: true)
@@ -725,102 +724,6 @@ class ActivitylistViewController: FormViewController {
             mutableData.value = value!
             return TransactionResult.success(withValue: mutableData)
         })
-    }
-}
-
-extension ActivitylistViewController: UpdateListDelegate {
-    func updateRecipe(recipe: Recipe?) {
-        
-    }
-    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
-        if let _: LabelRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "activitylistfields") as? MultivaluedSection {
-            mvs.remove(at: mvs.count - 2)
-        }
-        
-        var key = ""
-        if let object = recipe, let activityType = activityType {
-            key = object.title
-            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(object.title)"] = false
-                activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.id)":"\(activityType)"]
-            } else {
-                activitylist.items = ["\(object.title)": false]
-                activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.id)":"\(activityType)"]]
-            }
-        } else if let object = workout, let activityType = activityType {
-            key = object.title
-            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(object.title)"] = false
-                activitylist.IDTypeDictionary!["\(object.title)"] = ["\(object.identifier)":"\(activityType)"]
-            } else {
-                activitylist.items = ["\(object.title)": false]
-                activitylist.IDTypeDictionary = ["\(object.title)": ["\(object.identifier)":"\(activityType)"]]
-            }
-        } else if let object = event, let activityType = activityType {
-            key = object.name
-            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(object.name)"] = false
-                activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"\(activityType)"]
-            } else {
-                activitylist.items = ["\(object.name)": false]
-                activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"\(activityType)"]]
-            }
-        } else if let object = place, let activityType = activityType {
-            key = object.name
-            if activitylist.items != nil && activitylist.IDTypeDictionary != nil {
-                activitylist.items!["\(object.name)"] = false
-                activitylist.IDTypeDictionary!["\(object.name)"] = ["\(object.id)":"\(activityType)"]
-            } else {
-                activitylist.items = ["\(object.name)": false]
-                activitylist.IDTypeDictionary = ["\(object.name)": ["\(object.id)":"\(activityType)"]]
-            }
-        } else {
-            print("object not found")
-            return
-        }
-        
-        var mvs = (form.sectionBy(tag: "activitylistfields") as! MultivaluedSection)
-        mvs.insert(SplitRow<ButtonRow, CheckRow>() { splitRow in
-            splitRow.rowLeftPercentage = 0.75
-            splitRow.rowLeft = ButtonRow(){ row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.textLabel?.numberOfLines = 0
-                row.title = key
-                }.onCellSelection({ cell, row in
-                    self.activityName = key
-                    self.openActivity()
-            }).cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.textLabel?.textAlignment = .left
-                cell.textLabel?.numberOfLines = 0
-            }
-            splitRow.rowRight = CheckRow() {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.tintColor = FalconPalette.defaultBlue
-                $0.value = false
-                $0.cell.accessoryType = .checkmark
-                $0.cell.tintAdjustmentMode = .dimmed
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.tintColor = FalconPalette.defaultBlue
-                if row.value == false {
-                    cell.accessoryType = .checkmark
-                    cell.tintAdjustmentMode = .dimmed
-                } else {
-                    cell.tintAdjustmentMode = .automatic
-                }
-            }.onCellSelection({ (cell, row) in
-                self.activitylist.items![key] = row.value
-            })
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        } , at: mvs.count - 1)
-        
-        let createActivitylist = ActivitylistActions(activitylist: self.activitylist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-        createActivitylist.createNewActivitylist()
     }
 }
 

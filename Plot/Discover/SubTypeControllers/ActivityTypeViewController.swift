@@ -12,15 +12,9 @@ import Firebase
 import CodableFirebase
 import SwiftUI
 
-protocol UpdateListDelegate: AnyObject {
-    func updateRecipe(recipe: Recipe?)
-    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?)
-}
-
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
     
     weak var delegate : UpdateActivityDelegate?
-    weak var listDelegate : UpdateListDelegate?
     
     fileprivate var reference: DatabaseReference!
     
@@ -29,7 +23,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
     var attractionsString = [String]()
-    var customTypes: [CustomType] = [.basic]
+    var customTypes: [CustomType] = [.event]
     var favAct = [String: [String]]()
     
     var sections: [SectionType] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]
@@ -176,8 +170,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         if movingBackwards && navigationController?.visibleViewController is EventViewController {
             let activity = Activity(dictionary: ["activityID": UUID().uuidString as AnyObject])
             delegate?.updateActivity(activity: activity)
-        } else if movingBackwards && activeList && navigationController?.visibleViewController is ActivitylistViewController {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: nil, activityType: nil)
         }
         
     }
@@ -310,7 +302,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             cell.imageURL = self.sections[indexPath.section].image
             cell.fsVenue = object
             return cell
-        } else if let object = object as? Event {
+        } else if let object = object as? TicketMasterEvent {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kActivityTypeCell, for: indexPath) as! ActivityTypeCell
             cell.delegate = self
             if let events = self.favAct["events"], events.contains(object.id) {
@@ -648,24 +640,6 @@ extension ActivityTypeViewController: UpdateActivityDelegate {
     }
 }
 
-extension ActivityTypeViewController: UpdateListDelegate {
-    func updateRecipe(recipe: Recipe?) {
-        self.listDelegate?.updateRecipe(recipe: recipe)
-    }
-    
-    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
-        if let object = recipe {
-            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil, activityType: activityType)
-        } else if let object = workout {
-            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil, activityType: activityType)
-        } else if let object = event {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil, activityType: activityType)
-        } else if let object = place {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object, activityType: activityType)
-        }
-    }
-}
-
 extension ActivityTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: AnyHashable) {
         let snapshot = self.diffableDataSource.snapshot()
@@ -675,23 +649,18 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             if let object = type as? Recipe {
                 var updatedObject = object
                 updatedObject.title = updatedObject.title.removeCharacters()
-                self.listDelegate!.updateList(recipe: updatedObject, workout: nil, event: nil, place: nil, activityType: section?.image)
-            } else if let object = type as? Event {
+            } else if let object = type as? TicketMasterEvent {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: updatedObject, place: nil, activityType: section?.image)
             } else if let object = type as? PreBuiltWorkout {
                 var updatedObject = object
                 updatedObject.title = updatedObject.title.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: updatedObject, event: nil, place: nil, activityType: section?.image)
             } else if let object = type as? FSVenue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
             } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
                 var updatedObject = object
                 updatedObject.name = updatedObject.name.removeCharacters()
-                self.listDelegate!.updateList(recipe: nil, workout: nil, event: nil, place: updatedObject, activityType: section?.image)
             }
             self.actAddAlert()
             self.removeActAddAlert()
@@ -757,7 +726,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 destination.activityType = section?.image
                 if let object = type as? Recipe {
                     destination.recipe = object
-                } else if let object = type as? Event {
+                } else if let object = type as? TicketMasterEvent {
                     destination.event = object
                 } else if let object = type as? PreBuiltWorkout {
                     destination.workout = object
@@ -879,7 +848,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                         databaseReference.updateChildValues(["workouts": ["\(workout.identifier)"]])
                     }
                 })
-            } else if let event = type as? Event {
+            } else if let event = type as? TicketMasterEvent {
                 print(event.name)
                 databaseReference.child("events").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {
@@ -899,7 +868,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                         databaseReference.updateChildValues(["events": ["\(event.id)"]])
                     }
                 })
-            } else if let attraction = type as? Attraction {
+            } else if let attraction = type as? TicketMasterAttraction {
                 print(attraction.name)
                 databaseReference.child("attractions").observeSingleEvent(of: .value, with: { (snapshot) in
                     if snapshot.exists() {

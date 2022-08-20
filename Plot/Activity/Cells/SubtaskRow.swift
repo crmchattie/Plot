@@ -1,14 +1,14 @@
 //
-//  ScheduleRow.swift
-//  Pigeon-project
+//  SubtaskRow.swift
+//  Plot
 //
-//  Created by Cory McHattie on 5/31/19.
-//  Copyright © 2019 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 8/20/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
-import UIKit
+import Eureka
 
-class ChatActivitiesTableViewCell: UITableViewCell {
+final class SubtaskCell: Cell<Activity>, CellType {
     
     var formattedDate: (String, String) = ("", "")
     var allDay: Bool = false
@@ -16,8 +16,10 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.preferredFont(forTextStyle: .headline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
         return label
     }()
     
@@ -25,31 +27,45 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     lazy var locationNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
-    
     
     lazy var dateTimeLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.isUserInteractionEnabled = true
+        
         return label
     }()
+
+    //blue dot on the left of cell
+    let activityTypeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "activity"), for: .normal)
+        button.isUserInteractionEnabled = false
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+    override func setup() {
         // we do not want to show the default UITableViewCell's textLabel
+        textLabel?.text = nil
+        textLabel?.textColor = .clear
         
-        backgroundColor = .clear
+        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         contentView.addSubview(nameLabel)
         contentView.addSubview(dateTimeLabel)
         contentView.addSubview(locationNameLabel)
+        contentView.addSubview(activityTypeButton)
         
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
@@ -58,43 +74,52 @@ class ChatActivitiesTableViewCell: UITableViewCell {
         dateTimeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         dateTimeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         dateTimeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
-        
+                        
         locationNameLabel.topAnchor.constraint(equalTo: dateTimeLabel.bottomAnchor, constant: 2).isActive = true
         locationNameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         locationNameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         locationNameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
         
-        nameLabel.text = ""
-        locationNameLabel.text = ""
-        dateTimeLabel.text = ""
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        locationNameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        dateTimeLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        activityTypeButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+        activityTypeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
+        activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+                
     }
     
-    func configureCell(for activity: Activity) {
-        if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval, let allDay = activity.allDay {
-            let startTimeZone = activity.startTimeZone ?? "UTC"
-            let endTimeZone = activity.endTimeZone ?? "UTC"
+    override func update() {
+        height = { 60 }
+        // we do not want to show the default UITableViewCell's textLabel
+        textLabel?.text = nil
+
+        guard let schedule = row.value else { return }
+                
+        if let startDate = schedule.startDateTime as? TimeInterval, let endDate = schedule.endDateTime as? TimeInterval, let allDay = schedule.allDay {
+            let startTimeZone = schedule.startTimeZone ?? "UTC"
+            let endTimeZone = schedule.endTimeZone ?? "UTC"
             let startDate = Date(timeIntervalSince1970: startDate)
             let endDate = Date(timeIntervalSince1970: endDate)
             formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
         }
-        
-        
         // set the texts to the labels
-        nameLabel.text = activity.name
+        nameLabel.text = schedule.name
         dateTimeLabel.text = formattedDate.0 + formattedDate.1
-        if activity.locationName != "locationName" && activity.locationName != "Location" {
-            locationNameLabel.text = activity.locationName
+        if schedule.locationName != "locationName" {
+            locationNameLabel.text = schedule.locationName
         }
+        
+        if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
+            activityTypeButton.setImage(category.icon, for: .normal)
+            activityTypeButton.tintColor = category.color
+        } else {
+            activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
+            activityTypeButton.tintColor = ActivityCategory.uncategorized.color
+        }
+    }
+}
+
+final class SubtaskRow: Row<SubtaskCell>, RowType {
+        required init(tag: String?) {
+            super.init(tag: tag)
     }
 }

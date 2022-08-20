@@ -14,12 +14,14 @@ extension NSNotification.Name {
     static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
     static let calendarsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarsUpdated")
+    static let listsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".listsUpdated")
 }
 
 class ActivityService {
     let activitiesFetcher = ActivitiesFetcher()
     let invitationsFetcher = InvitationsFetcher()
     let calendarFetcher = CalendarFetcher()
+    let listFetcher = ListFetcher()
     
     var askedforAuthorization: Bool = false
     
@@ -27,6 +29,15 @@ class ActivityService {
         didSet {
             if oldValue != calendars {
                 NotificationCenter.default.post(name: .calendarsUpdated, object: nil)
+            }
+        }
+    }
+    
+    var lists = [String: [ListType]]()
+    {
+        didSet {
+            if oldValue != lists {
+                NotificationCenter.default.post(name: .listsUpdated, object: nil)
             }
         }
     }
@@ -96,6 +107,7 @@ class ActivityService {
             self?.observeInvitationForCurrentUser()
             self?.addRepeatingActivities(activities: self?.activities ?? [], completion: { newActivities in
                 self?.activities = newActivities
+                self?.grabPlotLists()
                 self?.grabPrimaryCalendar({ (calendar) in
                     self?.grabPlotCalendars()
                     if calendar == CalendarOptions.apple.name {
@@ -272,6 +284,52 @@ class ActivityService {
                     }
                 }
                 self?.calendars[CalendarOptions.plot.name] = plotCalendars
+            }
+        })
+    }
+    
+    func grabPlotLists() {
+        self.listFetcher.observeListForCurrentUser(listInitialAdd: { [weak self] listInitialAdd in
+            if self?.lists[ListOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListOptions.plot.name]
+                for list in listInitialAdd {
+                    if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
+                        plotLists?[index] = list
+                    }
+                }
+                self?.lists[ListOptions.plot.name] = plotLists
+            } else {
+                self?.lists[ListOptions.plot.name] = listInitialAdd
+            }
+        }, listAdded: { [weak self] listAdded in
+            if self?.lists[ListOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListOptions.plot.name]
+                for list in listAdded {
+                    if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
+                        plotLists?[index] = list
+                    }
+                }
+                self?.lists[ListOptions.plot.name] = plotLists
+            } else {
+                self?.lists[ListOptions.plot.name] = listAdded
+            }
+        }, listRemoved: { [weak self] listRemoved in
+            if self?.lists[ListOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListOptions.plot.name]
+                for list in listRemoved {
+                    plotLists = plotLists?.filter({$0.id != list.id})
+                }
+                self?.lists[ListOptions.plot.name] = plotLists
+            }
+        }, listChanged: { [weak self] listChanged in
+            if self?.lists[ListOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListOptions.plot.name]
+                for list in listChanged {
+                    if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
+                        plotLists?[index] = list
+                    }
+                }
+                self?.lists[ListOptions.plot.name] = plotLists
             }
         })
     }

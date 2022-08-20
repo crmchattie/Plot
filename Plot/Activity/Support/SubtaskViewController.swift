@@ -1,9 +1,9 @@
 //
-//  ScheduleViewController.swift
-//  Pigeon-project
+//  SubtaskViewController.swift
+//  Plot
 //
-//  Created by Cory McHattie on 5/22/19.
-//  Copyright © 2019 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 8/20/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
 import UIKit
@@ -14,29 +14,22 @@ import Contacts
 import EventKit
 import CodableFirebase
 
-
-protocol UpdateActivityDelegate: AnyObject {
-    func updateActivity(activity: Activity)
-}
-
-class ScheduleViewController: FormViewController {
+class SubtaskViewController: FormViewController {
     
     weak var delegate : UpdateActivityDelegate?
     
-    var schedule: Activity!
+    var subtask: Activity!
     
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
-    var locationName: String = "locationName"
-    var locationAddress = [String : [Double]]()
     var checklist: Checklist!
     var startDateTime: Date?
     var endDateTime: Date?
     var userNames : [String] = []
     var userNamesString: String = ""
     
-    var scheduleID = String()
+    var subtaskID = String()
     
     fileprivate var active: Bool = false
     
@@ -49,17 +42,17 @@ class ScheduleViewController: FormViewController {
     }
         
     override func viewDidLoad() {
-        super.viewDidLoad()        
-        if schedule != nil {
+        super.viewDidLoad()
+        if subtask != nil {
             title = "Sub-Event"
             active = true
-            if schedule.activityID != nil {
-                scheduleID = schedule.activityID!
+            if subtask.activityID != nil {
+                subtaskID = subtask.activityID!
             } else {
-                schedule.activityID = UUID().uuidString
+                subtask.activityID = UUID().uuidString
             }
             userNamesString = "Participants"
-            if let participants = schedule.participantsIDs {
+            if let participants = subtask.participantsIDs {
                 for ID in participants {
                     // users equals ACTIVITY selected falcon users
                     if let user = users.first(where: {$0.id == ID}) {
@@ -67,18 +60,14 @@ class ScheduleViewController: FormViewController {
                     }
                 }
             }
-            if let localName = schedule.locationName, localName != "locationName", let localAddress = schedule.locationAddress  {
-                locationName = localName
-                locationAddress = localAddress
-            }
             setupLists()
-            schedule.isSchedule = true
+            subtask.isSubtask = true
         } else {
             title = "New Sub-Event"
-            scheduleID = UUID().uuidString
-            schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
-            schedule.isSchedule = true
-            schedule.admin = Auth.auth().currentUser?.uid
+            subtaskID = UUID().uuidString
+            subtask = Activity(dictionary: ["activityID": subtaskID as AnyObject])
+            subtask.isSubtask = true
+            subtask.admin = Auth.auth().currentUser?.uid
         }
         
         setupMainView()
@@ -103,15 +92,8 @@ class ScheduleViewController: FormViewController {
                 navigationItem.leftBarButtonItem?.action = #selector(cancel)
             }
         } else {
-            if let localName = schedule.locationName, localName != "locationName" {
-                let dotsImage = UIImage(named: "dots")
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
-                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-                navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-            } else {
-                let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
-                navigationItem.rightBarButtonItem = plusBarButton
-            }
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
+            navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
         
@@ -132,7 +114,7 @@ class ScheduleViewController: FormViewController {
                 $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
                 if self.active {
-                    $0.value = self.schedule.name
+                    $0.value = self.subtask.name
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     $0.cell.textField.becomeFirstResponder()
@@ -155,8 +137,8 @@ class ScheduleViewController: FormViewController {
 //                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
 //                $0.placeholder = $0.tag
-//                if self.active && self.schedule.activityType != nil && self.schedule.activityType != "nothing" {
-//                    $0.value = self.schedule.activityType
+//                if self.active && self.subtask.activityType != nil && self.subtask.activityType != "nothing" {
+//                    $0.value = self.subtask.activityType
 //                }
 //                }.cellUpdate { cell, row in
 //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -170,8 +152,8 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 $0.placeholder = $0.tag
-                if self.active && self.schedule.activityDescription != nil && self.schedule.activityDescription != "nothing" {
-                    $0.value = self.schedule.activityDescription
+                if self.active && self.subtask.activityDescription != nil && self.subtask.activityDescription != "nothing" {
+                    $0.value = self.subtask.activityDescription
                 }
                 }.cellUpdate({ (cell, row) in
                     cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -179,36 +161,6 @@ class ScheduleViewController: FormViewController {
                     cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
                     cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 })
-            
-        <<< ButtonRow("Location") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textAlignment = .left
-            if self.active, let localName = schedule.locationName, localName != "locationName" {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.accessoryType = .detailDisclosureButton
-                row.title = localName
-            } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.title = row.tag
-            }
-            }.onCellSelection({ _,_ in
-                self.openLocationFinder()
-            }).cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textAlignment = .left
-                if row.title == "Location" {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    cell.accessoryType = .disclosureIndicator
-                } else if let value = row.title, !value.isEmpty {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.accessoryType = .detailDisclosureButton
-                } else {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    cell.accessoryType = .disclosureIndicator
-                    cell.textLabel?.text = "Location"
-                }
-            }
             
 //            <<< ButtonRow("Participants") { row in
 //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -230,7 +182,7 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.title = $0.tag
                 if self.active {
-                    $0.value = self.schedule.allDay
+                    $0.value = self.subtask.allDay
                 } else {
                     $0.value = false
                 }
@@ -266,9 +218,9 @@ class ScheduleViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: schedule.startTimeZone ?? "UTC")
-                    $0.value = Date(timeIntervalSince1970: self.schedule!.startDateTime as! TimeInterval)
-                    if self.schedule.allDay == true {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: subtask.startTimeZone ?? "UTC")
+                    $0.value = Date(timeIntervalSince1970: self.subtask!.startDateTime as! TimeInterval)
+                    if self.subtask.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
@@ -281,7 +233,7 @@ class ScheduleViewController: FormViewController {
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     $0.value = rounded
-                    self.schedule.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    self.subtask.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.startDateTime = $0.value
                 }.onChange { [weak self] row in
@@ -290,10 +242,10 @@ class ScheduleViewController: FormViewController {
                         endRow.value = Date(timeInterval: 0, since: row.value!)
                         endRow.updateCell()
                     }
-                    self!.schedule.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
+                    self!.subtask.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.startDateTime = row.value
                     if self!.active {
-                        self!.scheduleReminder()
+                        self!.subtaskReminder()
                     }
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate { (cell, row) in
@@ -309,7 +261,7 @@ class ScheduleViewController: FormViewController {
                         else {
                             cell.datePicker.datePickerMode = .dateAndTime
                         }
-                        if let startTimeZone = self?.schedule.startTimeZone {
+                        if let startTimeZone = self?.subtask.startTimeZone {
                             cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
                         } else if self!.active {
                             cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
@@ -343,10 +295,10 @@ class ScheduleViewController: FormViewController {
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
-                    row.value = schedule.startTimeZone ?? "UTC"
+                    row.value = subtask.startTimeZone ?? "UTC"
                 } else {
                     row.value = TimeZone.current.identifier
-                    schedule.startTimeZone = TimeZone.current.identifier
+                    subtask.startTimeZone = TimeZone.current.identifier
                 }
                 }.onCellSelection({ _,_ in
                     self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
@@ -366,9 +318,9 @@ class ScheduleViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: schedule.endTimeZone ?? "UTC")
-                    $0.value = Date(timeIntervalSince1970: self.schedule!.endDateTime as! TimeInterval)
-                    if self.schedule.allDay == true {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: subtask.endTimeZone ?? "UTC")
+                    $0.value = Date(timeIntervalSince1970: self.subtask!.endDateTime as! TimeInterval)
+                    if self.subtask.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
                     }
                     else {
@@ -381,7 +333,7 @@ class ScheduleViewController: FormViewController {
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     $0.value = rounded
-                    self.schedule.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    self.subtask.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
                 self.endDateTime = $0.value
                 }.onChange { [weak self] row in
@@ -390,13 +342,13 @@ class ScheduleViewController: FormViewController {
                         startRow.value = Date(timeInterval: 0, since: row.value!)
                         startRow.updateCell()
                     }
-                    self!.schedule.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
+                    self!.subtask.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
                     self!.endDateTime = row.value
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                    if let endTimeZone = self?.schedule.endTimeZone {
+                    if let endTimeZone = self?.subtask.endTimeZone {
                         cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
                     } else if self!.active {
                         cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
@@ -441,10 +393,10 @@ class ScheduleViewController: FormViewController {
                 row.title = "Time Zone"
                 row.hidden = true
                 if active {
-                    row.value = schedule.endTimeZone ?? "UTC"
+                    row.value = subtask.endTimeZone ?? "UTC"
                 } else {
                     row.value = TimeZone.current.identifier
-                    schedule.endTimeZone = TimeZone.current.identifier
+                    subtask.endTimeZone = TimeZone.current.identifier
                 }
                 }.onCellSelection({ _,_ in
                     self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
@@ -460,12 +412,12 @@ class ScheduleViewController: FormViewController {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 row.title = row.tag
-                if self.active, let value = self.schedule.reminder {
+                if self.active, let value = self.subtask.reminder {
                     row.value = EventAlert(rawValue: value)
                 } else {
                     row.value = EventAlert.None
                     if let reminder = row.value?.description {
-                        self.schedule.reminder = reminder
+                        self.subtask.reminder = reminder
                     }
                 }
                 row.options = EventAlert.allCases
@@ -486,9 +438,9 @@ class ScheduleViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.onChange() { [unowned self] row in
                 if let reminder = row.value?.description {
-                    self.schedule.reminder = reminder
+                    self.subtask.reminder = reminder
                     if self.active {
-                        self.scheduleReminder()
+                        self.subtaskReminder()
                     }
                 }
             }
@@ -501,8 +453,8 @@ class ScheduleViewController: FormViewController {
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if self.active && self.schedule.category != nil {
-                    row.value = self.schedule.category
+                if self.active && self.subtask.category != nil {
+                    row.value = self.subtask.category
                 } else {
                     row.value = "Uncategorized"
                 }
@@ -582,14 +534,14 @@ class ScheduleViewController: FormViewController {
                 }
             }
             
-            if schedule.checklistIDs == nil, let currentUserID = Auth.auth().currentUser?.uid {
+            if subtask.checklistIDs == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 checklist = Checklist(dictionary: ["ID": ID as AnyObject])
                 checklist.name = "CheckList"
                 checklist.createdDate = Date()
-                checklist.activityID = schedule.activityID
+                checklist.activityID = subtask.activityID
                 checklist.items = checklistDict
-                schedule.checklistIDs = [checklist.ID ?? ""]
+                subtask.checklistIDs = [checklist.ID ?? ""]
                 
                 let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
                 createChecklist.createNewChecklist()
@@ -599,46 +551,43 @@ class ScheduleViewController: FormViewController {
                 createChecklist.createNewChecklist()
             }
         } else {
-            schedule.checklistIDs = []
+            subtask.checklistIDs = []
         }
         
         let valuesDictionary = form.values()
         
-        schedule.activityID = scheduleID
+        subtask.activityID = subtaskID
 
-        schedule.name = valuesDictionary["Name"] as? String
+        subtask.name = valuesDictionary["Name"] as? String
 
         if let value = valuesDictionary["Type"] as? String {
-            schedule.activityType = value
+            subtask.activityType = value
         }
         
         if let value = valuesDictionary["Description"] as? String {
-            schedule.activityDescription = value
+            subtask.activityDescription = value
         }
-
-        schedule.locationName = self.locationName
-        schedule.locationAddress = self.locationAddress
 
         if let value = valuesDictionary["Transportation"] as? String {
-            schedule.transportation = value
+            subtask.transportation = value
         }
         
-        schedule.allDay = valuesDictionary["All-day"] as? Bool
-        schedule.startDateTime = NSNumber(value: Int((valuesDictionary["Starts"] as! Date).timeIntervalSince1970))
-        schedule.endDateTime = NSNumber(value: Int((valuesDictionary["Ends"] as! Date).timeIntervalSince1970))
+        subtask.allDay = valuesDictionary["All-day"] as? Bool
+        subtask.startDateTime = NSNumber(value: Int((valuesDictionary["Starts"] as! Date).timeIntervalSince1970))
+        subtask.endDateTime = NSNumber(value: Int((valuesDictionary["Ends"] as! Date).timeIntervalSince1970))
         
         if let value = valuesDictionary["Reminder"] as? String {
-            schedule.reminder = value
+            subtask.reminder = value
         }
         
         let membersIDs = fetchMembersIDs()
 
-        schedule.participantsIDs = membersIDs.0
+        subtask.participantsIDs = membersIDs.0
         
-        let createActivity = ActivityActions(activity: schedule, active: false, selectedFalconUsers: [])
+        let createActivity = ActivityActions(activity: subtask, active: false, selectedFalconUsers: [])
         createActivity.createSubActivity()
         
-        delegate?.updateActivity(activity: schedule)
+        delegate?.updateActivity(activity: subtask)
         
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
@@ -649,8 +598,8 @@ class ScheduleViewController: FormViewController {
     
     func setupLists() {
         let dispatchGroup = DispatchGroup()
-        if schedule.checklistIDs != nil {
-            for checklistID in schedule.checklistIDs! {
+        if subtask.checklistIDs != nil {
+            for checklistID in subtask.checklistIDs! {
                 dispatchGroup.enter()
                 let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
                 checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -719,29 +668,29 @@ class ScheduleViewController: FormViewController {
         }
     }
     
-    func scheduleReminder() {
-        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = schedule.allDay, let startTimeZone = schedule.startTimeZone, let endTimeZone = schedule.endTimeZone else {
+    func subtaskReminder() {
+        guard let subtask = subtask, let subtaskReminder = subtask.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = subtask.allDay, let startTimeZone = subtask.startTimeZone, let endTimeZone = subtask.endTimeZone else {
             return
         }
         let center = UNUserNotificationCenter.current()
-        guard scheduleReminder != "None" else {
-            center.removePendingNotificationRequests(withIdentifiers: ["\(scheduleID)_Reminder"])
+        guard subtaskReminder != "None" else {
+            center.removePendingNotificationRequests(withIdentifiers: ["\(subtaskID)_Reminder"])
             return
         }
         let content = UNMutableNotificationContent()
-        content.title = "\(String(describing: schedule.name!)) Reminder"
+        content.title = "\(String(describing: subtask.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
         formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
         content.subtitle = formattedDate.0
-        if let reminder = EventAlert(rawValue: scheduleReminder) {
+        if let reminder = EventAlert(rawValue: subtaskReminder) {
             let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
             var calendar = Calendar.current
             calendar.timeZone = TimeZone(identifier: startTimeZone)!
             let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                         repeats: false)
-            let identifier = "\(scheduleID)_Reminder"
+            let identifier = "\(subtaskID)_Reminder"
             let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
             center.add(request, withCompletionHandler: { (error) in
                 if let error = error {
@@ -749,18 +698,6 @@ class ScheduleViewController: FormViewController {
                 }
             })
         }
-    }
-    
-    @objc fileprivate func openLocationFinder() {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        let destination = LocationFinderTableViewController()
-        destination.delegate = self
-        self.navigationController?.pushViewController(destination, animated: true)
-        
-        //        present(destination, animated: true, completion: nil)
     }
     
     fileprivate func openTimeZoneFinder(startOrEndTimeZone: String) {
@@ -835,7 +772,7 @@ class ScheduleViewController: FormViewController {
         
         let destination = MapViewController()
         destination.sections = [.event]
-        destination.locations = [.event: schedule]
+        destination.locations = [.event: subtask]
         navigationController?.pushViewController(destination, animated: true)
         
     }
@@ -857,95 +794,10 @@ class ScheduleViewController: FormViewController {
         
         return (membersIDs, membersIDsDictionary)
     }
-    
-    @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard let row: ButtonRow = form.rowBy(tag: "Location"), indexPath == row.indexPath,let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
-            return
-        }
-        let ceo: CLGeocoder = CLGeocoder()
-        let loc: CLLocation = CLLocation(latitude:latitude, longitude: longitude)
-        var addressString : String = ""
-        ceo.reverseGeocodeLocation(loc) { (placemark, error) in
-            if error != nil {
-                return
-            }
-            let place = placemark![0]
-            if place.subThoroughfare != nil {
-                addressString = addressString + place.subThoroughfare! + " "
-            }
-            if place.thoroughfare != nil {
-                addressString = addressString + place.thoroughfare! + ", "
-            }
-            if place.locality != nil {
-                addressString = addressString + place.locality! + ", "
-            }
-            if place.country != nil {
-                addressString = addressString + place.country! + ", "
-            }
-            if place.postalCode != nil {
-                addressString = addressString + place.postalCode!
-            }
-            
-            let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
-            let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
-                let pasteboard = UIPasteboard.general
-                pasteboard.string = addressString
-            }
-            let changeAddress = UIAlertAction(title: "Change Address", style: .default) { (action:UIAlertAction) in
-                self.openLocationFinder()
-            }
-            let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
-                if let locationRow: ButtonRow = self.form.rowBy(tag: "Location") {
-                    self.locationAddress[self.locationName] = nil
-                    self.locationName = "locationName"
-                    self.schedule.locationName = "locationName"
-                    locationRow.title = "Location"
-                    locationRow.updateCell()
-                }
-            }
-            let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
-                
-            }
-            
-            alertController.addAction(copyAddress)
-            alertController.addAction(changeAddress)
-            alertController.addAction(removeAddress)
-            alertController.addAction(cancelAlert)
-            self.present(alertController, animated: true, completion: nil)
-        }
-        
-    }
-
 
 }
 
-extension ScheduleViewController: UpdateLocationDelegate {
-    func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
-        if let locationRow: ButtonRow = form.rowBy(tag: "Location") {
-            self.locationAddress[self.locationName] = nil
-            if self.schedule.locationAddress != nil {
-                self.schedule.locationAddress![self.locationName] = nil
-            }
-            for (key, value) in locationAddress {
-                let newLocationName = key.removeCharacters()
-                locationRow.title = newLocationName
-                locationRow.updateCell()
-
-                self.locationName = newLocationName
-                self.locationAddress[newLocationName] = value
-                
-                self.schedule.locationName = newLocationName
-                if schedule.locationAddress == nil {
-                    self.schedule.locationAddress = self.locationAddress
-                } else {
-                    self.schedule.locationAddress![newLocationName] = value
-                }
-            }
-        }
-    }
-}
-
-extension ScheduleViewController: UpdateTimeZoneDelegate {
+extension SubtaskViewController: UpdateTimeZoneDelegate {
     func updateTimeZone(startOrEndTimeZone: String, timeZone: TimeZone) {
         if startOrEndTimeZone == "startTimeZone" {
             if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone"), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts") {
@@ -955,7 +807,7 @@ extension ScheduleViewController: UpdateTimeZoneDelegate {
                 startRow.inlineRow?.updateCell()
                 timeZoneRow.value = timeZone.identifier
                 timeZoneRow.updateCell()
-                schedule.startTimeZone = timeZone.identifier
+                subtask.startTimeZone = timeZone.identifier
             }
         } else if startOrEndTimeZone == "endTimeZone" {
             if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
@@ -965,13 +817,13 @@ extension ScheduleViewController: UpdateTimeZoneDelegate {
                 endRow.inlineRow?.updateCell()
                 timeZoneRow.value = timeZone.identifier
                 timeZoneRow.updateCell()
-                schedule.endTimeZone = timeZone.identifier
+                subtask.endTimeZone = timeZone.identifier
             }
         }
     }
 }
 
-extension ScheduleViewController: UpdateInvitees {
+extension SubtaskViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
 //        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
 //            if !selectedFalconUsers.isEmpty {
@@ -987,15 +839,15 @@ extension ScheduleViewController: UpdateInvitees {
     }
 }
 
-extension ScheduleViewController: UpdateActivityLevelDelegate {
+extension SubtaskViewController: UpdateActivityLevelDelegate {
     func update(value: String, level: String) {
         if let row: LabelRow = form.rowBy(tag: level) {
             row.value = value
             row.updateCell()
             if level == "Category" {
-                self.schedule.category = value
+                self.subtask.category = value
             } else if level == "Subcategory" {
-                self.schedule.activityType = value
+                self.subtask.activityType = value
             }
         }
     }
@@ -1020,3 +872,4 @@ private extension BaseRow {
         }
     }
 }
+

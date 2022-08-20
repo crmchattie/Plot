@@ -12,7 +12,6 @@ import Firebase
 class ActivitySubTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     weak var delegate : UpdateActivityDelegate?
-    weak var listDelegate : UpdateListDelegate?
     
     let kCompositionalHeader = "CompositionalHeader"
     let kActivityTypeCell = "ActivityTypeCell"
@@ -247,22 +246,3 @@ extension ActivitySubTypeViewController: UpdateActivityDelegate {
         delegate?.updateActivity(activity: activity)
     }
 }
-
-extension ActivitySubTypeViewController: UpdateListDelegate {
-    func updateRecipe(recipe: Recipe?) {
-        self.listDelegate?.updateRecipe(recipe: recipe)
-    }
-    
-    func updateList(recipe: Recipe?, workout: PreBuiltWorkout?, event: Event?, place: FSVenue?, activityType: String?) {
-        if let object = recipe {
-            self.listDelegate?.updateList(recipe: object, workout: nil, event: nil, place: nil, activityType: activityType)
-        } else if let object = workout {
-            self.listDelegate?.updateList(recipe: nil, workout: object, event: nil, place: nil, activityType: activityType)
-        } else if let object = event {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: object, place: nil, activityType: activityType)
-        } else if let object = place {
-            self.listDelegate?.updateList(recipe: nil, workout: nil, event: nil, place: object, activityType: activityType)
-        }
-    }
-}
-

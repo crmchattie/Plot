@@ -272,15 +272,17 @@ extension Date {
 
 extension Date {
     
-    func getShortDateStringForActivity(timeZone: String?) -> String {
+    func getShortDateStringForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        let locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
+        dateFormatter.locale = locale
         dateFormatter.dateStyle = .medium
         dateFormatter.dateFormat = "MM/dd/yy"
         return dateFormatter.string(from: self)
     }
 
-    func getTimeStringForActivity(timeZone: String?) -> String {
+    func getTimeStringForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
@@ -292,7 +294,7 @@ extension Date {
         return dateFormatter.string(from: self)
     }
 
-    func dayOfWeekForActivity(timeZone: String?) -> String {
+    func dayOfWeekForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
@@ -301,10 +303,46 @@ extension Date {
         return dateFormatter.string(from: self).capitalized
     }
     
-    func dayOfWeek(timeZone: String?) -> String {
+    func dayOfWeekWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
+        dateFormatter.locale = locale
+        dateFormatter.dateFormat = "E"
+        return dateFormatter.string(from: self).capitalized
+    }
+    
+    func getShortDateStringForActivity() -> String {
+        let dateFormatter = DateFormatter()
+        let locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.locale = locale
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "MM/dd/yy"
+        return dateFormatter.string(from: self)
+    }
+
+    func getTimeStringForActivity() -> String {
+        let dateFormatter = DateFormatter()
+        let locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.locale = locale
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "hh:mm a"
+        dateFormatter.amSymbol = "AM"
+        dateFormatter.pmSymbol = "PM"
+        return dateFormatter.string(from: self)
+    }
+
+    func dayOfWeekForActivity() -> String {
+        let dateFormatter = DateFormatter()
+        let locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.locale = locale
+        dateFormatter.dateFormat = "E"
+        return dateFormatter.string(from: self).capitalized
+    }
+    
+    func dayOfWeek() -> String {
+        let dateFormatter = DateFormatter()
+        let locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.locale = locale
         dateFormatter.dateFormat = "E"
         return dateFormatter.string(from: self).capitalized
@@ -373,6 +411,15 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func getTimeString() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "hh:mm a"
+        dateFormatter.amSymbol = "AM"
+        dateFormatter.pmSymbol = "PM"
+        return dateFormatter.string(from: self)
+    }
+    
     func getHourlyTimeString() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
@@ -420,7 +467,7 @@ func timestampOfLastMessage(_ date: Date) -> String {
     //  if components.weekOfYear! >= 1 {
     //    return date.getShortDateStringFromUTC()
     //  } else if components.weekOfYear! < 1 && date.dayNumberOfWeek() != now.dayNumberOfWeek() {
-    //    return date.dayOfWeek()
+    //    return date.dayOfWeekWTZ()
     //  } else {
     //    return date.getTimeStringFromUTC()
     //  }
@@ -429,7 +476,7 @@ func timestampOfLastMessage(_ date: Date) -> String {
         if components.weekOfYear! >= 1 { // last week
             return date.getShortDateStringFromUTC()
         } else { // this week
-            return date.dayOfWeek(timeZone: nil)
+            return date.dayOfWeekWTZ(timeZone: nil)
         }
         
     } else { // this day
@@ -439,7 +486,7 @@ func timestampOfLastMessage(_ date: Date) -> String {
     
 }
 
-func timestampOfActivity(startDate: Date, endDate: Date, allDay: Bool, startTimeZone: String, endTimeZone: String) -> (String, String) {
+func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZone: String, endTimeZone: String) -> (String, String) {
     var startString: String
     var endString: String
     let calendar = NSCalendar.current
@@ -454,80 +501,80 @@ func timestampOfActivity(startDate: Date, endDate: Date, allDay: Bool, startTime
     var endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
     endComponents.timeZone = TimeZone(identifier: endTimeZone)
     
-    if now.getShortDateStringForActivity(timeZone: startTimeZone) != startDate.getShortDateStringForActivity(timeZone: startTimeZone) {  // not today
+    if now.getShortDateStringForActivityWTZ(timeZone: startTimeZone) != startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) {  // not today
         if startComponents.weekOfYear! >= 1 || startComponents.weekOfYear! <= -1 { // start date is next week
             if allDay {
-                if startDate.getShortDateStringForActivity(timeZone: startTimeZone) == endDate.getShortDateStringForActivity(timeZone: endTimeZone) {
-                    startString = startDate.getShortDateStringForActivity(timeZone: startTimeZone) + " All Day"
+                if startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) == endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) {
+                    startString = startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) + " All Day"
                     endString = ""
                 } else {
-                    startString = startDate.getShortDateStringForActivity(timeZone: startTimeZone) + " All Day"
-                    endString = " - " + endDate.getShortDateStringForActivity(timeZone: endTimeZone) + " All Day"
+                    startString = startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) + " All Day"
+                    endString = " - " + endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) + " All Day"
                 }
             } else {
-                if startDate.getShortDateStringForActivity(timeZone: startTimeZone) == endDate.getShortDateStringForActivity(timeZone: endTimeZone) {
-                    startString = startDate.getShortDateStringForActivity(timeZone: startTimeZone) + " " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                    endString = " - " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+                if startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) == endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) {
+                    startString = startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) + " " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                    endString = " - " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
                 } else {
-                    startString = startDate.getShortDateStringForActivity(timeZone: startTimeZone) + " " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                    endString = " - " + endDate.getShortDateStringForActivity(timeZone: endTimeZone) + " " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+                    startString = startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) + " " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                    endString = " - " + endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) + " " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
                 }
             }
         } else { // start date is this week
             if allDay {
-                if startDate.getShortDateStringForActivity(timeZone: startTimeZone) == endDate.getShortDateStringForActivity(timeZone: endTimeZone) {
-                    startString = startDate.dayOfWeekForActivity(timeZone: startTimeZone) + " All Day"
+                if startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) == endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) {
+                    startString = startDate.dayOfWeekForActivityWTZ(timeZone: startTimeZone) + " All Day"
                     endString = ""
                 } else {
                     if endComponents.weekOfYear! >= 1 { // end date is next week
-                        startString = startDate.dayOfWeekForActivity(timeZone: startTimeZone) + " All Day"
-                        endString = " - " + endDate.getShortDateStringForActivity(timeZone: endTimeZone) + " All Day"
+                        startString = startDate.dayOfWeekForActivityWTZ(timeZone: startTimeZone) + " All Day"
+                        endString = " - " + endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) + " All Day"
                     } else {
-                        startString = startDate.dayOfWeekForActivity(timeZone: startTimeZone) + " All Day"
-                        endString = " - " + endDate.dayOfWeek(timeZone: endTimeZone) + " All Day"
+                        startString = startDate.dayOfWeekForActivityWTZ(timeZone: startTimeZone) + " All Day"
+                        endString = " - " + endDate.dayOfWeekWTZ(timeZone: endTimeZone) + " All Day"
                     }
                 }
                 
             } else {
-                if startDate.getShortDateStringForActivity(timeZone: startTimeZone) == endDate.getShortDateStringForActivity(timeZone: endTimeZone) {
-                    startString = startDate.dayOfWeekForActivity(timeZone: startTimeZone) + " @ " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                    endString = " - " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+                if startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) == endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) {
+                    startString = startDate.dayOfWeekForActivityWTZ(timeZone: startTimeZone) + " @ " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                    endString = " - " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
                 } else {
                     if endComponents.weekOfYear! >= 1 { // end date is next week
-                        startString = startDate.dayOfWeekForActivity(timeZone: startTimeZone) + " @ " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                        endString = " - " + endDate.getShortDateStringForActivity(timeZone: endTimeZone) + " " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+                        startString = startDate.dayOfWeekForActivityWTZ(timeZone: startTimeZone) + " @ " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                        endString = " - " + endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) + " " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
                     } else {
-                        startString = startDate.dayOfWeekForActivity(timeZone: startTimeZone) + " @ " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                        endString = " - " + endDate.dayOfWeekForActivity(timeZone: endTimeZone) + " @ " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+                        startString = startDate.dayOfWeekForActivityWTZ(timeZone: startTimeZone) + " @ " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                        endString = " - " + endDate.dayOfWeekForActivityWTZ(timeZone: endTimeZone) + " @ " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
                     }
                 }
             }
         }
     } else { // start day is today
         if allDay {
-            if startDate.getShortDateStringForActivity(timeZone: startTimeZone) == endDate.getShortDateStringForActivity(timeZone: endTimeZone) {
+            if startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) == endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) {
                 startString = "Today All Day"
                 endString = ""
             } else {
                 if endComponents.weekOfYear! >= 1 { // end date is next week
                     startString = "Today All Day"
-                    endString = " - " + endDate.getShortDateStringForActivity(timeZone: endTimeZone) + " All Day"
+                    endString = " - " + endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) + " All Day"
                 } else {
                     startString = "Today All Day"
-                    endString = " - " + endDate.dayOfWeekForActivity(timeZone: endTimeZone) + " All Day"
+                    endString = " - " + endDate.dayOfWeekForActivityWTZ(timeZone: endTimeZone) + " All Day"
                 }
             }
         } else {
-            if startDate.getShortDateStringForActivity(timeZone: startTimeZone) == endDate.getShortDateStringForActivity(timeZone: endTimeZone) {
-                startString = "Today @ " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                endString = " - " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+            if startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) == endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) {
+                startString = "Today @ " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                endString = " - " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
             } else {
                 if endComponents.weekOfYear! >= 1 { // end date is next week
-                    startString = "Today @ " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                    endString = " - " + endDate.getShortDateStringForActivity(timeZone: endTimeZone) + " " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+                    startString = "Today @ " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                    endString = " - " + endDate.getShortDateStringForActivityWTZ(timeZone: endTimeZone) + " " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
                 } else {
-                    startString = "Today @ " + startDate.getTimeStringForActivity(timeZone: startTimeZone)
-                    endString = " - " + endDate.dayOfWeekForActivity(timeZone: endTimeZone) + " @ " + endDate.getTimeStringForActivity(timeZone: endTimeZone)
+                    startString = "Today @ " + startDate.getTimeStringForActivityWTZ(timeZone: startTimeZone)
+                    endString = " - " + endDate.dayOfWeekForActivityWTZ(timeZone: endTimeZone) + " @ " + endDate.getTimeStringForActivityWTZ(timeZone: endTimeZone)
                 }
             }
         }
@@ -535,6 +582,73 @@ func timestampOfActivity(startDate: Date, endDate: Date, allDay: Bool, startTime
     
     return (startString, endString)
     
+}
+
+func timestampOfTask(startDate: Date, endDate: Date?) -> (String, String) {
+    var startString: String
+    var endString: String
+    let calendar = NSCalendar.current
+    let unitFlags: Set<Calendar.Component> = [ .day, .weekOfYear, .weekday]
+    let now = Date()
+    let startEarliest = now < startDate ? now : startDate
+    let startLatest = (startEarliest == now) ? startDate : now
+    let startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
+    if let endDate = endDate {
+        let endEarliest = now < endDate ? now : endDate
+        let endLatest = (endDate == now) ? endDate : now
+        let endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
+        if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
+            if startComponents.weekOfYear! >= 1 || startComponents.weekOfYear! <= -1 { // start date is next week
+                if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
+                    startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getTimeStringForActivity()
+                } else {
+                    startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                }
+            } else { // start date is this week
+                if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
+                    startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getTimeStringForActivity()
+                } else {
+                    if endComponents.weekOfYear! >= 1 { // end date is next week
+                        startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
+                        endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                    } else {
+                        startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
+                        endString = " - " + endDate.dayOfWeekForActivity() + " @ " + endDate.getTimeStringForActivity()
+                    }
+                }
+            }
+        } else { // start day is today
+            if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
+                startString = "Today @ " + startDate.getTimeStringForActivity()
+                endString = " - " + endDate.getTimeStringForActivity()
+            } else {
+                if endComponents.weekOfYear! >= 1 { // end date is next week
+                    startString = "Today @ " + startDate.getTimeStringForActivity()
+                    endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                } else {
+                    startString = "Today @ " + startDate.getTimeStringForActivity()
+                    endString = " - " + endDate.dayOfWeekForActivity() + " @ " + endDate.getTimeStringForActivity()
+                }
+            }
+        }
+        
+        return (startString, endString)
+    } else {
+        if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
+            if startComponents.weekOfYear! >= 1 || startComponents.weekOfYear! <= -1 { // start date is next week
+                startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
+            } else { // start date is this week
+                startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
+            }
+        } else { // start day is today
+            startString = "Today @ " + startDate.getTimeStringForActivity()
+        }
+        
+        return (startString, "")
+    }
 }
 
 func timestampOfChatLogMessage(_ date: Date) -> String {

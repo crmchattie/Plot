@@ -13,7 +13,7 @@ protocol ListViewControllerDataStore: AnyObject {
     func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->())
 }
 
-class ListsViewController: UIViewController {
+class ListViewController: UIViewController {
         
     var activities = [Activity]()
     
@@ -190,7 +190,7 @@ class ListsViewController: UIViewController {
     
 }
 
-extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
+extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
 //    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
 //        
@@ -296,7 +296,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     
 }
 
-extension ListsViewController: ListViewControllerDataStore {
+extension ListViewController: ListViewControllerDataStore {
     func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->()) {
         if let grocerylist = grocerylist, let ID = grocerylist.ID, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
@@ -428,7 +428,7 @@ extension ListsViewController: ListViewControllerDataStore {
     }
 }
 
-extension ListsViewController: ListCellDelegate {
+extension ListViewController: ListCellDelegate {
     func openActivity(activityID: String) {
         if let index = self.activities.firstIndex(where: {$0.activityID == activityID}) {
             activityViewController!.loadActivity(activity: activities[index])
@@ -500,7 +500,7 @@ extension ListsViewController: ListCellDelegate {
     }
 }
 
-extension ListsViewController: MessagesDelegate {
+extension ListViewController: MessagesDelegate {
     
     func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
         chatLogController?.updateMessageStatus(messageRef: reference)
@@ -538,7 +538,7 @@ extension ListsViewController: MessagesDelegate {
     }
 }
 
-extension ListsViewController: ChooseChatDelegate {
+extension ListViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]

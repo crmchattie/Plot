@@ -9,7 +9,7 @@
 import UIKit
 
 protocol AttractionDetailCellDelegate: AnyObject {
-    func viewTapped(event: Event)
+    func viewTapped(event: TicketMasterEvent)
 }
 
 class AttractionDetailCell: UICollectionViewCell {
@@ -18,7 +18,7 @@ class AttractionDetailCell: UICollectionViewCell {
     
     var count: Int = 0
     
-    var event: Event! {
+    var event: TicketMasterEvent! {
         didSet {
             nameLabel.text = "\(event.name)"
             if let startDateTime = event.dates?.start?.dateTime, let date = startDateTime.toDate() {

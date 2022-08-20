@@ -37,7 +37,7 @@ class ActivityDetailCell: UICollectionViewCell {
         }
     }
     
-    var event: Event! {
+    var event: TicketMasterEvent! {
         didSet {
             if let event = event {
                 if let images = event.images, let image = images.first(where: { $0.width == 640 && $0.height == 427 }), let url = image.url {
@@ -50,7 +50,7 @@ class ActivityDetailCell: UICollectionViewCell {
         }
     }
     
-    var attraction: Attraction! {
+    var attraction: TicketMasterAttraction! {
         didSet {
             if let _ = attraction {
                 typeString = "Attraction"
