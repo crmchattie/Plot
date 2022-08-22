@@ -11,7 +11,8 @@ import Firebase
 import GoogleSignIn
 
 extension NSNotification.Name {
-    static let activitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".activitiesUpdated")
+    static let eventsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".eventsUpdated")
+    static let tasksUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".tasksUpdated")
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
     static let calendarsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarsUpdated")
     static let listsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".listsUpdated")
@@ -47,21 +48,45 @@ class ActivityService {
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
-                let currentDate = NSNumber(value: Int((Date().localTime).timeIntervalSince1970)).int64Value
-                activities.sort { (activity1, activity2) -> Bool in
-                    if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                        return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
-                    } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
-                        return currentDate < activity2.startDateTime?.int64Value ?? 0
-                    } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                        return activity1.startDateTime?.int64Value ?? 0 < currentDate
-                    }
-                    return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
-                }
-                NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
+                events = activities.filter { $0.startDate != nil }
+                tasks = activities.filter { $0.isTask ?? false }
             }
         }
     }
+    
+    var events = [Activity]() {
+        didSet {
+            if oldValue != events {
+                let currentDate = Date().localTime
+                events.sort { (event1, event2) -> Bool in
+                    if currentDate.isBetween(event1.startDate ?? Date.distantPast, and: event1.endDate ?? Date.distantPast) && currentDate.isBetween(event2.startDate ?? Date.distantPast, and: event2.endDate ?? Date.distantPast) {
+                        return event1.startDate ?? Date.distantPast < event2.startDate ?? Date.distantPast
+                    } else if currentDate.isBetween(event1.startDate ?? Date.distantPast, and: event1.endDate ?? Date.distantPast) {
+                        return currentDate < event2.startDate ?? Date.distantPast
+                    } else if currentDate.isBetween(event2.startDate ?? Date.distantPast, and: event2.endDate ?? Date.distantPast) {
+                        return event1.startDate ?? Date.distantPast < currentDate
+                    }
+                    return event1.startDate ?? Date.distantPast < event2.startDate ?? Date.distantPast
+                }
+                NotificationCenter.default.post(name: .eventsUpdated, object: nil)
+            }
+        }
+    }
+    
+    var tasks = [Activity]() {
+        didSet {
+            if oldValue != tasks {
+                tasks.sort { task1, task2 in
+                    if let task1StartDate = task1.startDate, let task2startDate = task2.startDate, task1StartDate == task2startDate {
+                        return task1.name ?? "" < task2.name ?? ""
+                    }
+                    return task1.startDate ?? Date.distantPast < task2.startDate ?? Date.distantPast
+                }
+                NotificationCenter.default.post(name: .tasksUpdated, object: nil)
+            }
+        }
+    }
+    
     //for Apple/Google Calendar functions
     var activitiesNoRepeats = [Activity]()
     var invitations: [String: Invitation] = [:] {

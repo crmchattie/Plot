@@ -56,7 +56,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate var isAppLoaded = false
     fileprivate let plotAppGroup = "group.immaturecreations.plot"
     fileprivate var sharedContainer : UserDefaults?
     
@@ -90,9 +89,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // [ActivityID: Participants]
     var activitiesParticipants: [String: [User]] = [:]
-    
-    var chatLogController: ChatLogController? = nil
-    var messagesFetcher: MessagesFetcher? = nil
     
     var activityDates = [String: Int]()
     
@@ -148,7 +144,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -161,7 +157,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         applyCalendarTheme()
     }
     
-    @objc fileprivate func activitiesUpdated() {
+    @objc fileprivate func eventsUpdated() {
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
         activityView.tableView.reloadData()
@@ -400,9 +396,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func handleReloadTable() {
-        guard !isAppLoaded else { return }
-        isAppLoaded = true
-        
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
                 
@@ -412,7 +405,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         
         activityView.tableView.layoutIfNeeded()
         handleReloadActivities(animated: false)
-        
     }
     
     func handleReloadActivities(animated: Bool) {
@@ -777,7 +769,7 @@ extension CalendarViewController: UpdateInvitationDelegate {
         InvitationsFetcher.update(invitation: invitation) { result in
             if result {
                 self.networkController.activityService.invitations[invitation.activityID] = invitation
-                NotificationCenter.default.post(name: .activitiesUpdated, object: nil)
+                NotificationCenter.default.post(name: .eventsUpdated, object: nil)
             }
         }
     }
@@ -820,104 +812,6 @@ extension CalendarViewController: ActivityDataStore {
         group.notify(queue: .main) {
             self.activitiesParticipants[activityID] = participants
             completion(participants)
-        }
-    }
-}
-
-extension CalendarViewController: MessagesDelegate {
-    
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
-    }
-    
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        chatLogController?.deleteAndExitDelegate = self
-        //chatLogController?.activityID = activityID
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
-        }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        self.chatLogController?.startCollectionViewAtBottom()
-        
-        self.navigationController?.pushViewController(destination, animated: true)
-        
-        chatLogController = nil
-        messagesFetcher?.delegate = nil
-        messagesFetcher = nil
-    }
-}
-
-extension CalendarViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
-        if let activityID = activityID {
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-            
-            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-                if conversation.activities != nil {
-                    var activities = conversation.activities!
-                    activities.append(activityID)
-                    let updatedActivities = ["activities": activities as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                } else {
-                    let updatedActivities = ["activities": [activityID] as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                }
-                if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-                    let activity = activities[index]
-                    if activity.grocerylistID != nil {
-                        if conversation.grocerylists != nil {
-                            var grocerylists = conversation.grocerylists!
-                            grocerylists.append(activity.grocerylistID!)
-                            let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                        } else {
-                            let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                        }
-                        Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
-                    }
-                    if activity.checklistIDs != nil {
-                        if conversation.checklists != nil {
-                            let checklists = conversation.checklists! + activity.checklistIDs!
-                            let updatedChecklists = [checklistsEntity: checklists as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                        } else {
-                            let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                        }
-                        for ID in activity.checklistIDs! {
-                            Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
-                            
-                        }
-                    }
-                    if activity.packinglistIDs != nil {
-                        if conversation.packinglists != nil {
-                            let packinglists = conversation.packinglists! + activity.packinglistIDs!
-                            let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                        } else {
-                            let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                        }
-                        for ID in activity.packinglistIDs! {
-                            Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
-                            
-                        }
-                    }
-                }
-            }
-            self.connectedToChatAlert()
-            self.dismiss(animated: true, completion: nil)
         }
     }
 }

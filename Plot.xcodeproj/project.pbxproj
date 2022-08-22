@@ -74,7 +74,7 @@
 		104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1046252F2571B4D40026C214 /* SummaryViewModel.swift */; };
 		104625362571B4FD0026C214 /* SummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104625352571B4FD0026C214 /* SummaryService.swift */; };
 		1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */; };
-		1051AC9B244F8C5F0066761C /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9A244F8C5F0066761C /* ListViewController.swift */; };
+		1051AC9B244F8C5F0066761C /* ListsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9A244F8C5F0066761C /* ListsViewController.swift */; };
 		1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */; };
 		1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */; };
 		105AA1372481B56B009DD09B /* NewUserChecklists.json in Resources */ = {isa = PBXBuildFile; fileRef = 105AA1362481B56B009DD09B /* NewUserChecklists.json */; };
@@ -197,8 +197,8 @@
 		10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */; };
 		10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */; };
 		10C0CC662885FED4007CC9F3 /* CustomRecurrenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */; };
-		10C23A01247D807100E3518D /* ListViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListViewController+SearchHandlers.swift */; };
-		10C23A03247D80E900E3518D /* ListViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListViewController+TableRowActionHandlers.swift */; };
+		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
+		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
 		10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */; };
 		10C50F972274E21900111033 /* CalendarViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F962274E21900111033 /* CalendarViewController+SearchHandlers.swift */; };
 		10C50F9B2274E80500111033 /* ActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F9A2274E80500111033 /* ActivityCell.swift */; };
@@ -286,7 +286,6 @@
 		10FBC8B924BFECD500D0E6B5 /* ActivitylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8B824BFECD500D0E6B5 /* ActivitylistViewController.swift */; };
 		10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */; };
 		10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */; };
-		10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */; };
 		26036762256CC4DA00FE9142 /* EventKitSetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036761256CC4DA00FE9142 /* EventKitSetupAssistant.swift */; };
 		26036766256CC88900FE9142 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036765256CC88900FE9142 /* EventKitService.swift */; };
 		2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603676B256CD9A000FE9142 /* EventKitManager.swift */; };
@@ -647,7 +646,7 @@
 		1046252F2571B4D40026C214 /* SummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewModel.swift; sourceTree = "<group>"; };
 		104625352571B4FD0026C214 /* SummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryService.swift; sourceTree = "<group>"; };
 		1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterActivityContainerController.swift; sourceTree = "<group>"; };
-		1051AC9A244F8C5F0066761C /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ListViewController.swift; path = ../../List/Controllers/ListViewController.swift; sourceTree = "<group>"; };
+		1051AC9A244F8C5F0066761C /* ListsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ListsViewController.swift; path = ../../List/Controllers/ListsViewController.swift; sourceTree = "<group>"; };
 		1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
 		1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionRuleFetcher.swift; sourceTree = "<group>"; };
@@ -774,8 +773,8 @@
 		10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerViewController.swift; sourceTree = "<group>"; };
 		10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTransactionTableViewController.swift; sourceTree = "<group>"; };
 		10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRecurrenceViewController.swift; sourceTree = "<group>"; };
-		10C23A00247D807100E3518D /* ListViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
-		10C23A02247D80E900E3518D /* ListViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
+		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
+		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatsTableViewController+Migration.swift"; sourceTree = "<group>"; };
 		10C50F962274E21900111033 /* CalendarViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C50F9A2274E80500111033 /* ActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCell.swift; sourceTree = "<group>"; };
@@ -862,7 +861,6 @@
 		10FBC8B824BFECD500D0E6B5 /* ActivitylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistViewController.swift; sourceTree = "<group>"; };
 		10FBC8BA24BFEF7E00D0E6B5 /* ActivitylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistActions.swift; sourceTree = "<group>"; };
 		10FBC8BC24BFF01200D0E6B5 /* ActivitylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitylistFetcher.swift; sourceTree = "<group>"; };
-		10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseListTableViewController.swift; sourceTree = "<group>"; };
 		26036761256CC4DA00FE9142 /* EventKitSetupAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitSetupAssistant.swift; sourceTree = "<group>"; };
 		26036765256CC88900FE9142 /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		2603676B256CD9A000FE9142 /* EventKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitManager.swift; sourceTree = "<group>"; };
@@ -1442,7 +1440,6 @@
 				10FBC8B824BFECD500D0E6B5 /* ActivitylistViewController.swift */,
 				10EE27F2245DFA8E00C80AAF /* PackinglistViewController.swift */,
 				10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */,
-				10FBC8BE24C0D10800D0E6B5 /* ChooseListTableViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1580,9 +1577,9 @@
 		10B3E51128B3B17600E1713D /* Lists */ = {
 			isa = PBXGroup;
 			children = (
-				1051AC9A244F8C5F0066761C /* ListViewController.swift */,
-				10C23A00247D807100E3518D /* ListViewController+SearchHandlers.swift */,
-				10C23A02247D80E900E3518D /* ListViewController+TableRowActionHandlers.swift */,
+				1051AC9A244F8C5F0066761C /* ListsViewController.swift */,
+				10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */,
+				10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */,
 			);
 			path = Lists;
 			sourceTree = "<group>";
@@ -3136,7 +3133,7 @@
 				10DFC3EB255CC3EA00565DAD /* MealActions.swift in Sources */,
 				4BAEE5B5212735E50045AB10 /* INSPhotosDataSource.swift in Sources */,
 				10970B0E25803F450027A9EF /* Mindfulness.swift in Sources */,
-				10C23A01247D807100E3518D /* ListViewController+SearchHandlers.swift in Sources */,
+				10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4FA21272D890045AB10 /* ChatLogController+MediaPickerHandlers.swift in Sources */,
 				1017D32B24F2B746001D7CBE /* MXHolding.swift in Sources */,
 				26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */,
@@ -3331,7 +3328,7 @@
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
 				F902FFC92613B55900EF5881 /* ColorHash.swift in Sources */,
 				104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */,
-				10C23A03247D80E900E3518D /* ListViewController+TableRowActionHandlers.swift in Sources */,
+				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				103F492E286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
 				10B3E50C28B168D700E1713D /* ListFetcher.swift in Sources */,
@@ -3416,7 +3413,6 @@
 				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
 				10B3E50E28B168E600E1713D /* ListActions.swift in Sources */,
 				260C87D22500C0D400715A64 /* StepsGroupOperation.swift in Sources */,
-				10FBC8BF24C0D10800D0E6B5 /* ChooseListTableViewController.swift in Sources */,
 				4BAEE54F212735880045AB10 /* User.swift in Sources */,
 				10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */,
 				4BAEE5E0212735E50045AB10 /* UIImageExtensions.swift in Sources */,
@@ -3455,7 +3451,7 @@
 				109F849923D6860D002C0044 /* FilterViewController.swift in Sources */,
 				4BAEE4EF21272D890045AB10 /* IncomingPhotoMessageCell.swift in Sources */,
 				4BAEE5F7212735E50045AB10 /* AvatarOpenerOverlay.swift in Sources */,
-				1051AC9B244F8C5F0066761C /* ListViewController.swift in Sources */,
+				1051AC9B244F8C5F0066761C /* ListsViewController.swift in Sources */,
 				105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */,
 				1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */,
 				109F848E23D60113002C0044 /* ActivitySubTypeViewController.swift in Sources */,

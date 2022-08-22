@@ -88,43 +88,15 @@ extension ListsViewController {
         }
     }
 
-    fileprivate func updateMutedDatabaseValue(to state: Bool, currentUserID: String, list: ListContainer) {
-        if list.type == "grocerylist" {
-            let metadataReference = Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
-            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
-                if error != nil {
-                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
-                }
-            })
-        } else if list.type == "checklist" {
-            let metadataReference = Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
-            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
-                if error != nil {
-                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
-                }
-            })
-        } else if list.type == "activitylist" {
-            let metadataReference = Database.database().reference().child(userActivitylistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
-            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
-                if error != nil {
-                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
-                }
-            })
-        } else if list.type == "packinglist" {
-            let metadataReference = Database.database().reference().child(userPackinglistsEntity).child(currentUserID).child(list.ID).child(messageMetaDataFirebaseFolder)
-            metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
-                if error != nil {
-                    basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
-                }
-            })
-        }
+    fileprivate func updateMutedDatabaseValue(to state: Bool, currentUserID: String, list: ListType) {
+        
     }
 
-    func handleMute(section: Int, for list: ListContainer) {
+    func handleMute(section: Int, for list: ListType) {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         
         if section == 0 {
-            guard list.muted else {
+            guard list.muted ?? false else {
                 updateMutedDatabaseValue(to: true, currentUserID: currentUserID, list: list)
                 return
             }

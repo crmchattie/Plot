@@ -12,143 +12,72 @@ import SDWebImage
 
 extension ListCell {
     
-    func configureCell(for indexPath: IndexPath, grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?) {
-        
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        listImageView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        if let grocerylist = grocerylist {
-            self.grocerylist = grocerylist
-            nameLabel.text = grocerylist.name
-            listTypeLabel.text = "Grocery List"
-            if let date = grocerylist.lastModifiedDate {
-                timeLabel.text = date.formatRelativeString()
-            }
-            muteIndicator.isHidden = !(grocerylist.muted ?? false)
-            
-            let badgeString = grocerylist.badge?.toString()
-            let badgeInt = grocerylist.badge ?? 0
-            
-            if badgeInt > 0  {
-                badgeLabel.text = badgeString
-                badgeLabel.isHidden = false
-                newMessageIndicator.isHidden = true
-            } else {
-                newMessageIndicator.isHidden = true
-                badgeLabel.isHidden = true
-            }
-            
-            if grocerylist.activityID == nil {
-                activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            } else {
-                activityButton.tintColor = .systemBlue
-            }
-            
-            if grocerylist.conversationID == nil {
-                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            } else {
-                chatButton.tintColor = .systemBlue
-            }
-        } else if let checklist = checklist {
-            self.checklist = checklist
-            nameLabel.text = checklist.name
-            listTypeLabel.text = "Checklist"
-            if let date = checklist.lastModifiedDate {
-                timeLabel.text = date.formatRelativeString()
-            }
-            muteIndicator.isHidden = !(checklist.muted ?? false)
-            
-            let badgeString = checklist.badge?.toString()
-            let badgeInt = checklist.badge ?? 0
-                                    
-            if badgeInt > 0  {
-
-                badgeLabel.text = badgeString
-                badgeLabel.isHidden = false
-                newMessageIndicator.isHidden = true
-            
-            } else {
-                newMessageIndicator.isHidden = true
-                badgeLabel.isHidden = true
+    func configureCell(for indexPath: IndexPath, list: ListType) {
+        self.list = list
                 
+        let isMuted = list.muted != nil && list.muted!
+        let name = list.name
+                        
+        nameLabel.text = name
+        muteIndicator.isHidden = !isMuted
+        
+        activityTypeButton.setImage(ActivityCategory.todo.icon, for: .normal)
+        activityTypeButton.tintColor = ActivityCategory.todo.color
+        activityTypeLabel.text = ActivityCategory.todo.rawValue
+        
+        let badgeString = list.badge?.toString()
+        let badgeInt = list.badge ?? 0
+        
+        if badgeInt > 0 {
+            badgeLabel.text = badgeString
+            badgeLabel.isHidden = false
+        } else {
+            badgeLabel.isHidden = true
+        }
+    }
+    
+    func loadParticipantsThumbnail(list: ListType) {
+        self.listDataStore?.getParticipants(forList: list, completion: { [weak self] (participants) in
+            for i in 0..<participants.count {
+                let user = participants[i]
+                if Auth.auth().currentUser?.uid == user.id {
+                    continue
+                }
+                
+                if i > 7 {
+                    return
+                }
+                
+                guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
+                    continue
+                }
+                
+                icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
+                    guard image != nil else { return }
+                    guard cacheType != SDImageCacheType.memory, cacheType != SDImageCacheType.disk else {
+                        return
+                    }
+                })
             }
-            
-            if checklist.activityID == nil {
-                activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        })
+    }
+    
+    func updateParticipantsThumbnail(activity: Activity, acceptedParticipants: [User]) {
+        let participants = acceptedParticipants.filter({$0.id != Auth.auth().currentUser?.uid})
+        let participantsCount = participants.count
+        if participantsCount != 0 {
+            iconViewTopAnchor.constant = iconViewTopAnchorRegular
+            iconViewHeightConstraint.constant = iconViewHeightConstant
+        } else {
+            iconViewTopAnchor.constant = 0
+            iconViewHeightConstraint.constant = 0
+        }
+        for i in 0..<thumbnails.count {
+            if i < participantsCount {
+                thumbnails[i].isHidden = false
+                thumbnails[i].image = UIImage(named: "UserpicIcon")
             } else {
-                activityButton.tintColor = .systemBlue
-            }
-            
-            if checklist.conversationID == nil {
-                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            } else {
-                chatButton.tintColor = .systemBlue
-            }
-        } else if let activitylist = activitylist {
-            self.activitylist = activitylist
-            nameLabel.text = activitylist.name
-            listTypeLabel.text = "Activity List"
-            if let date = activitylist.lastModifiedDate {
-                timeLabel.text = date.formatRelativeString()
-            }
-            muteIndicator.isHidden = !(activitylist.muted ?? false)
-            
-            let badgeString = activitylist.badge?.toString()
-            let badgeInt = activitylist.badge ?? 0
-                                    
-            if badgeInt > 0  {
-                badgeLabel.text = badgeString
-                badgeLabel.isHidden = false
-                newMessageIndicator.isHidden = true
-            
-            } else {
-                newMessageIndicator.isHidden = true
-                badgeLabel.isHidden = true
-            }
-            
-            if activitylist.activityID == nil {
-                activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            } else {
-                activityButton.tintColor = .systemBlue
-            }
-            
-            if activitylist.conversationID == nil {
-                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            } else {
-                chatButton.tintColor = .systemBlue
-            }
-        } else if let packinglist = packinglist {
-            self.packinglist = packinglist
-            nameLabel.text = packinglist.name
-            listTypeLabel.text = "Packing List"
-            if let date = packinglist.lastModifiedDate {
-                timeLabel.text = date.formatRelativeString()
-            }
-            muteIndicator.isHidden = !(packinglist.muted ?? false)
-            
-            let badgeString = packinglist.badge?.toString()
-            let badgeInt = packinglist.badge ?? 0
-            
-            if badgeInt > 0  {
-                badgeLabel.text = badgeString
-                badgeLabel.isHidden = false
-                newMessageIndicator.isHidden = true
-            } else {
-                newMessageIndicator.isHidden = true
-                badgeLabel.isHidden = true
-            }
-            
-            if packinglist.activityID == nil {
-                activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            } else {
-                activityButton.tintColor = .systemBlue
-            }
-            
-            if packinglist.conversationID == nil {
-                chatButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
-            } else {
-                chatButton.tintColor = .systemBlue
+                thumbnails[i].isHidden = true
             }
         }
     }

@@ -718,27 +718,6 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 
             }))
             
-            alert.addAction(UIAlertAction(title: "Add to List", style: .default, handler: { (_) in
-                
-                // ChooseActivityTableViewController
-                let destination = ChooseListTableViewController()
-                let navController = UINavigationController(rootViewController: destination)
-                destination.activityType = section?.image
-                if let object = type as? Recipe {
-                    destination.recipe = object
-                } else if let object = type as? TicketMasterEvent {
-                    destination.event = object
-                } else if let object = type as? PreBuiltWorkout {
-                    destination.workout = object
-                } else if let object = type as? FSVenue {
-                    destination.fsVenue = object
-                } else if let groupItem = type as? GroupItem, let object = groupItem.venue {
-                    destination.fsVenue = object
-                }
-                self.present(navController, animated: true, completion: nil)
-                
-            }))
-            
         }
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in

@@ -23,7 +23,10 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         filteredLists = searchText.isEmpty ? lists :
             lists.filter({ (list) -> Bool in
-                return list.name.lowercased().contains(searchText.lowercased())
+                if let name = list.name {
+                    return name.lowercased().contains(searchText.lowercased())
+                }
+                return ("").lowercased().contains(searchText.lowercased())
             })
         
         handleReloadTableAfterSearch()

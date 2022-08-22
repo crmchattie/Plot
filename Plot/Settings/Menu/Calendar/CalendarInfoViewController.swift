@@ -62,10 +62,10 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
     }
     
-    @objc fileprivate func activitiesUpdated() {
+    @objc fileprivate func eventsUpdated() {
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }

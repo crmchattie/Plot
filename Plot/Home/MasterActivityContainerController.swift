@@ -51,11 +51,13 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         
     weak var delegate: ManageAppearanceHome?
             
-    var sections: [SectionType] = [.calendar, .health, .finances]
+    var sections: [SectionType] = [.tasks, .calendar, .health, .finances]
     
     var sortedActivities = [Activity]()
+    var sortedTasks = [Activity]()
     
-    var updatingActivities = true
+    var updatingTasks = true
+    var updatingEvents = true
     var updatingHealth = true
     var updatingFinances = true
     
@@ -91,9 +93,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     var financeGroups = [SectionType: [AnyHashable]]()
     var transactionsDictionary = [TransactionDetails: [Transaction]]()
     var accountsDictionary = [AccountDetails: [MXAccount]]()
-    
-    var chatLogController: ChatLogController? = nil
-    var messagesFetcher: MessagesFetcher? = nil
     
     var activitiesParticipants: [String: [User]] = [:]
     
@@ -215,7 +214,8 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(activitiesUpdated), name: .activitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
@@ -236,8 +236,13 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         
     }
     
-    @objc fileprivate func activitiesUpdated() {
-        self.updatingActivities = false
+    @objc fileprivate func tasksUpdated() {
+        self.updatingTasks = false
+        
+    }
+    
+    @objc fileprivate func eventsUpdated() {
+        self.updatingEvents = false
         scrollToFirstActivityWithDate({ (activities) in
             if self.sortedActivities != activities {
                 self.sortedActivities = activities
@@ -734,110 +739,6 @@ extension MasterActivityContainerController {
         } else {
             let participants: [User] = []
             completion(participants)
-        }
-    }
-}
-
-extension MasterActivityContainerController: MessagesDelegate {
-    
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
-    }
-    
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        chatLogController?.deleteAndExitDelegate = self
-        //chatLogController?.activityID = activityID
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
-        }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        
-        self.chatLogController?.startCollectionViewAtBottom()
-        
-        
-        // If we're presenting a modal sheet
-        if let presentedViewController = presentedViewController as? UINavigationController {
-            presentedViewController.pushViewController(destination, animated: true)
-        } else {
-            navigationController?.pushViewController(destination, animated: true)
-        }
-        
-        chatLogController = nil
-        messagesFetcher?.delegate = nil
-        messagesFetcher = nil
-    }
-}
-
-extension MasterActivityContainerController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
-        if let activityID = activityID {
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-
-            if let conversation = networkController.conversationService.conversations.first(where: {$0.chatID == chatID}) {
-                if conversation.activities != nil {
-                    var activities = conversation.activities!
-                    activities.append(activityID)
-                    let updatedActivities = ["activities": activities as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                } else {
-                    let updatedActivities = ["activities": [activityID] as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                }
-                if let index = networkController.activityService.activities.firstIndex(where: {$0.activityID == activityID}) {
-                    let activity = networkController.activityService.activities[index]
-                    if activity.grocerylistID != nil {
-                        if conversation.grocerylists != nil {
-                            var grocerylists = conversation.grocerylists!
-                            grocerylists.append(activity.grocerylistID!)
-                            let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                        } else {
-                            let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                        }
-                        Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
-                    }
-                    if activity.checklistIDs != nil {
-                        if conversation.checklists != nil {
-                            let checklists = conversation.checklists! + activity.checklistIDs!
-                            let updatedChecklists = [checklistsEntity: checklists as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                        } else {
-                            let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                        }
-                        for ID in activity.checklistIDs! {
-                            Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                        }
-                    }
-                    if activity.packinglistIDs != nil {
-                        if conversation.packinglists != nil {
-                            let packinglists = conversation.packinglists! + activity.packinglistIDs!
-                            let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                        } else {
-                            let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
-                            Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                        }
-                       for ID in activity.packinglistIDs! {
-                            Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                        }
-                    }
-                }
-            }
-            self.connectedToChatAlert()
-            self.dismiss(animated: true, completion: nil)
         }
     }
 }
