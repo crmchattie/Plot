@@ -268,7 +268,7 @@ class ChooseActivityTableViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
         
-        cell.activityViewControllerDataStore = self
+        cell.activityDataStore = self
         
         let activity = filteredActivities[indexPath.row]
         
@@ -344,7 +344,7 @@ extension ChooseActivityTableViewController { /* hiding keyboard */
     }
 }
 
-extension ChooseActivityTableViewController: ActivityViewControllerDataStore {
+extension ChooseActivityTableViewController: ActivityDataStore {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         
     }

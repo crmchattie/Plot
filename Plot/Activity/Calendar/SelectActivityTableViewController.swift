@@ -302,7 +302,7 @@ class SelectActivityTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
         
         cell.updateInvitationDelegate = self
-        cell.activityViewControllerDataStore = self
+        cell.activityDataStore = self
         
         if indexPath.section == 0 {
             let activity = filteredPinnedActivities[indexPath.row]
@@ -474,7 +474,7 @@ extension SelectActivityTableViewController: UpdateInvitationDelegate {
     }
 }
 
-extension SelectActivityTableViewController: ActivityViewControllerDataStore {
+extension SelectActivityTableViewController: ActivityDataStore {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return

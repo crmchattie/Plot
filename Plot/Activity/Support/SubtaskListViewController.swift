@@ -42,7 +42,7 @@ class SubtaskListViewController: FormViewController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Sub-Task"
+        title = "Sub-Tasks"
         setupMainView()
         initializeForm()
         

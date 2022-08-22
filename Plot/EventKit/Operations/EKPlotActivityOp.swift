@@ -32,7 +32,7 @@ class EKPlotActivityOp: AsyncOperation {
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
-            if let activityID = activity.activityID {
+            if let activityID = activity.activityID, !(activity.calendarExport ?? false) {
                 dispatchGroup.enter()
                 if let event = eventKitService.storeEvent(for: activity) {
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]

@@ -141,7 +141,7 @@ extension ActivityCell {
     }
     
     func loadParticipantsThumbnail(activity: Activity) {
-        self.activityViewControllerDataStore?.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
+        self.activityDataStore?.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
             InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                 self?.updateParticipantsThumbnail(activity: activity, acceptedParticipants: acceptedParticipant)
                 for i in 0..<acceptedParticipant.count {

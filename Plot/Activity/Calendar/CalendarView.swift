@@ -12,12 +12,12 @@ import FSCalendar
 let kCalendarScope = "CalendarScope"
 let kCalendarView = "CalendarView"
 
-enum CalendarView: String {
+enum CalendarViewFilter: String {
     case list
     case daily
 }
 
-class ActivityView: UIView {
+class CalendarView: UIView {
     
     let calendar = FSCalendar()
     var calendarHeightConstraint: NSLayoutConstraint?

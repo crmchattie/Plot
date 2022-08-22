@@ -81,7 +81,6 @@ class ListFetcher: NSObject {
         var userLists: [String: ListType] = [:]
         
         userListDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            print("observeListForCurrentUser")
             print(snapshot.exists())
             guard snapshot.exists() else {
                 self.uploadInitialPlotLists()

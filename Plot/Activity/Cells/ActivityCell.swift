@@ -25,7 +25,7 @@ class ActivityCell: UITableViewCell {
     var participants: [User] = []
     let thumbnailsCount = 8
     weak var updateInvitationDelegate: UpdateInvitationDelegate?
-    weak var activityViewControllerDataStore: ActivityViewControllerDataStore?
+    weak var activityDataStore: ActivityDataStore?
     var thumbnails: [UIImageView] = []
     var activity: Activity?
     

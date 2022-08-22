@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {}
     
@@ -21,8 +21,8 @@ extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, U
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        filteredlistList = searchText.isEmpty ? listList :
-            listList.filter({ (list) -> Bool in
+        filteredLists = searchText.isEmpty ? lists :
+            lists.filter({ (list) -> Bool in
                 return list.name.lowercased().contains(searchText.lowercased())
             })
         
@@ -36,7 +36,7 @@ extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, U
     }
 }
 
-extension ListViewController { /* hiding keyboard */
+extension ListsViewController { /* hiding keyboard */
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.searchBar?.endEditing(true)

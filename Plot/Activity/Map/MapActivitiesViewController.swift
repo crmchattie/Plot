@@ -16,7 +16,7 @@ import CodableFirebase
 
 class MapActivitiesViewController: UIViewController, UISearchBarDelegate, FloatingPanelControllerDelegate {
     
-    weak var activityViewController: ActivityViewController?
+    weak var calendarViewController: CalendarViewController?
     var activities: [Activity] = [] {
         didSet {
             populateLocations()
@@ -95,7 +95,7 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
         if #available(iOS 13.0, *) {
             mapView.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         }
-        searchVC.activityViewController = activityViewController
+        searchVC.calendarViewController = calendarViewController
         searchVC.conversations = conversations
     }
     
@@ -280,7 +280,7 @@ extension MapActivitiesViewController: MKMapViewDelegate {
 
 class SearchPanelViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
-    weak var activityViewController: ActivityViewController?
+    weak var calendarViewController: CalendarViewController?
     
     var activities: [Activity] = []
     var invitations = [String: Invitation]()
@@ -380,8 +380,8 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
          if let activityCell = cell as? ActivityCell {
-               activityCell.updateInvitationDelegate = activityViewController
-               activityCell.activityViewControllerDataStore = activityViewController
+               activityCell.updateInvitationDelegate = calendarViewController
+               activityCell.activityDataStore = calendarViewController
                
                let activity = activities[indexPath.row]
                var invitation: Invitation?
@@ -399,7 +399,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
         
         let activity = activities[indexPath.row]
                 
-        activityViewController!.loadActivity(activity: activity)
+        calendarViewController!.loadActivity(activity: activity)
     }
 
     func showHeader() {

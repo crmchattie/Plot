@@ -35,6 +35,10 @@ protocol ChooseListDelegate: AnyObject {
     func chosenList(list: ListContainer)
 }
 
+protocol ListViewControllerDataStore: AnyObject {
+    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->())
+}
+
 class ChooseListTableViewController: UITableViewController {
     
     let checklistFetcher = ChecklistFetcher()

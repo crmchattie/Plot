@@ -9,7 +9,7 @@
 import UIKit
 
 
-extension ActivityViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+extension CalendarViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {}
     
@@ -49,7 +49,7 @@ extension ActivityViewController: UISearchBarDelegate, UISearchControllerDelegat
     }
 }
 
-extension ActivityViewController { /* hiding keyboard */
+extension CalendarViewController { /* hiding keyboard */
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.searchBar?.endEditing(true)

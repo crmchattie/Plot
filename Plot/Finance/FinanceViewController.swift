@@ -97,7 +97,7 @@ class FinanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        title = "Finance"
+        title = "Finances"
         
         customSegmented.delegate = self
         collectionView.dataSource = self

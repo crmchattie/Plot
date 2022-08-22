@@ -17,8 +17,7 @@ class ListCell: UITableViewCell {
     let thumbnailsCount = 9
     var thumbnails: [UIImageView] = []
     
-    weak var activityViewControllerDataStore: ActivityViewControllerDataStore?
-    weak var listViewControllerDataStore: ListViewControllerDataStore?
+    weak var activityDataStore: ActivityDataStore?
     
     var grocerylist: Grocerylist?
     var checklist: Checklist?

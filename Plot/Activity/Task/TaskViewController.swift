@@ -913,29 +913,29 @@ class TaskViewController: FormViewController {
             }
         }
         
-        <<< ButtonRow("Checklists") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.accessoryType = .disclosureIndicator
-            row.title = row.tag
-            row.hidden = "$showExtras == false"
-            if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-        }.onCellSelection({ _,_ in
-            self.openList()
-        }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.accessoryType = .disclosureIndicator
-            cell.textLabel?.textAlignment = .left
-            if let _ = self.activity.checklistIDs {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-        }
+//        <<< ButtonRow("Checklists") { row in
+//            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            row.cell.textLabel?.textAlignment = .left
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.title = row.tag
+//            row.hidden = "$showExtras == false"
+//            if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            } else {
+//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            }
+//        }.onCellSelection({ _,_ in
+//            self.openList()
+//        }).cellUpdate { cell, row in
+//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            cell.accessoryType = .disclosureIndicator
+//            cell.textLabel?.textAlignment = .left
+//            if let _ = self.activity.checklistIDs {
+//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            } else {
+//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            }
+//        }
         
         <<< ButtonRow("Media") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

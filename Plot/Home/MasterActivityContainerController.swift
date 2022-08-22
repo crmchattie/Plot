@@ -416,7 +416,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     
     func goToVC(section: SectionType) {
         if section == .calendar, !sortedActivities.isEmpty {
-            let destination = ActivityViewController(networkController: networkController)
+            let destination = CalendarViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
         } else if section == .health, !healthMetrics.isEmpty {

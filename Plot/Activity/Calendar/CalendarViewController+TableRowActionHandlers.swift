@@ -34,7 +34,7 @@ private let pinErrorMessage = "Changes won't be saved across app restarts. Check
 private let muteErrorTitle = "Error muting/unmuting"
 private let muteErrorMessage = "Check your internet connection and try again."
 
-extension ActivityViewController {
+extension CalendarViewController {
     
     fileprivate func delayWithSeconds(_ seconds: Double, completion: @escaping () -> ()) {
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {

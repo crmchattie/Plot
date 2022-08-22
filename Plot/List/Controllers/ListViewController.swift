@@ -1,5 +1,5 @@
 //
-//  OldListViewController.swift
+//  ListViewController.swift
 //  Plot
 //
 //  Created by Cory McHattie on 4/21/20.
@@ -9,29 +9,34 @@
 import UIKit
 import Firebase
 
-protocol OldListViewControllerDataStore: AnyObject {
-    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->())
-}
-
-class OldListViewController: UIViewController {
-        
-    var activities = [Activity]()
+class ListsViewController: UIViewController {
+    var networkController: NetworkController
     
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+        
     weak var calendarViewController: CalendarViewController?
     
     let tableView = UITableView()
     
     let listCellID = "listCellID"
     
-    var listList = [ListContainer]()
-    var filteredlistList = [ListContainer]()
-    var checklists = [Checklist]()
-    var activitylists = [Activitylist]()
-    var grocerylists = [Grocerylist]()
-
-    var users = [User]()
-    var filteredUsers = [User]()
-    var conversations = [Conversation]()
+    var lists = [ListType]()
+    var filteredLists = [ListType]()
+    var activities: [Activity] {
+        return networkController.activityService.activities
+    }
+    var filteredActivities = [Activity]()
+    
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var conversations: [Conversation] = networkController.conversationService.conversations
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -131,39 +136,6 @@ class OldListViewController: UIViewController {
         tableView.tableHeaderView = searchBar
     }
     
-    func updateCellForCLID(ID: String, checklist: Checklist) {
-        if let index = listList.firstIndex(where: {$0.ID == ID}) {
-            listList[index].checklist = checklist
-            handleReloadTableAfterSearch()
-        }
-    }
-    
-    func updateCellForALID(ID: String, activitylist: Activitylist) {
-        if let index = listList.firstIndex(where: {$0.ID == ID}) {
-            listList[index].activitylist = activitylist
-            handleReloadTableAfterSearch()
-        }
-    }
-    
-    func updateCellForGLID(ID: String, grocerylist: Grocerylist) {
-        if let index = listList.firstIndex(where: {$0.ID == ID}) {
-            listList[index].grocerylist = grocerylist
-            handleReloadTableAfterSearch()
-        }
-    }
-    
-    fileprivate func updateCell(at indexPath: IndexPath) {
-        tableView.beginUpdates()
-        tableView.reloadRows(at: [indexPath], with: .none)
-        tableView.endUpdates()
-    }
-    
-    fileprivate func deleteCell(at indexPath: IndexPath) {
-        tableView.beginUpdates()
-        tableView.deleteRows(at: [indexPath], with: .none)
-        tableView.endUpdates()
-    }
-    
     func checkIfThereAreAnyResults(isEmpty: Bool) {
         guard isEmpty else {
             viewPlaceholder.remove(from: tableView, priority: .medium)
@@ -173,24 +145,31 @@ class OldListViewController: UIViewController {
     }
     
     func sortandreload() {
-        listList = []
-        listList = (checklists.map { ListContainer(grocerylist: nil, checklist: $0, activitylist: nil, packinglist: nil) } + activitylists.map { ListContainer(grocerylist: nil, checklist: nil, activitylist: $0, packinglist: nil) } + grocerylists.map { ListContainer(grocerylist: $0, checklist: nil, activitylist: nil, packinglist: nil) }).sorted { $0.lastModifiedDate > $1.lastModifiedDate }
-        filteredlistList = listList
+        lists = []
+        let listIDs = activities.map({ $0.listID })
+        for (_, currentLists) in networkController.activityService.lists {
+            for list in currentLists {
+                if listIDs.contains(list.id) {
+                    lists.append(list)
+                }
+            }
+        }
+        filteredLists = lists
         tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
-        listList.sort { (list1, list2) -> Bool in
-            return list1.lastModifiedDate > list2.lastModifiedDate
+        lists.sort { (list1, list2) -> Bool in
+            return list1.lastModifiedDate ?? Date.distantPast > list2.lastModifiedDate ?? Date.distantPast
         }
-        filteredlistList = listList
+        filteredLists = lists
         tableView.reloadData()
         
     }
     
 }
 
-extension OldListViewController: UITableViewDataSource, UITableViewDelegate {
+extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
 //    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
 //        
@@ -205,98 +184,30 @@ extension OldListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if filteredlistList.count == 0 {
+        if  filteredLists.count == 0 {
             checkIfThereAreAnyResults(isEmpty: true)
         } else {
             checkIfThereAreAnyResults(isEmpty: false)
         }
-        return filteredlistList.count
+        return filteredLists.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ListCell ?? ListCell()
         cell.delegate = self
-        cell.listViewControllerDataStore = self
-        
-        let list = filteredlistList[indexPath.row]
-        if let grocerylist = list.grocerylist {
-            cell.configureCell(for: indexPath, grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil)
-        } else if let checklist = list.checklist {
-            cell.configureCell(for: indexPath, grocerylist: nil, checklist: checklist, packinglist: nil, activitylist: nil)
-        } else if let activitylist = list.activitylist {
-            cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: nil, activitylist: activitylist)
-        } else if let packinglist = list.packinglist {
-            cell.configureCell(for: indexPath, grocerylist: nil, checklist: nil, packinglist: packinglist, activitylist: nil)
-        }
+        let list = filteredLists[indexPath.row]
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let list = filteredLists[indexPath.row]
         
-        let list = filteredlistList[indexPath.row]
-        if let grocerylist = list.grocerylist {
-            let destination = GrocerylistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.grocerylist = grocerylist
-            destination.comingFromLists = true
-            destination.connectedToAct = grocerylist.activityID != nil
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            destination.conversations = self.conversations
-            self.getParticipants(grocerylist: grocerylist, checklist: nil, activitylist: nil, packinglist: nil) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-        } else if let checklist = list.checklist {
-            let destination = ChecklistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.checklist = checklist
-            destination.comingFromLists = true
-            destination.connectedToAct = checklist.activityID != nil
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            destination.conversations = self.conversations
-            self.getParticipants(grocerylist: nil, checklist: checklist, activitylist: nil, packinglist: nil) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-        } else if let activitylist = list.activitylist {
-            let destination = ActivitylistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.activitylist = activitylist
-            destination.comingFromLists = true
-            destination.connectedToAct = activitylist.activityID != nil
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            destination.conversations = self.conversations
-            self.getParticipants(grocerylist: nil, checklist: nil, activitylist: activitylist, packinglist: nil) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-        } else if let packinglist = list.packinglist {
-            let destination = PackinglistViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.packinglist = packinglist
-            destination.comingFromLists = true
-            destination.connectedToAct = packinglist.activityID != nil
-            destination.users = self.users
-            destination.filteredUsers = self.filteredUsers
-            destination.activities = self.activities
-            destination.conversations = self.conversations
-            self.getParticipants(grocerylist: nil, checklist: nil, activitylist: nil, packinglist: packinglist) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-        }
     }
     
     
 }
 
-extension OldListViewController: OldListViewControllerDataStore {
+extension ListViewController: ListViewControllerDataStore {
     func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, activitylist: Activitylist?, packinglist: Packinglist?, completion: @escaping ([User])->()) {
         if let grocerylist = grocerylist, let ID = grocerylist.ID, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
@@ -428,7 +339,7 @@ extension OldListViewController: OldListViewControllerDataStore {
     }
 }
 
-extension OldListViewController: ListCellDelegate {
+extension ListViewController: ListCellDelegate {
     func openActivity(activityID: String) {
         if let index = self.activities.firstIndex(where: {$0.activityID == activityID}) {
             calendarViewController!.loadActivity(activity: activities[index])
@@ -500,7 +411,7 @@ extension OldListViewController: ListCellDelegate {
     }
 }
 
-extension OldListViewController: MessagesDelegate {
+extension ListViewController: MessagesDelegate {
     
     func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
         chatLogController?.updateMessageStatus(messageRef: reference)
@@ -538,7 +449,7 @@ extension OldListViewController: MessagesDelegate {
     }
 }
 
-extension OldListViewController: ChooseChatDelegate {
+extension ListViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let grocerylistID = grocerylistID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]

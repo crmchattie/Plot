@@ -12,7 +12,8 @@ import CodableFirebase
 
 let kAppVersionKey = "AppVersionKey"
 var appLoaded = false
-extension ActivityViewController {
+
+extension CalendarViewController {
     
     func createParticiapantsInvitations(forActivities activities: [Activity]) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {

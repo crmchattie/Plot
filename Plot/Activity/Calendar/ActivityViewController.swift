@@ -44,7 +44,7 @@ protocol ActivityViewControllerDataStore: AnyObject {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->())
 }
 
-class ActivityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate {
+class CalendarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {

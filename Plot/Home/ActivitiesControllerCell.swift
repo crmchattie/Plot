@@ -76,7 +76,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
-        cell.activityViewControllerDataStore = self
+        cell.activityDataStore = self
         let activity = activities[indexPath.row]
         var invitation: Invitation? = nil
         if let activityID = activity.activityID, let value = invitations[activityID] {
@@ -97,7 +97,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
 }
 
-extension ActivitiesControllerCell: ActivityViewControllerDataStore {
+extension ActivitiesControllerCell: ActivityDataStore {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return

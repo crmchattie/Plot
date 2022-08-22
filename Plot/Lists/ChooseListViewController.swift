@@ -46,7 +46,7 @@ class ChooseListViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Reminders"
+        self.title = "Lists"
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         configureTableView()

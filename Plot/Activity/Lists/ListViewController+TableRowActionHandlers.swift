@@ -34,7 +34,7 @@ private let pinErrorMessage = "Changes won't be saved across app restarts. Check
 private let muteErrorTitle = "Error muting/unmuting"
 private let muteErrorMessage = "Check your internet connection and try again."
 
-extension ListViewController {
+extension ListsViewController {
     
     fileprivate func delayWithSeconds(_ seconds: Double, completion: @escaping () -> ()) {
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
@@ -48,11 +48,11 @@ extension ListViewController {
                 self.tableView.setEditing(false, animated: true)
             }
             self.delayWithSeconds(1, completion: {
-                self.handleMute(section: indexPath.section, for: self.listList[indexPath.row])
+                self.handleMute(section: indexPath.section, for: self.lists[indexPath.row])
             })
         }
 
-        let isMuted = listList[indexPath.row].muted == true
+        let isMuted = lists[indexPath.row].muted == true
         let muteTitle = isMuted ? "Unmute" : "Mute"
         mute.title = muteTitle
         mute.backgroundColor = UIColor(red:0.56, green:0.64, blue:0.68, alpha:1.0)
@@ -77,74 +77,11 @@ extension ListViewController {
 
     func deleteList(at indexPath: IndexPath) {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let list = listList[indexPath.row]
-        if list.type == "grocerylist" {
-            if let index = self.grocerylists.firstIndex(where: {$0 == list.grocerylist}) {
-                tableView.beginUpdates()
-                listList.remove(at: indexPath.row)
-                grocerylists.remove(at: index)
-
-                tableView.deleteRows(at: [indexPath], with: .left)
-                tableView.endUpdates()
-            Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
-            Database.database().reference().child(userGrocerylistsEntity).child(currentUserID).child(list.ID).removeValue()
-
-                let dataReference = Database.database().reference().child(grocerylistsEntity).child(list.ID)
-                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
-                        var varMemberIDs = membersIDs
-                        varMemberIDs[currentUserID] = nil
-                        dataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
-                    }
-                })
-            }
-        } else if list.type == "checklist" {
-            if let index = self.checklists.firstIndex(where: {$0 == list.checklist}) {
-                tableView.beginUpdates()
-                listList.remove(at: indexPath.row)
-                checklists.remove(at: index)
-
-                tableView.deleteRows(at: [indexPath], with: .left)
-                tableView.endUpdates()
-                Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
-                Database.database().reference().child(userChecklistsEntity).child(currentUserID).child(list.ID).removeValue()
-
-                let dataReference = Database.database().reference().child(checklistsEntity).child(list.ID)
-                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
-                        var varMemberIDs = membersIDs
-                        varMemberIDs[currentUserID] = nil
-                        dataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
-                    }
-                })
-            }
-        } else if list.type == "activitylist" {
-            if let index = self.activitylists.firstIndex(where: {$0 == list.activitylist}) {
-                tableView.beginUpdates()
-                listList.remove(at: indexPath.row)
-                activitylists.remove(at: index)
-
-                tableView.deleteRows(at: [indexPath], with: .left)
-                tableView.endUpdates()
-                Database.database().reference().child(userActivitylistsEntity).child(currentUserID).child(list.ID).removeAllObservers()
-                Database.database().reference().child(userActivitylistsEntity).child(currentUserID).child(list.ID).removeValue()
-
-                let dataReference = Database.database().reference().child(activitylistsEntity).child(list.ID)
-                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
-                        var varMemberIDs = membersIDs
-                        varMemberIDs[currentUserID] = nil
-                        dataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
-                    }
-                })
-            }
-        }
+        let list = lists[indexPath.row]
+        
 
 //        configureTabBarBadge()
-        if listList.count <= 0 {
+        if lists.count <= 0 {
             DispatchQueue.main.async {
                 self.checkIfThereAreAnyResults(isEmpty: true)
             }

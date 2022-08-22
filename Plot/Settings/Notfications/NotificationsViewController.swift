@@ -249,7 +249,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let activityCell = cell as? ActivityCell {
                 activityCell.updateInvitationDelegate = self
-                activityCell.activityViewControllerDataStore = self
+                activityCell.activityDataStore = self
                 let activity = filteredInvitedActivities[indexPath.row]
                 var invitation: Invitation?
                 if let activityID = activity.activityID, let value = invitations[activityID] {
@@ -588,7 +588,7 @@ extension NotificationsViewController: UpdateInvitationDelegate {
     }
 }
 
-extension NotificationsViewController: ActivityViewControllerDataStore {
+extension NotificationsViewController: ActivityDataStore {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
