@@ -13,6 +13,8 @@ import Firebase
 
 let documentsEntity = "documents"
 let imagesEntity = "images"
+let activitiesEntity = "activities"
+let messageMetaDataFirebaseFolder = "metaData"
 
 class ShareViewController: UIViewController {
     
@@ -57,7 +59,7 @@ class ShareViewController: UIViewController {
         shareHeaderView.frame = view.bounds
         shareHeaderView.tableView.dataSource = self
         shareHeaderView.tableView.delegate = self
-        shareHeaderView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: Identifiers.ActivityCell)
+        shareHeaderView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: Identifiers.EventCell)
         shareHeaderView.tableView.rowHeight = UITableView.automaticDimension
         shareHeaderView.tableView.separatorStyle = .none
     }
@@ -165,7 +167,7 @@ class ShareViewController: UIViewController {
         
         dispatchGroup.notify(queue: DispatchQueue.main, execute: {
             if !imageURLs.isEmpty {
-                let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child("metaData")
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activity.activityID!).child(messageMetaDataFirebaseFolder)
                 activityReference.updateChildValues(["activityPhotos": imageURLs])
             }
             self.hideActivityIndicator()
@@ -203,7 +205,7 @@ class ShareViewController: UIViewController {
         }
         dispatchGroup.notify(queue: DispatchQueue.main, execute: {
             if !fileURLs.isEmpty {
-                let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child("metaData")
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activity.activityID!).child(messageMetaDataFirebaseFolder)
                 activityReference.updateChildValues(["activityFiles": fileURLs])
             }
             self.hideActivityIndicator()
@@ -316,7 +318,7 @@ extension ShareViewController: UITableViewDataSource {
         return activitiesArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.ActivityCell, for: indexPath) as? ActivityCell ?? ActivityCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.EventCell, for: indexPath) as? EventCell ?? EventCell()
         
         let activity = activitiesArray[indexPath.row]
         cell.configureCell(for: indexPath, activity: activity)
@@ -342,7 +344,7 @@ extension ShareViewController: UITableViewDelegate {
 
 extension ShareViewController {
     struct Identifiers {
-        static let ActivityCell = "activityCell"
+        static let EventCell = "eventCell"
     }
     
 }

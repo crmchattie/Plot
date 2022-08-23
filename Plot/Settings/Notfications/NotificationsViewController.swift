@@ -76,7 +76,7 @@ class NotificationsViewController: UIViewController {
         
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
+        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: notificationCellID)
         tableView.isUserInteractionEnabled = true
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -245,17 +245,17 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             }
             return cell
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath)
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            if let activityCell = cell as? ActivityCell {
-                activityCell.updateInvitationDelegate = self
-                activityCell.activityDataStore = self
+            if let eventCell = cell as? EventCell {
+                eventCell.updateInvitationDelegate = self
+                eventCell.activityDataStore = self
                 let activity = filteredInvitedActivities[indexPath.row]
                 var invitation: Invitation?
                 if let activityID = activity.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
-                activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+                eventCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
             }
             return cell
         }

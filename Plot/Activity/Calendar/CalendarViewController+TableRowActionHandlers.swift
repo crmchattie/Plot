@@ -135,7 +135,7 @@ extension CalendarViewController {
 //        activityView.tableView.insertRows(at: [destinationIndexPath], with: .bottom)
 //        activityView.tableView.endUpdates()
 //
-//        let metadataRef = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+//        let metadataRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
 //        metadataRef.updateChildValues(["pinned": false], withCompletionBlock: { (error, reference) in
 //            if error != nil {
 //                basicErrorAlertWith(title: pinErrorTitle , message: pinErrorMessage, controller: self)
@@ -174,7 +174,7 @@ extension CalendarViewController {
 //        activityView.tableView.insertRows(at: [destinationIndexPath], with: .top)
 //        activityView.tableView.endUpdates()
 //
-//        let metadataReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+//        let metadataReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
 //        metadataReference.updateChildValues(["pinned": true], withCompletionBlock: { (error, reference) in
 //            if error != nil {
 //                basicErrorAlertWith(title: pinErrorTitle, message: pinErrorMessage, controller: self)
@@ -202,10 +202,10 @@ extension CalendarViewController {
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
         
-        Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
-        Database.database().reference().child("user-activities").child(currentUserID).child(activityID).removeValue()
+        Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+        Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).removeValue()
     
-        let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
@@ -227,13 +227,13 @@ extension CalendarViewController {
         let activity = filteredActivities[indexPath.row]
         guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activity.activityID  else { return }
         
-        guard let index = networkController.activityService.activities.firstIndex(where: { (activity) -> Bool in
+        guard let index = networkController.activityService.events.firstIndex(where: { (activity) -> Bool in
             return activity.activityID == self.filteredActivities[indexPath.row].activityID
         }) else { return }
         
         activityView.tableView.beginUpdates()
         filteredActivities.remove(at: indexPath.row)
-        networkController.activityService.activities.remove(at: index)
+        networkController.activityService.events.remove(at: index)
         
         if let invitation = networkController.activityService.invitations.removeValue(forKey: activityID) {
             InvitationsFetcher.remove(invitation: invitation)
@@ -241,10 +241,10 @@ extension CalendarViewController {
         
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()
-        Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
-        Database.database().reference().child("user-activities").child(currentUserID).child(activityID).removeValue()
+        Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
+        Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).removeValue()
     
-        let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
@@ -264,7 +264,7 @@ extension CalendarViewController {
     
     fileprivate func updateMutedDatabaseValue(to state: Bool, currentUserID: String, activityID: String) {
         
-        let metadataReference = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+        let metadataReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
         metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
             if error != nil {
                 basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)

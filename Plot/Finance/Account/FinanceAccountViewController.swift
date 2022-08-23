@@ -20,7 +20,7 @@ class FinanceAccountViewController: FormViewController {
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.activities
+    lazy var activities: [Activity] = networkController.activityService.events
     
     var selectedFalconUsers = [User]()
     

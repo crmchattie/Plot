@@ -789,7 +789,7 @@ extension ChecklistViewController: ChooseActivityDelegate {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let newChecklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
                 
-                let groupActivityReference = Database.database().reference().child("activities").child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
+                let groupActivityReference = Database.database().reference().child(activitiesEntity).child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
                 if mergeActivity.checklistIDs != nil {
                     var checklistIDs = mergeActivity.checklistIDs!
                     checklistIDs.append(newChecklistID)
@@ -815,7 +815,7 @@ extension ChecklistViewController: ChooseActivityDelegate {
                 }
             }
         } else {
-            let groupActivityReference = Database.database().reference().child("activities").child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
+            let groupActivityReference = Database.database().reference().child(activitiesEntity).child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
             if mergeActivity.checklistIDs != nil {
                 var checklistIDs = mergeActivity.checklistIDs!
                 checklistIDs.append(checklist.ID!)
@@ -858,17 +858,17 @@ extension ChecklistViewController: ChooseChatDelegate {
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
                 }
                 if let activityID = activityID {
-                    Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+                    Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
                     if conversation.activities != nil {
                         var activities = conversation.activities!
                         activities.append(activityID)
-                        let updatedActivities = ["activities": activities as AnyObject]
+                        let updatedActivities = [activitiesEntity: activities as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     } else {
-                        let updatedActivities = ["activities": [activityID] as AnyObject]
+                        let updatedActivities = [activitiesEntity: [activityID] as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     }
-                    Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
+                    Database.database().reference().child(activitiesEntity).child(activityID).updateChildValues(updatedConversationID)
                 }
                 self.connectedToChatAlert()
                 self.dismiss(animated: true, completion: nil)

@@ -40,7 +40,7 @@ class EventViewController: FormViewController {
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.activities
+    lazy var activities: [Activity] = networkController.activityService.events
     lazy var calendars: [String: [CalendarType]] = networkController.activityService.calendars
     lazy var conversations: [Conversation] = networkController.conversationService.conversations
     lazy var transactions: [Transaction] = networkController.financeService.transactions
@@ -102,7 +102,6 @@ class EventViewController: FormViewController {
             activityOld = activity.copy() as? Activity
             if activity.activityID != nil {
                 activityID = activity.activityID!
-                print(activityID)
             }
             if activity.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 activity.admin = currentUserID

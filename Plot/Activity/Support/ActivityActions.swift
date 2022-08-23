@@ -17,9 +17,6 @@ class ActivityActions: NSObject {
     var active: Bool?
     var selectedFalconUsers: [User]?
     
-    var startDateTime: Date?
-    var endDateTime: Date?
-    
     let dispatchGroup = DispatchGroup()
     let eventKitService = EventKitService()
     let googleCalService = GoogleCalService()
@@ -29,8 +26,6 @@ class ActivityActions: NSObject {
         self.activity = activity
         self.activityID = activity.activityID
         self.active = active
-        self.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
-        self.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
         self.selectedFalconUsers = selectedFalconUsers
     }
     
@@ -306,7 +301,7 @@ class ActivityActions: NSObject {
     }
     
     func scheduleReminder() {
-        guard let activity = activity, let activityReminder = activity.reminder, let activityID = activityID, let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
+        guard let activity = activity, let activityReminder = activity.reminder, let activityID = activityID, let startDate = activity.startDate, let endDate = activity.endDate, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
             return
         }
         let center = UNUserNotificationCenter.current()

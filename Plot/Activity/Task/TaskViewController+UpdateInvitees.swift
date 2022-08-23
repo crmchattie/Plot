@@ -15,11 +15,10 @@ extension TaskViewController: UpdateInvitees {
         if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
             if !selectedFalconUsers.isEmpty {
                 self.selectedFalconUsers = selectedFalconUsers
-                self.acceptedParticipant = acceptedParticipant.filter {selectedFalconUsers.contains($0)}
                 
-                var participantCount = self.acceptedParticipant.count
+                var participantCount = self.selectedFalconUsers.count
                 // If user is creating this activity (admin)
-                if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
+                if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
                     participantCount += 1
                 }
                 
@@ -34,14 +33,13 @@ extension TaskViewController: UpdateInvitees {
                 
             } else {
                 self.selectedFalconUsers = selectedFalconUsers
-                self.acceptedParticipant = selectedFalconUsers
                 inviteesRow.title = "1 participant"
                 inviteesRow.updateCell()
             }
             
             if active {
                 showActivityIndicator()
-                let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+                let createActivity = ActivityActions(activity: task, active: active, selectedFalconUsers: selectedFalconUsers)
                 createActivity.updateActivityParticipants()
                 
                 for list in listList {

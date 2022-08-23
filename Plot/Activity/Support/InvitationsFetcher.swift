@@ -41,7 +41,7 @@ class InvitationsFetcher: NSObject {
                                 invitations[invitation.activityID] = invitation
                                 
                                 group.enter()
-                                ref.child("activities").child(invitation.activityID).observeSingleEvent(of: .value, with: { activitySnapshot in
+                                ref.child(activitiesEntity).child(invitation.activityID).observeSingleEvent(of: .value, with: { activitySnapshot in
                                     if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject], let meta = activitySnapshotValue["metaData"] as? [String: AnyObject] {
                                         let activity = Activity(dictionary: meta)
                                         activiitiesForInvitations.append(activity)

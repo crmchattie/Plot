@@ -14,7 +14,8 @@ import LBTATools
 import HealthKit
 import GoogleSignIn
 
-let activitiesControllerCell = "ActivitiesControllerCell"
+let tasksControllerCell = "TasksControllerCell"
+let eventsControllerCell = "EventsControllerCell"
 let healthControllerCell = "HealthControllerCell"
 let financeControllerCell = "FinanceControllerCell"
 let setupCell = "SetupCell"
@@ -30,19 +31,7 @@ protocol ManageAppearanceHome: AnyObject {
 }
 
 class MasterActivityContainerController: UIViewController, ActivityDetailShowing {
-    
-    var networkController = NetworkController() {
-        didSet {
-            scrollToFirstActivityWithDate({ (activities) in
-                self.sortedActivities = activities
-                self.grabFinancialItems { (sections, groups) in
-                    self.financeSections = sections
-                    self.financeGroups = groups
-                    self.collectionView.reloadData()
-                }
-            })
-        }
-    }
+    var networkController = NetworkController()
 
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
@@ -53,7 +42,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
             
     var sections: [SectionType] = [.tasks, .calendar, .health, .finances]
     
-    var sortedActivities = [Activity]()
+    var sortedEvents = [Activity]()
     var sortedTasks = [Activity]()
     
     var updatingTasks = true
@@ -94,7 +83,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     var transactionsDictionary = [TransactionDetails: [Transaction]]()
     var accountsDictionary = [AccountDetails: [MXAccount]]()
     
-    var activitiesParticipants: [String: [User]] = [:]
+    var participants: [String: [User]] = [:]
     
     var isNewUser: Bool = true
     
@@ -201,7 +190,8 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         collectionView.fillSuperviewSafeAreaLayoutGuide()
         collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         
-        collectionView.register(ActivitiesControllerCell.self, forCellWithReuseIdentifier: activitiesControllerCell)
+        collectionView.register(EventsControllerCell.self, forCellWithReuseIdentifier: eventsControllerCell)
+        collectionView.register(TasksControllerCell.self, forCellWithReuseIdentifier: tasksControllerCell)
         collectionView.register(HealthControllerCell.self, forCellWithReuseIdentifier: healthControllerCell)
         collectionView.register(FinanceControllerCell.self, forCellWithReuseIdentifier: financeControllerCell)
         collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
@@ -238,14 +228,21 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     
     @objc fileprivate func tasksUpdated() {
         self.updatingTasks = false
-        
+        scrollToFirstTask({ (tasks) in
+            if self.sortedTasks != tasks {
+                self.sortedTasks = tasks
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+            }
+        })
     }
     
     @objc fileprivate func eventsUpdated() {
         self.updatingEvents = false
-        scrollToFirstActivityWithDate({ (activities) in
-            if self.sortedActivities != activities {
-                self.sortedActivities = activities
+        scrollToFirstActivityWithDate({ (events) in
+            if self.sortedEvents != events {
+                self.sortedEvents = events
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
                 }
@@ -322,8 +319,20 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         })
     }
     
+    func scrollToFirstTask(_ completion: @escaping ([Activity]) -> Void) {
+        let allTasks = networkController.activityService.tasks
+        var tasks = Array(allTasks.filter { !($0.isCompleted ?? false) }.prefix(4))
+        tasks = tasks.sorted(by: { task1, task2 in
+            if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
+                return task1.name ?? "" < task2.name ?? ""
+            }
+            return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+        })
+        completion(tasks)
+    }
+    
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
-        let allActivities = networkController.activityService.activities
+        let allActivities = networkController.activityService.events
         let totalNumberOfActivities = allActivities.count
         let numberOfActivities = 4
         if totalNumberOfActivities < numberOfActivities {
@@ -331,7 +340,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
             return
         }
         var index = 0
-        var activities = [Activity]()
+        var events = [Activity]()
         let currentDate = Date().localTime
         var calendar = Calendar.current
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
@@ -339,10 +348,10 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
             if let endDate = activity.endDateWTZ {
                 if (currentDate < endDate) || (activity.allDay ?? false && calendar.compare(currentDate, to: endDate, toGranularity: .day) != .orderedDescending) {
                     if index < totalNumberOfActivities - (numberOfActivities - 1) {
-                        if activities.count < numberOfActivities {
-                            activities.append(allActivities[index])
+                        if events.count < numberOfActivities {
+                            events.append(allActivities[index])
                         } else {
-                            completion(activities)
+                            completion(events)
                             return
                         }
                     } else {
@@ -353,11 +362,11 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
             }
         }
         
-        activities = []
+        events = []
         for i in 1...numberOfActivities {
-            activities.insert(allActivities[totalNumberOfActivities - i], at: 0)
+            events.insert(allActivities[totalNumberOfActivities - i], at: 0)
         }
-        completion(activities)
+        completion(events)
     }
     
     func grabFinancialItems(_ completion: @escaping ([SectionType], [SectionType: [AnyHashable]]) -> Void) {
@@ -420,7 +429,11 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     
     func goToVC(section: SectionType) {
-        if section == .calendar, !sortedActivities.isEmpty {
+        if section == .tasks, !sortedTasks.isEmpty {
+            let destination = ListsViewController(networkController: networkController)
+            destination.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(destination, animated: true)
+        } else if section == .calendar, !sortedEvents.isEmpty {
             let destination = CalendarViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
@@ -446,7 +459,7 @@ extension MasterActivityContainerController {
     
     @objc func goToNotifications() {
         let destination = NotificationsViewController()
-        destination.notificationActivities = networkController.activityService.activities
+        destination.notificationActivities = networkController.activityService.events
         destination.invitedActivities = networkController.activityService.invitedActivities
         destination.invitations = networkController.activityService.invitations
         destination.users = networkController.userService.users
@@ -484,6 +497,9 @@ extension MasterActivityContainerController: HeaderContainerCellDelegate {
 }
 
 extension MasterActivityContainerController: GIDSignInDelegate {
+    func newTask() {
+        
+    }
     func newCalendarItem() {
         if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -549,10 +565,17 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     }
 }
 
-// MARK: - ActivitiesControllerCellDelegate
+// MARK: - TasksControllerCellDelegate
 
-extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
-    
+extension MasterActivityContainerController: TasksControllerCellDelegate {
+    func cellTapped(task: Activity) {
+        showTaskDetail(task: task)
+    }
+}
+
+// MARK: - EventsControllerCellDelegate
+
+extension MasterActivityContainerController: EventsControllerCellDelegate {
     func cellTapped(activity: Activity) {
         showActivityDetail(activity: activity)
     }
@@ -755,8 +778,8 @@ extension MasterActivityContainerController: DeleteAndExitDelegate {
     }
     
     func activityIndex(for otherActivityID: String, at section: Int) -> Int? {
-//        let activitiesArray = section == 0 ? filteredPinnedActivities : filteredActivities
-//        guard let index = activitiesArray.firstIndex(where: { (activity) -> Bool in
+//        let eventsArray = section == 0 ? filteredPinnedActivities : filteredActivities
+//        guard let index = eventsArray.firstIndex(where: { (activity) -> Bool in
 //            guard let activityID = activity.activityID else { return false }
 //            return activityID == otherActivityID
 //        }) else { return nil }

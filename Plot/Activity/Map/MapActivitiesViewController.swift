@@ -311,7 +311,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
         super.viewDidLoad()
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
+        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.isUserInteractionEnabled = true
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorStyle = .none
@@ -378,17 +378,17 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath)
-         if let activityCell = cell as? ActivityCell {
-               activityCell.updateInvitationDelegate = calendarViewController
-               activityCell.activityDataStore = calendarViewController
+        let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath)
+         if let eventCell = cell as? EventCell {
+               eventCell.updateInvitationDelegate = calendarViewController
+               eventCell.activityDataStore = calendarViewController
                
                let activity = activities[indexPath.row]
                var invitation: Invitation?
                if let activityID = activity.activityID, let value = invitations[activityID] {
                    invitation = value
                }
-               activityCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+               eventCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
            }
         return cell
             

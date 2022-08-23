@@ -38,7 +38,7 @@ protocol ChooseActivityDelegate: AnyObject {
 
 class ChooseActivityTableViewController: UITableViewController {
     
-    let activityCellID = "activityCellID"
+    let eventCellID = "eventCellID"
     
     var needDelegate = false
     
@@ -114,7 +114,7 @@ class ChooseActivityTableViewController: UITableViewController {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
-        tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
+        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -266,7 +266,7 @@ class ChooseActivityTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
         
         cell.activityDataStore = self
         

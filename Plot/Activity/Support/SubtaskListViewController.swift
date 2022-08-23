@@ -25,7 +25,7 @@ class SubtaskListViewController: FormViewController {
     var subtaskList: [Activity]!
     var subtaskIndex: Int = 0
     
-    var acceptedParticipant = [User]()
+    var selectedFalconUsers = [User]()
     var startDateTime: Date?
     var endDateTime: Date?
     
@@ -117,8 +117,8 @@ class SubtaskListViewController: FormViewController {
             let subtaskItem = subtaskList[subtaskIndex]
             let destination = SubtaskViewController()
             destination.subtask = subtaskItem
-            destination.users = acceptedParticipant
-            destination.filteredUsers = acceptedParticipant
+            destination.users = selectedFalconUsers
+            destination.filteredUsers = selectedFalconUsers
             destination.startDateTime = startDateTime
             destination.endDateTime = endDateTime
             destination.delegate = self
@@ -131,8 +131,8 @@ class SubtaskListViewController: FormViewController {
                     mvs.remove(at: mvs.count - 2)
                 }
                 let destination = SubtaskViewController()
-                destination.users = self.acceptedParticipant
-                destination.filteredUsers = self.acceptedParticipant
+                destination.users = self.selectedFalconUsers
+                destination.filteredUsers = self.selectedFalconUsers
                 destination.delegate = self
                 destination.startDateTime = self.startDateTime
                 destination.endDateTime = self.endDateTime

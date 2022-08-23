@@ -336,7 +336,7 @@ extension EventViewController {
     }
     
     func updateLists(type: String) {
-        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "schedule" {
             var scheduleIDs = [String]()
             for schedule in scheduleList {
@@ -820,7 +820,7 @@ extension EventViewController {
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
-            self.delegate?.updateActivity(activity: activity ?? self.activity)
+            self.delegate?.updateActivity(activity: self.activity)
             self.navigationController?.popViewController(animated: true)
         }
     }
@@ -1111,7 +1111,7 @@ extension EventViewController {
     
     func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let badgeRef = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
+        let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
         badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
             var value = mutableData.value as? Int
             value = 0
@@ -1129,7 +1129,7 @@ extension EventViewController {
     }
     
     func runActivityBadgeUpdate(firstChild: String, secondChild: String) {
-        var ref = Database.database().reference().child("user-activities").child(firstChild).child(secondChild)
+        var ref = Database.database().reference().child(userActivitiesEntity).child(firstChild).child(secondChild)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             
             guard snapshot.hasChild(messageMetaDataFirebaseFolder) else {

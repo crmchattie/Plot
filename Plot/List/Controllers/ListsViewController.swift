@@ -33,8 +33,8 @@ class ListsViewController: UIViewController {
     
     var lists = [ListType]()
     var filteredLists = [ListType]()
-    var activities: [Activity] {
-        return networkController.activityService.activities
+    var tasks: [Activity] {
+        return networkController.activityService.tasks
     }
     var filteredActivities = [Activity]()
     
@@ -59,7 +59,7 @@ class ListsViewController: UIViewController {
         
         setupMainView()
         setupTableView()
-        
+        sortandreload()
         addObservers()
         
     }
@@ -88,11 +88,8 @@ class ListsViewController: UIViewController {
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
-        navigationItem.title = "Lists"
+        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.title = "Tasks"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
     }
     
@@ -116,8 +113,7 @@ class ListsViewController: UIViewController {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
         
-        tableView.sectionIndexBackgroundColor = view.backgroundColor
-        tableView.backgroundColor = view.backgroundColor
+        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorStyle = .none
         tableView.keyboardDismissMode = .onDrag
         tableView.rowHeight = UITableView.automaticDimension
@@ -147,7 +143,8 @@ class ListsViewController: UIViewController {
     
     func sortandreload() {
         lists = []
-        let listIDs = activities.map({ $0.listID })
+        let listIDs = tasks.map({ $0.listID })
+        print(listIDs)
         for (_, currentLists) in networkController.activityService.lists {
             for list in currentLists {
                 if listIDs.contains(list.id) {
@@ -200,7 +197,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ListCell ?? ListCell()
         let list = filteredLists[indexPath.row]
-        cell.list = list
+        cell.configureCell(for: indexPath, list: list)
         return cell
     }
     
@@ -208,8 +205,6 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         let list = filteredLists[indexPath.row]
         openList(list: list)
     }
-    
-    
 }
 
 extension ListsViewController: ListDataStore {

@@ -34,7 +34,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 
 class SelectActivityTableViewController: UITableViewController {
     
-    fileprivate let activityCellID = "activityCellID"
+    fileprivate let eventCellID = "eventCellID"
     
     var searchBar: UISearchBar?
     var searchActivityController: UISearchController?
@@ -111,7 +111,7 @@ class SelectActivityTableViewController: UITableViewController {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
+        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
 //        let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
@@ -299,7 +299,7 @@ class SelectActivityTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
         
         cell.updateInvitationDelegate = self
         cell.activityDataStore = self

@@ -13,13 +13,23 @@ import CodableFirebase
 protocol ActivityDetailShowing: UIViewController {
     
     var networkController: NetworkController { get }
-    var activitiesParticipants: [String: [User]] { get set }
+    var participants: [String: [User]] { get set }
     
     func showActivityIndicator()
     func hideActivityIndicator()
 }
 
 extension ActivityDetailShowing {
+    
+    func showTaskDetail(task: Activity) {
+        let destination = TaskViewController(networkController: networkController)
+        destination.hidesBottomBarWhenPushed = true
+        destination.task = task
+        self.getParticipants(forActivity: task) { (participants) in
+            destination.selectedFalconUsers = participants
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
     
     func showActivityDetail(activity: Activity) {
         let destination = EventViewController(networkController: networkController)
@@ -41,7 +51,7 @@ extension ActivityDetailShowing {
         }
         
         let group = DispatchGroup()
-        let olderParticipants = self.activitiesParticipants[activityID]
+        let olderParticipants = self.participants[activityID]
         var participants: [User] = []
         for id in participantsIDs {
             // Only if the current user is created this activity
@@ -68,7 +78,7 @@ extension ActivityDetailShowing {
         }
         
         group.notify(queue: .main) {
-            self.activitiesParticipants[activityID] = participants
+            self.participants[activityID] = participants
             completion(participants)
         }
     }

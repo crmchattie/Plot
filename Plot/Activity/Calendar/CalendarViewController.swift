@@ -33,7 +33,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
-let activityCellID = "activityCellID"
+let eventCellID = "eventCellID"
 let notificationCellID = "notificationCellID"
 
 protocol UpdateInvitationDelegate: AnyObject {
@@ -65,7 +65,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     var searchController: UISearchController?
     
     var activities: [Activity] {
-        return networkController.activityService.activities
+        return networkController.activityService.events
     }
     var filteredActivities = [Activity]()
     var pinnedActivities = [Activity]()
@@ -238,7 +238,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         
         activityView.tableView.dataSource = self
         activityView.tableView.delegate = self
-        activityView.tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
+        activityView.tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         activityView.tableView.allowsMultipleSelectionDuringEditing = false
         activityView.tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         activityView.tableView.backgroundColor = view.backgroundColor
@@ -645,7 +645,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
         cell.updateInvitationDelegate = self
         cell.activityDataStore = self
         if indexPath.section == 0 {

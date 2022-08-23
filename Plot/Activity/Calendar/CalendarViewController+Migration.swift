@@ -29,7 +29,7 @@ extension CalendarViewController {
                 if activity.admin == nil {
                     // make user current admin of activity
                     activity.admin = currentUserID
-                    let activityReference = Database.database().reference().child("activities").child(activity.activityID!).child(messageMetaDataFirebaseFolder)
+                    let activityReference = Database.database().reference().child(activitiesEntity).child(activity.activityID!).child(messageMetaDataFirebaseFolder)
                     let values:[String : Any] = ["admin": currentUserID]
                     dispatchGroup.enter()
                     activityReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
@@ -88,7 +88,7 @@ extension CalendarViewController {
                 }
             
                 activity.category = category
-                let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                 categoryUpdateDispatchGroup?.enter()
                 activityReference.updateChildValues(["category": category]) { [weak self] (error, ref) in
                     self?.categoryUpdateDispatchGroup?.leave()

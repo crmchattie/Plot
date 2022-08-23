@@ -119,7 +119,7 @@ extension TaskViewController {
     func setupLists() {
         guard delegate == nil else {return}
         let dispatchGroup = DispatchGroup()
-        for ID in activity.subtaskIDs ?? [] {
+        for ID in task.subtaskIDs ?? [] {
             dispatchGroup.enter()
             let dataReference = Database.database().reference().child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder)
             dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -131,7 +131,7 @@ extension TaskViewController {
                 dispatchGroup.leave()
             })
         }
-        for checklistID in activity.checklistIDs ?? [] {
+        for checklistID in task.checklistIDs ?? [] {
             dispatchGroup.enter()
             let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
             checklistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -143,7 +143,7 @@ extension TaskViewController {
                 dispatchGroup.leave()
             })
         }
-        if let containerID = activity.containerID {
+        if let containerID = task.containerID {
             dispatchGroup.enter()
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, health, transactions in
                 self.container = container
@@ -211,7 +211,7 @@ extension TaskViewController {
     }
     
     func updateLists(type: String) {
-        let groupActivityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "subtasks" {
             var subtaskIDs = [String]()
             for subtask in subtaskList {
@@ -220,10 +220,10 @@ extension TaskViewController {
                 }
             }
             if !subtaskIDs.isEmpty {
-                activity.subtaskIDs = subtaskIDs
+                task.subtaskIDs = subtaskIDs
                 groupActivityReference.updateChildValues(["subtaskIDs": subtaskIDs as AnyObject])
             } else {
-                activity.subtaskIDs = nil
+                task.subtaskIDs = nil
                 groupActivityReference.child("subtaskIDs").removeValue()
             }
         } else if type == "container" {
@@ -236,13 +236,13 @@ extension TaskViewController {
             ContainerFunctions.updateContainerAndStuffInside(container: container)
         } else {
             if listList.isEmpty {
-                activity.checklistIDs = nil
+                task.checklistIDs = nil
                 groupActivityReference.child("checklistIDs").removeValue()
-                activity.grocerylistID = nil
+                task.grocerylistID = nil
                 groupActivityReference.child("grocerylistID").removeValue()
-                activity.packinglistIDs = nil
+                task.packinglistIDs = nil
                 groupActivityReference.child("packinglistIDs").removeValue()
-                activity.activitylistIDs = nil
+                task.activitylistIDs = nil
                 groupActivityReference.child("activitylistIDs").removeValue()
             } else {
                 var checklistIDs = [String]()
@@ -261,31 +261,31 @@ extension TaskViewController {
                     }
                 }
                 if !checklistIDs.isEmpty {
-                    activity.checklistIDs = checklistIDs
+                    task.checklistIDs = checklistIDs
                     groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
                 } else {
-                    activity.checklistIDs = nil
+                    task.checklistIDs = nil
                     groupActivityReference.child("checklistIDs").removeValue()
                 }
                 if !activitylistIDs.isEmpty {
-                    activity.activitylistIDs = activitylistIDs
+                    task.activitylistIDs = activitylistIDs
                     groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
                 } else {
-                    activity.activitylistIDs = nil
+                    task.activitylistIDs = nil
                     groupActivityReference.child("activitylistIDs").removeValue()
                 }
                 if grocerylistID != "nothing" {
-                    activity.grocerylistID = grocerylistID
+                    task.grocerylistID = grocerylistID
                     groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
                 } else {
-                    activity.grocerylistID = nil
+                    task.grocerylistID = nil
                     groupActivityReference.child("grocerylistID").removeValue()
                 }
                 if !packinglistIDs.isEmpty {
-                    activity.packinglistIDs = packinglistIDs
+                    task.packinglistIDs = packinglistIDs
                     groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
                 } else {
-                    activity.packinglistIDs = nil
+                    task.packinglistIDs = nil
                     groupActivityReference.child("packinglistIDs").removeValue()
                 }
             }
@@ -293,17 +293,17 @@ extension TaskViewController {
     }
     
     func updateRepeatReminder() {
-        if let _ = activity.recurrences {
+        if let _ = task.recurrences {
             scheduleRecurrences()
         }
-        if let _ = activity.reminder {
+        if let _ = task.reminder {
             scheduleReminder()
         }
         
     }
     
     func scheduleRecurrences() {
-        guard let activity = activity, let recurrences = activity.recurrences, let startDate = activity.startDate else {
+        guard let task = task, let recurrences = task.recurrences, let startDate = task.startDate else {
             return
         }
         if let recurranceIndex = recurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
@@ -311,12 +311,12 @@ extension TaskViewController {
             recurrenceRule?.startDate = startDate
             var newRecurrences = recurrences
             newRecurrences[recurranceIndex] = recurrenceRule!.toRRuleString()
-            self.activity.recurrences = newRecurrences
+            self.task.recurrences = newRecurrences
         }
     }
     
     func scheduleReminder() {
-        guard let activity = activity, let activityReminder = activity.reminder, let startDate = activity.startDate else {
+        guard let task = task, let activityReminder = task.reminder, let startDate = task.startDate else {
             return
         }
         let center = UNUserNotificationCenter.current()
@@ -325,10 +325,10 @@ extension TaskViewController {
             return
         }
         let content = UNMutableNotificationContent()
-        content.title = "\(String(describing: activity.name!)) Reminder"
+        content.title = "\(String(describing: task.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfTask(startDate: startDate, endDate: activity.endDate)
+        formattedDate = timestampOfTask(startDate: startDate, endDate: task.endDate)
         content.subtitle = formattedDate.0
         if let reminder = EventAlert(rawValue: activityReminder) {
             let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
@@ -357,8 +357,8 @@ extension TaskViewController {
     func openTaskList() {
         let destination = ChooseListViewController()
         destination.delegate = self
-        destination.listID = self.activity.listID ?? self.lists[ListOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
-        if let source = self.activity.listSource, let lists = self.lists[source] {
+        destination.listID = self.task.listID ?? self.lists[ListOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
+        if let source = self.task.listSource, let lists = self.lists[source] {
             destination.lists = [source: lists]
         } else {
             destination.lists = [ListOptions.plot.name: self.lists[ListOptions.plot.name] ?? []]
@@ -374,8 +374,8 @@ extension TaskViewController {
         
         // prepare a recurrence rule and an occurrence date
         // occurrence date is the date which the repeat event occurs this time
-        let recurrences = activity.recurrences
-        let occurrenceDate = activity.startDate ?? Date()
+        let recurrences = task.recurrences
+        let occurrenceDate = task.startDate ?? Date()
 
         // initialization and configuration
         // RecurrencePicker can be initialized with a recurrence rule or nil, nil means "never repeat"
@@ -403,10 +403,10 @@ extension TaskViewController {
         }
         let destination = MediaViewController()
         destination.delegate = self
-        if let imageURLs = activity.activityPhotos {
+        if let imageURLs = task.activityPhotos {
             destination.imageURLs = imageURLs
         }
-        if let fileURLs = activity.activityFiles {
+        if let fileURLs = task.activityFiles {
             destination.fileURLs = fileURLs
         }
         self.navigationController?.pushViewController(destination, animated: true)
@@ -428,51 +428,13 @@ extension TaskViewController {
                 uniqueUsers.append(participant)
             }
         }
-        
-        destination.ownerID = self.activity.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
             destination.priorSelectedUsers = selectedFalconUsers
         }
-        
         destination.delegate = self
-        
-        if self.selectedFalconUsers.count > 0 {
-            let dispatchGroup = DispatchGroup()
-            for user in self.selectedFalconUsers {
-                dispatchGroup.enter()
-                guard let currentUserID = Auth.auth().currentUser?.uid, let userID = user.id, let activityID = activity.activityID else {
-                    dispatchGroup.leave()
-                    continue
-                }
-                
-                if userID == activity.admin {
-                    if userID != currentUserID {
-                        self.userInvitationStatus[userID] = .accepted
-                    }
-                    
-                    dispatchGroup.leave()
-                    continue
-                }
-                
-                InvitationsFetcher.activityInvitation(forUser: userID, activityID: activityID) { (invitation) in
-                    if let invitation = invitation {
-                        self.userInvitationStatus[userID] = invitation.status
-                    }
-                    dispatchGroup.leave()
-                }
-            }
-            dispatchGroup.notify(queue: .main) {
-                destination.userInvitationStatus = self.userInvitationStatus
-                InvitationsFetcher.getAcceptedParticipant(forActivity: self.activity, allParticipants: self.selectedFalconUsers) { acceptedParticipant in
-                    self.acceptedParticipant = acceptedParticipant
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
-            }
-        } else {
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     func openSubtasks() {
@@ -484,9 +446,9 @@ extension TaskViewController {
         let destination = SubtaskListViewController()
         destination.delegate = self
         destination.subtaskList = subtaskList
-        destination.acceptedParticipant = acceptedParticipant
+        destination.selectedFalconUsers = selectedFalconUsers
         destination.activities = activities
-        destination.activity = activity
+        destination.activity = task
         
         self.navigationController?.pushViewController(destination, animated: true)
     
@@ -509,8 +471,8 @@ extension TaskViewController {
                 let destination = FinanceTransactionViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                destination.users = self.acceptedParticipant
-                destination.filteredUsers = self.acceptedParticipant
+                destination.users = self.selectedFalconUsers
+                destination.filteredUsers = self.selectedFalconUsers
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
@@ -573,7 +535,7 @@ extension TaskViewController {
         let destination = ActivityListViewController()
         destination.delegate = self
         destination.listList = listList
-        destination.activity = activity
+        destination.activity = task
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -582,7 +544,7 @@ extension TaskViewController {
     }
     
     @objc func createNewActivity() {
-        if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
+        if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = taskOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
@@ -591,9 +553,9 @@ extension TaskViewController {
                 //duplicate updated activity w/ new ID and no recurrence rule
                 self.duplicateActivity(recurrenceRule: nil)
                 //update existing activity with exlusion date that fall's on this date
-                oldActivityRule.exdate = ExclusionDate(dates: [self.activity.startDate ?? Date()], granularity: .day)
-                self.activityOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
-                self.updateRecurrences(recurrences: self.activityOld.recurrences!)
+                oldActivityRule.exdate = ExclusionDate(dates: [self.task.startDate ?? Date()], granularity: .day)
+                self.taskOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
+                self.updateRecurrences(recurrences: self.taskOld.recurrences!)
             }))
             
             alert.addAction(UIAlertAction(title: "Save For Future Tasks", style: .default, handler: { (_) in
@@ -601,17 +563,17 @@ extension TaskViewController {
                 //update activity's recurrence to stop repeating just before this event
                 var oldActivityRule = oldRecurrenceRule
                 //will equal true if first instance of repeating event
-                if oldActivityRule.startDate == self.activityOld.startDate {
+                if oldActivityRule.startDate == self.taskOld.startDate {
                     //update all instances of activity
-                    if self.activity.recurrences == nil {
+                    if self.task.recurrences == nil {
                         self.deleteRecurrences()
                     }
                     self.createActivity(activity: nil)
-                } else if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: self.activityOld.startDate ?? Date()), let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+                } else if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: self.taskOld.startDate ?? Date()), let newRecurrences = self.task.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
                     
                     //update only future instances of activity
                     var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
-                    newActivityRule!.startDate = self.activity.startDate ?? Date()
+                    newActivityRule!.startDate = self.task.startDate ?? Date()
                     
                     var newRecurrences = oldRecurrences
                     newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
@@ -622,9 +584,9 @@ extension TaskViewController {
                     //update existing activity with end date equaling ocurrence before this date
                     oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
                     
-                    self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
+                    self.taskOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
                     
-                    self.updateRecurrences(recurrences: self.activityOld.recurrences!)
+                    self.updateRecurrences(recurrences: self.taskOld.recurrences!)
                 }
             }))
             
@@ -665,32 +627,32 @@ extension TaskViewController {
     
     func updateRecurrences(recurrences: [String]) {
         showActivityIndicator()
-        let createActivity = ActivityActions(activity: self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        let createActivity = ActivityActions(activity: self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.updateRecurrences(recurrences: recurrences)
         hideActivityIndicator()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
-            self.delegate?.updateActivity(activity: activity ?? self.activity)
+            self.delegate?.updateActivity(activity: self.task)
             self.navigationController?.popViewController(animated: true)
         }
     }
     
     func deleteRecurrences() {
-        let createActivity = ActivityActions(activity: self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        let createActivity = ActivityActions(activity: self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.deleteRecurrences()
     }
     
     func createActivity(activity: Activity?) {
         showActivityIndicator()
-        let createActivity = ActivityActions(activity: activity ?? self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        let createActivity = ActivityActions(activity: activity ?? self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.createNewActivity()
         hideActivityIndicator()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.delegate?.updateActivity(activity: activity ?? self.activity)
+            self.delegate?.updateActivity(activity: activity ?? self.task)
             self.updateDiscoverDelegate?.itemCreated()
         }
     }
@@ -709,10 +671,76 @@ extension TaskViewController {
         self.removeSpinner()
     }
     
+    func updateStartDate() {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "Start Date"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "Start Time"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "StartTime") {
+            if dateSwitchRowValue && timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
+                var dateComponents = DateComponents()
+                print(dateRowValue.yearNumber())
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                dateComponents.hour = timeRowValue.hourNumber()
+                dateComponents.minute = timeRowValue.minuteNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.task.hasStartTime = true
+            } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
+                print(dateRowValue.yearNumber())
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.task.hasStartTime = false
+            } else {
+                self.task.startDateTime = nil
+                self.task.hasStartTime = false
+                if let currentUserID = Auth.auth().currentUser?.uid, active {
+                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("startDateTime")
+                    userReference.removeValue()
+                }
+            }
+            self.updateRepeatReminder()
+        }
+    }
+    
+    func updateDeadlineDate() {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "Deadline Date"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "Deadline Time"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "DeadlineTime") {
+            if dateSwitchRowValue, timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                dateComponents.hour = timeRowValue.hourNumber()
+                dateComponents.minute = timeRowValue.minuteNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.task.hasDeadlineTime = true
+            } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.task.hasDeadlineTime = false
+            } else {
+                self.task.endDateTime = nil
+                self.task.hasDeadlineTime = false
+                if let currentUserID = Auth.auth().currentUser?.uid, active {
+                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("endDateTime")
+                    userReference.removeValue()
+                }
+            }
+            self.updateRepeatReminder()
+        }
+    }
+    
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-//        if activity.conversationID == nil {
+//        if task.conversationID == nil {
 //            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
 //                print("User click Approve button")
 //                self.goToChat()
@@ -748,8 +776,8 @@ extension TaskViewController {
     }
     
     @objc func goToChat() {
-        if activity!.conversationID != nil {
-            if let convo = conversations.first(where: {$0.chatID == activity!.conversationID}) {
+        if task!.conversationID != nil {
+            if let convo = conversations.first(where: {$0.chatID == task!.conversationID}) {
                 self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
                 self.messagesFetcher = MessagesFetcher()
                 self.messagesFetcher?.delegate = self
@@ -759,7 +787,7 @@ extension TaskViewController {
             let destination = ChooseChatTableViewController()
             let navController = UINavigationController(rootViewController: destination)
             destination.delegate = self
-            destination.activity = activity
+            destination.activity = task
             destination.conversations = conversations
             destination.pinnedConversations = conversations
             destination.filteredConversations = conversations
@@ -770,20 +798,20 @@ extension TaskViewController {
     
     func deleteActivity() {
         //need to look into equatable protocol for activities
-        if activity.recurrences != nil {
+        if task.recurrences != nil {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
                 //update activity's recurrence to skip repeat on this date
-                if let recurrences = self.activity.recurrences {
+                if let recurrences = self.task.recurrences {
                     if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
                         var rule = RecurrenceRule(rruleString: recurrence)
                         if rule != nil {
     //                      update existing activity with exlusion date that fall's on this date
-                            rule!.exdate = ExclusionDate(dates: [self.activity.startDate ?? Date()], granularity: .day)
-                            self.activity.recurrences!.append(rule!.exdate!.toExDateString()!)
-                            self.updateRecurrences(recurrences: self.activity.recurrences!)
+                            rule!.exdate = ExclusionDate(dates: [self.task.startDate ?? Date()], granularity: .day)
+                            self.task.recurrences!.append(rule!.exdate!.toExDateString()!)
+                            self.updateRecurrences(recurrences: self.task.recurrences!)
                         }
                     }
                 }
@@ -792,18 +820,18 @@ extension TaskViewController {
             alert.addAction(UIAlertAction(title: "Delete All Future Tasks", style: .default, handler: { (_) in
                 print("Save for future events")
                 //update activity's recurrence to stop repeating at this event
-                if let recurrences = self.activity.recurrences {
+                if let recurrences = self.task.recurrences {
                     if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
                         var rule = RecurrenceRule(rruleString: recurrence)
-                        if rule != nil, let index = rule!.allOccurrences().firstIndex(of: self.activity.startDate ?? Date()) {
+                        if rule != nil, let index = rule!.allOccurrences().firstIndex(of: self.task.startDate ?? Date()) {
                             if index > 0 {
                                 //update existing activity with end date equaling ocurrence of this date
                                 rule!.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: index)
-                                self.activity.recurrences = [rule!.toRRuleString()]
-                                self.updateRecurrences(recurrences: self.activity.recurrences!)
+                                self.task.recurrences = [rule!.toRRuleString()]
+                                self.updateRecurrences(recurrences: self.task.recurrences!)
                             } else {
                                 self.showActivityIndicator()
-                                let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                                let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                                 deleteActivity.deleteActivity()
                                 self.hideActivityIndicator()
                                 if self.navigationItem.leftBarButtonItem != nil {
@@ -830,7 +858,7 @@ extension TaskViewController {
             alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
                 print("Save for this event only")
                 self.showActivityIndicator()
-                let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 deleteActivity.deleteActivity()
                 self.hideActivityIndicator()
                 if self.navigationItem.leftBarButtonItem != nil {
@@ -850,7 +878,7 @@ extension TaskViewController {
     }
     
     func share() {
-        if let activity = activity, let name = activity.name {
+        if let task = task, let name = task.name {
             let imageName = "activityLarge"
             if let image = UIImage(named: imageName) {
                 let data = compressImage(image: image)
@@ -918,11 +946,11 @@ extension TaskViewController {
     }
     
     func duplicateActivity(recurrenceRule: [String]?) {
-        if let activity = activity, let currentUserID = Auth.auth().currentUser?.uid {
+        if let task = task, let currentUserID = Auth.auth().currentUser?.uid {
             var newActivityID: String!
             newActivityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
             
-            let newActivity = activity.copy() as! Activity
+            let newActivity = task.copy() as! Activity
             newActivity.activityID = newActivityID
             if let recurrenceRule = recurrenceRule {
                 newActivity.recurrences = recurrenceRule
@@ -937,7 +965,7 @@ extension TaskViewController {
     
     func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let badgeRef = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
+        let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
         badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
             var value = mutableData.value as? Int
             value = 0
@@ -955,7 +983,7 @@ extension TaskViewController {
     }
     
     func runActivityBadgeUpdate(firstChild: String, secondChild: String) {
-        var ref = Database.database().reference().child("user-activities").child(firstChild).child(secondChild)
+        var ref = Database.database().reference().child(userActivitiesEntity).child(firstChild).child(secondChild)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             
             guard snapshot.hasChild(messageMetaDataFirebaseFolder) else {

@@ -335,7 +335,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                         self.messagesFetcher?.loadMessagesData(for: conversation)
                     })
                 } else if let activityID = userInfo["activityID"] as? String {
-                    let groupChatDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                    let groupChatDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                         guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                         dictionary.updateValue(activityID as AnyObject, forKey: "id")

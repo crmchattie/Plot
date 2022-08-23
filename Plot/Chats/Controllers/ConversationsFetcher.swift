@@ -271,7 +271,7 @@ class ConversationsFetcher: NSObject {
                                            conversationPhotoKey: "chatThumbnailPhotoURL",
                                            chatID: chatID, membersIDsKey: "chatParticipantsIDs",
                                            adminKey: "admin", adminNeededKey: "adminNeeded",
-                                           activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists", activitylistsKey: "activitylists")
+                                           activitiesKey: activitiesEntity, checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists", activitylistsKey: "activitylists")
         })
     }
     
@@ -285,7 +285,7 @@ class ConversationsFetcher: NSObject {
             
             self.handleConversationChanges(from: snapshot, conversationNameKey: "chatName",
                                            conversationPhotoKey: "chatThumbnailPhotoURL",
-                                           chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists", activitylistsKey: "activitylists")
+                                           chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: activitiesEntity, checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists", activitylistsKey: "activitylists")
         })
     }
     
@@ -299,7 +299,7 @@ class ConversationsFetcher: NSObject {
             
             self.handleConversationRemovals(from: snapshot, conversationNameKey: "chatName",
                                             conversationPhotoKey: "chatThumbnailPhotoURL",
-                                            chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: "activities", checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists",  activitylistsKey: "activitylists")
+                                            chatID: chatID, membersIDsKey: "chatParticipantsIDs", adminKey: "admin", adminNeededKey: "adminNeeded", activitiesKey: activitiesEntity, checklistsKey: "checklists", packinglistsKey: "packinglists", grocerylistsKey: "grocerylists",  activitylistsKey: "activitylists")
         })
     }
     

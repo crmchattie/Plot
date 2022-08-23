@@ -121,7 +121,7 @@ class InAppNotificationManager: NSObject {
         guard let currentUserID = Auth.auth().currentUser?.uid, notificationReference != nil else { return }
         let reference = Database.database().reference()
         for handle in notificationActivityHandle {
-            notificationReference = reference.child("user-activities").child(currentUserID).child(handle.activityID).child(messageMetaDataFirebaseFolder)
+            notificationReference = reference.child(userActivitiesEntity).child(currentUserID).child(handle.activityID).child(messageMetaDataFirebaseFolder)
             notificationReference.removeObserver(withHandle: handle.handle)
         }
         notificationChatHandle.removeAll()
@@ -136,7 +136,7 @@ class InAppNotificationManager: NSObject {
             let element = (handle: handle, activityID: activityID)
             notificationActivityHandle.insert(element, at: 0)
             
-            notificationReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+            notificationReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             notificationActivityHandle[0].handle = notificationReference.observe(.childChanged, with: { (snapshot) in
                 self.handleInAppSoundPlayingForActivity(childchanged: snapshot.key, activity: activity, activities: self.activities)
             })

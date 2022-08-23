@@ -21,6 +21,13 @@ extension ListCell {
         nameLabel.text = name
         muteIndicator.isHidden = !isMuted
         
+        startLabel.numberOfLines = 1
+        startLabel.text = ""
+        
+        invitationSegmentedControlTopAnchor.constant = 0
+        invitationSegmentHeightConstraint.constant = 0
+        invitationSegmentedControl.isHidden = true
+        
         activityTypeButton.setImage(ActivityCategory.todo.icon, for: .normal)
         activityTypeButton.tintColor = ActivityCategory.todo.color
         activityTypeLabel.text = ActivityCategory.todo.rawValue

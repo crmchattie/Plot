@@ -146,7 +146,7 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
     func fetchFavAct() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         
-        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference = Database.database().reference().child(userFavActivitiesEntity).child(currentUserID)
         self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
                 if !NSDictionary(dictionary: self.favAct).isEqual(to: favoriteActivitiesSnapshot) {

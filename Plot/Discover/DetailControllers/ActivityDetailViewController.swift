@@ -140,7 +140,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
             activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         } else if !schedule {
             if let currentUserID = Auth.auth().currentUser?.uid {
-                activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 activity = Activity(dictionary: ["activityID": activityID as AnyObject])
             }
         }
@@ -181,7 +181,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         
-        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference = Database.database().reference().child(userFavActivitiesEntity).child(currentUserID)
         self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
                 print("snapshot exists")
@@ -246,7 +246,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     fileprivate func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let badgeRef = Database.database().reference().child("user-activities").child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
+        let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
         badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
             var value = mutableData.value as? Int
             value = 0

@@ -62,7 +62,7 @@ class Conversation: NSObject {
         badge = dictionary?["badge"] as? Int
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
-        activities = dictionary?["activities"] as? [String]
+        activities = dictionary?[activitiesEntity] as? [String]
         checklists = dictionary?["checklists"] as? [String]
         activitylists = dictionary?["activitylists"] as? [String]
         grocerylists = dictionary?["grocerylists"] as? [String]
@@ -101,7 +101,7 @@ class Conversation: NSObject {
         }
         
         if let value = self.activities as AnyObject? {
-            conversationDict["activities"] = value
+            conversationDict[activitiesEntity] = value
         }
         
         if let value = self.checklists as AnyObject? {

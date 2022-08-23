@@ -159,7 +159,7 @@ class ChooseChatTableViewController: UITableViewController {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let activities: [String] = [activity.activityID!]
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, "activities": activities as AnyObject, "chatName": activity.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "grocerylists": activity.grocerylistID as AnyObject, "checklists": activity.checklistIDs as AnyObject, "packinglists": activity.packinglistIDs as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, activitiesEntity: activities as AnyObject, "chatName": activity.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "grocerylists": activity.grocerylistID as AnyObject, "checklists": activity.checklistIDs as AnyObject, "packinglists": activity.packinglistIDs as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -173,7 +173,7 @@ class ChooseChatTableViewController: UITableViewController {
     func createChatwGL(chatID: String, membersIDs: ([String], [String:AnyObject]), grocerylist: Grocerylist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, grocerylistsEntity: [grocerylist.ID!] as AnyObject, "chatName": grocerylist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [grocerylist.activityID] as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, grocerylistsEntity: [grocerylist.ID!] as AnyObject, "chatName": grocerylist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, activitiesEntity: [grocerylist.activityID] as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -187,7 +187,7 @@ class ChooseChatTableViewController: UITableViewController {
     func createChatwCL(chatID: String, membersIDs: ([String], [String:AnyObject]), checklist: Checklist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, checklistsEntity: [checklist.ID!] as AnyObject, "chatName": checklist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [checklist.activityID] as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, checklistsEntity: [checklist.ID!] as AnyObject, "chatName": checklist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, activitiesEntity: [checklist.activityID] as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -201,7 +201,7 @@ class ChooseChatTableViewController: UITableViewController {
     func createChatwAL(chatID: String, membersIDs: ([String], [String:AnyObject]), activitylist: Activitylist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, activitylistsEntity: [activitylist.ID!] as AnyObject, "chatName": activitylist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [activitylist.activityID] as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, activitylistsEntity: [activitylist.ID!] as AnyObject, "chatName": activitylist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, activitiesEntity: [activitylist.activityID] as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
@@ -215,7 +215,7 @@ class ChooseChatTableViewController: UITableViewController {
     func createChatwPL(chatID: String, membersIDs: ([String], [String:AnyObject]), packinglist: Packinglist) {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let groupChatsReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, packinglistsEntity: [packinglist.ID!] as AnyObject, "chatName": packinglist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, "activities": [packinglist.activityID] as AnyObject]
+            let childValues: [String: AnyObject] = ["chatID": chatID as AnyObject, packinglistsEntity: [packinglist.ID!] as AnyObject, "chatName": packinglist.name as AnyObject, "chatParticipantsIDs": membersIDs.1 as AnyObject, "admin": currentUserID as AnyObject, "adminNeeded": false as AnyObject, "isGroupChat": true as AnyObject, activitiesEntity: [packinglist.activityID] as AnyObject]
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()
             activityCreatingGroup.enter()

@@ -18,11 +18,10 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
     private var cancellables = Set<AnyCancellable>()
     
     // activities
-    var activitiesParticipants: [String : [User]] = [:]
+    var participants: [String : [User]] = [:]
     // transaction
     var users = [User]()
     var filteredUsers = [User]()
-    var participants: [String: [User]] = [:]
     
     private let rangeControlView: UISegmentedControl = {
         let control = UISegmentedControl(items: DateRangeType.allCases.map { $0.filterTitle } )
@@ -38,7 +37,7 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
-        tableView.register(ActivityCell.self)
+        tableView.register(EventCell.self)
         tableView.register(FinanceTableViewCell.self)
         return tableView
     }()
@@ -257,7 +256,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         } else {
             switch viewModel.entries.value[indexPath.row] {
             case .activity(let activity):
-                let cell = tableView.dequeueReusableCell(ofType: ActivityCell.self, for: indexPath)
+                let cell = tableView.dequeueReusableCell(ofType: EventCell.self, for: indexPath)
                 cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
                 return cell
             case .transaction(let transaction):

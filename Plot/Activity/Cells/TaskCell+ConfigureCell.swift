@@ -1,34 +1,32 @@
 //
-//  ActivityCell+ConfigureCell.swift
-//  Pigeon-project
+//  TaskCell+ConfigureCell.swift
+//  Plot
 //
-//  Created by Cory McHattie on 4/28/19.
-//  Copyright © 2019 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 8/22/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
 import UIKit
 import Firebase
 import SDWebImage
 
-extension ActivityCell {
+extension TaskCell {
     
-    func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
+    func dateTimeValue(forTask task: Activity) -> (Int, String) {
         var value = ""
         var numberOfLines = 1
-        if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
-            let allDay = activity.allDay ?? false
-            let startDate = Date(timeIntervalSince1970: startDate)
-            let endDate = Date(timeIntervalSince1970: endDate)
+        if let startDate = task.startDate, let endDate = task.endDate {
+            let allDay = task.allDay ?? false
             let startDateFormatter = DateFormatter()
             let endDateFormatter = DateFormatter()
             startDateFormatter.dateFormat = "d"
             endDateFormatter.dateFormat = "d"
-            if let startTimeZone = activity.startTimeZone {
+            if let startTimeZone = task.startTimeZone {
                 startDateFormatter.timeZone = TimeZone(identifier: startTimeZone)
             } else {
                 startDateFormatter.timeZone = TimeZone(identifier: "UTC")
             }
-            if let endTimeZone = activity.endTimeZone {
+            if let endTimeZone = task.endTimeZone {
                 endDateFormatter.timeZone = TimeZone(identifier: endTimeZone)
             } else {
                 endDateFormatter.timeZone = TimeZone(identifier: "UTC")
@@ -88,38 +86,24 @@ extension ActivityCell {
         return (numberOfLines, value)
     }
     
-    func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {
-        self.invitation = invitation
-        self.activity = activity
+    func configureCell(for indexPath: IndexPath, task: Activity) {
+        self.task = task
                 
-        let isActivityMuted = activity.muted != nil && activity.muted!
-        let activityName = activity.name
+        let isActivityMuted = task.muted != nil && task.muted!
+        let activityName = task.name
                         
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
-        let dateTimeValueArray = dateTimeValue(forActivity: activity)
+        let dateTimeValueArray = dateTimeValue(forTask: task)
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
         
-        if let invitation = invitation {
-            invitationSegmentedControlTopAnchor.constant = invitationSegmentedControlTopAnchorRegular
-            invitationSegmentHeightConstraint.constant = invitationSegmentHeightConstant
-            invitationSegmentedControl.isHidden = false
-            if invitation.status != .pending {
-                let index = invitation.status == .accepted ? 0 : 1
-                invitationSegmentedControl.selectedSegmentIndex = index
-            } else {
-                invitationSegmentedControl.selectedSegmentIndex = -1
-            }
-            invitationSegmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        } else {
-            invitationSegmentedControlTopAnchor.constant = 0
-            invitationSegmentHeightConstraint.constant = 0
-            invitationSegmentedControl.isHidden = true
-        }
+        invitationSegmentedControlTopAnchor.constant = 0
+        invitationSegmentHeightConstraint.constant = 0
+        invitationSegmentedControl.isHidden = true
         
-        if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue) {
+        if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             activityTypeButton.tintColor = category.color
             activityTypeLabel.text = category.rawValue
@@ -129,8 +113,8 @@ extension ActivityCell {
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
         
-        let badgeString = activity.badge?.toString()
-        let badgeInt = activity.badge ?? 0
+        let badgeString = task.badge?.toString()
+        let badgeInt = task.badge ?? 0
         
         if badgeInt > 0 {
             badgeLabel.text = badgeString
@@ -142,29 +126,28 @@ extension ActivityCell {
     
     func loadParticipantsThumbnail(activity: Activity) {
         self.activityDataStore?.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
-            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                self?.updateParticipantsThumbnail(activity: activity, acceptedParticipants: acceptedParticipant)
-                for i in 0..<acceptedParticipant.count {
-                    let user = acceptedParticipant[i]
-                    if Auth.auth().currentUser?.uid == user.id {
-                        continue
-                    }
-                    
-                    if i > 7 {
+            
+            self?.updateParticipantsThumbnail(activity: activity, acceptedParticipants: participants)
+            for i in 0..<participants.count {
+                let user = participants[i]
+                if Auth.auth().currentUser?.uid == user.id {
+                    continue
+                }
+                
+                if i > 7 {
+                    return
+                }
+                
+                guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
+                    continue
+                }
+                
+                icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
+                    guard image != nil else { return }
+                    guard cacheType != SDImageCacheType.memory, cacheType != SDImageCacheType.disk else {
                         return
                     }
-                    
-                    guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
-                        continue
-                    }
-                    
-                    icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
-                        guard image != nil else { return }
-                        guard cacheType != SDImageCacheType.memory, cacheType != SDImageCacheType.disk else {
-                            return
-                        }
-                    })
-                }
+                })
             }
         })
     }

@@ -20,13 +20,27 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = sections[indexPath.section]
-        if section == .calendar {
-            //
-            if !sortedActivities.isEmpty || networkController.activityService.askedforAuthorization {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
+        if section == .tasks {
+            if !sortedTasks.isEmpty || networkController.activityService.askedforReminderAuthorization {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tasksControllerCell, for: indexPath) as! TasksControllerCell
                 cell.delegate = self
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.activities = sortedActivities
+                cell.tasks = sortedTasks
+                return cell
+            } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.intColor = (indexPath.section % 5)
+                cell.sectionType = section
+                return cell
+            }
+        }
+        else if section == .calendar {
+            if !sortedEvents.isEmpty || networkController.activityService.askedforCalendarAuthorization {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: eventsControllerCell, for: indexPath) as! EventsControllerCell
+                cell.delegate = self
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.events = sortedEvents
                 cell.invitations = networkController.activityService.invitations
                 return cell
             } else {
@@ -73,10 +87,23 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 0
         let section = sections[indexPath.section]
-        if section == .calendar {
-            if !sortedActivities.isEmpty || networkController.activityService.askedforAuthorization {
-                for activity in sortedActivities {
-                    let dummyCell = ActivityCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+        if section == .tasks {
+            if !sortedTasks.isEmpty || networkController.activityService.askedforReminderAuthorization {
+                for task in sortedTasks {
+                    let dummyCell = TaskCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+                    dummyCell.configureCell(for: indexPath, task: task)
+                    dummyCell.layoutIfNeeded()
+                    let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+                    height += estimatedSize.height
+                }
+                return CGSize(width: self.collectionView.frame.size.width, height: height)
+            } else {
+                return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
+            }
+        } else if section == .calendar {
+            if !sortedEvents.isEmpty || networkController.activityService.askedforCalendarAuthorization {
+                for activity in sortedEvents {
+                    let dummyCell = EventCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
                     var invitation: Invitation? = nil
                     if let activityID = activity.activityID, let value = self.networkController.activityService.invitations[activityID] {
                         invitation = value
@@ -198,9 +225,22 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             let section = sections[indexPath.section]
             sectionHeader.titleLabel.text = section.name
             sectionHeader.sectionType = section
-            if section == .calendar {
-                if !sortedActivities.isEmpty {
-                    if updatingActivities {
+            if section == .tasks {
+                if !sortedTasks.isEmpty {
+                    if updatingTasks {
+                        sectionHeader.spinnerView.startAnimating()
+                    } else {
+                        sectionHeader.spinnerView.stopAnimating()
+                    }
+                    sectionHeader.subTitleLabel.isHidden = false
+                    sectionHeader.delegate = self
+                } else {
+                    sectionHeader.subTitleLabel.isHidden = true
+                    sectionHeader.delegate = nil
+                }
+            } else if section == .calendar {
+                if !sortedEvents.isEmpty {
+                    if updatingEvents {
                         sectionHeader.spinnerView.startAnimating()
                     } else {
                         sectionHeader.spinnerView.stopAnimating()
@@ -247,7 +287,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = sections[indexPath.section]
         if let _ = collectionView.cellForItem(at: indexPath) as? SetupCell {
-            if section == .calendar {
+            if section == .tasks {
+                newTask()
+            } else if section == .calendar {
                 newCalendar()
             } else if section == .health {
                 networkController.healthService.grabHealth {

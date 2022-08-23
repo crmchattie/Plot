@@ -15,7 +15,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     
     fileprivate let membersCellID = "membersCellID"
     fileprivate let adminControlsCellID = "adminControlsCellID"
-    fileprivate let activityCellID = "activityCellID"
+    fileprivate let eventCellID = "eventCellID"
     fileprivate let listCellID = "listCellID"
     
     let groupProfileTableHeaderContainer = GroupProfileTableHeaderContainer()
@@ -174,7 +174,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.register(FalconUsersTableViewCell.self, forCellReuseIdentifier: membersCellID)
         tableView.register(GroupAdminControlsTableViewCell.self, forCellReuseIdentifier: adminControlsCellID)
-        tableView.register(ChatActivitiesTableViewCell.self, forCellReuseIdentifier: activityCellID)
+        tableView.register(ChatActivitiesTableViewCell.self, forCellReuseIdentifier: eventCellID)
         tableView.register(ChatListTableViewCell.self, forCellReuseIdentifier: listCellID)
         tableView.allowsSelection = true
         tableView.separatorStyle = .none
@@ -219,7 +219,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
         if conversation?.activities != nil {
             sections.append("Activities")
             for activityID in conversation!.activities! {
-                let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                 activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                     guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                     
@@ -496,9 +496,9 @@ class GroupAdminControlsTableViewController: UITableViewController {
                 let newActivityName = self.activities[indexPath.row].name?.trimmingCharacters(in: .whitespaces) ?? ""
                 let text = "The \(newActivityName) activity was disconnected to this chat"
                 informationMessageSender.sendInformatoinMessage(chatID: chatID, membersIDs: membersIDs, text: text)
-                let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).child("conversationID")
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).child("conversationID")
                 activityReference.removeValue()
-                let chatReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("activities")
+                let chatReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child(activitiesEntity)
                 chatReference.observeSingleEvent(of: .value, with: { (snapshot) in
                     for child in snapshot.children {
                         let snap = child as! DataSnapshot
@@ -510,7 +510,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
                             activityIDs.append(value)
                         }
                     }
-                    let updatedActivities = ["activities": activityIDs as AnyObject]
+                    let updatedActivities = [activitiesEntity: activityIDs as AnyObject]
                     Database.database().reference().child("groupChats").child(self.chatID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                 })
                 
@@ -902,7 +902,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
             
             return cell
         } else if sections[indexPath.section - 2] == "Activities" {
-            let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ChatActivitiesTableViewCell ?? ChatActivitiesTableViewCell()
+            let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? ChatActivitiesTableViewCell ?? ChatActivitiesTableViewCell()
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             
             cell.configureCell(for: activities[indexPath.row])

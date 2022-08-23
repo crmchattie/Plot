@@ -51,7 +51,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
         
-        summaryService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.activities) { stats in
+        summaryService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats in
             let activities = stats[.calendarSummary] ?? [:]
             
             guard !activities.isEmpty else {
@@ -106,7 +106,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        let entries = networkController.activityService.activities
+        let entries = networkController.activityService.events
             .filter {
                 if let startDate = $0.startDate, let endDate = $0.endDate {
                     return startDate < range.endDate && endDate > range.startDate

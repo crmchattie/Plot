@@ -619,7 +619,7 @@ class ChatLogController: UICollectionViewController {
     
     @objc func goToActivity(message: Message) {
         if let activityID = message.activityID, let currentUserID = Auth.auth().currentUser?.uid {
-            let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+            let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                 
@@ -627,7 +627,7 @@ class ChatLogController: UICollectionViewController {
                 let activity = Activity(dictionary: dictionary)
                 
                 //duplicate activity
-                let newActivityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                let newActivityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 let newActivity = activity.copy() as! Activity
                 newActivity.activityID = newActivityID
                 newActivity.admin = currentUserID

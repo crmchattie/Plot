@@ -19,8 +19,8 @@ import RRuleSwift
 import HealthKit
 
 class TaskViewController: FormViewController {
-    var activity: Activity!
-    var activityOld: Activity!
+    var task: Activity!
+    var taskOld: Activity!
     var invitation: Invitation?
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -40,7 +40,7 @@ class TaskViewController: FormViewController {
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.activities
+    lazy var activities: [Activity] = networkController.activityService.events
     lazy var lists: [String: [ListType]] = networkController.activityService.lists
     lazy var conversations: [Conversation] = networkController.conversationService.conversations
     lazy var transactions: [Transaction] = networkController.financeService.transactions
@@ -67,7 +67,6 @@ class TaskViewController: FormViewController {
     var activityID = String()
     let informationMessageSender = InformationMessageSender()
     // Participants with accepted invites
-    var acceptedParticipant: [User] = []
     var weather: [DailyWeatherElement]!
         
     var active = false
@@ -92,16 +91,15 @@ class TaskViewController: FormViewController {
         
         setupMainView()
         
-        if activity != nil {
+        if task != nil {
             title = "Task"
             active = true
-            activityOld = activity.copy() as? Activity
-            if activity.activityID != nil {
-                activityID = activity.activityID!
-                print(activityID)
+            taskOld = task.copy() as? Activity
+            if task.activityID != nil {
+                activityID = task.activityID!
             }
-            if activity.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
-                activity.admin = currentUserID
+            if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
+                task.admin = currentUserID
             }
             setupLists()
             resetBadgeForSelf()
@@ -111,17 +109,17 @@ class TaskViewController: FormViewController {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 let listDefault = lists[ListOptions.plot.name]?.first { $0.name == "Default"}
                 activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                activity = Activity(activityID: activityID, admin: currentUserID, listID: listDefault?.id ?? "", listName: listDefault?.name ?? "", listColor: listDefault?.color ?? "", listSource: listDefault?.source ?? "", isTask: true, isCompleted: false)
+                task = Activity(activityID: activityID, admin: currentUserID, listID: listDefault?.id ?? "", listName: listDefault?.name ?? "", listColor: listDefault?.color ?? "", listSource: listDefault?.source ?? "", isTask: true, isCompleted: false)
             }
         }
         
         setupRightBarButton()
         initializeForm()
         
-        var participantCount = self.acceptedParticipant.count
+        var participantCount = self.selectedFalconUsers.count
         
         // If user is creating this activity (admin)
-        if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
+        if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
             participantCount += 1
         }
         
@@ -136,9 +134,9 @@ class TaskViewController: FormViewController {
             inviteesRow.updateCell()
         }
         
-        purchaseUsers = self.acceptedParticipant
+        purchaseUsers = self.selectedFalconUsers
         
-        if let currentUserID = Auth.auth().currentUser?.uid, self.activity.admin == currentUserID {
+        if let currentUserID = Auth.auth().currentUser?.uid, self.task.admin == currentUserID {
             let participantReference = Database.database().reference().child("users").child(currentUserID)
             participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
@@ -200,13 +198,13 @@ class TaskViewController: FormViewController {
             $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
             if self.active {
-                $0.value = self.activity.name
+                $0.value = self.task.name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 $0.cell.textField.becomeFirstResponder()
             }
         }.onChange() { [unowned self] row in
-            self.activity.name = row.value
+            self.task.name = row.value
             if row.value == nil {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             } else {
@@ -224,15 +222,15 @@ class TaskViewController: FormViewController {
             $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
-            if self.active && self.activity.activityDescription != "nothing" && self.activity.activityDescription != nil {
-                $0.value = self.activity.activityDescription
+            if self.active && self.task.activityDescription != "nothing" && self.task.activityDescription != nil {
+                $0.value = self.task.activityDescription
             }
         }.cellUpdate({ (cell, row) in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
         }).onChange() { [unowned self] row in
-            self.activity.activityDescription = row.value
+            self.task.activityDescription = row.value
             if row.value == nil && self.active {
                 let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
                 reference.removeValue()
@@ -246,7 +244,7 @@ class TaskViewController: FormViewController {
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.cell.accessoryType = .checkmark
             $0.title = $0.tag
-            $0.value = activity.isCompleted ?? false
+            $0.value = task.isCompleted ?? false
             if $0.value ?? false {
                 $0.cell.tintAdjustmentMode = .automatic
             } else {
@@ -262,7 +260,7 @@ class TaskViewController: FormViewController {
                 cell.tintAdjustmentMode = .automatic
             }
         }.onChange { row in
-            self.activity.isCompleted = row.value
+            self.task.isCompleted = row.value
             if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                 row.cell.tintAdjustmentMode = .automatic
                 let original = Date()
@@ -272,14 +270,14 @@ class TaskViewController: FormViewController {
                 completedRow.updateCell()
                 completedRow.hidden = false
                 completedRow.evaluateHidden()
-                self.activity.completedDate = updateDate
+                self.task.completedDate = updateDate
             } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                 row.cell.tintAdjustmentMode = .dimmed
                 completedRow.value = nil
                 completedRow.updateCell()
                 completedRow.hidden = true
                 completedRow.evaluateHidden()
-                self.activity.completedDate = nil
+                self.task.completedDate = nil
             }
         }
         
@@ -291,14 +289,14 @@ class TaskViewController: FormViewController {
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
-            if self.active, let date = activity.completedDate {
+            if self.active, task.isCompleted ?? false, let date = task.completedDate {
                 $0.value = date
                 $0.updateCell()
             } else {
                 $0.hidden = true
             }
         }.onChange { [weak self] row in
-            self?.activity.completedDate = row.value
+            self?.task.completedDate = row.value
         }.onExpandInlineRow { cell, row, inlineRow in
             inlineRow.cellUpdate { (cell, row) in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -325,7 +323,7 @@ class TaskViewController: FormViewController {
         //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
         //                row.cell.accessoryType = .disclosureIndicator
         //                row.title = row.tag
-        //                if self.acceptedParticipant.count > 0 {
+        //                if self.selectedFalconUsers.count > 0 {
         //                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         //                    row.title = self.userNamesString
         //                }
@@ -347,44 +345,36 @@ class TaskViewController: FormViewController {
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
-            if self.active, let activity = activity, let startDateTime = activity.startDateTimeComponents {
+            if self.active, let task = task, let startDate = task.startDate {
                 $0.value = true
-                let calendar = Calendar.current
-                $0.cell.detailTextLabel?.text = calendar.date(from: startDateTime)?.getMonthAndDateAndYear()
+                $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
             } else {
                 $0.value = false
             }
         }.onChange { [weak self] row in
-            if let value = row.value, let startDate: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
+            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
                 if value, let startTime = self?.form.rowBy(tag: "StartTime") {
-                    if let activity = self?.activity, let startDateTime = activity.startDateTimeComponents {
-                        let calendar = Calendar.current
-                        row.cell.detailTextLabel?.text = calendar.date(from: startDateTime)?.getMonthAndDateAndYear()
-                        startDate.value = calendar.date(from: startDateTime)
+                    if let task = self?.task, let startDate = task.startDate {
+                        row.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+                        startDateRow.value = startDate
                     } else {
-                        let calendar = Calendar.current
                         let startDateTime = Date()
-                        startDate.value = startDateTime
+                        startDateRow.value = startDateTime
                         row.cell.detailTextLabel?.text = startDateTime.getMonthAndDateAndYear()
-                        self?.activity.startDateTimeComponents = calendar.dateComponents([.year, .month, .day], from: startDateTime)
 
                     }
                     startTime.hidden = true
                     startTime.evaluateHidden()
                 } else if let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Start Time") {
                     row.cell.detailTextLabel?.text = nil
-                    startDateSwitchRow.value = false
                     startDateSwitchRow.updateCell()
                     startDateSwitchRow.cell.detailTextLabel?.text = nil
-                    self?.activity.startDateTimeComponents = nil
                 }
+                self!.updateStartDate()
                 let condition: Condition = value ? false : true
                 row.disabled = condition
-                startDate.hidden = condition
-                startDate.evaluateHidden()
-                if self!.active {
-                    self?.updateRepeatReminder()
-                }
+                startDateRow.hidden = condition
+                startDateRow.evaluateHidden()
             }
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
@@ -401,12 +391,11 @@ class TaskViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            if let activity = self.activity, let startDateTime = activity.startDateTimeComponents {
-                let calendar = Calendar.current
-                cell.detailTextLabel?.text = calendar.date(from: startDateTime)?.getMonthAndDateAndYear()
+            if let task = self.task, let startDate = task.startDate {
+                cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
             }
         }
-        
+
         <<< DatePickerRow("StartDate") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -421,73 +410,64 @@ class TaskViewController: FormViewController {
             else {
                 $0.cell.datePicker.datePickerMode = .date
             }
-            if self.active, let activity = activity, let startDateTime = activity.startDateTimeComponents {
-                let calendar = Calendar.current
-                $0.value = calendar.date(from: startDateTime)
+            if self.active, let task = task, let startDate = task.startDate {
+                $0.value = startDate
                 $0.updateCell()
             }
         }.onChange { [weak self] row in
             if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "Start Date") {
-                let calendar = Calendar.current
-                self?.activity.startDateTimeComponents = calendar.dateComponents([.year, .month, .day], from: value)
                 switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
-                
             }
-            if self!.active {
-                self?.updateRepeatReminder()
-            }
+            self!.updateStartDate()
         }.cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
-        
+
         <<< SwitchRow("Start Time") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
-            if self.active, let activity = activity, let startDateTime = activity.startDateTimeComponents {
+            if self.active, let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
                 $0.value = true
-                let calendar = Calendar.current
-                $0.cell.detailTextLabel?.text = calendar.date(from: startDateTime)?.getTimeString()
+                $0.cell.detailTextLabel?.text = startDate.getTimeString()
             } else {
                 $0.value = false
             }
         }.onChange { [weak self] row in
-            if let value = row.value, let startTime: TimePickerRow = self?.form.rowBy(tag: "StartTime") {
+            if let value = row.value, let startTimeRow: TimePickerRow = self?.form.rowBy(tag: "StartTime") {
                 if value, let startDateDateRow = self?.form.rowBy(tag: "StartDate"), let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Start Date") {
-                    startDateSwitchRow.value = value
-                    startDateSwitchRow.updateCell()
-                    if let activity = self?.activity, let startDateTime = activity.startDateTimeComponents, let _ = startDateTime.hour, let _ = startDateTime.minute {
-                        let calendar = Calendar.current
-                        row.cell.detailTextLabel?.text = calendar.date(from: startDateTime)?.getTimeString()
-                        startDateSwitchRow.cell.detailTextLabel?.text = calendar.date(from: startDateTime)?.getMonthAndDateAndYear()
-                        startTime.value = calendar.date(from: startDateTime)
+                    if let task = self?.task, task.hasStartTime ?? false, let startDate = task.startDate {
+                        row.cell.detailTextLabel?.text = startDate.getTimeString()
+                        startTimeRow.value = startDate
+                        if !(startDateSwitchRow.value ?? false) {
+                            startDateSwitchRow.value = value
+                            startDateSwitchRow.updateCell()
+                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+                        }
                     } else {
-                        let calendar = Calendar.current
                         let original = Date()
-                        let startDateTime = Date(timeIntervalSinceReferenceDate:
+                        let startDate = Date(timeIntervalSinceReferenceDate:
                                             (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        startTime.value = startDateTime
-                        row.cell.detailTextLabel?.text = startDateTime.getTimeString()
-                        startDateSwitchRow.cell.detailTextLabel?.text = startDateTime.getMonthAndDateAndYear()
-                        self?.activity.startDateTimeComponents = calendar.dateComponents([.hour, .minute, .day, .month, .year], from: startDateTime)
-
+                        startTimeRow.value = startDate
+                        row.cell.detailTextLabel?.text = startDate.getTimeString()
+                        if !(startDateSwitchRow.value ?? false) {
+                            startDateSwitchRow.value = value
+                            startDateSwitchRow.updateCell()
+                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+                        }
                     }
                     startDateDateRow.hidden = true
                     startDateDateRow.evaluateHidden()
                 } else {
                     row.cell.detailTextLabel?.text = nil
-                    self?.activity.startDateTimeComponents?.hour = nil
-                    self?.activity.startDateTimeComponents?.minute = nil
                 }
+                self!.updateStartDate()
                 let condition: Condition = value ? false : true
                 row.disabled = condition
-                startTime.hidden = condition
-                startTime.evaluateHidden()
-                if self!.active {
-                    self?.updateRepeatReminder()
-                }
+                startTimeRow.hidden = condition
+                startTimeRow.evaluateHidden()
             }
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
@@ -504,12 +484,11 @@ class TaskViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            if let activity = self.activity, let startDateTime = activity.startDateTimeComponents, let _ = startDateTime.hour, let _ = startDateTime.minute {
-                let calendar = Calendar.current
-                cell.detailTextLabel?.text = calendar.date(from: startDateTime)?.getTimeString()
+            if let task = self.task, let startDate = task.startDate {
+                cell.detailTextLabel?.text = startDate.getTimeString()
             }
         }
-        
+
         <<< TimePickerRow("StartTime") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -524,21 +503,17 @@ class TaskViewController: FormViewController {
             else {
                 $0.cell.datePicker.datePickerMode = .time
             }
-            if self.active, let activity = activity, let startDateTime = activity.startDateTimeComponents {
-                let calendar = Calendar.current
-                $0.value = calendar.date(from: startDateTime)
+            if self.active, let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
+                $0.value = startDate
                 $0.updateCell()
             }
         }.onChange { [weak self] row in
             if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "Start Time") {
-                let calendar = Calendar.current
-                self?.activity.startDateTimeComponents = calendar.dateComponents([.hour, .minute, .day, .month, .year], from: value)
+                self?.task.startDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
                 switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
-                
             }
-            if self!.active {
-                self?.updateRepeatReminder()
-            }
+            
+            self!.updateStartDate()
         }.cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -549,50 +524,48 @@ class TaskViewController: FormViewController {
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
-            if self.active, let activity = activity, let deadlineDateTime = activity.deadlineDateTimeComponents {
+            if self.active, let task = task, let endDate = task.endDate {
                 $0.value = true
-                let calendar = Calendar.current
-                $0.cell.detailTextLabel?.text = calendar.date(from: deadlineDateTime)?.getMonthAndDateAndYear()
+                $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
             } else {
                 $0.value = false
             }
         }.onChange { [weak self] row in
-            if let value = row.value, let deadlineDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
-                if value, let deadlineTime = self?.form.rowBy(tag: "DeadlineTime") {
-                    if let activity = self?.activity, let deadlineDateTime = activity.deadlineDateTimeComponents {
-                        let calendar = Calendar.current
-                        row.cell.detailTextLabel?.text = calendar.date(from: deadlineDateTime)?.getMonthAndDateAndYear()
-                        deadlineDate.value = calendar.date(from: deadlineDateTime)
+            print("onchange deadline date")
+            if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
+                if value, let endTime = self?.form.rowBy(tag: "DeadlineTime") {
+                    if let task = self?.task, let endDate = task.endDate {
+                        row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                        endDateRow.value = endDate
                     } else {
-                        let calendar = Calendar.current
-                        let deadlineDateTime = Date()
-                        deadlineDate.value = deadlineDateTime
-                        row.cell.detailTextLabel?.text = deadlineDateTime.getMonthAndDateAndYear()
-                        self?.activity.deadlineDateTimeComponents = calendar.dateComponents([.year, .month, .day], from: deadlineDateTime)
+                        let endDateTime = Date()
+                        endDateRow.value = endDateTime
+                        row.cell.detailTextLabel?.text = endDateTime.getMonthAndDateAndYear()
 
                     }
-                    deadlineTime.hidden = true
-                    deadlineTime.evaluateHidden()
-                } else if let deadlineDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Deadline Time") {
+                    endTime.hidden = true
+                    endTime.evaluateHidden()
+                } else if let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Deadline Time") {
                     row.cell.detailTextLabel?.text = nil
-                    deadlineDateSwitchRow.value = false
-                    deadlineDateSwitchRow.updateCell()
-                    deadlineDateSwitchRow.cell.detailTextLabel?.text = nil
-                    self?.activity.deadlineDateTimeComponents = nil
+                    endDateSwitchRow.updateCell()
+                    endDateSwitchRow.cell.detailTextLabel?.text = nil
                 }
+                self!.updateDeadlineDate()
+
                 let condition: Condition = value ? false : true
                 row.disabled = condition
-                deadlineDate.hidden = condition
-                deadlineDate.evaluateHidden()
+                endDateRow.hidden = condition
+                endDateRow.evaluateHidden()
+                
             }
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
-                if let deadlineDate = self?.form.rowBy(tag: "DeadlineDate"), let deadlineTime = self?.form.rowBy(tag: "DeadlineTime") {
-                    deadlineDate.hidden = deadlineDate.isHidden ? false : true
-                    deadlineDate.evaluateHidden()
-                    if !deadlineDate.isHidden {
-                        deadlineTime.hidden = true
-                        deadlineTime.evaluateHidden()
+                if let endDate = self?.form.rowBy(tag: "DeadlineDate"), let endTime = self?.form.rowBy(tag: "DeadlineTime") {
+                    endDate.hidden = endDate.isHidden ? false : true
+                    endDate.evaluateHidden()
+                    if !endDate.isHidden {
+                        endTime.hidden = true
+                        endTime.evaluateHidden()
                     }
                 }
             }
@@ -600,12 +573,11 @@ class TaskViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            if let activity = self.activity, let deadlineDateTime = activity.deadlineDateTimeComponents {
-                let calendar = Calendar.current
-                cell.detailTextLabel?.text = calendar.date(from: deadlineDateTime)?.getMonthAndDateAndYear()
+            if let task = self.task, let endDate = task.endDate {
+                cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
             }
         }
-        
+
         <<< DatePickerRow("DeadlineDate") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -620,76 +592,79 @@ class TaskViewController: FormViewController {
             else {
                 $0.cell.datePicker.datePickerMode = .date
             }
-            if self.active, let activity = activity, let deadlineDateTime = activity.deadlineDateTimeComponents {
-                let calendar = Calendar.current
-                $0.value = calendar.date(from: deadlineDateTime)
+            if self.active, let task = task, let endDate = task.endDate {
+                $0.value = endDate
                 $0.updateCell()
             }
         }.onChange { [weak self] row in
             if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "Deadline Date") {
-                let calendar = Calendar.current
-                self?.activity.deadlineDateTimeComponents = calendar.dateComponents([.year, .month, .day], from: value)
                 switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
-                
             }
+            self!.updateDeadlineDate()
         }.cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
-        
+
         <<< SwitchRow("Deadline Time") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.title = $0.tag
-            if self.active, let activity = activity, let deadlineDateTime = activity.deadlineDateTimeComponents {
+            if self.active, let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                print("if")
                 $0.value = true
-                let calendar = Calendar.current
-                $0.cell.detailTextLabel?.text = calendar.date(from: deadlineDateTime)?.getTimeString()
+                $0.cell.detailTextLabel?.text = endDate.getTimeString()
             } else {
+                print("else")
                 $0.value = false
+                $0.cell.detailTextLabel?.text = nil
             }
         }.onChange { [weak self] row in
-            if let value = row.value, let deadlineTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
-                if value, let deadlineDateDateRow = self?.form.rowBy(tag: "DeadlineDate"), let deadlineDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Deadline Date") {
-                    deadlineDateSwitchRow.value = value
-                    deadlineDateSwitchRow.updateCell()
-                    if let activity = self?.activity, let deadlineDateTime = activity.deadlineDateTimeComponents, let _ = deadlineDateTime.hour, let _ = deadlineDateTime.minute {
-                        let calendar = Calendar.current
-                        row.cell.detailTextLabel?.text = calendar.date(from: deadlineDateTime)?.getTimeString()
-                        deadlineDateSwitchRow.cell.detailTextLabel?.text = calendar.date(from: deadlineDateTime)?.getMonthAndDateAndYear()
-                        deadlineTime.value = calendar.date(from: deadlineDateTime)
+            print("onchange deadline time")
+            if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
+                if value, let endDateDateRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Deadline Date") {
+                    if let task = self?.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                        row.cell.detailTextLabel?.text = endDate.getTimeString()
+                        endTimeRow.value = endDate
+                        if !(endDateSwitchRow.value ?? false) {
+                            endDateSwitchRow.value = value
+                            endDateSwitchRow.updateCell()
+                            endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                        }
                     } else {
-                        let calendar = Calendar.current
                         let original = Date()
-                        let deadlineDateTime = Date(timeIntervalSinceReferenceDate:
+                        let endDate = Date(timeIntervalSinceReferenceDate:
                                             (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        deadlineTime.value = deadlineDateTime
-                        row.cell.detailTextLabel?.text = deadlineDateTime.getTimeString()
-                        deadlineDateSwitchRow.cell.detailTextLabel?.text = deadlineDateTime.getMonthAndDateAndYear()
-                        self?.activity.deadlineDateTimeComponents = calendar.dateComponents([.hour, .minute, .day, .month, .year], from: deadlineDateTime)
-
+                        endTimeRow.value = endDate
+                        row.cell.detailTextLabel?.text = endDate.getTimeString()
+                        if !(endDateSwitchRow.value ?? false) {
+                            endDateSwitchRow.value = value
+                            endDateSwitchRow.updateCell()
+                            endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                        }
                     }
-                    deadlineDateDateRow.hidden = true
-                    deadlineDateDateRow.evaluateHidden()
+                    endDateDateRow.hidden = true
+                    endDateDateRow.evaluateHidden()
                 } else {
                     row.cell.detailTextLabel?.text = nil
-                    self?.activity.deadlineDateTimeComponents?.hour = nil
-                    self?.activity.deadlineDateTimeComponents?.minute = nil
                 }
+                self!.updateDeadlineDate()
+
                 let condition: Condition = value ? false : true
                 row.disabled = condition
-                deadlineTime.hidden = condition
-                deadlineTime.evaluateHidden()
+                endTimeRow.hidden = condition
+                endTimeRow.evaluateHidden()
+                
             }
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
-                if let deadlineTime = self?.form.rowBy(tag: "DeadlineTime"), let deadlineDate = self?.form.rowBy(tag: "DeadlineDate") {
-                    deadlineTime.hidden = deadlineTime.isHidden ? false : true
-                    deadlineTime.evaluateHidden()
-                    if !deadlineTime.isHidden {
-                        deadlineDate.hidden = true
-                        deadlineDate.evaluateHidden()
+                if let endTime = self?.form.rowBy(tag: "DeadlineTime"), let endDate = self?.form.rowBy(tag: "DeadlineDate") {
+                    endTime.hidden = endTime.isHidden ? false : true
+                    endTime.evaluateHidden()
+                    if !endTime.isHidden {
+                        endDate.hidden = true
+                        endDate.evaluateHidden()
                     }
                 }
             }
@@ -697,12 +672,11 @@ class TaskViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            if let activity = self.activity, let deadlineDateTime = activity.deadlineDateTimeComponents, let _ = deadlineDateTime.hour, let _ = deadlineDateTime.minute {
-                let calendar = Calendar.current
-                cell.detailTextLabel?.text = calendar.date(from: deadlineDateTime)?.getTimeString()
+            if let task = self.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                cell.detailTextLabel?.text = endDate.getTimeString()
             }
         }
-        
+
         <<< TimePickerRow("DeadlineTime") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -717,81 +691,20 @@ class TaskViewController: FormViewController {
             else {
                 $0.cell.datePicker.datePickerMode = .time
             }
-            if self.active, let activity = activity, let deadlineDateTime = activity.deadlineDateTimeComponents {
-                let calendar = Calendar.current
-                $0.value = calendar.date(from: deadlineDateTime)
+            if self.active, let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                $0.value = endDate
                 $0.updateCell()
             }
         }.onChange { [weak self] row in
+            print("onchange deadlinetime")
             if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "Deadline Time") {
-                let calendar = Calendar.current
-                self?.activity.deadlineDateTimeComponents = calendar.dateComponents([.hour, .minute, .day, .month, .year], from: value)
+                self?.task.endDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
                 switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
-                
-            }
+            }            
+            self!.updateDeadlineDate()
         }.cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
-        
-        <<< LabelRow("Repeat") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if self.active, let recurrences = self.activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
-                row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
-            } else {
-                row.value = "Never"
-            }
-        }.onCellSelection({ _, row in
-            self.openRepeat()
-        }).cellUpdate { cell, row in
-            cell.textLabel?.textAlignment = .left
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            cell.accessoryType = .disclosureIndicator
-        }
-        
-        <<< PushRow<EventAlert>("Reminder") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.title = row.tag
-            if self.active, let value = self.activity.reminder {
-                row.value = EventAlert(rawValue: value)
-            } else {
-                row.value = EventAlert.None
-                if let reminder = row.value?.description {
-                    self.activity.reminder = reminder
-                }
-            }
-            row.options = EventAlert.allCases
-        }.onPresent { from, to in
-            to.title = "Reminder"
-            to.tableViewStyle = .insetGrouped
-            to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                to.tableView.separatorStyle = .none
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        }.onChange() { [unowned self] row in
-            if let reminder = row.value?.description {
-                self.activity.reminder = reminder
-                if self.active {
-                    self.scheduleReminder()
-                }
-            }
         }
         
         <<< LabelRow("List") { row in
@@ -801,8 +714,8 @@ class TaskViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if self.active && self.activity.listName != nil {
-                row.value = self.activity.listName
+            if self.active && self.task.listName != nil {
+                row.value = self.task.listName
             } else {
                 row.value = "Default"
             }
@@ -823,8 +736,8 @@ class TaskViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if self.active && self.activity.category != nil {
-                row.value = self.activity.category
+            if self.active && self.task.category != nil {
+                row.value = self.task.category
             } else {
                 row.value = "Uncategorized"
             }
@@ -838,7 +751,7 @@ class TaskViewController: FormViewController {
             cell.textLabel?.textAlignment = .left
         }
         
-        //        if let _ = activity.activityType {
+        //        if let _ = task.activityType {
         //            form.last!
         //            <<< LabelRow("Subcategory") { row in
         //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -847,8 +760,8 @@ class TaskViewController: FormViewController {
         //                row.cell.accessoryType = .disclosureIndicator
         //                row.cell.selectionStyle = .default
         //                row.title = row.tag
-        //                if self.active && self.activity.activityType != "nothing" && self.activity.activityType != nil {
-        //                    row.value = self.activity.activityType!
+        //                if self.active && self.task.activityType != "nothing" && self.task.activityType != nil {
+        //                    row.value = self.task.activityType!
         //                } else {
         //                    row.value = "Uncategorized"
         //                }
@@ -867,11 +780,11 @@ class TaskViewController: FormViewController {
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             row.title = "Show Extras"
-            if let showExtras = activity.showExtras {
+            if let showExtras = task.showExtras {
                 row.value = showExtras
             } else {
                 row.value = true
-                self.activity.showExtras = true
+                self.task.showExtras = true
             }
         }.onChange { [weak self] row in
             if !row.value!, let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
@@ -895,7 +808,7 @@ class TaskViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
-            if self.activity.subtaskIDs != nil {
+            if self.task.subtaskIDs != nil {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             } else {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -906,7 +819,7 @@ class TaskViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
-            if let _ = self.activity.subtaskIDs {
+            if let _ = self.task.subtaskIDs {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             } else {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -919,7 +832,7 @@ class TaskViewController: FormViewController {
 //            row.cell.accessoryType = .disclosureIndicator
 //            row.title = row.tag
 //            row.hidden = "$showExtras == false"
-//            if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
+//            if self.task.checklistIDs != nil || self.task.grocerylistID != nil || self.task.activitylistIDs != nil {
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
 //            } else {
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -930,7 +843,7 @@ class TaskViewController: FormViewController {
 //            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //            cell.accessoryType = .disclosureIndicator
 //            cell.textLabel?.textAlignment = .left
-//            if let _ = self.activity.checklistIDs {
+//            if let _ = self.task.checklistIDs {
 //                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
 //            } else {
 //                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -950,7 +863,7 @@ class TaskViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
-            if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
+            if (self.task.activityPhotos == nil || self.task.activityPhotos!.isEmpty) && (self.task.activityFiles == nil || self.task.activityFiles!.isEmpty) {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -966,7 +879,7 @@ class TaskViewController: FormViewController {
                     $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
                 }
                 $0.options = ["Health", "Transactions"]
-                if !(activity.showExtras ?? true) {
+                if !(task.showExtras ?? true) {
                     $0.value = "Hidden"
                 } else {
                     $0.value = "Health"

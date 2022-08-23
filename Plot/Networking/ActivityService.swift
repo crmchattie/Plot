@@ -24,7 +24,8 @@ class ActivityService {
     let calendarFetcher = CalendarFetcher()
     let listFetcher = ListFetcher()
     
-    var askedforAuthorization: Bool = false
+    var askedforCalendarAuthorization: Bool = false
+    var askedforReminderAuthorization: Bool = false
     
     var calendars = [String: [CalendarType]]() {
         didSet {
@@ -77,10 +78,10 @@ class ActivityService {
         didSet {
             if oldValue != tasks {
                 tasks.sort { task1, task2 in
-                    if let task1StartDate = task1.startDate, let task2startDate = task2.startDate, task1StartDate == task2startDate {
+                    if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
                         return task1.name ?? "" < task2.name ?? ""
                     }
-                    return task1.startDate ?? Date.distantPast < task2.startDate ?? Date.distantPast
+                    return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
                 }
                 NotificationCenter.default.post(name: .tasksUpdated, object: nil)
             }
@@ -226,8 +227,8 @@ class ActivityService {
             return completion()
         }
         self.eventKitManager.checkEventAuthorizationStatus {}
-        self.eventKitManager.authorizeEventKit({ askedforAuthorization in
-            self.askedforAuthorization = askedforAuthorization
+        self.eventKitManager.authorizeEventKit({ askedforCalendarAuthorization in
+            self.askedforCalendarAuthorization = askedforCalendarAuthorization
             self.eventKitManager.syncEventKitActivities(existingActivities: self.activitiesNoRepeats, completion: {
                 self.eventKitManager.syncActivitiesToEventKit(activities: self.activitiesNoRepeats, completion: {
                     completion()
@@ -240,8 +241,8 @@ class ActivityService {
         guard Auth.auth().currentUser != nil else {
             return completion()
         }
-        self.googleCalManager.setupGoogle { askedforAuthorization in
-            self.askedforAuthorization = askedforAuthorization
+        self.googleCalManager.setupGoogle { askedforCalendarAuthorization in
+            self.askedforCalendarAuthorization = askedforCalendarAuthorization
             self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activitiesNoRepeats, completion: {
                 self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activitiesNoRepeats, completion: {
                     completion()
@@ -387,7 +388,7 @@ class ActivityService {
     }
     
     func runCalendarFunctions(value: String) {
-        if !askedforAuthorization {
+        if !askedforCalendarAuthorization {
             grabActivities {}
         } else {
             if value == primaryCalendar && value == CalendarOptions.apple.name {

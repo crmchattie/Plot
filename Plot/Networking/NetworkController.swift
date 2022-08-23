@@ -82,7 +82,7 @@ extension NetworkController {
                 
         let currentUserID = Auth.auth().currentUser?.uid
         
-        let activityID = Database.database().reference().child("user-activities").child(currentUserID!).childByAutoId().key ?? ""
+        let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID!).childByAutoId().key ?? ""
         let checklistID = Database.database().reference().child(userChecklistsEntity).child(currentUserID!).childByAutoId().key ?? ""
         
         let dispatchGroup = DispatchGroup()
@@ -174,13 +174,13 @@ extension NetworkController {
                 
                 
                 let activityDict = activity.toAnyObject()
-                let activityReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                 dispatchGroup.enter()
                 activityReference.updateChildValues(activityDict) { (error, reference) in
                     dispatchGroup.leave()
                 }
                 
-                let userReference = Database.database().reference().child("user-activities").child(currentUserID!).child(activityID).child(messageMetaDataFirebaseFolder)
+                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID!).child(activityID).child(messageMetaDataFirebaseFolder)
                 let values:[String : Any] = ["isGroupActivity": true]
                 dispatchGroup.enter()
                 userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in

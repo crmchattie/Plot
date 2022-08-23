@@ -445,6 +445,12 @@ extension Date {
     func dayNumberOfWeek() -> Int {
         return Calendar.current.dateComponents([.weekday], from: self).weekday!
     }
+    func minuteNumber() -> Int {
+        return Calendar.current.dateComponents([.minute], from: self).minute!
+    }
+    func hourNumber() -> Int {
+        return Calendar.current.dateComponents([.hour], from: self).hour!
+    }
     func dayNumber() -> Int {
         return Calendar.current.dateComponents([.day], from: self).day!
     }

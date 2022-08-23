@@ -12,6 +12,7 @@ import CodableFirebase
 
 let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
+let userFavActivitiesEntity = "user-fav-activities"
 
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
@@ -70,10 +71,10 @@ class Activity: NSObject, NSCopying, Codable {
     var listName: String?
     var listColor: String?
     var listSource: String?
-    var startDateTimeComponents: DateComponents?
-    var deadlineDateTimeComponents: DateComponents?
     var subtaskIDs: [String]?
     var isSubtask: Bool?
+    var hasStartTime: Bool?
+    var hasDeadlineTime: Bool?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -115,10 +116,10 @@ class Activity: NSObject, NSCopying, Codable {
         case listName
         case listColor
         case listSource
-        case startDateTimeComponents
-        case deadlineDateTimeComponents
         case subtaskIDs
         case isSubtask
+        case hasStartTime
+        case hasDeadlineTime
     }
     
     init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool) {
@@ -211,8 +212,8 @@ class Activity: NSObject, NSCopying, Codable {
         listSource = dictionary?["listSource"] as? String
         subtaskIDs = dictionary?["subtaskIDs"] as? [String]
         isSubtask = dictionary?["isSubtask"] as? Bool
-        startDateTimeComponents = dictionary?["startDateTimeComponents"] as? DateComponents
-        deadlineDateTimeComponents = dictionary?["deadlineDateTimeComponents"] as? DateComponents
+        hasStartTime = dictionary?["hasStartTime"] as? Bool
+        hasDeadlineTime = dictionary?["hasDeadlineTime"] as? Bool
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -410,12 +411,12 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["isSubtask"] = value
         }
         
-        if let value = self.startDateTimeComponents as AnyObject? {
-            dictionary["startDateTimeComponents"] = value
+        if let value = self.hasStartTime as AnyObject? {
+            dictionary["hasStartTime"] = value
         }
         
-        if let value = self.deadlineDateTimeComponents as AnyObject? {
-            dictionary["deadlineDateTimeComponents"] = value
+        if let value = self.hasDeadlineTime as AnyObject? {
+            dictionary["hasDeadlineTime"] = value
         }
         
         return dictionary
@@ -661,9 +662,7 @@ extension Activity {
     var startDate: Date? {
         if let startDateTime = startDateTime?.doubleValue {
             return Date(timeIntervalSince1970: startDateTime)
-        } else if let startDateTime = startDateTimeComponents {
-            let calendar = Calendar.current
-            return calendar.date(from: startDateTime)
+        //for tasks where deadline date is more likely to be set than start date
         }
         return nil
     }
@@ -671,9 +670,6 @@ extension Activity {
     var endDate: Date? {
         if let endDateTime = endDateTime?.doubleValue {
             return Date(timeIntervalSince1970: endDateTime)
-        } else if let endDateTime = deadlineDateTimeComponents {
-            let calendar = Calendar.current
-            return calendar.date(from: endDateTime)
         }
         return nil
     }

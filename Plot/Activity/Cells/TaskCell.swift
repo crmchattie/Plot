@@ -1,14 +1,14 @@
 //
-//  ListCell.swift
+//  TaskCell.swift
 //  Plot
 //
-//  Created by Cory McHattie on 5/20/20.
-//  Copyright © 2020 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 8/22/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-class ListCell: UITableViewCell {
+class TaskCell: UITableViewCell {
     var invitationSegmentHeightConstraint: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchorRegular: CGFloat = 8
@@ -21,9 +21,9 @@ class ListCell: UITableViewCell {
     
     var participants: [User] = []
     let thumbnailsCount = 8
-    weak var listDataStore: ListDataStore?
+    weak var activityDataStore: ActivityDataStore?
     var thumbnails: [UIImageView] = []
-    var list: ListType?
+    var task: Activity?
     
     //name of activity
     let nameLabel: UILabel = {
@@ -146,8 +146,8 @@ class ListCell: UITableViewCell {
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-        activityImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
-        activityImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15).isActive = true
+        activityImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        activityImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
@@ -173,7 +173,7 @@ class ListCell: UITableViewCell {
         invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
         invitationSegmentHeightConstraint = invitationSegmentedControl.heightAnchor.constraint(equalToConstant: invitationSegmentHeightConstant)
         invitationSegmentHeightConstraint.isActive = true
-                
+        
         muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 1).isActive = true
         muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor, constant: 1).isActive = true
         muteIndicator.widthAnchor.constraint(equalToConstant: 15).isActive = true
@@ -183,6 +183,7 @@ class ListCell: UITableViewCell {
         badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
+        invitationSegmentedControl.addTarget(self, action: #selector(EventCell.indexChangedSegmentedControl(_:)), for: .valueChanged)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -206,23 +207,3 @@ class ListCell: UITableViewCell {
         activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
     }
 }
-
-//        var x: CGFloat = 10
-//        for _ in 0..<thumbnailsCount {
-//            let icon = UIImageView()
-//            listImageView.addSubview(icon)
-//            thumbnails.append(icon)
-//            icon.translatesAutoresizingMaskIntoConstraints = false
-//            icon.contentMode = .scaleAspectFill
-//            icon.layer.cornerRadius = 15
-//            icon.layer.masksToBounds = true
-//            icon.image = UIImage(named: "UserpicIcon")
-//            icon.topAnchor.constraint(equalTo: activityLabel.bottomAnchor, constant: 8).isActive = true
-//            icon.leftAnchor.constraint(equalTo: listImageView.leftAnchor, constant: x).isActive = true
-//            icon.widthAnchor.constraint(equalToConstant: 30).isActive = true
-//            icon.heightAnchor.constraint(equalToConstant: 30).isActive = true
-//            icon.isHidden = true
-//            x += 38
-//        }
-
-

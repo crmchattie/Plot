@@ -338,16 +338,16 @@ extension EventViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let activityID = activityID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+            Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
 
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
                     var activities = conversation.activities!
                     activities.append(activityID)
-                    let updatedActivities = ["activities": activities as AnyObject]
+                    let updatedActivities = [activitiesEntity: activities as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                 } else {
-                    let updatedActivities = ["activities": [activityID] as AnyObject]
+                    let updatedActivities = [activitiesEntity: [activityID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                 }
                 if activity.grocerylistID != nil {

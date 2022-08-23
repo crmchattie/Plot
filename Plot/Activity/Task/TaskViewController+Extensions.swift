@@ -65,9 +65,9 @@ extension TaskViewController: UpdateActivityLevelDelegate {
             row.value = value
             row.updateCell()
             if level == "Category" {
-                self.activity.category = value
+                self.task.category = value
             } else if level == "Subcategory" {
-                self.activity.activityType = value
+                self.task.activityType = value
             }
         }
     }
@@ -229,13 +229,13 @@ extension TaskViewController: UpdateMindfulnessDelegate {
 
 extension TaskViewController: UpdateMediaDelegate {
     func updateMedia(imageURLs: [String], fileURLs: [String]) {
-        activity.activityPhotos = imageURLs
-        activity.activityFiles = fileURLs
+        task.activityPhotos = imageURLs
+        task.activityFiles = fileURLs
         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         activityReference.updateChildValues(["activityPhotos": imageURLs as AnyObject])
         activityReference.updateChildValues(["activityFiles": fileURLs as AnyObject])
         if let mediaRow: ButtonRow = form.rowBy(tag: "Media") {
-            if self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty || self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty {
+            if self.task.activityPhotos == nil || self.task.activityPhotos!.isEmpty || self.task.activityFiles == nil || self.task.activityFiles!.isEmpty {
                 mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {
                 mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -261,16 +261,16 @@ extension TaskViewController: UpdateActivityListDelegate {
 extension TaskViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         // do something, if recurrenceRule is nil, that means "never repeat".
-        if let row: LabelRow = form.rowBy(tag: "Repeat"), let startDate = activity.startDate {
+        if let row: LabelRow = form.rowBy(tag: "Repeat"), let startDate = task.startDate {
             if let recurrenceRule = recurrenceRule {
                 let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
                 row.value = rowText
                 row.updateCell()
-                activity.recurrences = [recurrenceRule.toRRuleString()]
+                task.recurrences = [recurrenceRule.toRRuleString()]
             } else {
                 row.value = "Never"
                 row.updateCell()
-                activity.recurrences = nil
+                task.recurrences = nil
             }
         }
     }
@@ -280,68 +280,68 @@ extension TaskViewController: ChooseChatDelegate {
     func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
         if let activityID = activityID {
             let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+            Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
 
             if let conversation = conversations.first(where: {$0.chatID == chatID}) {
                 if conversation.activities != nil {
                     var activities = conversation.activities!
                     activities.append(activityID)
-                    let updatedActivities = ["activities": activities as AnyObject]
+                    let updatedActivities = [activitiesEntity: activities as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                 } else {
-                    let updatedActivities = ["activities": [activityID] as AnyObject]
+                    let updatedActivities = [activitiesEntity: [activityID] as AnyObject]
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                 }
-                if activity.grocerylistID != nil {
+                if task.grocerylistID != nil {
                     if conversation.grocerylists != nil {
                         var grocerylists = conversation.grocerylists!
-                        grocerylists.append(activity.grocerylistID!)
+                        grocerylists.append(task.grocerylistID!)
                         let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
                     } else {
-                        let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
+                        let updatedGrocerylists = [grocerylistsEntity: [task.grocerylistID!] as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
                     }
-                    Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
+                    Database.database().reference().child(grocerylistsEntity).child(task.grocerylistID!).updateChildValues(updatedConversationID)
                 }
-                if activity.checklistIDs != nil {
+                if task.checklistIDs != nil {
                     if conversation.checklists != nil {
-                        let checklists = conversation.checklists! + activity.checklistIDs!
+                        let checklists = conversation.checklists! + task.checklistIDs!
                         let updatedChecklists = [checklistsEntity: checklists as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
                     } else {
-                        let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
+                        let updatedChecklists = [checklistsEntity: task.checklistIDs! as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
                     }
-                    for ID in activity.checklistIDs! {
+                    for ID in task.checklistIDs! {
                         Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
 
                     }
                 }
-                if activity.activitylistIDs != nil {
+                if task.activitylistIDs != nil {
                     if conversation.activitylists != nil {
-                        let activitylists = conversation.activitylists! + activity.activitylistIDs!
+                        let activitylists = conversation.activitylists! + task.activitylistIDs!
                         let updatedActivitylists = [activitylistsEntity: activitylists as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
                     } else {
-                        let updatedActivitylists = [activitylistsEntity: activity.activitylistIDs! as AnyObject]
+                        let updatedActivitylists = [activitylistsEntity: task.activitylistIDs! as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
                     }
-                    for ID in activity.activitylistIDs! {
+                    for ID in task.activitylistIDs! {
                         Database.database().reference().child(activitylistsEntity).child(ID).updateChildValues(updatedConversationID)
 
                     }
                 }
-                if activity.packinglistIDs != nil {
+                if task.packinglistIDs != nil {
                     if conversation.packinglists != nil {
-                        let packinglists = conversation.packinglists! + activity.packinglistIDs!
+                        let packinglists = conversation.packinglists! + task.packinglistIDs!
                         let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
                     } else {
-                        let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
+                        let updatedPackinglists = [packinglistsEntity: task.packinglistIDs! as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
                     }
-                   for ID in activity.packinglistIDs! {
+                   for ID in task.packinglistIDs! {
                         Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
 
                     }

@@ -33,7 +33,7 @@ class Packinglist: NSObject, NSCopying, Codable {
         
         name = dictionary?["name"] as? String
         ID = dictionary?["ID"] as? String
-        activities = dictionary?["activities"] as? [String: Bool]
+        activities = dictionary?[activitiesEntity] as? [String: Bool]
         items = dictionary?["items"] as? [String: [Int: Bool]]
         admin = dictionary?["admin"] as? String
         badge = dictionary?["badge"] as? Int
@@ -72,7 +72,7 @@ class Packinglist: NSObject, NSCopying, Codable {
         }
         
         if let value = self.activities as AnyObject? {
-            dictionary["activities"] = value
+            dictionary[activitiesEntity] = value
         }
                 
         if let value = self.items as AnyObject? {

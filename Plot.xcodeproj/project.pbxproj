@@ -180,6 +180,9 @@
 		10B3E50A28B1478A00E1713D /* ListDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50928B1478A00E1713D /* ListDetailViewController.swift */; };
 		10B3E50C28B168D700E1713D /* ListFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50B28B168D700E1713D /* ListFetcher.swift */; };
 		10B3E50E28B168E600E1713D /* ListActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50D28B168E600E1713D /* ListActions.swift */; };
+		10B3E51328B3EFB300E1713D /* TasksControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E51228B3EFB300E1713D /* TasksControllerCell.swift */; };
+		10B3E51528B3F56000E1713D /* TaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E51428B3F56000E1713D /* TaskCell.swift */; };
+		10B3E51728B3F57500E1713D /* TaskCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E51628B3F57500E1713D /* TaskCell+ConfigureCell.swift */; };
 		10B4AE3324FE9CBA005B967B /* FinancialAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */; };
 		10B4AE3524FEC5BC005B967B /* FinanceAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */; };
 		10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541C925476D8B00CC9023 /* GroceryProduct.swift */; };
@@ -201,10 +204,10 @@
 		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
 		10C32861248D8B9300E4475B /* ChatsTableViewController+Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */; };
 		10C50F972274E21900111033 /* CalendarViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F962274E21900111033 /* CalendarViewController+SearchHandlers.swift */; };
-		10C50F9B2274E80500111033 /* ActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F9A2274E80500111033 /* ActivityCell.swift */; };
+		10C50F9B2274E80500111033 /* EventCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50F9A2274E80500111033 /* EventCell.swift */; };
 		10C50FA22274ED9200111033 /* CalendarViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA12274ED9200111033 /* CalendarViewController+TableRowActionHandlers.swift */; };
 		10C50FA42274EF9100111033 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA32274EF9000111033 /* Activity.swift */; };
-		10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */; };
+		10C50FA62276345500111033 /* EventCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C50FA52276345500111033 /* EventCell+ConfigureCell.swift */; };
 		10C766E325321732003C8E1F /* FinanceTransactionRuleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */; };
 		10C766E525321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */; };
 		10C7F92525A520ED004E9277 /* ActiveEnergyOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */; };
@@ -249,7 +252,7 @@
 		10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */; };
 		10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB0925217C3200898D6E /* HeaderCell.swift */; };
 		10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */; };
-		10E8E4F725923B320076BE42 /* ActivitiesControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */; };
+		10E8E4F725923B320076BE42 /* EventsControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E4F625923B320076BE42 /* EventsControllerCell.swift */; };
 		10E8E4FB25923B3F0076BE42 /* HealthControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */; };
 		10E8E4FF25923B4F0076BE42 /* FinanceControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */; };
 		10E8E50325923C070076BE42 /* BaseContainerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E50225923C070076BE42 /* BaseContainerCell.swift */; };
@@ -756,6 +759,9 @@
 		10B3E50928B1478A00E1713D /* ListDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailViewController.swift; sourceTree = "<group>"; };
 		10B3E50B28B168D700E1713D /* ListFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListFetcher.swift; sourceTree = "<group>"; };
 		10B3E50D28B168E600E1713D /* ListActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListActions.swift; sourceTree = "<group>"; };
+		10B3E51228B3EFB300E1713D /* TasksControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksControllerCell.swift; sourceTree = "<group>"; };
+		10B3E51428B3F56000E1713D /* TaskCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCell.swift; sourceTree = "<group>"; };
+		10B3E51628B3F57500E1713D /* TaskCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10B4AE3224FE9CBA005B967B /* FinancialAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountCell.swift; sourceTree = "<group>"; };
 		10B4AE3424FEC5BC005B967B /* FinanceAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountViewController.swift; sourceTree = "<group>"; };
 		10B541C925476D8B00CC9023 /* GroceryProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryProduct.swift; sourceTree = "<group>"; };
@@ -777,10 +783,10 @@
 		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C32860248D8B9300E4475B /* ChatsTableViewController+Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatsTableViewController+Migration.swift"; sourceTree = "<group>"; };
 		10C50F962274E21900111033 /* CalendarViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
-		10C50F9A2274E80500111033 /* ActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCell.swift; sourceTree = "<group>"; };
+		10C50F9A2274E80500111033 /* EventCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCell.swift; sourceTree = "<group>"; };
 		10C50FA12274ED9200111033 /* CalendarViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
 		10C50FA32274EF9000111033 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
-		10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActivityCell+ConfigureCell.swift"; sourceTree = "<group>"; };
+		10C50FA52276345500111033 /* EventCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10C766E225321732003C8E1F /* FinanceTransactionRuleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionRuleViewController.swift; sourceTree = "<group>"; };
 		10C766E425321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTransactionNewLevelViewController.swift; sourceTree = "<group>"; };
 		10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveEnergyOperation.swift; sourceTree = "<group>"; };
@@ -825,7 +831,7 @@
 		10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTableViewCell.swift; sourceTree = "<group>"; };
 		10E4DB0925217C3200898D6E /* HeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCell.swift; sourceTree = "<group>"; };
 		10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewMemberCell.swift; sourceTree = "<group>"; };
-		10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesControllerCell.swift; sourceTree = "<group>"; };
+		10E8E4F625923B320076BE42 /* EventsControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsControllerCell.swift; sourceTree = "<group>"; };
 		10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthControllerCell.swift; sourceTree = "<group>"; };
 		10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceControllerCell.swift; sourceTree = "<group>"; };
 		10E8E50225923C070076BE42 /* BaseContainerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseContainerCell.swift; sourceTree = "<group>"; };
@@ -1265,7 +1271,8 @@
 				1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */,
 				103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */,
 				103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */,
-				10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */,
+				10B3E51228B3EFB300E1713D /* TasksControllerCell.swift */,
+				10E8E4F625923B320076BE42 /* EventsControllerCell.swift */,
 				10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */,
 				10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */,
 				10BA3BCD259BEDF9005D98EC /* SetupCell.swift */,
@@ -1614,8 +1621,10 @@
 		10C50F992274E7D500111033 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				10C50F9A2274E80500111033 /* ActivityCell.swift */,
-				10C50FA52276345500111033 /* ActivityCell+ConfigureCell.swift */,
+				10C50F9A2274E80500111033 /* EventCell.swift */,
+				10C50FA52276345500111033 /* EventCell+ConfigureCell.swift */,
+				10B3E51428B3F56000E1713D /* TaskCell.swift */,
+				10B3E51628B3F57500E1713D /* TaskCell+ConfigureCell.swift */,
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
 				109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */,
@@ -3149,6 +3158,7 @@
 				1034A07825C84FCC006D3DB8 /* GoogleCalManager.swift in Sources */,
 				4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */,
 				101B90902457999600EDDB90 /* Weather.swift in Sources */,
+				10B3E51728B3F57500E1713D /* TaskCell+ConfigureCell.swift in Sources */,
 				10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */,
 				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
 				4B5E99DE212CC0C0001F067F /* InAppNotificationManager.swift in Sources */,
@@ -3211,6 +3221,7 @@
 				4BAEE4FF21272D890045AB10 /* VoiceRecordingContainerView.swift in Sources */,
 				10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */,
 				10DFC3F9255CC64000565DAD /* MealFetcher.swift in Sources */,
+				10B3E51528B3F56000E1713D /* TaskCell.swift in Sources */,
 				108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */,
 				10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */,
 				1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */,
@@ -3243,6 +3254,7 @@
 				4BAEE49421272C5E0045AB10 /* FalconUsersTableViewCell.swift in Sources */,
 				102076CC23C2D3B5009AEAA4 /* Service.swift in Sources */,
 				108087232585058100FB9BB0 /* MoodFetcher.swift in Sources */,
+				10B3E51328B3EFB300E1713D /* TasksControllerCell.swift in Sources */,
 				4BAEE4F521272D890045AB10 /* GroupProfileTableViewController.swift in Sources */,
 				105F34B32885EF7A007531EB /* RecurrenceRule+Text.swift in Sources */,
 				4BAEE5E6212735E50045AB10 /* EnterVerificationContainerView.swift in Sources */,
@@ -3343,7 +3355,7 @@
 				1080872F258506DF00FB9BB0 /* WorkActions.swift in Sources */,
 				100A53F323E3BDAC004AA952 /* Filter.swift in Sources */,
 				F98329952602B25100EB51F7 /* ActivityCategory.swift in Sources */,
-				10C50F9B2274E80500111033 /* ActivityCell.swift in Sources */,
+				10C50F9B2274E80500111033 /* EventCell.swift in Sources */,
 				269105F8253E8E2E00A02C5F /* LargeValueFormatter.swift in Sources */,
 				4BAEE5B6212735E50045AB10 /* INSPhotosViewController.swift in Sources */,
 				100E0DB024D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift in Sources */,
@@ -3441,7 +3453,7 @@
 				108C37F328997CBF00DC4998 /* ActivityListViewController.swift in Sources */,
 				4BAEE5B8212735E50045AB10 /* INSPhotosInteractionAnimator.swift in Sources */,
 				1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */,
-				10E8E4F725923B320076BE42 /* ActivitiesControllerCell.swift in Sources */,
+				10E8E4F725923B320076BE42 /* EventsControllerCell.swift in Sources */,
 				4BAEE5EA212735E50045AB10 /* Country.swift in Sources */,
 				2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */,
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
@@ -3458,7 +3470,7 @@
 				26B453AB254F8FCA00C63093 /* HealthDetailService.swift in Sources */,
 				109FEB3D22A7003000621D2F /* CalendarType.swift in Sources */,
 				4BAEE4EC21272D890045AB10 /* UserInfoCreateContactTableViewController.swift in Sources */,
-				10C50FA62276345500111033 /* ActivityCell+ConfigureCell.swift in Sources */,
+				10C50FA62276345500111033 /* EventCell+ConfigureCell.swift in Sources */,
 				10C766E525321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift in Sources */,
 				1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */,
 				4BAEE46621272B380045AB10 /* PrivacyTableViewController.swift in Sources */,

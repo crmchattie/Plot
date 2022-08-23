@@ -441,8 +441,7 @@ enum SectionType: Hashable, CaseIterable {
         case .calendar: return "calendar"
         case .health: return "heart"
         case .finances: return "money"
-        case .task: return "task"
-        case .tasks: return "tasks"
+        case .task, .tasks: return "task"
         }
     }
 }

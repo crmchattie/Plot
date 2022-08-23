@@ -562,7 +562,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     func fetchFavAct() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         
-        self.reference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+        self.reference = Database.database().reference().child(userFavActivitiesEntity).child(currentUserID)
         self.reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let favoriteActivitiesSnapshot = snapshot.value as? [String: [String]] {
                 if !NSDictionary(dictionary: self.favAct).isEqual(to: favoriteActivitiesSnapshot) {
@@ -672,7 +672,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         } else if !schedule {
             if let currentUserID = Auth.auth().currentUser?.uid {
-                let activityID = Database.database().reference().child("user-activities").child(currentUserID).childByAutoId().key ?? ""
+                let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 activity = Activity(dictionary: ["activityID": activityID as AnyObject])
             }
         } else {
@@ -786,7 +786,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
     func bookmarkButtonTapped(type: Any) {
         print("bookmarkButtonTapped")
         if let currentUserID = Auth.auth().currentUser?.uid {
-            let databaseReference = Database.database().reference().child("user-fav-activities").child(currentUserID)
+            let databaseReference = Database.database().reference().child(userFavActivitiesEntity).child(currentUserID)
             if let recipe = type as? Recipe {
                 print(recipe.title)
                 databaseReference.child("recipes").observeSingleEvent(of: .value, with: { (snapshot) in

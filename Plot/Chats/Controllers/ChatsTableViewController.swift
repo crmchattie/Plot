@@ -476,7 +476,7 @@ extension ChatsTableViewController: ChatCellDelegate {
                 })
             }
             for activityID in convoActivities {
-                let activityDataReference = Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder)
+                let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                 activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
                     guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                     

@@ -1,5 +1,5 @@
 //
-//  ActivitiesControllerCell.swift
+//  EventsControllerCell.swift
 //  Plot
 //
 //  Created by Cory McHattie on 12/22/20.
@@ -9,16 +9,16 @@
 import UIKit
 import Firebase
 
-protocol ActivitiesControllerCellDelegate: AnyObject {
+protocol EventsControllerCellDelegate: AnyObject {
     func cellTapped(activity: Activity)
     func updateInvitation(invitation: Invitation)
 }
 
-class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UITableViewDelegate, UpdateInvitationDelegate {
-    weak var delegate: ActivitiesControllerCellDelegate?
+class EventsControllerCell: UICollectionViewCell, UITableViewDataSource, UITableViewDelegate, UpdateInvitationDelegate {
+    weak var delegate: EventsControllerCellDelegate?
     
     var tableView = UITableView(frame: .zero, style: .insetGrouped)
-    var activities = [Activity]() {
+    var events = [Activity]() {
         didSet {
             setupViews()
             tableView.reloadData()
@@ -26,15 +26,15 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     var invitations: [String: Invitation] = [:]
     
-    let activityCellID = "activityCellID"
+    let eventCellID = "eventCellID"
     
     let viewPlaceholder = ViewPlaceholder()
     
-    var activitiesParticipants: [String: [User]] = [:]
+    var participants: [String: [User]] = [:]
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        tableView.register(ActivityCell.self, forCellReuseIdentifier: activityCellID)
+        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.isScrollEnabled = false
         tableView.separatorStyle = .none
         tableView.dataSource = self
@@ -66,18 +66,18 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if activities.count == 0 {
+        if events.count == 0 {
             viewPlaceholder.add(for: tableView, title: .emptyActivitiesMain, subtitle: .emptyActivitiesMain, priority: .medium, position: .fill)
         } else {
             viewPlaceholder.remove(from: tableView, priority: .medium)
         }
-        return activities.count
+        return events.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: activityCellID, for: indexPath) as? ActivityCell ?? ActivityCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
         cell.activityDataStore = self
-        let activity = activities[indexPath.row]
+        let activity = events[indexPath.row]
         var invitation: Invitation? = nil
         if let activityID = activity.activityID, let value = invitations[activityID] {
             invitation = value
@@ -88,7 +88,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let activity = activities[indexPath.row]
+        let activity = events[indexPath.row]
         delegate?.cellTapped(activity: activity)
     }
     
@@ -97,7 +97,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
 }
 
-extension ActivitiesControllerCell: ActivityDataStore {
+extension EventsControllerCell: ActivityDataStore {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -105,7 +105,7 @@ extension ActivitiesControllerCell: ActivityDataStore {
         
         
         let group = DispatchGroup()
-        let olderParticipants = self.activitiesParticipants[activityID]
+        let olderParticipants = self.participants[activityID]
         var participants: [User] = []
         for id in participantsIDs {
             // Only if the current user is created this activity
@@ -132,7 +132,7 @@ extension ActivitiesControllerCell: ActivityDataStore {
         }
         
         group.notify(queue: .main) {
-            self.activitiesParticipants[activityID] = participants
+            self.participants[activityID] = participants
             completion(participants)
         }
     }

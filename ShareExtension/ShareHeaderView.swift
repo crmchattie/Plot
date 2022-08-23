@@ -65,7 +65,7 @@ class ShareHeaderView: UIView {
     }
 }
 
-class ActivityCell: UITableViewCell {
+class EventCell: UITableViewCell {
     
     var activity: Activity?
     

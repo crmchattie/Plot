@@ -1252,7 +1252,7 @@ extension GrocerylistViewController: UpdateInvitees {
 
 extension GrocerylistViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
-        let groupActivityReference = Database.database().reference().child("activities").child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(mergeActivity.activityID!).child(messageMetaDataFirebaseFolder)
         if let activityGrocerylistID = mergeActivity.grocerylistID {
             let grocerylistDataReference = Database.database().reference().child(grocerylistsEntity).child(activityGrocerylistID)
             grocerylistDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -1403,17 +1403,17 @@ extension GrocerylistViewController: ChooseChatDelegate {
                     Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
                 }
                 if let activityID = activityID {
-                    Database.database().reference().child("activities").child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
+                    Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
                     if conversation.activities != nil {
                         var activities = conversation.activities!
                         activities.append(activityID)
-                        let updatedActivities = ["activities": activities as AnyObject]
+                        let updatedActivities = [activitiesEntity: activities as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     } else {
-                        let updatedActivities = ["activities": [activityID] as AnyObject]
+                        let updatedActivities = [activitiesEntity: [activityID] as AnyObject]
                         Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
                     }
-                    Database.database().reference().child("activities").child(activityID).updateChildValues(updatedConversationID)
+                    Database.database().reference().child(activitiesEntity).child(activityID).updateChildValues(updatedConversationID)
                 }
                 self.connectedToChatAlert()
                 self.dismiss(animated: true, completion: nil)

@@ -1,5 +1,5 @@
 //
-//  ActivityCell.swift
+//  EventCell.swift
 //  Pigeon-project
 //
 //  Created by Cory McHattie on 4/27/19.
@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import SDWebImage
 
-class ActivityCell: UITableViewCell {
+class EventCell: UITableViewCell {
     var invitationSegmentHeightConstraint: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
     var invitationSegmentedControlTopAnchorRegular: CGFloat = 8
@@ -187,7 +187,7 @@ class ActivityCell: UITableViewCell {
         badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
-        invitationSegmentedControl.addTarget(self, action: #selector(ActivityCell.indexChangedSegmentedControl(_:)), for: .valueChanged)
+        invitationSegmentedControl.addTarget(self, action: #selector(EventCell.indexChangedSegmentedControl(_:)), for: .valueChanged)
     }
     
     required init?(coder aDecoder: NSCoder) {
