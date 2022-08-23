@@ -148,13 +148,13 @@ class ScheduleListViewController: FormViewController {
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseActivityTableViewController()
+                let destination = ChooseEventTableViewController()
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
-                destination.activity = self.activity
+                destination.event = self.activity
+                destination.events = self.activities
+                destination.filteredEvents = self.activities
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in

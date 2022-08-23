@@ -21,15 +21,19 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        filteredLists = searchText.isEmpty ? lists :
-            lists.filter({ (list) -> Bool in
-                if let name = list.name {
+        if searchText.isEmpty {
+            sortandreload()
+        } else {
+            sections = [.tasks]
+            filteredLists = [:]
+            filteredTasks = tasks.filter({ (task) -> Bool in
+                if let name = task.name {
                     return name.lowercased().contains(searchText.lowercased())
                 }
                 return ("").lowercased().contains(searchText.lowercased())
             })
-        
-        handleReloadTableAfterSearch()
+            tableView.reloadData()
+        }
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {

@@ -142,13 +142,13 @@ class SubtaskListViewController: FormViewController {
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseActivityTableViewController()
+                let destination = ChooseTaskTableViewController()
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
-                destination.activity = self.activity
+                destination.task = self.activity
+                destination.tasks = self.activities
+                destination.filteredTasks = self.activities
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in

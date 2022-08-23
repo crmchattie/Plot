@@ -59,10 +59,6 @@ class TasksControllerCell: UICollectionViewCell, UITableViewDataSource, UITableV
         return 0
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tasks.count == 0 {
             viewPlaceholder.add(for: tableView, title: .emptyTasksMain, subtitle: .emptyTasksMain, priority: .medium, position: .fill)

@@ -392,7 +392,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             viewPlaceholder.remove(from: activityView.tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: activityView.tableView, title: .emptyActivities, subtitle: .emptyActivities, priority: .medium, position: .top)
+        viewPlaceholder.add(for: activityView.tableView, title: .emptyEvents, subtitle: .emptyEvents, priority: .medium, position: .top)
     }
     
     func handleReloadTable() {
@@ -611,7 +611,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        return false
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

@@ -1,5 +1,5 @@
 //
-//  ChooseActivityTableViewController.swift
+//  ChooseEventTableViewController.swift
 //  Plot
 //
 //  Created by Cory McHattie on 4/10/20.
@@ -36,39 +36,33 @@ protocol ChooseActivityDelegate: AnyObject {
 }
 
 
-class ChooseActivityTableViewController: UITableViewController {
+class ChooseEventTableViewController: UITableViewController {
     
     let eventCellID = "eventCellID"
     
     var needDelegate = false
     
     var searchBar: UISearchBar?
-    var searchActivityController: UISearchController?
+    var searchEventController: UISearchController?
     
-    var activities = [Activity]()
-    var filteredActivities = [Activity]()
-    var existingActivities = [Activity]()
+    var events = [Activity]()
+    var filteredEvents = [Activity]()
+    var existingEvents = [Activity]()
     
-    var activity: Activity?
+    var event: Activity?
     var activityID: String?
-    var grocerylist: Grocerylist?
-    var checklist: Checklist?
-    var activitylist: Activitylist?
-    var packinglist: Packinglist?
     var users = [User]()
     var filteredUsers = [User]()
-    
-    let navigationItemActivityIndicator = NavigationItemActivityIndicator()
-    
+        
     weak var delegate : ChooseActivityDelegate?
     
-    let activityCreatingGroup = DispatchGroup()
+    let eventCreatingGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
     
     let viewPlaceholder = ViewPlaceholder()
     
     // [chatID: Participants]
-    var activityParticipants: [String: [User]] = [:]
+    var eventParticipants: [String: [User]] = [:]
     
     var movingBackwards = false
     
@@ -77,31 +71,31 @@ class ChooseActivityTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = "Choose Activity"
+        navigationItem.title = "Choose Event"
         
-        activities = activities.filter { $0.containerID == nil }
-        if let activity = activity {
-            if let index = activities.firstIndex(of: activity) {
-                activities.remove(at: index)
+        events = events.filter { $0.containerID == nil }
+        if let event = event {
+            if let index = events.firstIndex(of: event) {
+                events.remove(at: index)
             }
         } else if let activityID = activityID {
-            if let index = activities.firstIndex(where: {$0.activityID == activityID}) {
-                activities.remove(at: index)
+            if let index = events.firstIndex(where: {$0.activityID == activityID}) {
+                events.remove(at: index)
             }
-        } else if !existingActivities.isEmpty {
-            activities = activities.filter { !existingActivities.contains($0) }
+        } else if !existingEvents.isEmpty {
+            events = events.filter { !existingEvents.contains($0) }
         }
-        filteredActivities = activities
+        filteredEvents = events
         
         configureTableView()
-        scrollToFirstActivityWithDate(animated: false)
+        scrollToFirstEventWithDate(animated: false)
         
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         if needDelegate && movingBackwards {
-            let activity = Activity(dictionary: ["activityID": "" as AnyObject])
-            delegate?.chosenActivity(mergeActivity: activity)
+            let event = Activity(dictionary: ["activityID": "" as AnyObject])
+            delegate?.chosenActivity(mergeActivity: event)
         }
     }
     
@@ -132,8 +126,8 @@ class ChooseActivityTableViewController: UITableViewController {
     
     @objc fileprivate func cancel() {
         if needDelegate {
-            let activity = Activity(dictionary: ["activityID": "" as AnyObject])
-            delegate?.chosenActivity(mergeActivity: activity)
+            let event = Activity(dictionary: ["activityID": "" as AnyObject])
+            delegate?.chosenActivity(mergeActivity: event)
         }
         movingBackwards = false
         dismiss(animated: true, completion: nil)
@@ -145,13 +139,13 @@ class ChooseActivityTableViewController: UITableViewController {
     
     fileprivate func setupSearchController() {
         if #available(iOS 11.0, *) {
-            searchActivityController = UISearchController(searchResultsController: nil)
-            searchActivityController?.searchResultsUpdater = self
-            searchActivityController?.obscuresBackgroundDuringPresentation = false
-            searchActivityController?.searchBar.delegate = self
-            searchActivityController?.definesPresentationContext = true
-            searchActivityController?.searchBar.becomeFirstResponder()
-            navigationItem.searchController = searchActivityController
+            searchEventController = UISearchController(searchResultsController: nil)
+            searchEventController?.searchResultsUpdater = self
+            searchEventController?.obscuresBackgroundDuringPresentation = false
+            searchEventController?.searchBar.delegate = self
+            searchEventController?.definesPresentationContext = true
+            searchEventController?.searchBar.becomeFirstResponder()
+            navigationItem.searchController = searchEventController
             navigationItem.hidesSearchBarWhenScrolling = true
         } else {
             searchBar = UISearchBar()
@@ -165,51 +159,51 @@ class ChooseActivityTableViewController: UITableViewController {
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
-        filteredActivities = activities
-        filteredActivities.sort { (activity1, activity2) -> Bool in
-            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
-                return currentDate < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+        filteredEvents = events
+        filteredEvents.sort { (event1, event2) -> Bool in
+            if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
+                return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) {
+                return currentDate < event2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
+                return event1.startDateTime?.int64Value ?? 0 < currentDate
             }
-            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
         }
-        scrollToFirstActivityWithDate(animated: true)
+        scrollToFirstEventWithDate(animated: true)
     }
     
     func handleReloadTableAfterSearch() {
-        filteredActivities.sort { (activity1, activity2) -> Bool in
-            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
-                return currentDate < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+        filteredEvents.sort { (event1, event2) -> Bool in
+            if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
+                return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) {
+                return currentDate < event2.startDateTime?.int64Value ?? 0
+            } else if currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
+                return event1.startDateTime?.int64Value ?? 0 < currentDate
             }
-            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
         }
-        scrollToFirstActivityWithDate(animated: true)
+        scrollToFirstEventWithDate(animated: true)
     }
     
-    func scrollToFirstActivityWithDate(animated: Bool) {
+    func scrollToFirstEventWithDate(animated: Bool) {
         let date = Date().localTime
         var index = 0
-        var activityFound = false
+        var eventFound = false
         var calendar = Calendar.current
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-        for activity in self.filteredActivities {
-            if let endDate = activity.endDateWTZ {
-                if (date < endDate) || (activity.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
-                    activityFound = true
+        for event in self.filteredEvents {
+            if let endDate = event.endDateWTZ {
+                if (date < endDate) || (event.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
+                    eventFound = true
                     break
                 }
                 index += 1
             }
         }
         
-        if activityFound {
+        if eventFound {
             let numberOfRows = self.tableView.numberOfRows(inSection: 0)
             if index < numberOfRows {
                 let indexPath = IndexPath(row: index, section: 0)
@@ -218,7 +212,7 @@ class ChooseActivityTableViewController: UITableViewController {
                     self.tableView.reloadData()
                 }
             }
-        } else if !activityFound {
+        } else if !eventFound {
             let numberOfRows = self.tableView.numberOfRows(inSection: 0)
             if numberOfRows > 0 {
                 let indexPath = IndexPath(row: numberOfRows - 1, section: 0)
@@ -232,7 +226,7 @@ class ChooseActivityTableViewController: UITableViewController {
     
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        return false
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -261,7 +255,7 @@ class ChooseActivityTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return filteredActivities.count
+        return filteredEvents.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -270,16 +264,16 @@ class ChooseActivityTableViewController: UITableViewController {
         
         cell.activityDataStore = self
         
-        let activity = filteredActivities[indexPath.row]
+        let event = filteredEvents[indexPath.row]
         
-        cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
+        cell.configureCell(for: indexPath, activity: event, withInvitation: nil)
         
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let activity = filteredActivities[indexPath.row]
-        delegate?.chosenActivity(mergeActivity: activity)
+        let event = filteredEvents[indexPath.row]
+        delegate?.chosenActivity(mergeActivity: event)
         movingBackwards = false
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
@@ -289,7 +283,7 @@ class ChooseActivityTableViewController: UITableViewController {
     }
 }
 
-extension ChooseActivityTableViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+extension ChooseEventTableViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {}
     
@@ -302,9 +296,9 @@ extension ChooseActivityTableViewController: UISearchBarDelegate, UISearchContro
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
-        filteredActivities = searchText.isEmpty ? activities :
-            activities.filter({ (activity) -> Bool in
-                if let name = activity.name {
+        filteredEvents = searchText.isEmpty ? events :
+            events.filter({ (event) -> Bool in
+                if let name = event.name {
                     return name.lowercased().contains(searchText.lowercased())
                 }
                 return ("").lowercased().contains(searchText.lowercased())
@@ -323,12 +317,12 @@ extension ChooseActivityTableViewController: UISearchBarDelegate, UISearchContro
     }
 }
 
-extension ChooseActivityTableViewController { /* hiding keyboard */
+extension ChooseEventTableViewController { /* hiding keyboard */
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         
         if #available(iOS 11.0, *) {
-            searchActivityController?.searchBar.endEditing(true)
+            searchEventController?.searchBar.endEditing(true)
         } else {
             self.searchBar?.endEditing(true)
         }
@@ -337,15 +331,15 @@ extension ChooseActivityTableViewController { /* hiding keyboard */
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         setNeedsStatusBarAppearanceUpdate()
         if #available(iOS 11.0, *) {
-            searchActivityController?.searchBar.endEditing(true)
+            searchEventController?.searchBar.endEditing(true)
         } else {
             self.searchBar?.endEditing(true)
         }
     }
 }
 
-extension ChooseActivityTableViewController: ActivityDataStore {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
+extension ChooseEventTableViewController: ActivityDataStore {
+    func getParticipants(forActivity event: Activity, completion: @escaping ([User])->()) {
         
     }
 }

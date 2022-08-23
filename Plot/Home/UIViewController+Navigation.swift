@@ -31,13 +31,13 @@ extension ActivityDetailShowing {
         }
     }
     
-    func showActivityDetail(activity: Activity) {
+    func showEventDetail(event: Activity) {
         let destination = EventViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
-        destination.activity = activity
-        destination.invitation = self.networkController.activityService.invitations[activity.activityID ?? ""]
-        self.getParticipants(forActivity: activity) { (participants) in
-            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+        destination.activity = event
+        destination.invitation = self.networkController.activityService.invitations[event.activityID ?? ""]
+        self.getParticipants(forActivity: event) { (participants) in
+            InvitationsFetcher.getAcceptedParticipant(forActivity: event, allParticipants: participants) { acceptedParticipant in
                 destination.acceptedParticipant = acceptedParticipant
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)

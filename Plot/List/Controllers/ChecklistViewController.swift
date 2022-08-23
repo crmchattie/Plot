@@ -212,13 +212,12 @@ class ChecklistViewController: FormViewController {
             alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
                 print("User click Edit button")
                                     
-                // ChooseActivityTableViewController
-                let destination = ChooseActivityTableViewController()
+                // ChooseEventTableViewController
+                let destination = ChooseEventTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
                 destination.delegate = self
-                destination.checklist = self.checklist
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
+                destination.events = self.activities
+                destination.filteredEvents = self.activities
                 self.present(navController, animated: true, completion: nil)
             
             }))
@@ -238,13 +237,12 @@ class ChecklistViewController: FormViewController {
                     createChecklist.createNewChecklist()
                     self.hideActivityIndicator()
                     
-                    // ChooseActivityTableViewController
-                    let destination = ChooseActivityTableViewController()
+                    // ChooseEventTableViewController
+                    let destination = ChooseEventTableViewController()
                     let navController = UINavigationController(rootViewController: destination)
                     destination.delegate = self
-                    destination.checklist = self.checklist
-                    destination.activities = self.activities
-                    destination.filteredActivities = self.activities
+                    destination.events = self.activities
+                    destination.filteredEvents = self.activities
                     self.present(navController, animated: true, completion: nil)
                 }
             
@@ -300,14 +298,13 @@ class ChecklistViewController: FormViewController {
                 let createChecklist = ChecklistActions(checklist: self.checklist, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createChecklist.createNewChecklist()
                                     
-                // ChooseActivityTableViewController
-                let destination = ChooseActivityTableViewController()
+                // ChooseEventTableViewController
+                let destination = ChooseEventTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
                 destination.delegate = self
-                destination.checklist = self.checklist
                 destination.activityID = self.checklist.activityID
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
+                destination.events = self.activities
+                destination.filteredEvents = self.activities
                 self.present(navController, animated: true, completion: nil)
             
             }))
@@ -330,13 +327,12 @@ class ChecklistViewController: FormViewController {
             alert.addAction(UIAlertAction(title: "Add to Activity", style: .default, handler: { (_) in
                 print("User click Edit button")
                                     
-                // ChooseActivityTableViewController
-                let destination = ChooseActivityTableViewController()
+                // ChooseEventTableViewController
+                let destination = ChooseEventTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
                 destination.delegate = self
-                destination.checklist = self.checklist
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
+                destination.events = self.activities
+                destination.filteredEvents = self.activities
                 self.present(navController, animated: true, completion: nil)
             
             }))

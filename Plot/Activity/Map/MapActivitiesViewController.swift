@@ -365,7 +365,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
             viewPlaceholder.remove(from: tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: tableView, title: .emptyActivities, subtitle: .emptyMap, priority: .medium, position: .top)
+        viewPlaceholder.add(for: tableView, title: .emptyEvents, subtitle: .emptyMap, priority: .medium, position: .top)
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

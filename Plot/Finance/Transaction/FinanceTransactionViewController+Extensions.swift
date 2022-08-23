@@ -88,13 +88,13 @@ extension FinanceTransactionViewController {
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseActivityTableViewController()
+                let destination = ChooseEventTableViewController()
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
-                destination.existingActivities = self.eventList
+                destination.events = self.activities
+                destination.filteredEvents = self.activities
+                destination.existingEvents = self.eventList
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in

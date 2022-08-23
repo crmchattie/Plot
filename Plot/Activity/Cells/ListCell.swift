@@ -146,8 +146,8 @@ class ListCell: UITableViewCell {
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-        activityImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
-        activityImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15).isActive = true
+        activityImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        activityImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true

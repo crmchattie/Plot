@@ -707,13 +707,13 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             
             alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                 
-                // ChooseActivityTableViewController
-                let destination = ChooseActivityTableViewController()
+                // ChooseEventTableViewController
+                let destination = ChooseEventTableViewController()
                 let navController = UINavigationController(rootViewController: destination)
                 destination.delegate = self
-                destination.activity = self.activity
-                destination.activities = self.activities
-                destination.filteredActivities = self.activities
+                destination.event = self.activity
+                destination.events = self.activities
+                destination.filteredEvents = self.activities
                 self.present(navController, animated: true, completion: nil)
                 
             }))

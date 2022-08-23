@@ -276,7 +276,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         guard indexPath.section > 0 else { return }
         switch viewModel.entries.value[indexPath.row] {
         case .activity(let activity):
-            showActivityDetail(activity: activity)
+            showEventDetail(event: activity)
         case .transaction(let transaction):
             showTranscationDetail(transaction: transaction)
         case .account(let account):
