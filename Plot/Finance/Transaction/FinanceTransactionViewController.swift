@@ -686,11 +686,9 @@ class FinanceTransactionViewController: FormViewController {
     }
     
     @objc fileprivate func openTags() {
-        let destination = FinanceTagsViewController()
+        let destination = TagsViewController()
         destination.delegate = self
         destination.tags = transaction.tags
-        destination.ID = transaction.guid
-        destination.type = "transaction"
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -891,5 +889,7 @@ extension FinanceTransactionViewController: UITextViewDelegate {
 extension FinanceTransactionViewController: UpdateTagsDelegate {
     func updateTags(tags: [String]?) {
         transaction.tags = tags
+        let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid)
+        reference.updateChildValues(["tags": tags as AnyObject])
     }
 }

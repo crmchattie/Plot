@@ -76,6 +76,7 @@ class Activity: NSObject, NSCopying, Codable {
     var hasStartTime: Bool?
     var hasDeadlineTime: Bool?
     var flagged: Bool?
+    var tags: [String]?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -122,6 +123,7 @@ class Activity: NSObject, NSCopying, Codable {
         case hasStartTime
         case hasDeadlineTime
         case flagged
+        case tags
     }
     
     init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool) {
@@ -217,6 +219,7 @@ class Activity: NSObject, NSCopying, Codable {
         hasStartTime = dictionary?["hasStartTime"] as? Bool
         hasDeadlineTime = dictionary?["hasDeadlineTime"] as? Bool
         flagged = dictionary?["flagged"] as? Bool
+        tags = dictionary?["tags"] as? [String]
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -424,6 +427,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.flagged as AnyObject? {
             dictionary["flagged"] = value
+        }
+        
+        if let value = self.tags as AnyObject? {
+            dictionary["tags"] = value
         }
         
         return dictionary

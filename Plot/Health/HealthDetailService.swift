@@ -39,9 +39,19 @@ class HealthDetailService: HealthDetailServiceInterface {
             statisticsOptions = .cumulativeSum
             quantityType = type
         }
+        else if case .flightsClimbed = healthMetricType {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.flightsClimbed) else {
+                print("*** Unable to create a flight climbed count type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            statisticsOptions = .cumulativeSum
+            quantityType = type
+        }
         else if case .weight = healthMetricType {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass) else {
-                print("*** Unable to create a step count type ***")
+                print("*** Unable to create a bodyMass count type ***")
                 completion(nil, nil, nil)
                 return
             }
@@ -51,7 +61,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         else if case .heartRate = healthMetricType {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate) else {
-                print("*** Unable to create a step count type ***")
+                print("*** Unable to create a heartRate count type ***")
                 completion(nil, nil, nil)
                 return
             }
@@ -106,6 +116,8 @@ class HealthDetailService: HealthDetailServiceInterface {
         else if segmentType == .year {
             if case .steps = healthMetricType {
                 interval.day = 1
+            } else if case .flightsClimbed = healthMetricType {
+                interval.day = 1
             } else if case .activeEnergy = healthMetricType {
                 interval.day = 1
             } else {
@@ -121,7 +133,18 @@ class HealthDetailService: HealthDetailServiceInterface {
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
                 let workoutActivityType = hkWorkout.workoutActivityType
-                HealthKitService.getAllWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
+                HealthKitService.getWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
+                    var stats: [Statistic]?
+                    if segmentType == .day {
+                        stats = self?.perpareCustomStatsForHourlyWorkouts(from: workouts)
+                    } else {
+                        stats = self?.perpareCustomStatsForDailyWorkouts(from: workouts, segmentType: segmentType)
+                    }
+                    completion(stats, workouts, nil)
+                }
+            }
+            else if case .workoutMinutes = healthMetricType {
+                HealthKitService.getAllWorkouts(startDate: startDate, endDate: endDate) { [weak self] workouts, errors  in
                     var stats: [Statistic]?
                     if segmentType == .day {
                         stats = self?.perpareCustomStatsForHourlyWorkouts(from: workouts)
@@ -152,6 +175,13 @@ class HealthDetailService: HealthDetailServiceInterface {
                 HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { [weak self] (results, error) in
                     var stats: [Statistic]?
                     if case .steps = healthMetricType {
+                        if segmentType == .year {
+                            stats = self?.perpareCustomStatsForDailyAverageForAnnualMetrics(from: results, unit: unit)
+                        } else {
+                            stats = self?.perpareCustomStats(from: results, unit: unit, statisticsOptions: statisticsOptions)
+                        }
+                    }
+                    else if case .flightsClimbed = healthMetricType {
                         if segmentType == .year {
                             stats = self?.perpareCustomStatsForDailyAverageForAnnualMetrics(from: results, unit: unit)
                         } else {

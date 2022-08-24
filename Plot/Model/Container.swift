@@ -25,6 +25,7 @@ struct Container: Codable, Equatable, Hashable {
     var mindfulnessIDs: [String]?
     var mealIDs: [String]?
     var transactionIDs: [String]?
+    var participantsIDs: [String]?
     
     init(id: String, activityIDs: [String]?, taskIDs: [String]?, workoutIDs: [String]?, mindfulnessIDs: [String]?, mealIDs: [String]?, transactionIDs: [String]?) {
         self.id = id

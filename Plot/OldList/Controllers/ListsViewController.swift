@@ -58,7 +58,6 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
         
@@ -253,8 +252,10 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     }
     
     @objc func newList() {
-        let destination = ListDetailViewController()
+        let destination = ListDetailViewController(networkController: networkController)
         destination.delegate = self
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+        destination.navigationItem.leftBarButtonItem = cancelBarButton
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -411,7 +412,6 @@ extension ListsViewController: ListDataStore {
         guard let id = list.id, let participantsIDs = list.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        
         
         let group = DispatchGroup()
         let olderParticipants = self.participants[id]

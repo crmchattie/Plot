@@ -1,5 +1,5 @@
 //
-//  FinanceTagsViewController.swift
+//  TagsViewController.swift
 //  Plot
 //
 //  Created by Cory McHattie on 10/21/20.
@@ -15,10 +15,8 @@ protocol UpdateTagsDelegate: AnyObject {
     func updateTags(tags: [String]?)
 }
 
-class FinanceTagsViewController: FormViewController {
+class TagsViewController: FormViewController {
     var tags: [String]?
-    var ID: String!
-    var type: String!
     
     var active: Bool = true
     
@@ -59,7 +57,7 @@ class FinanceTagsViewController: FormViewController {
     }
     
     @IBAction func create(_ sender: AnyObject) {
-        self.updateTags()
+        self.delegate?.updateTags(tags: tags)
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -109,29 +107,4 @@ class FinanceTagsViewController: FormViewController {
             }
         }
     }
-    
-    fileprivate func updateTags() {
-        if let mvs = (form.values()["tagsfields"] as? [Any?])?.compactMap({ $0 as? String }) {
-            if !mvs.isEmpty {
-                var tagsArray = [String]()
-                for value in mvs {
-                    tagsArray.append(value)
-                }
-                self.tags = tagsArray
-            } else {
-                self.tags = []
-            }
-            self.delegate?.updateTags(tags: tags)
-            if let currentUser = Auth.auth().currentUser?.uid {
-                if type == "transaction" {
-                    let updatedTags = ["tags": self.tags as AnyObject]
-                    Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(ID).updateChildValues(updatedTags)
-                } else if type == "account" {
-                    let updatedTags = ["tags": self.tags as AnyObject]
-                    Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(ID).updateChildValues(updatedTags)
-                }
-            }
-        }
-    }
-    
 }

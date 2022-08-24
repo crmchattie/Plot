@@ -64,13 +64,13 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     var healthMetrics: [String: [HealthMetric]] {
         var metrics = networkController.healthService.healthMetrics
         if let generalMetrics = metrics[HealthMetricCategory.general.rawValue] {
-            metrics[HealthMetricCategory.general.rawValue] = generalMetrics.filter({ $0.type.name == HealthMetricType.steps.name || $0.type.name == HealthMetricType.sleep.name || $0.type.name == HealthMetricType.heartRate.name })
+            metrics[HealthMetricCategory.general.rawValue] = generalMetrics.filter({ $0.type.name == HealthMetricType.steps.name || $0.type.name == HealthMetricType.sleep.name || $0.type.name == HealthMetricType.heartRate.name || $0.type.name == HealthMetricType.flightsClimbed.name })
             if metrics[HealthMetricCategory.general.rawValue] == [] {
                 metrics[HealthMetricCategory.general.rawValue] = nil
             }
         }
         if let workoutMetrics = metrics[HealthMetricCategory.workouts.rawValue] {
-            metrics[HealthMetricCategory.general.rawValue]?.append(contentsOf: workoutMetrics.filter({ $0.type.name == HealthMetricType.activeEnergy.name}))
+            metrics[HealthMetricCategory.general.rawValue]?.append(contentsOf: workoutMetrics.filter({ $0.type.name == HealthMetricType.activeEnergy.name || $0.type.name == HealthMetricType.workoutMinutes.name}))
             metrics[HealthMetricCategory.workouts.rawValue] = nil
         }
         if let nutritionMetrics = metrics[HealthMetricCategory.nutrition.rawValue] {

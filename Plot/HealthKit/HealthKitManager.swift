@@ -58,6 +58,11 @@ class HealthKitManager {
             adapter.addDependency(annualAverageStepsOperation)
             groupOperation.addDependency(adapter)
             
+            // Flights Climbed
+            let flightsClimbedOperation = FlightsClimbedOperation(date: today)
+            flightsClimbedOperation.delegate = self
+    
+            
             // Heart Rate
             let annualAverageHeartRateOperation = AnnualAverageHeartRateOperation(date: today)
             let heartRateOperation = HeartRateOperation(date: today)
@@ -90,8 +95,6 @@ class HealthKitManager {
             mindfulnessOp.delegate = self
             mindfulnessOp.lastSyncDate = lastSyncDate
             
-            // Workouts
-            // Consider workouts until a day in future
             let activeEnergyOp = ActiveEnergyOperation(date: today)
             activeEnergyOp.delegate = self
             
@@ -113,7 +116,7 @@ class HealthKitManager {
             dietarySugarOp.delegate = self
             
             // Setup queue
-            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
+            self?.queue.addOperations([annualAverageStepsOperation, groupOperation, adapter, flightsClimbedOperation, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
             
             let futureDay = today.dayAfter
             if #available(iOS 14.0, *) {
@@ -138,6 +141,21 @@ class HealthKitManager {
                 guard let _self = self else {
                     completion([:], false)
                     return
+                }
+                
+                if let workoutList = _self.metrics[HealthMetricCategory.workouts.rawValue] {
+                    let workoutMinutesMetricList = workoutList.filter { $0.unitName == "hrs" }
+                    if !workoutMinutesMetricList.isEmpty {
+                        var newWorkoutList = workoutList.filter { $0.unitName != "hrs" }
+                        let total = workoutMinutesMetricList.reduce(0) { $0 + $1.total }
+                        let average = workoutMinutesMetricList.reduce(0) { $0 + ($1.average ?? 0) } / Double(workoutMinutesMetricList.count)
+                        let mostRecentMetric = workoutMinutesMetricList.reduce(workoutMinutesMetricList[0], { $0.date.timeIntervalSince1970 > $1.date.timeIntervalSince1970 ? $0 : $1 } )
+                        var workoutMinutesMetric = HealthMetric(type: HealthMetricType.workoutMinutes, total: total, date: mostRecentMetric.date, unitName: "hrs", rank: -1)
+                        workoutMinutesMetric.hkSample = mostRecentMetric.hkSample
+                        workoutMinutesMetric.average = average
+                        newWorkoutList.append(workoutMinutesMetric)
+                        _self.metrics[HealthMetricCategory.workouts.rawValue] = newWorkoutList
+                    }
                 }
                 
                 // sort each section(items in a category)

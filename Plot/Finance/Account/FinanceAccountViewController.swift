@@ -20,7 +20,6 @@ class FinanceAccountViewController: FormViewController {
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.events
     
     var selectedFalconUsers = [User]()
     
@@ -508,11 +507,9 @@ class FinanceAccountViewController: FormViewController {
     }
     
     @objc fileprivate func openTags() {
-        let destination = FinanceTagsViewController()
+        let destination = TagsViewController()
         destination.delegate = self
         destination.tags = account.tags
-        destination.ID = account.guid
-        destination.type = "account"
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -625,6 +622,8 @@ extension FinanceAccountViewController: UpdateInvitees {
 extension FinanceAccountViewController: UpdateTagsDelegate {
     func updateTags(tags: [String]?) {
         account.tags = tags
+        let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid)
+        reference.updateChildValues(["tags": tags as AnyObject])
     }
 }
 

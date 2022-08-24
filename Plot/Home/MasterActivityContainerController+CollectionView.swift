@@ -116,7 +116,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             }
         } else {
             if !financeSections.isEmpty {
-                height += CGFloat(financeSections.count * 40)
+                height += CGFloat(financeSections.count * 50)
                 for section in financeSections {
                     if section == .financialIssues {
                         if let group = financeGroups[section] as? [MXMember] {

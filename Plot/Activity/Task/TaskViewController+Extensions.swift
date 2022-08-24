@@ -362,3 +362,11 @@ extension TaskViewController: RecurrencePickerDelegate {
         }
     }
 }
+
+extension TaskViewController: UpdateTagsDelegate {
+    func updateTags(tags: [String]?) {
+        task.tags = tags
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+        groupActivityReference.updateChildValues(["tags": tags as AnyObject])
+    }
+}

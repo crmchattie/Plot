@@ -17,6 +17,7 @@ protocol UpdateListDelegate: AnyObject {
 
 class ChooseListViewController: FormViewController {
     weak var delegate : UpdateListDelegate?
+    var networkController: NetworkController
     
     var lists = [String: [ListType]]() {
         didSet {
@@ -33,10 +34,9 @@ class ChooseListViewController: FormViewController {
     var sections = [String]()
     var list: ListType!
     var listID: String?
-    
-//    var listFetcher = ReminderFetcher()
-    
-    init() {
+        
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -84,8 +84,10 @@ class ChooseListViewController: FormViewController {
     }
     
     @objc func newCategory(_ item:UIBarButtonItem) {
-        let destination = ListDetailViewController()
+        let destination = ListDetailViewController(networkController: networkController)
         destination.delegate = self
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+        destination.navigationItem.leftBarButtonItem = cancelBarButton
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }

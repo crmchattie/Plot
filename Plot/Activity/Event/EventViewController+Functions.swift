@@ -485,7 +485,7 @@ extension EventViewController {
     }
     
     func openCalendar() {
-        let destination = CalendarListViewController()
+        let destination = ChooseCalendarViewController(networkController: networkController)
         destination.delegate = self
         destination.calendarID = self.activity.calendarID ?? self.calendars[CalendarOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
         if let source = self.activity.calendarSource, let calendars = self.calendars[source] {
@@ -773,6 +773,13 @@ extension EventViewController {
         destination.delegate = self
         destination.listList = listList
         destination.activity = activity
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    func openTags() {
+        let destination = TagsViewController()
+        destination.delegate = self
+        destination.tags = activity.tags
         self.navigationController?.pushViewController(destination, animated: true)
     }
     

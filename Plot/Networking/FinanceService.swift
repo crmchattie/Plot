@@ -271,10 +271,10 @@ class FinanceService {
     func observeTransactionsForCurrentUser(_ completion: @escaping () -> Void) {
         self.transactionFetcher.observeTransactionForCurrentUser(transactionsInitialAdd: {
             [weak self] transactionsInitialAdd in
-            print("transactionsInitialAdd")
             if self!.transactions.isEmpty {
-                self?.transactions = transactionsInitialAdd
                 completion()
+                
+                self?.transactions = transactionsInitialAdd
             } else {
                 for transaction in transactionsInitialAdd {
                     if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {

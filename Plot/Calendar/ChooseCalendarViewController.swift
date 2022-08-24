@@ -15,8 +15,10 @@ protocol UpdateCalendarDelegate: AnyObject {
     func update(calendar: CalendarType)
 }
 
-class CalendarListViewController: FormViewController {
+class ChooseCalendarViewController: FormViewController {
     weak var delegate : UpdateCalendarDelegate?
+    
+    var networkController: NetworkController
     
     var calendars = [String: [CalendarType]]() {
         didSet {
@@ -36,7 +38,8 @@ class CalendarListViewController: FormViewController {
     
     var calendarFetcher = CalendarFetcher()
     
-    init() {
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -84,7 +87,7 @@ class CalendarListViewController: FormViewController {
     }
     
     @objc func newCategory(_ item:UIBarButtonItem) {
-        let destination = CalendarDetailViewController()
+        let destination = CalendarDetailViewController(networkController: networkController)
         destination.delegate = self
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
@@ -125,7 +128,7 @@ class CalendarListViewController: FormViewController {
     
 }
 
-extension CalendarListViewController: CalendarDetailDelegate {
+extension ChooseCalendarViewController: CalendarDetailDelegate {
     func update() {
         grabCalendars()
     }

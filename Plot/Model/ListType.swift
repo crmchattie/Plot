@@ -21,7 +21,6 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     var name: String?
     var id: String?
     var description: String?
-    var type: String?
     //CIColor(color: UIcolor).stringRepresentation
     var color: String?
     var source: String?
@@ -32,8 +31,9 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var category: String?
     
-    init(id: String, name: String, color: String, source: String) {
+    init(id: String, name: String?, color: String?, source: String) {
         self.id = id
         self.name = name
         self.color = color
@@ -41,13 +41,9 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     }
 }
 
-let prebuiltLists: [ListType] = [defaultList, homeList, personalList, socialList, workList]
+let prebuiltLists: [ListType] = [defaultList]
 
-let defaultList = ListType(id: UUID().uuidString, name: "Default", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
-let homeList = ListType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
-let personalList = ListType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarOptions.plot.name)
-let socialList = ListType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarOptions.plot.name)
-let workList = ListType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarOptions.plot.name)
+let defaultList = ListType(id: UUID().uuidString, name: "Default", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListOptions.plot.name)
 
 enum ListOptions:String, CaseIterable {
     case plot = "Plot"

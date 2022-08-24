@@ -221,6 +221,10 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
             return UICollectionReusableView()
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
+    }
 }
 
 extension HealthViewController: UpdateFilter {

@@ -386,3 +386,11 @@ extension EventViewController: RecurrencePickerDelegate {
         }
     }
 }
+
+extension EventViewController: UpdateTagsDelegate {
+    func updateTags(tags: [String]?) {
+        activity.tags = tags
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+        groupActivityReference.updateChildValues(["tags": tags as AnyObject])
+    }
+}

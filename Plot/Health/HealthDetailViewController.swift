@@ -268,6 +268,17 @@ class HealthDetailViewController: UIViewController {
             }
         case .activeEnergy:
             print("steps")
+        case .workoutMinutes:
+            if let hkWorkout = sample as? HKWorkout {
+                HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: hkWorkout) { workout in
+                    guard workout != nil else { return }
+                    let destination = WorkoutViewController(networkController: self.networkController)
+                    destination.workout = workout
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
+            }
+        case .flightsClimbed:
+            print("steps")
         }
     }
 }

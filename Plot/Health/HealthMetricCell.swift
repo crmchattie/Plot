@@ -122,6 +122,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         
         var total = "\(Int(healthMetric.total))"
         var subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
+        
         if case HealthMetricType.weight = healthMetric.type {
             total = healthMetric.total.clean
             subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
@@ -130,9 +131,14 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             total = TimeInterval(healthMetric.total).stringTimeShort
             subtitleLabelText = "\(total) \(timeAgo)"
         }
-        if case HealthMetricType.mindfulness = healthMetric.type, let hkCategorySample = healthMetric.hkSample as? HKCategorySample {
+        else if case HealthMetricType.mindfulness = healthMetric.type, let hkCategorySample = healthMetric.hkSample as? HKCategorySample {
             total = hkCategorySample.endDate.timeIntervalSince(hkCategorySample.startDate).stringTimeShort
             timeAgo = NSCalendar.current.isDateInToday(hkCategorySample.endDate) ? "today" : timeAgoSinceDate(hkCategorySample.endDate)
+            subtitleLabelText = "\(total) \(timeAgo)"
+        }
+        else if case HealthMetricType.workoutMinutes = healthMetric.type, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+            total = hkWorkout.endDate.timeIntervalSince(hkWorkout.startDate).stringTimeShort
+            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
             subtitleLabelText = "\(total) \(timeAgo)"
         }
         
@@ -148,6 +154,10 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
                 averageText = "\(shortTime) on average"
             }
             else if case HealthMetricType.mindfulness = healthMetric.type {
+                let shortTime = TimeInterval(averageValue).stringTimeShort
+                averageText = "\(shortTime) on average"
+            }
+            else if case HealthMetricType.workoutMinutes = healthMetric.type {
                 let shortTime = TimeInterval(averageValue).stringTimeShort
                 averageText = "\(shortTime) on average"
             }
@@ -167,6 +177,8 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         switch healthMetric.type {
         case .steps:
             imageName = "walking"
+        case .flightsClimbed:
+            imageName = "stairs"
         case .nutrition:
             imageName = "nutrition"
         case .workout:
@@ -184,6 +196,8 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             imageName = "mindfulness"
         case .activeEnergy:
             imageName = "trending"
+        case .workoutMinutes:
+            imageName = "workout"
         }
         
         activityTypeButton.setImage(UIImage(named: imageName), for: .normal)

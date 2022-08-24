@@ -116,6 +116,7 @@ class TaskViewController: FormViewController {
                 } else {
                     list = lists[ListOptions.plot.name]?.first { $0.name == "Default"}
                     task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? "", listSource: list?.source ?? "", isTask: true, isCompleted: false)
+                    task.category = list?.category
 
                 }
             }
@@ -778,6 +779,24 @@ class TaskViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.textLabel?.textAlignment = .left
+        }
+        
+        <<< LabelRow("Tags") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+        }.onCellSelection({ _, row in
+            self.openTags()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.textLabel?.textAlignment = .left
         }
         

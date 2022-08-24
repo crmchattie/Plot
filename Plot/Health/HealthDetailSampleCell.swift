@@ -175,6 +175,16 @@ class HealthDetailSampleCell: UITableViewCell {
                 subtitleLabel.text = string
             }
         }
+        else if case .flightsClimbed = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
+            let unit = HKUnit.count()
+            let count = Int(quantitySample.quantity.doubleValue(for: unit))
+            let string = "\(count) floors"
+            if let text = titleLabel.text, text.isEmpty {
+                titleLabel.text = string
+            } else {
+                subtitleLabel.text = string
+            }
+        }
         else if case .sleep = healthMetric.type, let categorySample = sample as? HKCategorySample, let sleepValue = HKCategoryValueSleepAnalysis(rawValue: categorySample.value) {
             switch sleepValue {
             case .asleep:

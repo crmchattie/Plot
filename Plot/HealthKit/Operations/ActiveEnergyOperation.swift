@@ -29,7 +29,7 @@ class ActiveEnergyOperation: AsyncOperation {
                 return
             }
 
-            var metric = HealthMetric(type: HealthMetricType.activeEnergy, total: dailyTotal, date: recentStatDate, unitName: "calories", rank: 1)
+            var metric = HealthMetric(type: HealthMetricType.activeEnergy, total: dailyTotal, date: recentStatDate, unitName: "calories", rank: 0)
             metric.average = annualAverage
             metric.unit = .kilocalorie()
             

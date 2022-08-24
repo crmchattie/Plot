@@ -359,7 +359,7 @@ extension TaskViewController {
     }
     
     func openTaskList() {
-        let destination = ChooseListViewController()
+        let destination = ChooseListViewController(networkController: networkController)
         destination.delegate = self
         destination.listID = self.task.listID ?? self.lists[ListOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
         if let source = self.task.listSource, let lists = self.lists[source] {
@@ -588,6 +588,13 @@ extension TaskViewController {
         destination.delegate = self
         destination.listList = listList
         destination.activity = task
+        self.navigationController?.pushViewController(destination, animated: true)
+    }
+    
+    func openTags() {
+        let destination = TagsViewController()
+        destination.delegate = self
+        destination.tags = task.tags
         self.navigationController?.pushViewController(destination, animated: true)
     }
     

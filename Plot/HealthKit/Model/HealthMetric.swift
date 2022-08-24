@@ -49,6 +49,8 @@ enum HealthMetricType {
     case sleep
     case mindfulness
     case activeEnergy
+    case workoutMinutes
+    case flightsClimbed
     
     var name: String {
         get {
@@ -69,6 +71,10 @@ enum HealthMetricType {
                 return "Mindfulness"
             case .activeEnergy:
                 return "Active Energy"
+            case .workoutMinutes:
+                return "Workout Minutes"
+            case .flightsClimbed:
+                return "Flights Climbed"
             }
         }
     }
@@ -77,20 +83,24 @@ enum HealthMetricType {
         get {
             switch self {
             case .steps:
-                return 3
+                return 2
             case .nutrition:
                 return 7
             case .workout:
-                return 6
+                return 5
             case .heartRate:
-                return 2
+                return 9
             case .weight:
                 return 1
             case .mindfulness:
-                return 4
+                return 3
             case .sleep:
-                return 5
+                return 4
+            case .workoutMinutes:
+                return 6
             case .activeEnergy:
+                return 7
+            case .flightsClimbed:
                 return 8
             }
         }
