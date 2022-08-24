@@ -30,43 +30,17 @@ class ChooseTransactionTableViewController: UITableViewController {
     weak var delegate : ChooseTransactionDelegate?
     
     var movingBackwards = false
-    
-    private lazy var activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(style: .large)
-        activityIndicator.sizeToFit()
-        return activityIndicator
-    }()
         
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Choose Transaction"
         
-        view.addSubview(activityIndicator)
-        
-        activityIndicator.center = view.center
-        activityIndicator.autoresizingMask = [.flexibleTopMargin,
-                                              .flexibleBottomMargin,
-                                              .flexibleLeftMargin,
-                                              .flexibleRightMargin]
-        
-        tableView = UITableView(frame: .zero, style: .insetGrouped)
-        
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = view.backgroundColor
-        tableView.separatorStyle = .none
-        extendedLayoutIncludesOpaqueBars = true
-        tableView.register(FinanceTableViewCell.self, forCellReuseIdentifier: kFinanceTableViewCell)
-        
         self.transactions = self.transactions.filter{ !self.existingTransactions.contains($0) && $0.status != .pending && $0.containerID == nil }
+        filteredTransactions = transactions
         
-        
-        handleReloadTable()
+        configureView()
         setupSearchController()
-        
-        if navigationItem.leftBarButtonItem != nil {
-            navigationItem.leftBarButtonItem?.action = #selector(cancel)
-        }
-        
+                
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -74,6 +48,20 @@ class ChooseTransactionTableViewController: UITableViewController {
             let transaction = Transaction(description: "Name", amount: 0.0, created_at: "", guid: "", user_guid: "", type: nil, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: "")
             self.delegate?.chosenTransaction(transaction: transaction)
         }
+    }
+    
+    fileprivate func configureView() {
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
+        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = view.backgroundColor
+        tableView.separatorStyle = .none
+        extendedLayoutIncludesOpaqueBars = true
+        tableView.register(FinanceTableViewCell.self, forCellReuseIdentifier: kFinanceTableViewCell)
+        
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
+        
     }
     
     @objc fileprivate func cancel() {
@@ -91,6 +79,7 @@ class ChooseTransactionTableViewController: UITableViewController {
             searchController?.searchBar.delegate = self
             searchController?.definesPresentationContext = true
             navigationItem.searchController = searchController
+            navigationItem.hidesSearchBarWhenScrolling = false
         } else {
             searchBar = UISearchBar()
             searchBar?.delegate = self
@@ -101,48 +90,24 @@ class ChooseTransactionTableViewController: UITableViewController {
         }
     }
     
-    func handleReloadTable() {
-        if transactions != nil {
-            activityIndicator.startAnimating()
-            DispatchQueue.global(qos: .userInteractive).async {
-                self.filteredTransactions = self.transactions
-                self.filteredTransactions.sort { (transaction1, transaction2) -> Bool in
-                    if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                        if let date1 = self.isodateFormatter.date(from: transaction1.transacted_at), let date2 = self.isodateFormatter.date(from: transaction2.transacted_at) {
-                            return date1 > date2
-                        }
-                        return transaction1.description < transaction2.description
-                    }
-                    return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
-                }
-                DispatchQueue.main.async {
-                    self.activityIndicator.stopAnimating()
-                    self.tableView.reloadData()
-                }
-            }
-        }
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return false
     }
     
-    
-    func handleReloadTableAfterSearch() {
-        self.activityIndicator.startAnimating()
-        if transactions != nil {
-            filteredTransactions.sort { (transaction1, transaction2) -> Bool in
-                if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                    if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
-                        return date1 > date2
-                    }
-                    return transaction1.description < transaction2.description
-                }
-                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
-            }
-        }
-        DispatchQueue.main.async {
-            self.activityIndicator.stopAnimating()
-            self.tableView.reloadData()
-        }
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return ""
     }
     
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        return view
+        
+    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let filteredTransactions = filteredTransactions {
@@ -178,13 +143,10 @@ extension ChooseTransactionTableViewController: UISearchBarDelegate, UISearchCon
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
+        searchBar.resignFirstResponder()
         filteredTransactions = transactions
-        handleReloadTable()
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(false, animated: true)
-            searchBar.resignFirstResponder()
-            return
-        }
+        tableView.reloadData()
+
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -194,15 +156,11 @@ extension ChooseTransactionTableViewController: UISearchBarDelegate, UISearchCon
                 return transaction.description.lowercased().contains(searchText.lowercased())
             })
         }
-        handleReloadTableAfterSearch()
+        tableView.reloadData()
     }
 
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
         searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(true, animated: true)
-            return true
-        }
         return true
     }
 }

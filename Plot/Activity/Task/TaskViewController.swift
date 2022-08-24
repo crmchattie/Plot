@@ -43,13 +43,11 @@ class TaskViewController: FormViewController {
     lazy var tasks: [Activity] = networkController.activityService.tasks
     lazy var events: [Activity] = networkController.activityService.events
     lazy var lists: [String: [ListType]] = networkController.activityService.lists
-    lazy var conversations: [Conversation] = networkController.conversationService.conversations
     lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
     var purchaseUsers = [User]()
     var userInvitationStatus: [String: Status] = [:]
-    var conversation: Conversation!
     let avatarOpener = AvatarOpener()
     var subtaskList = [Activity]()
     var container: Container!
@@ -57,6 +55,7 @@ class TaskViewController: FormViewController {
     var purchaseDict = [User: Double]()
     var listList = [ListContainer]()
     var healthList = [HealthContainer]()
+    var list: ListType?
     var purchaseIndex: Int = 0
     var listIndex: Int = 0
     var healthIndex: Int = 0
@@ -111,9 +110,14 @@ class TaskViewController: FormViewController {
             title = "New Task"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
-                let listDefault = lists[ListOptions.plot.name]?.first { $0.name == "Default"}
                 activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                task = Activity(activityID: activityID, admin: currentUserID, listID: listDefault?.id ?? "", listName: listDefault?.name ?? "", listColor: listDefault?.color ?? "", listSource: listDefault?.source ?? "", isTask: true, isCompleted: false)
+                if let list = list {
+                    task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? "", listSource: list.source ?? "", isTask: true, isCompleted: false)
+                } else {
+                    list = lists[ListOptions.plot.name]?.first { $0.name == "Default"}
+                    task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? "", listSource: list?.source ?? "", isTask: true, isCompleted: false)
+
+                }
             }
         }
         
@@ -267,14 +271,17 @@ class TaskViewController: FormViewController {
             self.task.isCompleted = row.value
             if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                 row.cell.tintAdjustmentMode = .automatic
+                
                 let original = Date()
                 let updateDate = Date(timeIntervalSinceReferenceDate:
                                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                
                 completedRow.value = updateDate
                 completedRow.updateCell()
                 completedRow.hidden = false
                 completedRow.evaluateHidden()
-                self.task.completedDate = updateDate
+                
+                self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
             } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                 row.cell.tintAdjustmentMode = .dimmed
                 completedRow.value = nil
@@ -294,13 +301,15 @@ class TaskViewController: FormViewController {
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
             if self.active, task.isCompleted ?? false, let date = task.completedDate {
-                $0.value = date
+                $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
                 $0.updateCell()
             } else {
                 $0.hidden = true
             }
         }.onChange { [weak self] row in
-            self?.task.completedDate = row.value
+            if let value = row.value {
+                self?.task.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
+            }
         }.onExpandInlineRow { cell, row, inlineRow in
             inlineRow.cellUpdate { (cell, row) in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

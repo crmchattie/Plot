@@ -162,6 +162,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         let destination = TaskViewController(networkController: self.networkController)
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.list = list
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }

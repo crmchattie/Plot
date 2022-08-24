@@ -42,7 +42,7 @@ class ChooseTaskTableViewController: UITableViewController {
     var needDelegate = false
     
     var searchBar: UISearchBar?
-    var searchTaskController: UISearchController?
+    var searchController: UISearchController?
     
     var tasks = [Activity]()
     var filteredTasks = [Activity]()
@@ -85,6 +85,7 @@ class ChooseTaskTableViewController: UITableViewController {
         filteredTasks = tasks
         
         configureTableView()
+        setupSearchController()
         
     }
     
@@ -112,8 +113,6 @@ class ChooseTaskTableViewController: UITableViewController {
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
-//        let searchBarButton = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-//        navigationItem.rightBarButtonItem = searchBarButton
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
@@ -135,41 +134,20 @@ class ChooseTaskTableViewController: UITableViewController {
     
     fileprivate func setupSearchController() {
         if #available(iOS 11.0, *) {
-            searchTaskController = UISearchController(searchResultsController: nil)
-            searchTaskController?.searchResultsUpdater = self
-            searchTaskController?.obscuresBackgroundDuringPresentation = false
-            searchTaskController?.searchBar.delegate = self
-            searchTaskController?.definesPresentationContext = true
-            searchTaskController?.searchBar.becomeFirstResponder()
-            navigationItem.searchController = searchTaskController
-            navigationItem.hidesSearchBarWhenScrolling = true
+            searchController = UISearchController(searchResultsController: nil)
+            searchController?.searchResultsUpdater = self
+            searchController?.obscuresBackgroundDuringPresentation = false
+            searchController?.searchBar.delegate = self
+            searchController?.definesPresentationContext = true
+            navigationItem.searchController = searchController
+            navigationItem.hidesSearchBarWhenScrolling = false
         } else {
             searchBar = UISearchBar()
             searchBar?.delegate = self
             searchBar?.placeholder = "Search"
             searchBar?.searchBarStyle = .minimal
             searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-            searchBar?.becomeFirstResponder()
             tableView.tableHeaderView = searchBar
-        }
-    }
-    
-    func handleReloadTableAftersearchBarCancelButtonClicked() {
-        filteredTasks = tasks
-        filteredTasks.sort { task1, task2 in
-            if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
-                return task1.name ?? "" < task2.name ?? ""
-            }
-            return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
-        }
-    }
-    
-    func handleReloadTableAfterSearch() {
-        filteredTasks.sort { task1, task2 in
-            if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
-                return task1.name ?? "" < task2.name ?? ""
-            }
-            return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
         }
     }
     
@@ -233,13 +211,12 @@ extension ChooseTaskTableViewController: UISearchBarDelegate, UISearchController
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
-        searchBar.setShowsCancelButton(false, animated: true)
         searchBar.resignFirstResponder()
-        handleReloadTableAftersearchBarCancelButtonClicked()
+        filteredTasks = tasks
+        tableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
         filteredTasks = searchText.isEmpty ? tasks :
             tasks.filter({ (task) -> Bool in
                 if let name = task.name {
@@ -248,15 +225,11 @@ extension ChooseTaskTableViewController: UISearchBarDelegate, UISearchController
                 return ("").lowercased().contains(searchText.lowercased())
             })
         
-        handleReloadTableAfterSearch()
+        tableView.reloadData()
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
         searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(true, animated: true)
-            return true
-        }
         return true
     }
 }
@@ -266,7 +239,7 @@ extension ChooseTaskTableViewController { /* hiding keyboard */
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         
         if #available(iOS 11.0, *) {
-            searchTaskController?.searchBar.endEditing(true)
+            searchController?.searchBar.endEditing(true)
         } else {
             self.searchBar?.endEditing(true)
         }
@@ -275,7 +248,7 @@ extension ChooseTaskTableViewController { /* hiding keyboard */
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         setNeedsStatusBarAppearanceUpdate()
         if #available(iOS 11.0, *) {
-            searchTaskController?.searchBar.endEditing(true)
+            searchController?.searchBar.endEditing(true)
         } else {
             self.searchBar?.endEditing(true)
         }

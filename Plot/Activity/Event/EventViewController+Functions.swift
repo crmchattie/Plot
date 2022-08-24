@@ -911,21 +911,6 @@ extension EventViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-//        if activity.conversationID == nil {
-//            alert.addAction(UIAlertAction(title: "Connect Activity to a Chat", style: .default, handler: { (_) in
-//                print("User click Approve button")
-//                self.goToChat()
-//
-//            }))
-//        } else {
-//            alert.addAction(UIAlertAction(title: "Go to Chat", style: .default, handler: { (_) in
-//                print("User click Approve button")
-//                self.goToChat()
-//
-//
-//            }))
-//        }
-        
         alert.addAction(UIAlertAction(title: "Delete Event", style: .default, handler: { (_) in
             self.deleteActivity()
         }))
@@ -935,11 +920,6 @@ extension EventViewController {
                 self.goToMap()
             }))
         }
-        
-//                alert.addAction(UIAlertAction(title: "Share Event", style: .default, handler: { (_) in
-//                    print("User click Edit button")
-//                    self.share()
-//                }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -1050,74 +1030,6 @@ extension EventViewController {
                 print("completion block")
             })
         }
-    }
-    
-    func share() {
-        if let activity = activity, let name = activity.name {
-            let imageName = "activityLarge"
-            if let image = UIImage(named: imageName) {
-                let data = compressImage(image: image)
-                let aO = ["activityName": "\(name)",
-                          "activityID": activityID,
-                          "activityImageURL": "\(imageName)",
-                          "object": data] as [String: AnyObject]
-                let activityObject = ActivityObject(dictionary: aO)
-                
-                let alert = UIAlertController(title: "Share Event", message: nil, preferredStyle: .actionSheet)
-                
-                alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
-                    print("User click Approve button")
-                    let destination = ChooseChatTableViewController()
-                    let navController = UINavigationController(rootViewController: destination)
-                    destination.activityObject = activityObject
-                    destination.users = self.users
-                    destination.filteredUsers = self.filteredUsers
-                    destination.conversations = self.conversations
-                    destination.filteredConversations = self.conversations
-                    destination.filteredPinnedConversations = self.conversations
-                    self.present(navController, animated: true, completion: nil)
-                    
-                }))
-                
-                alert.addAction(UIAlertAction(title: "Outside of Plot", style: .default, handler: { (_) in
-                    print("User click Edit button")
-                    // Fallback on earlier versions
-                    let shareText = "Hey! Download Plot on the App Store so I can share an activity with you."
-                    guard let url = URL(string: "https://apps.apple.com/us/app/plot-scheduling-app/id1473764067?ls=1")
-                    else { return }
-                    let shareContent: [Any] = [shareText, url]
-                    let activityController = UIActivityViewController(activityItems: shareContent,
-                                                                      applicationActivities: nil)
-                    self.present(activityController, animated: true, completion: nil)
-                    activityController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed:
-                                                                        Bool, arrayReturnedItems: [Any]?, error: Error?) in
-                        if completed {
-                            print("share completed")
-                            return
-                        } else {
-                            print("cancel")
-                        }
-                        if let shareError = error {
-                            print("error while sharing: \(shareError.localizedDescription)")
-                        }
-                    }
-                    
-                }))
-                
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                    print("User click Dismiss button")
-                }))
-                
-                self.present(alert, animated: true, completion: {
-                    print("completion block")
-                })
-                print("shareButtonTapped")
-            }
-            
-            
-        }
-        
     }
     
     func duplicateActivity(recurrenceRule: [String]?) {

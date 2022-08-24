@@ -88,8 +88,8 @@ class ChooseEventTableViewController: UITableViewController {
         filteredEvents = events
         
         configureTableView()
+        setupSearchController()
         scrollToFirstEventWithDate(animated: false)
-        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -116,8 +116,6 @@ class ChooseEventTableViewController: UITableViewController {
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
-//        let searchBarButton = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(search))
-//        navigationItem.rightBarButtonItem = searchBarButton
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
@@ -146,7 +144,7 @@ class ChooseEventTableViewController: UITableViewController {
             searchEventController?.definesPresentationContext = true
             searchEventController?.searchBar.becomeFirstResponder()
             navigationItem.searchController = searchEventController
-            navigationItem.hidesSearchBarWhenScrolling = true
+            navigationItem.hidesSearchBarWhenScrolling = false
         } else {
             searchBar = UISearchBar()
             searchBar?.delegate = self
@@ -156,35 +154,6 @@ class ChooseEventTableViewController: UITableViewController {
             searchBar?.becomeFirstResponder()
             tableView.tableHeaderView = searchBar
         }
-    }
-    
-    func handleReloadTableAftersearchBarCancelButtonClicked() {
-        filteredEvents = events
-        filteredEvents.sort { (event1, event2) -> Bool in
-            if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
-                return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) {
-                return currentDate < event2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
-                return event1.startDateTime?.int64Value ?? 0 < currentDate
-            }
-            return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
-        }
-        scrollToFirstEventWithDate(animated: true)
-    }
-    
-    func handleReloadTableAfterSearch() {
-        filteredEvents.sort { (event1, event2) -> Bool in
-            if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
-                return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(event1.startDateTime?.int64Value ?? 0, and: event1.endDateTime?.int64Value ?? 0) {
-                return currentDate < event2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(event2.startDateTime?.int64Value ?? 0, and: event2.endDateTime?.int64Value ?? 0) {
-                return event1.startDateTime?.int64Value ?? 0 < currentDate
-            }
-            return event1.startDateTime?.int64Value ?? 0 < event2.startDateTime?.int64Value ?? 0
-        }
-        scrollToFirstEventWithDate(animated: true)
     }
     
     func scrollToFirstEventWithDate(animated: Bool) {
@@ -237,13 +206,6 @@ class ChooseEventTableViewController: UITableViewController {
         return 0
     }
     
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let view = UIView()
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-        return view
-        
-    }
-    
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
         
@@ -268,13 +230,9 @@ class ChooseEventTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
-        
         cell.activityDataStore = self
-        
         let event = filteredEvents[indexPath.row]
-        
         cell.configureCell(for: indexPath, activity: event, withInvitation: nil)
-        
         return cell
     }
     
@@ -296,13 +254,13 @@ extension ChooseEventTableViewController: UISearchBarDelegate, UISearchControlle
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
-        searchBar.setShowsCancelButton(false, animated: true)
         searchBar.resignFirstResponder()
-        handleReloadTableAftersearchBarCancelButtonClicked()
+        filteredEvents = events
+        tableView.reloadData()
+        scrollToFirstEventWithDate(animated: false)
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
         filteredEvents = searchText.isEmpty ? events :
             events.filter({ (event) -> Bool in
                 if let name = event.name {
@@ -311,15 +269,12 @@ extension ChooseEventTableViewController: UISearchBarDelegate, UISearchControlle
                 return ("").lowercased().contains(searchText.lowercased())
             })
         
-        handleReloadTableAfterSearch()
+        tableView.reloadData()
+        tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
         searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        guard #available(iOS 11.0, *) else {
-            searchBar.setShowsCancelButton(true, animated: true)
-            return true
-        }
         return true
     }
 }

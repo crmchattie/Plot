@@ -41,13 +41,11 @@ class EventViewController: FormViewController {
     lazy var activities: [Activity] = networkController.activityService.events
     lazy var tasks: [Activity] = networkController.activityService.tasks
     lazy var calendars: [String: [CalendarType]] = networkController.activityService.calendars
-    lazy var conversations: [Conversation] = networkController.conversationService.conversations
     lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
     var purchaseUsers = [User]()
     var userInvitationStatus: [String: Status] = [:]
-    var conversation: Conversation!
     let avatarOpener = AvatarOpener()
     var locationName : String = "locationName"
     var locationAddress = [String : [Double]]()
@@ -57,6 +55,7 @@ class EventViewController: FormViewController {
     var purchaseDict = [User: Double]()
     var listList = [ListContainer]()
     var healthList = [HealthContainer]()
+    var calendar: CalendarType!
     var purchaseIndex: Int = 0
     var listIndex: Int = 0
     var healthIndex: Int = 0
@@ -119,11 +118,17 @@ class EventViewController: FormViewController {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                let calendarDefault = calendars[CalendarOptions.plot.name]?.first { $0.name == "Default"}
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
                                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendarDefault?.id ?? "", calendarName: calendarDefault?.name ?? "", calendarColor: calendarDefault?.color ?? "", calendarSource: calendarDefault?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                
+                if let calendar = calendar {
+                    activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? "", calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                } else {
+                    let calendar = calendars[CalendarOptions.plot.name]?.first { $0.name == "Default"}
+                    activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? "", calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+
+                }
             }
         }
         

@@ -62,9 +62,9 @@ class Activity: NSObject, NSCopying, Codable {
     //task will key off of isTask and isCompleted
     var isTask: Bool?
     var isCompleted: Bool?
-    var completedDate: Date?
+    var completedDate: NSNumber?
     var userIsCompleted: Bool?
-    var userCompletedDate: Date?
+    var userCompletedDate: NSNumber?
     var scheduleIDs: [String]?
     var isSchedule: Bool?
     var listID: String?
@@ -201,9 +201,9 @@ class Activity: NSObject, NSCopying, Codable {
         containerID = dictionary?["containerID"] as? String
         showExtras = dictionary?["showExtras"] as? Bool
         isCompleted = dictionary?["isCompleted"] as? Bool
-        completedDate = dictionary?["completedDate"] as? Date
+        completedDate = dictionary?["completedDate"] as? NSNumber
         userIsCompleted = dictionary?["userIsCompleted"] as? Bool
-        userCompletedDate = dictionary?["userCompletedDate"] as? Date
+        userCompletedDate = dictionary?["userCompletedDate"] as? NSNumber
         isTask = dictionary?["isTask"] as? Bool
         isEvent = dictionary?["isEvent"] as? Bool
         isSchedule = dictionary?["isSchedule"] as? Bool
