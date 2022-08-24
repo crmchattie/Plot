@@ -79,7 +79,7 @@ class WorkoutOperation: AsyncOperation {
                                 let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
                                 activityActions.createNewActivity()
                                 
-                                let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: [workout.uuid.uuidString], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+                                let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.uuid.uuidString], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
                                 containers.append(container)
                                 
                                 

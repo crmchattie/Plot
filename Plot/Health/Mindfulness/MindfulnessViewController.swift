@@ -22,8 +22,10 @@ class MindfulnessViewController: FormViewController {
     var container: Container!
     var eventList = [Activity]()
     var purchaseList = [Transaction]()
+    var taskList = [Activity]()
     var eventIndex: Int = 0
     var purchaseIndex: Int = 0
+    var taskIndex: Int = 0
         
     fileprivate var productIndex: Int = 0
     
@@ -31,7 +33,8 @@ class MindfulnessViewController: FormViewController {
         
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.events
+    lazy var tasks: [Activity] = networkController.activityService.tasks
+    lazy var events: [Activity] = networkController.activityService.events
     lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
@@ -103,7 +106,7 @@ class MindfulnessViewController: FormViewController {
         
         if active {
             for row in form.allRows {
-                if row.tag != "sections" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
+                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -252,7 +255,7 @@ class MindfulnessViewController: FormViewController {
             activityActions.createNewActivity()
             //will update activity.containerID and mindfulness.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: [hkSampleID], mealIDs: nil, transactionIDs: nil)
+            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [hkSampleID], mealIDs: nil, transactionIDs: nil)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
             completion()
         }
@@ -423,21 +426,47 @@ class MindfulnessViewController: FormViewController {
                     } else {
                         // Fallback on earlier versions
                     }
-                    $0.options = ["Event", "Transactions"]
-                    $0.value = "Event"
+                    $0.options = ["Tasks", "Events", "Transactions"]
+                    $0.value = "Tasks"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }.onChange({ _ in
                         self.sectionChanged = true
                     })
+            
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Tasks",
+                                   footer: "Connect an task") {
+                                    $0.tag = "Tasks"
+                                    $0.hidden = "!$sections == 'Tasks'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("taskButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Task"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.taskIndex = index
+                                        self.openTask()
+                                        return SubtaskRow("label"){
+                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        }
+                                    }
+
+                                }
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Event",
+                                   header: "Events",
                                    footer: "Connect an event") {
                                     $0.tag = "Events"
-                                    $0.hidden = "!$sections == 'Event'"
+                                    $0.hidden = "!$sections == 'Events'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("scheduleButton"){
                                             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

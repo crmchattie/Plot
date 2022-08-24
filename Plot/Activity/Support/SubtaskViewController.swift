@@ -14,9 +14,13 @@ import Contacts
 import EventKit
 import CodableFirebase
 
+protocol UpdateTaskDelegate: AnyObject {
+    func updateTask(task: Activity)
+}
+
 class SubtaskViewController: FormViewController {
     
-    weak var delegate : UpdateActivityDelegate?
+    weak var delegate : UpdateTaskDelegate?
     
     var subtask: Activity!
     
@@ -587,7 +591,7 @@ class SubtaskViewController: FormViewController {
         let createActivity = ActivityActions(activity: subtask, active: false, selectedFalconUsers: [])
         createActivity.createSubActivity()
         
-        delegate?.updateActivity(activity: subtask)
+        delegate?.updateTask(task: subtask)
         
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)

@@ -145,18 +145,11 @@ extension TaskViewController {
         }
         if let containerID = task.containerID {
             dispatchGroup.enter()
-            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, health, transactions in
+            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, _, health, transactions in
                 self.container = container
+                self.eventList = activities ?? []
                 self.healthList = health ?? []
-                for list in self.healthList {
-                    print(list.name)
-                    print(list.ID)
-                }
                 self.purchaseList = transactions ?? []
-                for list in self.purchaseList {
-                    print(list.description)
-                    print(list.guid)
-                }
                 dispatchGroup.leave()
             }
         }
@@ -169,6 +162,17 @@ extension TaskViewController {
 
     
     func listRow() {
+        for activity in eventList {
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
+            mvs.insert(ScheduleRow() {
+                $0.value = activity
+            }.onCellSelection() { cell, row in
+                self.eventIndex = row.indexPath!.row
+                self.openEvent()
+                cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+        }
+        
         for health in healthList {
             var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
             mvs.insert(HealthRow() {
@@ -228,10 +232,10 @@ extension TaskViewController {
             }
         } else if type == "container" {
             if container != nil {
-                container = Container(id: container.id, activityIDs: container.activityIDs, workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+                container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: container.taskIDs, workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
             } else {
                 let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                container = Container(id: containerID, activityIDs: [activityID], workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+                container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: [activityID], workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
             }
             ContainerFunctions.updateContainerAndStuffInside(container: container)
         } else {
@@ -447,11 +451,59 @@ extension TaskViewController {
         destination.delegate = self
         destination.subtaskList = subtaskList
         destination.selectedFalconUsers = selectedFalconUsers
-        destination.activities = activities
-        destination.activity = task
+        destination.tasks = tasks
+        destination.task = task
         
         self.navigationController?.pushViewController(destination, animated: true)
     
+    }
+    
+    func openEvent() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        if eventList.indices.contains(eventIndex) {
+            showActivityIndicator()
+            let destination = EventViewController(networkController: networkController)
+            destination.activity = eventList[eventIndex]
+            destination.delegate = self
+            self.hideActivityIndicator()
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+                let destination = EventViewController(networkController: self.networkController)
+                destination.users = self.selectedFalconUsers
+                destination.filteredUsers = self.selectedFalconUsers
+                destination.delegate = self
+                destination.startDateTime = self.task.startDate
+                destination.endDateTime = self.task.endDate
+                self.navigationController?.pushViewController(destination, animated: true)
+            }))
+            alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+                let destination = ChooseEventTableViewController()
+                destination.needDelegate = true
+                destination.movingBackwards = true
+                destination.delegate = self
+                destination.events = self.events
+                destination.filteredEvents = self.events
+                destination.existingEvents = self.eventList
+                self.navigationController?.pushViewController(destination, animated: true)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+            }))
+            self.present(alert, animated: true)
+        }
     }
     
     func openPurchases() {
@@ -604,12 +656,12 @@ extension TaskViewController {
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            alert.addAction(UIAlertAction(title: "Update Event", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Update Task", style: .default, handler: { (_) in
                 print("User click Edit button")
                 self.createActivity(activity: nil)
             }))
             
-            alert.addAction(UIAlertAction(title: "Duplicate Event", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Duplicate Task", style: .default, handler: { (_) in
                 print("User click Edit button")
                 self.duplicateActivity(recurrenceRule: nil)
             }))
@@ -625,6 +677,22 @@ extension TaskViewController {
         }
     }
     
+    func sortSchedule() {
+        eventList.sort { (schedule1, schedule2) -> Bool in
+            return schedule1.startDateTime?.int64Value ?? 0 < schedule2.startDateTime?.int64Value ?? 0
+        }
+        if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+            if mvs.count == 1 {
+                return
+            }
+            for index in 0...mvs.count - 2 {
+                let scheduleRow = mvs.allRows[index]
+                scheduleRow.baseValue = eventList[index]
+                scheduleRow.reload()
+            }
+        }
+    }
+    
     func updateRecurrences(recurrences: [String]) {
         showActivityIndicator()
         let createActivity = ActivityActions(activity: self.task, active: active, selectedFalconUsers: selectedFalconUsers)
@@ -633,7 +701,7 @@ extension TaskViewController {
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
-            self.delegate?.updateActivity(activity: self.task)
+            self.delegate?.updateTask(task: self.task)
             self.navigationController?.popViewController(animated: true)
         }
     }
@@ -652,7 +720,7 @@ extension TaskViewController {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.delegate?.updateActivity(activity: activity ?? self.task)
+            self.delegate?.updateTask(task: activity ?? self.task)
             self.updateDiscoverDelegate?.itemCreated()
         }
     }
@@ -755,11 +823,11 @@ extension TaskViewController {
 //            }))
 //        }
         
-        alert.addAction(UIAlertAction(title: "Delete Event", style: .default, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "Delete Task", style: .default, handler: { (_) in
             self.deleteActivity()
         }))
         
-//                alert.addAction(UIAlertAction(title: "Share Event", style: .default, handler: { (_) in
+//                alert.addAction(UIAlertAction(title: "Share Task", style: .default, handler: { (_) in
 //                    print("User click Edit button")
 //                    self.share()
 //                }))
@@ -773,27 +841,6 @@ extension TaskViewController {
         })
         print("shareButtonTapped")
         
-    }
-    
-    @objc func goToChat() {
-        if task!.conversationID != nil {
-            if let convo = conversations.first(where: {$0.chatID == task!.conversationID}) {
-                self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-                self.messagesFetcher = MessagesFetcher()
-                self.messagesFetcher?.delegate = self
-                self.messagesFetcher?.loadMessagesData(for: convo)
-            }
-        } else {
-            let destination = ChooseChatTableViewController()
-            let navController = UINavigationController(rootViewController: destination)
-            destination.delegate = self
-            destination.activity = task
-            destination.conversations = conversations
-            destination.pinnedConversations = conversations
-            destination.filteredConversations = conversations
-            destination.filteredPinnedConversations = conversations
-            present(navController, animated: true, completion: nil)
-        }
     }
     
     func deleteActivity() {
@@ -888,7 +935,7 @@ extension TaskViewController {
                           "object": data] as [String: AnyObject]
                 let activityObject = ActivityObject(dictionary: aO)
                 
-                let alert = UIAlertController(title: "Share Event", message: nil, preferredStyle: .actionSheet)
+                let alert = UIAlertController(title: "Share Task", message: nil, preferredStyle: .actionSheet)
                 
                 alert.addAction(UIAlertAction(title: "Inside of Plot", style: .default, handler: { (_) in
                     print("User click Approve button")

@@ -77,7 +77,7 @@ class MindfulnessOperation: AsyncOperation {
                         let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
                         activityActions.createNewActivity()
                         
-                        let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: nil, mindfulnessIDs: [sample.uuid.uuidString], mealIDs: nil, transactionIDs: nil)
+                        let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [sample.uuid.uuidString], mealIDs: nil, transactionIDs: nil)
                         containers.append(container)
                     }
                 }

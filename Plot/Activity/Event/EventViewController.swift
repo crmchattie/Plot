@@ -22,8 +22,6 @@ class EventViewController: FormViewController {
     var activity: Activity!
     var activityOld: Activity!
     var invitation: Invitation?
-    var chatLogController: ChatLogController? = nil
-    var messagesFetcher: MessagesFetcher? = nil
     
     weak var delegate : UpdateActivityDelegate?
     
@@ -41,6 +39,7 @@ class EventViewController: FormViewController {
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
     lazy var activities: [Activity] = networkController.activityService.events
+    lazy var tasks: [Activity] = networkController.activityService.tasks
     lazy var calendars: [String: [CalendarType]] = networkController.activityService.calendars
     lazy var conversations: [Conversation] = networkController.conversationService.conversations
     lazy var transactions: [Transaction] = networkController.financeService.transactions
@@ -61,6 +60,8 @@ class EventViewController: FormViewController {
     var purchaseIndex: Int = 0
     var listIndex: Int = 0
     var healthIndex: Int = 0
+    var taskList = [Activity]()
+    var taskIndex: Int = 0
     var grocerylistIndex: Int = -1
     var startDateTime: Date?
     var endDateTime: Date?
@@ -808,11 +809,11 @@ class EventViewController: FormViewController {
                 if #available(iOS 13.0, *) {
                     $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
                 }
-                $0.options = ["Health", "Transactions"]
+                $0.options = ["Tasks", "Health", "Transactions"]
                 if !(activity.showExtras ?? true) {
                     $0.value = "Hidden"
                 } else {
-                    $0.value = "Health"
+                    $0.value = "Tasks"
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -820,6 +821,32 @@ class EventViewController: FormViewController {
             }.onChange({ _ in
                 self.sectionChanged = true
             })
+            
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Tasks",
+                                   footer: "Connect an task") {
+                                    $0.tag = "Tasks"
+                                    $0.hidden = "!$sections == 'Tasks'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("taskButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Task"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.taskIndex = index
+                                        self.openTask()
+                                        return SubtaskRow("label"){
+                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        }
+                                    }
+
+                                }
             
             form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],

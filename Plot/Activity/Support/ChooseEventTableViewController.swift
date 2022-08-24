@@ -237,6 +237,13 @@ class ChooseEventTableViewController: UITableViewController {
         return 0
     }
     
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        return view
+        
+    }
+    
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
         

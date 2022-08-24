@@ -101,6 +101,93 @@ extension TaskViewController: UpdateSubtaskListDelegate {
     }
 }
 
+extension TaskViewController: UpdateActivityDelegate {
+    func updateActivity(activity: Activity) {
+        if let _ = activity.name {
+            if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+                let scheduleRow = mvs.allRows[eventIndex]
+                scheduleRow.baseValue = activity
+                scheduleRow.reload()
+                eventList[eventIndex] = activity
+            } else {
+                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
+                mvs.insert(ScheduleRow() {
+                    $0.value = activity
+                }.onCellSelection() { cell, row in
+                    self.eventIndex = row.indexPath!.row
+                    self.openEvent()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+                Analytics.logEvent("new_schedule", parameters: [
+                    "schedule_name": activity.name ?? "name" as NSObject,
+                    "schedule_type": activity.activityType ?? "basic" as NSObject
+                ])
+                eventList.append(activity)
+            }
+            
+            sortSchedule()
+        }
+    }
+}
+
+extension TaskViewController: ChooseActivityDelegate {
+    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
+        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let group = DispatchGroup()
+        var participants: [User] = []
+        for id in participantsIDs {
+            // Only if the current user is created this activity
+            if activity.admin == currentUserID && id == currentUserID {
+                continue
+            }
+            
+            group.enter()
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    participants.append(user)
+                }
+                
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(participants)
+        }
+    }
+    
+    func chosenActivity(mergeActivity: Activity) {
+        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        if let _ = mergeActivity.name {
+            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
+            mvs.insert(ScheduleRow() {
+                $0.value = mergeActivity
+            }.onCellSelection() { cell, row in
+                self.eventIndex = row.indexPath!.row
+                self.openEvent()
+                cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+            
+            Analytics.logEvent("new_schedule", parameters: [
+                "schedule_name": mergeActivity.name ?? "name" as NSObject,
+                "schedule_type": mergeActivity.activityType ?? "basic" as NSObject
+            ])
+            
+            eventList.append(mergeActivity)
+            sortSchedule()
+        }
+    }
+}
+
 extension TaskViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
@@ -273,115 +360,5 @@ extension TaskViewController: RecurrencePickerDelegate {
                 task.recurrences = nil
             }
         }
-    }
-}
-
-extension TaskViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
-        if let activityID = activityID {
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-
-            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-                if conversation.activities != nil {
-                    var activities = conversation.activities!
-                    activities.append(activityID)
-                    let updatedActivities = [activitiesEntity: activities as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                } else {
-                    let updatedActivities = [activitiesEntity: [activityID] as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                }
-                if task.grocerylistID != nil {
-                    if conversation.grocerylists != nil {
-                        var grocerylists = conversation.grocerylists!
-                        grocerylists.append(task.grocerylistID!)
-                        let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                    } else {
-                        let updatedGrocerylists = [grocerylistsEntity: [task.grocerylistID!] as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                    }
-                    Database.database().reference().child(grocerylistsEntity).child(task.grocerylistID!).updateChildValues(updatedConversationID)
-                }
-                if task.checklistIDs != nil {
-                    if conversation.checklists != nil {
-                        let checklists = conversation.checklists! + task.checklistIDs!
-                        let updatedChecklists = [checklistsEntity: checklists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                    } else {
-                        let updatedChecklists = [checklistsEntity: task.checklistIDs! as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                    }
-                    for ID in task.checklistIDs! {
-                        Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                    }
-                }
-                if task.activitylistIDs != nil {
-                    if conversation.activitylists != nil {
-                        let activitylists = conversation.activitylists! + task.activitylistIDs!
-                        let updatedActivitylists = [activitylistsEntity: activitylists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
-                    } else {
-                        let updatedActivitylists = [activitylistsEntity: task.activitylistIDs! as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
-                    }
-                    for ID in task.activitylistIDs! {
-                        Database.database().reference().child(activitylistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                    }
-                }
-                if task.packinglistIDs != nil {
-                    if conversation.packinglists != nil {
-                        let packinglists = conversation.packinglists! + task.packinglistIDs!
-                        let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                    } else {
-                        let updatedPackinglists = [packinglistsEntity: task.packinglistIDs! as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                    }
-                   for ID in task.packinglistIDs! {
-                        Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                    }
-                }
-            }
-            self.connectedToChatAlert()
-            self.dismiss(animated: true, completion: nil)
-        }
-    }
-}
-
-extension TaskViewController: MessagesDelegate {
-    
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
-    }
-    
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
-        }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        
-        if #available(iOS 11.0, *) {
-        } else {
-            self.chatLogController?.startCollectionViewAtBottom()
-        }
-        
-        navigationController?.pushViewController(destination, animated: true)
-        chatLogController = nil
-        messagesFetcher?.delegate = nil
-        messagesFetcher = nil
     }
 }

@@ -31,6 +31,10 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
+protocol ChooseTaskDelegate: AnyObject {
+    func chosenTask(mergeTask: Activity)
+}
+
 class ChooseTaskTableViewController: UITableViewController {
     
     let taskCellID = "taskCellID"
@@ -49,7 +53,7 @@ class ChooseTaskTableViewController: UITableViewController {
     var users = [User]()
     var filteredUsers = [User]()
         
-    weak var delegate : ChooseActivityDelegate?
+    weak var delegate : ChooseTaskDelegate?
     
     let taskCreatingGroup = DispatchGroup()
     let informationMessageSender = InformationMessageSender()
@@ -87,7 +91,7 @@ class ChooseTaskTableViewController: UITableViewController {
     override func viewDidDisappear(_ animated: Bool) {
         if needDelegate && movingBackwards {
             let task = Activity(dictionary: ["activityID": "" as AnyObject])
-            delegate?.chosenActivity(mergeActivity: task)
+            delegate?.chosenTask(mergeTask: task)
         }
     }
     
@@ -100,7 +104,7 @@ class ChooseTaskTableViewController: UITableViewController {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
-        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
+        tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
@@ -119,7 +123,7 @@ class ChooseTaskTableViewController: UITableViewController {
     @objc fileprivate func cancel() {
         if needDelegate {
             let task = Activity(dictionary: ["activityID": "" as AnyObject])
-            delegate?.chosenActivity(mergeActivity: task)
+            delegate?.chosenTask(mergeTask: task)
         }
         movingBackwards = false
         dismiss(animated: true, completion: nil)
@@ -182,12 +186,11 @@ class ChooseTaskTableViewController: UITableViewController {
         return 0
     }
     
-    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
         view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        return view
         
-        if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }
     }
     
     // MARK: - Table view data source
@@ -214,7 +217,7 @@ class ChooseTaskTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let task = filteredTasks[indexPath.row]
-        delegate?.chosenActivity(mergeActivity: task)
+        delegate?.chosenTask(mergeTask: task)
         movingBackwards = false
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)

@@ -19,16 +19,19 @@ class FinanceTransactionViewController: FormViewController {
     var transaction: Transaction!
     var container: Container!
     var eventList = [Activity]()
-    var healthList = [HealthContainer]()
     var eventIndex: Int = 0
+    var healthList = [HealthContainer]()
     var healthIndex: Int = 0
+    var taskList = [Activity]()
+    var taskIndex: Int = 0
     
     var accounts: [MXAccount] {
         return networkController.financeService.accounts
     }
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.events
+    lazy var tasks: [Activity] = networkController.activityService.tasks
+    lazy var events: [Activity] = networkController.activityService.events
     
     var selectedFalconUsers = [User]()
     
@@ -585,8 +588,8 @@ class FinanceTransactionViewController: FormViewController {
                     } else {
                         // Fallback on earlier versions
                     }
-                    $0.options = ["Event", "Health"]
-                    $0.value = "Event"
+                    $0.options = ["Events", "Health"]
+                    $0.value = "Events"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -596,10 +599,10 @@ class FinanceTransactionViewController: FormViewController {
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Event",
+                                   header: "Events",
                                    footer: "Connect an event") {
                                     $0.tag = "Events"
-                                    $0.hidden = "!$sections == 'Event'"
+                                    $0.hidden = "!$sections == 'Events'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("scheduleButton"){
                                             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

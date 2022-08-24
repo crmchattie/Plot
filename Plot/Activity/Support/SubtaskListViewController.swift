@@ -29,8 +29,8 @@ class SubtaskListViewController: FormViewController {
     var startDateTime: Date?
     var endDateTime: Date?
     
-    var activities = [Activity]()
-    var activity: Activity!
+    var tasks = [Activity]()
+    var task: Activity!
         
     init() {
         super.init(style: .insetGrouped)
@@ -146,9 +146,9 @@ class SubtaskListViewController: FormViewController {
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
-                destination.task = self.activity
-                destination.tasks = self.activities
-                destination.filteredTasks = self.activities
+                destination.task = self.task
+                destination.tasks = self.tasks
+                destination.filteredTasks = self.tasks
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -206,18 +206,18 @@ class SubtaskListViewController: FormViewController {
     }
 }
 
-extension SubtaskListViewController: UpdateActivityDelegate {
-    func updateActivity(activity: Activity) {
-        if let _ = activity.name {
+extension SubtaskListViewController: UpdateTaskDelegate {
+    func updateTask(task: Activity) {
+        if let _ = task.name {
             if subtaskList.indices.contains(subtaskIndex), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                 let subtaskRow = mvs.allRows[subtaskIndex]
-                subtaskRow.baseValue = activity
+                subtaskRow.baseValue = task
                 subtaskRow.reload()
-                subtaskList[subtaskIndex] = activity
+                subtaskList[subtaskIndex] = task
             } else {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {
-                    $0.value = activity
+                    $0.value = task
                     }.onCellSelection() { cell, row in
                         self.subtaskIndex = row.indexPath!.row
                         self.openSubtask()
@@ -225,10 +225,10 @@ extension SubtaskListViewController: UpdateActivityDelegate {
                 }, at: mvs.count - 1)
                 
                 Analytics.logEvent("new_subtask", parameters: [
-                    "subtask_name": activity.name ?? "name" as NSObject,
-                    "subtask_type": activity.activityType ?? "basic" as NSObject
+                    "subtask_name": task.name ?? "name" as NSObject,
+                    "subtask_type": task.activityType ?? "basic" as NSObject
                 ])
-                subtaskList.append(activity)
+                subtaskList.append(task)
             }
             
             sortSubtask()
@@ -236,7 +236,7 @@ extension SubtaskListViewController: UpdateActivityDelegate {
     }
 }
 
-extension SubtaskListViewController: ChooseActivityDelegate {
+extension SubtaskListViewController: ChooseTaskDelegate {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -268,22 +268,22 @@ extension SubtaskListViewController: ChooseActivityDelegate {
         }
     }
     
-    func chosenActivity(mergeActivity: Activity) {
+    func chosenTask(mergeTask: Activity) {
         if let _: SubtaskRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
         }
-        if let _ = mergeActivity.name, let currentUserID = Auth.auth().currentUser?.uid {
-            self.getParticipants(forActivity: mergeActivity) { (participants) in
-                let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+        if let _ = mergeTask.name, let currentUserID = Auth.auth().currentUser?.uid {
+            self.getParticipants(forActivity: mergeTask) { (participants) in
+                let deleteActivity = ActivityActions(activity: mergeTask, active: true, selectedFalconUsers: participants)
                 deleteActivity.deleteActivity()
             }
             
-            mergeActivity.participantsIDs = [currentUserID]
-            mergeActivity.admin = currentUserID
+            mergeTask.participantsIDs = [currentUserID]
+            mergeTask.admin = currentUserID
             
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
-                $0.value = mergeActivity
+                $0.value = mergeTask
                 }.onCellSelection() { cell, row in
                     self.subtaskIndex = row.indexPath!.row
                     self.openSubtask()
@@ -291,11 +291,11 @@ extension SubtaskListViewController: ChooseActivityDelegate {
             }, at: mvs.count - 1)
             
             Analytics.logEvent("new_subtask", parameters: [
-                "subtask_name": mergeActivity.name ?? "name" as NSObject,
-                "subtask_type": mergeActivity.activityType ?? "basic" as NSObject
+                "subtask_name": mergeTask.name ?? "name" as NSObject,
+                "subtask_type": mergeTask.activityType ?? "basic" as NSObject
             ])
             
-            subtaskList.append(mergeActivity)
+            subtaskList.append(mergeTask)
             
             sortSubtask()
         }

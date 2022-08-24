@@ -159,6 +159,59 @@ extension EventViewController: UpdateScheduleListDelegate {
     }
 }
 
+extension EventViewController: UpdateTaskDelegate {
+    func updateTask(task: Activity) {
+        if let _ = task.name {
+            if taskList.indices.contains(taskIndex), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                let row = mvs.allRows[taskIndex]
+                row.baseValue = activity
+                row.reload()
+                taskList[taskIndex] = task
+            } else {
+                var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+                mvs.insert(SubtaskRow() {
+                    $0.value = task
+                }.onCellSelection() { cell, row in
+                    self.taskIndex = row.indexPath!.row
+                    self.openTask()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+                Analytics.logEvent("new_task", parameters: [
+                    "task_name": task.name ?? "name" as NSObject,
+                    "task_type": task.activityType ?? "basic" as NSObject
+                ])
+                taskList.append(task)
+            }
+        }
+    }
+}
+
+extension EventViewController: ChooseTaskDelegate {
+    func chosenTask(mergeTask: Activity) {
+        if let _: SubtaskRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        if let _ = mergeTask.name {
+            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+            mvs.insert(SubtaskRow() {
+                $0.value = mergeTask
+            }.onCellSelection() { cell, row in
+                self.taskIndex = row.indexPath!.row
+                self.openTask()
+                cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+            
+            Analytics.logEvent("new_task", parameters: [
+                "task_name": mergeTask.name ?? "name" as NSObject,
+                "task_type": mergeTask.activityType ?? "basic" as NSObject
+            ])
+            
+            taskList.append(mergeTask)
+        }
+    }
+}
+
 extension EventViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
@@ -329,166 +382,6 @@ extension EventViewController: RecurrencePickerDelegate {
                 row.value = "Never"
                 row.updateCell()
                 activity.recurrences = nil
-            }
-        }
-    }
-}
-
-extension EventViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
-        if let activityID = activityID {
-            let updatedConversationID = ["conversationID": chatID as AnyObject]
-            Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).updateChildValues(updatedConversationID)
-
-            if let conversation = conversations.first(where: {$0.chatID == chatID}) {
-                if conversation.activities != nil {
-                    var activities = conversation.activities!
-                    activities.append(activityID)
-                    let updatedActivities = [activitiesEntity: activities as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                } else {
-                    let updatedActivities = [activitiesEntity: [activityID] as AnyObject]
-                    Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivities)
-                }
-                if activity.grocerylistID != nil {
-                    if conversation.grocerylists != nil {
-                        var grocerylists = conversation.grocerylists!
-                        grocerylists.append(activity.grocerylistID!)
-                        let updatedGrocerylists = [grocerylistsEntity: grocerylists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                    } else {
-                        let updatedGrocerylists = [grocerylistsEntity: [activity.grocerylistID!] as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedGrocerylists)
-                    }
-                    Database.database().reference().child(grocerylistsEntity).child(activity.grocerylistID!).updateChildValues(updatedConversationID)
-                }
-                if activity.checklistIDs != nil {
-                    if conversation.checklists != nil {
-                        let checklists = conversation.checklists! + activity.checklistIDs!
-                        let updatedChecklists = [checklistsEntity: checklists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                    } else {
-                        let updatedChecklists = [checklistsEntity: activity.checklistIDs! as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedChecklists)
-                    }
-                    for ID in activity.checklistIDs! {
-                        Database.database().reference().child(checklistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                    }
-                }
-                if activity.activitylistIDs != nil {
-                    if conversation.activitylists != nil {
-                        let activitylists = conversation.activitylists! + activity.activitylistIDs!
-                        let updatedActivitylists = [activitylistsEntity: activitylists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
-                    } else {
-                        let updatedActivitylists = [activitylistsEntity: activity.activitylistIDs! as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedActivitylists)
-                    }
-                    for ID in activity.activitylistIDs! {
-                        Database.database().reference().child(activitylistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                    }
-                }
-                if activity.packinglistIDs != nil {
-                    if conversation.packinglists != nil {
-                        let packinglists = conversation.packinglists! + activity.packinglistIDs!
-                        let updatedPackinglists = [packinglistsEntity: packinglists as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                    } else {
-                        let updatedPackinglists = [packinglistsEntity: activity.packinglistIDs! as AnyObject]
-                        Database.database().reference().child("groupChats").child(conversation.chatID!).child(messageMetaDataFirebaseFolder).updateChildValues(updatedPackinglists)
-                    }
-                   for ID in activity.packinglistIDs! {
-                        Database.database().reference().child(packinglistsEntity).child(ID).updateChildValues(updatedConversationID)
-
-                    }
-                }
-            }
-            self.connectedToChatAlert()
-            self.dismiss(animated: true, completion: nil)
-        }
-    }
-}
-
-extension EventViewController: MessagesDelegate {
-    
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
-    }
-    
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
-        }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        
-        if #available(iOS 11.0, *) {
-        } else {
-            self.chatLogController?.startCollectionViewAtBottom()
-        }
-        
-        navigationController?.pushViewController(destination, animated: true)
-        chatLogController = nil
-        messagesFetcher?.delegate = nil
-        messagesFetcher = nil
-    }
-}
-
-public extension Form {
-    func valuesForFirebase(includeHidden: Bool = false) -> [String: Any?] {
-        let rows = includeHidden ? self.allRows : self.rows
-        return rows.filter({ $0.tag != nil })
-            .reduce([:], { (dictionary, row) -> [String: Any?] in
-                var dictionary = dictionary
-                dictionary[row.tag!] = row.firebaseValue
-                return dictionary
-            })
-    }
-}
-
-public extension Dictionary {
-    func valuesForEureka(forForm form: Form) -> [String: Any?] {
-        return self.reduce([:], { (dictionary, tuple) -> [String: Any?] in
-            var dictionary = dictionary
-            let row = form.rowBy(tag: tuple.key as! String)
-            if row is SwitchRow || row is CheckRow {
-                let typedValue = tuple.value as! Int
-                dictionary[tuple.key as! String] = (typedValue == 1) ? true : false
-            } else if row is DateRow || row is TimeRow || row is DateTimeRow {
-                let typedValue = tuple.value as! TimeInterval
-                dictionary[tuple.key as! String] = Date(timeIntervalSince1970: typedValue)
-            } else {
-                dictionary[tuple.key as! String] = tuple.value
-            }
-            return dictionary
-        })
-    }
-}
-
-private extension BaseRow {
-    var firebaseValue: Any? {
-        get {
-            if self is SwitchRow || self is CheckRow {
-                return (self.baseValue as! Bool) ? true : false
-            } else if self is DateRow || self is TimeRow || self is DateTimeRow || self is DateTimeInlineRow {
-                return NSNumber(value: Int((self.baseValue as! Date).timeIntervalSince1970))
-            }
-            else {
-                if self.baseValue == nil {
-                    return "nothing"
-                } else {
-                    return self.baseValue
-                }
             }
         }
     }

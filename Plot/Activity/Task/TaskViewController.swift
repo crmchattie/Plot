@@ -25,7 +25,7 @@ class TaskViewController: FormViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     
-    weak var delegate : UpdateActivityDelegate?
+    weak var delegate : UpdateTaskDelegate?
     
     var networkController: NetworkController
     
@@ -40,7 +40,8 @@ class TaskViewController: FormViewController {
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.tasks
+    lazy var tasks: [Activity] = networkController.activityService.tasks
+    lazy var events: [Activity] = networkController.activityService.events
     lazy var lists: [String: [ListType]] = networkController.activityService.lists
     lazy var conversations: [Conversation] = networkController.conversationService.conversations
     lazy var transactions: [Transaction] = networkController.financeService.transactions
@@ -59,6 +60,9 @@ class TaskViewController: FormViewController {
     var purchaseIndex: Int = 0
     var listIndex: Int = 0
     var healthIndex: Int = 0
+    var eventList = [Activity]()
+    var eventIndex: Int = 0
+    
     var grocerylistIndex: Int = -1
     var userNames : [String] = []
     var userNamesString: String = ""
@@ -897,11 +901,11 @@ class TaskViewController: FormViewController {
                 if #available(iOS 13.0, *) {
                     $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
                 }
-                $0.options = ["Health", "Transactions"]
+                $0.options = ["Events", "Health", "Transactions"]
                 if !(task.showExtras ?? true) {
                     $0.value = "Hidden"
                 } else {
-                    $0.value = "Health"
+                    $0.value = "Events"
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -909,6 +913,32 @@ class TaskViewController: FormViewController {
             }.onChange({ _ in
                 self.sectionChanged = true
             })
+            
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Events",
+                                   footer: "Connect an event") {
+                                    $0.tag = "Events"
+                                    $0.hidden = "!$sections == 'Events'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("scheduleButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Event"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.eventIndex = index
+                                        self.openEvent()
+                                        return ScheduleRow("label"){
+                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        }
+                                    }
+
+                                }
             
             form +++
             MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
@@ -996,6 +1026,12 @@ class TaskViewController: FormViewController {
         let rowType = rows[0].self
         
         DispatchQueue.main.async { [weak self] in
+            if rowType is ScheduleRow {
+                if self!.eventList.indices.contains(self!.eventIndex) {
+                    self!.eventList.remove(at: rowNumber)
+                    self!.updateLists(type: "container")
+                }
+            }
             if rowType is PurchaseRow {
                 if self!.purchaseList.indices.contains(self!.purchaseIndex) {
                     self!.purchaseList.remove(at: rowNumber)

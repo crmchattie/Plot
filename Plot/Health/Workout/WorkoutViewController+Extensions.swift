@@ -17,8 +17,9 @@ extension WorkoutViewController {
         let dispatchGroup = DispatchGroup()
         if let containerID = workout.containerID {
             dispatchGroup.enter()
-            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, _, transactions in
+            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, tasks, _, transactions in
                 self.container = container
+                self.taskList = tasks ?? []
                 self.eventList = activities ?? []
                 self.purchaseList = transactions ?? []
                 dispatchGroup.leave()
@@ -32,6 +33,16 @@ extension WorkoutViewController {
     }
     
     func listRow() {
+        for task in taskList {
+            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+            mvs.insert(SubtaskRow() {
+                $0.value = task
+            }.onCellSelection() { cell, row in
+                self.taskIndex = row.indexPath!.row
+                self.openTask()
+                cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+        }
         for activity in eventList {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
@@ -54,6 +65,52 @@ extension WorkoutViewController {
         }
     }
     
+    func openTask() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        if taskList.indices.contains(taskIndex) {
+            showActivityIndicator()
+            let destination = TaskViewController(networkController: networkController)
+            destination.task = taskList[taskIndex]
+            destination.delegate = self
+            self.hideActivityIndicator()
+            self.navigationController?.pushViewController(destination, animated: true)
+        } else {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "New Task", style: .default, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+                let destination = TaskViewController(networkController: self.networkController)
+                destination.users = self.selectedFalconUsers
+                destination.filteredUsers = self.selectedFalconUsers
+                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
+            }))
+            alert.addAction(UIAlertAction(title: "Existing Task", style: .default, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+                let destination = ChooseTaskTableViewController()
+                destination.needDelegate = true
+                destination.movingBackwards = true
+                destination.delegate = self
+                destination.tasks = self.tasks
+                destination.filteredTasks = self.tasks
+                destination.existingTasks = self.taskList
+                self.navigationController?.pushViewController(destination, animated: true)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+            }))
+            self.present(alert, animated: true)
+        }
+    }
+    
     func openEvent() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
@@ -68,7 +125,7 @@ extension WorkoutViewController {
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
@@ -80,7 +137,7 @@ extension WorkoutViewController {
                 destination.endDateTime = self.workout.endDateTime
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
-            alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
@@ -88,8 +145,8 @@ extension WorkoutViewController {
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
-                destination.events = self.activities
-                destination.filteredEvents = self.activities
+                destination.events = self.events
+                destination.filteredEvents = self.events
                 destination.existingEvents = self.eventList
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
@@ -143,10 +200,10 @@ extension WorkoutViewController {
     
     func updateLists() {
         if container != nil {
-            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: container.workoutIDs, mindfulnessIDs: container.mindfulnessIDs, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: container.workoutIDs, mindfulnessIDs: container.mindfulnessIDs, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
         } else {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), workoutIDs: [workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+            container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: [workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
         }
         ContainerFunctions.updateContainerAndStuffInside(container: container)
     }
@@ -164,6 +221,59 @@ extension WorkoutViewController {
                 scheduleRow.baseValue = eventList[index]
                 scheduleRow.reload()
             }
+        }
+    }
+}
+
+extension WorkoutViewController: UpdateTaskDelegate {
+    func updateTask(task: Activity) {
+        if let _ = task.name {
+            if taskList.indices.contains(taskIndex), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                let row = mvs.allRows[taskIndex]
+                row.baseValue = task
+                row.reload()
+                taskList[taskIndex] = task
+            } else {
+                var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+                mvs.insert(SubtaskRow() {
+                    $0.value = task
+                }.onCellSelection() { cell, row in
+                    self.taskIndex = row.indexPath!.row
+                    self.openTask()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+                Analytics.logEvent("new_task", parameters: [
+                    "task_name": task.name ?? "name" as NSObject,
+                    "task_type": task.activityType ?? "basic" as NSObject
+                ])
+                taskList.append(task)
+            }
+        }
+    }
+}
+
+extension WorkoutViewController: ChooseTaskDelegate {
+    func chosenTask(mergeTask: Activity) {
+        if let _: SubtaskRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        if let _ = mergeTask.name {
+            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+            mvs.insert(SubtaskRow() {
+                $0.value = mergeTask
+            }.onCellSelection() { cell, row in
+                self.taskIndex = row.indexPath!.row
+                self.openTask()
+                cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+            
+            Analytics.logEvent("new_task", parameters: [
+                "task_name": mergeTask.name ?? "name" as NSObject,
+                "task_type": mergeTask.activityType ?? "basic" as NSObject
+            ])
+            
+            taskList.append(mergeTask)
         }
     }
 }

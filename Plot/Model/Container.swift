@@ -20,14 +20,16 @@ struct Container: Codable, Equatable, Hashable {
     
     var id: String
     var activityIDs: [String]?
+    var taskIDs: [String]?
     var workoutIDs: [String]?
     var mindfulnessIDs: [String]?
     var mealIDs: [String]?
     var transactionIDs: [String]?
     
-    init(id: String, activityIDs: [String]?, workoutIDs: [String]?, mindfulnessIDs: [String]?, mealIDs: [String]?, transactionIDs: [String]?) {
+    init(id: String, activityIDs: [String]?, taskIDs: [String]?, workoutIDs: [String]?, mindfulnessIDs: [String]?, mealIDs: [String]?, transactionIDs: [String]?) {
         self.id = id
         self.activityIDs = activityIDs
+        self.taskIDs = taskIDs
         self.workoutIDs = workoutIDs
         self.mindfulnessIDs = mindfulnessIDs
         self.mealIDs = mealIDs
@@ -48,6 +50,9 @@ class ContainerFunctions {
         for ID in container.activityIDs ?? [] {
             reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).setValue(container.id)
         }
+        for ID in container.taskIDs ?? [] {
+            reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).setValue(container.id)
+        }
         for ID in container.transactionIDs ?? [] {
             reference.child(financialTransactionsEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
@@ -59,9 +64,10 @@ class ContainerFunctions {
         }
     }
     
-    class func grabContainerAndStuffInside(id: String, completion: @escaping (Container, [Activity]?, [HealthContainer]?, [Transaction]?) -> Void) {
-        var container = Container(id: id, activityIDs: nil, workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+    class func grabContainerAndStuffInside(id: String, completion: @escaping (Container, [Activity]?, [Activity]?, [HealthContainer]?, [Transaction]?) -> Void) {
+        var container = Container(id: id, activityIDs: nil, taskIDs: nil, workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
         var activities = [Activity]()
+        var tasks = [Activity]()
         var healths = [HealthContainer]()
         var transactions = [Transaction]()
         
@@ -79,6 +85,17 @@ class ContainerFunctions {
                             let activity = Activity(dictionary: snapshotValue)
                             activities.append(activity)
 
+                        }
+                        dispatchGroup.leave()
+                    })
+                }
+                for taskID in container.taskIDs ?? [] {
+                    dispatchGroup.enter()
+                    let dataReference = Database.database().reference().child(activitiesEntity).child(taskID).child(messageMetaDataFirebaseFolder)
+                    dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
+                            let task = Activity(dictionary: snapshotValue)
+                            tasks.append(task)
                         }
                         dispatchGroup.leave()
                     })
@@ -136,7 +153,7 @@ class ContainerFunctions {
         })
         
         dispatchGroup.notify(queue: .main) {
-            completion(container, activities, healths, transactions)
+            completion(container, activities, tasks, healths, transactions)
         }
     }
 }

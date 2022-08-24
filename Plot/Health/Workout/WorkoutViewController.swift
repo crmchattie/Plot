@@ -22,12 +22,15 @@ class WorkoutViewController: FormViewController {
     var container: Container!
     var eventList = [Activity]()
     var purchaseList = [Transaction]()
+    var taskList = [Activity]()
     var eventIndex: Int = 0
     var purchaseIndex: Int = 0
+    var taskIndex: Int = 0
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
-    lazy var activities: [Activity] = networkController.activityService.events
+    lazy var tasks: [Activity] = networkController.activityService.tasks
+    lazy var events: [Activity] = networkController.activityService.events
     lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
@@ -251,7 +254,7 @@ class WorkoutViewController: FormViewController {
             
             //will update activity.containerID and workout.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            let container = Container(id: containerID, activityIDs: [activityID], workoutIDs: [hkSampleID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [hkSampleID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
             completion()
         }
