@@ -25,9 +25,10 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     
     let taskCellID = "taskCellID"
     
-    var list: ListType?
+    var list: ListType!
     var tasks = [Activity]()
     var filteredTasks = [Activity]()
+    lazy var networkTasks = networkController.activityService.tasks
     
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
@@ -78,6 +79,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     }
     
     @objc fileprivate func tasksUpdated() {
+        tasks = networkTasks.filter { $0.listID ?? "" == list.id }
         handleReloadTableAftersearchBarCancelButtonClicked()
     }
     
