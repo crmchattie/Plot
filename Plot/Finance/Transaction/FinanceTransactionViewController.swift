@@ -555,6 +555,11 @@ class FinanceTransactionViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textLabel?.textAlignment = .left
+                if let tags = self.transaction.tags, !tags.isEmpty {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                } else {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
             }
         
             

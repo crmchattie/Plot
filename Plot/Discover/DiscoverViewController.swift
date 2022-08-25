@@ -10,7 +10,6 @@ import UIKit
 import MapKit
 import Firebase
 import CodableFirebase
-import SwiftUI
 import GoogleSignIn
 
 protocol UpdateDiscover: AnyObject {
@@ -129,7 +128,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateSections), name: .calendarsUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -156,6 +154,15 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         } else if !sections.contains(.calendar) {
             customTypes.insert(.calendar, at: 1)
             sections.insert(.calendar, at: 1)
+            fetchData()
+        }
+        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) && !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
+            customTypes.removeAll(where: {$0 == .lists})
+            sections.removeAll(where: {$0 == .lists})
+            fetchData()
+        } else if !sections.contains(.lists) {
+            customTypes.insert(.lists, at: 1)
+            sections.insert(.lists, at: 1)
             fetchData()
         }
     }
@@ -195,6 +202,8 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 self.navigationController?.pushViewController(destination, animated: true)
             case .calendar:
                 self.newCalendar()
+            case .lists:
+                self.newList()
             case .flight:
                 print("flight")
             case .meal:
@@ -325,6 +334,32 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         })
     }
     
+    @objc func newList() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: ListOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryList(value: ListOptions.apple.name)
+            }))
+        }
+        
+        if !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
+            alert.addAction(UIAlertAction(title: ListOptions.google.name, style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance().delegate = self
+                GIDSignIn.sharedInstance()?.presentingViewController = self
+                GIDSignIn.sharedInstance()?.signIn()
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+    }
+    
     func getSelectedFalconUsers(forActivity activity: Activity, completion: @escaping ([User])->()) {
         guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -379,9 +414,9 @@ extension DiscoverViewController: EndedWebViewDelegate {
 
 extension DiscoverViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        print("signed in")
         if (error == nil) {
             self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+            self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
         } else {
           print("\(error.localizedDescription)")
         }

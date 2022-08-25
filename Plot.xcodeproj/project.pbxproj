@@ -158,6 +158,14 @@
 		1092E25C28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */; };
 		1092E25E28B6F2EA0018FCAA /* EKReminderTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */; };
 		1092E26028B6F2FB0018FCAA /* EKPlotTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25F28B6F2FB0018FCAA /* EKPlotTaskOp.swift */; };
+		1092E26528B7AE1A0018FCAA /* GFetchListTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E26428B7AE1A0018FCAA /* GFetchListTasksOp.swift */; };
+		1092E26728B7AE420018FCAA /* GSyncListTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E26628B7AE420018FCAA /* GSyncListTasksOp.swift */; };
+		1092E26928B7AE6C0018FCAA /* GListTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E26828B7AE6C0018FCAA /* GListTaskOp.swift */; };
+		1092E26B28B7AE960018FCAA /* GPlotTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E26A28B7AE960018FCAA /* GPlotTaskOp.swift */; };
+		1092E26D28B7D91F0018FCAA /* CustomType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E26C28B7D91F0018FCAA /* CustomType.swift */; };
+		1092E27128B7E4440018FCAA /* TimeInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */; };
+		1092E27328B7E5600018FCAA /* TaskInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */; };
+		1092E27528B7E5750018FCAA /* TaskAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27428B7E5750018FCAA /* TaskAccountView.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -287,8 +295,8 @@
 		10F3033224EC700C00C04B8F /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3033124EC700C00C04B8F /* Transaction.swift */; };
 		10F5CFF625CB7E3B0078C821 /* GFetchCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */; };
 		10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */; };
-		10F5CFFE25CB7E5A0078C821 /* GCalendarActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */; };
-		10F5D00225CB7E670078C821 /* GPlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */; };
+		10F5CFFE25CB7E5A0078C821 /* GCalendarEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFFD25CB7E5A0078C821 /* GCalendarEventOp.swift */; };
+		10F5D00225CB7E670078C821 /* GPlotEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D00125CB7E670078C821 /* GPlotEventOp.swift */; };
 		10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */; };
 		10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */; };
 		10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */; };
@@ -744,6 +752,14 @@
 		1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKSyncReminderTasksOp.swift; sourceTree = "<group>"; };
 		1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKReminderTaskOp.swift; sourceTree = "<group>"; };
 		1092E25F28B6F2FB0018FCAA /* EKPlotTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKPlotTaskOp.swift; sourceTree = "<group>"; };
+		1092E26428B7AE1A0018FCAA /* GFetchListTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GFetchListTasksOp.swift; sourceTree = "<group>"; };
+		1092E26628B7AE420018FCAA /* GSyncListTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GSyncListTasksOp.swift; sourceTree = "<group>"; };
+		1092E26828B7AE6C0018FCAA /* GListTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GListTaskOp.swift; sourceTree = "<group>"; };
+		1092E26A28B7AE960018FCAA /* GPlotTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPlotTaskOp.swift; sourceTree = "<group>"; };
+		1092E26C28B7D91F0018FCAA /* CustomType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomType.swift; sourceTree = "<group>"; };
+		1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInfoViewController.swift; sourceTree = "<group>"; };
+		1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskInfoViewController.swift; sourceTree = "<group>"; };
+		1092E27428B7E5750018FCAA /* TaskAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskAccountView.swift; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -872,8 +888,8 @@
 		10F3033124EC700C00C04B8F /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GFetchCalendarEventsOp.swift; sourceTree = "<group>"; };
 		10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSyncCalendarEventsOp.swift; sourceTree = "<group>"; };
-		10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCalendarActivityOp.swift; sourceTree = "<group>"; };
-		10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPlotActivityOp.swift; sourceTree = "<group>"; };
+		10F5CFFD25CB7E5A0078C821 /* GCalendarEventOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCalendarEventOp.swift; sourceTree = "<group>"; };
+		10F5D00125CB7E670078C821 /* GPlotEventOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPlotEventOp.swift; sourceTree = "<group>"; };
 		10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientSearchViewController.swift; sourceTree = "<group>"; };
 		10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDetailCell.swift; sourceTree = "<group>"; };
 		10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
@@ -1567,8 +1583,8 @@
 			children = (
 				10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */,
 				10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */,
-				10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */,
-				10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */,
+				10F5CFFD25CB7E5A0078C821 /* GCalendarEventOp.swift */,
+				10F5D00125CB7E670078C821 /* GPlotEventOp.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -1576,8 +1592,31 @@
 		1092E26328B70DD30018FCAA /* Reminder */ = {
 			isa = PBXGroup;
 			children = (
+				1092E26428B7AE1A0018FCAA /* GFetchListTasksOp.swift */,
+				1092E26628B7AE420018FCAA /* GSyncListTasksOp.swift */,
+				1092E26828B7AE6C0018FCAA /* GListTaskOp.swift */,
+				1092E26A28B7AE960018FCAA /* GPlotTaskOp.swift */,
 			);
 			path = Reminder;
+			sourceTree = "<group>";
+		};
+		1092E26E28B7E37E0018FCAA /* Reminders */ = {
+			isa = PBXGroup;
+			children = (
+				1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */,
+				1092E27428B7E5750018FCAA /* TaskAccountView.swift */,
+			);
+			path = Reminders;
+			sourceTree = "<group>";
+		};
+		1092E26F28B7E3950018FCAA /* Time */ = {
+			isa = PBXGroup;
+			children = (
+				1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */,
+				1092E26E28B7E37E0018FCAA /* Reminders */,
+				1034A04325C5ECB9006D3DB8 /* Calendar */,
+			);
+			path = Time;
 			sourceTree = "<group>";
 		};
 		10970B122580605D0027A9EF /* Mindfulness */ = {
@@ -2079,7 +2118,7 @@
 		4BAEE45021272B380045AB10 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
-				1034A04325C5ECB9006D3DB8 /* Calendar */,
+				1092E26F28B7E3950018FCAA /* Time */,
 				10F3032824EC69C200C04B8F /* Financial */,
 				10F3032324EB744500C04B8F /* Accounts */,
 				4BAEE45D21272B380045AB10 /* Model */,
@@ -2526,6 +2565,7 @@
 				100A53F223E3BDAC004AA952 /* Filter.swift */,
 				10737F8424912BDD00D146D6 /* Preview.swift */,
 				10B656CD24AFB0E7006686FA /* SectionType.swift */,
+				1092E26C28B7D91F0018FCAA /* CustomType.swift */,
 				F916C763260E66170062F952 /* DateRange.swift */,
 				102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */,
 				10C8333F249AC2F00037F638 /* SygicPlacesSearchResult.swift */,
@@ -3238,7 +3278,7 @@
 				4BAEE4F321272D890045AB10 /* GroupProfileTableHeaderContainer.swift in Sources */,
 				1039468A2549FD4B005CED3A /* FoodProductContainer.swift in Sources */,
 				4BAEE46421272B380045AB10 /* AccountSettingsTableViewCell.swift in Sources */,
-				10F5CFFE25CB7E5A0078C821 /* GCalendarActivityOp.swift in Sources */,
+				10F5CFFE25CB7E5A0078C821 /* GCalendarEventOp.swift in Sources */,
 				26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */,
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				105F34A72885EF7A007531EB /* RecurrenceRule+Generator.swift in Sources */,
@@ -3264,8 +3304,10 @@
 				4BAEE50B21272D890045AB10 /* UserCell+ConfigureCell.swift in Sources */,
 				4BA1E77A215250F900391BCB /* StorageMediaUploader.swift in Sources */,
 				1082C89524F0A8F500CF6491 /* FinanceViewController.swift in Sources */,
+				1092E26D28B7D91F0018FCAA /* CustomType.swift in Sources */,
 				10DFC3DB255C48A500565DAD /* FinancialInfoViewController.swift in Sources */,
 				10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */,
+				1092E27128B7E4440018FCAA /* TimeInfoViewController.swift in Sources */,
 				1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */,
 				26BDCDCC2582097700E850CF /* SleepOperation.swift in Sources */,
 				10B541E225479D3100CC9023 /* MealViewController.swift in Sources */,
@@ -3280,12 +3322,14 @@
 				10B3E51528B3F56000E1713D /* TaskCell.swift in Sources */,
 				108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */,
 				10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */,
+				1092E26B28B7AE960018FCAA /* GPlotTaskOp.swift in Sources */,
 				1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */,
 				4BAEE5EC212735E50045AB10 /* SelectNewAdminTableViewController.swift in Sources */,
 				4BAEE550212735880045AB10 /* MediaObject.swift in Sources */,
 				260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */,
 				4BAEE5B7212735E50045AB10 /* INSPhotosTransitionAnimator.swift in Sources */,
 				4BAEE46D21272B380045AB10 /* SwitchObject.swift in Sources */,
+				1092E27528B7E5750018FCAA /* TaskAccountView.swift in Sources */,
 				103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */,
 				10C766E325321732003C8E1F /* FinanceTransactionRuleViewController.swift in Sources */,
 				F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */,
@@ -3350,11 +3394,12 @@
 				260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
-				10F5D00225CB7E670078C821 /* GPlotActivityOp.swift in Sources */,
+				10F5D00225CB7E670078C821 /* GPlotEventOp.swift in Sources */,
 				10DFC3F5255CC63000565DAD /* WorkoutFetcher.swift in Sources */,
 				10B541DE25479D0700CC9023 /* MealProductSearchViewController.swift in Sources */,
 				1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */,
 				102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */,
+				1092E26728B7AE420018FCAA /* GSyncListTasksOp.swift in Sources */,
 				100FE70A28931CFF00D3124C /* CalendarFetcher.swift in Sources */,
 				4B4F452F1F32230C00A6FF96 /* AppDelegate.swift in Sources */,
 				1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */,
@@ -3449,6 +3494,7 @@
 				10B3E4FF28AEAC4E00E1713D /* ListType.swift in Sources */,
 				10E0F616259A727000A1D86E /* ListService.swift in Sources */,
 				10ED76C426403CA7002838F5 /* TrackingService.swift in Sources */,
+				1092E27328B7E5600018FCAA /* TaskInfoViewController.swift in Sources */,
 				4BAEE5F0212735E50045AB10 /* RevealableView.swift in Sources */,
 				10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */,
 				4BAEE50021272D890045AB10 /* UserInfoTableViewController.swift in Sources */,
@@ -3556,6 +3602,7 @@
 				10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */,
 				F9DD16C52613D57A00B8374D /* MonthAxisValueFormatter.swift in Sources */,
 				10B3E50128B10F4500E1713D /* SubtaskListViewController.swift in Sources */,
+				1092E26928B7AE6C0018FCAA /* GListTaskOp.swift in Sources */,
 				105F34B12885EF7A007531EB /* RecurrencePicker.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
 				2603677E256DC86300FE9142 /* EKCalendarEventOp.swift in Sources */,
@@ -3646,6 +3693,7 @@
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,
 				10E0D7C125959D6200B0F83C /* ConversationService.swift in Sources */,
 				269105F6253E8E2E00A02C5F /* DayAxisValueFormatter.swift in Sources */,
+				1092E26528B7AE1A0018FCAA /* GFetchListTasksOp.swift in Sources */,
 				108C37FB28A14F6E00DC4998 /* Container.swift in Sources */,
 				10B645432578494D00C49A13 /* SectionHeader.swift in Sources */,
 				4BB46C6A2136E6F8005405BB /* ChatLogHistoryFetcher.swift in Sources */,

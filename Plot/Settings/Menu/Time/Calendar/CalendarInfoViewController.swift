@@ -11,9 +11,6 @@ import Firebase
 import CodableFirebase
 import GoogleSignIn
 
-let primaryCalendarKey = "primary-calendar"
-let primaryReminderKey = "primary-reminder"
-
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()
     
@@ -63,7 +60,7 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarsUpdated, object: nil)
     }
     
     @objc fileprivate func eventsUpdated() {
@@ -165,7 +162,6 @@ class CalendarInfoViewController: UITableViewController {
     }
         
     @objc func updatePrimaryCalendar(_ sender: TapGesture) {
-        let sections = Array(calendars.keys)
         let section = sender.item
         networkController.activityService.updatePrimaryCalendarFB(value: sections[section])
         tableView.reloadData()
@@ -175,7 +171,6 @@ class CalendarInfoViewController: UITableViewController {
 extension CalendarInfoViewController: GIDSignInDelegate {
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        print("signed in")
         if (error == nil) {
             self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
         } else {

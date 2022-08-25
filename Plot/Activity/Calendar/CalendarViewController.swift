@@ -249,49 +249,38 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func newItem() {
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
-                let calendar = Calendar.current
-                var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.selectedDate)
-                dateComponents.hour = calendar.component(.hour, from: Date())
-                dateComponents.minute = calendar.component(.minute, from: Date())
-                
-                let destination = EventViewController(networkController: self.networkController)
-                destination.startDateTime = calendar.date(from: dateComponents)
-                destination.endDateTime = calendar.date(from: dateComponents)
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
-                self.newCalendar()
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
-        } else {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
             let calendar = Calendar.current
-            var dateComponents = calendar.dateComponents([.day, .month, .year], from: selectedDate)
+            var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.selectedDate)
             dateComponents.hour = calendar.component(.hour, from: Date())
             dateComponents.minute = calendar.component(.minute, from: Date())
             
-            let destination = EventViewController(networkController: networkController)
+            let destination = EventViewController(networkController: self.networkController)
             destination.startDateTime = calendar.date(from: dateComponents)
             destination.endDateTime = calendar.date(from: dateComponents)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
-        }
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
+            let destination = CalendarDetailViewController(networkController: self.networkController)
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     @objc func newCalendar() {

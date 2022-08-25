@@ -222,7 +222,6 @@ class HealthDetailViewController: UIViewController {
             guard let weakSelf = self else { return }
             weakSelf.backgroundChartView.isHidden = false
             weakSelf.tableView.isHidden = false
-            
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMinimum = 0
             weakSelf.chartView.rightAxis.axisMaximum = maxValue
@@ -332,13 +331,8 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if case .workout = viewModel.healthMetric.type {
-            let sample = viewModel.samples[indexPath.row]
-            openSample(sample: sample, type: viewModel.healthMetric.type)
-        } else if case .mindfulness = viewModel.healthMetric.type {
-            let sample = viewModel.samples[indexPath.row]
-            openSample(sample: sample, type: viewModel.healthMetric.type)
-        }
+        let sample = viewModel.samples[indexPath.row]
+        openSample(sample: sample, type: viewModel.healthMetric.type)
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

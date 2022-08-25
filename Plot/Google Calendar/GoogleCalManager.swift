@@ -10,35 +10,48 @@ import Foundation
 
 class GoogleCalManager {
     private let googleCalService: GoogleCalService
-    private var isRunning: Bool
-    private var activities: [Activity]
+    private var isRunningEvents: Bool
+    private var isRunningTasks: Bool
+    private var events: [Activity]
+    private var tasks: [Activity]
     private var queue: OperationQueue
     
-    var isAuthorized: Bool
+    var isAuthorizedEvents: Bool
+    var isAuthorizedTasks: Bool
         
     init(googleCalService: GoogleCalService) {
         self.googleCalService = googleCalService
-        self.isRunning = false
-        self.isAuthorized = false
-        self.activities = []
+        self.isRunningEvents = false
+        self.isRunningTasks = false
+        self.isAuthorizedEvents = false
+        self.isAuthorizedTasks = false
+        self.events = []
+        self.tasks = []
         self.queue = OperationQueue()
     }
     
-    func setupGoogle(_ completion: @escaping (Bool) -> Void) {
-        googleCalService.setupGoogle { [weak self] bool in
-            self?.isAuthorized = bool
+    func authorizeGEvents(_ completion: @escaping (Bool) -> Void) {
+        googleCalService.authorizeGEvents { [weak self] bool in
+            self?.isAuthorizedEvents = bool
+            completion(true)
+        }
+    }
+    
+    func authorizeGReminders(_ completion: @escaping (Bool) -> Void) {
+        googleCalService.authorizeGReminders { [weak self] bool  in
+            self?.isAuthorizedTasks = bool
             completion(true)
         }
     }
     
     func syncGoogleCalActivities(existingActivities: [Activity], completion: @escaping () -> Void) {
-        guard !isRunning, isAuthorized else {
+        guard !isRunningEvents, isAuthorizedEvents else {
             completion()
             return
         }
         
-        activities = []
-        isRunning = true
+        events = []
+        isRunningEvents = true
         
         let eventsOp = GFetchCalendarEventsOp(googleCalService: googleCalService)
         let syncEventsOp = GSyncCalendarEventsOp(existingActivities: existingActivities)
@@ -58,18 +71,18 @@ class GoogleCalManager {
                 return
             }
             
-            weakSelf.isRunning = false
+            weakSelf.isRunningEvents = false
             completion()
         }
     }
     
     func syncActivitiesToGoogleCal(activities: [Activity], completion: @escaping () -> Void)  {
-        guard !isRunning, isAuthorized else {
+        guard !isRunningEvents, isAuthorizedEvents else {
             completion()
             return
         }
                 
-        isRunning = true
+        isRunningEvents = true
         
         let calendar = Calendar.current
 
@@ -84,11 +97,11 @@ class GoogleCalManager {
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
-        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) }
+        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) && ($0.isTask == nil) }
                 
-        let activitiesOp = GPlotActivityOp(googleCalService: googleCalService, activities: filterActivities)
+        let eventsOp = GPlotEventOp(googleCalService: googleCalService, activities: filterActivities)
         // Setup queue
-        queue.addOperations([activitiesOp], waitUntilFinished: false)
+        queue.addOperations([eventsOp], waitUntilFinished: false)
         
         // Once everything is fetched call the completion block
         queue.addBarrierBlock { [weak self] in
@@ -97,13 +110,13 @@ class GoogleCalManager {
                 return
             }
             
-            weakSelf.isRunning = false
+            weakSelf.isRunningEvents = false
             completion()
         }
     }
     
     func grabCalendars(completion: @escaping ([CalendarType]?) -> Swift.Void) {
-        guard isAuthorized else {
+        guard isAuthorizedEvents else {
             completion(nil)
             return
         }
@@ -112,84 +125,72 @@ class GoogleCalManager {
         }
     }
     
-//    func syncGoogleCalTasks(existingActivities: [Activity], completion: @escaping () -> Void) {
-//        guard !isRunning, isAuthorized else {
-//            completion()
-//            return
-//        }
-//
-//        activities = []
-//        isRunning = true
-//
-//        let eventsOp = GFetchCalendarEventsOp(googleCalService: googleCalService)
-//        let syncEventsOp = GSyncCalendarEventsOp(existingActivities: existingActivities)
-//        let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
-//            syncEventsOp.calendarEventsDict = eventsOp.calendarEventsDict
-//        }
-//        eventsOpAdapter.addDependency(eventsOp)
-//        syncEventsOp.addDependency(eventsOpAdapter)
-//
-//        // Setup queue
-//        queue.addOperations([eventsOp, eventsOpAdapter, syncEventsOp], waitUntilFinished: false)
-//
-//        // Once everything is fetched call the completion block
-//        queue.addBarrierBlock { [weak self] in
-//            guard let weakSelf = self else {
-//                completion()
-//                return
-//            }
-//
-//            weakSelf.isRunning = false
-//            completion()
-//        }
-//    }
-//
-//    func syncTasksToGoogleTasks(activities: [Activity], completion: @escaping () -> Void)  {
-//        guard !isRunning, isAuthorized else {
-//            completion()
-//            return
-//        }
-//
-//        isRunning = true
-//
-//        let calendar = Calendar.current
-//
-//        // Create the start date components
-//        var timeAgoComponents = DateComponents()
-//        timeAgoComponents.day = -7
-//        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
-//
-//        // Create the end date components.
-//        var timeFromNowComponents = DateComponents()
-//        timeFromNowComponents.month = 3
-//        let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
-//
-//        //filter old activities out
-//        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) }
-//
-//        let activitiesOp = GPlotActivityOp(googleCalService: googleCalService, activities: filterActivities)
-//        // Setup queue
-//        queue.addOperations([activitiesOp], waitUntilFinished: false)
-//
-//        // Once everything is fetched call the completion block
-//        queue.addBarrierBlock { [weak self] in
-//            guard let weakSelf = self else {
-//                completion()
-//                return
-//            }
-//
-//            weakSelf.isRunning = false
-//            completion()
-//        }
-//    }
-//
-//    func grabLists(completion: @escaping ([CalendarType]?) -> Swift.Void) {
-//        guard isAuthorized else {
-//            completion(nil)
-//            return
-//        }
-//        googleCalService.grabCalendars { (calendars) in
-//            completion(calendars)
-//        }
-//    }
+    func syncGoogleCalTasks(existingActivities: [Activity], completion: @escaping () -> Void) {
+        guard !isRunningTasks, isAuthorizedTasks else {
+            completion()
+            return
+        }
+
+        tasks = []
+        isRunningTasks = true
+
+        let tasksOp = GFetchListTasksOp(googleCalService: googleCalService)
+        let syncTasksOp = GSyncListTasksOp(existingActivities: existingActivities)
+        let tasksOpAdapter = BlockOperation() { [unowned tasksOp, unowned syncTasksOp] in
+            syncTasksOp.listTasksDict = tasksOp.listTasksDict
+        }
+        tasksOpAdapter.addDependency(tasksOp)
+        syncTasksOp.addDependency(tasksOpAdapter)
+
+        // Setup queue
+        queue.addOperations([tasksOp, tasksOpAdapter, syncTasksOp], waitUntilFinished: false)
+
+        // Once everything is fetched call the completion block
+        queue.addBarrierBlock { [weak self] in
+            guard let weakSelf = self else {
+                completion()
+                return
+            }
+
+            weakSelf.isRunningTasks = false
+            completion()
+        }
+    }
+
+    func syncTasksToGoogleTasks(activities: [Activity], completion: @escaping () -> Void)  {
+        guard !isRunningTasks, isAuthorizedTasks else {
+            completion()
+            return
+        }
+
+        isRunningTasks = true
+
+        //filter old activities out
+        let filterActivities = activities.filter { !($0.calendarExport ?? false) && $0.isTask ?? false }
+
+        let activitiesOp = GPlotTaskOp(googleCalService: googleCalService, activities: filterActivities)
+        // Setup queue
+        queue.addOperations([activitiesOp], waitUntilFinished: false)
+
+        // Once everything is fetched call the completion block
+        queue.addBarrierBlock { [weak self] in
+            guard let weakSelf = self else {
+                completion()
+                return
+            }
+
+            weakSelf.isRunningTasks = false
+            completion()
+        }
+    }
+
+    func grabLists(completion: @escaping ([ListType]?) -> Swift.Void) {
+        guard isAuthorizedTasks else {
+            completion(nil)
+            return
+        }
+        googleCalService.grabLists { (lists) in
+            completion(lists)
+        }
+    }
 }

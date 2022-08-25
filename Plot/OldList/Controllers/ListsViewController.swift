@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import GoogleSignIn
 
 protocol ListDataStore: AnyObject {
     func getParticipants(forList list: ListType, completion: @escaping ([User])->())
@@ -80,6 +81,7 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
 
     }
     
@@ -94,6 +96,10 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     }
     
     @objc fileprivate func tasksUpdated() {
+        sortandreload()
+    }
+    
+    @objc fileprivate func listsUpdated() {
         sortandreload()
     }
     
@@ -163,7 +169,7 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         lists = [:]
         taskList = [:]
         
-        sections = [.tasks]
+        sections = [.lists]
         let dailyList = ListType(id: "", name: "Today", color: "", source: "")
         let dailyTasks = tasks.filter {
             if let endDate = $0.endDate {
@@ -196,14 +202,14 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         taskList[allList] = allTasks
         
         let listOfLists = [dailyList, scheduledList, flaggedList, allList]
-        lists[.tasks, default: []].append(contentsOf: listOfLists)
+        lists[.lists, default: []].append(contentsOf: listOfLists)
         
         for (_, currentLists) in networkController.activityService.lists {
             for list in currentLists {
                 let currentTaskList = tasks.filter { $0.listID == list.id }
                 if !currentTaskList.isEmpty {
-                    sections.insert(.lists, at: 1)
-                    lists[.lists, default: []].append(list)
+                    sections.insert(.myLists, at: 1)
+                    lists[.myLists, default: []].append(list)
                     taskList[list, default: []].append(contentsOf: currentTaskList)
                 }
             }
@@ -220,44 +226,31 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     }
     
     @objc fileprivate func newItem() {
-        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-                let destination = TaskViewController(networkController: self.networkController)
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
-                self.newList()
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
-        } else {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
             let destination = TaskViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
-        }
-    }
-    
-    @objc func newList() {
-        let destination = ListDetailViewController(networkController: networkController)
-        destination.delegate = self
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-        destination.navigationItem.leftBarButtonItem = cancelBarButton
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
+            let destination = ListDetailViewController(networkController: self.networkController)
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     @objc fileprivate func filter() {
@@ -289,7 +282,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier:
                                                                 headerCellID) as? TableViewHeader ?? TableViewHeader()
         let section = sections[section]
-        if section == .lists {
+        if section == .myLists {
             header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             header.titleLabel.text = section.name
             header.subTitleLabel.isHidden = true
@@ -300,7 +293,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if sections[section] == .lists {
+        if sections[section] == .myLists {
             return 40
         }
         return 0
@@ -454,7 +447,7 @@ extension ListsViewController: UpdateFilter {
     }
     
     func updateTableViewWFilters() {
-        sections = [.tasks]
+        sections = [.lists]
         filteredLists = [:]
         let dispatchGroup = DispatchGroup()
         if let value = filterDictionary["search"] {
@@ -489,9 +482,14 @@ extension ListsViewController: UpdateFilter {
     }
 }
 
-extension ListsViewController: ListDetailDelegate {
-    func update() {
-        
+extension ListsViewController: GIDSignInDelegate {
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if (error == nil) {
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+            self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
+        } else {
+          print("\(error.localizedDescription)")
+        }
     }
 }
 

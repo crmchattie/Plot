@@ -519,9 +519,34 @@ extension MasterActivityContainerController: HeaderContainerCellDelegate {
 }
 
 extension MasterActivityContainerController: GIDSignInDelegate {
-    func newTask() {
-        
+    func newListItem() {
+        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
+                let destination = EventViewController(networkController: self.networkController)
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
+                self.newList()
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+        } else {
+            let destination = TaskViewController(networkController: networkController)
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
     }
+    
     func newCalendarItem() {
         if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -548,6 +573,32 @@ extension MasterActivityContainerController: GIDSignInDelegate {
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
+    }
+    
+    func newList() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: ListOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryList(value: ListOptions.apple.name)
+            }))
+        }
+        
+        if !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
+            alert.addAction(UIAlertAction(title: ListOptions.google.name, style: .default, handler: { (_) in
+                GIDSignIn.sharedInstance().delegate = self
+                GIDSignIn.sharedInstance()?.presentingViewController = self
+                GIDSignIn.sharedInstance()?.signIn()
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func newCalendar() {

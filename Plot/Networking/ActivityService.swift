@@ -27,29 +27,10 @@ class ActivityService {
     var askedforCalendarAuthorization: Bool = false
     var askedforReminderAuthorization: Bool = false
     
-    var calendars = [String: [CalendarType]]() {
-        didSet {
-            if oldValue != calendars {
-                NotificationCenter.default.post(name: .calendarsUpdated, object: nil)
-            }
-        }
-    }
-    
-    var lists = [String: [ListType]]()
-    {
-        didSet {
-            if oldValue != lists {
-                NotificationCenter.default.post(name: .listsUpdated, object: nil)
-            }
-        }
-    }
-    
-    var primaryCalendar = String()
-    
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
-                events = activities.filter { $0.startDate != nil }
+                events = activities.filter { $0.isTask == nil }
                 tasks = activities.filter { $0.isTask ?? false }
             }
         }
@@ -73,6 +54,8 @@ class ActivityService {
             }
         }
     }
+    //for Apple/Google Calendar functions
+    var eventsNoRepeats = [Activity]()
     
     var tasks = [Activity]() {
         didSet {
@@ -87,9 +70,9 @@ class ActivityService {
             }
         }
     }
+    //for Apple/Google Task functions
+    var tasksNoRepeats = [Activity]()
     
-    //for Apple/Google Calendar functions
-    var activitiesNoRepeats = [Activity]()
     var invitations: [String: Invitation] = [:] {
         didSet {
             if oldValue != invitations {
@@ -99,7 +82,27 @@ class ActivityService {
     }
     var invitedActivities = [Activity]()
     
+    var calendars = [String: [CalendarType]]() {
+        didSet {
+            if oldValue != calendars {
+                NotificationCenter.default.post(name: .calendarsUpdated, object: nil)
+            }
+        }
+    }
+    
+    var lists = [String: [ListType]]() {
+        didSet {
+            if oldValue != lists {
+                NotificationCenter.default.post(name: .listsUpdated, object: nil)
+            }
+        }
+    }
+    
+    var primaryCalendar = String()
+    var primaryList = String()
+    
     var hasLoadedCalendarEventActivities = false
+    var hasLoadedListTaskActivities = false
     
     var eventKitManager: EventKitManager = {
         let eventKitService = EventKitService()
@@ -133,15 +136,23 @@ class ActivityService {
             self?.observeInvitationForCurrentUser()
             self?.addRepeatingActivities(activities: self?.activities ?? [], completion: { newActivities in
                 self?.activities = newActivities
-                self?.grabPlotLists()
                 self?.grabPrimaryCalendar({ (calendar) in
                     self?.grabPlotCalendars()
                     if calendar == CalendarOptions.apple.name {
-                        self?.grabEventKit {}
+                        self?.grabEKEvents {}
                     } else if calendar == CalendarOptions.google.name {
-                        self?.grabGoogle {}
+                        self?.grabGEvents {}
                     }
                     self?.grabCalendars()
+                })
+                self?.grabPrimaryList({ (list) in
+                    self?.grabPlotLists()
+                    if list == ListOptions.apple.name {
+                        self?.grabEKReminders {}
+                    } else if list == ListOptions.google.name {
+                        self?.grabGTasks {}
+                    }
+                    self?.grabLists()
                 })
             })
         }
@@ -151,7 +162,8 @@ class ActivityService {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
             if self?.activities.isEmpty ?? true {
                 self?.activities = activitiesInitialAdd
-                self?.activitiesNoRepeats = activitiesInitialAdd
+                self?.eventsNoRepeats = activitiesInitialAdd.filter { $0.isTask == nil }
+                self?.tasksNoRepeats = activitiesInitialAdd.filter { $0.isTask != nil }
                 completion()
             } else {
                 for activity in activitiesInitialAdd {
@@ -174,7 +186,6 @@ class ActivityService {
                 }
             }
         }, activitiesAdded: { [weak self] activitiesAdded in
-            print("activitiesAdded")
             for activity in activitiesAdded {
                 if activity.recurrences != nil {
                     if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
@@ -194,13 +205,11 @@ class ActivityService {
                 }
             }
         }, activitiesRemoved: { [weak self] activitiesRemoved in
-            print("activitiesRemoved")
             for activity in activitiesRemoved {
                 //just filter out activities that match activityID; will capture both recurring and non-recurring
                 self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
             }
         }, activitiesChanged: { [weak self] activitiesChanged in
-            print("activitiesChanged")
             for activity in activitiesChanged {
                 if activity.recurrences != nil {
                     if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
@@ -222,29 +231,58 @@ class ActivityService {
         })
     }
     
-    func grabEventKit(_ completion: @escaping () -> Void) {
+    func grabEKEvents(_ completion: @escaping () -> Void) {
         guard Auth.auth().currentUser != nil else {
             return completion()
         }
         self.eventKitManager.checkEventAuthorizationStatus {}
-        self.eventKitManager.authorizeEventKit({ askedforCalendarAuthorization in
-            self.askedforCalendarAuthorization = askedforCalendarAuthorization
-            self.eventKitManager.syncEventKitActivities(existingActivities: self.activitiesNoRepeats, completion: {
-                self.eventKitManager.syncActivitiesToEventKit(activities: self.activitiesNoRepeats, completion: {
+        self.eventKitManager.authorizeEventKitEvents({ askedforAuthorization in
+            self.askedforCalendarAuthorization = askedforAuthorization
+            self.eventKitManager.syncEventKitActivities(existingActivities: self.eventsNoRepeats, completion: {
+                self.eventKitManager.syncActivitiesToEventKit(activities: self.eventsNoRepeats, completion: {
                     completion()
                 })
             })
         })
     }
     
-    func grabGoogle(_ completion: @escaping () -> Void) {
+    func grabEKReminders(_ completion: @escaping () -> Void) {
         guard Auth.auth().currentUser != nil else {
             return completion()
         }
-        self.googleCalManager.setupGoogle { askedforCalendarAuthorization in
+        self.eventKitManager.checkEventAuthorizationStatus {}
+        self.eventKitManager.authorizeEventKitReminders({ askedforAuthorization in
+            self.askedforReminderAuthorization = askedforAuthorization
+            self.eventKitManager.syncEventKitReminders(existingActivities: self.tasksNoRepeats, completion: {
+                self.eventKitManager.syncTasksToEventKit(activities: self.tasksNoRepeats, completion: {
+                    completion()
+                })
+            })
+        })
+    }
+    
+    func grabGEvents(_ completion: @escaping () -> Void) {
+        guard Auth.auth().currentUser != nil else {
+            return completion()
+        }
+        self.googleCalManager.authorizeGEvents { askedforCalendarAuthorization in
             self.askedforCalendarAuthorization = askedforCalendarAuthorization
-            self.googleCalManager.syncGoogleCalActivities(existingActivities: self.activitiesNoRepeats, completion: {
-                self.googleCalManager.syncActivitiesToGoogleCal(activities: self.activitiesNoRepeats, completion: {
+            self.googleCalManager.syncGoogleCalActivities(existingActivities: self.eventsNoRepeats, completion: {
+                self.googleCalManager.syncActivitiesToGoogleCal(activities: self.eventsNoRepeats, completion: {
+                    completion()
+                })
+            })
+        }
+    }
+    
+    func grabGTasks(_ completion: @escaping () -> Void) {
+        guard Auth.auth().currentUser != nil else {
+            return completion()
+        }
+        self.googleCalManager.authorizeGReminders { askedforCalendarAuthorization in
+            self.askedforReminderAuthorization = askedforCalendarAuthorization
+            self.googleCalManager.syncGoogleCalTasks(existingActivities: self.tasksNoRepeats, completion: {
+                self.googleCalManager.syncTasksToGoogleTasks(activities: self.tasksNoRepeats, completion: {
                     completion()
                 })
             })
@@ -253,12 +291,12 @@ class ActivityService {
     
     func grabCalendars() {
         if let _ = Auth.auth().currentUser {
-            self.eventKitManager.authorizeEventKit({ _ in
+            self.eventKitManager.authorizeEventKitEvents { _ in
                 if let calendars = self.eventKitManager.grabCalendars() {
                     self.calendars[CalendarOptions.apple.name] = calendars
                 }
-            })
-            self.googleCalManager.setupGoogle { _ in
+            }
+            self.googleCalManager.authorizeGEvents { _ in
                 self.googleCalManager.grabCalendars() { calendars in
                     if let calendars = calendars {
                         self.calendars[CalendarOptions.google.name] = calendars
@@ -314,6 +352,72 @@ class ActivityService {
         })
     }
     
+    func grabPrimaryCalendar(_ completion: @escaping (String) -> Void) {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let value = snapshot.value as? String {
+                    self.primaryCalendar = value
+                    completion(value)
+                } else {
+                    completion("none")
+                }
+            })
+        }
+    }
+    
+    func updatePrimaryCalendar(value: String) {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if !snapshot.exists() {
+                    self.updatePrimaryCalendarFB(value: value)
+                } else {
+                    self.runCalendarFunctions(value: value)
+                }
+            })
+        }
+    }
+    
+    func runCalendarFunctions(value: String) {
+        if !askedforCalendarAuthorization {
+            grabActivities {}
+        } else {
+            if value == primaryCalendar && value == CalendarOptions.apple.name {
+                grabEKEvents {}
+            } else if value == primaryCalendar && value == CalendarOptions.google.name {
+                grabGEvents {}
+            }
+            grabCalendars()
+        }
+    }
+    
+    func updatePrimaryCalendarFB(value: String) {
+        if let currentUserId = Auth.auth().currentUser?.uid {
+            self.primaryCalendar = value
+            self.runCalendarFunctions(value: value)
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            reference.setValue(value)
+        }
+    }
+    
+    func grabLists() {
+        if let _ = Auth.auth().currentUser {
+            self.eventKitManager.authorizeEventKitReminders { _ in
+                if let lists = self.eventKitManager.grabLists() {
+                    self.lists[ListOptions.apple.name] = lists
+                }
+            }
+            self.googleCalManager.authorizeGReminders { _ in
+                self.googleCalManager.grabLists() { lists in
+                    if let lists = lists {
+                        self.lists[ListOptions.google.name] = lists
+                    }
+                }
+            }
+        }
+    }
+    
     func grabPlotLists() {
         self.listFetcher.observeListForCurrentUser(listInitialAdd: { [weak self] listInitialAdd in
             if self?.lists[ListOptions.plot.name] != nil {
@@ -360,12 +464,12 @@ class ActivityService {
         })
     }
     
-    func grabPrimaryCalendar(_ completion: @escaping (String) -> Void) {
+    func grabPrimaryList(_ completion: @escaping (String) -> Void) {
         if let currentUserId = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
-                    self.primaryCalendar = value
+                    self.primaryList = value
                     completion(value)
                 } else {
                     completion("none")
@@ -374,37 +478,37 @@ class ActivityService {
         }
     }
     
-    func updatePrimaryCalendar(value: String) {
+    func updatePrimaryList(value: String) {
         if let currentUserId = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if !snapshot.exists() {
-                    self.updatePrimaryCalendarFB(value: value)
+                    self.updatePrimaryListFB(value: value)
                 } else {
-                    self.runCalendarFunctions(value: value)
+                    self.runListFunctions(value: value)
                 }
             })
         }
     }
     
-    func runCalendarFunctions(value: String) {
-        if !askedforCalendarAuthorization {
+    func runListFunctions(value: String) {
+        if !askedforReminderAuthorization {
             grabActivities {}
         } else {
-            if value == primaryCalendar && value == CalendarOptions.apple.name {
-                grabEventKit {}
-            } else if value == primaryCalendar && value == CalendarOptions.google.name {
-                grabGoogle {}
+            if value == primaryList && value == ListOptions.apple.name {
+                grabEKReminders {}
+            } else if value == primaryList && value == ListOptions.google.name {
+                grabGTasks {}
             }
-            grabCalendars()
+            grabLists()
         }
     }
     
-    func updatePrimaryCalendarFB(value: String) {
+    func updatePrimaryListFB(value: String) {
         if let currentUserId = Auth.auth().currentUser?.uid {
-            self.primaryCalendar = value
-            self.runCalendarFunctions(value: value)
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            self.primaryList = value
+            self.runListFunctions(value: value)
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.setValue(value)
         }
     }

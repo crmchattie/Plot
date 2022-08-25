@@ -59,13 +59,12 @@ class ActivityActions: NSObject {
                     if value == ListOptions.apple.name {
                         self.eventKitService.deleteReminder(for: activity)
                     } else if value == ListOptions.google.name {
-
+                        self.googleCalService.deleteTask(for: activity)
                     }
                 }
             })
         } else {
             let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
-            
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == CalendarOptions.apple.name {
@@ -162,13 +161,12 @@ class ActivityActions: NSObject {
                     if value == ListOptions.apple.name {
                         self.eventKitService.updateReminder(for: activity)
                     } else if value == ListOptions.google.name {
-                        
+                        self.googleCalService.updateTask(for: activity)
                     }
                 }
             })
         } else {
             let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
-            
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == CalendarOptions.apple.name {
@@ -203,20 +201,23 @@ class ActivityActions: NSObject {
         }
         
         if activity.isTask ?? false {
-            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+            var reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
-                    if value == ListOptions.apple.name {
-                        if let reminder = self.eventKitService.storeReminder(for: activity) {
-                            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
-                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                            reference.updateChildValues(calendarEventActivityValue)
-                            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            let values:[String : Any] = ["calendarExport": true, "externalActivityID": reminder.calendarItemIdentifier as Any]
-                            userReference.updateChildValues(values)
-                        }
-                    } else if value == ListOptions.google.name {
-                        
+                    if value == ListOptions.apple.name, let reminder = self.eventKitService.storeReminder(for: activity) {
+                        reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
+                        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                        reference.updateChildValues(calendarEventActivityValue)
+                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": reminder.calendarItemIdentifier as Any]
+                        userReference.updateChildValues(values)
+                    } else if value == ListOptions.google.name, let task = self.googleCalService.storeTask(for: activity), let id = task.identifier {
+                        reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
+                        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                        reference.updateChildValues(calendarEventActivityValue)
+                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": task.identifier as Any]
+                        userReference.updateChildValues(values)
                     }
                 }
             })

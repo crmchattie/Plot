@@ -248,6 +248,7 @@ extension WorkoutViewController: UpdateTaskDelegate {
                     "task_type": task.activityType ?? "basic" as NSObject
                 ])
                 taskList.append(task)
+                updateLists()
             }
         }
     }
@@ -274,6 +275,7 @@ extension WorkoutViewController: ChooseTaskDelegate {
             ])
             
             taskList.append(mergeTask)
+            updateLists()
         }
     }
 }
@@ -304,6 +306,7 @@ extension WorkoutViewController: UpdateActivityDelegate {
             }
             
             sortSchedule()
+            updateLists()
         }
     }
 }
@@ -361,6 +364,7 @@ extension WorkoutViewController: ChooseActivityDelegate {
             
             eventList.append(mergeActivity)
             sortSchedule()
+            updateLists()
         }
     }
 }
@@ -387,6 +391,7 @@ extension WorkoutViewController: UpdateTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
+            updateLists()
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)
@@ -417,6 +422,7 @@ extension WorkoutViewController: ChooseTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
+            updateLists()
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)

@@ -10,7 +10,6 @@ import UIKit
 import MapKit
 import Firebase
 import CodableFirebase
-import SwiftUI
 
 class ActivityTypeViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CLLocationManagerDelegate {
     

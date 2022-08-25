@@ -127,6 +127,10 @@ class HealthDetailSampleCell: UITableViewCell {
             let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
             subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
         }
+        else if case .workoutMinutes = healthMetric.type, let workout = sample as? HKWorkout {
+            let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
+            subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
+        }
         else if case .heartRate = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
             let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit))

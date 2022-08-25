@@ -781,24 +781,6 @@ class TaskViewController: FormViewController {
             cell.textLabel?.textAlignment = .left
         }
         
-        <<< LabelRow("Tags") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-        }.onCellSelection({ _, row in
-            self.openTags()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.textLabel?.textAlignment = .left
-        }
-        
         //        if let _ = task.activityType {
         //            form.last!
         //            <<< LabelRow("Subcategory") { row in
@@ -858,18 +840,13 @@ class TaskViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
-            if self.task.subtaskIDs != nil {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }
         }.onCellSelection({ _,_ in
             self.openSubtasks()
         }).cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
-            if let _ = self.task.subtaskIDs {
+            if let subtaskIDs = self.task.subtaskIDs, !subtaskIDs.isEmpty {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             } else {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -903,7 +880,6 @@ class TaskViewController: FormViewController {
         <<< ButtonRow("Media") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textAlignment = .left
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
@@ -917,6 +893,27 @@ class TaskViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }
+        }
+        
+        <<< LabelRow("Tags") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.textLabel?.textAlignment = .left
+            row.hidden = "$showExtras == false"
+            row.title = row.tag
+        }.onCellSelection({ _, row in
+            self.openTags()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel?.textAlignment = .left
+            if let tags = self.task.tags, !tags.isEmpty {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            } else {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
         }
         

@@ -8,12 +8,12 @@
 
 import Foundation
 
-class GSyncCalendarEventsOp: AsyncOperation {
+class GSyncListTasksOp: AsyncOperation {
     
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
-    var calendarEventsDict: [GTLRCalendar_CalendarListEntry: [GTLRCalendar_Event]] = [:]
-    var existingEvents: [GTLRCalendar_Event] = []
+    var listTasksDict: [GTLRTasks_TaskList: [GTLRTasks_Task]] = [:]
+    var existingTasks: [GTLRTasks_Task] = []
     var existingActivities: [Activity] = []
     
     init(existingActivities: [Activity]) {
@@ -26,9 +26,9 @@ class GSyncCalendarEventsOp: AsyncOperation {
     }
     
     private func startRequest() {
-        for (calendar, events) in calendarEventsDict {
-            for event in events {
-                let op = GCalendarEventOp(calendar: calendar, event: event)
+        for (list, tasks) in listTasksDict {
+            for task in tasks {
+                let op = GListTaskOp(list: list, task: task)
                 queue.addOperation(op)
             }
         }

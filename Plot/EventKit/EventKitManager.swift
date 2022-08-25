@@ -13,23 +13,36 @@ import UIKit
 
 class EventKitManager {
     private let eventKitService: EventKitService
-    private var isRunning: Bool
-    private var activities: [Activity]
+    private var isRunningEvents: Bool
+    private var isRunningTasks: Bool
+    private var events: [Activity]
+    private var tasks: [Activity]
     private var queue: OperationQueue
     
-    var isAuthorized: Bool
+    var isAuthorizedEvents: Bool
+    var isAuthorizedReminders: Bool
     
     init(eventKitService: EventKitService) {
         self.eventKitService = eventKitService
-        self.isRunning = false
-        self.isAuthorized = false
-        self.activities = []
+        self.isRunningEvents = false
+        self.isRunningTasks = false
+        self.isAuthorizedEvents = false
+        self.isAuthorizedReminders = false
+        self.events = []
+        self.tasks = []
         self.queue = OperationQueue()
     }
     
-    func authorizeEventKit(_ completion: @escaping (Bool) -> Void) {
-        eventKitService.authorizeEventKit { [weak self] (granted, _) in
-            self?.isAuthorized = granted
+    func authorizeEventKitEvents(_ completion: @escaping (Bool) -> Void) {
+        eventKitService.authorizeEventKitEvents { [weak self] (granted, _) in
+            self?.isAuthorizedEvents = granted
+            completion(true)
+        }
+    }
+    
+    func authorizeEventKitReminders(_ completion: @escaping (Bool) -> Void) {
+        eventKitService.authorizeEventKitReminders { [weak self] (granted, _) in
+            self?.isAuthorizedReminders = granted
             completion(true)
         }
     }
@@ -39,13 +52,13 @@ class EventKitManager {
     }
     
     func syncEventKitActivities(existingActivities: [Activity], completion: @escaping () -> Void) {
-        guard !isRunning, isAuthorized else {
+        guard !isRunningEvents, isAuthorizedEvents else {
             completion()
             return
         }
                         
-        activities = []
-        isRunning = true
+        events = []
+        isRunningEvents = true
         
         let eventsOp = EKFetchCalendarEventsOp(eventKitService: eventKitService)
         let syncEventsOp = EKSyncCalendarEventsOp(existingActivities: existingActivities)
@@ -64,18 +77,18 @@ class EventKitManager {
                 completion()
                 return
             }
-            weakSelf.isRunning = false
+            weakSelf.isRunningEvents = false
             completion()
         }
     }
     
     func syncActivitiesToEventKit(activities: [Activity], completion: @escaping () -> Void)  {
-        guard !isRunning, isAuthorized else {
+        guard !isRunningEvents, isAuthorizedEvents else {
             completion()
             return
         }
         
-        isRunning = true
+        isRunningEvents = true
         
         let calendar = Calendar.current
 
@@ -102,14 +115,13 @@ class EventKitManager {
                 completion()
                 return
             }
-            print("syncActivitiesToEventKit completion")
-            weakSelf.isRunning = false
+            weakSelf.isRunningEvents = false
             completion()
         }
     }
     
     func grabCalendars() -> [CalendarType]? {
-        guard isAuthorized else {
+        guard isAuthorizedEvents else {
             return nil
         }
         let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.title != "Plot" }
@@ -126,13 +138,13 @@ class EventKitManager {
     }
     
     func syncEventKitReminders(existingActivities: [Activity], completion: @escaping () -> Void) {
-        guard !isRunning, isAuthorized else {
+        guard !isRunningTasks, isAuthorizedReminders else {
             completion()
             return
         }
                         
-        activities = []
-        isRunning = true
+        tasks = []
+        isRunningTasks = true
         
         let remindersOp = EKFetchReminderTasksOp(eventKitService: eventKitService)
         let syncRemindersOp = EKSyncReminderTasksOp(existingActivities: existingActivities)
@@ -151,35 +163,23 @@ class EventKitManager {
                 completion()
                 return
             }
-            weakSelf.isRunning = false
+            weakSelf.isRunningTasks = false
             completion()
         }
     }
     
     func syncTasksToEventKit(activities: [Activity], completion: @escaping () -> Void)  {
-        guard !isRunning, isAuthorized else {
+        guard !isRunningTasks, isAuthorizedReminders else {
             completion()
             return
         }
         
-        isRunning = true
+        isRunningTasks = true
         
-        let calendar = Calendar.current
-
-        // Create the start date components
-        var timeAgoComponents = DateComponents()
-        timeAgoComponents.day = -7
-        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
-
-        // Create the end date components.
-        var timeFromNowComponents = DateComponents()
-        timeFromNowComponents.month = 3
-        let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
-
         //filter old activities out
-        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) && $0.isTask ?? false }
+        let filterActivities = activities.filter { !($0.calendarExport ?? false) && $0.isTask ?? false }
                 
-        let activitiesOp = EKPlotTaskOp(eventKitService: eventKitService, tasks: filterActivities)
+        let activitiesOp = EKPlotTaskOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
         queue.addOperations([activitiesOp], waitUntilFinished: false)
         
@@ -190,13 +190,13 @@ class EventKitManager {
                 return
             }
             print("syncActivitiesToEventKit completion")
-            weakSelf.isRunning = false
+            weakSelf.isRunningTasks = false
             completion()
         }
     }
     
     func grabLists() -> [ListType]? {
-        guard isAuthorized else {
+        guard isAuthorizedReminders else {
             return nil
         }
         let calendars = eventKitService.eventStore.calendars(for: .reminder).filter { $0.title != "Plot" }

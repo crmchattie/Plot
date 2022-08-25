@@ -113,9 +113,9 @@ class EKReminderTaskOp: AsyncOperation {
         if let endDate = reminder.dueDateComponents?.date {
             activity.endDateTime = NSNumber(value: endDate.timeIntervalSince1970)
             if reminder.dueDateComponents?.hour != nil {
-                activity.hasStartTime = true
+                activity.hasDeadlineTime = true
             } else {
-                activity.hasStartTime = false
+                activity.hasDeadlineTime = false
             }
         }
         activity.isCompleted = reminder.isCompleted

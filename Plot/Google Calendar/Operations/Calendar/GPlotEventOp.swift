@@ -10,7 +10,7 @@ import Foundation
 import Firebase
 import CodableFirebase
 
-class GPlotActivityOp: AsyncOperation {
+class GPlotEventOp: AsyncOperation {
     private let googleCalService: GoogleCalService
     private var activities: [Activity]
     

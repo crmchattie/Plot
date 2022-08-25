@@ -97,7 +97,7 @@ extension TaskViewController: UpdateSubtaskListDelegate {
         }
         self.subtaskList = subtaskList
         sortSubtasks()
-        self.updateLists(type: "subtask")
+        updateLists(type: "subtask")
     }
 }
 
@@ -127,6 +127,7 @@ extension TaskViewController: UpdateActivityDelegate {
             }
             
             sortSchedule()
+            updateLists(type: "container")
         }
     }
 }
@@ -184,6 +185,7 @@ extension TaskViewController: ChooseActivityDelegate {
             
             eventList.append(mergeActivity)
             sortSchedule()
+            updateLists(type: "container")
         }
     }
 }

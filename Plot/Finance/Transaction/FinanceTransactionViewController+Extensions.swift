@@ -247,6 +247,8 @@ extension FinanceTransactionViewController: UpdateTaskDelegate {
                     "task_type": task.activityType ?? "basic" as NSObject
                 ])
                 taskList.append(task)
+                updateLists()
+
             }
         }
     }
@@ -273,6 +275,8 @@ extension FinanceTransactionViewController: ChooseTaskDelegate {
             ])
             
             taskList.append(mergeTask)
+            updateLists()
+
         }
     }
 }
@@ -303,6 +307,8 @@ extension FinanceTransactionViewController: UpdateActivityDelegate {
             }
             
             sortSchedule()
+            updateLists()
+
         }
     }
 }
@@ -360,6 +366,8 @@ extension FinanceTransactionViewController: ChooseActivityDelegate {
             
             eventList.append(mergeActivity)
             sortSchedule()
+            updateLists()
+
         }
     }
 }

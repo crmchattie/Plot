@@ -475,6 +475,11 @@ class FinanceAccountViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 cell.textLabel?.textAlignment = .left
+                if let tags = self.account.tags, !tags.isEmpty {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                } else {
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                }
             }
         
         //            <<< ButtonRow("Participants") { row in

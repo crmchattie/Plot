@@ -182,6 +182,7 @@ extension EventViewController: UpdateTaskDelegate {
                     "task_type": task.activityType ?? "basic" as NSObject
                 ])
                 taskList.append(task)
+                updateLists(type: "container")
             }
         }
     }
@@ -208,6 +209,7 @@ extension EventViewController: ChooseTaskDelegate {
             ])
             
             taskList.append(mergeTask)
+            updateLists(type: "container")
         }
     }
 }

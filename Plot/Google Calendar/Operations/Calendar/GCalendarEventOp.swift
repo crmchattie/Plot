@@ -10,7 +10,7 @@ import Foundation
 import Firebase
 import CodableFirebase
 
-class GCalendarActivityOp: AsyncOperation {
+class GCalendarEventOp: AsyncOperation {
     private var calendar: GTLRCalendar_CalendarListEntry
     private var event: GTLRCalendar_Event
     

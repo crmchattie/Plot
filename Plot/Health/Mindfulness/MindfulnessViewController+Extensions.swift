@@ -249,6 +249,7 @@ extension MindfulnessViewController: UpdateTaskDelegate {
                     "task_type": task.activityType ?? "basic" as NSObject
                 ])
                 taskList.append(task)
+                updateLists()
             }
         }
     }
@@ -275,6 +276,7 @@ extension MindfulnessViewController: ChooseTaskDelegate {
             ])
             
             taskList.append(mergeTask)
+            updateLists()
         }
     }
 }
@@ -303,8 +305,8 @@ extension MindfulnessViewController: UpdateActivityDelegate {
                 ])
                 eventList.append(activity)
             }
-            
             sortSchedule()
+            updateLists()
         }
     }
 }
@@ -362,6 +364,8 @@ extension MindfulnessViewController: ChooseActivityDelegate {
             
             eventList.append(mergeActivity)
             sortSchedule()
+            updateLists()
+
         }
     }
 }
@@ -388,6 +392,7 @@ extension MindfulnessViewController: UpdateTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
+            updateLists()
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)
@@ -418,6 +423,7 @@ extension MindfulnessViewController: ChooseTransactionDelegate {
             } else {
                 purchaseList.append(transaction)
             }
+            updateLists()
         }
         else if mvs.allRows.count - 1 > purchaseIndex {
             mvs.remove(at: purchaseIndex)

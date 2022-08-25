@@ -733,7 +733,7 @@ class EventViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
-            if let _ = self.activity.scheduleIDs {
+            if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             } else {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -781,6 +781,27 @@ class EventViewController: FormViewController {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             } else {
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }
+        }
+        
+        <<< LabelRow("Tags") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.textLabel?.textAlignment = .left
+            row.hidden = "$showExtras == false"
+            row.title = row.tag
+        }.onCellSelection({ _, row in
+            self.openTags()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel?.textAlignment = .left
+            if let tags = self.activity.tags, !tags.isEmpty {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            } else {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
         }
         

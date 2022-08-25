@@ -19,7 +19,7 @@ class AccountSettingsController: UITableViewController {
     
     let accountSettingsCellId = "userProfileCell"
     
-    var firstSection = [( icon: UIImage(named: "CalendarAccounts") , title: "Calendar Info" ),
+    var firstSection = [( icon: UIImage(named: "CalendarAccounts") , title: "Time Info" ),
                         ( icon: UIImage(named: "FinancialAccounts") , title: "Financial Info" ),
 //                        ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
@@ -338,7 +338,7 @@ extension AccountSettingsController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             if indexPath.row == 0 {
-                let destination = CalendarInfoViewController()
+                let destination = TimeInfoViewController()
                 destination.networkController = networkController
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)

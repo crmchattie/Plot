@@ -13,10 +13,12 @@ class EventKitSetupAssistant {
     
     static let eventStore = EKEventStore()
     
-    class func authorizeEventKit(completion: @escaping (Bool, Error?) -> Swift.Void) {
+    class func authorizeEventKitEvents(completion: @escaping (Bool, Error?) -> Swift.Void) {
         EventKitSetupAssistant.eventStore.requestAccess(to: .event) { granted, error in
             completion(granted, error)
         }
+    }
+    class func authorizeEventKitReminders(completion: @escaping (Bool, Error?) -> Swift.Void) {
         EventKitSetupAssistant.eventStore.requestAccess(to: .reminder) { granted, error in
             completion(granted, error)
         }

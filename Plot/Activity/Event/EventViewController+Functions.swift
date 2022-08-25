@@ -213,6 +213,9 @@ extension EventViewController {
             dispatchGroup.enter()
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, tasks, health, transactions in
                 self.container = container
+                for task in tasks ?? [] {
+                    print(task.name)
+                }
                 self.taskList = tasks ?? []
                 self.healthList = health ?? []
                 self.purchaseList = transactions ?? []

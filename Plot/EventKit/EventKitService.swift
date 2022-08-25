@@ -15,12 +15,33 @@ class EventKitService {
         return EventKitSetupAssistant.eventStore
     }
     
-    func authorizeEventKit(completion: @escaping (Bool, Error?) -> Swift.Void) {
-        EventKitSetupAssistant.authorizeEventKit(completion: completion)
+    func authorizeEventKitEvents(completion: @escaping (Bool, Error?) -> Swift.Void) {
+        EventKitSetupAssistant.authorizeEventKitEvents(completion: completion)
+    }
+    
+    func authorizeEventKitReminders(completion: @escaping (Bool, Error?) -> Swift.Void) {
+        EventKitSetupAssistant.authorizeEventKitReminders(completion: completion)
     }
     
     func checkEventAuthorizationStatus() {
         let status = EKEventStore.authorizationStatus(for: .event)
+        switch (status) {
+        case EKAuthorizationStatus.notDetermined:
+            // This happens on first-run
+            print("notDetermined")
+        case EKAuthorizationStatus.authorized:
+            // Things are in line with being able to show the calendars in the table view
+            print("authorized")
+        case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
+            // We need to help them give us permission
+            print("restricted")
+        default:
+            print("default")
+        }
+    }
+    
+    func checkReminderAuthorizationStatus() {
+        let status = EKEventStore.authorizationStatus(for: .reminder)
         switch (status) {
         case EKAuthorizationStatus.notDetermined:
             // This happens on first-run
@@ -111,7 +132,16 @@ class EventKitService {
             }
                         
             event.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
-            if let value = UserDefaults.standard.string(forKey: "PlotCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
+            if let value = UserDefaults.standard.string(forKey: "PlotAppleCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
+                event.calendar = calendar
+                do {
+                    try eventStore.save(event, span: .thisEvent)
+                }
+                catch let error as NSError {
+                    print("Failed to save iOS calendar event with error : \(error)")
+                }
+            } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
+                UserDefaults.standard.set(value, forKey: "PlotAppleCalendar")
                 event.calendar = calendar
                 do {
                     try eventStore.save(event, span: .thisEvent)
@@ -215,7 +245,7 @@ class EventKitService {
         calendar.source = source
         do {
             try eventStore.saveCalendar(calendar, commit: true)
-            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: "PlotCalendar")
+            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: "PlotAppleCalendar")
         } catch let error as NSError {
             print("Failed to save iOS calendar with error : \(error)")
         }
@@ -231,10 +261,13 @@ class EventKitService {
     }
     
     func fetchReminders(completion: @escaping ([EKReminder]) -> Swift.Void) {
-        
+        print("fetchReminders")
         let predicate: NSPredicate? = eventStore.predicateForReminders(in: nil)
         if let aPredicate = predicate {
             eventStore.fetchReminders(matching: aPredicate, completion: {(_ reminders: [Any]?) -> Void in
+                for reminder in reminders as? [EKReminder] ?? [] {
+                    print(reminder.title)
+                }
                 completion(reminders as? [EKReminder] ?? [])
             })
         }
@@ -306,7 +339,7 @@ class EventKitService {
 
             reminder.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
             
-            if let value = UserDefaults.standard.string(forKey: "PlotList"), let calendar = eventStore.calendar(withIdentifier: value) {
+            if let value = UserDefaults.standard.string(forKey: "PlotAppleList"), let calendar = eventStore.calendar(withIdentifier: value) {
                 reminder.calendar = calendar
                 do {
                     try eventStore.save(reminder, commit: true)
@@ -431,7 +464,7 @@ class EventKitService {
         calendar.source = source
         do {
             try eventStore.saveCalendar(calendar, commit: true)
-            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: "PlotList")
+            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: "PlotAppleList")
         } catch let error as NSError {
             print("Failed to save iOS calendar with error : \(error)")
         }

@@ -1,21 +1,21 @@
 //
-//  SyncPlotActivitiesOp.swift
+//  GPlotActivityOp.swift
 //  Plot
 //
-//  Created by Cory McHattie on 1/25/21.
+//  Created by Cory McHattie on 2/3/21.
 //  Copyright © 2021 Immature Creations. All rights reserved.
 //
 
-import EventKit
+import Foundation
 import Firebase
 import CodableFirebase
 
-class EKPlotTaskOp: AsyncOperation {
-    private let eventKitService: EventKitService
+class GPlotTaskOp: AsyncOperation {
+    private let googleCalService: GoogleCalService
     private var activities: [Activity]
     
-    init(eventKitService: EventKitService, activities: [Activity]) {
-        self.eventKitService = eventKitService
+    init(googleCalService: GoogleCalService, activities: [Activity]) {
+        self.googleCalService = googleCalService
         self.activities = activities
     }
     
@@ -28,17 +28,16 @@ class EKPlotTaskOp: AsyncOperation {
             self.finish()
             return
         }
-        // @FIX-ME remove in four months from 2/6/21 since we can check for calendar export property on activities
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
             if let activityID = activity.activityID, !(activity.calendarExport ?? false) {
                 dispatchGroup.enter()
-                if let reminder = eventKitService.storeReminder(for: activity) {
-                    let reminderTaskActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                    reference.child(reminder.calendarItemIdentifier).updateChildValues(reminderTaskActivityValue) { (_, _) in
+                if let task = googleCalService.storeTask(for: activity), let id = task.identifier {
+                    let listTaskActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                    reference.child(id).updateChildValues(listTaskActivityValue) { (_, _) in
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": reminder.calendarItemIdentifier as Any]
+                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": id as Any]
                         userReference.updateChildValues(values)
                         dispatchGroup.leave()
                     }
@@ -50,5 +49,5 @@ class EKPlotTaskOp: AsyncOperation {
         dispatchGroup.notify(queue: .global()) {
             self.finish()
         }
-    }    
+    }
 }
