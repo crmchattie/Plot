@@ -91,6 +91,9 @@ PODS:
     - GTMSessionFetcher/Full (< 3.0, >= 1.6.1)
   - GoogleAPIClientForREST/Core (2.0.0):
     - GTMSessionFetcher/Full (< 3.0, >= 1.6.1)
+  - GoogleAPIClientForREST/Tasks (2.0.0):
+    - GoogleAPIClientForREST/Core
+    - GTMSessionFetcher/Full (< 3.0, >= 1.6.1)
   - GoogleAppMeasurement (8.15.0):
     - GoogleAppMeasurement/AdIdSupport (= 8.15.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 7.7)
@@ -181,6 +184,7 @@ DEPENDENCIES:
   - FSCalendar
   - FTPopOverMenu_Swift (~> 0.2.0)
   - GoogleAPIClientForREST/Calendar
+  - GoogleAPIClientForREST/Tasks
   - GoogleSignIn (~> 5.0.2)
   - PhoneNumberKit
   - SDWebImage
@@ -256,6 +260,6 @@ SPEC CHECKSUMS:
   SplitRow: 1911d2bd0f34e6ac93d83cc741730505a91c4d04
   ViewRow: 8da541e9c019f3be63f4e28f311a62cac2045ecf
 
-PODFILE CHECKSUM: 3679760fb490202e12eb00abe247f937b6f04e81
+PODFILE CHECKSUM: 576a054c0ec427c4484fe55a2f323bbf6e04e6fd
 
 COCOAPODS: 1.11.3

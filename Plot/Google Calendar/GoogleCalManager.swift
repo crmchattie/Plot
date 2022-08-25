@@ -111,4 +111,85 @@ class GoogleCalManager {
             completion(calendars)
         }
     }
+    
+//    func syncGoogleCalTasks(existingActivities: [Activity], completion: @escaping () -> Void) {
+//        guard !isRunning, isAuthorized else {
+//            completion()
+//            return
+//        }
+//
+//        activities = []
+//        isRunning = true
+//
+//        let eventsOp = GFetchCalendarEventsOp(googleCalService: googleCalService)
+//        let syncEventsOp = GSyncCalendarEventsOp(existingActivities: existingActivities)
+//        let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
+//            syncEventsOp.calendarEventsDict = eventsOp.calendarEventsDict
+//        }
+//        eventsOpAdapter.addDependency(eventsOp)
+//        syncEventsOp.addDependency(eventsOpAdapter)
+//
+//        // Setup queue
+//        queue.addOperations([eventsOp, eventsOpAdapter, syncEventsOp], waitUntilFinished: false)
+//
+//        // Once everything is fetched call the completion block
+//        queue.addBarrierBlock { [weak self] in
+//            guard let weakSelf = self else {
+//                completion()
+//                return
+//            }
+//
+//            weakSelf.isRunning = false
+//            completion()
+//        }
+//    }
+//
+//    func syncTasksToGoogleTasks(activities: [Activity], completion: @escaping () -> Void)  {
+//        guard !isRunning, isAuthorized else {
+//            completion()
+//            return
+//        }
+//
+//        isRunning = true
+//
+//        let calendar = Calendar.current
+//
+//        // Create the start date components
+//        var timeAgoComponents = DateComponents()
+//        timeAgoComponents.day = -7
+//        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
+//
+//        // Create the end date components.
+//        var timeFromNowComponents = DateComponents()
+//        timeFromNowComponents.month = 3
+//        let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
+//
+//        //filter old activities out
+//        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) }
+//
+//        let activitiesOp = GPlotActivityOp(googleCalService: googleCalService, activities: filterActivities)
+//        // Setup queue
+//        queue.addOperations([activitiesOp], waitUntilFinished: false)
+//
+//        // Once everything is fetched call the completion block
+//        queue.addBarrierBlock { [weak self] in
+//            guard let weakSelf = self else {
+//                completion()
+//                return
+//            }
+//
+//            weakSelf.isRunning = false
+//            completion()
+//        }
+//    }
+//
+//    func grabLists(completion: @escaping ([CalendarType]?) -> Swift.Void) {
+//        guard isAuthorized else {
+//            completion(nil)
+//            return
+//        }
+//        googleCalService.grabCalendars { (calendars) in
+//            completion(calendars)
+//        }
+//    }
 }

@@ -56,9 +56,9 @@ class ActivityActions: NSObject {
             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
-                    if value == CalendarOptions.apple.name {
+                    if value == ListOptions.apple.name {
                         self.eventKitService.deleteReminder(for: activity)
-                    } else if value == CalendarOptions.google.name {
+                    } else if value == ListOptions.google.name {
 
                     }
                 }
@@ -159,9 +159,9 @@ class ActivityActions: NSObject {
             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
-                    if value == CalendarOptions.apple.name {
+                    if value == ListOptions.apple.name {
                         self.eventKitService.updateReminder(for: activity)
-                    } else if value == CalendarOptions.google.name {
+                    } else if value == ListOptions.google.name {
                         
                     }
                 }
@@ -206,7 +206,7 @@ class ActivityActions: NSObject {
             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
-                    if value == CalendarOptions.apple.name {
+                    if value == ListOptions.apple.name {
                         if let reminder = self.eventKitService.storeReminder(for: activity) {
                             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
                             let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
@@ -215,7 +215,7 @@ class ActivityActions: NSObject {
                             let values:[String : Any] = ["calendarExport": true, "externalActivityID": reminder.calendarItemIdentifier as Any]
                             userReference.updateChildValues(values)
                         }
-                    } else if value == CalendarOptions.google.name {
+                    } else if value == ListOptions.google.name {
                         
                     }
                 }

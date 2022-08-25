@@ -95,7 +95,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>To get access to your personal data</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>w</string>
+	<string>We use exercise, nutritional and mindful minutes data to help you keep track of your health activities.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>We use exercise, nutritional and mindful minutes data to help you keep track of your health activities.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

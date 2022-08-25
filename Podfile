@@ -24,6 +24,7 @@ target 'Plot' do
 
   pod 'GoogleSignIn', '~> 5.0.2'
   pod 'GoogleAPIClientForREST/Calendar'
+  pod 'GoogleAPIClientForREST/Tasks'
 end
 
 target 'ShareExtension' do
