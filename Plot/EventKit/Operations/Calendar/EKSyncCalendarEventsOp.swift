@@ -29,11 +29,11 @@ class EKSyncCalendarEventsOp: AsyncOperation {
         for event in events {
 //            if !existingEvents.contains(where: {$0.title == event.title && $0.startDate == event.startDate && $0.endDate == event.endDate}) && !existingActivities.contains(where: {$0.name == event.title && $0.startDate == event.startDate && $0.endDate == event.endDate}) {
 //                existingEvents.append(event)
-//                let op = EKCalendarActivityOp(event: event)
+//                let op = EKCalendarEventOp(event: event)
 //                queue.addOperation(op)
 //                
 //            }
-            let op = EKCalendarActivityOp(event: event)
+            let op = EKCalendarEventOp(event: event)
             queue.addOperation(op)
         }
         

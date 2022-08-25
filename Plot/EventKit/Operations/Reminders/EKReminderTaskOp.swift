@@ -10,11 +10,11 @@ import EventKit
 import Firebase
 import CodableFirebase
 
-class EKCalendarActivityOp: AsyncOperation {
-    private var event: EKEvent
+class EKReminderTaskOp: AsyncOperation {
+    private var reminder: EKReminder
     
-    init(event: EKEvent) {
-        self.event = event
+    init(reminder: EKReminder) {
+        self.reminder = reminder
     }
     
     override func main() {
@@ -26,7 +26,7 @@ class EKCalendarActivityOp: AsyncOperation {
             self.finish()
             return
         }
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] {
                 let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
@@ -39,13 +39,13 @@ class EKCalendarActivityOp: AsyncOperation {
                     let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                     activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                         let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        var values: [String : Any] = ["calendarExport": true,
-                                                      "calendarID": self?.event.calendar.calendarIdentifier as Any,
-                                                      "calendarName": self?.event.calendar.title as Any,
-                                                      "calendarSource": CalendarOptions.apple.name as Any,
-                                                      "externalActivityID": self?.event.calendarItemIdentifier as Any]
-                        if let CGColor = self?.event.calendar.cgColor {
-                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                        var values: [String : Any] = ["listExport": true,
+                                                      "listID": self?.reminder.calendar.calendarIdentifier as Any,
+                                                      "listName": self?.reminder.calendar.title as Any,
+                                                      "listSource": CalendarOptions.apple.name as Any,
+                                                      "externalActivityID": self?.reminder.calendarItemIdentifier as Any]
+                        if let CGColor = self?.reminder.calendar.cgColor {
+                            values["listColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
                         }
                         userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                             self?.finish()
@@ -67,13 +67,13 @@ class EKCalendarActivityOp: AsyncOperation {
                         var values: [String : Any] = ["isGroupActivity": false,
                                                       "badge": 0,
                                                       "calendarExport": true,
-                                                      "calendarID": self?.event.calendar.calendarIdentifier as Any,
-                                                      "calendarName": self?.event.calendar.title as Any,
-                                                      "calendarSource": CalendarOptions.apple.name as Any,
-                                                      "externalActivityID": self?.event.calendarItemIdentifier as Any,
+                                                      "listID": self?.reminder.calendar.calendarIdentifier as Any,
+                                                      "listName": self?.reminder.calendar.title as Any,
+                                                      "listSource": CalendarOptions.apple.name as Any,
+                                                      "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
                                                       "showExtras": activity.showExtras as Any]
-                        if let CGColor = self?.event.calendar.cgColor {
-                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                        if let CGColor = self?.reminder.calendar.cgColor {
+                            values["listColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
                         }
                         userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                             self?.finish()
@@ -94,23 +94,34 @@ class EKCalendarActivityOp: AsyncOperation {
     }
     
     private func update(activity: Activity) {
-        activity.name = event.title
-        activity.activityDescription = event.notes
-        if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location {
-            let coordinates = geoLocation.coordinate
-            let latitude = coordinates.latitude
-            let longitude = coordinates.longitude
-            activity.locationName = location.removeCharacters()
-            activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
-        }
+        activity.isTask = true
+        activity.name = reminder.title
+        activity.activityDescription = reminder.notes
         activity.category = ActivityCategory.categorize(activity).rawValue
         activity.activityType = CustomType.iOSCalendarEvent.categoryText
-        activity.allDay = event.isAllDay
-        activity.startTimeZone = event.timeZone?.identifier
-        activity.endTimeZone = event.timeZone?.identifier
-        activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
-        activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
+        activity.startTimeZone = reminder.timeZone?.identifier
+        activity.endTimeZone = reminder.timeZone?.identifier
+        activity.recurrences = reminder.recurrenceRules?.map { $0.iCalRuleString() }
+        if let startDate = reminder.startDateComponents?.date {
+            activity.startDateTime = NSNumber(value: startDate.timeIntervalSince1970)
+            if reminder.startDateComponents?.hour != nil {
+                activity.hasStartTime = true
+            } else {
+                activity.hasStartTime = false
+            }
+        }
+        if let endDate = reminder.dueDateComponents?.date {
+            activity.endDateTime = NSNumber(value: endDate.timeIntervalSince1970)
+            if reminder.dueDateComponents?.hour != nil {
+                activity.hasStartTime = true
+            } else {
+                activity.hasStartTime = false
+            }
+        }
+        activity.isCompleted = reminder.isCompleted
+        if let completionDate = reminder.completionDate {
+            activity.completedDate = NSNumber(value: completionDate.timeIntervalSince1970)
+        }
         activity.admin = Auth.auth().currentUser?.uid
     }
     
@@ -120,7 +131,7 @@ class EKCalendarActivityOp: AsyncOperation {
             return
         }
         
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             guard snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] else {
                 self?.finish()

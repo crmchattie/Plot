@@ -80,10 +80,9 @@ class SubtaskListViewController: FormViewController {
                                         }
                                 }
                                 $0.multivaluedRowToInsertAt = { index in
-                                    self.subtaskIndex = index
-                                    self.openSubtask()
-                                    return SubtaskRow("label"){
-                                        $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                    return SubtaskRow("label"){ _ in
+                                        self.subtaskIndex = index
+                                        self.openSubtask()
                                     }
                                 }
 
@@ -125,38 +124,46 @@ class SubtaskListViewController: FormViewController {
             self.hideActivityIndicator()
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Sub-Task", style: .default, handler: { (_) in
-                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-                let destination = SubtaskViewController()
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
-                destination.delegate = self
-                destination.startDateTime = self.startDateTime
-                destination.endDateTime = self.endDateTime
-                self.navigationController?.pushViewController(destination, animated: true)
-            }))
-            alert.addAction(UIAlertAction(title: "Merge Existing Task", style: .default, handler: { (_) in
-                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-                let destination = ChooseTaskTableViewController()
-                destination.needDelegate = true
-                destination.movingBackwards = true
-                destination.delegate = self
-                destination.task = self.task
-                destination.tasks = self.tasks
-                destination.filteredTasks = self.tasks
-                self.navigationController?.pushViewController(destination, animated: true)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-            }))
-            self.present(alert, animated: true)
+            let destination = SubtaskViewController()
+            destination.users = self.selectedFalconUsers
+            destination.filteredUsers = self.selectedFalconUsers
+            destination.delegate = self
+            destination.startDateTime = self.startDateTime
+            destination.endDateTime = self.endDateTime
+            self.navigationController?.pushViewController(destination, animated: true)
+            
+//            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//            alert.addAction(UIAlertAction(title: "New Sub-Task", style: .default, handler: { (_) in
+//                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+//                    mvs.remove(at: mvs.count - 2)
+//                }
+//                let destination = SubtaskViewController()
+//                destination.users = self.selectedFalconUsers
+//                destination.filteredUsers = self.selectedFalconUsers
+//                destination.delegate = self
+//                destination.startDateTime = self.startDateTime
+//                destination.endDateTime = self.endDateTime
+//                self.navigationController?.pushViewController(destination, animated: true)
+//            }))
+//            alert.addAction(UIAlertAction(title: "Merge Existing Task", style: .default, handler: { (_) in
+//                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+//                    mvs.remove(at: mvs.count - 2)
+//                }
+//                let destination = ChooseTaskTableViewController()
+//                destination.needDelegate = true
+//                destination.movingBackwards = true
+//                destination.delegate = self
+//                destination.task = self.task
+//                destination.tasks = self.tasks
+//                destination.filteredTasks = self.tasks
+//                self.navigationController?.pushViewController(destination, animated: true)
+//            }))
+//            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+//                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+//                    mvs.remove(at: mvs.count - 2)
+//                }
+//            }))
+//            self.present(alert, animated: true)
         }
     }
     
@@ -208,6 +215,10 @@ class SubtaskListViewController: FormViewController {
 
 extension SubtaskListViewController: UpdateTaskDelegate {
     func updateTask(task: Activity) {
+        if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        
         if let _ = task.name {
             if subtaskList.indices.contains(subtaskIndex), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                 let subtaskRow = mvs.allRows[subtaskIndex]
@@ -269,9 +280,6 @@ extension SubtaskListViewController: ChooseTaskDelegate {
     }
     
     func chosenTask(mergeTask: Activity) {
-        if let _: SubtaskRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
-            mvs.remove(at: mvs.count - 2)
-        }
         if let _ = mergeTask.name, let currentUserID = Auth.auth().currentUser?.uid {
             self.getParticipants(forActivity: mergeTask) { (participants) in
                 let deleteActivity = ActivityActions(activity: mergeTask, active: true, selectedFalconUsers: participants)

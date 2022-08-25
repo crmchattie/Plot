@@ -844,10 +844,9 @@ class EventViewController: FormViewController {
                                             }
                                     }
                                     $0.multivaluedRowToInsertAt = { index in
-                                        self.taskIndex = index
-                                        self.openTask()
-                                        return SubtaskRow("label"){
-                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        return SubtaskRow("label"){ _ in
+                                            self.taskIndex = index
+                                            self.openTask()
                                         }
                                     }
 

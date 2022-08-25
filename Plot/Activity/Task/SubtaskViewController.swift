@@ -37,6 +37,8 @@ class SubtaskViewController: FormViewController {
     
     fileprivate var active: Bool = false
     
+    var movingBackwards: Bool = true
+    
     init() {
         super.init(style: .insetGrouped)
     }
@@ -78,6 +80,14 @@ class SubtaskViewController: FormViewController {
         initializeForm()
         
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if movingBackwards && navigationController?.visibleViewController is SubtaskListViewController {
+            delegate?.updateTask(task: subtask)
+        }
+    }
+
     
     fileprivate func setupMainView() {
         
@@ -591,6 +601,7 @@ class SubtaskViewController: FormViewController {
         let createActivity = ActivityActions(activity: subtask, active: false, selectedFalconUsers: [])
         createActivity.createSubActivity()
         
+        movingBackwards = false
         delegate?.updateTask(task: subtask)
         
         if navigationItem.leftBarButtonItem != nil {

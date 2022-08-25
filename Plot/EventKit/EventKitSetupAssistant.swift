@@ -17,5 +17,8 @@ class EventKitSetupAssistant {
         EventKitSetupAssistant.eventStore.requestAccess(to: .event) { granted, error in
             completion(granted, error)
         }
+        EventKitSetupAssistant.eventStore.requestAccess(to: .reminder) { granted, error in
+            completion(granted, error)
+        }
     }
 }

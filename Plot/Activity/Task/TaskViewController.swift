@@ -281,7 +281,6 @@ class TaskViewController: FormViewController {
                 completedRow.updateCell()
                 completedRow.hidden = false
                 completedRow.evaluateHidden()
-                
                 self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
             } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                 row.cell.tintAdjustmentMode = .dimmed
@@ -961,8 +960,8 @@ class TaskViewController: FormViewController {
                                     $0.multivaluedRowToInsertAt = { index in
                                         self.eventIndex = index
                                         self.openEvent()
-                                        return ScheduleRow("label"){
-                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        return ScheduleRow("label"){ _ in
+                                            
                                         }
                                     }
 

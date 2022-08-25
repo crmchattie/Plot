@@ -95,7 +95,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>To get access to your personal data</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>We help you keep track of your exercise, nutritional, sleep, mindful minutes and body measurement data from all sources.</string>
+	<string>w</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>We use exercise, nutritional and mindful minutes data to help you keep track of your health activities.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -106,6 +106,8 @@
 	<string>To save selected media to your photo library</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To select a profile photo or send photo or video via message</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>To help you keep track of your reminders</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This identifier will be used to deliver personalized ads to you.</string>
 	<key>UIBackgroundModes</key>

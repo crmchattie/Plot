@@ -81,10 +81,9 @@ class ScheduleListViewController: FormViewController {
                                         }
                                 }
                                 $0.multivaluedRowToInsertAt = { index in
-                                    self.scheduleIndex = index
-                                    self.openSchedule()
-                                    return ScheduleRow("label"){
-                                        $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                    return ScheduleRow("label"){ _ in
+                                        self.scheduleIndex = index
+                                        self.openSchedule()
                                     }
                                 }
 
@@ -130,39 +129,47 @@ class ScheduleListViewController: FormViewController {
             destination.delegate = self
             self.hideActivityIndicator()
             self.navigationController?.pushViewController(destination, animated: true)
-        } else {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Sub-Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-                let destination = ScheduleViewController()
-                destination.users = self.acceptedParticipant
-                destination.filteredUsers = self.acceptedParticipant
-                destination.delegate = self
-                destination.startDateTime = self.startDateTime
-                destination.endDateTime = self.endDateTime
-                self.navigationController?.pushViewController(destination, animated: true)
-            }))
-            alert.addAction(UIAlertAction(title: "Merge Existing Event", style: .default, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-                let destination = ChooseEventTableViewController()
-                destination.needDelegate = true
-                destination.movingBackwards = true
-                destination.delegate = self
-                destination.event = self.activity
-                destination.events = self.activities
-                destination.filteredEvents = self.activities
-                self.navigationController?.pushViewController(destination, animated: true)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-            }))
-            self.present(alert, animated: true)
+        } else {            
+            let destination = ScheduleViewController()
+            destination.users = self.acceptedParticipant
+            destination.filteredUsers = self.acceptedParticipant
+            destination.delegate = self
+            destination.startDateTime = self.startDateTime
+            destination.endDateTime = self.endDateTime
+            self.navigationController?.pushViewController(destination, animated: true)
+                        
+//            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//            alert.addAction(UIAlertAction(title: "New Sub-Event", style: .default, handler: { (_) in
+//                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+//                    mvs.remove(at: mvs.count - 2)
+//                }
+//                let destination = ScheduleViewController()
+//                destination.users = self.acceptedParticipant
+//                destination.filteredUsers = self.acceptedParticipant
+//                destination.delegate = self
+//                destination.startDateTime = self.startDateTime
+//                destination.endDateTime = self.endDateTime
+//                self.navigationController?.pushViewController(destination, animated: true)
+//            }))
+//            alert.addAction(UIAlertAction(title: "Merge Existing Event", style: .default, handler: { (_) in
+//                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+//                    mvs.remove(at: mvs.count - 2)
+//                }
+//                let destination = ChooseEventTableViewController()
+//                destination.needDelegate = true
+//                destination.movingBackwards = true
+//                destination.delegate = self
+//                destination.event = self.activity
+//                destination.events = self.activities
+//                destination.filteredEvents = self.activities
+//                self.navigationController?.pushViewController(destination, animated: true)
+//            }))
+//            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+//                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+//                    mvs.remove(at: mvs.count - 2)
+//                }
+//            }))
+//            self.present(alert, animated: true)
         }
     }
     
@@ -219,6 +226,10 @@ class ScheduleListViewController: FormViewController {
 
 extension ScheduleListViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
+        if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        
         if let _ = activity.name {
             if scheduleList.indices.contains(scheduleIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                 let scheduleRow = mvs.allRows[scheduleIndex]
@@ -285,9 +296,6 @@ extension ScheduleListViewController: ChooseActivityDelegate {
     }
     
     func chosenActivity(mergeActivity: Activity) {
-        if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
-            mvs.remove(at: mvs.count - 2)
-        }
         if let _ = mergeActivity.name, let currentUserID = Auth.auth().currentUser?.uid {
             self.getParticipants(forActivity: mergeActivity) { (participants) in
                 let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)

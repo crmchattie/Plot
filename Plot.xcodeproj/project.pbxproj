@@ -59,7 +59,7 @@
 		1031410F230D712E00DB471B /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1031410D230D712E00DB471B /* MainInterface.storyboard */; };
 		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
-		1034A01325BF8015006D3DB8 /* EKPlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */; };
+		1034A01325BF8015006D3DB8 /* EKPlotEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* EKPlotEventOp.swift */; };
 		1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */; };
 		1034A07825C84FCC006D3DB8 /* GoogleCalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */; };
 		1034A07E25C84FF0006D3DB8 /* GoogleCalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */; };
@@ -154,6 +154,10 @@
 		108C380328AC483E00DC4998 /* TaskViewController+UpdateInvitees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380228AC483900DC4998 /* TaskViewController+UpdateInvitees.swift */; };
 		108C380528AC485300DC4998 /* TaskViewController+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380428AC485300DC4998 /* TaskViewController+Functions.swift */; };
 		108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */; };
+		1092E25A28B6F2B50018FCAA /* EKFetchReminderTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25928B6F2B50018FCAA /* EKFetchReminderTasksOp.swift */; };
+		1092E25C28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */; };
+		1092E25E28B6F2EA0018FCAA /* EKReminderTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */; };
+		1092E26028B6F2FB0018FCAA /* EKPlotTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25F28B6F2FB0018FCAA /* EKPlotTaskOp.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -297,7 +301,7 @@
 		2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603676B256CD9A000FE9142 /* EventKitManager.swift */; };
 		26036774256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036773256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift */; };
 		26036778256DC76900FE9142 /* EKSyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26036777256DC76800FE9142 /* EKSyncCalendarEventsOp.swift */; };
-		2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603677D256DC86300FE9142 /* EKCalendarActivityOp.swift */; };
+		2603677E256DC86300FE9142 /* EKCalendarEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603677D256DC86300FE9142 /* EKCalendarEventOp.swift */; };
 		260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87C924FF5FE900715A64 /* HealthKitManager.swift */; };
 		260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CB24FF600900715A64 /* AsyncOperation.swift */; };
 		260C87CE24FF60B200715A64 /* StepsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C87CD24FF60B100715A64 /* StepsOperation.swift */; };
@@ -637,7 +641,7 @@
 		1031410E230D712E00DB471B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		10314110230D712E00DB471B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		10323D5D2479A58500749706 /* GrocerylistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistActions.swift; sourceTree = "<group>"; };
-		1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKPlotActivityOp.swift; sourceTree = "<group>"; };
+		1034A01225BF8015006D3DB8 /* EKPlotEventOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKPlotEventOp.swift; sourceTree = "<group>"; };
 		1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarInfoViewController.swift; sourceTree = "<group>"; };
 		1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalManager.swift; sourceTree = "<group>"; };
 		1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalService.swift; sourceTree = "<group>"; };
@@ -736,6 +740,10 @@
 		108C380228AC483900DC4998 /* TaskViewController+UpdateInvitees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+UpdateInvitees.swift"; sourceTree = "<group>"; };
 		108C380428AC485300DC4998 /* TaskViewController+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+Functions.swift"; sourceTree = "<group>"; };
 		108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+Extensions.swift"; sourceTree = "<group>"; };
+		1092E25928B6F2B50018FCAA /* EKFetchReminderTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKFetchReminderTasksOp.swift; sourceTree = "<group>"; };
+		1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKSyncReminderTasksOp.swift; sourceTree = "<group>"; };
+		1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKReminderTaskOp.swift; sourceTree = "<group>"; };
+		1092E25F28B6F2FB0018FCAA /* EKPlotTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKPlotTaskOp.swift; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -878,7 +886,7 @@
 		2603676B256CD9A000FE9142 /* EventKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitManager.swift; sourceTree = "<group>"; };
 		26036773256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKFetchCalendarEventsOp.swift; sourceTree = "<group>"; };
 		26036777256DC76800FE9142 /* EKSyncCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKSyncCalendarEventsOp.swift; sourceTree = "<group>"; };
-		2603677D256DC86300FE9142 /* EKCalendarActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKCalendarActivityOp.swift; sourceTree = "<group>"; };
+		2603677D256DC86300FE9142 /* EKCalendarEventOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKCalendarEventOp.swift; sourceTree = "<group>"; };
 		260C87C924FF5FE900715A64 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		260C87CB24FF600900715A64 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		260C87CD24FF60B100715A64 /* StepsOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsOperation.swift; sourceTree = "<group>"; };
@@ -1532,6 +1540,46 @@
 			path = TransactionRule;
 			sourceTree = "<group>";
 		};
+		1092E25828B6F2900018FCAA /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				26036773256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift */,
+				26036777256DC76800FE9142 /* EKSyncCalendarEventsOp.swift */,
+				2603677D256DC86300FE9142 /* EKCalendarEventOp.swift */,
+				1034A01225BF8015006D3DB8 /* EKPlotEventOp.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		1092E26128B705540018FCAA /* Reminders */ = {
+			isa = PBXGroup;
+			children = (
+				1092E25928B6F2B50018FCAA /* EKFetchReminderTasksOp.swift */,
+				1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */,
+				1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */,
+				1092E25F28B6F2FB0018FCAA /* EKPlotTaskOp.swift */,
+			);
+			path = Reminders;
+			sourceTree = "<group>";
+		};
+		1092E26228B70DCC0018FCAA /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */,
+				10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */,
+				10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */,
+				10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		1092E26328B70DD30018FCAA /* Reminder */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Reminder;
+			sourceTree = "<group>";
+		};
 		10970B122580605D0027A9EF /* Mindfulness */ = {
 			isa = PBXGroup;
 			children = (
@@ -1749,10 +1797,8 @@
 		10F5CFF025CB7D100078C821 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
-				10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */,
-				10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */,
-				10F5CFFD25CB7E5A0078C821 /* GCalendarActivityOp.swift */,
-				10F5D00125CB7E670078C821 /* GPlotActivityOp.swift */,
+				1092E26228B70DCC0018FCAA /* Calendar */,
+				1092E26328B70DD30018FCAA /* Reminder */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -1772,10 +1818,8 @@
 		26036771256DB68600FE9142 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
-				26036773256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift */,
-				26036777256DC76800FE9142 /* EKSyncCalendarEventsOp.swift */,
-				2603677D256DC86300FE9142 /* EKCalendarActivityOp.swift */,
-				1034A01225BF8015006D3DB8 /* EKPlotActivityOp.swift */,
+				1092E25828B6F2900018FCAA /* Calendar */,
+				1092E26128B705540018FCAA /* Reminders */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -3104,6 +3148,7 @@
 				100FE7032892D91200D3124C /* ChooseCalendarViewController.swift in Sources */,
 				105F34B42885EF7A007531EB /* RecurrencePickerDelegate.swift in Sources */,
 				10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */,
+				1092E25A28B6F2B50018FCAA /* EKFetchReminderTasksOp.swift in Sources */,
 				10C8334824A3A43F0037F638 /* SygicCollectionsSearchResult.swift in Sources */,
 				105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */,
 				10B4AE3324FE9CBA005B967B /* FinancialAccountCell.swift in Sources */,
@@ -3140,6 +3185,7 @@
 				F916C768260E793F0062F952 /* DateRangeFormatter.swift in Sources */,
 				4BAEE50521272D890045AB10 /* MediaPicerControllerNew+ImagePicker.swift in Sources */,
 				4BAEE50821272D890045AB10 /* UserCell.swift in Sources */,
+				1092E25C28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift in Sources */,
 				1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */,
 				4BAEE5E1212735E50045AB10 /* ImagePickerTrayController.swift in Sources */,
 				10196F0224411B5600B6AFDF /* MapActivityViewController.swift in Sources */,
@@ -3159,6 +3205,7 @@
 				10DFAFCA287776BE00D38016 /* HealthContainer.swift in Sources */,
 				10DFAFC82877753D00D38016 /* EventViewController+Extensions.swift in Sources */,
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,
+				1092E25E28B6F2EA0018FCAA /* EKReminderTaskOp.swift in Sources */,
 				10B3E50A28B1478A00E1713D /* ListDetailViewController.swift in Sources */,
 				4BAEE50121272D890045AB10 /* OutgoingPhotoMessageCell.swift in Sources */,
 				100B9F632564539300A80C87 /* FinanceDetailService.swift in Sources */,
@@ -3406,6 +3453,7 @@
 				10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */,
 				4BAEE50021272D890045AB10 /* UserInfoTableViewController.swift in Sources */,
 				108C380328AC483E00DC4998 /* TaskViewController+UpdateInvitees.swift in Sources */,
+				1092E26028B6F2FB0018FCAA /* EKPlotTaskOp.swift in Sources */,
 				10B541D025476DA700CC9023 /* MenuProduct.swift in Sources */,
 				10F3032A24EC6FBC00C04B8F /* MXUser.swift in Sources */,
 				4BAEE5D6212735E50045AB10 /* Announcement.swift in Sources */,
@@ -3503,14 +3551,14 @@
 				4BAEE51221272D890045AB10 /* UserInfoPhoneNumberTableViewCell.swift in Sources */,
 				1011466925A8E6C5007B51AF /* TimeZoneFinderViewController.swift in Sources */,
 				265AA95E23A362CE00DBB10A /* CalendarViewController+Migration.swift in Sources */,
-				1034A01325BF8015006D3DB8 /* EKPlotActivityOp.swift in Sources */,
+				1034A01325BF8015006D3DB8 /* EKPlotEventOp.swift in Sources */,
 				10F3033224EC700C00C04B8F /* Transaction.swift in Sources */,
 				10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */,
 				F9DD16C52613D57A00B8374D /* MonthAxisValueFormatter.swift in Sources */,
 				10B3E50128B10F4500E1713D /* SubtaskListViewController.swift in Sources */,
 				105F34B12885EF7A007531EB /* RecurrencePicker.swift in Sources */,
 				4BAEE4ED21272D890045AB10 /* LeaveGroupAndChangeAdminController.swift in Sources */,
-				2603677E256DC86300FE9142 /* EKCalendarActivityOp.swift in Sources */,
+				2603677E256DC86300FE9142 /* EKCalendarEventOp.swift in Sources */,
 				10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */,
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
 				100FE70E2894407600D3124C /* ActivitySubcategory.swift in Sources */,

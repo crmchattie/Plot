@@ -90,9 +90,9 @@ class EventKitManager {
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
-        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) }
+        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) && ($0.isTask == nil) }
                 
-        let activitiesOp = EKPlotActivityOp(eventKitService: eventKitService, activities: filterActivities)
+        let activitiesOp = EKPlotEventOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
         queue.addOperations([activitiesOp], waitUntilFinished: false)
         
@@ -123,5 +123,92 @@ class EventKitManager {
             calendarTypes.append(calendarType)
         }
         return calendarTypes
+    }
+    
+    func syncEventKitReminders(existingActivities: [Activity], completion: @escaping () -> Void) {
+        guard !isRunning, isAuthorized else {
+            completion()
+            return
+        }
+                        
+        activities = []
+        isRunning = true
+        
+        let remindersOp = EKFetchReminderTasksOp(eventKitService: eventKitService)
+        let syncRemindersOp = EKSyncReminderTasksOp(existingActivities: existingActivities)
+        let remindersOpAdapter = BlockOperation() { [unowned remindersOp, unowned syncRemindersOp] in
+            syncRemindersOp.reminders = remindersOp.reminders
+        }
+        remindersOpAdapter.addDependency(remindersOp)
+        syncRemindersOp.addDependency(remindersOpAdapter)
+        
+        // Setup queue
+        queue.addOperations([remindersOp, remindersOpAdapter, syncRemindersOp], waitUntilFinished: false)
+        
+        // Once everything is fetched call the completion block
+        queue.addBarrierBlock { [weak self] in
+            guard let weakSelf = self else {
+                completion()
+                return
+            }
+            weakSelf.isRunning = false
+            completion()
+        }
+    }
+    
+    func syncTasksToEventKit(activities: [Activity], completion: @escaping () -> Void)  {
+        guard !isRunning, isAuthorized else {
+            completion()
+            return
+        }
+        
+        isRunning = true
+        
+        let calendar = Calendar.current
+
+        // Create the start date components
+        var timeAgoComponents = DateComponents()
+        timeAgoComponents.day = -7
+        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
+
+        // Create the end date components.
+        var timeFromNowComponents = DateComponents()
+        timeFromNowComponents.month = 3
+        let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
+
+        //filter old activities out
+        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) && $0.isTask ?? false }
+                
+        let activitiesOp = EKPlotTaskOp(eventKitService: eventKitService, tasks: filterActivities)
+        // Setup queue
+        queue.addOperations([activitiesOp], waitUntilFinished: false)
+        
+        // Once everything is fetched call the completion block
+        queue.addBarrierBlock { [weak self] in
+            guard let weakSelf = self else {
+                completion()
+                return
+            }
+            print("syncActivitiesToEventKit completion")
+            weakSelf.isRunning = false
+            completion()
+        }
+    }
+    
+    func grabLists() -> [ListType]? {
+        guard isAuthorized else {
+            return nil
+        }
+        let calendars = eventKitService.eventStore.calendars(for: .reminder).filter { $0.title != "Plot" }
+        return convertListsToPlot(lists: calendars)
+    }
+    
+    func convertListsToPlot(lists: [EKCalendar]) -> [ListType] {
+        var listTypes = [ListType]()
+        for list in lists {
+            let listType = ListType(id: list.calendarIdentifier, name: list.title, color: CIColor(cgColor: list.cgColor).stringRepresentation, source: ListOptions.apple.name)
+            listTypes.append(listType)
+        }
+        return listTypes
     }
 }

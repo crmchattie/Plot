@@ -11,6 +11,9 @@ import UIKit
 let userCalendarEventsEntity = "user-calendar-events"
 let calendarEventsKey = "calendar-events"
 
+let userReminderTasksEntity = "user-reminders-tasks"
+let reminderTasksKey = "reminders-tasks"
+
 class User: NSObject {
     
     var id: String?

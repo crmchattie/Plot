@@ -528,14 +528,40 @@ class WorkoutViewController: FormViewController {
                     } else {
                         // Fallback on earlier versions
                     }
-                    $0.options = ["Events", "Transactions"]
-                    $0.value = "Events"
+                    $0.options = ["Tasks", "Events", "Transactions"]
+                    $0.value = "Tasks"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     }.onChange({ _ in
                         self.sectionChanged = true
                     })
+            
+            form +++
+                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                                   header: "Tasks",
+                                   footer: "Connect an task") {
+                                    $0.tag = "Tasks"
+                                    $0.hidden = "!$sections == 'Tasks'"
+                                    $0.addButtonProvider = { section in
+                                        return ButtonRow("taskButton"){
+                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.title = "Connect Task"
+                                            }.cellUpdate { cell, row in
+                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.textLabel?.textAlignment = .left
+                                                cell.height = { 60 }
+                                            }
+                                    }
+                                    $0.multivaluedRowToInsertAt = { index in
+                                        self.taskIndex = index
+                                        self.openTask()
+                                        return SubtaskRow("label"){ _ in
+                                            
+                                        }
+                                    }
+
+                                }
 
             form +++
                 MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
@@ -556,8 +582,8 @@ class WorkoutViewController: FormViewController {
                                     $0.multivaluedRowToInsertAt = { index in
                                         self.eventIndex = index
                                         self.openEvent()
-                                        return ScheduleRow("label"){
-                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        return ScheduleRow("label"){ _ in
+                                            
                                         }
                                     }
 

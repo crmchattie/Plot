@@ -138,8 +138,8 @@ class EventKitService {
             return
         }
         
-        let existingEvent = eventStore.event(withIdentifier: eventID)
-        if let event = existingEvent {
+        let existingEvent = eventStore.calendarItem(withIdentifier:eventID)
+        if let event = existingEvent as? EKEvent {
             event.title = name
             event.startDate = startDate
             event.endDate = endDate
@@ -194,9 +194,9 @@ class EventKitService {
             return
         }
         
-        if let event = eventStore.event(withIdentifier: eventID) {
+        if let event = eventStore.calendarItem(withIdentifier: eventID) as? EKEvent {
             do {
-                try eventStore.save(event, span: .futureEvents)
+                try eventStore.remove(event, span: .futureEvents, commit: true)
             }
             catch let error as NSError {
                 print("Failed to save iOS calendar event with error : \(error)")
@@ -209,7 +209,7 @@ class EventKitService {
         calendar.title = "Plot"
         calendar.cgColor = UIColor.systemBlue.cgColor
 
-        guard let source = bestPossibleEKSource() else {
+        guard let source = bestPossibleEKEventSource() else {
             return nil
         }
         calendar.source = source
@@ -222,8 +222,224 @@ class EventKitService {
         return calendar
     }
     
-    func bestPossibleEKSource() -> EKSource? {
+    func bestPossibleEKEventSource() -> EKSource? {
         let `default` = eventStore.defaultCalendarForNewEvents?.source
+        let iCloud = eventStore.sources.first(where: { $0.title == "iCloud" }) // this is fragile, user can rename the source
+        let local = eventStore.sources.first(where: { $0.sourceType == .local })
+
+        return `default` ?? iCloud ?? local
+    }
+    
+    func fetchReminders(completion: @escaping ([EKReminder]) -> Swift.Void) {
+        
+        let predicate: NSPredicate? = eventStore.predicateForReminders(in: nil)
+        if let aPredicate = predicate {
+            eventStore.fetchReminders(matching: aPredicate, completion: {(_ reminders: [Any]?) -> Void in
+                completion(reminders as? [EKReminder] ?? [])
+            })
+        }
+    }
+    
+    func storeReminder(for activity: Activity) -> EKReminder? {
+        guard let name = activity.name else {
+            return nil
+        }
+
+        let reminder = EKReminder(eventStore: eventStore)
+        reminder.title = name
+        if let startDate = activity.startDate {
+            let calendar = Calendar.current
+            if activity.hasStartTime ?? false {
+                let dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: startDate)
+                reminder.startDateComponents = dateComponents
+            } else {
+                let dateComponents = calendar.dateComponents([.year, .month, .day], from: startDate)
+                reminder.startDateComponents = dateComponents
+            }
+        }
+        if let endDate = activity.endDate {
+            let calendar = Calendar.current
+            if activity.hasDeadlineTime ?? false {
+                let dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: endDate)
+                reminder.dueDateComponents = dateComponents
+            } else {
+                let dateComponents = calendar.dateComponents([.year, .month, .day], from: endDate)
+                reminder.dueDateComponents = dateComponents
+            }
+        }
+        reminder.isCompleted = activity.isCompleted ?? false
+        if let completedDate = activity.completedDate {
+            reminder.completionDate = Date(timeIntervalSince1970: completedDate as! TimeInterval)
+        }
+        reminder.notes = activity.activityDescription ?? ""
+
+        if let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let frequency = EKRecurrenceFrequency(rawValue: recurrenceRule.frequency.number) {
+            var daysOfTheWeek = [EKRecurrenceDayOfWeek]()
+            for dayy in recurrenceRule.byweekday {
+                daysOfTheWeek.append(EKRecurrenceDayOfWeek.init(dayy))
+            }
+
+            var daysOfTheMonth = [NSNumber]()
+            for dayy in recurrenceRule.bymonthday {
+                daysOfTheMonth.append(NSNumber(value: dayy))
+            }
+
+            var monthsOfTheYear = [NSNumber]()
+            for month in recurrenceRule.bymonth {
+                monthsOfTheYear.append(NSNumber(value: month))
+            }
+
+            var weeksOfTheYear = [NSNumber]()
+            for week in recurrenceRule.byweekno {
+                weeksOfTheYear.append(NSNumber(value: week))
+            }
+
+            var daysOfTheYear = [NSNumber]()
+            for dayy in recurrenceRule.byyearday {
+                daysOfTheYear.append(NSNumber(value: dayy))
+            }
+
+            var setPositions = [NSNumber]()
+            for setPos in recurrenceRule.bysetpos {
+                setPositions.append(NSNumber(value: setPos))
+            }
+
+            reminder.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
+            
+            if let value = UserDefaults.standard.string(forKey: "PlotList"), let calendar = eventStore.calendar(withIdentifier: value) {
+                reminder.calendar = calendar
+                do {
+                    try eventStore.save(reminder, commit: true)
+                }
+                catch let error as NSError {
+                    print("Failed to save iOS calendar event with error : \(error)")
+                }
+            } else if let calendar = createPlotCalendar() {
+                reminder.calendar = calendar
+                do {
+                    try eventStore.save(reminder, commit: true)
+                }
+                catch let error as NSError {
+                    print("Failed to save iOS calendar event with error : \(error)")
+                }
+            }
+
+        }
+        return reminder
+    }
+
+    func updateReminder(for activity: Activity) {
+        guard let reminderID = activity.externalActivityID, let name = activity.name else {
+            return
+        }
+
+        let existingReminder = eventStore.calendarItem(withIdentifier: reminderID)
+        if let reminder = existingReminder as? EKReminder {
+            reminder.title = name
+            if let startDate = activity.startDate {
+                let calendar = Calendar.current
+                if activity.hasStartTime ?? false {
+                    let dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: startDate)
+                    reminder.startDateComponents = dateComponents
+                } else {
+                    let dateComponents = calendar.dateComponents([.year, .month, .day], from: startDate)
+                    reminder.startDateComponents = dateComponents
+                }
+            }
+            if let endDate = activity.endDate {
+                let calendar = Calendar.current
+                if activity.hasDeadlineTime ?? false {
+                    let dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: endDate)
+                    reminder.dueDateComponents = dateComponents
+                } else {
+                    let dateComponents = calendar.dateComponents([.year, .month, .day], from: endDate)
+                    reminder.dueDateComponents = dateComponents
+                }
+            }
+            reminder.isCompleted = activity.isCompleted ?? false
+            if let completedDate = activity.completedDate {
+                reminder.completionDate = Date(timeIntervalSince1970: completedDate as! TimeInterval)
+            }
+            reminder.notes = activity.activityDescription ?? ""
+
+            if let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let frequency = EKRecurrenceFrequency(rawValue: recurrenceRule.frequency.number) {
+                var daysOfTheWeek = [EKRecurrenceDayOfWeek]()
+                for dayy in recurrenceRule.byweekday {
+                    daysOfTheWeek.append(EKRecurrenceDayOfWeek.init(dayy))
+                }
+
+                var daysOfTheMonth = [NSNumber]()
+                for dayy in recurrenceRule.bymonthday {
+                    daysOfTheMonth.append(NSNumber(value: dayy))
+                }
+
+                var monthsOfTheYear = [NSNumber]()
+                for month in recurrenceRule.bymonth {
+                    monthsOfTheYear.append(NSNumber(value: month))
+                }
+
+                var weeksOfTheYear = [NSNumber]()
+                for week in recurrenceRule.byweekno {
+                    weeksOfTheYear.append(NSNumber(value: week))
+                }
+
+                var daysOfTheYear = [NSNumber]()
+                for dayy in recurrenceRule.byyearday {
+                    daysOfTheYear.append(NSNumber(value: dayy))
+                }
+
+                var setPositions = [NSNumber]()
+                for setPos in recurrenceRule.bysetpos {
+                    setPositions.append(NSNumber(value: setPos))
+                }
+
+                reminder.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
+            }
+
+            do {
+                try eventStore.save(reminder, commit: true)
+            }
+            catch let error as NSError {
+                print("Failed to save iOS calendar event with error : \(error)")
+            }
+        }
+    }
+
+    func deleteReminder(for activity: Activity) {
+        guard let reminderID = activity.externalActivityID else {
+            return
+        }
+
+        if let reminder = eventStore.calendarItem(withIdentifier: reminderID) as? EKReminder {
+            do {
+                try eventStore.remove(reminder, commit: true)
+            }
+            catch let error as NSError {
+                print("Failed to save iOS calendar event with error : \(error)")
+            }
+        }
+    }
+
+    func createPlotList() -> EKCalendar? {
+        let calendar = EKCalendar(for: .reminder, eventStore: eventStore)
+        calendar.title = "Plot"
+        calendar.cgColor = UIColor.systemBlue.cgColor
+
+        guard let source = bestPossibleEKReminderSource() else {
+            return nil
+        }
+        calendar.source = source
+        do {
+            try eventStore.saveCalendar(calendar, commit: true)
+            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: "PlotList")
+        } catch let error as NSError {
+            print("Failed to save iOS calendar with error : \(error)")
+        }
+        return calendar
+    }
+
+    func bestPossibleEKReminderSource() -> EKSource? {
+        let `default` = eventStore.defaultCalendarForNewReminders()?.source
         let iCloud = eventStore.sources.first(where: { $0.title == "iCloud" }) // this is fragile, user can rename the source
         let local = eventStore.sources.first(where: { $0.sourceType == .local })
 

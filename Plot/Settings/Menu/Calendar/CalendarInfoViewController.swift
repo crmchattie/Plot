@@ -12,6 +12,7 @@ import CodableFirebase
 import GoogleSignIn
 
 let primaryCalendarKey = "primary-calendar"
+let primaryReminderKey = "primary-reminder"
 
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()

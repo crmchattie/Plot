@@ -38,7 +38,9 @@ class ScheduleViewController: FormViewController {
     
     var scheduleID = String()
     
-    fileprivate var active: Bool = false
+    var movingBackwards = true
+    
+    fileprivate var active = false
     
     init() {
         super.init(style: .insetGrouped)
@@ -84,6 +86,13 @@ class ScheduleViewController: FormViewController {
         setupMainView()
         initializeForm()
         
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if movingBackwards && navigationController?.visibleViewController is ScheduleListViewController {
+            delegate?.updateActivity(activity: schedule)
+        }
     }
     
     fileprivate func setupMainView() {
@@ -638,6 +647,7 @@ class ScheduleViewController: FormViewController {
         let createActivity = ActivityActions(activity: schedule, active: false, selectedFalconUsers: [])
         createActivity.createSubActivity()
         
+        movingBackwards = false
         delegate?.updateActivity(activity: schedule)
         
         if navigationItem.leftBarButtonItem != nil {

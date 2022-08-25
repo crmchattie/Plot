@@ -454,8 +454,8 @@ class MindfulnessViewController: FormViewController {
                                     $0.multivaluedRowToInsertAt = { index in
                                         self.taskIndex = index
                                         self.openTask()
-                                        return SubtaskRow("label"){
-                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        return SubtaskRow("label"){ _ in 
+                                            
                                         }
                                     }
 
@@ -480,8 +480,8 @@ class MindfulnessViewController: FormViewController {
                                     $0.multivaluedRowToInsertAt = { index in
                                         self.eventIndex = index
                                         self.openEvent()
-                                        return ScheduleRow("label"){
-                                            $0.value = Activity(dictionary: ["name": "Activity" as AnyObject])
+                                        return ScheduleRow("label"){ _ in
+                                            
                                         }
                                     }
 

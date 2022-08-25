@@ -102,8 +102,9 @@ class GCalendarActivityOp: AsyncOperation {
         }
     }
     
-    private func update(activity: Activity, completion: @escaping (Activity) -> Void) {        
+    private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
         activity.name = event.summary
+        activity.isEvent = true
         activity.activityDescription = event.descriptionProperty
         activity.recurrences = event.recurrence
         activity.admin = Auth.auth().currentUser?.uid
