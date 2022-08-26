@@ -45,7 +45,6 @@ class AccountSettingsController: UITableViewController {
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         
         
-        
         configureTableView()
         configureContainerView()
         configureNavigationBar()

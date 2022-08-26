@@ -402,6 +402,7 @@ class ActivityService {
     }
     
     func grabLists() {
+        print("grablists")
         if let _ = Auth.auth().currentUser {
             self.eventKitManager.authorizeEventKitReminders { _ in
                 if let lists = self.eventKitManager.grabLists() {
@@ -409,8 +410,11 @@ class ActivityService {
                 }
             }
             self.googleCalManager.authorizeGReminders { _ in
+                print("authorizeGReminders")
                 self.googleCalManager.grabLists() { lists in
+                    print("glists")
                     if let lists = lists {
+                        print("adding glists")
                         self.lists[ListOptions.google.name] = lists
                     }
                 }

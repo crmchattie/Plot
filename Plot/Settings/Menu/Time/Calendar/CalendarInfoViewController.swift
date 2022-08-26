@@ -7,9 +7,6 @@
 //
 
 import UIKit
-import Firebase
-import CodableFirebase
-import GoogleSignIn
 
 class CalendarInfoViewController: UITableViewController {
     var networkController = NetworkController()
@@ -30,7 +27,7 @@ class CalendarInfoViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         
-        title = "Calendar Information"
+        title = "Calendars Information"
         
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -50,23 +47,10 @@ class CalendarInfoViewController: UITableViewController {
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
-        
-        addObservers()
-        
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarsUpdated, object: nil)
-    }
-    
-    @objc fileprivate func eventsUpdated() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {
@@ -78,29 +62,11 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     @objc func newCalendar() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if !calendars.keys.contains(CalendarOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
-            }))
-        }
-        
-        if !calendars.keys.contains(CalendarOptions.google.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
-                GIDSignIn.sharedInstance().delegate = self
-                GIDSignIn.sharedInstance()?.presentingViewController = self
-                GIDSignIn.sharedInstance()?.signIn()
-            }))
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
+        let destination = SignInAppleGoogleViewController()
+        destination.networkController = self.networkController
+        destination.title = "Calendars"
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -168,13 +134,16 @@ class CalendarInfoViewController: UITableViewController {
     }
 }
 
-extension CalendarInfoViewController: GIDSignInDelegate {
-    
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
-        } else {
-          print("\(error.localizedDescription)")
+extension CalendarInfoViewController: UpdateWithGoogleAppleSignInDelegate {
+    func UpdateWithGoogleAppleSignIn() {
+        sections = Array(calendars.keys).sorted { s1, s2 in
+            if s1 == ListOptions.plot.name {
+                return true
+            } else if s2 == ListOptions.plot.name {
+                return false
+            }
+            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
+        self.tableView.reloadData()
     }
 }

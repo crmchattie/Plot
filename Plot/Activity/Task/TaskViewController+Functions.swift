@@ -607,45 +607,48 @@ extension TaskViewController {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                //update activity's recurrence to skip repeat on this date
+                //update task's recurrence to skip repeat on this date
                 var oldActivityRule = oldRecurrenceRule
-                //duplicate updated activity w/ new ID and no recurrence rule
+                //duplicate updated task w/ new ID and no recurrence rule
                 self.duplicateActivity(recurrenceRule: nil)
-                //update existing activity with exlusion date that fall's on this date
-                oldActivityRule.exdate = ExclusionDate(dates: [self.task.startDate ?? Date()], granularity: .day)
+                //update existing task with exlusion date that fall's on this date
+                //FIX-ME: need to make sure oldActivityRule dates correspond to self.task.startDate
+                oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
                 self.taskOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
                 self.updateRecurrences(recurrences: self.taskOld.recurrences!)
             }))
             
-            alert.addAction(UIAlertAction(title: "Save For Future Tasks", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
                 print("Save for future events")
-                //update activity's recurrence to stop repeating just before this event
+                //update task's recurrence to stop repeating just before this event
                 var oldActivityRule = oldRecurrenceRule
                 //will equal true if first instance of repeating event
-                if oldActivityRule.startDate == self.taskOld.startDate {
-                    //update all instances of activity
-                    if self.task.recurrences == nil {
-                        self.deleteRecurrences()
+                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: startDate) {
+                    if dateIndex == 0 {
+                        //update all instances of task
+                        if self.task.recurrences == nil {
+                            self.deleteRecurrences()
+                        }
+                        self.createActivity(activity: nil)
+                    } else if let newRecurrences = self.task.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+
+                        //update only future instances of task
+                        var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
+                        newActivityRule!.startDate = self.task.startDate ?? Date()
+                        
+                        var newRecurrences = oldRecurrences
+                        newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
+                        
+                        //duplicate task w/ new ID and same recurrence rule starting from this event's date
+                        self.duplicateActivity(recurrenceRule: newRecurrences)
+                        
+                        //update existing task with end date equaling ocurrence before this date
+                        oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
+                        
+                        self.taskOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
+                        
+                        self.updateRecurrences(recurrences: self.taskOld.recurrences!)
                     }
-                    self.createActivity(activity: nil)
-                } else if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: self.taskOld.startDate ?? Date()), let newRecurrences = self.task.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
-                    
-                    //update only future instances of activity
-                    var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
-                    newActivityRule!.startDate = self.task.startDate ?? Date()
-                    
-                    var newRecurrences = oldRecurrences
-                    newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
-                    
-                    //duplicate activity w/ new ID and same recurrence rule starting from this event's date
-                    self.duplicateActivity(recurrenceRule: newRecurrences)
-                    
-                    //update existing activity with end date equaling ocurrence before this date
-                    oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
-                    
-                    self.taskOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
-                    
-                    self.updateRecurrences(recurrences: self.taskOld.recurrences!)
                 }
             }))
             
@@ -663,12 +666,12 @@ extension TaskViewController {
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            alert.addAction(UIAlertAction(title: "Update Task", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Update Event", style: .default, handler: { (_) in
                 print("User click Edit button")
                 self.createActivity(activity: nil)
             }))
             
-            alert.addAction(UIAlertAction(title: "Duplicate Task", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Duplicate Event", style: .default, handler: { (_) in
                 print("User click Edit button")
                 self.duplicateActivity(recurrenceRule: nil)
             }))
@@ -832,49 +835,40 @@ extension TaskViewController {
     
     func deleteActivity() {
         //need to look into equatable protocol for activities
-        if task.recurrences != nil {
+        if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = taskOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
+                
                 //update activity's recurrence to skip repeat on this date
-                if let recurrences = self.task.recurrences {
-                    if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
-                        var rule = RecurrenceRule(rruleString: recurrence)
-                        if rule != nil {
-    //                      update existing activity with exlusion date that fall's on this date
-                            rule!.exdate = ExclusionDate(dates: [self.task.startDate ?? Date()], granularity: .day)
-                            self.task.recurrences!.append(rule!.exdate!.toExDateString()!)
-                            self.updateRecurrences(recurrences: self.task.recurrences!)
-                        }
-                    }
-                }
+                var oldActivityRule = oldRecurrenceRule
+                //update existing activity with exlusion date that fall's on this date
+                oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
+                self.task.recurrences!.append(oldActivityRule.exdate!.toExDateString()!)
+                self.updateRecurrences(recurrences: self.task.recurrences!)
             }))
             
-            alert.addAction(UIAlertAction(title: "Delete All Future Tasks", style: .default, handler: { (_) in
-                print("Save for future events")
+            alert.addAction(UIAlertAction(title: "Delete All Future Events", style: .default, handler: { (_) in
                 //update activity's recurrence to stop repeating at this event
-                if let recurrences = self.task.recurrences {
-                    if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
-                        var rule = RecurrenceRule(rruleString: recurrence)
-                        if rule != nil, let index = rule!.allOccurrences().firstIndex(of: self.task.startDate ?? Date()) {
-                            if index > 0 {
-                                //update existing activity with end date equaling ocurrence of this date
-                                rule!.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: index)
-                                self.task.recurrences = [rule!.toRRuleString()]
-                                self.updateRecurrences(recurrences: self.task.recurrences!)
-                            } else {
-                                self.showActivityIndicator()
-                                let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                                deleteActivity.deleteActivity()
-                                self.hideActivityIndicator()
-                                if self.navigationItem.leftBarButtonItem != nil {
-                                    self.dismiss(animated: true, completion: nil)
-                                } else {
-                                    self.navigationController?.popViewController(animated: true)
-                                }
-                            }
+                var oldActivityRule = oldRecurrenceRule
+                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: startDate) {
+                    //will equal true if first instance of repeating event
+                    if dateIndex == 0 {
+                        self.showActivityIndicator()
+                        let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                        deleteActivity.deleteActivity()
+                        self.hideActivityIndicator()
+                        if self.navigationItem.leftBarButtonItem != nil {
+                            self.dismiss(animated: true, completion: nil)
+                        } else {
+                            self.navigationController?.popViewController(animated: true)
                         }
+                    } else {
+                        //update existing activity with end date equaling ocurrence of this date
+                        oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
+                        self.task.recurrences = [oldActivityRule.toRRuleString()]
+                        self.updateRecurrences(recurrences: self.task.recurrences!)
                     }
                 }
             }))

@@ -7,9 +7,6 @@
 //
 
 import UIKit
-import Firebase
-import CodableFirebase
-import GoogleSignIn
 
 class TaskInfoViewController: UITableViewController {
     var networkController = NetworkController()
@@ -40,6 +37,7 @@ class TaskInfoViewController: UITableViewController {
         if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
             let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
             navigationItem.rightBarButtonItem = barButton
+
         }
         
         sections = Array(lists.keys).sorted { s1, s2 in
@@ -50,23 +48,10 @@ class TaskInfoViewController: UITableViewController {
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
-        
-        addObservers()
-        
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
-    }
-    
-    @objc fileprivate func listsUpdated() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {
@@ -78,29 +63,11 @@ class TaskInfoViewController: UITableViewController {
     }
     
     @objc func newList() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if !lists.keys.contains(ListOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: ListOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryList(value: ListOptions.apple.name)
-            }))
-        }
-        
-        if !lists.keys.contains(ListOptions.google.name) {
-            alert.addAction(UIAlertAction(title: ListOptions.google.name, style: .default, handler: { (_) in
-                GIDSignIn.sharedInstance().delegate = self
-                GIDSignIn.sharedInstance()?.presentingViewController = self
-                GIDSignIn.sharedInstance()?.signIn()
-            }))
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
+        let destination = SignInAppleGoogleViewController()
+        destination.networkController = self.networkController
+        destination.title = "Tasks"
+        destination.delegate = self
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -168,13 +135,19 @@ class TaskInfoViewController: UITableViewController {
     }
 }
 
-extension TaskInfoViewController: GIDSignInDelegate {
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        print("signed in")
-        if (error == nil) {
-            self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
-        } else {
-          print("\(error.localizedDescription)")
+extension TaskInfoViewController: UpdateWithGoogleAppleSignInDelegate {
+    func UpdateWithGoogleAppleSignIn() {
+        for (key, _) in lists {
+            print(key)
         }
+        sections = Array(lists.keys).sorted { s1, s2 in
+            if s1 == ListOptions.plot.name {
+                return true
+            } else if s2 == ListOptions.plot.name {
+                return false
+            }
+            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
+        }
+        self.tableView.reloadData()
     }
 }

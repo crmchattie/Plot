@@ -54,7 +54,7 @@ enum ListOptions:String, CaseIterable {
             switch self {
             case .plot: return UIImage(named: "plotLogo")!
             case .apple: return UIImage(named: "iCloud")!
-            case .google: return UIImage(named: "googleCalendar")!
+            case .google: return UIImage(named: "google")!
         }
     }
         

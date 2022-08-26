@@ -83,6 +83,15 @@ enum Theme: Int {
         }
     }
     
+    var googleSignInBackgroundColor: UIColor {
+        switch self {
+        case .Default:
+            return UIColor("#FFFFFF")
+        case .Dark:
+            return UIColor("#4285F4")
+        }
+    }
+    
     var chatBackgroundColor: UIColor {
         switch self {
         case .Default:

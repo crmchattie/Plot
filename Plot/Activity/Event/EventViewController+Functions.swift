@@ -800,7 +800,8 @@ extension EventViewController {
                 //duplicate updated activity w/ new ID and no recurrence rule
                 self.duplicateActivity(recurrenceRule: nil)
                 //update existing activity with exlusion date that fall's on this date
-                oldActivityRule.exdate = ExclusionDate(dates: [self.activity.startDate ?? Date()], granularity: .day)
+                //FIX-ME: need to make sure oldActivityRule dates correspond to self.activity.startDate
+                oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
                 self.activityOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
                 self.updateRecurrences(recurrences: self.activityOld.recurrences!)
             }))
@@ -810,30 +811,32 @@ extension EventViewController {
                 //update activity's recurrence to stop repeating just before this event
                 var oldActivityRule = oldRecurrenceRule
                 //will equal true if first instance of repeating event
-                if oldActivityRule.startDate == self.activityOld.startDate {
-                    //update all instances of activity
-                    if self.activity.recurrences == nil {
-                        self.deleteRecurrences()
+                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: startDate) {
+                    if dateIndex == 0 {
+                        //update all instances of activity
+                        if self.activity.recurrences == nil {
+                            self.deleteRecurrences()
+                        }
+                        self.createActivity(activity: nil)
+                    } else if let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+
+                        //update only future instances of activity
+                        var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
+                        newActivityRule!.startDate = self.activity.startDate ?? Date()
+                        
+                        var newRecurrences = oldRecurrences
+                        newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
+                        
+                        //duplicate activity w/ new ID and same recurrence rule starting from this event's date
+                        self.duplicateActivity(recurrenceRule: newRecurrences)
+                        
+                        //update existing activity with end date equaling ocurrence before this date
+                        oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
+                        
+                        self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
+                        
+                        self.updateRecurrences(recurrences: self.activityOld.recurrences!)
                     }
-                    self.createActivity(activity: nil)
-                } else if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: self.activityOld.startDate ?? Date()), let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
-                    
-                    //update only future instances of activity
-                    var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
-                    newActivityRule!.startDate = self.activity.startDate ?? Date()
-                    
-                    var newRecurrences = oldRecurrences
-                    newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
-                    
-                    //duplicate activity w/ new ID and same recurrence rule starting from this event's date
-                    self.duplicateActivity(recurrenceRule: newRecurrences)
-                    
-                    //update existing activity with end date equaling ocurrence before this date
-                    oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
-                    
-                    self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
-                    
-                    self.updateRecurrences(recurrences: self.activityOld.recurrences!)
                 }
             }))
             
@@ -963,49 +966,40 @@ extension EventViewController {
     
     func deleteActivity() {
         //need to look into equatable protocol for activities
-        if activity.recurrences != nil {
+        if let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
+                
                 //update activity's recurrence to skip repeat on this date
-                if let recurrences = self.activity.recurrences {
-                    if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
-                        var rule = RecurrenceRule(rruleString: recurrence)
-                        if rule != nil {
-    //                      update existing activity with exlusion date that fall's on this date
-                            rule!.exdate = ExclusionDate(dates: [self.activity.startDate ?? Date()], granularity: .day)
-                            self.activity.recurrences!.append(rule!.exdate!.toExDateString()!)
-                            self.updateRecurrences(recurrences: self.activity.recurrences!)
-                        }
-                    }
-                }
+                var oldActivityRule = oldRecurrenceRule
+                //update existing activity with exlusion date that fall's on this date
+                oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
+                self.activity.recurrences!.append(oldActivityRule.exdate!.toExDateString()!)
+                self.updateRecurrences(recurrences: self.activity.recurrences!)
             }))
             
             alert.addAction(UIAlertAction(title: "Delete All Future Events", style: .default, handler: { (_) in
-                print("Save for future events")
                 //update activity's recurrence to stop repeating at this event
-                if let recurrences = self.activity.recurrences {
-                    if let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
-                        var rule = RecurrenceRule(rruleString: recurrence)
-                        if rule != nil, let index = rule!.allOccurrences().firstIndex(of: self.activity.startDate ?? Date()) {
-                            if index > 0 {
-                                //update existing activity with end date equaling ocurrence of this date
-                                rule!.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: index)
-                                self.activity.recurrences = [rule!.toRRuleString()]
-                                self.updateRecurrences(recurrences: self.activity.recurrences!)
-                            } else {
-                                self.showActivityIndicator()
-                                let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                                deleteActivity.deleteActivity()
-                                self.hideActivityIndicator()
-                                if self.navigationItem.leftBarButtonItem != nil {
-                                    self.dismiss(animated: true, completion: nil)
-                                } else {
-                                    self.navigationController?.popViewController(animated: true)
-                                }
-                            }
+                var oldActivityRule = oldRecurrenceRule
+                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: startDate) {
+                    //will equal true if first instance of repeating event
+                    if dateIndex == 0 {
+                        self.showActivityIndicator()
+                        let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                        deleteActivity.deleteActivity()
+                        self.hideActivityIndicator()
+                        if self.navigationItem.leftBarButtonItem != nil {
+                            self.dismiss(animated: true, completion: nil)
+                        } else {
+                            self.navigationController?.popViewController(animated: true)
                         }
+                    } else {
+                        //update existing activity with end date equaling ocurrence of this date
+                        oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
+                        self.activity.recurrences = [oldActivityRule.toRRuleString()]
+                        self.updateRecurrences(recurrences: self.activity.recurrences!)
                     }
                 }
             }))

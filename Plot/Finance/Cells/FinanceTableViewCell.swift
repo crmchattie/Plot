@@ -142,5 +142,4 @@ class FinanceTableViewCell: UITableViewCell {
         bottomLabel.font = UIFont.preferredFont(forTextStyle: .body)
         IV.isHidden = false
     }
-    
 }

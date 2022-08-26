@@ -200,10 +200,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
                 let destination = TaskViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
-            case .calendar:
-                self.newCalendar()
-            case .lists:
-                self.newList()
             case .flight:
                 print("flight")
             case .meal:
@@ -306,58 +302,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         let navigationViewController = UINavigationController(rootViewController: destination)
         navigationViewController.modalPresentationStyle = .fullScreen
         self.present(navigationViewController, animated: true, completion: nil)
-    }
-    
-    @objc func newCalendar() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
-            }))
-        }
-        
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
-                GIDSignIn.sharedInstance().delegate = self
-                GIDSignIn.sharedInstance()?.presentingViewController = self
-                GIDSignIn.sharedInstance()?.signIn()
-            }))
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-    }
-    
-    @objc func newList() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: ListOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryList(value: ListOptions.apple.name)
-            }))
-        }
-        
-        if !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
-            alert.addAction(UIAlertAction(title: ListOptions.google.name, style: .default, handler: { (_) in
-                GIDSignIn.sharedInstance().delegate = self
-                GIDSignIn.sharedInstance()?.presentingViewController = self
-                GIDSignIn.sharedInstance()?.signIn()
-            }))
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
     }
     
     func getSelectedFalconUsers(forActivity activity: Activity, completion: @escaping ([User])->()) {

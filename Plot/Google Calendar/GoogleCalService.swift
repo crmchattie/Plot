@@ -25,6 +25,8 @@ class GoogleCalService {
     
     func authorizeGReminders(completion: @escaping (Bool) -> Swift.Void) {
         GoogleCalSetupAssistant.authorizeGReminders { bool in
+            print("authorizeGReminders")
+            print(bool)
             completion(bool)
         }
     }

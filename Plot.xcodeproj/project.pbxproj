@@ -166,6 +166,10 @@
 		1092E27128B7E4440018FCAA /* TimeInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */; };
 		1092E27328B7E5600018FCAA /* TaskInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */; };
 		1092E27528B7E5750018FCAA /* TaskAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27428B7E5750018FCAA /* TaskAccountView.swift */; };
+		1092E27828B923A70018FCAA /* SignInAppleGoogleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27728B923A70018FCAA /* SignInAppleGoogleViewController.swift */; };
+		1092E27A28B927BC0018FCAA /* TableViewObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27928B927BC0018FCAA /* TableViewObject.swift */; };
+		1092E27C28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */; };
+		1092E27F28B93CE10018FCAA /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -760,6 +764,10 @@
 		1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInfoViewController.swift; sourceTree = "<group>"; };
 		1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskInfoViewController.swift; sourceTree = "<group>"; };
 		1092E27428B7E5750018FCAA /* TaskAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskAccountView.swift; sourceTree = "<group>"; };
+		1092E27728B923A70018FCAA /* SignInAppleGoogleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInAppleGoogleViewController.swift; sourceTree = "<group>"; };
+		1092E27928B927BC0018FCAA /* TableViewObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewObject.swift; sourceTree = "<group>"; };
+		1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInAppleGoogleTableViewCell.swift; sourceTree = "<group>"; };
+		1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Medium.ttf"; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -1615,8 +1623,26 @@
 				1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */,
 				1092E26E28B7E37E0018FCAA /* Reminders */,
 				1034A04325C5ECB9006D3DB8 /* Calendar */,
+				1092E27628B91F990018FCAA /* SignInAppleGoogle */,
 			);
 			path = Time;
+			sourceTree = "<group>";
+		};
+		1092E27628B91F990018FCAA /* SignInAppleGoogle */ = {
+			isa = PBXGroup;
+			children = (
+				1092E27728B923A70018FCAA /* SignInAppleGoogleViewController.swift */,
+				1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */,
+			);
+			path = SignInAppleGoogle;
+			sourceTree = "<group>";
+		};
+		1092E27D28B93C5A0018FCAA /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		10970B122580605D0027A9EF /* Mindfulness */ = {
@@ -2059,6 +2085,7 @@
 				4B4F453C1F32230C00A6FF96 /* Info.plist */,
 				10217A7923103377004CBA9E /* Plot-Bridging-Header.h */,
 				10ED542C22CAEA41003797CF /* Plot.entitlements */,
+				1092E27D28B93C5A0018FCAA /* Fonts */,
 			);
 			path = Plot;
 			sourceTree = "<group>";
@@ -2171,6 +2198,7 @@
 			children = (
 				4BAEE45E21272B380045AB10 /* SwitchObject.swift */,
 				4BAEE45F21272B380045AB10 /* Biometrics.swift */,
+				1092E27928B927BC0018FCAA /* TableViewObject.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3086,6 +3114,7 @@
 				105F34A62885EF7A007531EB /* PickerViewCell.xib in Resources */,
 				4BAEE51721272D890045AB10 /* TimestampView.xib in Resources */,
 				4BAEE5EB212735E50045AB10 /* CallingCodes.plist in Resources */,
+				1092E27F28B93CE10018FCAA /* Roboto-Medium.ttf in Resources */,
 				4B4F45381F32230C00A6FF96 /* Assets.xcassets in Resources */,
 				4BAEE5B9212735E50045AB10 /* INSPhotoGallery.bundle in Resources */,
 				4BCB128C224ADD450046DFF3 /* GoogleService-Info.plist in Resources */,
@@ -3196,6 +3225,7 @@
 				4BAEE5BC212735E50045AB10 /* INSPhotoViewController.swift in Sources */,
 				4BAEE52321272D890045AB10 /* GroupAdminControlsTableViewController.swift in Sources */,
 				10173606251924120073D283 /* FinancialAccountFetcher.swift in Sources */,
+				1092E27828B923A70018FCAA /* SignInAppleGoogleViewController.swift in Sources */,
 				4BAEE49621272C5E0045AB10 /* CurrentUserTableViewCell.swift in Sources */,
 				10196F0B24411B5600B6AFDF /* MediaViewController.swift in Sources */,
 				10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */,
@@ -3292,6 +3322,7 @@
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,
 				26A5DDD82394CB2400771DC1 /* RecipeSearchResult.swift in Sources */,
 				108C37F928A14DA900DC4998 /* WorkoutViewController+Extensions.swift in Sources */,
+				1092E27C28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift in Sources */,
 				1080872B2585064300FB9BB0 /* SleepFetcher.swift in Sources */,
 				26836B552514916B00AFC2D7 /* HealthMetricCell.swift in Sources */,
 				4BAEE46B21272B380045AB10 /* SwitchTableViewController.swift in Sources */,
@@ -3433,6 +3464,7 @@
 				10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */,
 				269105FA2549D66800A02C5F /* HealthDetailViewModel.swift in Sources */,
 				108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */,
+				1092E27A28B927BC0018FCAA /* TableViewObject.swift in Sources */,
 				4B6521FA219B3A4400FF655E /* GroupMembersManager.swift in Sources */,
 				10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */,
 				4BAEE46521272B380045AB10 /* AccountSettingsController.swift in Sources */,
