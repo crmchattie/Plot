@@ -140,15 +140,6 @@ class EventKitService {
                 catch let error as NSError {
                     print("Failed to save iOS calendar event with error : \(error)")
                 }
-            } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
-                UserDefaults.standard.set(value, forKey: "PlotAppleCalendar")
-                event.calendar = calendar
-                do {
-                    try eventStore.save(event, span: .thisEvent)
-                }
-                catch let error as NSError {
-                    print("Failed to save iOS calendar event with error : \(error)")
-                }
             } else if let calendar = createPlotCalendar() {
                 event.calendar = calendar
                 do {
@@ -261,13 +252,9 @@ class EventKitService {
     }
     
     func fetchReminders(completion: @escaping ([EKReminder]) -> Swift.Void) {
-        print("fetchReminders")
         let predicate: NSPredicate? = eventStore.predicateForReminders(in: nil)
         if let aPredicate = predicate {
             eventStore.fetchReminders(matching: aPredicate, completion: {(_ reminders: [Any]?) -> Void in
-                for reminder in reminders as? [EKReminder] ?? [] {
-                    print(reminder.title)
-                }
                 completion(reminders as? [EKReminder] ?? [])
             })
         }
@@ -340,6 +327,7 @@ class EventKitService {
             reminder.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
             
             if let value = UserDefaults.standard.string(forKey: "PlotAppleList"), let calendar = eventStore.calendar(withIdentifier: value) {
+                print("found calendar")
                 reminder.calendar = calendar
                 do {
                     try eventStore.save(reminder, commit: true)
@@ -347,7 +335,7 @@ class EventKitService {
                 catch let error as NSError {
                     print("Failed to save iOS calendar event with error : \(error)")
                 }
-            } else if let calendar = createPlotCalendar() {
+            } else if let calendar = createPlotList() {
                 reminder.calendar = calendar
                 do {
                     try eventStore.save(reminder, commit: true)

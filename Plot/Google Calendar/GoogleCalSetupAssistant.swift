@@ -9,54 +9,83 @@
 import Foundation
 import GoogleSignIn
 
+let googleEmailScope = "https://www.googleapis.com/auth/calendar"
+let googleTaskScope = "https://www.googleapis.com/auth/tasks"
+let googleScopes = [googleEmailScope, googleTaskScope]
+
 class GoogleCalSetupAssistant {
+    static var calendarService: GTLRCalendarService?
+    static var taskService: GTLRTasksService?
     
-    static let currentUser = GIDSignIn.sharedInstance().currentUser
-    static let authentication = currentUser?.authentication
+    class func setupCalendarService(_ completion: @escaping () -> Void) {
+        let currentUser = GIDSignIn.sharedInstance().currentUser
+        let authentication = currentUser?.authentication
+        let grantedScopes = currentUser?.grantedScopes as? [String]
+        
+        authentication?.getTokensWithHandler { authentication, error in
+            guard error == nil, let authentication = authentication, let grantedScopes = grantedScopes, grantedScopes.contains(googleTaskScope)
+            else {
+                print(error as Any)
+                completion()
+                return
+            }
+            let service = GTLRCalendarService()
+            // Have the service object set tickets to fetch consecutive pages
+            // of the feed so we do not need to manually fetch them
+            service.shouldFetchNextPages = true
+            // Have the service object set tickets to retry temporary error conditions
+            // automatically
+            service.isRetryEnabled = true
+            service.maxRetryInterval = 15
+            service.authorizer = authentication.fetcherAuthorizer()
+            calendarService = service
+            completion()
+        }
+    }
     
-    /// Creates calendar service with current authentication
-    static let calendarService: GTLRCalendarService? = {
-        let service = GTLRCalendarService()
-        // Have the service object set tickets to fetch consecutive pages
-        // of the feed so we do not need to manually fetch them
-        service.shouldFetchNextPages = true
-        // Have the service object set tickets to retry temporary error conditions
-        // automatically
-        service.isRetryEnabled = true
-        service.maxRetryInterval = 15
-        guard let authentication = authentication else { return nil }
-        service.authorizer = authentication.fetcherAuthorizer()
-        return service
-    }()
-    
-    /// Creates task service with current authentication
-    static let taskService: GTLRTasksService? = {
-        let service = GTLRTasksService()
-        // Have the service object set tickets to fetch consecutive pages
-        // of the feed so we do not need to manually fetch them
-        service.shouldFetchNextPages = true
-        // Have the service object set tickets to retry temporary error conditions
-        // automatically
-        service.isRetryEnabled = true
-        service.maxRetryInterval = 15
-        guard let authentication = authentication else { return nil }
-        service.authorizer = authentication.fetcherAuthorizer()
-        return service
-    }()
+    class func setupTaskService(_ completion: @escaping () -> Void) {        
+        let currentUser = GIDSignIn.sharedInstance().currentUser
+        let authentication = currentUser?.authentication
+        let grantedScopes = currentUser?.grantedScopes as? [String]
+        
+        authentication?.getTokensWithHandler { authentication, error in
+            guard error == nil, let authentication = authentication, let grantedScopes = grantedScopes, grantedScopes.contains(googleTaskScope)
+            else {
+                print(error as Any)
+                completion()
+                return
+            }
+            let service = GTLRTasksService()
+            // Have the service object set tickets to fetch consecutive pages
+            // of the feed so we do not need to manually fetch them
+            service.shouldFetchNextPages = true
+            // Have the service object set tickets to retry temporary error conditions
+            // automatically
+            service.isRetryEnabled = true
+            service.maxRetryInterval = 15
+            service.authorizer = authentication.fetcherAuthorizer()
+            GoogleCalSetupAssistant.taskService = service
+            completion()
+        }
+    }
     
     class func authorizeGEvents(_ completion: @escaping (Bool) -> Void) {
-        if calendarService != nil {
-            completion(true)
-            return
+        setupCalendarService {
+            if calendarService != nil {
+                completion(true)
+                return
+            }
+            completion(false)
         }
-        completion(false)
     }
     
     class func authorizeGReminders(_ completion: @escaping (Bool) -> Void) {
-        if taskService != nil {
-            completion(true)
-            return
+        setupTaskService {
+            if taskService != nil {
+                completion(true)
+                return
+            }
+            completion(false)
         }
-        completion(false)
     }
 }

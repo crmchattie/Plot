@@ -25,8 +25,6 @@ class GoogleCalService {
     
     func authorizeGReminders(completion: @escaping (Bool) -> Swift.Void) {
         GoogleCalSetupAssistant.authorizeGReminders { bool in
-            print("authorizeGReminders")
-            print(bool)
             completion(bool)
         }
     }
@@ -199,6 +197,7 @@ class GoogleCalService {
         let query = GTLRCalendarQuery_CalendarListList.query()
         service.executeQuery(query) { (ticket, result, error) in
             guard error == nil, let items = (result as? GTLRCalendar_CalendarList)?.items else {
+                print("grabCalendars error \(String(describing: error))")
                 completion(nil)
                 return
             }
@@ -382,6 +381,7 @@ class GoogleCalService {
         let query = GTLRTasksQuery_TasklistsList.query()
         service.executeQuery(query) { (ticket, result, error) in
             guard error == nil, let items = (result as? GTLRTasks_TaskLists)?.items else {
+                print("grabLists error \(String(describing: error))")
                 completion(nil)
                 return
             }

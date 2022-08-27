@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Database.database().isPersistenceEnabled = true
         userDefaults.configureInitialLaunch()
         GIDSignIn.sharedInstance().clientID = "433321796976-14dht5ecttj96dnltoj7cf0arfr7e6bo.apps.googleusercontent.com"
-        GIDSignIn.sharedInstance().scopes = ["https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/tasks"]
+        GIDSignIn.sharedInstance().scopes = googleScopes
         GIDSignIn.sharedInstance()?.restorePreviousSignIn()
         //manually create window or default controller, thus ridding of Storyboard
         let masterController = MasterActivityContainerController()

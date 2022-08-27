@@ -152,11 +152,12 @@ class SignInAppleGoogleViewController: UITableViewController {
 extension SignInAppleGoogleViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         print("signed in")
-        if (error == nil) && title == "Tasks" {
+        self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
+        self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+        
+        if (error == nil) {
             print("updatePrimaryCalendar")
             self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
-        }
-        else if (error == nil) && title == "Calendars" {
             self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
         }
         else {

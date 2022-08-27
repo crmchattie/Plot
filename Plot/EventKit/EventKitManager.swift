@@ -169,6 +169,7 @@ class EventKitManager {
     }
     
     func syncTasksToEventKit(activities: [Activity], completion: @escaping () -> Void)  {
+        print("syncTasksToEventKit")
         guard !isRunningTasks, isAuthorizedReminders else {
             completion()
             return
@@ -178,7 +179,7 @@ class EventKitManager {
         
         //filter old activities out
         let filterActivities = activities.filter { !($0.calendarExport ?? false) && $0.isTask ?? false }
-                
+                        
         let activitiesOp = EKPlotTaskOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
         queue.addOperations([activitiesOp], waitUntilFinished: false)

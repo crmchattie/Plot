@@ -44,24 +44,16 @@ class WorkoutOperation: AsyncOperation {
                     // Most recent workout
                     let workout = workouts.last {
                     let workoutTotalCalories = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-                    let workoutTotalMinutes = workout.endDate.timeIntervalSince(workout.startDate)
                     
                     var metricCalories = HealthMetric(type: HealthMetricType.workout, total: workoutTotalCalories, date: workout.endDate, unitName: "calories", rank: _self.rank)
                     metricCalories.hkSample = workout
-                    
-                    var metricMinutes = HealthMetric(type: HealthMetricType.workoutMinutes, total: workoutTotalMinutes, date: workout.endDate, unitName: "hrs", rank: -1)
-                    metricMinutes.hkSample = workout
-                    
+                                        
                     var containers: [Container] = []
                     var averageEnergyBurned: Double = 0
-                    var averageWorkoutTime: Double = 0
                     
                         workouts.forEach { workout in
                             let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
                             averageEnergyBurned += totalEnergyBurned
-                            
-                            let interval = workout.endDate.timeIntervalSince(workout.startDate)
-                            averageWorkoutTime += interval
                             
                             // Only create activities that past lastSync date time
                             if (_self.lastSyncDate == nil || (workout.startDate >= _self.lastSyncDate!)) && existingWorkoutKeys[workout.uuid.uuidString] == nil {
@@ -100,13 +92,7 @@ class WorkoutOperation: AsyncOperation {
                         metricCalories.average = averageEnergyBurned
                     }
                     
-                    if averageWorkoutTime != 0 {
-                        averageWorkoutTime /= Double(workouts.count)
-                        metricMinutes.average = averageWorkoutTime
-                    }
-
                     _self.delegate?.insertMetric(_self, metricCalories, HealthMetricCategory.workouts.rawValue, containers)
-                    _self.delegate?.insertMetric(_self, metricMinutes, HealthMetricCategory.workouts.rawValue, containers)
                 }
 
                 self?.finish()

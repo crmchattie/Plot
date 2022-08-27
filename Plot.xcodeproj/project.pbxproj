@@ -170,6 +170,7 @@
 		1092E27A28B927BC0018FCAA /* TableViewObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27928B927BC0018FCAA /* TableViewObject.swift */; };
 		1092E27C28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */; };
 		1092E27F28B93CE10018FCAA /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */; };
+		1092E28128BA7C3D0018FCAA /* WorkoutMinutesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -768,6 +769,7 @@
 		1092E27928B927BC0018FCAA /* TableViewObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewObject.swift; sourceTree = "<group>"; };
 		1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInAppleGoogleTableViewCell.swift; sourceTree = "<group>"; };
 		1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Medium.ttf"; sourceTree = "<group>"; };
+		1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutMinutesOperation.swift; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -1924,6 +1926,7 @@
 				261FAF76251C661D008636DF /* AnnualAverageWeightOperation.swift */,
 				261FAF78251C69C0008636DF /* WeightOperation.swift */,
 				26317C2F251DB250007CC315 /* WorkoutOperation.swift */,
+				1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */,
 				26958552255A7355008FEE9B /* NutritionOperation.swift */,
 				26BDCDCB2582097700E850CF /* SleepOperation.swift */,
 				263508A9258D76B000F57ACB /* MindfulnessOperation.swift */,
@@ -3656,6 +3659,7 @@
 				10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */,
 				F9B82C8325FAB1670072BE74 /* AnalyticsViewController.swift in Sources */,
 				10DF1F1025D2EDF4009FABA7 /* CalendarAccountView.swift in Sources */,
+				1092E28128BA7C3D0018FCAA /* WorkoutMinutesOperation.swift in Sources */,
 				F9DD17032613E67300B8374D /* AnalyticsBarChartCell.swift in Sources */,
 				10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */,
 				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,

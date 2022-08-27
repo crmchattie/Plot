@@ -22,7 +22,7 @@ target 'Plot' do
   pod 'FloatingPanel', '~> 1.6.5'
   pod 'Charts', '~> 3.6.0'
 
-  pod 'GoogleSignIn', '~> 5.0.2'
+  pod 'GoogleSignIn'
   pod 'GoogleAPIClientForREST/Calendar'
   pod 'GoogleAPIClientForREST/Tasks'
 end

@@ -27,7 +27,7 @@ class TaskInfoViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         
-        title = "Task Information"
+        title = "Tasks Information"
         
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

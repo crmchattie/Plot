@@ -144,7 +144,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
             }
             else if case .workoutMinutes = healthMetricType {
-                HealthKitService.getAllWorkouts(startDate: startDate, endDate: endDate) { [weak self] workouts, errors  in
+                HealthKitService.getAllWorkouts(startDate: startDate, endDate: endDate) { [weak self] workouts, errorList  in
                     var stats: [Statistic]?
                     if segmentType == .day {
                         stats = self?.perpareCustomStatsForHourlyWorkouts(from: workouts)

@@ -47,12 +47,12 @@ class TimeInfoViewController: UITableViewController {
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         if indexPath.row == 0 {
-            cell.textLabel?.text = "Task Info"
+            cell.textLabel?.text = "Tasks Info"
             cell.isUserInteractionEnabled = true
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         else if indexPath.row == 1 {
-            cell.textLabel?.text = "Calendar Info"
+            cell.textLabel?.text = "Calendars Info"
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         return cell

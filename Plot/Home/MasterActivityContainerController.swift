@@ -343,13 +343,15 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     
     func scrollToFirstTask(_ completion: @escaping ([Activity]) -> Void) {
         let allTasks = networkController.activityService.tasks
-        var tasks = Array(allTasks.filter { !($0.isCompleted ?? false) }.prefix(3))
-        tasks = tasks.sorted(by: { task1, task2 in
-            if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
-                return task1.name ?? "" < task2.name ?? ""
+        var tasks = [Activity]()
+        if allTasks.count < 3 {
+            completion(allTasks)
+            return
+        } else {
+            for index in 0...2 {
+                tasks.append(allTasks[index])
             }
-            return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
-        })
+        }
         completion(tasks)
     }
     

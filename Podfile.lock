@@ -185,7 +185,7 @@ DEPENDENCIES:
   - FTPopOverMenu_Swift (~> 0.2.0)
   - GoogleAPIClientForREST/Calendar
   - GoogleAPIClientForREST/Tasks
-  - GoogleSignIn (~> 5.0.2)
+  - GoogleSignIn
   - PhoneNumberKit
   - SDWebImage
   - SplitRow
@@ -260,6 +260,6 @@ SPEC CHECKSUMS:
   SplitRow: 1911d2bd0f34e6ac93d83cc741730505a91c4d04
   ViewRow: 8da541e9c019f3be63f4e28f311a62cac2045ecf
 
-PODFILE CHECKSUM: 576a054c0ec427c4484fe55a2f323bbf6e04e6fd
+PODFILE CHECKSUM: 74cc5a50399dd38db35b1babc74d757e1b3c2277
 
 COCOAPODS: 1.11.3

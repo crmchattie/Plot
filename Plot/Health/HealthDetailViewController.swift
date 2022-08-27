@@ -319,7 +319,8 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
             cell.selectionStyle = .default
         } else if case .mindfulness = viewModel.healthMetric.type {
             cell.selectionStyle = .default
-
+        } else if case .workoutMinutes = viewModel.healthMetric.type {
+            cell.selectionStyle = .default
         } else {
             cell.selectionStyle = .none
         }

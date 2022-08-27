@@ -61,10 +61,13 @@ class ActivityService {
         didSet {
             if oldValue != tasks {
                 tasks.sort { task1, task2 in
-                    if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
-                        return task1.name ?? "" < task2.name ?? ""
+                    if task1.isCompleted ?? false == task2.isCompleted ?? false {
+                        if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
                     }
-                    return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+                    return !(task1.isCompleted ?? false)                    
                 }
                 NotificationCenter.default.post(name: .tasksUpdated, object: nil)
             }
@@ -402,7 +405,6 @@ class ActivityService {
     }
     
     func grabLists() {
-        print("grablists")
         if let _ = Auth.auth().currentUser {
             self.eventKitManager.authorizeEventKitReminders { _ in
                 if let lists = self.eventKitManager.grabLists() {
@@ -410,11 +412,8 @@ class ActivityService {
                 }
             }
             self.googleCalManager.authorizeGReminders { _ in
-                print("authorizeGReminders")
                 self.googleCalManager.grabLists() { lists in
-                    print("glists")
                     if let lists = lists {
-                        print("adding glists")
                         self.lists[ListOptions.google.name] = lists
                     }
                 }
