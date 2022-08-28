@@ -45,7 +45,7 @@ enum ActivityCategory: String, CaseIterable {
         case .family: return UIImage(named: "family")!
         case .personal: return UIImage(named: "personal")!
         case .todo: return UIImage(named: "todo")!
-        case .uncategorized: return UIImage(named: "activity")!
+        case .uncategorized: return UIImage(named: "event")!
         case .mindfulness: return UIImage(named: "mindfulness")!
         }
     }

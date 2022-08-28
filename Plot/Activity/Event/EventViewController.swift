@@ -956,19 +956,25 @@ class EventViewController: FormViewController {
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
         super.rowsHaveBeenRemoved(rows, at: indexes)
         let rowNumber : Int = indexes.first!.row
-        let rowType = rows[0].self
+        let row = rows[0].self
         
         DispatchQueue.main.async { [weak self] in
-            if rowType is PurchaseRow {
-                if self!.purchaseList.indices.contains(self!.purchaseIndex) {
+            if row is PurchaseRow {
+                if self!.purchaseList.indices.contains(rowNumber) {
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
                     //                    self!.purchaseBreakdown()
                 }
             }
-            else if rowType is HealthRow {
-                if self!.healthList.indices.contains(self!.healthIndex) {
+            else if row is HealthRow {
+                if self!.healthList.indices.contains(rowNumber) {
                     self!.healthList.remove(at: rowNumber)
+                    self!.updateLists(type: "container")
+                }
+            }
+            else if row is SubtaskRow {
+                if self!.taskList.indices.contains(rowNumber) {
+                    self!.taskList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
                 }
             }

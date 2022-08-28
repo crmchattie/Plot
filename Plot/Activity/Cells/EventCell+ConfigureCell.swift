@@ -121,10 +121,13 @@ extension EventCell {
         
         if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
+            if category == .uncategorized {
+                activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
+            }
             activityTypeButton.tintColor = category.color
             activityTypeLabel.text = category.rawValue
         } else {
-            activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
+            activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             activityTypeButton.tintColor = ActivityCategory.uncategorized.color
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }

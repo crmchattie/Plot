@@ -201,11 +201,11 @@ class ActivityListViewController: FormViewController {
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
         super.rowsHaveBeenRemoved(rows, at: indexes)
         let rowNumber : Int = indexes.first!.row
-        let rowType = rows[0].self
+        let row = rows[0].self
         
         DispatchQueue.main.async { [weak self] in
-            if rowType is ButtonRow, rows[0].title != "Add New Checklist" {
-                if self!.listList.indices.contains(self!.listIndex) {
+            if row is ButtonRow, rows[0].title != "Add New Checklist" {
+                if self!.listList.indices.contains(rowNumber) {
                     self!.listList.remove(at: rowNumber)
                 }
                 if rowNumber == self!.grocerylistIndex {

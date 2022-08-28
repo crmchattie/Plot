@@ -79,7 +79,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     }
     
     @objc fileprivate func tasksUpdated() {
-        tasks = networkTasks.filter { $0.listID ?? "" == list.id }
+        tasks = networkTasks.filter { $0.listID == list.id }
         handleReloadTableAftersearchBarCancelButtonClicked()
     }
     
@@ -149,6 +149,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
             }
             return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
         }
+        tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
@@ -158,6 +159,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
             }
             return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
         }
+        tableView.reloadData()
     }
     
     @objc fileprivate func newItem() {

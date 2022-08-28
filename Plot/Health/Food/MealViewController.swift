@@ -598,9 +598,9 @@ class MealViewController: FormViewController {
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
         super.rowsHaveBeenRemoved(rows, at: indexes)
         let rowNumber : Int = indexes.first!.row
-        let rowType = rows[0].self
+        let row = rows[0].self
         DispatchQueue.main.async { [weak self] in
-            if rowType is ButtonRow, let productContainer = self!.meal.productContainer, productContainer.indices.contains(rowNumber) {
+            if row is ButtonRow, let productContainer = self!.meal.productContainer, productContainer.indices.contains(rowNumber) {
                 self!.meal.productContainer!.remove(at: rowNumber)
                 self!.calcNutrition()
             }

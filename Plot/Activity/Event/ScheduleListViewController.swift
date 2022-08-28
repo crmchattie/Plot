@@ -176,11 +176,11 @@ class ScheduleListViewController: FormViewController {
     override func rowsHaveBeenRemoved(_ rows: [BaseRow], at indexes: [IndexPath]) {
         super.rowsHaveBeenRemoved(rows, at: indexes)
         let rowNumber : Int = indexes.first!.row
-        let rowType = rows[0].self
+        let row = rows[0].self
                     
         DispatchQueue.main.async { [weak self] in
-            if rowType is ScheduleRow {
-                if self!.scheduleList.indices.contains(self!.scheduleIndex) {
+            if row is ScheduleRow, row.tag != "label" {
+                if self!.scheduleList.indices.contains(rowNumber) {
                     if let scheduleLocationAddress = self!.scheduleList[rowNumber].locationAddress {
                         for (key, _) in scheduleLocationAddress {
                             self!.locationAddress[key] = nil
@@ -198,7 +198,8 @@ class ScheduleListViewController: FormViewController {
             return schedule1.startDateTime?.int64Value ?? 0 < schedule2.startDateTime?.int64Value ?? 0
         }
         if let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
-            if mvs.count == 1 {
+            print(mvs.count)
+            if mvs.count < 3 {
                 return
             }
             for index in 0...mvs.count - 2 {
