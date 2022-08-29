@@ -401,7 +401,7 @@ extension EventViewController: UpdateTagsDelegate {
 extension EventViewController: UpdateTaskCellDelegate {
     func updateCompletion(task: Activity) {
         if let index = taskList.firstIndex(where: {$0.activityID == task.activityID} ) {
-            taskList[index].isCompleted = !(task.isCompleted ?? false)
+            taskList[index].isCompleted = task.isCompleted ?? false
             if (taskList[index].isCompleted ?? false) {
                 let original = Date()
                 let updateDate = Date(timeIntervalSinceReferenceDate:

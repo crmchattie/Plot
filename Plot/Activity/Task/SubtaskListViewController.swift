@@ -252,7 +252,7 @@ extension SubtaskListViewController: UpdateTaskDelegate {
 extension SubtaskListViewController: UpdateTaskCellDelegate {
     func updateCompletion(task: Activity) {
         if let index = subtaskList.firstIndex(where: {$0.activityID == task.activityID} ) {
-            subtaskList[index].isCompleted = !(task.isCompleted ?? false)
+            subtaskList[index].isCompleted = task.isCompleted ?? false
             if (subtaskList[index].isCompleted ?? false) {
                 let original = Date()
                 let updateDate = Date(timeIntervalSinceReferenceDate:

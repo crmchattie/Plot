@@ -591,7 +591,7 @@ func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZon
     
 }
 
-func timestampOfTask(endDate: Date, endDateHasTime: Bool, startDate: Date?, startDateHasTime: Bool?) -> (String, String) {
+func timestampOfTask(startDate: Date?, endDate: Date) -> (String, String) {
     var startString: String
     var endString: String
     let calendar = NSCalendar.current
@@ -600,7 +600,7 @@ func timestampOfTask(endDate: Date, endDateHasTime: Bool, startDate: Date?, star
     let endEarliest = now < endDate ? now : endDate
     let endLatest = (endDate == now) ? endDate : now
     let endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
-    if let startDate = startDate, let startDateHasTime = startDateHasTime {
+    if let startDate = startDate {
         let startEarliest = now < startDate ? now : startDate
         let startLatest = (startEarliest == now) ? startDate : now
         let startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
