@@ -57,8 +57,8 @@ class SubtaskListViewController: FormViewController {
         
         extendedLayoutIncludesOpaqueBars = true
                 
-//        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
-//        navigationItem.rightBarButtonItem = plusBarButton
+        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
+        navigationItem.rightBarButtonItem = plusBarButton
                 
     }
     

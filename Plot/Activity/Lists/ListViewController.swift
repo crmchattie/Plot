@@ -28,8 +28,10 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     var list: ListType!
     var tasks = [Activity]()
     var filteredTasks = [Activity]()
-    lazy var networkTasks = networkController.activityService.tasks
     
+    var networkTasks: [Activity] {
+        return networkController.activityService.tasks
+    }
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
     lazy var conversations: [Conversation] = networkController.conversationService.conversations
@@ -144,20 +146,26 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     func handleReloadTableAftersearchBarCancelButtonClicked() {
         filteredTasks = tasks
         filteredTasks.sort { task1, task2 in
-            if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
-                return task1.name ?? "" < task2.name ?? ""
+            if task1.isCompleted ?? false == task2.isCompleted ?? false {
+                if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
+                    return task1.name ?? "" < task2.name ?? ""
+                }
+                return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
             }
-            return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+            return !(task1.isCompleted ?? false)
         }
         tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
         filteredTasks.sort { task1, task2 in
-            if let task1Date = task1.endDate, let task2Date = task2.endDate, task1Date == task2Date {
-                return task1.name ?? "" < task2.name ?? ""
+            if task1.isCompleted ?? false == task2.isCompleted ?? false {
+                if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
+                    return task1.name ?? "" < task2.name ?? ""
+                }
+                return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
             }
-            return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+            return !(task1.isCompleted ?? false)
         }
         tableView.reloadData()
     }

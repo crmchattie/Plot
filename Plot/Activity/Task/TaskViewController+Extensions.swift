@@ -97,7 +97,7 @@ extension TaskViewController: UpdateSubtaskListDelegate {
         }
         self.subtaskList = subtaskList
         sortSubtasks()
-        updateLists(type: "subtask")
+        updateLists(type: "subtasks")
     }
 }
 
