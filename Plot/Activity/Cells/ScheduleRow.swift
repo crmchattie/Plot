@@ -94,11 +94,9 @@ final class ScheduleCell: Cell<Activity>, CellType {
 
         guard let schedule = row.value else { return }
                 
-        if let startDate = schedule.startDateTime as? TimeInterval, let endDate = schedule.endDateTime as? TimeInterval, let allDay = schedule.allDay {
+        if let startDate = schedule.startDate, let endDate = schedule.endDate, let allDay = schedule.allDay {
             let startTimeZone = schedule.startTimeZone ?? "UTC"
             let endTimeZone = schedule.endTimeZone ?? "UTC"
-            let startDate = Date(timeIntervalSince1970: startDate)
-            let endDate = Date(timeIntervalSince1970: endDate)
             formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
         }
         // set the texts to the labels

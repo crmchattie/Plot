@@ -45,13 +45,13 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
 
 let prebuiltCalendars: [CalendarType] = [defaultCalendar, personalCalendar, homeCalendar, workCalendar, socialCalendar]
 
-let defaultCalendar = CalendarType(id: UUID().uuidString, name: "Default", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
-let homeCalendar = CalendarType(id: UUID().uuidString, name: "Home", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarOptions.plot.name)
-let personalCalendar = CalendarType(id: UUID().uuidString, name: "Personal", color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarOptions.plot.name)
-let socialCalendar = CalendarType(id: UUID().uuidString, name: "Social", color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarOptions.plot.name)
-let workCalendar = CalendarType(id: UUID().uuidString, name: "Work", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarOptions.plot.name)
+let defaultCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.defaultCal.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarSourceOptions.plot.name)
+let homeCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.homeCal.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarSourceOptions.plot.name)
+let personalCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.personalCal.rawValue, color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarSourceOptions.plot.name)
+let socialCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.socialCal.rawValue, color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarSourceOptions.plot.name)
+let workCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.workCal.rawValue, color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarSourceOptions.plot.name)
 
-enum CalendarOptions:String, CaseIterable {
+enum CalendarSourceOptions: String, CaseIterable {
     case plot = "Plot"
     case apple = "iCloud"
     case google = "Google"
@@ -71,4 +71,12 @@ enum CalendarOptions:String, CaseIterable {
             case .google: return "Google"
         }
     }
+}
+
+enum CalendarOptions: String, CaseIterable {
+    case defaultCal = "Default"
+    case homeCal = "Home"
+    case personalCal = "Personal"
+    case socialCal = "Social"
+    case workCal = "Work"
 }

@@ -130,7 +130,6 @@ class TableViewHeader: UITableViewHeaderFooterView {
     }
     
     func setupViews() {
-                        
         addSubview(view)
         view.addSubview(titleLabel)
         view.addSubview(subTitleLabel)
@@ -153,7 +152,6 @@ class TableViewHeader: UITableViewHeaderFooterView {
         guard let sectionType = sectionType else {
             return
         }
-        print("viewTapped")
         self.delegate?.viewTapped(sectionType: sectionType)
     }
 }

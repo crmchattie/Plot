@@ -9,11 +9,6 @@
 import UIKit
 
 class ListCell: UITableViewCell {
-    var invitationSegmentHeightConstraint: NSLayoutConstraint!
-    var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
-    var invitationSegmentedControlTopAnchorRegular: CGFloat = 8
-    let invitationSegmentHeightConstant: CGFloat = 29
-    
     var iconViewHeightConstraint: NSLayoutConstraint!
     var iconViewTopAnchor: NSLayoutConstraint!
     var iconViewTopAnchorRegular: CGFloat = 8
@@ -89,14 +84,6 @@ class ListCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-        
-    let invitationSegmentedControl: UISegmentedControl = {
-        let items = ["Accept" , "Decline"]
-        let segmentedControl = UISegmentedControl(items: items)
-        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        return segmentedControl
-    }()
     
     let badgeLabel: UILabel = {
         let badgeLabel = UILabel()
@@ -117,7 +104,7 @@ class ListCell: UITableViewCell {
     
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "activity"), for: .normal)
+        button.setImage(UIImage(named: "todo"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -127,6 +114,22 @@ class ListCell: UITableViewCell {
         let button = UIView()
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
+    }()
+    
+    let taskNumberLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.backgroundColor = .clear
+        label.layer.cornerRadius = 10
+        label.text = "1"
+        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textAlignment = .center
+        label.layer.masksToBounds = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.adjustsFontForContentSizeCategory = true
+        label.minimumScaleFactor = 0.1
+        label.adjustsFontSizeToFitWidth = true
+        return label
     }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -140,9 +143,9 @@ class ListCell: UITableViewCell {
         activityImageView.addSubview(activityTypeLabel)
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
+        activityImageView.addSubview(taskNumberLabel)
         activityImageView.addSubview(muteIndicator)
 //        activityImageView.addSubview(iconView)
-        activityImageView.addSubview(invitationSegmentedControl)
         
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
@@ -151,28 +154,24 @@ class ListCell: UITableViewCell {
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        nameLabel.rightAnchor.constraint(lessThanOrEqualTo: taskNumberLabel.leftAnchor, constant: -5).isActive = true
         
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        startLabel.rightAnchor.constraint(lessThanOrEqualTo: taskNumberLabel.leftAnchor, constant: -5).isActive = true
 //
         activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
         activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        activityTypeLabel.rightAnchor.constraint(lessThanOrEqualTo: taskNumberLabel.leftAnchor, constant: -5).isActive = true
+        activityTypeLabel.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
-        invitationSegmentedControlTopAnchor.isActive = true
-        invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
-        invitationSegmentHeightConstraint = invitationSegmentedControl.heightAnchor.constraint(equalToConstant: invitationSegmentHeightConstant)
-        invitationSegmentHeightConstraint.isActive = true
+        taskNumberLabel.centerYAnchor.constraint(equalTo: activityTypeButton.centerYAnchor, constant: 0).isActive = true
+        taskNumberLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
                 
         muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 1).isActive = true
         muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor, constant: 1).isActive = true
@@ -198,9 +197,9 @@ class ListCell: UITableViewCell {
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
-        activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
+        activityTypeButton.setImage(UIImage(named: "todo"), for: .normal)
     }
-    
+        
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
         activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)

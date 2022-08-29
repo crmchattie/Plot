@@ -22,9 +22,9 @@ class ChooseListViewController: FormViewController {
     var lists = [String: [ListType]]() {
         didSet {
             sections = Array(lists.keys).sorted { s1, s2 in
-                if s1 == ListOptions.plot.name {
+                if s1 == ListSourceOptions.plot.name {
                     return true
-                } else if s2 == ListOptions.plot.name {
+                } else if s2 == ListSourceOptions.plot.name {
                     return false
                 }
                 return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
@@ -52,7 +52,7 @@ class ChooseListViewController: FormViewController {
         configureTableView()
         initializeForm()
         
-        if lists.keys.contains(ListOptions.apple.name) || lists.keys.contains(ListOptions.google.name) {
+        if lists.keys.contains(ListSourceOptions.apple.name) || lists.keys.contains(ListSourceOptions.google.name) {
             for row in form.rows {
                 row.baseCell.isUserInteractionEnabled = false
             }

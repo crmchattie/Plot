@@ -9,6 +9,8 @@
 import UIKit
 import Firebase
 
+let kShowCompletedTasks = "showCompletedTasks"
+
 class ListViewController: UIViewController, ActivityDetailShowing {
     var networkController: NetworkController
     
@@ -24,6 +26,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     let tableView = UITableView(frame: .zero, style: .insetGrouped)
     
     let taskCellID = "taskCellID"
+    let newTaskCellID = "newTaskCellID"
     
     var list: ListType!
     var tasks = [Activity]()
@@ -43,7 +46,8 @@ class ListViewController: UIViewController, ActivityDetailShowing {
             
     var participants: [String: [User]] = [:]
     
-    var filters: [filter] = [.search, .taskCategory]
+    var showCompletedTasks: Bool = true
+    var filters: [filter] = [.search, .showCompletedTasks, .taskCategory]
     var filterDictionary = [String: [String]]()
     
     override func viewDidLoad() {
@@ -52,11 +56,17 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         let theme = ThemeManager.currentTheme()
         view.backgroundColor = theme.generalBackgroundColor
         
+        showCompletedTasks = getShowCompletedTasksBool()
+        
         setupMainView()
         setupTableView()
         addObservers()
         
-        filteredTasks = tasks
+        if !showCompletedTasks {
+            filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+        } else {
+            filteredTasks = tasks
+        }
         
     }
     
@@ -81,7 +91,42 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     }
     
     @objc fileprivate func tasksUpdated() {
-        tasks = networkTasks.filter { $0.listID == list.id }
+        if !showCompletedTasks {
+            tasks = networkTasks.filter({ !($0.isCompleted ?? false) })
+        } else {
+            tasks = networkTasks
+        }
+        switch ListOptions(rawValue: list.name ?? "") {
+        case .allList:
+            break
+        case .flaggedList:
+            let flaggedTasks = tasks.filter {
+                if $0.flagged ?? false {
+                    return true
+                }
+                return false
+            }
+            tasks = flaggedTasks
+        case .scheduledList:
+            let scheduledTasks = tasks.filter {
+                if let _ = $0.endDate {
+                    return true
+                }
+                return false
+            }
+            tasks = scheduledTasks
+        case .todayList:
+            let dailyTasks = tasks.filter {
+                if let endDate = $0.endDate {
+                    return NSCalendar.current.isDateInToday(endDate)
+                }
+                return false
+            }
+            tasks = dailyTasks
+        default:
+            tasks = tasks.filter { $0.listID == list.id }
+        }
+        
         handleReloadTableAftersearchBarCancelButtonClicked()
     }
     
@@ -90,7 +135,10 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         navigationItem.title = "Tasks"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
-        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+        let newItemBarButton = UIBarButtonItem(image: UIImage(systemName:  "info.circle"),
+                                                           style: .plain,
+                                                           target: self,
+                                                           action: #selector(listInfo))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
     }
@@ -114,6 +162,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         tableView.dataSource = self
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
+        tableView.register(NewTaskCell.self, forCellReuseIdentifier: newTaskCellID)
         
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorStyle = .none
@@ -144,13 +193,22 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     }
     
     func handleReloadTableAftersearchBarCancelButtonClicked() {
-        filteredTasks = tasks
+        if !showCompletedTasks {
+            filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+        } else {
+            filteredTasks = tasks
+        }
         filteredTasks.sort { task1, task2 in
-            if task1.isCompleted ?? false == task2.isCompleted ?? false {
+            if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
                 if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
                     return task1.name ?? "" < task2.name ?? ""
                 }
                 return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+            } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                    return task1.name ?? "" < task2.name ?? ""
+                }
+                return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
             }
             return !(task1.isCompleted ?? false)
         }
@@ -159,11 +217,16 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     
     func handleReloadTableAfterSearch() {
         filteredTasks.sort { task1, task2 in
-            if task1.isCompleted ?? false == task2.isCompleted ?? false {
+            if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
                 if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
                     return task1.name ?? "" < task2.name ?? ""
                 }
                 return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+            } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                    return task1.name ?? "" < task2.name ?? ""
+                }
+                return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
             }
             return !(task1.isCompleted ?? false)
         }
@@ -179,7 +242,17 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
+    @objc fileprivate func listInfo() {
+        let destination = ListDetailViewController(networkController: self.networkController)
+        destination.list = list
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+        destination.navigationItem.leftBarButtonItem = cancelBarButton
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
     @objc fileprivate func filter() {
+        filterDictionary["showCompletedTasks"] = showCompletedTasks ? ["Yes"] : ["No"]
         let destination = FilterViewController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
@@ -192,6 +265,17 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         setupSearchController()
     }
     
+    func saveShowCompletedTasks() {
+        UserDefaults.standard.setValue(showCompletedTasks, forKey: kShowCompletedTasks)
+    }
+    
+    func getShowCompletedTasksBool() -> Bool {
+        if let value = UserDefaults.standard.value(forKey: kShowCompletedTasks) as? Bool {
+            return value
+        } else {
+            return true
+        }
+    }
 }
 
 extension ListViewController: UITableViewDataSource, UITableViewDelegate {
@@ -218,7 +302,11 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
+        if filteredTasks.indices.contains(indexPath.row) {
+            return UITableView.automaticDimension
+        } else {
+            return 72.66
+        }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -231,20 +319,29 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             viewPlaceholder.remove(from: tableView, priority: .medium)
         }
-        return filteredTasks.count
+        return filteredTasks.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-        cell.activityDataStore = self
-        let task = filteredTasks[indexPath.row]
-        cell.configureCell(for: indexPath, task: task)
-        return cell
+        if filteredTasks.indices.contains(indexPath.row) {
+            let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+            cell.activityDataStore = self
+            let task = filteredTasks[indexPath.row]
+            cell.configureCell(for: indexPath, task: task)
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
+            return cell
+        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let task = filteredTasks[indexPath.row]
-        showTaskDetail(task: task)
+        if filteredTasks.indices.contains(indexPath.row) {
+            let task = filteredTasks[indexPath.row]
+            showTaskDetail(task: task)
+        } else {
+            newItem()
+        }
     }
 }
 
@@ -309,10 +406,22 @@ extension ListViewController: UpdateFilter {
     
     func updateTableViewWFilters() {
         let dispatchGroup = DispatchGroup()
+        if let value = filterDictionary["showCompletedTasks"] {
+            dispatchGroup.enter()
+            let bool = value[0].lowercased()
+            if bool == "yes" {
+                filteredTasks = tasks
+                self.showCompletedTasks = true
+            } else {
+                filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+                self.showCompletedTasks = false
+            }
+            dispatchGroup.leave()
+        }
         if let value = filterDictionary["search"] {
             dispatchGroup.enter()
             let searchText = value[0]
-            filteredTasks = tasks.filter({ (task) -> Bool in
+            filteredTasks = filteredTasks.filter({ (task) -> Bool in
                 if let name = task.name {
                     return name.lowercased().contains(searchText.lowercased())
                 }
@@ -320,13 +429,29 @@ extension ListViewController: UpdateFilter {
             })
             dispatchGroup.leave()
         }
+        if let categories = filterDictionary["taskCategory"] {
+            dispatchGroup.enter()
+            filteredTasks = filteredTasks.filter({ (task) -> Bool in
+                if let category = task.category {
+                    return categories.contains(category)
+                }
+                return false
+            })
+            dispatchGroup.leave()
+        }
+        
         if filterDictionary.isEmpty {
-            handleReloadTableAftersearchBarCancelButtonClicked()
+            if !showCompletedTasks {
+                filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+            } else {
+                filteredTasks = tasks
+            }
         }
         
         dispatchGroup.notify(queue: .main) {
             self.tableView.reloadData()
             self.tableView.layoutIfNeeded()
+            self.saveShowCompletedTasks()
         }
     }
 }

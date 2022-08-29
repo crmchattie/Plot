@@ -209,7 +209,7 @@ class GoogleCalService {
     func convertCalendarsToPlot(calendars: [GTLRCalendar_CalendarListEntry]) -> [CalendarType] {
         var calendarTypes = [CalendarType]()
         for calendar in calendars {
-            let calendarType = CalendarType(id: calendar.identifier ?? UUID().uuidString, name: calendar.summary ?? "Google", color:  CIColor(color: UIColor(calendar.backgroundColor ?? "#007AFF")).stringRepresentation, source: CalendarOptions.google.name)
+            let calendarType = CalendarType(id: calendar.identifier ?? UUID().uuidString, name: calendar.summary ?? "Google", color:  CIColor(color: UIColor(calendar.backgroundColor ?? "#007AFF")).stringRepresentation, source: CalendarSourceOptions.google.name)
             calendarTypes.append(calendarType)
         }
         return calendarTypes
@@ -268,8 +268,8 @@ class GoogleCalService {
         
         let isodateFormatter = ISO8601DateFormatter()
         
-        if activity.hasDeadlineTime ?? false, let deadlineDate = activity.endDate {
-            let date = isodateFormatter.string(from: deadlineDate)
+        if activity.hasDeadlineTime ?? false, let deadlineDateSwitch = activity.endDate {
+            let date = isodateFormatter.string(from: deadlineDateSwitch)
             task.due = date
         }
         
@@ -318,8 +318,8 @@ class GoogleCalService {
             
             let isodateFormatter = ISO8601DateFormatter()
             
-            if activity.hasDeadlineTime ?? false, let deadlineDate = activity.endDate {
-                let date = isodateFormatter.string(from: deadlineDate)
+            if activity.hasDeadlineTime ?? false, let deadlineDateSwitch = activity.endDate {
+                let date = isodateFormatter.string(from: deadlineDateSwitch)
                 task.due = date
             }
             
@@ -393,7 +393,7 @@ class GoogleCalService {
     func convertListsToPlot(lists: [GTLRTasks_TaskList]) -> [ListType] {
         var listTypes = [ListType]()
         for list in lists {
-            let listType = ListType(id: list.identifier ?? UUID().uuidString, name: list.title ?? "Google", color:  CIColor(color: UIColor("#007AFF")).stringRepresentation, source: ListOptions.google.name)
+            let listType = ListType(id: list.identifier ?? UUID().uuidString, name: list.title ?? "Google", color:  CIColor(color: UIColor("#007AFF")).stringRepresentation, source: ListSourceOptions.google.name)
             listTypes.append(listType)
         }
         return listTypes

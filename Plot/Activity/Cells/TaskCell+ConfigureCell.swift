@@ -99,10 +99,6 @@ extension TaskCell {
         startLabel.numberOfLines = dateTimeValueArray.0
         startLabel.text = dateTimeValueArray.1
         
-        invitationSegmentedControlTopAnchor.constant = 0
-        invitationSegmentHeightConstraint.constant = 0
-        invitationSegmentedControl.isHidden = true
-        
         if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
@@ -115,6 +111,9 @@ extension TaskCell {
             activityTypeButton.tintColor = ActivityCategory.uncategorized.color
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
+        
+        let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
+        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         let badgeString = task.badge?.toString()
         let badgeInt = task.badge ?? 0

@@ -34,16 +34,16 @@ class TaskInfoViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
+        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
             let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
             navigationItem.rightBarButtonItem = barButton
 
         }
         
         sections = Array(lists.keys).sorted { s1, s2 in
-            if s1 == ListOptions.plot.name {
+            if s1 == ListSourceOptions.plot.name {
                 return true
-            } else if s2 == ListOptions.plot.name {
+            } else if s2 == ListSourceOptions.plot.name {
                 return false
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
@@ -86,7 +86,7 @@ class TaskInfoViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = TaskAccountView()
-        if let list = ListOptions(rawValue: sections[section]) {
+        if let list = ListSourceOptions(rawValue: sections[section]) {
             headerView.nameLabel.text = list.name
             headerView.accountImageView.image = list.image
             if list.name == primaryList {
@@ -141,9 +141,9 @@ extension TaskInfoViewController: UpdateWithGoogleAppleSignInDelegate {
             print(key)
         }
         sections = Array(lists.keys).sorted { s1, s2 in
-            if s1 == ListOptions.plot.name {
+            if s1 == ListSourceOptions.plot.name {
                 return true
-            } else if s2 == ListOptions.plot.name {
+            } else if s2 == ListSourceOptions.plot.name {
                 return false
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending

@@ -25,7 +25,7 @@ enum filter: String {
     //finance
     case financeAccount, financeLevel
     //task
-    case taskCategory
+    case taskCategory, showCompletedTasks
     
     var activity: String {
         switch self {
@@ -57,6 +57,7 @@ enum filter: String {
         case .financeAccount: return "Accounts"
         case .financeLevel: return "Level"
         case .taskCategory: return "Categories"
+        case .showCompletedTasks: return "Show"
         }
     }
     
@@ -90,6 +91,7 @@ enum filter: String {
         case .financeAccount: return "multiple"
         case .financeLevel: return "single"
         case .taskCategory: return "multiple"
+        case .showCompletedTasks: return "single"
         }
     }
     
@@ -119,6 +121,7 @@ enum filter: String {
         case .financeAccount: return "Accounts"
         case .financeLevel: return "Level"
         case .taskCategory: return "Categories"
+        case .showCompletedTasks: return "Show"
         }
     }
     
@@ -148,7 +151,7 @@ enum filter: String {
         case .financeAccount: return "Filter based on account(s) included"
         case .financeLevel: return "Filter cash flow/balances sections based on level of detail shown"
         case .taskCategory: return "Filter based on categories"
-
+        case .showCompletedTasks: return "Show Completed Tasks"
         }
     }
     
@@ -180,6 +183,7 @@ enum filter: String {
         case .calendarCategory: return []
         case .healthCategory: return []
         case .taskCategory: return []
+        case .showCompletedTasks: return ["Yes", "No"]
         case .financeAccount: return []
         case .financeLevel: return ["All", "Top"]
             

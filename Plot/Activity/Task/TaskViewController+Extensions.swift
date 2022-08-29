@@ -350,9 +350,9 @@ extension TaskViewController: UpdateActivityListDelegate {
 extension TaskViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         // do something, if recurrenceRule is nil, that means "never repeat".
-        if let row: LabelRow = form.rowBy(tag: "Repeat"), let startDate = task.startDate {
+        if let row: LabelRow = form.rowBy(tag: "Repeat"), let endDate = task.endDate {
             if let recurrenceRule = recurrenceRule {
-                let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
+                let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
                 row.value = rowText
                 row.updateCell()
                 task.recurrences = [recurrenceRule.toRRuleString()]

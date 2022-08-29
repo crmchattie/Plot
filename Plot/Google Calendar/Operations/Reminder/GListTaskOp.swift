@@ -44,7 +44,7 @@ class GListTaskOp: AsyncOperation {
                             let values: [String : Any] = ["listExport": true,
                                                           "listID": self?.list.identifier as Any,
                                                           "listName": self?.list.title as Any,
-                                                          "listSource": ListOptions.google.name as Any,
+                                                          "listSource": ListSourceOptions.google.name as Any,
                                                           "listColor": CIColor(color: UIColor("#007AFF")).stringRepresentation as Any,
                                                           "externalActivityID": self?.task.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]
@@ -72,7 +72,7 @@ class GListTaskOp: AsyncOperation {
                                                           "listExport": true,
                                                           "listID": self?.list.identifier as Any,
                                                           "listName": self?.list.title as Any,
-                                                          "listSource": ListOptions.google.name as Any,
+                                                          "listSource": ListSourceOptions.google.name as Any,
                                                           "listColor": CIColor(color: UIColor("#007AFF")).stringRepresentation as Any,
                                                           "externalActivityID": self?.task.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]

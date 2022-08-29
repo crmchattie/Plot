@@ -591,19 +591,19 @@ func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZon
     
 }
 
-func timestampOfTask(startDate: Date, endDate: Date?) -> (String, String) {
+func timestampOfTask(endDate: Date, endDateHasTime: Bool, startDate: Date?, startDateHasTime: Bool?) -> (String, String) {
     var startString: String
     var endString: String
     let calendar = NSCalendar.current
     let unitFlags: Set<Calendar.Component> = [ .day, .weekOfYear, .weekday]
     let now = Date()
-    let startEarliest = now < startDate ? now : startDate
-    let startLatest = (startEarliest == now) ? startDate : now
-    let startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
-    if let endDate = endDate {
-        let endEarliest = now < endDate ? now : endDate
-        let endLatest = (endDate == now) ? endDate : now
-        let endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
+    let endEarliest = now < endDate ? now : endDate
+    let endLatest = (endDate == now) ? endDate : now
+    let endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
+    if let startDate = startDate, let startDateHasTime = startDateHasTime {
+        let startEarliest = now < startDate ? now : startDate
+        let startLatest = (startEarliest == now) ? startDate : now
+        let startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
         if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
             if startComponents.weekOfYear! >= 1 || startComponents.weekOfYear! <= -1 { // start date is next week
                 if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
@@ -644,17 +644,17 @@ func timestampOfTask(startDate: Date, endDate: Date?) -> (String, String) {
         
         return (startString, endString)
     } else {
-        if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
-            if startComponents.weekOfYear! >= 1 || startComponents.weekOfYear! <= -1 { // start date is next week
-                startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
+        if now.getShortDateStringForActivity() != endDate.getShortDateStringForActivity() {  // not today
+            if endComponents.weekOfYear! >= 1 || endComponents.weekOfYear! <= -1 { // start date is next week
+                endString = endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
             } else { // start date is this week
-                startString = startDate.dayOfWeekForActivity() + " @ " + startDate.getTimeStringForActivity()
+                endString = endDate.dayOfWeekForActivity() + " @ " + endDate.getTimeStringForActivity()
             }
         } else { // start day is today
-            startString = "Today @ " + startDate.getTimeStringForActivity()
+            endString = "Today @ " + endDate.getTimeStringForActivity()
         }
         
-        return (startString, "")
+        return (endString, "")
     }
 }
 

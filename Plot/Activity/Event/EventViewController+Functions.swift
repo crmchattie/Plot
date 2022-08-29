@@ -235,6 +235,7 @@ extension EventViewController {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
                 $0.value = task
+                $0.cell.delegate = self
             }.onCellSelection() { cell, row in
                 self.taskIndex = row.indexPath!.row
                 self.openTask()
@@ -490,11 +491,11 @@ extension EventViewController {
     func openCalendar() {
         let destination = ChooseCalendarViewController(networkController: networkController)
         destination.delegate = self
-        destination.calendarID = self.activity.calendarID ?? self.calendars[CalendarOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
+        destination.calendarID = self.activity.calendarID ?? self.calendars[CalendarSourceOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
         if let source = self.activity.calendarSource, let calendars = self.calendars[source] {
             destination.calendars = [source: calendars]
         } else {
-            destination.calendars = [CalendarOptions.plot.name: self.calendars[CalendarOptions.plot.name] ?? []]
+            destination.calendars = [CalendarSourceOptions.plot.name: self.calendars[CalendarSourceOptions.plot.name] ?? []]
         }
         self.navigationController?.pushViewController(destination, animated: true)
     }
@@ -966,7 +967,7 @@ extension EventViewController {
     
     func deleteActivity() {
         //need to look into equatable protocol for activities
-        if let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", activity.calendarName != "Birthdays", activity.calendarSource != CalendarOptions.apple.name {
+        if let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", activity.calendarName != "Birthdays", activity.calendarSource != CalendarSourceOptions.apple.name {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in

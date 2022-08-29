@@ -522,7 +522,7 @@ extension MasterActivityContainerController: HeaderContainerCellDelegate {
 
 extension MasterActivityContainerController: GIDSignInDelegate {
     func newListItem() {
-        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
+        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
@@ -550,7 +550,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     }
     
     func newCalendarItem() {
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
+        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
@@ -580,14 +580,14 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     func newList() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: ListOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryList(value: ListOptions.apple.name)
+        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: ListSourceOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
             }))
         }
         
-        if !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
-            alert.addAction(UIAlertAction(title: ListOptions.google.name, style: .default, handler: { (_) in
+        if !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
+            alert.addAction(UIAlertAction(title: ListSourceOptions.google.name, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance().delegate = self
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
@@ -606,15 +606,15 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
+        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: CalendarSourceOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
                 self.collectionView.reloadData()
             }))
         }
         
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
+        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
+            alert.addAction(UIAlertAction(title: CalendarSourceOptions.google.name, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance().delegate = self
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
@@ -632,7 +632,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
             self.collectionView.reloadData()
         } else {
           print("\(error.localizedDescription)")

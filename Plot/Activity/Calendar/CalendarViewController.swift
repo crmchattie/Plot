@@ -286,14 +286,14 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     @objc func newCalendar() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
+        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) {
+            alert.addAction(UIAlertAction(title: CalendarSourceOptions.apple.name, style: .default, handler: { (_) in
+                self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
             }))
         }
         
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
-            alert.addAction(UIAlertAction(title: CalendarOptions.google.name, style: .default, handler: { (_) in
+        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
+            alert.addAction(UIAlertAction(title: CalendarSourceOptions.google.name, style: .default, handler: { (_) in
                 GIDSignIn.sharedInstance().delegate = self
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
@@ -808,7 +808,7 @@ extension CalendarViewController: ActivityDataStore {
 extension CalendarViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
         } else {
             print("\(error.localizedDescription)")
         }

@@ -12,7 +12,7 @@ import SDWebImage
 
 extension ListCell {
     
-    func configureCell(for indexPath: IndexPath, list: ListType) {
+    func configureCell(for indexPath: IndexPath, list: ListType, taskNumber: Int) {
         self.list = list
                 
         let isMuted = list.muted != nil && list.muted!
@@ -24,13 +24,11 @@ extension ListCell {
         startLabel.numberOfLines = 1
         startLabel.text = ""
         
-        invitationSegmentedControlTopAnchor.constant = 0
-        invitationSegmentHeightConstraint.constant = 0
-        invitationSegmentedControl.isHidden = true
-        
         activityTypeButton.setImage(ActivityCategory.todo.icon, for: .normal)
         activityTypeButton.tintColor = ActivityCategory.todo.color
         activityTypeLabel.text = ActivityCategory.todo.rawValue
+        
+        taskNumberLabel.text = String(taskNumber)
         
         let badgeString = list.badge?.toString()
         let badgeInt = list.badge ?? 0

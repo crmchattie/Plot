@@ -107,6 +107,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
         let activity = activities[indexPath.row]
         if section == .tasks {
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+            
             cell.activityDataStore = self
             cell.configureCell(for: indexPath, task: activity)
             return cell

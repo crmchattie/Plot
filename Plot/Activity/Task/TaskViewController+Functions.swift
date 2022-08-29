@@ -307,12 +307,12 @@ extension TaskViewController {
     }
     
     func scheduleRecurrences() {
-        guard let task = task, let recurrences = task.recurrences, let startDate = task.startDate else {
+        guard let task = task, let recurrences = task.recurrences, let endDate = task.endDate else {
             return
         }
         if let recurranceIndex = recurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
             var recurrenceRule = RecurrenceRule(rruleString: recurrences[recurranceIndex])
-            recurrenceRule?.startDate = startDate
+            recurrenceRule?.startDate = endDate
             var newRecurrences = recurrences
             newRecurrences[recurranceIndex] = recurrenceRule!.toRRuleString()
             self.task.recurrences = newRecurrences
@@ -320,7 +320,7 @@ extension TaskViewController {
     }
     
     func scheduleReminder() {
-        guard let task = task, let activityReminder = task.reminder, let startDate = task.startDate else {
+        guard let task = task, let activityReminder = task.reminder, let endDate = task.endDate else {
             return
         }
         let center = UNUserNotificationCenter.current()
@@ -332,12 +332,12 @@ extension TaskViewController {
         content.title = "\(String(describing: task.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfTask(startDate: startDate, endDate: task.endDate)
+        formattedDate = timestampOfTask(startDate: task.startDate, endDate: endDate)
         content.subtitle = formattedDate.0
         if let reminder = EventAlert(rawValue: activityReminder) {
-            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
+            let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)
             let calendar = Calendar.current
-            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                         repeats: false)
             let identifier = "\(activityID)_Reminder"
@@ -361,11 +361,11 @@ extension TaskViewController {
     func openTaskList() {
         let destination = ChooseListViewController(networkController: networkController)
         destination.delegate = self
-        destination.listID = self.task.listID ?? self.lists[ListOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
+        destination.listID = self.task.listID ?? self.lists[ListSourceOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
         if let source = self.task.listSource, let lists = self.lists[source] {
             destination.lists = [source: lists]
         } else {
-            destination.lists = [ListOptions.plot.name: self.lists[ListOptions.plot.name] ?? []]
+            destination.lists = [ListSourceOptions.plot.name: self.lists[ListSourceOptions.plot.name] ?? []]
         }
         self.navigationController?.pushViewController(destination, animated: true)
     }
@@ -379,7 +379,7 @@ extension TaskViewController {
         // prepare a recurrence rule and an occurrence date
         // occurrence date is the date which the repeat event occurs this time
         let recurrences = task.recurrences
-        let occurrenceDate = task.startDate ?? Date()
+        let occurrenceDate = task.endDate ?? Date()
 
         // initialization and configuration
         // RecurrencePicker can be initialized with a recurrence rule or nil, nil means "never repeat"
@@ -603,7 +603,7 @@ extension TaskViewController {
     }
     
     @objc func createNewActivity() {
-        if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = taskOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
+        if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
@@ -612,8 +612,8 @@ extension TaskViewController {
                 //duplicate updated task w/ new ID and no recurrence rule
                 self.duplicateActivity(recurrenceRule: nil)
                 //update existing task with exlusion date that fall's on this date
-                //FIX-ME: need to make sure oldActivityRule dates correspond to self.task.startDate
-                oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
+                //FIX-ME: need to make sure oldActivityRule dates correspond to self.task.endDate
+                oldActivityRule.exdate = ExclusionDate(dates: [endDate], granularity: .day)
                 self.taskOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
                 self.updateRecurrences(recurrences: self.taskOld.recurrences!)
             }))
@@ -623,7 +623,7 @@ extension TaskViewController {
                 //update task's recurrence to stop repeating just before this event
                 var oldActivityRule = oldRecurrenceRule
                 //will equal true if first instance of repeating event
-                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: startDate) {
+                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: endDate) {
                     if dateIndex == 0 {
                         //update all instances of task
                         if self.task.recurrences == nil {
@@ -634,7 +634,7 @@ extension TaskViewController {
 
                         //update only future instances of task
                         var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
-                        newActivityRule!.startDate = self.task.startDate ?? Date()
+                        newActivityRule!.startDate = self.task.endDate ?? Date()
                         
                         var newRecurrences = oldRecurrences
                         newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
@@ -784,7 +784,7 @@ extension TaskViewController {
     }
     
     func updateDeadlineDate() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "Deadline Date"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "Deadline Time"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "DeadlineTime") {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "deadlineTimeSwitch"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "DeadlineTime") {
             if dateSwitchRowValue, timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
                 var dateComponents = DateComponents()
                 dateComponents.year = dateRowValue.yearNumber()
@@ -835,7 +835,7 @@ extension TaskViewController {
     
     func deleteActivity() {
         //need to look into equatable protocol for activities
-        if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = taskOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
+        if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in
@@ -844,7 +844,7 @@ extension TaskViewController {
                 //update activity's recurrence to skip repeat on this date
                 var oldActivityRule = oldRecurrenceRule
                 //update existing activity with exlusion date that fall's on this date
-                oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
+                oldActivityRule.exdate = ExclusionDate(dates: [endDate], granularity: .day)
                 self.task.recurrences!.append(oldActivityRule.exdate!.toExDateString()!)
                 self.updateRecurrences(recurrences: self.task.recurrences!)
             }))
@@ -852,7 +852,7 @@ extension TaskViewController {
             alert.addAction(UIAlertAction(title: "Delete All Future Events", style: .default, handler: { (_) in
                 //update activity's recurrence to stop repeating at this event
                 var oldActivityRule = oldRecurrenceRule
-                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: startDate) {
+                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: endDate) {
                     //will equal true if first instance of repeating event
                     if dateIndex == 0 {
                         self.showActivityIndicator()

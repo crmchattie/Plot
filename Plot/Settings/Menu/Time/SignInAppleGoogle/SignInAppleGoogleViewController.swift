@@ -56,21 +56,21 @@ class SignInAppleGoogleViewController: UITableViewController {
     
     fileprivate func createDataSource() {
         if title == "Tasks" {
-            if !lists.keys.contains(ListOptions.apple.name) && !lists.keys.contains(ListOptions.google.name) {
+            if !lists.keys.contains(ListSourceOptions.apple.name) && !lists.keys.contains(ListSourceOptions.google.name) {
                 firstSection.append(apple)
                 secondSection.append(google)
-            } else if !lists.keys.contains(ListOptions.apple.name) {
+            } else if !lists.keys.contains(ListSourceOptions.apple.name) {
                 firstSection.append(apple)
-            } else if !lists.keys.contains(ListOptions.google.name) {
+            } else if !lists.keys.contains(ListSourceOptions.google.name) {
                 firstSection.append(google)
             }
         } else if title == "Calendars" {
-            if !calendars.keys.contains(CalendarOptions.apple.name) && !calendars.keys.contains(CalendarOptions.google.name) {
+            if !calendars.keys.contains(CalendarSourceOptions.apple.name) && !calendars.keys.contains(CalendarSourceOptions.google.name) {
                 firstSection.append(apple)
                 secondSection.append(google)
-            } else if !calendars.keys.contains(CalendarOptions.apple.name) {
+            } else if !calendars.keys.contains(CalendarSourceOptions.apple.name) {
                 firstSection.append(apple)
-            } else if !calendars.keys.contains(CalendarOptions.google.name) {
+            } else if !calendars.keys.contains(CalendarSourceOptions.google.name) {
                 firstSection.append(google)
             }
         }
@@ -128,9 +128,9 @@ class SignInAppleGoogleViewController: UITableViewController {
                 GIDSignIn.sharedInstance()?.signIn()
             } else {
                 if title == "Tasks" {
-                    self.networkController.activityService.updatePrimaryList(value: ListOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
                 } else {
-                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
                 }
             }
         } else {
@@ -140,9 +140,9 @@ class SignInAppleGoogleViewController: UITableViewController {
                 GIDSignIn.sharedInstance()?.signIn()
             } else {
                 if title == "Tasks" {
-                    self.networkController.activityService.updatePrimaryList(value: ListOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
                 } else {
-                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
                 }
             }
         }
@@ -152,13 +152,13 @@ class SignInAppleGoogleViewController: UITableViewController {
 extension SignInAppleGoogleViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         print("signed in")
-        self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
-        self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+        self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+        self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
         
         if (error == nil) {
             print("updatePrimaryCalendar")
-            self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
+            self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
         }
         else {
           print("\(error.localizedDescription)")

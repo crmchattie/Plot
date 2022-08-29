@@ -66,13 +66,8 @@ class CalendarDetailCell: UICollectionViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFit
-        if #available(iOS 13.0, *) {
-            let smallConfiguration = UIImage.SymbolConfiguration(scale: .small)
-            imageView.image = UIImage(systemName: "info.circle", withConfiguration: smallConfiguration)!.withRenderingMode(.alwaysTemplate)
-        } else {
-            imageView.image = UIImage(named: "info")!.withRenderingMode(.alwaysTemplate)
-            imageView.tintColor = FalconPalette.defaultBlue
-        }
+        let smallConfiguration = UIImage.SymbolConfiguration(scale: .small)
+        imageView.image = UIImage(systemName: "info.circle", withConfiguration: smallConfiguration)!.withRenderingMode(.alwaysTemplate)
         imageView.isUserInteractionEnabled = true
         return imageView
     }()

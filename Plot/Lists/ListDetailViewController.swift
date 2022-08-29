@@ -79,6 +79,9 @@ class ListDetailViewController: FormViewController {
         if active {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
         } else {
             let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = addBarButton
@@ -113,7 +116,7 @@ class ListDetailViewController: FormViewController {
         } else if let currentUser = Auth.auth().currentUser?.uid {
             title = "New List"
             let ID = Database.database().reference().child(userListEntity).child(currentUser).childByAutoId().key ?? ""
-            list = ListType(id: ID, name: nil, color: nil, source: ListOptions.plot.name)
+            list = ListType(id: ID, name: nil, color: nil, source: ListSourceOptions.plot.name)
         }
     }
     

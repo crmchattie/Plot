@@ -34,15 +34,15 @@ class CalendarInfoViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
+        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
             let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newCalendar))
             navigationItem.rightBarButtonItem = barButton
         }
         
         sections = Array(calendars.keys).sorted { s1, s2 in
-            if s1 == CalendarOptions.plot.name {
+            if s1 == CalendarSourceOptions.plot.name {
                 return true
-            } else if s2 == CalendarOptions.plot.name {
+            } else if s2 == CalendarSourceOptions.plot.name {
                 return false
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
@@ -85,7 +85,7 @@ class CalendarInfoViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = CalendarAccountView()
-        if let calendar = CalendarOptions(rawValue: sections[section]) {
+        if let calendar = CalendarSourceOptions(rawValue: sections[section]) {
             headerView.nameLabel.text = calendar.name
             headerView.accountImageView.image = calendar.image
             if calendar.name == primaryCalendar {
@@ -137,9 +137,9 @@ class CalendarInfoViewController: UITableViewController {
 extension CalendarInfoViewController: UpdateWithGoogleAppleSignInDelegate {
     func UpdateWithGoogleAppleSignIn() {
         sections = Array(calendars.keys).sorted { s1, s2 in
-            if s1 == ListOptions.plot.name {
+            if s1 == ListSourceOptions.plot.name {
                 return true
-            } else if s2 == ListOptions.plot.name {
+            } else if s2 == ListSourceOptions.plot.name {
                 return false
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending

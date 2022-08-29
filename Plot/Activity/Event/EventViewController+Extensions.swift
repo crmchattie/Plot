@@ -171,6 +171,7 @@ extension EventViewController: UpdateTaskDelegate {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {
                     $0.value = task
+                    $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
                     self.taskIndex = row.indexPath!.row
                     self.openTask()
@@ -394,5 +395,24 @@ extension EventViewController: UpdateTagsDelegate {
         activity.tags = tags
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(["tags": tags as AnyObject])
+    }
+}
+
+extension EventViewController: UpdateTaskCellDelegate {
+    func updateCompletion(task: Activity) {
+        if let index = taskList.firstIndex(where: {$0.activityID == task.activityID} ) {
+            taskList[index].isCompleted = !(task.isCompleted ?? false)
+            if (taskList[index].isCompleted ?? false) {
+                let original = Date()
+                let updateDate = Date(timeIntervalSinceReferenceDate:
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                taskList[index].completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+            } else {
+                taskList[index].completedDate = nil
+            }
+            
+            let updateTask = ActivityActions(activity: taskList[index], active: true, selectedFalconUsers: [])
+            updateTask.updateCompletion(isComplete: taskList[index].isCompleted ?? false)
+        }
     }
 }

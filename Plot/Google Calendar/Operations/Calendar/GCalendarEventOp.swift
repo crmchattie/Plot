@@ -44,7 +44,7 @@ class GCalendarEventOp: AsyncOperation {
                             var values: [String : Any] = ["calendarExport": true,
                                                           "calendarID": self?.calendar.identifier as Any,
                                                           "calendarName": self?.calendar.summary as Any,
-                                                          "calendarSource": CalendarOptions.google.name as Any,
+                                                          "calendarSource": CalendarSourceOptions.google.name as Any,
                                                           "externalActivityID": self?.event.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]
                             if let value = self?.calendar.backgroundColor {
@@ -74,7 +74,7 @@ class GCalendarEventOp: AsyncOperation {
                                                           "calendarExport": true,
                                                           "calendarID": self?.calendar.identifier as Any,
                                                           "calendarName": self?.calendar.summary as Any,
-                                                          "calendarSource": CalendarOptions.google.name as Any,
+                                                          "calendarSource": CalendarSourceOptions.google.name as Any,
                                                           "externalActivityID": self?.event.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]
                             if let value = self?.calendar.backgroundColor {

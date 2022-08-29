@@ -43,9 +43,9 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
 
 let prebuiltLists: [ListType] = [defaultList]
 
-let defaultList = ListType(id: UUID().uuidString, name: "Default", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListOptions.plot.name)
+let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name)
 
-enum ListOptions:String, CaseIterable {
+enum ListSourceOptions: String, CaseIterable {
     case plot = "Plot"
     case apple = "iCloud"
     case google = "Google"
@@ -65,4 +65,12 @@ enum ListOptions:String, CaseIterable {
             case .google: return "Google"
         }
     }
+}
+
+enum ListOptions: String, CaseIterable {
+    case defaultList = "Default"
+    case todayList = "Today"
+    case scheduledList = "Scheduled"
+    case flaggedList = "Flagged"
+    case allList = "All"
 }

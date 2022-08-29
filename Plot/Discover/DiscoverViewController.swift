@@ -147,7 +147,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
     }
     
     @objc func updateSections() {
-        if !networkController.activityService.calendars.keys.contains(CalendarOptions.apple.name) && !networkController.activityService.calendars.keys.contains(CalendarOptions.google.name) {
+        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) && !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
             customTypes.removeAll(where: {$0 == .calendar})
             sections.removeAll(where: {$0 == .calendar})
             fetchData()
@@ -156,7 +156,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             sections.insert(.calendar, at: 1)
             fetchData()
         }
-        if !networkController.activityService.lists.keys.contains(ListOptions.apple.name) && !networkController.activityService.lists.keys.contains(ListOptions.google.name) {
+        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) && !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
             customTypes.removeAll(where: {$0 == .lists})
             sections.removeAll(where: {$0 == .lists})
             fetchData()
@@ -359,8 +359,8 @@ extension DiscoverViewController: EndedWebViewDelegate {
 extension DiscoverViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
-            self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+            self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
         } else {
           print("\(error.localizedDescription)")
         }

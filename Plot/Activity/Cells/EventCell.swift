@@ -121,7 +121,7 @@ class EventCell: UITableViewCell {
     
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "activity"), for: .normal)
+        button.setImage(UIImage(named: "event"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -203,7 +203,7 @@ class EventCell: UITableViewCell {
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
-        activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
+        activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {

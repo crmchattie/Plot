@@ -300,60 +300,107 @@ class FilterViewController: FormViewController {
         if filters.contains(.calendarCategory) {
             if let currentUser = Auth.auth().currentUser?.uid {
                 let reference = Database.database().reference()
-                var categories = ActivityCategory.allCases.map({ $0.rawValue }).sorted(by: >)
-                reference.child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        let array = Array(values.values)
-                        categories.append(contentsOf: array)
-                        categories = categories.sorted(by: >)
-                    }
-                    if let row: CheckRow = self.form.rowBy(tag: filter.calendarCategory.rawValue), let sectionIndex = row.section?.index {
-                        var section = self.form.allSections[sectionIndex]
-                        categories.forEach {
-                            let choice = $0
-                            section.insert(
-                                ListCheckRow<String>("\(choice)_\(filter.calendarCategory.rawValue)"){ row in
-                                    row.title = choice
-                                    row.selectableValue = choice
-                                    row.value = nil
-                                    row.hidden = .function([filter.calendarCategory.rawValue], { form -> Bool in
-                                        let row: RowOf<Bool>! = form.rowBy(tag: filter.calendarCategory.rawValue)
-                                        return row.value ?? false == false
-                                    })
-                                    }.cellSetup { (cell, row) in
-                                        if self.filterDictionary.keys.contains(filter.calendarCategory.rawValue), let choiceList = self.filterDictionary[filter.calendarCategory.rawValue], let _ = choiceList.firstIndex(of: choice) {
-                                            row.value = choice
-                                        }
-                                        cell.accessoryType = .checkmark
-                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                                }.onChange({ row in
-                                    if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
-                                        let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
-                                        let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
-                                        if row.value != nil {
-                                            if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
-                                                if choiceList.contains(choice) {
-                                                    return
-                                                } else {
-                                                    choiceList.append(choice)
-                                                    self.filterDictionary[filter] = choiceList
-                                                }
+                let categories = ActivityCategory.allCases.map({ $0.rawValue }).sorted(by: >)
+                if let row: CheckRow = self.form.rowBy(tag: filter.calendarCategory.rawValue), let sectionIndex = row.section?.index {
+                    var section = self.form.allSections[sectionIndex]
+                    categories.forEach {
+                        let choice = $0
+                        section.insert(
+                            ListCheckRow<String>("\(choice)_\(filter.calendarCategory.rawValue)"){ row in
+                                row.title = choice
+                                row.selectableValue = choice
+                                row.value = nil
+                                row.hidden = .function([filter.calendarCategory.rawValue], { form -> Bool in
+                                    let row: RowOf<Bool>! = form.rowBy(tag: filter.calendarCategory.rawValue)
+                                    return row.value ?? false == false
+                                })
+                                }.cellSetup { (cell, row) in
+                                    if self.filterDictionary.keys.contains(filter.calendarCategory.rawValue), let choiceList = self.filterDictionary[filter.calendarCategory.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                        row.value = choice
+                                    }
+                                    cell.accessoryType = .checkmark
+                                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            }.onChange({ row in
+                                if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
+                                    let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
+                                    let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                                    if row.value != nil {
+                                        if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
+                                            if choiceList.contains(choice) {
+                                                return
                                             } else {
-                                                self.filterDictionary[filter] = [choice]
+                                                choiceList.append(choice)
+                                                self.filterDictionary[filter] = choiceList
                                             }
                                         } else {
-                                            if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
-                                                choiceList.remove(at: indexChoice)
-                                                self.filterDictionary[filter] = choiceList
-                                            } else {
-                                                self.filterDictionary[filter] = nil
-                                            }
+                                            self.filterDictionary[filter] = [choice]
+                                        }
+                                    } else {
+                                        if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
+                                            choiceList.remove(at: indexChoice)
+                                            self.filterDictionary[filter] = choiceList
+                                        } else {
+                                            self.filterDictionary[filter] = nil
                                         }
                                     }
-                                })
-                                , at: section.count)
+                                }
+                            })
+                            , at: section.count)
+                    }
+                }
+                reference.child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                        let updatedCategories = Array(values.values).sorted(by: >)
+                        if let row: CheckRow = self.form.rowBy(tag: filter.calendarCategory.rawValue), let sectionIndex = row.section?.index {
+                            var section = self.form.allSections[sectionIndex]
+                            updatedCategories.forEach {
+                                let choice = $0
+                                section.insert(
+                                    ListCheckRow<String>("\(choice)_\(filter.calendarCategory.rawValue)"){ row in
+                                        row.title = choice
+                                        row.selectableValue = choice
+                                        row.value = nil
+                                        row.hidden = .function([filter.calendarCategory.rawValue], { form -> Bool in
+                                            let row: RowOf<Bool>! = form.rowBy(tag: filter.calendarCategory.rawValue)
+                                            return row.value ?? false == false
+                                        })
+                                        }.cellSetup { (cell, row) in
+                                            if self.filterDictionary.keys.contains(filter.calendarCategory.rawValue), let choiceList = self.filterDictionary[filter.calendarCategory.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                                row.value = choice
+                                            }
+                                            cell.accessoryType = .checkmark
+                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                    }.onChange({ row in
+                                        if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
+                                            let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
+                                            let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                                            if row.value != nil {
+                                                if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
+                                                    if choiceList.contains(choice) {
+                                                        return
+                                                    } else {
+                                                        choiceList.append(choice)
+                                                        self.filterDictionary[filter] = choiceList
+                                                    }
+                                                } else {
+                                                    self.filterDictionary[filter] = [choice]
+                                                }
+                                            } else {
+                                                if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
+                                                    choiceList.remove(at: indexChoice)
+                                                    self.filterDictionary[filter] = choiceList
+                                                } else {
+                                                    self.filterDictionary[filter] = nil
+                                                }
+                                            }
+                                        }
+                                    })
+                                    , at: section.count)
+                            }
                         }
                     }
                 })
@@ -362,60 +409,107 @@ class FilterViewController: FormViewController {
         if filters.contains(.taskCategory) {
             if let currentUser = Auth.auth().currentUser?.uid {
                 let reference = Database.database().reference()
-                var categories = ActivityCategory.allCases.map({ $0.rawValue }).sorted(by: >)
-                reference.child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
-                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
-                        let array = Array(values.values)
-                        categories.append(contentsOf: array)
-                        categories = categories.sorted(by: >)
-                    }
-                    if let row: CheckRow = self.form.rowBy(tag: filter.taskCategory.rawValue), let sectionIndex = row.section?.index {
-                        var section = self.form.allSections[sectionIndex]
-                        categories.forEach {
-                            let choice = $0
-                            section.insert(
-                                ListCheckRow<String>("\(choice)_\(filter.taskCategory.rawValue)"){ row in
-                                    row.title = choice
-                                    row.selectableValue = choice
-                                    row.value = nil
-                                    row.hidden = .function([filter.taskCategory.rawValue], { form -> Bool in
-                                        let row: RowOf<Bool>! = form.rowBy(tag: filter.taskCategory.rawValue)
-                                        return row.value ?? false == false
-                                    })
-                                    }.cellSetup { (cell, row) in
-                                        if self.filterDictionary.keys.contains(filter.taskCategory.rawValue), let choiceList = self.filterDictionary[filter.taskCategory.rawValue], let _ = choiceList.firstIndex(of: choice) {
-                                            row.value = choice
-                                        }
-                                        cell.accessoryType = .checkmark
-                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                                }.onChange({ row in
-                                    if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
-                                        let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
-                                        let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
-                                        if row.value != nil {
-                                            if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
-                                                if choiceList.contains(choice) {
-                                                    return
-                                                } else {
-                                                    choiceList.append(choice)
-                                                    self.filterDictionary[filter] = choiceList
-                                                }
+                let categories = ActivityCategory.allCases.map({ $0.rawValue }).sorted(by: >)
+                if let row: CheckRow = self.form.rowBy(tag: filter.taskCategory.rawValue), let sectionIndex = row.section?.index {
+                    var section = self.form.allSections[sectionIndex]
+                    categories.forEach {
+                        let choice = $0
+                        section.insert(
+                            ListCheckRow<String>("\(choice)_\(filter.taskCategory.rawValue)"){ row in
+                                row.title = choice
+                                row.selectableValue = choice
+                                row.value = nil
+                                row.hidden = .function([filter.taskCategory.rawValue], { form -> Bool in
+                                    let row: RowOf<Bool>! = form.rowBy(tag: filter.taskCategory.rawValue)
+                                    return row.value ?? false == false
+                                })
+                                }.cellSetup { (cell, row) in
+                                    if self.filterDictionary.keys.contains(filter.taskCategory.rawValue), let choiceList = self.filterDictionary[filter.taskCategory.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                        row.value = choice
+                                    }
+                                    cell.accessoryType = .checkmark
+                                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            }.onChange({ row in
+                                if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
+                                    let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
+                                    let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                                    if row.value != nil {
+                                        if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
+                                            if choiceList.contains(choice) {
+                                                return
                                             } else {
-                                                self.filterDictionary[filter] = [choice]
+                                                choiceList.append(choice)
+                                                self.filterDictionary[filter] = choiceList
                                             }
                                         } else {
-                                            if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
-                                                choiceList.remove(at: indexChoice)
-                                                self.filterDictionary[filter] = choiceList
-                                            } else {
-                                                self.filterDictionary[filter] = nil
-                                            }
+                                            self.filterDictionary[filter] = [choice]
+                                        }
+                                    } else {
+                                        if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
+                                            choiceList.remove(at: indexChoice)
+                                            self.filterDictionary[filter] = choiceList
+                                        } else {
+                                            self.filterDictionary[filter] = nil
                                         }
                                     }
-                                })
-                                , at: section.count)
+                                }
+                            })
+                            , at: section.count)
+                    }
+                }
+                reference.child(userActivityCategoriesEntity).child(currentUser).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.exists(), let values = snapshot.value as? [String: String] {
+                        let updatedCategories = Array(values.values).sorted(by: >)
+                        if let row: CheckRow = self.form.rowBy(tag: filter.taskCategory.rawValue), let sectionIndex = row.section?.index {
+                            var section = self.form.allSections[sectionIndex]
+                            updatedCategories.forEach {
+                                let choice = $0
+                                section.insert(
+                                    ListCheckRow<String>("\(choice)_\(filter.taskCategory.rawValue)"){ row in
+                                        row.title = choice
+                                        row.selectableValue = choice
+                                        row.value = nil
+                                        row.hidden = .function([filter.taskCategory.rawValue], { form -> Bool in
+                                            let row: RowOf<Bool>! = form.rowBy(tag: filter.taskCategory.rawValue)
+                                            return row.value ?? false == false
+                                        })
+                                        }.cellSetup { (cell, row) in
+                                            if self.filterDictionary.keys.contains(filter.taskCategory.rawValue), let choiceList = self.filterDictionary[filter.taskCategory.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                                row.value = choice
+                                            }
+                                            cell.accessoryType = .checkmark
+                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                    }.onChange({ row in
+                                        if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
+                                            let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
+                                            let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                                            if row.value != nil {
+                                                if var choiceList = self.filterDictionary[filter], !choiceList.isEmpty {
+                                                    if choiceList.contains(choice) {
+                                                        return
+                                                    } else {
+                                                        choiceList.append(choice)
+                                                        self.filterDictionary[filter] = choiceList
+                                                    }
+                                                } else {
+                                                    self.filterDictionary[filter] = [choice]
+                                                }
+                                            } else {
+                                                if var choiceList = self.filterDictionary[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
+                                                    choiceList.remove(at: indexChoice)
+                                                    self.filterDictionary[filter] = choiceList
+                                                } else {
+                                                    self.filterDictionary[filter] = nil
+                                                }
+                                            }
+                                        }
+                                    })
+                                    , at: section.count)
+                            }
                         }
                     }
                 })

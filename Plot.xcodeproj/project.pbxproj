@@ -171,6 +171,7 @@
 		1092E27C28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */; };
 		1092E27F28B93CE10018FCAA /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */; };
 		1092E28128BA7C3D0018FCAA /* WorkoutMinutesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */; };
+		1092E28528BD3B150018FCAA /* NewTaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E28428BD3B150018FCAA /* NewTaskCell.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -770,6 +771,7 @@
 		1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInAppleGoogleTableViewCell.swift; sourceTree = "<group>"; };
 		1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Medium.ttf"; sourceTree = "<group>"; };
 		1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutMinutesOperation.swift; sourceTree = "<group>"; };
+		1092E28428BD3B150018FCAA /* NewTaskCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTaskCell.swift; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -1224,7 +1226,6 @@
 				1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */,
 				1027D09F23EEF7100005D2A7 /* SubTypeControllers */,
 				1082B66523EF25D300A27046 /* DetailControllers */,
-				109F849823D6860D002C0044 /* FilterViewController.swift */,
 				100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */,
 				1040E582242AA05D00304D05 /* MessageViewController.swift */,
 				100A53EF23E0E839004AA952 /* HorizontalSnappingController.swift */,
@@ -1647,6 +1648,14 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
+		1092E28328BD28470018FCAA /* Filter */ = {
+			isa = PBXGroup;
+			children = (
+				109F849823D6860D002C0044 /* FilterViewController.swift */,
+			);
+			path = Filter;
+			sourceTree = "<group>";
+		};
 		10970B122580605D0027A9EF /* Mindfulness */ = {
 			isa = PBXGroup;
 			children = (
@@ -1745,6 +1754,7 @@
 				10C50FA52276345500111033 /* EventCell+ConfigureCell.swift */,
 				10B3E51428B3F56000E1713D /* TaskCell.swift */,
 				10B3E51628B3F57500E1713D /* TaskCell+ConfigureCell.swift */,
+				1092E28428BD3B150018FCAA /* NewTaskCell.swift */,
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
 				109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */,
@@ -2068,6 +2078,7 @@
 				108C37EA289951E400DC4998 /* Media */,
 				105F345A2885EB2F007531EB /* Repeat */,
 				10B3E52628B6AEB900E1713D /* Tags */,
+				1092E28328BD28470018FCAA /* Filter */,
 				1051AC99244F8C470066761C /* OldList */,
 				4BAEE4A421272D880045AB10 /* Chats */,
 				4BAEE4AB21272D880045AB10 /* ChatLog */,
@@ -3275,6 +3286,7 @@
 				1017D32B24F2B746001D7CBE /* MXHolding.swift in Sources */,
 				26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */,
 				10E93D5A24BE43B700F6EE18 /* UIView+Layout.swift in Sources */,
+				1092E28528BD3B150018FCAA /* NewTaskCell.swift in Sources */,
 				10DFAFCA287776BE00D38016 /* HealthContainer.swift in Sources */,
 				10DFAFC82877753D00D38016 /* EventViewController+Extensions.swift in Sources */,
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,

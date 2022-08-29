@@ -125,7 +125,7 @@ class EventViewController: FormViewController {
                 if let calendar = calendar {
                     activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? "", calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
                 } else {
-                    let calendar = calendars[CalendarOptions.plot.name]?.first { $0.name == "Default"}
+                    let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.name == "Default"}
                     activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? "", calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
 
                 }
@@ -718,11 +718,12 @@ class EventViewController: FormViewController {
         
         <<< ButtonRow("Sub-Events") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             row.cell.textLabel?.textAlignment = .left
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
-            if self.activity.scheduleIDs != nil {
+            if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             } else {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -731,6 +732,7 @@ class EventViewController: FormViewController {
             self.openSchedule()
         }).cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
             if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {

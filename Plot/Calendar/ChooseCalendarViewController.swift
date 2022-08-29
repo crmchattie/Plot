@@ -23,9 +23,9 @@ class ChooseCalendarViewController: FormViewController {
     var calendars = [String: [CalendarType]]() {
         didSet {
             sections = Array(calendars.keys).sorted { s1, s2 in
-                if s1 == CalendarOptions.plot.name {
+                if s1 == CalendarSourceOptions.plot.name {
                     return true
-                } else if s2 == CalendarOptions.plot.name {
+                } else if s2 == CalendarSourceOptions.plot.name {
                     return false
                 }
                 return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
@@ -55,7 +55,7 @@ class ChooseCalendarViewController: FormViewController {
         configureTableView()
         initializeForm()
         
-        if calendars.keys.contains(CalendarOptions.apple.name) || calendars.keys.contains(CalendarOptions.google.name) {
+        if calendars.keys.contains(CalendarSourceOptions.apple.name) || calendars.keys.contains(CalendarSourceOptions.google.name) {
             for row in form.rows {
                 row.baseCell.isUserInteractionEnabled = false
             }

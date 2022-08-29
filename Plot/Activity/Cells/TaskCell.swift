@@ -9,11 +9,6 @@
 import UIKit
 
 class TaskCell: UITableViewCell {
-    var invitationSegmentHeightConstraint: NSLayoutConstraint!
-    var invitationSegmentedControlTopAnchor: NSLayoutConstraint!
-    var invitationSegmentedControlTopAnchorRegular: CGFloat = 8
-    let invitationSegmentHeightConstant: CGFloat = 29
-    
     var iconViewHeightConstraint: NSLayoutConstraint!
     var iconViewTopAnchor: NSLayoutConstraint!
     var iconViewTopAnchorRegular: CGFloat = 8
@@ -89,14 +84,6 @@ class TaskCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-        
-    let invitationSegmentedControl: UISegmentedControl = {
-        let items = ["Accept" , "Decline"]
-        let segmentedControl = UISegmentedControl(items: items)
-        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        return segmentedControl
-    }()
     
     let badgeLabel: UILabel = {
         let badgeLabel = UILabel()
@@ -117,10 +104,23 @@ class TaskCell: UITableViewCell {
     
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "activity"), for: .normal)
+        button.setImage(UIImage(named: "task"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
+    }()
+    
+    let checkView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    let checkImage: UIImageView = {
+        let view = UIImageView()
+        view.tintColor = .systemGray3
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     let iconView: UIView = {
@@ -128,6 +128,8 @@ class TaskCell: UITableViewCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    let checkConfiguration = UIImage.SymbolConfiguration(weight: .medium)
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
@@ -141,39 +143,43 @@ class TaskCell: UITableViewCell {
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
         activityImageView.addSubview(muteIndicator)
+        activityImageView.addSubview(checkView)
+        checkView.addSubview(checkImage)
 //        activityImageView.addSubview(iconView)
-        activityImageView.addSubview(invitationSegmentedControl)
-        
+
         activityImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         activityImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
         activityImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         activityImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
-        nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        checkView.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 0).isActive = true
+        checkView.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 0).isActive = true
+        checkView.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: 0).isActive = true
+        checkView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+
+        checkImage.centerYAnchor.constraint(equalTo: checkView.centerYAnchor, constant: 0).isActive = true
+        checkImage.leadingAnchor.constraint(equalTo: checkView.leadingAnchor, constant: 10).isActive = true
+        checkImage.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        checkImage.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        
+        nameLabel.topAnchor.constraint(equalTo: checkView.topAnchor, constant: 10).isActive = true
+        nameLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
-        startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        startLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
         startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
 //
         activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
-        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
+        activityTypeLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
         activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        activityTypeLabel.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
-        invitationSegmentedControlTopAnchor = invitationSegmentedControl.topAnchor.constraint(equalTo: activityTypeLabel.bottomAnchor, constant: invitationSegmentedControlTopAnchorRegular)
-        invitationSegmentedControlTopAnchor.isActive = true
-        invitationSegmentedControl.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 5).isActive = true
-        invitationSegmentedControl.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -5).isActive = true
-        invitationSegmentedControl.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
-        invitationSegmentHeightConstraint = invitationSegmentedControl.heightAnchor.constraint(equalToConstant: invitationSegmentHeightConstant)
-        invitationSegmentHeightConstraint.isActive = true
-        
+                
         muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 1).isActive = true
         muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor, constant: 1).isActive = true
         muteIndicator.widthAnchor.constraint(equalToConstant: 15).isActive = true
@@ -183,7 +189,9 @@ class TaskCell: UITableViewCell {
         badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
-        invitationSegmentedControl.addTarget(self, action: #selector(EventCell.indexChangedSegmentedControl(_:)), for: .valueChanged)
+        let viewTap = UITapGestureRecognizer(target: self, action: #selector(TaskCell.checkViewChanged(_:)))
+        checkView.addGestureRecognizer(viewTap)
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -199,11 +207,24 @@ class TaskCell: UITableViewCell {
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
-        activityTypeButton.setImage(UIImage(named: "activity"), for: .normal)
+        activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
         activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
+    }
+    
+    @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
+        guard let task = task else {
+            return
+        }
+
+        let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
+        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
+        
+        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false))
+        
     }
 }

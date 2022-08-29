@@ -61,13 +61,18 @@ class ActivityService {
         didSet {
             if oldValue != tasks {
                 tasks.sort { task1, task2 in
-                    if task1.isCompleted ?? false == task2.isCompleted ?? false {
+                    if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
                         if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
                             return task1.name ?? "" < task2.name ?? ""
                         }
                         return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+                    } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                        if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
                     }
-                    return !(task1.isCompleted ?? false)                    
+                    return !(task1.isCompleted ?? false)
                 }
                 NotificationCenter.default.post(name: .tasksUpdated, object: nil)
             }
@@ -141,18 +146,18 @@ class ActivityService {
                 self?.activities = newActivities
                 self?.grabPrimaryCalendar({ (calendar) in
                     self?.grabPlotCalendars()
-                    if calendar == CalendarOptions.apple.name {
+                    if calendar == CalendarSourceOptions.apple.name {
                         self?.grabEKEvents {}
-                    } else if calendar == CalendarOptions.google.name {
+                    } else if calendar == CalendarSourceOptions.google.name {
                         self?.grabGEvents {}
                     }
                     self?.grabCalendars()
                 })
                 self?.grabPrimaryList({ (list) in
                     self?.grabPlotLists()
-                    if list == ListOptions.apple.name {
+                    if list == ListSourceOptions.apple.name {
                         self?.grabEKReminders {}
-                    } else if list == ListOptions.google.name {
+                    } else if list == ListSourceOptions.google.name {
                         self?.grabGTasks {}
                     }
                     self?.grabLists()
@@ -296,13 +301,13 @@ class ActivityService {
         if let _ = Auth.auth().currentUser {
             self.eventKitManager.authorizeEventKitEvents { _ in
                 if let calendars = self.eventKitManager.grabCalendars() {
-                    self.calendars[CalendarOptions.apple.name] = calendars
+                    self.calendars[CalendarSourceOptions.apple.name] = calendars
                 }
             }
             self.googleCalManager.authorizeGEvents { _ in
                 self.googleCalManager.grabCalendars() { calendars in
                     if let calendars = calendars {
-                        self.calendars[CalendarOptions.google.name] = calendars
+                        self.calendars[CalendarSourceOptions.google.name] = calendars
                     }
                 }
             }
@@ -311,46 +316,46 @@ class ActivityService {
     
     func grabPlotCalendars() {
         self.calendarFetcher.observeCalendarForCurrentUser(calendarInitialAdd: { [weak self] calendarInitialAdd in
-            if self?.calendars[CalendarOptions.plot.name] != nil {
-                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+            if self?.calendars[CalendarSourceOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
                 for calendar in calendarInitialAdd {
                     if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
                         plotCalendars?[index] = calendar
                     }
                 }
-                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+                self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
             } else {
-                self?.calendars[CalendarOptions.plot.name] = calendarInitialAdd
+                self?.calendars[CalendarSourceOptions.plot.name] = calendarInitialAdd
             }
         }, calendarAdded: { [weak self] calendarAdded in
-            if self?.calendars[CalendarOptions.plot.name] != nil {
-                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+            if self?.calendars[CalendarSourceOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
                 for calendar in calendarAdded {
                     if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
                         plotCalendars?[index] = calendar
                     }
                 }
-                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+                self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
             } else {
-                self?.calendars[CalendarOptions.plot.name] = calendarAdded
+                self?.calendars[CalendarSourceOptions.plot.name] = calendarAdded
             }
         }, calendarRemoved: { [weak self] calendarRemoved in
-            if self?.calendars[CalendarOptions.plot.name] != nil {
-                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+            if self?.calendars[CalendarSourceOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
                 for calendar in calendarRemoved {
                     plotCalendars = plotCalendars?.filter({$0.id != calendar.id})
                 }
-                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+                self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
             }
         }, calendarChanged: { [weak self] calendarChanged in
-            if self?.calendars[CalendarOptions.plot.name] != nil {
-                var plotCalendars = self?.calendars[CalendarOptions.plot.name]
+            if self?.calendars[CalendarSourceOptions.plot.name] != nil {
+                var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
                 for calendar in calendarChanged {
                     if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
                         plotCalendars?[index] = calendar
                     }
                 }
-                self?.calendars[CalendarOptions.plot.name] = plotCalendars
+                self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
             }
         })
     }
@@ -386,9 +391,9 @@ class ActivityService {
         if !askedforCalendarAuthorization {
             grabActivities {}
         } else {
-            if value == primaryCalendar && value == CalendarOptions.apple.name {
+            if value == primaryCalendar && value == CalendarSourceOptions.apple.name {
                 grabEKEvents {}
-            } else if value == primaryCalendar && value == CalendarOptions.google.name {
+            } else if value == primaryCalendar && value == CalendarSourceOptions.google.name {
                 grabGEvents {}
             }
             grabCalendars()
@@ -408,13 +413,13 @@ class ActivityService {
         if let _ = Auth.auth().currentUser {
             self.eventKitManager.authorizeEventKitReminders { _ in
                 if let lists = self.eventKitManager.grabLists() {
-                    self.lists[ListOptions.apple.name] = lists
+                    self.lists[ListSourceOptions.apple.name] = lists
                 }
             }
             self.googleCalManager.authorizeGReminders { _ in
                 self.googleCalManager.grabLists() { lists in
                     if let lists = lists {
-                        self.lists[ListOptions.google.name] = lists
+                        self.lists[ListSourceOptions.google.name] = lists
                     }
                 }
             }
@@ -423,46 +428,46 @@ class ActivityService {
     
     func grabPlotLists() {
         self.listFetcher.observeListForCurrentUser(listInitialAdd: { [weak self] listInitialAdd in
-            if self?.lists[ListOptions.plot.name] != nil {
-                var plotLists = self?.lists[ListOptions.plot.name]
+            if self?.lists[ListSourceOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listInitialAdd {
                     if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
                         plotLists?[index] = list
                     }
                 }
-                self?.lists[ListOptions.plot.name] = plotLists
+                self?.lists[ListSourceOptions.plot.name] = plotLists
             } else {
-                self?.lists[ListOptions.plot.name] = listInitialAdd
+                self?.lists[ListSourceOptions.plot.name] = listInitialAdd
             }
         }, listAdded: { [weak self] listAdded in
-            if self?.lists[ListOptions.plot.name] != nil {
-                var plotLists = self?.lists[ListOptions.plot.name]
+            if self?.lists[ListSourceOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listAdded {
                     if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
                         plotLists?[index] = list
                     }
                 }
-                self?.lists[ListOptions.plot.name] = plotLists
+                self?.lists[ListSourceOptions.plot.name] = plotLists
             } else {
-                self?.lists[ListOptions.plot.name] = listAdded
+                self?.lists[ListSourceOptions.plot.name] = listAdded
             }
         }, listRemoved: { [weak self] listRemoved in
-            if self?.lists[ListOptions.plot.name] != nil {
-                var plotLists = self?.lists[ListOptions.plot.name]
+            if self?.lists[ListSourceOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listRemoved {
                     plotLists = plotLists?.filter({$0.id != list.id})
                 }
-                self?.lists[ListOptions.plot.name] = plotLists
+                self?.lists[ListSourceOptions.plot.name] = plotLists
             }
         }, listChanged: { [weak self] listChanged in
-            if self?.lists[ListOptions.plot.name] != nil {
-                var plotLists = self?.lists[ListOptions.plot.name]
+            if self?.lists[ListSourceOptions.plot.name] != nil {
+                var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listChanged {
                     if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
                         plotLists?[index] = list
                     }
                 }
-                self?.lists[ListOptions.plot.name] = plotLists
+                self?.lists[ListSourceOptions.plot.name] = plotLists
             }
         })
     }
@@ -498,9 +503,9 @@ class ActivityService {
         if !askedforReminderAuthorization {
             grabActivities {}
         } else {
-            if value == primaryList && value == ListOptions.apple.name {
+            if value == primaryList && value == ListSourceOptions.apple.name {
                 grabEKReminders {}
-            } else if value == primaryList && value == ListOptions.google.name {
+            } else if value == primaryList && value == ListSourceOptions.google.name {
                 grabGTasks {}
             }
             grabLists()

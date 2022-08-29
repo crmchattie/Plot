@@ -42,7 +42,7 @@ class EKReminderTaskOp: AsyncOperation {
                         var values: [String : Any] = ["listExport": true,
                                                       "listID": self?.reminder.calendar.calendarIdentifier as Any,
                                                       "listName": self?.reminder.calendar.title as Any,
-                                                      "listSource": CalendarOptions.apple.name as Any,
+                                                      "listSource": CalendarSourceOptions.apple.name as Any,
                                                       "externalActivityID": self?.reminder.calendarItemIdentifier as Any]
                         if let CGColor = self?.reminder.calendar.cgColor {
                             values["listColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
@@ -69,7 +69,7 @@ class EKReminderTaskOp: AsyncOperation {
                                                       "calendarExport": true,
                                                       "listID": self?.reminder.calendar.calendarIdentifier as Any,
                                                       "listName": self?.reminder.calendar.title as Any,
-                                                      "listSource": CalendarOptions.apple.name as Any,
+                                                      "listSource": CalendarSourceOptions.apple.name as Any,
                                                       "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
                                                       "showExtras": activity.showExtras as Any]
                         if let CGColor = self?.reminder.calendar.cgColor {

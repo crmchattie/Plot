@@ -8,10 +8,14 @@
 
 import Eureka
 
+protocol UpdateTaskCellDelegate: AnyObject {
+    func updateCompletion(task: Activity)
+}
+
 final class SubtaskCell: Cell<Activity>, CellType {
+    weak var delegate: UpdateTaskCellDelegate?
     
     var formattedDate: (String, String) = ("", "")
-    var allDay: Bool = false
     
     lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -56,6 +60,21 @@ final class SubtaskCell: Cell<Activity>, CellType {
         return button
     }()
     
+    let checkView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    let checkImage: UIImageView = {
+        let view = UIImageView()
+        view.tintColor = .systemGray3
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    let checkConfiguration = UIImage.SymbolConfiguration(weight: .medium)
+    
     override func setup() {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
@@ -65,26 +84,32 @@ final class SubtaskCell: Cell<Activity>, CellType {
         contentView.addSubview(nameLabel)
         contentView.addSubview(dateTimeLabel)
         contentView.addSubview(locationNameLabel)
-        contentView.addSubview(activityTypeButton)
+        contentView.addSubview(checkView)
+        checkView.addSubview(checkImage)
         
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+        nameLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.rightAnchor, constant: -15).isActive = true
         
         dateTimeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         dateTimeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
-        dateTimeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+        dateTimeLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.rightAnchor, constant: -15).isActive = true
                         
         locationNameLabel.topAnchor.constraint(equalTo: dateTimeLabel.bottomAnchor, constant: 2).isActive = true
         locationNameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         locationNameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
-        locationNameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+        locationNameLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.rightAnchor, constant: -15).isActive = true
         
-        activityTypeButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        activityTypeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
-        activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-                
+        checkView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
+        checkView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0).isActive = true
+        checkView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
+        checkView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+
+        checkImage.centerYAnchor.constraint(equalTo: checkView.centerYAnchor, constant: 0).isActive = true
+        checkImage.leftAnchor.constraint(equalTo: checkView.leftAnchor, constant: -10).isActive = true
+        checkImage.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        checkImage.heightAnchor.constraint(equalToConstant: 30).isActive = true
+                        
     }
     
     override func update() {
@@ -92,29 +117,42 @@ final class SubtaskCell: Cell<Activity>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 
-        guard let schedule = row.value else { return }
+        guard let subtask = row.value else { return }
                 
-        if let startDate = schedule.startDateTime as? TimeInterval, let endDate = schedule.endDateTime as? TimeInterval, let allDay = schedule.allDay {
-            let startTimeZone = schedule.startTimeZone ?? "UTC"
-            let endTimeZone = schedule.endTimeZone ?? "UTC"
-            let startDate = Date(timeIntervalSince1970: startDate)
-            let endDate = Date(timeIntervalSince1970: endDate)
-            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        if let endDate = subtask.endDate {
+            formattedDate = timestampOfTask(startDate: subtask.startDate, endDate: endDate)
         }
         // set the texts to the labels
-        nameLabel.text = schedule.name
+        nameLabel.text = subtask.name
         dateTimeLabel.text = formattedDate.0 + formattedDate.1
-        if schedule.locationName != "locationName" {
-            locationNameLabel.text = schedule.locationName
+        if subtask.locationName != "locationName" {
+            locationNameLabel.text = subtask.locationName
         }
         
-        if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
+        let image = subtask.isCompleted ?? false ? "checkmark.circle" : "circle"
+        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
+        
+        if let categoryValue = subtask.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             activityTypeButton.tintColor = category.color
         } else {
             activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
             activityTypeButton.tintColor = ActivityCategory.uncategorized.color
         }
+        
+        let viewTap = UITapGestureRecognizer(target: self, action: #selector(checkViewChanged(_:)))
+        checkView.addGestureRecognizer(viewTap)
+        
+    }
+    
+    @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
+        guard let subtask = row.value else { return }
+        delegate?.updateCompletion(task: subtask)
+        
+        let image = !(subtask.isCompleted ?? false) ? "checkmark.circle" : "circle"
+        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
+        subtask.isCompleted = !(subtask.isCompleted ?? false)
+
     }
 }
 

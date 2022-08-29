@@ -161,7 +161,11 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
             viewPlaceholder.remove(from: tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: tableView, title: .emptyLists, subtitle: .emptyLists, priority: .medium, position: .top)
+        if filterDictionary.isEmpty {
+            viewPlaceholder.add(for: tableView, title: .emptyLists, subtitle: .emptyLists, priority: .medium, position: .top)
+        } else {
+            viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasks, priority: .medium, position: .top)
+        }
     }
     
     func sortandreload() {
@@ -170,38 +174,52 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         taskList = [:]
         
         sections = [.lists]
-        let dailyList = ListType(id: "", name: "Today", color: "", source: "")
-        let dailyTasks = tasks.filter {
-            if let endDate = $0.endDate {
-                return NSCalendar.current.isDateInToday(endDate)
-            }
-            return false
-        }
-        taskList[dailyList] = dailyTasks
         
-        let scheduledList = ListType(id: "", name: "Scheduled", color: "", source: "")
-        let scheduledTasks = tasks.filter {
-            if let _ = $0.endDate {
-                return true
-            }
-            return false
+        var listOfLists = [ListType]()
+
+        let allTasks = tasks
+        if !allTasks.isEmpty {
+            let allList = ListType(id: "", name: ListOptions.allList.rawValue, color: "", source: "")
+            taskList[allList] = allTasks
+            listOfLists.insert(allList, at: 0)
         }
-        taskList[scheduledList] = scheduledTasks
         
-        let flaggedList = ListType(id: "", name: "Flagged", color: "", source: "")
         let flaggedTasks = tasks.filter {
             if $0.flagged ?? false {
                 return true
             }
             return false
         }
-        taskList[flaggedList] = flaggedTasks
+        if !flaggedTasks.isEmpty {
+            let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "")
+            taskList[flaggedList] = flaggedTasks
+            listOfLists.insert(flaggedList, at: 0)
+        }
         
-        let allList = ListType(id: "", name: "All", color: "", source: "")
-        let allTasks = tasks
-        taskList[allList] = allTasks
+        let scheduledTasks = tasks.filter {
+            if let _ = $0.endDate {
+                return true
+            }
+            return false
+        }
+        if !scheduledTasks.isEmpty {
+            let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "")
+            taskList[scheduledList] = scheduledTasks
+            listOfLists.insert(scheduledList, at: 0)
+        }
         
-        let listOfLists = [dailyList, scheduledList, flaggedList, allList]
+        let dailyTasks = tasks.filter {
+            if let endDate = $0.endDate {
+                return NSCalendar.current.isDateInToday(endDate)
+            }
+            return false
+        }
+        if !dailyTasks.isEmpty {
+            let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "")
+            taskList[dailyList] = dailyTasks
+            listOfLists.insert(dailyList, at: 0)
+        }
+        
         lists[.lists, default: []].append(contentsOf: listOfLists)
         
         for (_, currentLists) in networkController.activityService.lists {
@@ -323,7 +341,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ListCell ?? ListCell()
         if let filteredLists = filteredLists[section] {
             let list = filteredLists[indexPath.row]
-            cell.configureCell(for: indexPath, list: list)
+            cell.configureCell(for: indexPath, list: list, taskNumber: taskList[list]?.filter({ !($0.isCompleted ?? false) }).count ?? 0)
             return cell
         } else if !filteredTasks.isEmpty {
             let task = filteredTasks[indexPath.row]
@@ -485,8 +503,8 @@ extension ListsViewController: UpdateFilter {
 extension ListsViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarOptions.google.name)
-            self.networkController.activityService.updatePrimaryList(value: ListOptions.google.name)
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+            self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
         } else {
           print("\(error.localizedDescription)")
         }

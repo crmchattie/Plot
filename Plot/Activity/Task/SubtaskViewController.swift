@@ -28,10 +28,10 @@ class SubtaskViewController: FormViewController {
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
     var checklist: Checklist!
-    var startDateTime: Date?
-    var endDateTime: Date?
     var userNames : [String] = []
     var userNamesString: String = ""
+    var startDateTime: Date?
+    var endDateTime: Date?
     
     var subtaskID = String()
     
@@ -50,7 +50,7 @@ class SubtaskViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if subtask != nil {
-            title = "Sub-Event"
+            title = "Sub-Task"
             active = true
             if subtask.activityID != nil {
                 subtaskID = subtask.activityID!
@@ -69,7 +69,7 @@ class SubtaskViewController: FormViewController {
             setupLists()
             subtask.isSubtask = true
         } else {
-            title = "New Sub-Event"
+            title = "New Sub-Task"
             subtaskID = UUID().uuidString
             subtask = Activity(dictionary: ["activityID": subtaskID as AnyObject])
             subtask.isSubtask = true
@@ -190,40 +190,54 @@ class SubtaskViewController: FormViewController {
 //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                    cell.textLabel?.textAlignment = .left
 //            }
-            
-            <<< SwitchRow("All-day") {
+        
+            <<< CheckRow("Completed") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.tintColor = FalconPalette.defaultBlue
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.accessoryType = .checkmark
                 $0.title = $0.tag
-                if self.active {
-                    $0.value = self.subtask.allDay
+                $0.value = subtask.isCompleted ?? false
+                if $0.value ?? false {
+                    $0.cell.tintAdjustmentMode = .automatic
                 } else {
-                    $0.value = false
+                    $0.cell.tintAdjustmentMode = .dimmed
                 }
-                }.onChange { [weak self] row in
-                    let startDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
-                    let endDate: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.tintColor = FalconPalette.defaultBlue
+                cell.accessoryType = .checkmark
+                if row.value == false {
+                    cell.tintAdjustmentMode = .dimmed
+                } else {
+                    cell.tintAdjustmentMode = .automatic
+                }
+            }.onChange { row in
+                self.subtask.isCompleted = row.value
+                if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+                    row.cell.tintAdjustmentMode = .automatic
                     
-                    if row.value ?? false {
-                        startDate.dateFormatter?.timeStyle = .none
-                        endDate.dateFormatter?.timeStyle = .none
-                    }
-                    else {
-                        startDate.dateFormatter?.timeStyle = .short
-                        endDate.dateFormatter?.timeStyle = .short
-                    }
-                    startDate.updateCell()
-                    endDate.updateCell()
-                    startDate.inlineRow?.updateCell()
-                    endDate.inlineRow?.updateCell()
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    let original = Date()
+                    let updateDate = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     
+                    completedRow.value = updateDate
+                    completedRow.updateCell()
+                    completedRow.hidden = false
+                    completedRow.evaluateHidden()
+                    self.subtask.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+                    row.cell.tintAdjustmentMode = .dimmed
+                    completedRow.value = nil
+                    completedRow.updateCell()
+                    completedRow.hidden = true
+                    completedRow.evaluateHidden()
+                    self.subtask.completedDate = nil
+                }
             }
-
             
-            <<< DateTimeInlineRow("Starts") {
+            <<< DateTimeInlineRow("Completed On") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
@@ -231,234 +245,438 @@ class SubtaskViewController: FormViewController {
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
-                if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: subtask.startTimeZone ?? "UTC")
-                    $0.value = Date(timeIntervalSince1970: self.subtask!.startDateTime as! TimeInterval)
-                    if self.subtask.allDay == true {
-                        $0.dateFormatter?.timeStyle = .none
-                    }
-                    else {
-                        $0.dateFormatter?.timeStyle = .short
-                    }
+                if self.active, subtask.isCompleted ?? false, let date = subtask.completedDate {
+                    $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
                     $0.updateCell()
                 } else {
-                    $0.dateFormatter?.timeZone = .current
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.subtask.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    $0.hidden = true
                 }
-                self.startDateTime = $0.value
-                }.onChange { [weak self] row in
-                    let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
-                    if row.value?.compare(endRow.value!) == .orderedDescending {
-                        endRow.value = Date(timeInterval: 0, since: row.value!)
-                        endRow.updateCell()
-                    }
-                    self!.subtask.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-                    self!.startDateTime = row.value
-                    if self!.active {
-                        self!.subtaskReminder()
-                    }
-                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
-                    inlineRow.cellUpdate { (cell, row) in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
-                        }
-                        let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                        if allRow.value ?? false {
-                            cell.datePicker.datePickerMode = .date
-                        }
-                        else {
-                            cell.datePicker.datePickerMode = .dateAndTime
-                        }
-                        if let startTimeZone = self?.subtask.startTimeZone {
-                            cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
-                        } else if self!.active {
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                        } else {
-                            cell.datePicker.timeZone = .current
-                        }
-                    }
-                    cell.detailTextLabel?.textColor = cell.tintColor
-                    if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "startTimeZone") {
-                        timeZoneRow.hidden = false
-                        timeZoneRow.evaluateHidden()
-                    }
-                }.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone") {
-                        timeZoneRow.hidden = true
-                        timeZoneRow.evaluateHidden()
-                    }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }.onChange { [weak self] row in
+                if let value = row.value {
+                    self?.subtask.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
                 }
-            
-            <<< LabelRow("startTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.selectionStyle = .default
-                row.title = "Time Zone"
-                row.hidden = true
-                if active {
-                    row.value = subtask.startTimeZone ?? "UTC"
-                } else {
-                    row.value = TimeZone.current.identifier
-                    subtask.startTimeZone = TimeZone.current.identifier
-                }
-                }.onCellSelection({ _,_ in
-                    self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
-                }).cellUpdate { cell, row in
-                    cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.textLabel?.textAlignment = .left
-                }
-            
-            <<< DateTimeInlineRow("Ends") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.title = $0.tag
-                $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .medium
-                $0.dateFormatter?.timeStyle = .short
-                if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: subtask.endTimeZone ?? "UTC")
-                    $0.value = Date(timeIntervalSince1970: self.subtask!.endDateTime as! TimeInterval)
-                    if self.subtask.allDay == true {
-                        $0.dateFormatter?.timeStyle = .none
-                    }
-                    else {
-                        $0.dateFormatter?.timeStyle = .short
-                    }
-                    $0.updateCell()
-                } else {
-                    $0.dateFormatter?.timeZone = .current
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.subtask.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                }
-                self.endDateTime = $0.value
-                }.onChange { [weak self] row in
-                    let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
-                    if row.value?.compare(startRow.value!) == .orderedAscending {
-                        startRow.value = Date(timeInterval: 0, since: row.value!)
-                        startRow.updateCell()
-                    }
-                    self!.subtask.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-                    self!.endDateTime = row.value
-                }.onExpandInlineRow { [weak self] cell, row, inlineRow in
+            }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                     row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
-                    if let endTimeZone = self?.subtask.endTimeZone {
-                        cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
-                    } else if self!.active {
-                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    } else {
-                        cell.datePicker.timeZone = .current
-                    }
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
-                    }
-                    let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
-                    if allRow.value ?? false {
-                        cell.datePicker.datePickerMode = .date
                     }
                     else {
                         cell.datePicker.datePickerMode = .dateAndTime
                     }
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
-                if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "endTimeZone") {
-                    timeZoneRow.hidden = false
-                    timeZoneRow.evaluateHidden()
-                }
-                }.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                    if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone") {
-                        timeZoneRow.hidden = true
-                        timeZoneRow.evaluateHidden()
-                    }
-                }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    
-                }
-            
-            <<< LabelRow("endTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.selectionStyle = .default
-                row.title = "Time Zone"
-                row.hidden = true
-                if active {
-                    row.value = subtask.endTimeZone ?? "UTC"
-                } else {
-                    row.value = TimeZone.current.identifier
-                    subtask.endTimeZone = TimeZone.current.identifier
-                }
-                }.onCellSelection({ _,_ in
-                    self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
-                }).cellUpdate { cell, row in
-                    cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.textLabel?.textAlignment = .left
-                }
-        
-            <<< PushRow<EventAlert>("Reminder") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                row.title = row.tag
-                if self.active, let value = self.subtask.reminder {
-                    row.value = EventAlert(rawValue: value)
-                } else {
-                    row.value = EventAlert.None
-                    if let reminder = row.value?.description {
-                        self.subtask.reminder = reminder
-                    }
-                }
-                row.options = EventAlert.allCases
-            }.onPresent { from, to in
-                to.title = "Reminder"
-                to.tableViewStyle = .insetGrouped
-                to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                }
+            }.onCollapseInlineRow { cell, _, _ in
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }.cellUpdate { cell, row in
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            }.onChange() { [unowned self] row in
-                if let reminder = row.value?.description {
-                    self.subtask.reminder = reminder
-                    if self.active {
-                        self.subtaskReminder()
+            }
+            
+//                <<< SwitchRow("Start Date") {
+//                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    $0.title = $0.tag
+//                    if self.active, let subtask = subtask, let startDate = subtask.startDate {
+//                        $0.value = true
+//                        $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+//                    } else {
+//                        $0.value = false
+//                    }
+//                }.onChange { [weak self] row in
+//                    if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
+//                        if value, let startTime = self?.form.rowBy(tag: "StartTime") {
+//                            if let subtask = self?.subtask, let startDate = subtask.startDate {
+//                                row.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+//                                startDateRow.value = startDate
+//                            } else {
+//                                let startDateTime = Date()
+//                                startDateRow.value = startDateTime
+//                                row.cell.detailTextLabel?.text = startDateTime.getMonthAndDateAndYear()
+//        
+//                            }
+//                            startTime.hidden = true
+//                            startTime.evaluateHidden()
+//                        } else if let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Start Time") {
+//                            row.cell.detailTextLabel?.text = nil
+//                            startDateSwitchRow.updateCell()
+//                            startDateSwitchRow.cell.detailTextLabel?.text = nil
+//                        }
+//                        self!.updateStartDate()
+//                        let condition: Condition = value ? false : true
+//                        row.disabled = condition
+//                        startDateRow.hidden = condition
+//                        startDateRow.evaluateHidden()
+//                    }
+//                }.onCellSelection({ [weak self] _, row in
+//                    if row.value ?? false {
+//                        if let startDate = self?.form.rowBy(tag: "StartDate"), let startTime = self?.form.rowBy(tag: "StartTime") {
+//                            startDate.hidden = startDate.isHidden ? false : true
+//                            startDate.evaluateHidden()
+//                            if !startDate.isHidden {
+//                                startTime.hidden = true
+//                                startTime.evaluateHidden()
+//                            }
+//                        }
+//                    }
+//                }).cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    if let subtask = self.subtask, let startDate = subtask.startDate {
+//                        cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+//                    }
+//                }
+//        
+//                <<< DatePickerRow("StartDate") {
+//                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.hidden = true
+//                    $0.minuteInterval = 5
+//                    if #available(iOS 13.4, *) {
+//                        $0.cell.datePicker.preferredDatePickerStyle = .wheels
+//                    }
+//                    else {
+//                        $0.cell.datePicker.datePickerMode = .date
+//                    }
+//                    if self.active, let subtask = subtask, let startDate = subtask.startDate {
+//                        $0.value = startDate
+//                        $0.updateCell()
+//                    }
+//                }.onChange { [weak self] row in
+//                    if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "Start Date") {
+//                        switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
+//                    }
+//                    self!.updateStartDate()
+//                }.cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                }
+//        
+//                <<< SwitchRow("Start Time") {
+//                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    $0.title = $0.tag
+//                    if self.active, let subtask = subtask, subtask.hasStartTime ?? false, let startDate = subtask.startDate {
+//                        $0.value = true
+//                        $0.cell.detailTextLabel?.text = startDate.getTimeString()
+//                    } else {
+//                        $0.value = false
+//                    }
+//                }.onChange { [weak self] row in
+//                    if let value = row.value, let startTimeRow: TimePickerRow = self?.form.rowBy(tag: "StartTime") {
+//                        if value, let startDateDateRow = self?.form.rowBy(tag: "StartDate"), let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "Start Date") {
+//                            if let subtask = self?.subtask, subtask.hasStartTime ?? false, let startDate = subtask.startDate {
+//                                row.cell.detailTextLabel?.text = startDate.getTimeString()
+//                                startTimeRow.value = startDate
+//                                if !(startDateSwitchRow.value ?? false) {
+//                                    startDateSwitchRow.value = value
+//                                    startDateSwitchRow.updateCell()
+//                                    startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+//                                }
+//                            } else {
+//                                let original = Date()
+//                                let startDate = Date(timeIntervalSinceReferenceDate:
+//                                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+//                                startTimeRow.value = startDate
+//                                row.cell.detailTextLabel?.text = startDate.getTimeString()
+//                                if !(startDateSwitchRow.value ?? false) {
+//                                    startDateSwitchRow.value = value
+//                                    startDateSwitchRow.updateCell()
+//                                    startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+//                                }
+//                            }
+//                            startDateDateRow.hidden = true
+//                            startDateDateRow.evaluateHidden()
+//                        } else {
+//                            row.cell.detailTextLabel?.text = nil
+//                        }
+//                        self!.updateStartDate()
+//                        let condition: Condition = value ? false : true
+//                        row.disabled = condition
+//                        startTimeRow.hidden = condition
+//                        startTimeRow.evaluateHidden()
+//                    }
+//                }.onCellSelection({ [weak self] _, row in
+//                    if row.value ?? false {
+//                        if let startTime = self?.form.rowBy(tag: "StartTime"), let startDate = self?.form.rowBy(tag: "StartDate") {
+//                            startTime.hidden = startTime.isHidden ? false : true
+//                            startTime.evaluateHidden()
+//                            if !startTime.isHidden {
+//                                startDate.hidden = true
+//                                startDate.evaluateHidden()
+//                            }
+//                        }
+//                    }
+//                }).cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    if let subtask = self.subtask, let startDate = subtask.startDate {
+//                        cell.detailTextLabel?.text = startDate.getTimeString()
+//                    }
+//                }
+//        
+//                <<< TimePickerRow("StartTime") {
+//                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    $0.hidden = true
+//                    $0.minuteInterval = 5
+//                    if #available(iOS 13.4, *) {
+//                        $0.cell.datePicker.preferredDatePickerStyle = .wheels
+//                    }
+//                    else {
+//                        $0.cell.datePicker.datePickerMode = .time
+//                    }
+//                    if self.active, let subtask = subtask, subtask.hasStartTime ?? false, let startDate = subtask.startDate {
+//                        $0.value = startDate
+//                        $0.updateCell()
+//                    }
+//                }.onChange { [weak self] row in
+//                    if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "Start Time") {
+//                        self?.subtask.startDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
+//                        switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
+//                    }
+//        
+//                    self!.updateStartDate()
+//                }.cellUpdate { cell, row in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                }
+
+                <<< SwitchRow("deadlineDateSwitch") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = "Deadline Date"
+                    if self.active, let subtask = subtask, let endDate = subtask.endDate {
+                        $0.value = true
+                        $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                    } else {
+                        $0.value = false
+                    }
+                }.onChange { [weak self] row in
+                    if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
+                        if value, let endTime = self?.form.rowBy(tag: "DeadlineTime") {
+                            if let subtask = self?.subtask, let endDate = subtask.endDate {
+                                row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                                endDateRow.value = endDate
+                            } else {
+                                let endDateTime = Date()
+                                endDateRow.value = endDateTime
+                                row.cell.detailTextLabel?.text = endDateTime.getMonthAndDateAndYear()
+
+                            }
+                            endTime.hidden = true
+                            endTime.evaluateHidden()
+                        } else if let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                            row.cell.detailTextLabel?.text = nil
+                            endDateSwitchRow.updateCell()
+                            endDateSwitchRow.cell.detailTextLabel?.text = nil
+                        }
+                        self!.updateDeadlineDate()
+
+                        let condition: Condition = value ? false : true
+                        row.disabled = condition
+                        endDateRow.hidden = condition
+                        endDateRow.evaluateHidden()
+                        
+                    }
+                }.onCellSelection({ [weak self] _, row in
+                    if row.value ?? false {
+                        if let endDate = self?.form.rowBy(tag: "DeadlineDate"), let endTime = self?.form.rowBy(tag: "DeadlineTime") {
+                            endDate.hidden = endDate.isHidden ? false : true
+                            endDate.evaluateHidden()
+                            if !endDate.isHidden {
+                                endTime.hidden = true
+                                endTime.evaluateHidden()
+                            }
+                        }
+                    }
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    if let subtask = self.subtask, let endDate = subtask.endDate {
+                        cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                     }
                 }
-            }
+
+                <<< DatePickerRow("DeadlineDate") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.hidden = true
+                    $0.minuteInterval = 5
+                    if #available(iOS 13.4, *) {
+                        $0.cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
+                    else {
+                        $0.cell.datePicker.datePickerMode = .date
+                    }
+                    if self.active, let subtask = subtask, let endDate = subtask.endDate {
+                        $0.value = endDate
+                        $0.updateCell()
+                    }
+                }.onChange { [weak self] row in
+                    if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                        switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
+                    }
+                    self!.updateDeadlineDate()
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
+
+                <<< SwitchRow("deadlineTimeSwitch") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.title = "Deadline Time"
+                    if self.active, let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                        print("if")
+                        $0.value = true
+                        $0.cell.detailTextLabel?.text = endDate.getTimeString()
+                    } else {
+                        print("else")
+                        $0.value = false
+                        $0.cell.detailTextLabel?.text = nil
+                    }
+                }.onChange { [weak self] row in
+                    if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
+                        if value, let endDateDateRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                            if let subtask = self?.subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                                row.cell.detailTextLabel?.text = endDate.getTimeString()
+                                endTimeRow.value = endDate
+                                if !(endDateSwitchRow.value ?? false) {
+                                    endDateSwitchRow.value = value
+                                    endDateSwitchRow.updateCell()
+                                    endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                                }
+                            } else {
+                                let original = Date()
+                                let endDate = Date(timeIntervalSinceReferenceDate:
+                                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                                endTimeRow.value = endDate
+                                row.cell.detailTextLabel?.text = endDate.getTimeString()
+                                if !(endDateSwitchRow.value ?? false) {
+                                    endDateSwitchRow.value = value
+                                    endDateSwitchRow.updateCell()
+                                    endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                                }
+                            }
+                            endDateDateRow.hidden = true
+                            endDateDateRow.evaluateHidden()
+                        } else {
+                            row.cell.detailTextLabel?.text = nil
+                        }
+                        self!.updateDeadlineDate()
+
+                        let condition: Condition = value ? false : true
+                        row.disabled = condition
+                        endTimeRow.hidden = condition
+                        endTimeRow.evaluateHidden()
+                        
+                    }
+                }.onCellSelection({ [weak self] _, row in
+                    if row.value ?? false {
+                        if let endTime = self?.form.rowBy(tag: "DeadlineTime"), let endDate = self?.form.rowBy(tag: "DeadlineDate") {
+                            endTime.hidden = endTime.isHidden ? false : true
+                            endTime.evaluateHidden()
+                            if !endTime.isHidden {
+                                endDate.hidden = true
+                                endDate.evaluateHidden()
+                            }
+                        }
+                    }
+                }).cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    if let subtask = self.subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                        cell.detailTextLabel?.text = endDate.getTimeString()
+                    }
+                }
+
+                <<< TimePickerRow("DeadlineTime") {
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.hidden = true
+                    $0.minuteInterval = 5
+                    if #available(iOS 13.4, *) {
+                        $0.cell.datePicker.preferredDatePickerStyle = .wheels
+                    }
+                    else {
+                        $0.cell.datePicker.datePickerMode = .time
+                    }
+                    if self.active, let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                        $0.value = endDate
+                        $0.updateCell()
+                    }
+                }.onChange { [weak self] row in
+                    print("onchange deadlinetime")
+                    if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                        self?.subtask.endDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
+                        switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
+                    }
+                    self!.updateDeadlineDate()
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                }
         
+        <<< PushRow<EventAlert>("Reminder") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.title = row.tag
+            row.hidden = "$deadlineDateSwitch == false"
+            if self.active, let value = self.subtask.reminder {
+                row.value = EventAlert(rawValue: value)
+            } else {
+                row.value = EventAlert.None
+                if let reminder = row.value?.description {
+                    self.subtask.reminder = reminder
+                }
+            }
+            row.options = EventAlert.allCases
+        }.onPresent { from, to in
+            to.title = "Reminder"
+            to.tableViewStyle = .insetGrouped
+            to.selectableRowCellUpdate = { cell, row in
+                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.tableView.separatorStyle = .none
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }.onChange() { [unowned self] row in
+            if let reminder = row.value?.description {
+                self.subtask.reminder = reminder
+                if self.active {
+                    self.subtaskReminder()
+                }
+            }
+        }
         
             <<< LabelRow("Category") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -586,10 +804,6 @@ class SubtaskViewController: FormViewController {
             subtask.transportation = value
         }
         
-        subtask.allDay = valuesDictionary["All-day"] as? Bool
-        subtask.startDateTime = NSNumber(value: Int((valuesDictionary["Starts"] as! Date).timeIntervalSince1970))
-        subtask.endDateTime = NSNumber(value: Int((valuesDictionary["Ends"] as! Date).timeIntervalSince1970))
-        
         if let value = valuesDictionary["Reminder"] as? String {
             subtask.reminder = value
         }
@@ -683,12 +897,70 @@ class SubtaskViewController: FormViewController {
         }
     }
     
+    func updateStartDate() {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "Start Date"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "Start Time"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "StartTime") {
+            if dateSwitchRowValue && timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
+                var dateComponents = DateComponents()
+                print(dateRowValue.yearNumber())
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                dateComponents.hour = timeRowValue.hourNumber()
+                dateComponents.minute = timeRowValue.minuteNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.subtask.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.hasStartTime = true
+            } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
+                print(dateRowValue.yearNumber())
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.subtask.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.hasStartTime = false
+            } else {
+                self.subtask.startDateTime = nil
+                self.subtask.hasStartTime = false
+            }
+            self.subtaskReminder()
+        }
+    }
+    
+    func updateDeadlineDate() {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "deadlineTimeSwitch"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "DeadlineTime") {
+            if dateSwitchRowValue, timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                dateComponents.hour = timeRowValue.hourNumber()
+                dateComponents.minute = timeRowValue.minuteNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.subtask.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.hasDeadlineTime = true
+            } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.subtask.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.hasDeadlineTime = false
+            } else {
+                self.subtask.endDateTime = nil
+                self.subtask.hasDeadlineTime = false
+            }
+            self.subtaskReminder()
+        }
+    }
+    
     func subtaskReminder() {
-        guard let subtask = subtask, let subtaskReminder = subtask.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = subtask.allDay, let startTimeZone = subtask.startTimeZone, let endTimeZone = subtask.endTimeZone else {
+        guard let subtask = subtask, let activityReminder = subtask.reminder, let endDate = subtask.endDate else {
             return
         }
         let center = UNUserNotificationCenter.current()
-        guard subtaskReminder != "None" else {
+        guard activityReminder != "None" else {
             center.removePendingNotificationRequests(withIdentifiers: ["\(subtaskID)_Reminder"])
             return
         }
@@ -696,13 +968,12 @@ class SubtaskViewController: FormViewController {
         content.title = "\(String(describing: subtask.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        formattedDate = timestampOfTask(startDate: subtask.startDate, endDate: endDate)
         content.subtitle = formattedDate.0
-        if let reminder = EventAlert(rawValue: subtaskReminder) {
-            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
-            var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: startTimeZone)!
-            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+        if let reminder = EventAlert(rawValue: activityReminder) {
+            let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)
+            let calendar = Calendar.current
+            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                         repeats: false)
             let identifier = "\(subtaskID)_Reminder"
@@ -713,17 +984,6 @@ class SubtaskViewController: FormViewController {
                 }
             })
         }
-    }
-    
-    fileprivate func openTimeZoneFinder(startOrEndTimeZone: String) {
-        guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
-            return
-        }
-        let destination = TimeZoneViewController()
-        destination.delegate = self
-        destination.startOrEndTimeZone = startOrEndTimeZone
-        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     //update so existing invitees are shown as selected
@@ -810,32 +1070,6 @@ class SubtaskViewController: FormViewController {
         return (membersIDs, membersIDsDictionary)
     }
 
-}
-
-extension SubtaskViewController: UpdateTimeZoneDelegate {
-    func updateTimeZone(startOrEndTimeZone: String, timeZone: TimeZone) {
-        if startOrEndTimeZone == "startTimeZone" {
-            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone"), let startRow: DateTimeInlineRow = self.form.rowBy(tag: "Starts") {
-                startRow.dateFormatter?.timeZone = timeZone
-                startRow.updateCell()
-                startRow.inlineRow?.cell.datePicker.timeZone = timeZone
-                startRow.inlineRow?.updateCell()
-                timeZoneRow.value = timeZone.identifier
-                timeZoneRow.updateCell()
-                subtask.startTimeZone = timeZone.identifier
-            }
-        } else if startOrEndTimeZone == "endTimeZone" {
-            if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone"), let endRow: DateTimeInlineRow = self.form.rowBy(tag: "Ends") {
-                endRow.dateFormatter?.timeZone = timeZone
-                endRow.updateCell()
-                endRow.inlineRow?.cell.datePicker.timeZone = timeZone
-                endRow.inlineRow?.updateCell()
-                timeZoneRow.value = timeZone.identifier
-                timeZoneRow.updateCell()
-                subtask.endTimeZone = timeZone.identifier
-            }
-        }
-    }
 }
 
 extension SubtaskViewController: UpdateInvitees {

@@ -92,6 +92,7 @@ class SubtaskListViewController: FormViewController {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
                 $0.value = subtask
+                $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
                     self.subtaskIndex = row.indexPath!.row
                     self.openSubtask()
@@ -229,6 +230,7 @@ extension SubtaskListViewController: UpdateTaskDelegate {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {
                     $0.value = task
+                    $0.cell.delegate = self
                     }.onCellSelection() { cell, row in
                         self.subtaskIndex = row.indexPath!.row
                         self.openSubtask()
@@ -243,6 +245,22 @@ extension SubtaskListViewController: UpdateTaskDelegate {
             }
             
             sortSubtask()
+        }
+    }
+}
+
+extension SubtaskListViewController: UpdateTaskCellDelegate {
+    func updateCompletion(task: Activity) {
+        if let index = subtaskList.firstIndex(where: {$0.activityID == task.activityID} ) {
+            subtaskList[index].isCompleted = !(task.isCompleted ?? false)
+            if (subtaskList[index].isCompleted ?? false) {
+                let original = Date()
+                let updateDate = Date(timeIntervalSinceReferenceDate:
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                subtaskList[index].completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+            } else {
+                subtaskList[index].completedDate = nil
+            }
         }
     }
 }
@@ -292,6 +310,7 @@ extension SubtaskListViewController: ChooseTaskDelegate {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
                 $0.value = mergeTask
+                $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
                     self.subtaskIndex = row.indexPath!.row
                     self.openSubtask()
