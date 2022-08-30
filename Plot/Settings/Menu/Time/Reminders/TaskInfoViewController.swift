@@ -117,15 +117,29 @@ class TaskInfoViewController: UITableViewController {
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        cell.accessoryType = .none
+        cell.accessoryType = .disclosureIndicator
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         let section = sections[indexPath.section]
-        let listNames = lists[section]?.map({ $0.name ?? "" })
-        cell.textLabel?.text = listNames?.sorted()[indexPath.row]
-        cell.isUserInteractionEnabled = false
+        let listSorted = lists[section]?.sorted()
+        cell.textLabel?.text = listSorted?[indexPath.row].name
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let section = sections[indexPath.section]
+        let listSorted = lists[section]?.sorted()
+        if let list = listSorted?[indexPath.row] {
+            listInfo(list: list)
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    fileprivate func listInfo(list: ListType) {
+        let destination = ListDetailViewController(networkController: self.networkController)
+        destination.list = list
+        navigationController?.pushViewController(destination, animated: true)
     }
         
     @objc func updatePrimaryList(_ sender: TapGesture) {

@@ -120,7 +120,7 @@ final class SubtaskCell: Cell<Activity>, CellType {
         guard let subtask = row.value else { return }
                 
         if let endDate = subtask.endDate {
-            formattedDate = timestampOfTask(startDate: subtask.startDate, endDate: endDate)
+            formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
         }
         // set the texts to the labels
         nameLabel.text = subtask.name

@@ -21,12 +21,13 @@ extension ListCell {
         nameLabel.text = name
         muteIndicator.isHidden = !isMuted
         
-        startLabel.numberOfLines = 1
-        startLabel.text = ""
+        if let color = list.color, color != "" {
+            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+        } else {
+            activityTypeButton.tintColor = .systemBlue
+        }
         
-        activityTypeButton.setImage(ActivityCategory.todo.icon, for: .normal)
-        activityTypeButton.tintColor = ActivityCategory.todo.color
-        activityTypeLabel.text = ActivityCategory.todo.rawValue
+        activityTypeButton.setImage(UIImage(named: "list"), for: .normal)
         
         taskNumberLabel.text = String(taskNumber)
         

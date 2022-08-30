@@ -139,8 +139,6 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.separatorStyle = .none
         tableView.keyboardDismissMode = .onDrag
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 100
         
     }
     
@@ -361,6 +359,15 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             let task = filteredTasks[indexPath.row]
             showTaskDetail(task: task)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let section = sections[indexPath.section]
+        if let filteredLists = filteredLists[section], filteredLists.indices.contains(indexPath.row) {
+            return 65
+        } else {
+            return UITableView.automaticDimension
         }
     }
 }

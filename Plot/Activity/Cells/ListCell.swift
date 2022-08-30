@@ -51,29 +51,6 @@ class ListCell: UITableViewCell {
         return muteIndicator
     }()
     
-    //date/time of activity
-    let startLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        label.textAlignment = .left
-        return label
-    }()
-    
-    //activity type label (e.g. drinks, trip)
-    let activityTypeLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        label.numberOfLines = 1
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
     //activity participants label (e.g. whoever is invited to activity)
     let activityParticipantsLabel: UILabel = {
         let label = UILabel()
@@ -125,10 +102,7 @@ class ListCell: UITableViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.textAlignment = .center
         label.layer.masksToBounds = true
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.adjustsFontForContentSizeCategory = true
-        label.minimumScaleFactor = 0.1
-        label.adjustsFontSizeToFitWidth = true
+        label.font = UIFont.preferredFont(forTextStyle: .headline)
         return label
     }()
 
@@ -139,8 +113,6 @@ class ListCell: UITableViewCell {
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
-        activityImageView.addSubview(startLabel)
-        activityImageView.addSubview(activityTypeLabel)
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
         activityImageView.addSubview(taskNumberLabel)
@@ -153,19 +125,12 @@ class ListCell: UITableViewCell {
         activityImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
+        nameLabel.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(lessThanOrEqualTo: taskNumberLabel.leftAnchor, constant: -5).isActive = true
         
-        startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
-        startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        startLabel.rightAnchor.constraint(lessThanOrEqualTo: taskNumberLabel.leftAnchor, constant: -5).isActive = true
-//
-        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
-        activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        activityTypeLabel.rightAnchor.constraint(lessThanOrEqualTo: taskNumberLabel.leftAnchor, constant: -5).isActive = true
-        activityTypeLabel.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
-        
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
+        activityTypeButton.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
@@ -192,8 +157,6 @@ class ListCell: UITableViewCell {
         super.prepareForReuse()
         contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         nameLabel.text = nil
-        startLabel.text = nil
-        activityTypeLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         nameLabel.textColor = .label

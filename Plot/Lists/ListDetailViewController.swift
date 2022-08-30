@@ -64,6 +64,11 @@ class ListDetailViewController: FormViewController {
         configureTableView()
         initializeForm()
         
+        if list.source == ListSourceOptions.apple.name || list.source == ListSourceOptions.google.name {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
     }
     
     fileprivate func configureTableView() {

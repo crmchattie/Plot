@@ -42,8 +42,6 @@ class FinanceTransactionRuleViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        
-        
         dateFormatterPrint.dateFormat = "MMM dd, yyyy"
         setupVariables()
         configureTableView()

@@ -64,6 +64,11 @@ class CalendarDetailViewController: FormViewController {
         configureTableView()
         initializeForm()
         
+        if calendar.source == CalendarSourceOptions.apple.name || calendar.source == CalendarSourceOptions.google.name {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
     }
     
     fileprivate func configureTableView() {

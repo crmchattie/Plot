@@ -968,7 +968,7 @@ class SubtaskViewController: FormViewController {
         content.title = "\(String(describing: subtask.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfTask(startDate: subtask.startDate, endDate: endDate)
+        formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
         content.subtitle = formattedDate.0
         if let reminder = EventAlert(rawValue: activityReminder) {
             let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)

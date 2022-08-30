@@ -116,15 +116,29 @@ class CalendarInfoViewController: UITableViewController {
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        cell.accessoryType = .none
+        cell.accessoryType = .disclosureIndicator
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         let section = sections[indexPath.section]
-        let calendarNames = calendars[section]?.map({ $0.name ?? "" })
-        cell.textLabel?.text = calendarNames?.sorted()[indexPath.row]
-        cell.isUserInteractionEnabled = false
+        let calendarsSorted = calendars[section]?.sorted()
+        cell.textLabel?.text = calendarsSorted?[indexPath.row].name
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let section = sections[indexPath.section]
+        let calendarsSorted = calendars[section]?.sorted()
+        if let calendar = calendarsSorted?[indexPath.row] {
+            calendarInfo(calendar: calendar)
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    fileprivate func calendarInfo(calendar: CalendarType) {
+        let destination = CalendarDetailViewController(networkController: self.networkController)
+        destination.calendar = calendar
+        navigationController?.pushViewController(destination, animated: true)
     }
         
     @objc func updatePrimaryCalendar(_ sender: TapGesture) {

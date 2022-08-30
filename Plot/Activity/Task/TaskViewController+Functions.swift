@@ -332,7 +332,7 @@ extension TaskViewController {
         content.title = "\(String(describing: task.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfTask(startDate: task.startDate, endDate: endDate)
+        formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: task.hasDeadlineTime ?? false, startDate: task.startDate, hasStartTime: task.hasStartTime)
         content.subtitle = formattedDate.0
         if let reminder = EventAlert(rawValue: activityReminder) {
             let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)
