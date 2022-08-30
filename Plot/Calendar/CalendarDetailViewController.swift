@@ -189,6 +189,39 @@ class CalendarDetailViewController: FormViewController {
             }
         }
         
+        <<< ColorPushRow<UIColor>("Color") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.title = row.tag
+            row.cell.detailTextLabel?.text = nil
+//            row.cell.accessoryType = .disclosureIndicator
+            if self.active, let color = self.calendar.color {
+                row.value = UIColor(ciColor: CIColor(string: color))
+            }
+            row.options = ChartColors.palette()
+        }.onPresent { from, to in
+            to.title = "Color"
+            to.tableViewStyle = .insetGrouped
+            to.selectableRowCellUpdate = { cell, row in
+                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.tableView.separatorStyle = .none
+                if let index = row.indexPath?.row {
+                    cell.backgroundColor = ChartColors.palette()[index]
+                    cell.textLabel?.text = nil
+                    cell.detailTextLabel?.text = nil
+                }
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.text = nil
+        }.onChange() { [unowned self] row in
+            if let color = row.value {
+                calendar.color = CIColor(color: color).stringRepresentation
+            }
+        }
+        
 //        <<< ButtonRow("Participants") { row in
 //            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //            row.cell.textLabel?.textAlignment = .left

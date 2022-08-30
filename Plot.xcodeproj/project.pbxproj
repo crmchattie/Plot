@@ -172,6 +172,7 @@
 		1092E27F28B93CE10018FCAA /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */; };
 		1092E28128BA7C3D0018FCAA /* WorkoutMinutesOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */; };
 		1092E28528BD3B150018FCAA /* NewTaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E28428BD3B150018FCAA /* NewTaskCell.swift */; };
+		1092E28728BE53D10018FCAA /* ColorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E28628BE53D00018FCAA /* ColorRow.swift */; };
 		1092F23A2414507200E8CE16 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F2392414507200E8CE16 /* WebViewController.swift */; };
 		1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */; };
 		1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */; };
@@ -772,6 +773,7 @@
 		1092E27E28B93CE00018FCAA /* Roboto-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Medium.ttf"; sourceTree = "<group>"; };
 		1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutMinutesOperation.swift; sourceTree = "<group>"; };
 		1092E28428BD3B150018FCAA /* NewTaskCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTaskCell.swift; sourceTree = "<group>"; };
+		1092E28628BE53D00018FCAA /* ColorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorRow.swift; sourceTree = "<group>"; };
 		1092F2392414507200E8CE16 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		1092F23B2414580E00E8CE16 /* RecipeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailCell.swift; sourceTree = "<group>"; };
 		1092F23F241482C600E8CE16 /* RecipeDetailViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailViewCell.swift; sourceTree = "<group>"; };
@@ -1761,6 +1763,7 @@
 				103E968922C2B309007D6668 /* PurchaseRow.swift */,
 				10DFAFCB2877775800D38016 /* HealthRow.swift */,
 				10B3E50228B10FC100E1713D /* SubtaskRow.swift */,
+				1092E28628BE53D00018FCAA /* ColorRow.swift */,
 				101B90962458DA2D00EDDB90 /* WeatherRow.swift */,
 			);
 			path = Cells;
@@ -3721,6 +3724,7 @@
 				2670E33A252D2023007A6194 /* UserHealth.swift in Sources */,
 				4BAEE4F921272D890045AB10 /* IncomingVoiceMessageCell.swift in Sources */,
 				100A53EE23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift in Sources */,
+				1092E28728BE53D10018FCAA /* ColorRow.swift in Sources */,
 				10DE97352475737500D4A7E8 /* ListCell.swift in Sources */,
 				4BAEE5D8212735E50045AB10 /* CameraOverlayView.swift in Sources */,
 				4BAEE5CC212735E50045AB10 /* ParticipantTableViewCell.swift in Sources */,

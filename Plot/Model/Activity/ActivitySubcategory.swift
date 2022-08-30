@@ -51,23 +51,6 @@ enum ActivitySubcategory: String, CaseIterable {
         }
     }
     
-    var color: UIColor {
-        switch self {
-        case .sleep: return ChartColors.palette()[0]
-        case .meal: return ChartColors.palette()[1]
-        case .work: return ChartColors.palette()[2]
-        case .social: return ChartColors.palette()[4]
-        case .leisure: return ChartColors.palette()[6]
-        case .workout: return ChartColors.palette()[7]
-        case .family: return ChartColors.palette()[8]
-        case .personal: return ChartColors.palette()[9]
-        case .todo: return ChartColors.palette()[10]
-        case .uncategorized,
-             .notApplicable:
-            return UIColor.systemBlue
-        }
-    }
-    
     // MARK: - Utility
     static func categorize(_ activity: Activity) -> ActivityCategory {
         let text = "\(activity.name?.lowercased() ?? "") \(activity.notes?.lowercased() ?? "")"

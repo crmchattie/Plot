@@ -33,6 +33,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
+let taskCellID = "taskCellID"
 let eventCellID = "eventCellID"
 let notificationCellID = "notificationCellID"
 
@@ -44,7 +45,7 @@ protocol ActivityDataStore: AnyObject {
     func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->())
 }
 
-class CalendarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate {
+class CalendarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate, ActivityDetailShowing {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -55,18 +56,16 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    fileprivate let plotAppGroup = "group.immaturecreations.plot"
-    fileprivate var sharedContainer : UserDefaults?
-    
+        
     let activityView = CalendarView()
     
     var searchBar: UISearchBar?
     var searchController: UISearchController?
     
     var activities: [Activity] {
-        return networkController.activityService.events
+        return networkController.activityService.calendarActivities
     }
+    
     var filteredActivities = [Activity]()
     var pinnedActivities = [Activity]()
     var filteredPinnedActivities = [Activity]()
@@ -88,7 +87,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     // [ActivityID: Participants]
-    var activitiesParticipants: [String: [User]] = [:]
+    var participants: [String: [User]] = [:]
     
     var activityDates = [String: Int]()
     
@@ -131,7 +130,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         
         configureView()
         
-        sharedContainer = UserDefaults(suiteName: plotAppGroup)
         addObservers()
         
         handleReloadTable()
@@ -145,6 +143,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -158,6 +157,12 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func eventsUpdated() {
+        filteredPinnedActivities = pinnedActivities
+        filteredActivities = activities
+        activityView.tableView.reloadData()
+    }
+    
+    @objc fileprivate func tasksUpdated() {
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
         activityView.tableView.reloadData()
@@ -239,6 +244,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.dataSource = self
         activityView.tableView.delegate = self
         activityView.tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
+        activityView.tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
         activityView.tableView.allowsMultipleSelectionDuringEditing = false
         activityView.tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         activityView.tableView.backgroundColor = view.backgroundColor
@@ -260,6 +266,14 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             let destination = EventViewController(networkController: self.networkController)
             destination.startDateTime = calendar.date(from: dateComponents)
             destination.endDateTime = calendar.date(from: dateComponents)
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
+            let destination = TaskViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
@@ -387,11 +401,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     func handleReloadTable() {
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
-                
         let allActivities = pinnedActivities + activities
-        saveDataToSharedContainer(activities: allActivities)
         compileActivityDates(activities: allActivities)
-        
         activityView.tableView.layoutIfNeeded()
         handleReloadActivities(animated: false)
     }
@@ -445,26 +456,22 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let startDate = selectedDate.startOfDay
         let endDate = selectedDate.endOfDay
         filteredPinnedActivities = pinnedActivities.filter({ (activity) -> Bool in
-            if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate {
-                if activityStartDate > startDate && endDate > activityStartDate {
-                    return true
-                } else if activityEndDate.timeIntervalSince(activityStartDate) > 86399 && activityEndDate > startDate && endDate > activityEndDate {
-                    return true
-                } else if startDate > activityStartDate && activityEndDate > endDate {
-                    return true
-                }
+            if let activityStartDate = activity.startDate, activityStartDate > startDate, endDate > activityStartDate {
+                return true
+            } else if let activityEndDate = activity.endDate, activityEndDate > startDate,  endDate > activityEndDate {
+                return true
+            } else if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate, startDate > activityStartDate, activityEndDate > endDate {
+                return true
             }
             return false
         })
         filteredActivities = activities.filter({ (activity) -> Bool in
-            if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate {
-                if activityStartDate > startDate && endDate > activityStartDate {
-                    return true
-                } else if activityEndDate.timeIntervalSince(activityStartDate) > 86399 && activityEndDate > startDate && endDate > activityEndDate {
-                    return true
-                } else if startDate > activityStartDate && activityEndDate > endDate {
-                    return true
-                }
+            if let activityStartDate = activity.startDate, activityStartDate > startDate, endDate > activityStartDate {
+                return true
+            } else if let activityEndDate = activity.endDate, activityEndDate > startDate,  endDate > activityEndDate {
+                return true
+            } else if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate, startDate > activityStartDate, activityEndDate > endDate {
+                return true
             }
             return false
         })
@@ -476,27 +483,33 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func handleReloadTableAfterSearch() {
-        let currentDate = NSNumber(value: Int((Date().localTime).timeIntervalSince1970)).int64Value
+        let currentDate = Date().localTime
         filteredPinnedActivities.sort { (activity1, activity2) -> Bool in
-            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
-                return currentDate < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+            if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) && currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
+                return activity1.startDate ?? Date.distantPast < activity2.startDate ?? Date.distantPast
+            } else if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) {
+                return currentDate < activity2.startDate ?? Date.distantPast
+            } else if currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
+                return activity1.startDate ?? Date.distantPast < currentDate
             }
-            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            if activity1.finalDate == activity2.finalDate {
+                return activity1.name ?? "" < activity2.name ?? ""
+            }
+            return activity1.finalDate ?? Date.distantPast < activity2.finalDate ?? Date.distantPast
         }
         
         filteredActivities.sort { (activity1, activity2) -> Bool in
-            if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) && currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity1.startDateTime?.int64Value ?? 0, and: activity1.endDateTime?.int64Value ?? 0) {
-                return currentDate < activity2.startDateTime?.int64Value ?? 0
-            } else if currentDate.isBetween(activity2.startDateTime?.int64Value ?? 0, and: activity2.endDateTime?.int64Value ?? 0) {
-                return activity1.startDateTime?.int64Value ?? 0 < currentDate
+            if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) && currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
+                return activity1.startDate ?? Date.distantPast < activity2.startDate ?? Date.distantPast
+            } else if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) {
+                return currentDate < activity2.startDate ?? Date.distantPast
+            } else if currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
+                return activity1.startDate ?? Date.distantPast < currentDate
             }
-            return activity1.startDateTime?.int64Value ?? 0 < activity2.startDateTime?.int64Value ?? 0
+            if activity1.finalDate == activity2.finalDate {
+                return activity1.name ?? "" < activity2.name ?? ""
+            }
+            return activity1.finalDate ?? Date.distantPast < activity2.finalDate ?? Date.distantPast
         }
         
         self.activityView.tableView.reloadData()
@@ -634,25 +647,43 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
-        cell.updateInvitationDelegate = self
-        cell.activityDataStore = self
         if indexPath.section == 0 {
             let activity = filteredPinnedActivities[indexPath.row]
-            var invitation: Invitation? = nil
-            if let activityID = activity.activityID, let value = invitations[activityID] {
-                invitation = value
+            if activity.isTask ?? false {
+                let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+                cell.activityDataStore = self
+                cell.configureCell(for: indexPath, task: activity)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
+                cell.updateInvitationDelegate = self
+                cell.activityDataStore = self
+                var invitation: Invitation? = nil
+                if let activityID = activity.activityID, let value = invitations[activityID] {
+                    invitation = value
+                }
+                cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+                return cell
             }
-            cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         } else {
             let activity = filteredActivities[indexPath.row]
-            var invitation: Invitation? = nil
-            if let activityID = activity.activityID, let value = invitations[activityID] {
-                invitation = value
+            if activity.isTask ?? false {
+                let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+                cell.activityDataStore = self
+                cell.configureCell(for: indexPath, task: activity)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
+                cell.updateInvitationDelegate = self
+                cell.activityDataStore = self
+                var invitation: Invitation? = nil
+                if let activityID = activity.activityID, let value = invitations[activityID] {
+                    invitation = value
+                }
+                cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+                return cell
             }
-            cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
         }
-        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -668,28 +699,10 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func loadActivity(activity: Activity) {
-        let destination = EventViewController(networkController: networkController)
-        destination.hidesBottomBarWhenPushed = true
-        destination.activity = activity
-        destination.invitation = invitations[activity.activityID ?? ""]
-        self.getParticipants(forActivity: activity) { (participants) in
-            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                destination.acceptedParticipant = acceptedParticipant
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-        }
-    }
-    
-    fileprivate func saveDataToSharedContainer(activities: [Activity]) {
-        if let sharedContainer = sharedContainer {
-            var activitiesArray = [Any]()
-            for activity in activities {
-                let activityNSDictionary = activity.toAnyObject()
-                activitiesArray.append(NSKeyedArchiver.archivedData(withRootObject: activityNSDictionary))
-            }
-            sharedContainer.set(activitiesArray, forKey: "ActivitiesArray")
-            sharedContainer.synchronize()
+        if activity.isTask ?? false {
+            showTaskDetail(task: activity)
+        } else {
+            showEventDetail(event: activity)
         }
     }
     
@@ -711,6 +724,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                     }
                 }
                 dispatchGroup.leave()
+            } else if let endDate = activity.endDate {
+                activityDates[dateFormatter.string(from: endDate), default: 0] += 1
             }
         }
         dispatchGroup.notify(queue: .main) {
@@ -772,7 +787,7 @@ extension CalendarViewController: ActivityDataStore {
         
         
         let group = DispatchGroup()
-        let olderParticipants = self.activitiesParticipants[activityID]
+        let olderParticipants = self.participants[activityID]
         var participants: [User] = []
         for id in participantsIDs {
             // Only if the current user is created this activity
@@ -799,7 +814,7 @@ extension CalendarViewController: ActivityDataStore {
         }
         
         group.notify(queue: .main) {
-            self.activitiesParticipants[activityID] = participants
+            self.participants[activityID] = participants
             completion(participants)
         }
     }

@@ -32,6 +32,7 @@ class ActivityService {
             if oldValue != activities {
                 events = activities.filter { $0.isTask == nil }
                 tasks = activities.filter { $0.isTask ?? false }
+                calendarActivities = activities.filter { $0.finalDate != nil }
             }
         }
     }
@@ -78,6 +79,27 @@ class ActivityService {
             }
         }
     }
+    
+    var calendarActivities = [Activity]() {
+        didSet {
+            let currentDate = Date().localTime
+            calendarActivities.sort { (activity1, activity2) -> Bool in
+                if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) && currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
+                    return activity1.startDate ?? Date.distantPast < activity2.startDate ?? Date.distantPast
+                } else if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) {
+                    return currentDate < activity2.startDate ?? Date.distantPast
+                } else if currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
+                    return activity1.startDate ?? Date.distantPast < currentDate
+                }
+                if activity1.finalDate == activity2.finalDate {
+                    return activity1.name ?? "" < activity2.name ?? ""
+                }
+                return activity1.finalDate ?? Date.distantPast < activity2.finalDate ?? Date.distantPast
+            }
+            NotificationCenter.default.post(name: .eventsUpdated, object: nil)
+        }
+    }
+    
     //for Apple/Google Task functions
     var tasksNoRepeats = [Activity]()
     
@@ -125,6 +147,8 @@ class ActivityService {
     }()
     
     var isRunning: Bool = true
+    fileprivate let plotAppGroup = "group.immaturecreations.plot"
+    fileprivate var sharedContainer : UserDefaults?
     
     func grabActivities(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
@@ -163,6 +187,7 @@ class ActivityService {
                     self?.grabLists()
                 })
             })
+            self?.saveDataToSharedContainer(activities: self?.activities ?? [])
         }
     }
     
@@ -518,6 +543,19 @@ class ActivityService {
             self.runListFunctions(value: value)
             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.setValue(value)
+        }
+    }
+    
+    func saveDataToSharedContainer(activities: [Activity]) {
+        sharedContainer = UserDefaults(suiteName: plotAppGroup)
+        if let sharedContainer = sharedContainer {
+            var activitiesArray = [Any]()
+            for activity in activities {
+                let activityNSDictionary = activity.toAnyObject()
+                activitiesArray.append(NSKeyedArchiver.archivedData(withRootObject: activityNSDictionary))
+            }
+            sharedContainer.set(activitiesArray, forKey: "ActivitiesArray")
+            sharedContainer.synchronize()
         }
     }
 }

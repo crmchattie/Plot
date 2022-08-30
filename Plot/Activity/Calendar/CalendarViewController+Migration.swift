@@ -53,7 +53,7 @@ extension CalendarViewController {
             
             dispatchGroup.notify(queue: .main) {
                 if remainingActivities.count == 0 {
-                    self.activitiesParticipants = [:]
+                    self.participants = [:]
                 } else {
                     self.createParticiapantsInvitations(forActivities: remainingActivities)
                 }

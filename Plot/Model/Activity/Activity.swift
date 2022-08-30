@@ -607,6 +607,17 @@ extension Activity {
         }
         return nil
     }
+    
+    var finalDate: Date? {
+        if let startDateTime = startDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: startDateTime)
+        //for tasks where deadline date is more likely to be set than start date
+        }
+        else if let endDateTime = endDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: endDateTime)
+        }
+        return nil
+    }
 }
 
 extension Activity {

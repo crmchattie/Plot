@@ -108,11 +108,10 @@ final class ScheduleCell: Cell<Activity>, CellType {
         
         if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
-            activityTypeButton.tintColor = category.color
         } else {
             activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
-            activityTypeButton.tintColor = ActivityCategory.uncategorized.color
-        }        
+        }
+        activityTypeButton.tintColor = .systemBlue
     }
 }
 

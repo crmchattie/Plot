@@ -73,7 +73,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                     let total = stats.reduce(0, { $0 + $1.value * 60 })
                     let totalString = self.dateFormatter.string(from: total) ?? "NaN"
                     categories.append(CategorySummaryViewModel(title: category,
-                                                               color: (ActivityCategory(rawValue: category) ?? .uncategorized).color,
+                                                               color: .systemBlue,
                                                                value: total,
                                                                formattedValue: totalString))
                     activityCount += stats.count

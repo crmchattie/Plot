@@ -34,11 +34,8 @@ class TaskInfoViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
-        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
-            let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newList))
-            navigationItem.rightBarButtonItem = barButton
-
-        }
+        let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+        navigationItem.rightBarButtonItem = barButton
         
         sections = Array(lists.keys).sorted { s1, s2 in
             if s1 == ListSourceOptions.plot.name {
@@ -62,12 +59,34 @@ class TaskInfoViewController: UITableViewController {
         viewPlaceholder.add(for: tableView, title: .emptyLists, subtitle: .emptyLists, priority: .medium, position: .top)
     }
     
-    @objc func newList() {
-        let destination = SignInAppleGoogleViewController()
-        destination.networkController = self.networkController
-        destination.title = "Tasks"
-        destination.delegate = self
-        self.navigationController?.pushViewController(destination, animated: true)
+    @objc fileprivate func newItem() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Plot List", style: .default, handler: { (_) in
+            let destination = ListDetailViewController(networkController: self.networkController)
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }))
+        
+        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
+            alert.addAction(UIAlertAction(title: "External List", style: .default, handler: { (_) in
+                let destination = SignInAppleGoogleViewController()
+                destination.networkController = self.networkController
+                destination.title = "Tasks"
+                destination.delegate = self
+                self.navigationController?.pushViewController(destination, animated: true)
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

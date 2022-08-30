@@ -38,7 +38,7 @@ class NewTaskCell: UITableViewCell {
     
     let plusImage: UIImageView = {
         let view = UIImageView()
-        view.tintColor = .systemGray3
+        view.tintColor = ThemeManager.currentTheme().generalSubtitleColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
