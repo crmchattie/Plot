@@ -81,14 +81,19 @@ class CalendarDetailViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-        } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        if calendar.source == CalendarSourceOptions.plot.name {
+            if active {
+                let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+                navigationItem.rightBarButtonItem = addBarButton
+                if navigationItem.leftBarButtonItem != nil {
+                    navigationItem.leftBarButtonItem?.action = #selector(cancel)
+                }
+            } else {
+                let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+                navigationItem.rightBarButtonItem = addBarButton
+                if navigationItem.leftBarButtonItem != nil {
+                    navigationItem.leftBarButtonItem?.action = #selector(cancel)
+                }
             }
         }
     }
@@ -167,28 +172,6 @@ class CalendarDetailViewController: FormViewController {
             cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         
-        
-        <<< TextAreaRow("Description") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            $0.placeholder = $0.tag
-            if self.active && self.calendar.description != "nothing" && self.calendar.description != nil {
-                $0.value = self.calendar.description
-            }
-        }.cellUpdate({ (cell, row) in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }).onChange() { [unowned self] row in
-            self.calendar.description = row.value
-            if row.value == nil, self.active, let id = calendar.id {
-                let reference = Database.database().reference().child(calendarEntity).child(id).child("description")
-                reference.removeValue()
-            }
-        }
-        
         <<< ColorPushRow<UIColor>("Color") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -197,6 +180,9 @@ class CalendarDetailViewController: FormViewController {
 //            row.cell.accessoryType = .disclosureIndicator
             if self.active, let color = self.calendar.color {
                 row.value = UIColor(ciColor: CIColor(string: color))
+            }
+            if calendar.source != CalendarSourceOptions.plot.name {
+                row.cell.accessoryType = .none
             }
             row.options = ChartColors.palette()
         }.onPresent { from, to in
@@ -207,9 +193,11 @@ class CalendarDetailViewController: FormViewController {
                 to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 to.tableView.separatorStyle = .none
                 if let index = row.indexPath?.row {
+                    cell.selectionStyle = .none
                     cell.backgroundColor = ChartColors.palette()[index]
                     cell.textLabel?.text = nil
                     cell.detailTextLabel?.text = nil
+                    cell.accessoryType = .none
                 }
             }
         }.cellUpdate { cell, row in
@@ -219,9 +207,39 @@ class CalendarDetailViewController: FormViewController {
         }.onChange() { [unowned self] row in
             if let color = row.value {
                 calendar.color = CIColor(color: color).stringRepresentation
+                guard let currentUserID = Auth.auth().currentUser?.uid, let id = calendar.id else { return }
+                let userReference = Database.database().reference().child(userCalendarEntity).child(currentUserID).child(id)
+                let values:[String : Any] = ["color": CIColor(color: color).stringRepresentation]
+                userReference.updateChildValues(values)
             }
         }
         
+        
+        if calendar.source == CalendarSourceOptions.plot.name {
+            form.last!
+            <<< TextAreaRow("Description") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if self.active && self.calendar.description != "nothing" && self.calendar.description != nil {
+                    $0.value = self.calendar.description
+                }
+            }.cellUpdate({ (cell, row) in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }).onChange() { [unowned self] row in
+                self.calendar.description = row.value
+                if row.value == nil, self.active, let id = calendar.id {
+                    let reference = Database.database().reference().child(calendarEntity).child(id).child("description")
+                    reference.removeValue()
+                }
+            }
+        }
+        
+//        form.last!
 //        <<< ButtonRow("Participants") { row in
 //            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
 //            row.cell.textLabel?.textAlignment = .left

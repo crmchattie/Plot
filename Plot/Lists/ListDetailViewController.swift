@@ -81,17 +81,20 @@ class ListDetailViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
-        } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        
+        if list.source == ListSourceOptions.plot.name {
+            if active {
+                let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+                navigationItem.rightBarButtonItem = addBarButton
+                if navigationItem.leftBarButtonItem != nil {
+                    navigationItem.leftBarButtonItem?.action = #selector(cancel)
+                }
+            } else {
+                let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+                navigationItem.rightBarButtonItem = addBarButton
+                if navigationItem.leftBarButtonItem != nil {
+                    navigationItem.leftBarButtonItem?.action = #selector(cancel)
+                }
             }
         }
     }
@@ -170,28 +173,6 @@ class ListDetailViewController: FormViewController {
             cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         
-        
-        <<< TextAreaRow("Description") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            $0.placeholder = $0.tag
-            if self.active && self.list.description != "nothing" && self.list.description != nil {
-                $0.value = self.list.description
-            }
-        }.cellUpdate({ (cell, row) in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-        }).onChange() { [unowned self] row in
-            self.list.description = row.value
-            if row.value == nil, self.active, let id = list.id {
-                let reference = Database.database().reference().child(listEntity).child(id).child("description")
-                reference.removeValue()
-            }
-        }
-        
         <<< ColorPushRow<UIColor>("Color") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -200,6 +181,9 @@ class ListDetailViewController: FormViewController {
 //            row.cell.accessoryType = .disclosureIndicator
             if self.active, let color = self.list.color {
                 row.value = UIColor(ciColor: CIColor(string: color))
+            }
+            if list.source != ListSourceOptions.plot.name {
+                row.cell.accessoryType = .none
             }
             row.options = ChartColors.palette()
         }.onPresent { from, to in
@@ -210,9 +194,11 @@ class ListDetailViewController: FormViewController {
                 to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
                 to.tableView.separatorStyle = .none
                 if let index = row.indexPath?.row {
+                    cell.selectionStyle = .none
                     cell.backgroundColor = ChartColors.palette()[index]
                     cell.textLabel?.text = nil
                     cell.detailTextLabel?.text = nil
+                    cell.accessoryType = .none
                 }
             }
         }.cellUpdate { cell, row in
@@ -222,30 +208,60 @@ class ListDetailViewController: FormViewController {
         }.onChange() { [unowned self] row in
             if let color = row.value {
                 list.color = CIColor(color: color).stringRepresentation
+                guard let currentUserID = Auth.auth().currentUser?.uid, let id = list.id else { return }
+                let userReference = Database.database().reference().child(userListEntity).child(currentUserID).child(id)
+                let values:[String : Any] = ["color": CIColor(color: color).stringRepresentation]
+                userReference.updateChildValues(values)
             }
         }
         
-        <<< LabelRow("Category") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if self.active && self.list.category != nil {
-                row.value = self.list.category
-            } else {
-                row.value = "Uncategorized"
+        if list.source == ListSourceOptions.plot.name {
+            form.last!
+            <<< TextAreaRow("Description") {
+                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.placeholder = $0.tag
+                if self.active && self.list.description != "nothing" && self.list.description != nil {
+                    $0.value = self.list.description
+                }
+            }.cellUpdate({ (cell, row) in
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            }).onChange() { [unowned self] row in
+                self.list.description = row.value
+                if row.value == nil, self.active, let id = list.id {
+                    let reference = Database.database().reference().child(listEntity).child(id).child("description")
+                    reference.removeValue()
+                }
             }
-        }.onCellSelection({ _, row in
-            self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            cell.textLabel?.textAlignment = .left
         }
+        
+//        form.last!
+        
+//        <<< LabelRow("Category") { row in
+//            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.title = row.tag
+//            if self.active && self.list.category != nil {
+//                row.value = self.list.category
+//            } else {
+//                row.value = "Uncategorized"
+//            }
+//        }.onCellSelection({ _, row in
+//            self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            cell.textLabel?.textAlignment = .left
+//        }
         
 //        <<< ButtonRow("Participants") { row in
 //            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

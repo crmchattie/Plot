@@ -168,10 +168,9 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     
     func sortandreload() {
         filteredTasks = []
+        sections = []
         lists = [:]
         taskList = [:]
-        
-        sections = [.lists]
         
         var listOfLists = [ListType]()
 
@@ -218,18 +217,26 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
             listOfLists.insert(dailyList, at: 0)
         }
         
-        lists[.lists, default: []].append(contentsOf: listOfLists)
+        if !listOfLists.isEmpty {
+            sections.append(.lists)
+            lists[.lists, default: []].append(contentsOf: listOfLists)
+        }
         
-        for (_, currentLists) in networkController.activityService.lists {
-            for list in currentLists {
-                let currentTaskList = tasks.filter { $0.listID == list.id }
-                if !currentTaskList.isEmpty {
-                    sections.insert(.myLists, at: 1)
-                    lists[.myLists, default: []].append(list)
-                    taskList[list, default: []].append(contentsOf: currentTaskList)
-                }
+        listOfLists = []
+        
+        for (id, list) in networkController.activityService.listIDs {
+            let currentTaskList = tasks.filter { $0.listID == id }
+            if !currentTaskList.isEmpty {
+                listOfLists.append(list)
+                taskList[list] = currentTaskList
             }
         }
+        
+        if !listOfLists.isEmpty {
+            sections.insert(.myLists, at: 1)
+            lists[.myLists, default: []].append(contentsOf: listOfLists.sorted(by: {$0.name ?? "" < $1.name ?? "" }))
+        }
+                
         filteredLists = lists
         tableView.reloadData()
     }
@@ -345,6 +352,9 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             let task = filteredTasks[indexPath.row]
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
             cell.activityDataStore = self
+            if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                task.listColor = color
+            }
             cell.configureCell(for: indexPath, task: task)
             return cell
         }
@@ -472,7 +482,7 @@ extension ListsViewController: UpdateFilter {
     }
     
     func updateTableViewWFilters() {
-        sections = [.lists]
+        sections = [.tasks]
         filteredLists = [:]
         let dispatchGroup = DispatchGroup()
         if let value = filterDictionary["search"] {

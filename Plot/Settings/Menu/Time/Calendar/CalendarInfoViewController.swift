@@ -47,8 +47,24 @@ class CalendarInfoViewController: UITableViewController {
         }
     }
     
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc fileprivate func calendarsUpdated() {
+        sections = Array(calendars.keys).sorted { s1, s2 in
+            if s1 == CalendarSourceOptions.plot.name {
+                return true
+            } else if s2 == CalendarSourceOptions.plot.name {
+                return false
+            }
+            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
+        }
+        tableView.reloadData()
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {

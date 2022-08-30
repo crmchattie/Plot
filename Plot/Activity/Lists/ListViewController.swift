@@ -77,6 +77,7 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
 
     }
     
@@ -130,17 +131,29 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         handleReloadTableAftersearchBarCancelButtonClicked()
     }
     
+    @objc fileprivate func listsUpdated() {
+        if let id = list.id, let list = networkController.activityService.listIDs[id] {
+            self.list = list
+        }
+        tableView.reloadData()
+    }
+    
     fileprivate func setupMainView() {
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Tasks"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
-        let newItemBarButton = UIBarButtonItem(image: UIImage(systemName:  "info.circle"),
-                                                           style: .plain,
-                                                           target: self,
-                                                           action: #selector(listInfo))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
-        navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+        if let id = list.id, id != "" {
+            let newItemBarButton = UIBarButtonItem(image: UIImage(systemName:  "info.circle"),
+                                                               style: .plain,
+                                                               target: self,
+                                                               action: #selector(listInfo))
+            navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+        }
+        else {
+            navigationItem.rightBarButtonItem = filterBarButton
+        }
     }
     
     fileprivate func setupTableView() {
@@ -327,6 +340,9 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
             cell.activityDataStore = self
             let task = filteredTasks[indexPath.row]
+            if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                task.listColor = color
+            }
             cell.configureCell(for: indexPath, task: task)
             return cell
         } else {

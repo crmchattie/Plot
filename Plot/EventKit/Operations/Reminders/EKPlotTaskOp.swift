@@ -32,7 +32,7 @@ class EKPlotTaskOp: AsyncOperation {
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
-            if let activityID = activity.activityID, !(activity.calendarExport ?? false) {
+            if let activityID = activity.activityID {
                 dispatchGroup.enter()
                 if let reminder = eventKitService.storeReminder(for: activity) {
                     let reminderTaskActivityValue: [String : Any] = ["activityID": activityID as AnyObject]

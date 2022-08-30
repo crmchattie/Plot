@@ -209,6 +209,8 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -295,6 +297,18 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
                     self.collectionView.reloadData()
                 }
             }
+        }
+    }
+    
+    @objc fileprivate func listsUpdated() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    @objc fileprivate func calendarsUpdated() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
         }
     }
     
@@ -637,14 +651,6 @@ extension MasterActivityContainerController: GIDSignInDelegate {
         } else {
           print("\(error.localizedDescription)")
         }
-    }
-}
-
-// MARK: - TasksControllerCellDelegate
-
-extension MasterActivityContainerController: TasksControllerCellDelegate {
-    func cellTapped(task: Activity) {
-        showTaskDetail(task: task)
     }
 }
 

@@ -307,6 +307,10 @@ class ActivityActions: NSObject {
     }
     
     func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
+        guard let activity = activity else {
+            self.dispatchGroup.leave()
+            return
+        }
         let connectingMembersGroup = DispatchGroup()
         for _ in memberIDs {
             connectingMembersGroup.enter()
@@ -315,11 +319,31 @@ class ActivityActions: NSObject {
             self.dispatchGroup.leave()
         })
         for memberID in memberIDs {
-            let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["isGroupActivity": true]
-            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                connectingMembersGroup.leave()
-            })
+            if activity.isTask ?? false {
+                let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+                let values: [String : Any] = ["isGroupActivity": false,
+                                              "badge": 0,
+                                              "listID": activity.listID as Any,
+                                              "listName": activity.listName as Any,
+                                              "listSource": activity.listSource as Any,
+                                              "listColor": activity.listColor as Any,
+                                              "showExtras": activity.showExtras as Any]
+                userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                    connectingMembersGroup.leave()
+                })
+            } else {
+                let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+                let values: [String : Any] = ["isGroupActivity": false,
+                                              "badge": 0,
+                                              "calendarID": activity.calendarID as Any,
+                                              "calendarName": activity.calendarName as Any,
+                                              "calendarSource": activity.calendarSource as Any,
+                                              "calendarColor": activity.calendarColor as Any,
+                                              "showExtras": activity.showExtras as Any]
+                userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                    connectingMembersGroup.leave()
+                })
+            }
         }
     }
 

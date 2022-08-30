@@ -18,6 +18,7 @@ protocol ActivitiesControllerCellDelegate: AnyObject {
 class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UITableViewDelegate, UpdateInvitationDelegate {
     weak var delegate: ActivitiesControllerCellDelegate?
     
+    var networkController = NetworkController()
     var tableView = UITableView(frame: .zero, style: .insetGrouped)
     var sections = [SectionType]()
     var activities = [SectionType: [Activity]]() {
@@ -107,14 +108,19 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
         let activity = activities[indexPath.row]
         if section == .tasks {
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-            
             cell.activityDataStore = self
+            if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                activity.listColor = color
+            }
             cell.configureCell(for: indexPath, task: activity)
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
             cell.activityDataStore = self
             var invitation: Invitation? = nil
+            if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                activity.calendarColor = color
+            }
             if let activityID = activity.activityID, let value = invitations[activityID] {
                 invitation = value
             }

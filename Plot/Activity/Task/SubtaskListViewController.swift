@@ -150,7 +150,7 @@ class SubtaskListViewController: FormViewController {
 //                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
 //                    mvs.remove(at: mvs.count - 2)
 //                }
-//                let destination = ChooseTaskTableViewController()
+//                let destination = ChooseTaskTableViewController(networkController: networkController)
 //                destination.needDelegate = true
 //                destination.movingBackwards = true
 //                destination.delegate = self

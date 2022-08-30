@@ -119,17 +119,20 @@ extension EventCell {
             invitationSegmentedControl.isHidden = true
         }
         
-        if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue), let color = activity.calendarColor {
+        if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
             }
-            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
             activityTypeLabel.text = category.rawValue
         } else {
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
-            activityTypeButton.tintColor = .systemBlue
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+        }
+        
+        activityTypeButton.tintColor = .systemBlue
+        if let color = activity.calendarColor {
+            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
         
         let badgeString = activity.badge?.toString()

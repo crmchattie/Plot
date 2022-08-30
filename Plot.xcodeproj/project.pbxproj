@@ -198,7 +198,6 @@
 		10B3E50A28B1478A00E1713D /* ListDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50928B1478A00E1713D /* ListDetailViewController.swift */; };
 		10B3E50C28B168D700E1713D /* ListFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50B28B168D700E1713D /* ListFetcher.swift */; };
 		10B3E50E28B168E600E1713D /* ListActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E50D28B168E600E1713D /* ListActions.swift */; };
-		10B3E51328B3EFB300E1713D /* TasksControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E51228B3EFB300E1713D /* TasksControllerCell.swift */; };
 		10B3E51528B3F56000E1713D /* TaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E51428B3F56000E1713D /* TaskCell.swift */; };
 		10B3E51728B3F57500E1713D /* TaskCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E51628B3F57500E1713D /* TaskCell+ConfigureCell.swift */; };
 		10B3E51928B4FF2000E1713D /* ChooseTaskTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3E51828B4FF2000E1713D /* ChooseTaskTableViewController.swift */; };
@@ -799,7 +798,6 @@
 		10B3E50928B1478A00E1713D /* ListDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDetailViewController.swift; sourceTree = "<group>"; };
 		10B3E50B28B168D700E1713D /* ListFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListFetcher.swift; sourceTree = "<group>"; };
 		10B3E50D28B168E600E1713D /* ListActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListActions.swift; sourceTree = "<group>"; };
-		10B3E51228B3EFB300E1713D /* TasksControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksControllerCell.swift; sourceTree = "<group>"; };
 		10B3E51428B3F56000E1713D /* TaskCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCell.swift; sourceTree = "<group>"; };
 		10B3E51628B3F57500E1713D /* TaskCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskCell+ConfigureCell.swift"; sourceTree = "<group>"; };
 		10B3E51828B4FF2000E1713D /* ChooseTaskTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTaskTableViewController.swift; sourceTree = "<group>"; };
@@ -1318,7 +1316,6 @@
 				10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */,
 				1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */,
 				F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */,
-				10B3E51228B3EFB300E1713D /* TasksControllerCell.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -3403,7 +3400,6 @@
 				4BAEE49421272C5E0045AB10 /* FalconUsersTableViewCell.swift in Sources */,
 				102076CC23C2D3B5009AEAA4 /* Service.swift in Sources */,
 				108087232585058100FB9BB0 /* MoodFetcher.swift in Sources */,
-				10B3E51328B3EFB300E1713D /* TasksControllerCell.swift in Sources */,
 				4BAEE4F521272D890045AB10 /* GroupProfileTableViewController.swift in Sources */,
 				105F34B32885EF7A007531EB /* RecurrenceRule+Text.swift in Sources */,
 				4BAEE5E6212735E50045AB10 /* EnterVerificationContainerView.swift in Sources */,

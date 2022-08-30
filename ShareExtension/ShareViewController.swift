@@ -319,7 +319,6 @@ extension ShareViewController: UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Identifiers.EventCell, for: indexPath) as? EventCell ?? EventCell()
-        
         let activity = activitiesArray[indexPath.row]
         cell.configureCell(for: indexPath, activity: activity)
         return cell

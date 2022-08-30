@@ -155,7 +155,7 @@ class ScheduleListViewController: FormViewController {
 //                if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
 //                    mvs.remove(at: mvs.count - 2)
 //                }
-//                let destination = ChooseEventTableViewController()
+//                let destination = ChooseEventTableViewController(networkController: networkController)
 //                destination.needDelegate = true
 //                destination.movingBackwards = true
 //                destination.delegate = self

@@ -707,7 +707,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
             alert.addAction(UIAlertAction(title: "Add to Existing Activity", style: .default, handler: { (_) in
                 
                 // ChooseEventTableViewController
-                let destination = ChooseEventTableViewController()
+                let destination = ChooseEventTableViewController(networkController: self.networkController)
                 let navController = UINavigationController(rootViewController: destination)
                 destination.delegate = self
                 destination.event = self.activity

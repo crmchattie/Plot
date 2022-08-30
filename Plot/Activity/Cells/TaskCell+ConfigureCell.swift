@@ -104,16 +104,17 @@ extension TaskCell {
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             }
-            activityTypeButton.tintColor = .systemBlue
-            if let color = task.calendarColor {
-                activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-            }
             activityTypeLabel.text = category.rawValue
         } else {
             activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
-            activityTypeButton.tintColor = .systemBlue
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
+        
+        activityTypeButton.tintColor = .systemBlue
+        if let color = task.listColor {
+            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+        }
+
         
         let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)

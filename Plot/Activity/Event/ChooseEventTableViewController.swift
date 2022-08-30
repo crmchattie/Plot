@@ -37,6 +37,16 @@ protocol ChooseActivityDelegate: AnyObject {
 
 
 class ChooseEventTableViewController: UITableViewController {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     let eventCellID = "eventCellID"
     
@@ -51,8 +61,6 @@ class ChooseEventTableViewController: UITableViewController {
     
     var event: Activity?
     var activityID: String?
-    var users = [User]()
-    var filteredUsers = [User]()
         
     weak var delegate : ChooseActivityDelegate?
     
@@ -232,6 +240,9 @@ class ChooseEventTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
         cell.activityDataStore = self
         let event = filteredEvents[indexPath.row]
+        if let calendarID = event.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+            event.calendarColor = color
+        }
         cell.configureCell(for: indexPath, activity: event, withInvitation: nil)
         return cell
     }

@@ -652,6 +652,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             if activity.isTask ?? false {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
                 cell.activityDataStore = self
+                if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    activity.listColor = color
+                }
                 cell.configureCell(for: indexPath, task: activity)
                 return cell
             } else {
@@ -659,6 +662,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.updateInvitationDelegate = self
                 cell.activityDataStore = self
                 var invitation: Invitation? = nil
+                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    activity.calendarColor = color
+                }
                 if let activityID = activity.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
@@ -670,6 +676,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             if activity.isTask ?? false {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
                 cell.activityDataStore = self
+                if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    activity.listColor = color
+                }
                 cell.configureCell(for: indexPath, task: activity)
                 return cell
             } else {
@@ -677,6 +686,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.updateInvitationDelegate = self
                 cell.activityDataStore = self
                 var invitation: Invitation? = nil
+                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    activity.calendarColor = color
+                }
                 if let activityID = activity.activityID, let value = invitations[activityID] {
                     invitation = value
                 }

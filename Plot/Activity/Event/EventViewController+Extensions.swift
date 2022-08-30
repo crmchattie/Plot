@@ -78,6 +78,10 @@ extension EventViewController: UpdateCalendarDelegate {
         if let row: LabelRow = form.rowBy(tag: "Calendar") {
             row.value = calendar.name
             row.updateCell()
+            activity.calendarID = calendar.id
+            activity.calendarName = calendar.name
+            activity.calendarColor = calendar.color
+            activity.calendarSource = calendar.source
             guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["calendarID": calendar.id as Any, "calendarName": calendar.name as Any, "calendarColor": calendar.color as Any, "calendarSource": calendar.source as Any]

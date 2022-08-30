@@ -96,7 +96,7 @@ extension FinanceTransactionViewController {
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseTaskTableViewController()
+                let destination = ChooseTaskTableViewController(networkController: self.networkController)
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
@@ -146,7 +146,7 @@ extension FinanceTransactionViewController {
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseEventTableViewController()
+                let destination = ChooseEventTableViewController(networkController: self.networkController)
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self

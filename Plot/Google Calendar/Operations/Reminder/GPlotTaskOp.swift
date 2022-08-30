@@ -31,7 +31,7 @@ class GPlotTaskOp: AsyncOperation {
         let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
-            if let activityID = activity.activityID, !(activity.calendarExport ?? false) {
+            if let activityID = activity.activityID {
                 dispatchGroup.enter()
                 if let task = googleCalService.storeTask(for: activity), let id = task.identifier {
                     let listTaskActivityValue: [String : Any] = ["activityID": activityID as AnyObject]

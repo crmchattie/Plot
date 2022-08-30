@@ -677,7 +677,7 @@ extension EventViewController {
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseTaskTableViewController()
+                let destination = ChooseTaskTableViewController(networkController: self.networkController)
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
@@ -717,7 +717,7 @@ extension EventViewController {
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
-                let destination = ChooseTransactionTableViewController()
+                let destination = ChooseTransactionTableViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
                 destination.existingTransactions = self.purchaseList

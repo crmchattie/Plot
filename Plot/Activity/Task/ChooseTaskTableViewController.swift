@@ -36,6 +36,16 @@ protocol ChooseTaskDelegate: AnyObject {
 }
 
 class ChooseTaskTableViewController: UITableViewController {
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     let taskCellID = "taskCellID"
     
@@ -50,8 +60,6 @@ class ChooseTaskTableViewController: UITableViewController {
     
     var task: Activity?
     var activityID: String?
-    var users = [User]()
-    var filteredUsers = [User]()
         
     weak var delegate : ChooseTaskDelegate?
     
@@ -189,6 +197,9 @@ class ChooseTaskTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
         cell.activityDataStore = self
         let task = filteredTasks[indexPath.row]
+        if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+            task.listColor = color
+        }
         cell.configureCell(for: indexPath, task: task)
         return cell
     }

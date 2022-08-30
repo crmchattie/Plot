@@ -95,7 +95,7 @@ extension MindfulnessViewController {
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseTaskTableViewController()
+                let destination = ChooseTaskTableViewController(networkController: self.networkController)
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
@@ -143,7 +143,7 @@ extension MindfulnessViewController {
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseEventTableViewController()
+                let destination = ChooseEventTableViewController(networkController: self.networkController)
                 destination.needDelegate = true
                 destination.movingBackwards = true
                 destination.delegate = self
@@ -184,7 +184,7 @@ extension MindfulnessViewController {
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
                 print("Existing")
-                let destination = ChooseTransactionTableViewController()
+                let destination = ChooseTransactionTableViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
                 destination.existingTransactions = self.purchaseList

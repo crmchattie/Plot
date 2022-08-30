@@ -78,6 +78,10 @@ extension TaskViewController: UpdateListDelegate {
         if let row: LabelRow = form.rowBy(tag: "List") {
             row.value = list.name
             row.updateCell()
+            task.listID = list.id
+            task.listName = list.name
+            task.listColor = list.color
+            task.listSource = list.source
             guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["listID": list.id as Any, "listName": list.name as Any, "listColor": list.color as Any, "listSource": list.source as Any]

@@ -53,13 +53,13 @@ let workCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.wor
 
 enum CalendarSourceOptions: String, CaseIterable {
     case plot = "Plot"
-    case apple = "iCloud"
+    case apple = "Apple"
     case google = "Google"
     
     var image: UIImage {
             switch self {
             case .plot: return UIImage(named: "plotLogo")!
-            case .apple: return UIImage(named: "iCloud")!
+            case .apple: return UIImage(named: "apple")!
             case .google: return UIImage(named: "googleCalendar")!
         }
     }
@@ -67,7 +67,7 @@ enum CalendarSourceOptions: String, CaseIterable {
     var name: String {
             switch self {
             case .plot: return "Plot"
-            case .apple: return "iCloud"
+            case .apple: return "Apple"
             case .google: return "Google"
         }
     }

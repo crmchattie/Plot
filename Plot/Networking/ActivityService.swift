@@ -79,6 +79,8 @@ class ActivityService {
             }
         }
     }
+    //for Apple/Google Task functions
+    var tasksNoRepeats = [Activity]()
     
     var calendarActivities = [Activity]() {
         didSet {
@@ -96,12 +98,8 @@ class ActivityService {
                 }
                 return activity1.finalDate ?? Date.distantPast < activity2.finalDate ?? Date.distantPast
             }
-            NotificationCenter.default.post(name: .eventsUpdated, object: nil)
         }
     }
-    
-    //for Apple/Google Task functions
-    var tasksNoRepeats = [Activity]()
     
     var invitations: [String: Invitation] = [:] {
         didSet {
@@ -115,18 +113,34 @@ class ActivityService {
     var calendars = [String: [CalendarType]]() {
         didSet {
             if oldValue != calendars {
+                for (_, calendarList) in calendars {
+                    for calendar in calendarList {
+                        if let id = calendar.id {
+                            calendarIDs[id] = calendar
+                        }
+                    }
+                }
                 NotificationCenter.default.post(name: .calendarsUpdated, object: nil)
             }
         }
     }
-    
     var lists = [String: [ListType]]() {
         didSet {
             if oldValue != lists {
+                for (_, listList) in lists {
+                    for list in listList {
+                        if let id = list.id {
+                            listIDs[id] = list
+                        }
+                    }
+                }
                 NotificationCenter.default.post(name: .listsUpdated, object: nil)
             }
         }
     }
+
+    var calendarIDs = [String: CalendarType]()
+    var listIDs = [String: ListType]()
     
     var primaryCalendar = String()
     var primaryList = String()
@@ -168,23 +182,23 @@ class ActivityService {
             self?.observeInvitationForCurrentUser()
             self?.addRepeatingActivities(activities: self?.activities ?? [], completion: { newActivities in
                 self?.activities = newActivities
-                self?.grabPrimaryCalendar({ (calendar) in
-                    self?.grabPlotCalendars()
-                    if calendar == CalendarSourceOptions.apple.name {
-                        self?.grabEKEvents {}
-                    } else if calendar == CalendarSourceOptions.google.name {
-                        self?.grabGEvents {}
-                    }
-                    self?.grabCalendars()
-                })
+                self?.grabPlotLists()
+                self?.grabPlotCalendars()
                 self?.grabPrimaryList({ (list) in
-                    self?.grabPlotLists()
                     if list == ListSourceOptions.apple.name {
                         self?.grabEKReminders {}
                     } else if list == ListSourceOptions.google.name {
                         self?.grabGTasks {}
                     }
                     self?.grabLists()
+                })
+                self?.grabPrimaryCalendar({ (calendar) in
+                    if calendar == CalendarSourceOptions.apple.name {
+                        self?.grabEKEvents {}
+                    } else if calendar == CalendarSourceOptions.google.name {
+                        self?.grabGEvents {}
+                    }
+                    self?.grabCalendars()
                 })
             })
             self?.saveDataToSharedContainer(activities: self?.activities ?? [])

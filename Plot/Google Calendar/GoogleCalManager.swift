@@ -97,7 +97,7 @@ class GoogleCalManager {
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
-        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) && ($0.isTask == nil) }
+        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) && $0.isTask == nil && $0.calendarSource == CalendarSourceOptions.plot.name }
                 
         let eventsOp = GPlotEventOp(googleCalService: googleCalService, activities: filterActivities)
         // Setup queue
@@ -166,7 +166,7 @@ class GoogleCalManager {
         isRunningTasks = true
 
         //filter old activities out
-        let filterActivities = activities.filter { !($0.calendarExport ?? false) && $0.isTask ?? false }
+        let filterActivities = activities.filter { !($0.calendarExport ?? false) && $0.isTask ?? false && $0.listSource == ListSourceOptions.plot.name }
 
         let activitiesOp = GPlotTaskOp(googleCalService: googleCalService, activities: filterActivities)
         // Setup queue

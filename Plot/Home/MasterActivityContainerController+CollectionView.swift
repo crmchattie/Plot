@@ -25,6 +25,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
                 cell.delegate = self
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.networkController = networkController
                 cell.sections = activitiesSections
                 cell.activities = activities
                 return cell
