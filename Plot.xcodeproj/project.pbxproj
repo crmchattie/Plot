@@ -57,7 +57,6 @@
 		102BE8C6243E47F000722E7B /* AttractionDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102BE8C5243E47F000722E7B /* AttractionDetailCell.swift */; };
 		1031410C230D712E00DB471B /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1031410B230D712E00DB471B /* ShareViewController.swift */; };
 		1031410F230D712E00DB471B /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1031410D230D712E00DB471B /* MainInterface.storyboard */; };
-		10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10314109230D712E00DB471B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
 		1034A01325BF8015006D3DB8 /* EKPlotEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A01225BF8015006D3DB8 /* EKPlotEventOp.swift */; };
 		1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034A04425C5ECD4006D3DB8 /* CalendarInfoViewController.swift */; };
@@ -564,16 +563,6 @@
 		F9E5BD0B260298D200CA027D /* WeekdayAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E5BD0A260298D200CA027D /* WeekdayAxisValueFormatter.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		10314111230D712E00DB471B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4B4F45231F32230C00A6FF96 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 10314108230D712E00DB471B;
-			remoteInfo = ShareExtension;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		105F34BB2885F29A007531EB /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -584,17 +573,6 @@
 				105F34BA2885F29A007531EB /* RRuleSwift.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B9AF38E1F3B9B6E00A3934D /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				10314113230D712E00DB471B /* ShareExtension.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -1801,10 +1779,10 @@
 				10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */,
 				10173605251924120073D283 /* FinancialAccountFetcher.swift */,
 				10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */,
-				1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */,
 				10DC5C3F25AF35C600D52722 /* FinancialMemberFetcher.swift */,
 				106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */,
 				106774FB25DAFA8D002F78E7 /* FinancialHoldingActions.swift */,
+				1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */,
 				10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */,
 			);
 			path = Support;
@@ -3015,14 +2993,12 @@
 				4B4F45271F32230C00A6FF96 /* Sources */,
 				4B4F45281F32230C00A6FF96 /* Frameworks */,
 				4B4F45291F32230C00A6FF96 /* Resources */,
-				4B9AF38E1F3B9B6E00A3934D /* Embed App Extensions */,
 				F12AFB3F9F7ACA543353B20B /* [CP] Copy Pods Resources */,
 				105F34BB2885F29A007531EB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				10314112230D712E00DB471B /* PBXTargetDependency */,
 			);
 			name = Plot;
 			packageProductDependencies = (
@@ -3749,14 +3725,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		10314112230D712E00DB471B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 10314108230D712E00DB471B /* ShareExtension */;
-			targetProxy = 10314111230D712E00DB471B /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		1031410D230D712E00DB471B /* MainInterface.storyboard */ = {

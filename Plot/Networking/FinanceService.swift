@@ -94,15 +94,15 @@ class FinanceService {
     func grabFinances(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
             self?.observeAccountsForCurrentUser {}
-            self?.observeTransactionRulesForCurrentUser {
+            self?.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
+                self?.transactionRules = transactionRules
                 self?.observeTransactionsForCurrentUser {
                     self?.removePendingTransactions()
                     completion()
 //                    self?.grabTransactionAttributes()
                 }
-
-            }
-            
+            })
+            self?.observeTransactionRulesForCurrentUser {}
             self?.observeHoldingsForCurrentUser()
             self?.observeMembersForCurrentUser {
                 self?.setupMembersAccountsDict()
@@ -205,7 +205,7 @@ class FinanceService {
             if self?.members.isEmpty ?? true {
                 self?.members = membersInitialAdd
                 completion()
-            } else {
+            } else if !membersInitialAdd.isEmpty {
                 for member in membersInitialAdd {
                     if let index = self?.members.firstIndex(where: {$0.guid == member.guid}) {
                         self?.members[index] = member
@@ -213,6 +213,8 @@ class FinanceService {
                         self?.members.append(member)
                     }
                 }
+            } else {
+                completion()
             }
         }, membersAdded: { [weak self] membersAdded in
             for member in membersAdded {
@@ -239,7 +241,7 @@ class FinanceService {
             if self?.accounts.isEmpty ?? true {
                 self?.accounts = accountsInitialAdd
                 completion()
-            } else {
+            } else if !accountsInitialAdd.isEmpty {
                 for account in accountsInitialAdd {
                     if let index = self?.accounts.firstIndex(where: {$0.guid == account.guid}) {
                         self?.accounts[index] = account
@@ -247,6 +249,8 @@ class FinanceService {
                         self?.accounts.append(account)
                     }
                 }
+            } else {
+                completion()
             }
         }, accountsAdded: { [weak self] accountsAdded in
             for account in accountsAdded {
@@ -271,33 +275,47 @@ class FinanceService {
     func observeTransactionsForCurrentUser(_ completion: @escaping () -> Void) {
         self.transactionFetcher.observeTransactionForCurrentUser(transactionsInitialAdd: {
             [weak self] transactionsInitialAdd in
-            if self!.transactions.isEmpty {
-                completion()
-                
-                self?.transactions = transactionsInitialAdd
-            } else {
+            if !transactionsInitialAdd.isEmpty {
                 for transaction in transactionsInitialAdd {
-                    if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
-                        self?.transactions[index] = transaction
-                    } else {
-                        self?.transactions.append(transaction)
+                    updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
+                        if bool {
+                            if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                                self?.transactions[index] = transaction
+                            } else {
+                                self?.transactions.append(transaction)
+                            }
+                            self?.updateExistingTransactionsFB(transactions: [transaction])
+                        }
                     }
                 }
+                completion()
+            } else {
+                completion()
             }
         }, transactionsAdded: { [weak self] transactionsAdded in
             for transaction in transactionsAdded {
-                if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
-                    self?.transactions[index] = transaction
-                } else {
-                    self?.transactions.append(transaction)
+                updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
+                    if bool {
+                        if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                            self?.transactions[index] = transaction
+                        } else {
+                            self?.transactions.append(transaction)
+                        }
+                        self?.updateExistingTransactionsFB(transactions: [transaction])
+                    }
                 }
             }
         }, transactionsChanged: { [weak self] transactionsChanged in
             for transaction in transactionsChanged {
-                if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
-                    self?.transactions[index] = transaction
-                } else {
-                    self?.transactions.append(transaction)
+                updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
+                    if bool {
+                        if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                            self?.transactions[index] = transaction
+                        } else {
+                            self?.transactions.append(transaction)
+                        }
+                        self?.updateExistingTransactionsFB(transactions: [transaction])
+                    }
                 }
             }
         })
@@ -305,7 +323,6 @@ class FinanceService {
     
     func observeTransactionRulesForCurrentUser(_ completion: @escaping () -> Void) {
         self.transactionRuleFetcher.observeTransactionRuleForCurrentUser(transactionRulesAdded: { [weak self] transactionRulesAdded in
-            var newTransactions = [Transaction]()
             for transactionRule in transactionRulesAdded {
                 if let index = self?.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
                     self?.transactionRules[index] = transactionRule
@@ -316,17 +333,14 @@ class FinanceService {
                     for index in 0...self!.transactions.count - 1 {
                         updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
                             if bool {
-                                self!.transactions[index] = transaction
-                                newTransactions.append(transaction)
+                                self?.transactions[index] = transaction
+                                self?.updateExistingTransactionsFB(transactions: [transaction])
                             }
                         }
                     }
                 }
             }
             completion()
-            if !newTransactions.isEmpty {
-                self?.updateExistingTransactionsFB(transactions: newTransactions)
-            }
             }, transactionRulesRemoved: { [weak self] transactionRulesRemoved in
                 for transactionRule in transactionRulesRemoved {
                     if let index = self?.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
@@ -334,7 +348,6 @@ class FinanceService {
                     }
                 }
             }, transactionRulesChanged: { [weak self] transactionRulesChanged in
-                var newTransactions = [Transaction]()
                 for transactionRule in transactionRulesChanged {
                     if let index = self?.transactionRules.firstIndex(where: {$0.guid == transactionRule.guid}) {
                         self?.transactionRules[index] = transactionRule
@@ -346,14 +359,11 @@ class FinanceService {
                             updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
                                 if bool {
                                     self?.transactions[index] = transaction
-                                    newTransactions.append(transaction)
+                                    self?.updateExistingTransactionsFB(transactions: [transaction])
                                 }
                             }
                         }
                     }
-                }
-                if !newTransactions.isEmpty {
-                    self?.updateExistingTransactionsFB(transactions: newTransactions)
                 }
             }
         )

@@ -77,6 +77,7 @@ class Activity: NSObject, NSCopying, Codable {
     var hasDeadlineTime: Bool?
     var flagged: Bool?
     var tags: [String]?
+    var priority: String?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -124,6 +125,7 @@ class Activity: NSObject, NSCopying, Codable {
         case hasDeadlineTime
         case flagged
         case tags
+        case priority
     }
     
     init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool) {
@@ -220,6 +222,7 @@ class Activity: NSObject, NSCopying, Codable {
         hasDeadlineTime = dictionary?["hasDeadlineTime"] as? Bool
         flagged = dictionary?["flagged"] as? Bool
         tags = dictionary?["tags"] as? [String]
+        priority = dictionary?["priority"] as? String
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -431,6 +434,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.tags as AnyObject? {
             dictionary["tags"] = value
+        }
+        
+        if let value = self.priority as AnyObject? {
+            dictionary["priority"] = value
         }
         
         return dictionary
@@ -685,4 +692,12 @@ extension GTLRCalendar_Event {
         }
         return date
     }
+}
+
+enum TaskPriority: String, CaseIterable {
+    case None = "None"
+    case Low = "Low"
+    case Medium = "Medium"
+    case High = "High"
+    
 }

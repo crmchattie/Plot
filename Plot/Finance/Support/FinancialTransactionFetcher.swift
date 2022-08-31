@@ -37,13 +37,11 @@ class FinancialTransactionFetcher: NSObject {
         
         userTransactionsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
-                print("!snapshot.exists()")
                 transactionsInitialAdd([])
                 return
             }
             
             if let completion = self.transactionsInitialAdd {
-                print("completion = self.transactionsInitialAdd")
                 var transactions: [Transaction] = []
                 let group = DispatchGroup()
                 var counter = 0

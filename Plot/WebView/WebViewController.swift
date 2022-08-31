@@ -29,14 +29,6 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     let mxScheme = "mx://"
     let atriumScheme = "atrium://"
     
-    let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        spinner.hidesWhenStopped = true
-        spinner.startAnimating()
-        return spinner
-    }()
-    
     override func loadView() {
         let webPreferences = WKPreferences()
         webPreferences.javaScriptCanOpenWindowsAutomatically = true
@@ -45,7 +37,6 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         webConfiguration.preferences = webPreferences
 
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.isOpaque = false
         webView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         webView.navigationDelegate = self
@@ -57,22 +48,20 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
         
-        navigationController?.isNavigationBarHidden = false
-        navigationController?.navigationBar.isHidden = false
-        navigationItem.largeTitleDisplayMode = .never
-        
         title = controllerTitle
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton
         
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
+
         if let url = urlString, let myURL = URL(string: url) {
             let myRequest = URLRequest(url: myURL)
             webView.load(myRequest)
             webView.allowsBackForwardNavigationGestures = true
+            activityIndicatorView.stopAnimating()
         } else {
-//            view.addSubview(activityIndicatorView)
-//            activityIndicatorView.centerInSuperview()
             fetchData()
         }
         
@@ -82,9 +71,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         Service.shared.fetchMXConnectURL(current_member_guid: current_member_guid) { (search, err) in
             if let search = search, let url = search["url"], let myURL = URL(string: url) {
                 DispatchQueue.main.async {
-//                    self.spinner.isHidden = true
-//                    self.spinner.stopAnimating()
-//                    self.spinner.removeFromSuperview()
+                    activityIndicatorView.stopAnimating()
                     let myRequest = URLRequest(url: myURL)
                     self.webView.load(myRequest)
                     self.webView.allowsBackForwardNavigationGestures = true
@@ -141,7 +128,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         if let urlToOpen = url {
             // Don't open the url, if it is the widget url itself on the first load
             if (urlToOpen != urlString) {
-                UIApplication.shared.open(URL(string: urlToOpen)!)
+//                UIApplication.shared.open(URL(string: urlToOpen)!)
             }
         }
 

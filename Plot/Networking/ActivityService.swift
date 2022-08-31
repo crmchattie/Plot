@@ -212,7 +212,7 @@ class ActivityService {
                 self?.eventsNoRepeats = activitiesInitialAdd.filter { $0.isTask == nil }
                 self?.tasksNoRepeats = activitiesInitialAdd.filter { $0.isTask != nil }
                 completion()
-            } else {
+            } else if !activitiesInitialAdd.isEmpty {
                 for activity in activitiesInitialAdd {
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
@@ -231,6 +231,8 @@ class ActivityService {
                         self?.activities.append(activity)
                     }
                 }
+            } else {
+                completion()
             }
         }, activitiesAdded: { [weak self] activitiesAdded in
             for activity in activitiesAdded {

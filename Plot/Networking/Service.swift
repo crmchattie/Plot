@@ -1069,19 +1069,21 @@ class Service {
     
     func fetchMXConnectURL(current_member_guid: String?, completion: @escaping (([String: String]?), Error?) -> ()) {
         let baseURL: URL = {
-            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/openMXConnect")!
+            return URL(string:
+                        "https://us-central1-messenging-app-94621.cloudfunctions.net/openMXConnect")!
         }()
         
-        var parameters = ["isMobileWebview":"\(true)",
-                          "uiMessageVersion": "\(4)"]
+        var parameters = ["widget_type": "connect_widget",
+                          "is_mobile_webview":"\(true)",
+                          "ui_message_version": "\(4)"]
         if UITraitCollection.current.userInterfaceStyle == .light {
-            parameters["colorScheme"] = "light"
+            parameters["color_scheme"] = "light"
         } else {
-            parameters["colorScheme"] = "dark"
+            parameters["color_scheme"] = "dark"
         }
         if let guid = current_member_guid {
-            parameters["currentMemberGuid"] = "\(guid)"
-            parameters["disableInstitutionSearch"] = "true"
+            parameters["current_member_guid"] = "\(guid)"
+            parameters["disable_institution_search"] = "true"
         }
         
         let currentUser = Auth.auth().currentUser
@@ -1099,11 +1101,34 @@ class Service {
                 urlRequest.httpMethod = "POST"
                 let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
                 urlRequest.httpBody = jsonData
-                
                 self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
             }
         }
         
+    }
+    
+    func triggerUpdateMXUser(completion: @escaping ((String?), Error?) -> ()) {
+        let baseURL: URL = {
+            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/triggerUpdateMXUser")!
+        }()
+        
+        let currentUser = Auth.auth().currentUser
+        currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
+            if let error = error {
+                print("error getting token \(error)")
+                // Handle error
+                return
+            }
+            if let token = token {
+                var urlRequest = URLRequest(url: baseURL)
+                urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
+                                                  "Authorization" : "Bearer \(token)"]
+                
+                urlRequest.httpMethod = "POST"
+                
+                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+            }
+        }
     }
     
     func deleteMXMember(current_member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
@@ -1129,31 +1154,6 @@ class Service {
                 
                 let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
                 urlRequest.httpBody = jsonData
-                
-                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-            }
-        }
-        
-    }
-    
-    func triggerUpdateMXUser(completion: @escaping ((String?), Error?) -> ()) {
-        let baseURL: URL = {
-            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/triggerUpdateMXUser")!
-        }()
-        
-        let currentUser = Auth.auth().currentUser
-        currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
-            if let error = error {
-                print("error getting token \(error)")
-                // Handle error
-                return
-            }
-            if let token = token {
-                var urlRequest = URLRequest(url: baseURL)
-                urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
-                                                  "Authorization" : "Bearer \(token)"]
-                
-                urlRequest.httpMethod = "POST"
                 
                 self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
             }

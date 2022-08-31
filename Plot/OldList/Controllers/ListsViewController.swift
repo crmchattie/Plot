@@ -105,7 +105,7 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     
     fileprivate func setupMainView() {
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = "Lists"
+        navigationItem.title = "Tasks"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
@@ -173,13 +173,6 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         taskList = [:]
         
         var listOfLists = [ListType]()
-
-        let allTasks = tasks
-        if !allTasks.isEmpty {
-            let allList = ListType(id: "", name: ListOptions.allList.rawValue, color: "", source: "")
-            taskList[allList] = allTasks
-            listOfLists.insert(allList, at: 0)
-        }
         
         let flaggedTasks = tasks.filter {
             if $0.flagged ?? false {
@@ -218,8 +211,8 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         }
         
         if !listOfLists.isEmpty {
-            sections.append(.lists)
-            lists[.lists, default: []].append(contentsOf: listOfLists)
+            sections.append(.presetLists)
+            lists[.presetLists, default: []].append(contentsOf: listOfLists)
         }
         
         listOfLists = []
@@ -235,6 +228,11 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         if !listOfLists.isEmpty {
             sections.insert(.myLists, at: 1)
             lists[.myLists, default: []].append(contentsOf: listOfLists.sorted(by: {$0.name ?? "" < $1.name ?? "" }))
+        }
+        
+        if !tasks.isEmpty {
+            sections.append(.tasks)
+            filteredTasks = tasks
         }
                 
         filteredLists = lists
@@ -305,21 +303,16 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier:
                                                                 headerCellID) as? TableViewHeader ?? TableViewHeader()
         let section = sections[section]
-        if section == .myLists {
-            header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            header.titleLabel.text = section.name
-            header.subTitleLabel.isHidden = true
-            header.sectionType = section
-        }
+        header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        header.titleLabel.text = section.name
+        header.subTitleLabel.isHidden = true
+        header.sectionType = section
         return header
 
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if sections[section] == .myLists {
-            return 40
-        }
-        return 0
+        return 40
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {

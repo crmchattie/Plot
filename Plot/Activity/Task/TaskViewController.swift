@@ -732,6 +732,42 @@ class TaskViewController: FormViewController {
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         
+        <<< PushRow<TaskPriority>("Priority") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.title = row.tag
+            if self.active, let value = self.task.priority {
+                row.value = TaskPriority(rawValue: value)
+            } else {
+                row.value = TaskPriority.None
+                if let priority = row.value?.rawValue {
+                    print(priority)
+                    self.task.priority = priority
+                }
+            }
+            row.options = TaskPriority.allCases
+        }.onPresent { from, to in
+            to.title = "Priority"
+            to.tableViewStyle = .insetGrouped
+            to.selectableRowCellUpdate = { cell, row in
+                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.tableView.separatorStyle = .none
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        }.onChange() { [unowned self] row in
+            if let priority = row.value?.rawValue {
+                self.task.priority = priority
+            }
+        }
+        
         <<< LabelRow("Repeat") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
