@@ -358,6 +358,7 @@ class WorkoutViewController: FormViewController {
             }
         }.onPresent { from, to in
             to.title = "Type"
+            to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.enableDeselection = false
             to.selectableRowCellUpdate = { cell, row in

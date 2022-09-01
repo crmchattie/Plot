@@ -265,6 +265,8 @@ class ActivityActions: NSObject {
         guard let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
+        print("updating completion")
+        print(activityID)
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         if isComplete {
             let original = Date()

@@ -157,6 +157,7 @@ class FinanceTransactionNewLevelViewController: FormViewController {
                 } else {
                     to.title = "Subcategories"
                 }
+                to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor

@@ -104,6 +104,11 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     }
     
     fileprivate func setupMainView() {
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        extendedLayoutIncludesOpaqueBars = true
+        
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Tasks"
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor

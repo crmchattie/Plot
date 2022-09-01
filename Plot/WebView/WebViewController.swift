@@ -38,7 +38,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
 
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.isOpaque = false
-        webView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        webView.backgroundColor = ThemeManager.currentTheme().launchBackgroundColor
         webView.navigationDelegate = self
         webView.uiDelegate = self
         view = webView
@@ -49,6 +49,8 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         extendedLayoutIncludesOpaqueBars = true
         
         title = controllerTitle
+        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().launchBackgroundColor
+
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton

@@ -165,6 +165,9 @@ extension TaskViewController {
         for activity in eventList {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
+                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    activity.calendarColor = color
+                }
                 $0.value = activity
             }.onCellSelection() { cell, row in
                 self.eventIndex = row.indexPath!.row

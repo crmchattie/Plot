@@ -46,6 +46,7 @@ class FinanceService {
                     }
                     return account1.should_link ?? true && !(account2.should_link ?? true)
                 }
+                setupMembersAccountsDict()
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }
         }
@@ -56,6 +57,7 @@ class FinanceService {
                 members.sort { (member1, member2) -> Bool in
                     return member1.name < member2.name
                 }
+                setupMembersAccountsDict()
                 NotificationCenter.default.post(name: .financeUpdated, object: nil)
             }
         }
@@ -104,9 +106,7 @@ class FinanceService {
             })
             self?.observeTransactionRulesForCurrentUser {}
             self?.observeHoldingsForCurrentUser()
-            self?.observeMembersForCurrentUser {
-                self?.setupMembersAccountsDict()
-            }
+            self?.observeMembersForCurrentUser {}
 
         }
     }
@@ -224,7 +224,6 @@ class FinanceService {
                     self?.members.append(member)
                 }
             }
-            self?.setupMembersAccountsDict()
         }, membersChanged: { [weak self] membersChanged in
             for member in membersChanged {
                 if let index = self?.members.firstIndex(where: {$0.guid == member.guid}) {
@@ -260,7 +259,6 @@ class FinanceService {
                     self?.accounts.append(account)
                 }
             }
-            self?.setupMembersAccountsDict()
         }, accountsChanged: { [weak self] accountsChanged in
             for account in accountsChanged {
                 if let index = self?.accounts.firstIndex(where: {$0.guid == account.guid}) {
@@ -276,15 +274,19 @@ class FinanceService {
         self.transactionFetcher.observeTransactionForCurrentUser(transactionsInitialAdd: {
             [weak self] transactionsInitialAdd in
             if !transactionsInitialAdd.isEmpty {
+                if self!.transactions.isEmpty {
+                    self?.transactions = transactionsInitialAdd
+                }
                 for transaction in transactionsInitialAdd {
                     updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
                         if bool {
+                            self?.updateExistingTransactionsFB(transactions: [transaction])
+                        } else {
                             if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
                                 self?.transactions[index] = transaction
                             } else {
                                 self?.transactions.append(transaction)
                             }
-                            self?.updateExistingTransactionsFB(transactions: [transaction])
                         }
                     }
                 }
@@ -296,26 +298,22 @@ class FinanceService {
             for transaction in transactionsAdded {
                 updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
                     if bool {
+                        self?.updateExistingTransactionsFB(transactions: [transaction])
+                    } else {
                         if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
                             self?.transactions[index] = transaction
                         } else {
                             self?.transactions.append(transaction)
                         }
-                        self?.updateExistingTransactionsFB(transactions: [transaction])
                     }
                 }
             }
         }, transactionsChanged: { [weak self] transactionsChanged in
             for transaction in transactionsChanged {
-                updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
-                    if bool {
-                        if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
-                            self?.transactions[index] = transaction
-                        } else {
-                            self?.transactions.append(transaction)
-                        }
-                        self?.updateExistingTransactionsFB(transactions: [transaction])
-                    }
+                if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                    self?.transactions[index] = transaction
+                } else {
+                    self?.transactions.append(transaction)
                 }
             }
         })
@@ -333,7 +331,6 @@ class FinanceService {
                     for index in 0...self!.transactions.count - 1 {
                         updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
                             if bool {
-                                self?.transactions[index] = transaction
                                 self?.updateExistingTransactionsFB(transactions: [transaction])
                             }
                         }
@@ -358,7 +355,6 @@ class FinanceService {
                         for index in 0...self!.transactions.count - 1 {
                             updateTransactionWRule(transaction: self!.transactions[index], transactionRules: self!.transactionRules) { (transaction, bool) in
                                 if bool {
-                                    self?.transactions[index] = transaction
                                     self?.updateExistingTransactionsFB(transactions: [transaction])
                                 }
                             }

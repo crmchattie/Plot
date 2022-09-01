@@ -261,6 +261,9 @@ extension SubtaskListViewController: UpdateTaskCellDelegate {
             } else {
                 subtaskList[index].completedDate = nil
             }
+            
+            let updateTask = ActivityActions(activity: subtaskList[index], active: true, selectedFalconUsers: [])
+            updateTask.updateCompletion(isComplete: subtaskList[index].isCompleted ?? false)
         }
     }
 }

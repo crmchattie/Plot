@@ -298,7 +298,8 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 topHeightConstraint = 10
                                 
                 nameLabel.text = account.name
-                let currentBalance = account.available_balance ?? account.balance
+                
+                let currentBalance = account.finalBalance
                 if let balance = numberFormatter.string(from: currentBalance as NSNumber) {
                     middleLabel.text = "Balance: \(balance)"
                 }

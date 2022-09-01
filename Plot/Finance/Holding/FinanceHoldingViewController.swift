@@ -223,6 +223,7 @@ class FinanceHoldingViewController: FormViewController {
                 }
             }.onPresent { from, to in
                 to.title = "Type"
+                to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = true
                 to.dismissOnChange = true
@@ -398,6 +399,7 @@ class FinanceHoldingViewController: FormViewController {
                 }
             }.onPresent { from, to in
                 to.title = "Accounts"
+                to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
                     to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor

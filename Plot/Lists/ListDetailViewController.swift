@@ -188,6 +188,7 @@ class ListDetailViewController: FormViewController {
             row.options = ChartColors.palette()
         }.onPresent { from, to in
             to.title = "Color"
+            to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
                 to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor

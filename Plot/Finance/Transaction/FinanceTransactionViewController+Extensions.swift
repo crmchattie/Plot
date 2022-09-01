@@ -36,6 +36,9 @@ extension FinanceTransactionViewController {
         for task in taskList {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
+                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    task.listColor = color
+                }
                 $0.value = task
                 $0.cell.delegate = self
             }.onCellSelection() { cell, row in
@@ -48,6 +51,9 @@ extension FinanceTransactionViewController {
         for activity in eventList {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
+                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    activity.calendarColor = color
+                }
                 $0.value = activity
             }.onCellSelection() { cell, row in
                 self.eventIndex = row.indexPath!.row
@@ -236,6 +242,9 @@ extension FinanceTransactionViewController: UpdateTaskDelegate {
             } else {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {
+                    if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                        task.listColor = color
+                    }
                     $0.value = task
                     $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
@@ -264,6 +273,9 @@ extension FinanceTransactionViewController: ChooseTaskDelegate {
         if let _ = mergeTask.name {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
+                if let listID = mergeTask.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    mergeTask.listColor = color
+                }
                 $0.value = mergeTask
             }.onCellSelection() { cell, row in
                 self.taskIndex = row.indexPath!.row
@@ -294,6 +306,9 @@ extension FinanceTransactionViewController: UpdateActivityDelegate {
             } else {
                 var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
+                    if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                        activity.calendarColor = color
+                    }
                     $0.value = activity
                 }.onCellSelection() { cell, row in
                     self.eventIndex = row.indexPath!.row
@@ -354,6 +369,9 @@ extension FinanceTransactionViewController: ChooseActivityDelegate {
         if let _ = mergeActivity.name {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
+                if let calendarID = mergeActivity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    mergeActivity.calendarColor = color
+                }
                 $0.value = mergeActivity
             }.onCellSelection() { cell, row in
                 self.eventIndex = row.indexPath!.row

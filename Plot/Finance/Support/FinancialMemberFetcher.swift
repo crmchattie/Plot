@@ -61,6 +61,11 @@ class FinancialMemberFetcher: NSObject {
                                     members = [member]
                                     completion(members)
                                 }
+                            } else {
+                                if counter > 0 {
+                                    group.leave()
+                                    counter -= 1
+                                }
                             }
                         }
                         

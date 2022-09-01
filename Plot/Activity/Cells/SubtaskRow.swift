@@ -68,7 +68,6 @@ final class SubtaskCell: Cell<Activity>, CellType {
     
     let checkImage: UIImageView = {
         let view = UIImageView()
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -134,10 +133,17 @@ final class SubtaskCell: Cell<Activity>, CellType {
         
         if let categoryValue = subtask.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
+            if category == .uncategorized {
+                activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
+            }
         } else {
-            activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
+            activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
         }
-        activityTypeButton.tintColor = .systemBlue
+        
+        checkImage.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        if let color = subtask.listColor {
+            checkImage.tintColor = UIColor(ciColor: CIColor(string: color))
+        }
         
         let viewTap = UITapGestureRecognizer(target: self, action: #selector(checkViewChanged(_:)))
         checkView.addGestureRecognizer(viewTap)
@@ -146,10 +152,9 @@ final class SubtaskCell: Cell<Activity>, CellType {
     
     @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
         guard let subtask = row.value else { return }
-        subtask.isCompleted = subtask.isCompleted ?? false
+        subtask.isCompleted = !(subtask.isCompleted ?? false)
         let image = subtask.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
-        subtask.isCompleted = !(subtask.isCompleted ?? false)
         delegate?.updateCompletion(task: subtask)
 
     }

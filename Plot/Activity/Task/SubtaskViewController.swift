@@ -656,6 +656,7 @@ class SubtaskViewController: FormViewController {
             row.options = EventAlert.allCases
         }.onPresent { from, to in
             to.title = "Reminder"
+            to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
                 to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor

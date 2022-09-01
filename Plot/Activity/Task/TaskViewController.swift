@@ -748,7 +748,9 @@ class TaskViewController: FormViewController {
             }
             row.options = TaskPriority.allCases
         }.onPresent { from, to in
+            to.extendedLayoutIncludesOpaqueBars = true
             to.title = "Priority"
+            to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
                 to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
@@ -813,6 +815,7 @@ class TaskViewController: FormViewController {
             row.options = EventAlert.allCases
         }.onPresent { from, to in
             to.title = "Reminder"
+            to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
                 to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
@@ -958,29 +961,29 @@ class TaskViewController: FormViewController {
             }
         }
         
-//        <<< ButtonRow("Checklists") { row in
-//            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            row.cell.textLabel?.textAlignment = .left
-//            row.cell.accessoryType = .disclosureIndicator
-//            row.title = row.tag
-//            row.hidden = "$showExtras == false"
-//            if self.task.checklistIDs != nil || self.task.grocerylistID != nil || self.task.activitylistIDs != nil {
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            } else {
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//            }
-//        }.onCellSelection({ _,_ in
-//            self.openList()
-//        }).cellUpdate { cell, row in
-//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            cell.accessoryType = .disclosureIndicator
-//            cell.textLabel?.textAlignment = .left
-//            if let _ = self.task.checklistIDs {
-//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            } else {
-//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//            }
-//        }
+        <<< ButtonRow("Checklists") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.accessoryType = .disclosureIndicator
+            row.title = row.tag
+            row.hidden = "$showExtras == false"
+            if self.task.checklistIDs != nil || self.task.grocerylistID != nil || self.task.activitylistIDs != nil {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            } else {
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }.onCellSelection({ _,_ in
+            self.openList()
+        }).cellUpdate { cell, row in
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.textAlignment = .left
+            if let _ = self.task.checklistIDs {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            } else {
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            }
+        }
         
         <<< ButtonRow("Media") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

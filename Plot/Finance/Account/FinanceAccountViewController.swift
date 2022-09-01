@@ -55,7 +55,6 @@ class FinanceAccountViewController: FormViewController {
         navigationItem.largeTitleDisplayMode = .never
                 
         
-        
         numberFormatter.numberStyle = .currency
         numberFormatter.maximumFractionDigits = 0
         dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
@@ -66,7 +65,7 @@ class FinanceAccountViewController: FormViewController {
         
         if !(account.user_created ?? false) {
             for row in form.rows {
-                if row.tag != "Should Link" && row.tag != "Tags" && row.tag != "Participants" && row.tag != "Description" {
+                if row.tag != "Name" && row.tag != "Should Link" && row.tag != "Tags" && row.tag != "Participants" && row.tag != "Description" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -189,7 +188,7 @@ class FinanceAccountViewController: FormViewController {
                 $0.placeholder = $0.tag
                 if active {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
-                    $0.value = account.name.capitalized
+                    $0.value = account.name
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                     $0.cell.textField.becomeFirstResponder()
@@ -242,6 +241,7 @@ class FinanceAccountViewController: FormViewController {
                 }
             }.onPresent { from, to in
                 to.title = "Type"
+                to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = true
                 to.dismissOnChange = true
@@ -283,6 +283,7 @@ class FinanceAccountViewController: FormViewController {
                     }
                 }.onPresent { from, to in
                     to.title = "Subtype"
+                    to.extendedLayoutIncludesOpaqueBars = true
                     to.tableViewStyle = .insetGrouped
                     to.dismissOnSelection = true
                     to.dismissOnChange = true

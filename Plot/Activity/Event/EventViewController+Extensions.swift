@@ -168,12 +168,15 @@ extension EventViewController: UpdateTaskDelegate {
         if let _ = task.name {
             if taskList.indices.contains(taskIndex), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                 let row = mvs.allRows[taskIndex]
-                row.baseValue = activity
+                row.baseValue = task
                 row.reload()
                 taskList[taskIndex] = task
             } else {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {
+                    if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                        task.listColor = color
+                    }
                     $0.value = task
                     $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
@@ -201,6 +204,9 @@ extension EventViewController: ChooseTaskDelegate {
         if let _ = mergeTask.name {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
+                if let listID = mergeTask.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    mergeTask.listColor = color
+                }
                 $0.value = mergeTask
             }.onCellSelection() { cell, row in
                 self.taskIndex = row.indexPath!.row

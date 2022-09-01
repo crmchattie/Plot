@@ -117,8 +117,8 @@ class AccountSettingsController: UITableViewController {
     }
 
     func configureNavigationBar() {
-        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+//        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
+//        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
         doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
         navigationItem.rightBarButtonItem = doneBarButton
     }

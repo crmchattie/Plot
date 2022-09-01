@@ -234,6 +234,9 @@ extension EventViewController {
         for task in taskList {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
+                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    task.listColor = color
+                }
                 $0.value = task
                 $0.cell.delegate = self
             }.onCellSelection() { cell, row in

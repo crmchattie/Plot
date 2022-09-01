@@ -116,6 +116,9 @@ extension TaskViewController: UpdateActivityDelegate {
             } else {
                 var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
+                    if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                        activity.calendarColor = color
+                    }
                     $0.value = activity
                 }.onCellSelection() { cell, row in
                     self.eventIndex = row.indexPath!.row
@@ -175,6 +178,9 @@ extension TaskViewController: ChooseActivityDelegate {
         if let _ = mergeActivity.name {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
+                if let calendarID = mergeActivity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    mergeActivity.calendarColor = color
+                }
                 $0.value = mergeActivity
             }.onCellSelection() { cell, row in
                 self.eventIndex = row.indexPath!.row

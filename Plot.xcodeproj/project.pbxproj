@@ -1378,10 +1378,10 @@
 				100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */,
 				105CB18D2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift */,
 				1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */,
-				108C380D28AC829F00DC4998 /* TransactionRule */,
 				108C380828AC81C100DC4998 /* Transaction */,
 				108C380C28AC821B00DC4998 /* Holding */,
 				108C380B28AC821100DC4998 /* Account */,
+				108C380D28AC829F00DC4998 /* TransactionRule */,
 				10DFC3EF255CC55600565DAD /* Cells */,
 				10DFC3EE255CC53600565DAD /* Support */,
 			);

@@ -16,7 +16,7 @@ struct MXMemberResult: Codable {
 }
 
 struct MXMember: Codable, Equatable, Hashable {
-    var aggregated_at: String
+    var aggregated_at: String?
     var connection_status: ConnectionStatus
     var guid: String
     //atrium API

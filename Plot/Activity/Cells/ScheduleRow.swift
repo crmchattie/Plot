@@ -106,12 +106,20 @@ final class ScheduleCell: Cell<Activity>, CellType {
             locationNameLabel.text = schedule.locationName
         }
         
+        
         if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
+            if category == .uncategorized {
+                activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+            }
         } else {
-            activityTypeButton.setImage(ActivityCategory.uncategorized.icon, for: .normal)
+            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
         }
+        
         activityTypeButton.tintColor = .systemBlue
+        if let color = schedule.calendarColor {
+            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+        }
     }
 }
 
