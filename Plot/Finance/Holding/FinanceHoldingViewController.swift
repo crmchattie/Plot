@@ -265,6 +265,7 @@ class FinanceHoldingViewController: FormViewController {
 //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                }).onChange { row in
+                      
 //                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("holdingDescription")
 //                    self.holding.holdingDescription = row.value
 //                    reference.setValue(row.value)

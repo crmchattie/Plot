@@ -14,9 +14,7 @@ protocol UpdateTaskCellDelegate: AnyObject {
 
 final class SubtaskCell: Cell<Activity>, CellType {
     weak var delegate: UpdateTaskCellDelegate?
-    
-    var formattedDate: (String, String) = ("", "")
-    
+        
     lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -118,12 +116,16 @@ final class SubtaskCell: Cell<Activity>, CellType {
 
         guard let subtask = row.value else { return }
                 
-        if let endDate = subtask.endDate {
-            formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
-        }
-        // set the texts to the labels
         nameLabel.text = subtask.name
-        dateTimeLabel.text = formattedDate.0 + formattedDate.1
+
+        if let _ = subtask.endDate {
+            let dateTimeValue = dateTimeValue(forTask: subtask)
+            dateTimeLabel.text = dateTimeValue
+        } else {
+            dateTimeLabel.text = ""
+        }
+        
+        // set the texts to the labels
         if subtask.locationName != "locationName" {
             locationNameLabel.text = subtask.locationName
         }

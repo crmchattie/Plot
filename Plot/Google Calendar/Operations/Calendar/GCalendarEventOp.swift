@@ -133,6 +133,9 @@ class GCalendarEventOp: AsyncOperation {
                     completion(activity)
                 }
             }
+        } else {
+            activity.locationName = nil
+            activity.locationAddress = nil
         }
     }
     

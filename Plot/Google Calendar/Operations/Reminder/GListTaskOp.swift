@@ -110,12 +110,14 @@ class GListTaskOp: AsyncOperation {
             activity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
             activity.hasDeadlineTime = true
         } else {
+            activity.endDateTime = nil
             activity.hasDeadlineTime = false
         }
         if let completed = task.completed, let date = isodateFormatter.date(from: completed) {
             activity.completedDate = NSNumber(value: date.timeIntervalSince1970)
             activity.isCompleted = true
         } else {
+            activity.completedDate = nil
             activity.isCompleted = false
         }
         completion(activity)

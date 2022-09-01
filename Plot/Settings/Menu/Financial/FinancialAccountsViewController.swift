@@ -13,9 +13,7 @@ import CodableFirebase
 class FinancialAccountsViewController: UITableViewController {
     var networkController = NetworkController()
             
-    var members: [MXMember] {
-        return networkController.financeService.members
-    }
+    var members = [MXMember]()
     var memberAccountsDict: [MXMember: [MXAccount]] {
         return networkController.financeService.memberAccountsDict
     }
@@ -34,6 +32,8 @@ class FinancialAccountsViewController: UITableViewController {
         
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = barButton
+        
+        members = Array(memberAccountsDict.keys).sorted(by: {$0.name < $1.name})
                 
     }
     
@@ -47,6 +47,7 @@ class FinancialAccountsViewController: UITableViewController {
     
     @objc fileprivate func financeUpdated() {
         DispatchQueue.main.async {
+            self.members = Array(self.memberAccountsDict.keys).sorted(by: {$0.name < $1.name})
             self.tableView.reloadData()
         }
     }
@@ -179,6 +180,10 @@ class FinancialAccountsViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { (_) in
             let member = self.members[sender.item]
             self.networkController.financeService.deleteMXMember(member: member)
+            self.members.remove(at: sender.item)
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
 
         }))
         

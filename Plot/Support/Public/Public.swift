@@ -599,11 +599,9 @@ func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, has
     let now = Date()
     let endEarliest = now < endDate ? now : endDate
     let endLatest = (endDate == now) ? endDate : now
-    let endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
     if let startDate = startDate {
         let startEarliest = now < startDate ? now : startDate
         let startLatest = (startEarliest == now) ? startDate : now
-        let startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
         if let hasStartTime = hasStartTime, hasStartTime, hasDeadlineTime {
             if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
                 //start date is next week
@@ -659,6 +657,112 @@ func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, has
         }
         return (endString, "")
     }
+}
+
+func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
+    var value = ""
+    var numberOfLines = 1
+    if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
+        let allDay = activity.allDay ?? false
+        let startDate = Date(timeIntervalSince1970: startDate)
+        let endDate = Date(timeIntervalSince1970: endDate)
+        let startDateFormatter = DateFormatter()
+        let endDateFormatter = DateFormatter()
+        startDateFormatter.dateFormat = "d"
+        endDateFormatter.dateFormat = "d"
+        if let startTimeZone = activity.startTimeZone {
+            startDateFormatter.timeZone = TimeZone(identifier: startTimeZone)
+        } else {
+            startDateFormatter.timeZone = TimeZone(identifier: "UTC")
+        }
+        if let endTimeZone = activity.endTimeZone {
+            endDateFormatter.timeZone = TimeZone(identifier: endTimeZone)
+        } else {
+            endDateFormatter.timeZone = TimeZone(identifier: "UTC")
+        }
+    
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var startDay = ""
+        var day = startDateFormatter.string(from: startDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            startDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        var endDay = ""
+        day = endDateFormatter.string(from: endDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            endDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        startDateFormatter.dateFormat = "EEEE, MMM"
+        value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
+        
+        if allDay {
+            value += " All Day"
+        } else {
+            startDateFormatter.dateFormat = "h:mm a"
+            value += " \(startDateFormatter.string(from: startDate))"
+        }
+        
+        if endDate.timeIntervalSince(startDate) > 86399 {
+            value += "\n"
+            numberOfLines = 2
+            
+            endDateFormatter.dateFormat = "EEEE, MMM"
+            value += "\(endDateFormatter.string(from: endDate)) \(endDay) "
+            
+            if allDay {
+                value += "All Day"
+            }
+        }
+
+        if !allDay {
+            if numberOfLines == 1 {
+                value += "\n"
+                numberOfLines = 2
+            }
+            
+            endDateFormatter.dateFormat = "h:mm a"
+            value += "\(endDateFormatter.string(from: endDate))"
+            
+        }
+    }
+    
+    return (numberOfLines, value)
+}
+
+func dateTimeValue(forTask task: Activity) -> String {
+    var value = ""
+    if let endDate = task.endDate {
+        let allDay = !(task.hasDeadlineTime ?? false)
+        let endDateFormatter = DateFormatter()
+        endDateFormatter.dateFormat = "d"
+    
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var endDay = ""
+        let day = endDateFormatter.string(from: endDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            endDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        endDateFormatter.dateFormat = "EEEE, MMM"
+        value += "\(endDateFormatter.string(from: endDate)) \(endDay)"
+        
+        if !allDay {
+            endDateFormatter.dateFormat = "h:mm a"
+            value += " \(endDateFormatter.string(from: endDate))"
+        }
+        
+    }
+    
+    return value
 }
 
 func timestampOfChatLogMessage(_ date: Date) -> String {

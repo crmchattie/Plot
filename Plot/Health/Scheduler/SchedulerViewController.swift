@@ -384,7 +384,7 @@ class SchedulerViewController: FormViewController {
         if let lengthRow : TextRow = form.rowBy(tag: lengthRowTag), let startRow : DateTimeInlineRow = form.rowBy(tag: startRowTag), let startValue = startRow.value, let endRow : DateTimeInlineRow = form.rowBy(tag: endRowTag), let endValue = endRow.value {
             var length = Calendar.current.dateComponents([.second], from: startValue, to: endValue).second ?? 0
             if length < 0 {
-                length += 60*60*24
+                length += 86400
             }
             let hour = length / 3600
             let minutes = (length % 3600) / 60

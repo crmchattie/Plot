@@ -99,7 +99,7 @@ class FinanceService {
             self?.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
                 self?.transactionRules = transactionRules
                 self?.observeTransactionsForCurrentUser {
-                    self?.removePendingTransactions()
+//                    self?.removePendingTransactions()
                     completion()
 //                    self?.grabTransactionAttributes()
                 }

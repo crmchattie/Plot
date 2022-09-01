@@ -814,7 +814,7 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
         if let balances = account.balances {
             let sortedBalances = Array(balances.keys.sorted {$0.localizedStandardCompare($1) == .orderedDescending})
             let firstBalanceDate = isodateFormatter.date(from: sortedBalances.last!)!
-            let lastBalanceDate = Date().addingTimeInterval(60*60*24)
+            let lastBalanceDate = Date().addingTimeInterval(86400)
             if date > firstBalanceDate, nextDate > firstBalanceDate, date < lastBalanceDate, nextDate < lastBalanceDate {
                 var currentBalance = 0.0
                 if let balanceDate = sortedBalances.first(where: { isodateFormatter.date(from: $0)! > date && nextDate > isodateFormatter.date(from: $0)! }) {
@@ -917,6 +917,8 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
                         continue
                     }
                 }
+            } else {
+                print("failed")
             }
         }
     }

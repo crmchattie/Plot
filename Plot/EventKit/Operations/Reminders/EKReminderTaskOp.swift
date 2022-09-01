@@ -109,18 +109,28 @@ class EKReminderTaskOp: AsyncOperation {
             } else {
                 activity.hasStartTime = false
             }
+        } else {
+            activity.startDateTime = nil
+            activity.hasStartTime = false
         }
         if let endDate = reminder.dueDateComponents?.date {
+            print(endDate)
             activity.endDateTime = NSNumber(value: endDate.timeIntervalSince1970)
             if reminder.dueDateComponents?.hour != nil {
                 activity.hasDeadlineTime = true
             } else {
                 activity.hasDeadlineTime = false
             }
+        } else {
+            activity.endDateTime = nil
+            activity.hasDeadlineTime = false
         }
+
         activity.isCompleted = reminder.isCompleted
         if let completionDate = reminder.completionDate {
             activity.completedDate = NSNumber(value: completionDate.timeIntervalSince1970)
+        } else {
+            activity.completedDate = nil
         }
         activity.admin = Auth.auth().currentUser?.uid
     }

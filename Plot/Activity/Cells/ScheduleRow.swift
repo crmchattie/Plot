@@ -93,14 +93,15 @@ final class ScheduleCell: Cell<Activity>, CellType {
         textLabel?.text = nil
 
         guard let schedule = row.value else { return }
-                
+
+        nameLabel.text = schedule.name
+
         if let startDate = schedule.startDate, let endDate = schedule.endDate, let allDay = schedule.allDay {
             let startTimeZone = schedule.startTimeZone ?? "UTC"
             let endTimeZone = schedule.endTimeZone ?? "UTC"
             formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
         }
         // set the texts to the labels
-        nameLabel.text = schedule.name
         dateTimeLabel.text = formattedDate.0 + formattedDate.1
         if schedule.locationName != "locationName" {
             locationNameLabel.text = schedule.locationName

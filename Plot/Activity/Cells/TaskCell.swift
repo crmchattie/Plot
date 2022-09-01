@@ -52,12 +52,13 @@ class TaskCell: UITableViewCell {
     }()
     
     //date/time of activity
-    let startLabel: UILabel = {
+    let endLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 1
         label.sizeToFit()
         label.textAlignment = .left
         return label
@@ -138,7 +139,7 @@ class TaskCell: UITableViewCell {
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
-        activityImageView.addSubview(startLabel)
+        activityImageView.addSubview(endLabel)
         activityImageView.addSubview(activityTypeLabel)
         activityImageView.addSubview(badgeLabel)
         activityImageView.addSubview(activityTypeButton)
@@ -166,11 +167,11 @@ class TaskCell: UITableViewCell {
         nameLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         
-        startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
-        startLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
-        startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        endLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
+        endLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
+        endLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
 //
-        activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
+        activityTypeLabel.topAnchor.constraint(equalTo: endLabel.bottomAnchor, constant: 2).isActive = true
         activityTypeLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
         activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
         activityTypeLabel.bottomAnchor.constraint(equalTo: activityImageView.bottomAnchor, constant: -10).isActive = true
@@ -202,7 +203,7 @@ class TaskCell: UITableViewCell {
         super.prepareForReuse()
         contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         nameLabel.text = nil
-        startLabel.text = nil
+        endLabel.text = nil
         activityTypeLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true

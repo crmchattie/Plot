@@ -103,6 +103,9 @@ class EKCalendarEventOp: AsyncOperation {
             let longitude = coordinates.longitude
             activity.locationName = location.removeCharacters()
             activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
+        } else {
+            activity.locationName = nil
+            activity.locationAddress = nil
         }
         activity.category = ActivityCategory.categorize(activity).rawValue
         activity.activityType = CustomType.iOSCalendarEvent.categoryText

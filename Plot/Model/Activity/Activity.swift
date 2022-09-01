@@ -266,6 +266,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.activityType as AnyObject? {
             dictionary["activityType"] = value
+        } else {
+            dictionary["activityType"] = NSNull()
         }
         
         if let value = self.category as AnyObject? {
@@ -274,38 +276,56 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.activityDescription as AnyObject? {
             dictionary["activityDescription"] = value
+        } else {
+            dictionary["activityDescription"] = NSNull()
         }
         
         if let value = self.locationName as AnyObject? {
             dictionary["locationName"] = value
+        } else {
+            dictionary["locationName"] = NSNull()
         }
         
         if let value = self.locationAddress as AnyObject? {
             dictionary["locationAddress"] = value
+        } else {
+            dictionary["locationAddress"] = NSNull()
         }
         
         if let value = self.participantsIDs as AnyObject? {
             dictionary["participantsIDs"] = value
+        } else {
+            dictionary["participantsIDs"] = NSNull()
         }
         
         if let value = self.transportation as AnyObject? {
             dictionary["transportation"] = value
+        } else {
+            dictionary["transportation"] = NSNull()
         }
         
         if let value = self.activityOriginalPhotoURL as AnyObject? {
             dictionary["activityOriginalPhotoURL"] = value
+        } else {
+            dictionary["activityOriginalPhotoURL"] = NSNull()
         }
         
         if let value = self.activityThumbnailPhotoURL as AnyObject? {
             dictionary["activityThumbnailPhotoURL"] = value
+        } else {
+            dictionary["activityThumbnailPhotoURL"] = NSNull()
         }
         
         if let value = self.activityPhotos as AnyObject? {
             dictionary["activityPhotos"] = value
+        } else {
+            dictionary["activityPhotos"] = NSNull()
         }
         
         if let value = self.activityFiles as AnyObject? {
             dictionary["activityFiles"] = value
+        } else {
+            dictionary["activityFiles"] = NSNull()
         }
         
         if let value = self.allDay as AnyObject? {
@@ -314,50 +334,72 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.startDateTime as AnyObject? {
             dictionary["startDateTime"] = value
+        } else {
+            dictionary["startDateTime"] = NSNull()
         }
         
         if let value = self.startTimeZone as AnyObject? {
             dictionary["startTimeZone"] = value
+        } else {
+            dictionary["startTimeZone"] = NSNull()
         }
         
         if let value = self.endDateTime as AnyObject? {
             dictionary["endDateTime"] = value
+        } else {
+            dictionary["endDateTime"] = NSNull()
+        }
+        
+        if let value = self.endTimeZone as AnyObject? {
+            dictionary["endTimeZone"] = value
+        } else {
+            dictionary["endTimeZone"] = NSNull()
         }
         
         if let value = self.recurrences as AnyObject? {
             dictionary["recurrences"] = value
         }
-        
-        if let value = self.endTimeZone as AnyObject? {
-            dictionary["endTimeZone"] = value
-        }
-        
+                
         if let value = self.notes as AnyObject? {
             dictionary["notes"] = value
+        } else {
+            dictionary["notes"] = NSNull()
         }
         
         if let value = self.conversationID as AnyObject? {
             dictionary["conversationID"] = value
+        } else {
+            dictionary["conversationID"] = NSNull()
         }
         
         if let value = self.grocerylistID as AnyObject? {
             dictionary["grocerylistID"] = value
+        } else {
+            dictionary["grocerylistID"] = NSNull()
         }
         
         if let value = self.checklistIDs as AnyObject? {
             dictionary["checklistIDs"] = value
+        } else {
+            dictionary["checklistIDs"] = NSNull()
         }
         
         if let value = self.activitylistIDs as AnyObject? {
             dictionary["activitylistIDs"] = value
+        } else {
+            dictionary["activitylistIDs"] = NSNull()
         }
         
         if let value = self.packinglistIDs as AnyObject? {
             dictionary["packinglistIDs"] = value
+        } else {
+            dictionary["packinglistIDs"] = NSNull()
         }
         
         if let value = self.containerID as AnyObject? {
             dictionary["containerID"] = value
+        } else {
+            dictionary["containerID"] = NSNull()
         }
         
         if let value = self.showExtras as AnyObject? {
@@ -370,6 +412,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.completedDate as AnyObject? {
             dictionary["completedDate"] = value
+        } else {
+            dictionary["completedDate"] = NSNull()
         }
         
         if let value = self.userIsCompleted as AnyObject? {
@@ -378,6 +422,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.userCompletedDate as AnyObject? {
             dictionary["userCompletedDate"] = value
+        } else {
+            dictionary["userCompletedDate"] = NSNull()
         }
         
         if let value = self.isTask as AnyObject? {
@@ -394,6 +440,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.scheduleIDs as AnyObject? {
             dictionary["scheduleIDs"] = value
+        } else {
+            dictionary["scheduleIDs"] = NSNull()
         }
         
         if let value = self.listID as AnyObject? {
@@ -414,6 +462,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.subtaskIDs as AnyObject? {
             dictionary["subtaskIDs"] = value
+        } else {
+            dictionary["subtaskIDs"] = NSNull()
         }
         
         if let value = self.isSubtask as AnyObject? {
@@ -434,6 +484,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.tags as AnyObject? {
             dictionary["tags"] = value
+        } else {
+            dictionary["tags"] = NSNull()
         }
         
         if let value = self.priority as AnyObject? {

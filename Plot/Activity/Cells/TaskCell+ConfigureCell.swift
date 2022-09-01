@@ -12,80 +12,6 @@ import SDWebImage
 
 extension TaskCell {
     
-    func dateTimeValue(forTask task: Activity) -> (Int, String) {
-        var value = ""
-        var numberOfLines = 1
-        if let startDate = task.startDate, let endDate = task.endDate {
-            let allDay = task.allDay ?? false
-            let startDateFormatter = DateFormatter()
-            let endDateFormatter = DateFormatter()
-            startDateFormatter.dateFormat = "d"
-            endDateFormatter.dateFormat = "d"
-            if let startTimeZone = task.startTimeZone {
-                startDateFormatter.timeZone = TimeZone(identifier: startTimeZone)
-            } else {
-                startDateFormatter.timeZone = TimeZone(identifier: "UTC")
-            }
-            if let endTimeZone = task.endTimeZone {
-                endDateFormatter.timeZone = TimeZone(identifier: endTimeZone)
-            } else {
-                endDateFormatter.timeZone = TimeZone(identifier: "UTC")
-            }
-        
-            let numberFormatter = NumberFormatter()
-            numberFormatter.numberStyle = .ordinal
-            
-            var startDay = ""
-            var day = startDateFormatter.string(from: startDate)
-            if let integer = Int(day) {
-                let number = NSNumber(value: integer)
-                startDay = numberFormatter.string(from: number) ?? ""
-            }
-            
-            var endDay = ""
-            day = endDateFormatter.string(from: endDate)
-            if let integer = Int(day) {
-                let number = NSNumber(value: integer)
-                endDay = numberFormatter.string(from: number) ?? ""
-            }
-            
-            startDateFormatter.dateFormat = "EEEE, MMM"
-            value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
-            
-            if allDay {
-                value += " All Day"
-            } else {
-                startDateFormatter.dateFormat = "h:mm a"
-                value += " \(startDateFormatter.string(from: startDate))"
-            }
-            
-            if endDate.timeIntervalSince(startDate) > 86399 {
-                value += "\n"
-                numberOfLines = 2
-                
-                endDateFormatter.dateFormat = "EEEE, MMM"
-                value += "\(endDateFormatter.string(from: endDate)) \(endDay) "
-                
-                if allDay {
-                    value += "All Day"
-                }
-            }
-
-            if !allDay {
-                if numberOfLines == 1 {
-                    value += "\n"
-                    numberOfLines = 2
-                }
-                
-                endDateFormatter.dateFormat = "h:mm a"
-                value += "\(endDateFormatter.string(from: endDate))"
-                
-            }
-        }
-        
-        return (numberOfLines, value)
-    }
-    
     func configureCell(for indexPath: IndexPath, task: Activity) {
         self.task = task
                 
@@ -95,9 +21,8 @@ extension TaskCell {
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
-        let dateTimeValueArray = dateTimeValue(forTask: task)
-        startLabel.numberOfLines = dateTimeValueArray.0
-        startLabel.text = dateTimeValueArray.1
+        let dateTimeValue = dateTimeValue(forTask: task)
+        endLabel.text = dateTimeValue
         
         if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)

@@ -250,10 +250,6 @@ class EventViewController: FormViewController {
             cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
         }).onChange() { [unowned self] row in
             self.activity.activityDescription = row.value
-            if row.value == nil && self.active {
-                let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("activityDescription")
-                reference.removeValue()
-            }
         }
         
         <<< ButtonRow("Location") { row in
@@ -824,10 +820,6 @@ class EventViewController: FormViewController {
         //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
         //                }).onChange() { [unowned self] row in
         //                    self.activity.notes = row.value
-        //                    if row.value == nil && self.active {
-        //                        let reference = Database.database().reference().child(activitiesEntity).child(self.activityID).child(messageMetaDataFirebaseFolder).child("notes")
-        //                        reference.removeValue()
-        //                    }
         //                }
         
         if delegate == nil {
