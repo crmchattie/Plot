@@ -111,15 +111,15 @@ class GCalendarEventOp: AsyncOperation {
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
-            activity.startTimeZone = event.start?.timeZone ?? TimeZone.current.identifier
+            activity.startTimeZone = event.start?.timeZone
             activity.endDateTime = NSNumber(value: end.date.addingTimeInterval(-86400).timeIntervalSince1970)
-            activity.endTimeZone = event.end?.timeZone ?? TimeZone.current.identifier
+            activity.endTimeZone = event.end?.timeZone
         } else if let start = event.start?.dateTime, let end = event.end?.dateTime {
             activity.allDay = false
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)
-            activity.startTimeZone = event.start?.timeZone ?? TimeZone.current.identifier
+            activity.startTimeZone = event.start?.timeZone
             activity.endDateTime = NSNumber(value: end.date.timeIntervalSince1970)
-            activity.endTimeZone = event.end?.timeZone ?? TimeZone.current.identifier
+            activity.endTimeZone = event.end?.timeZone
         }
         if let location = event.location {
             lookupLocation(for: location) { coordinates in

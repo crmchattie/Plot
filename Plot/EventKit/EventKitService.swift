@@ -81,7 +81,13 @@ class EventKitService {
         // Fetch all events that match the predicate.
         var events: [EKEvent] = []
         if let aPredicate = predicate {
-            events = eventStore.events(matching: aPredicate)
+            let unfilteredEvents = eventStore.events(matching: aPredicate)
+            //remove redunction events due to recurrences
+            for event in unfilteredEvents {
+                if !events.contains(where: {$0.calendarItemIdentifier == event.calendarItemIdentifier} ) {
+                    events.append(event)
+                }
+            }
         }
         
         return events
@@ -256,7 +262,14 @@ class EventKitService {
         let predicate: NSPredicate? = eventStore.predicateForReminders(in: nil)
         if let aPredicate = predicate {
             eventStore.fetchReminders(matching: aPredicate, completion: {(_ reminders: [Any]?) -> Void in
-                completion(reminders as? [EKReminder] ?? [])
+                var filteredReminders = [EKReminder]()
+                //remove redunction reminders due to recurrences
+                for reminder in reminders as? [EKReminder] ?? [] {
+                    if !filteredReminders.contains(where: {$0.calendarItemIdentifier == reminder.calendarItemIdentifier} ) {
+                        filteredReminders.append(reminder)
+                    }
+                }
+                completion(filteredReminders)
             })
         }
     }

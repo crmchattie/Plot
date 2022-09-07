@@ -350,7 +350,9 @@ class EventViewController: FormViewController {
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
             if self.active {
-                $0.dateFormatter?.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
+                if let timeZone = activity.startTimeZone {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
+                }
                 $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
                 if self.activity.allDay == true {
                     $0.dateFormatter?.timeStyle = .none
@@ -405,10 +407,6 @@ class EventViewController: FormViewController {
                 }
                 if let startTimeZone = self?.activity.startTimeZone {
                     cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
-                } else if self!.active {
-                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                } else {
-                    cell.datePicker.timeZone = .current
                 }
             }
             cell.detailTextLabel?.textColor = cell.tintColor
@@ -435,11 +433,8 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
             row.hidden = true
-            if active {
-                row.value = activity.startTimeZone ?? "UTC"
-            } else {
-                row.value = TimeZone.current.identifier
-                activity.startTimeZone = TimeZone.current.identifier
+            if active, let timeZone = activity.startTimeZone {
+                row.value = timeZone
             }
         }.onCellSelection({ _,_ in
             self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
@@ -458,7 +453,9 @@ class EventViewController: FormViewController {
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
             if self.active {
-                $0.dateFormatter?.timeZone = TimeZone(identifier: activity.endTimeZone ?? "UTC")
+                if let timeZone = activity.endTimeZone {
+                    $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
+                }
                 $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
                 if self.activity.allDay == true {
                     $0.dateFormatter?.timeStyle = .none
@@ -500,8 +497,6 @@ class EventViewController: FormViewController {
                 row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                 if let endTimeZone = self?.activity.endTimeZone {
                     cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
-                } else if self!.active {
-                    cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 } else {
                     cell.datePicker.timeZone = .current
                 }
@@ -541,12 +536,14 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
             row.hidden = true
-            if active {
-                row.value = activity.endTimeZone ?? "UTC"
-            } else {
-                row.value = TimeZone.current.identifier
-                activity.endTimeZone = TimeZone.current.identifier
+            
+            if active, let timeZone = activity.endTimeZone {
+                row.value = timeZone
             }
+//            else {
+//                row.value = TimeZone.current.identifier
+//                activity.endTimeZone = TimeZone.current.identifier
+//            }
         }.onCellSelection({ _,_ in
             self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
         }).cellUpdate { cell, row in
@@ -787,6 +784,7 @@ class EventViewController: FormViewController {
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.accessoryType = .disclosureIndicator
             row.cell.textLabel?.textAlignment = .left
+            row.cell.selectionStyle = .default
             row.hidden = "$showExtras == false"
             row.title = row.tag
         }.onCellSelection({ _, row in

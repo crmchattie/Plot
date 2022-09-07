@@ -255,6 +255,7 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         self.updatingEvents = false
         scrollToFirstActivityWithDate({ (events) in
             if self.sortedEvents != events {
+                print("self.sortedEvents != events")
                 self.sortedEvents = events
                 if !events.isEmpty {
                     if self.activitiesSections.firstIndex(of: .calendar) == nil {

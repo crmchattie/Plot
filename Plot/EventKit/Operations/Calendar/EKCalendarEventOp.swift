@@ -116,6 +116,7 @@ class EKCalendarEventOp: AsyncOperation {
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
         activity.admin = Auth.auth().currentUser?.uid
+        
     }
     
     private func deleteActivity() {

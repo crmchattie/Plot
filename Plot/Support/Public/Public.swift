@@ -276,7 +276,9 @@ extension Date {
     func getShortDateStringForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
+        if let timeZone = timeZone {
+            dateFormatter.timeZone = TimeZone(identifier: timeZone)
+        }
         dateFormatter.locale = locale
         dateFormatter.dateStyle = .medium
         dateFormatter.dateFormat = "MM/dd/yy"
@@ -286,7 +288,9 @@ extension Date {
     func getTimeStringForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
+        if let timeZone = timeZone {
+            dateFormatter.timeZone = TimeZone(identifier: timeZone)
+        }
         dateFormatter.locale = locale
         dateFormatter.dateStyle = .medium
         dateFormatter.dateFormat = "hh:mm a"
@@ -298,7 +302,9 @@ extension Date {
     func dayOfWeekForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
+        if let timeZone = timeZone {
+            dateFormatter.timeZone = TimeZone(identifier: timeZone)
+        }
         dateFormatter.locale = locale
         dateFormatter.dateFormat = "E"
         return dateFormatter.string(from: self).capitalized
@@ -307,7 +313,9 @@ extension Date {
     func dayOfWeekWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(identifier: timeZone ?? "UTC")
+        if let timeZone = timeZone {
+            dateFormatter.timeZone = TimeZone(identifier: timeZone)
+        }
         dateFormatter.locale = locale
         dateFormatter.dateFormat = "E"
         return dateFormatter.string(from: self).capitalized
@@ -493,7 +501,7 @@ func timestampOfLastMessage(_ date: Date) -> String {
     
 }
 
-func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZone: String, endTimeZone: String) -> (String, String) {
+func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZone: String?, endTimeZone: String?) -> (String, String) {
     var startString: String
     var endString: String
     let calendar = NSCalendar.current
@@ -502,12 +510,15 @@ func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZon
     let startEarliest = now < startDate ? now : startDate
     let startLatest = (startEarliest == now) ? startDate : now
     var startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
-    startComponents.timeZone = TimeZone(identifier: startTimeZone)
+    if let startTimeZone = startTimeZone {
+        startComponents.timeZone = TimeZone(identifier: startTimeZone)
+    }
     let endEarliest = now < endDate ? now : endDate
     let endLatest = (endDate == now) ? endDate : now
     var endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
-    endComponents.timeZone = TimeZone(identifier: endTimeZone)
-    
+    if let endTimeZone = endTimeZone {
+        endComponents.timeZone = TimeZone(identifier: endTimeZone)
+    }
     if now.getShortDateStringForActivityWTZ(timeZone: startTimeZone) != startDate.getShortDateStringForActivityWTZ(timeZone: startTimeZone) {  // not today
         if startComponents.weekOfYear! >= 1 || startComponents.weekOfYear! <= -1 { // start date is next week
             if allDay {
@@ -594,14 +605,9 @@ func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZon
 func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, hasStartTime: Bool?) -> (String, String) {
     var startString: String
     var endString: String
-    let calendar = NSCalendar.current
-    let unitFlags: Set<Calendar.Component> = [ .day, .weekOfYear, .weekday]
     let now = Date()
-    let endEarliest = now < endDate ? now : endDate
-    let endLatest = (endDate == now) ? endDate : now
     if let startDate = startDate {
         let startEarliest = now < startDate ? now : startDate
-        let startLatest = (startEarliest == now) ? startDate : now
         if let hasStartTime = hasStartTime, hasStartTime, hasDeadlineTime {
             if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
                 //start date is next week
@@ -672,13 +678,9 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
         endDateFormatter.dateFormat = "d"
         if let startTimeZone = activity.startTimeZone {
             startDateFormatter.timeZone = TimeZone(identifier: startTimeZone)
-        } else {
-            startDateFormatter.timeZone = TimeZone(identifier: "UTC")
         }
         if let endTimeZone = activity.endTimeZone {
             endDateFormatter.timeZone = TimeZone(identifier: endTimeZone)
-        } else {
-            endDateFormatter.timeZone = TimeZone(identifier: "UTC")
         }
     
         let numberFormatter = NumberFormatter()
@@ -708,7 +710,7 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
             value += " \(startDateFormatter.string(from: startDate))"
         }
         
-        if endDate.timeIntervalSince(startDate) > 86399 {
+        if startDate.getShortDateStringForActivityWTZ(timeZone: activity.startTimeZone) != endDate.getShortDateStringForActivityWTZ(timeZone: activity.endTimeZone) {
             value += "\n"
             numberOfLines = 2
             

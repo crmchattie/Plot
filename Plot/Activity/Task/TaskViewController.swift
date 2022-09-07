@@ -1004,6 +1004,7 @@ class TaskViewController: FormViewController {
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.accessoryType = .disclosureIndicator
             row.cell.textLabel?.textAlignment = .left
+            row.cell.selectionStyle = .default
             row.hidden = "$showExtras == false"
             row.title = row.tag
         }.onCellSelection({ _, row in
