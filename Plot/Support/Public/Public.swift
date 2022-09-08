@@ -1971,7 +1971,7 @@ extension TimeInterval {
         if minutes > 0 {
             time += "\(minutes)m "
         }
-        if seconds > 0 {
+        if seconds > 0 && minutes == 0 && hours == 0 {
             time += "\(seconds)s"
         }
         

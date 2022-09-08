@@ -269,40 +269,9 @@ extension SubtaskListViewController: UpdateTaskCellDelegate {
 }
 
 extension SubtaskListViewController: ChooseTaskDelegate {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        let group = DispatchGroup()
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            completion(participants)
-        }
-    }
-    
     func chosenTask(mergeTask: Activity) {
         if let _ = mergeTask.name, let currentUserID = Auth.auth().currentUser?.uid {
-            self.getParticipants(forActivity: mergeTask) { (participants) in
+            ParticipantsFetcher.getParticipants(forActivity: mergeTask) { (participants) in
                 let deleteActivity = ActivityActions(activity: mergeTask, active: true, selectedFalconUsers: participants)
                 deleteActivity.deleteActivity()
             }

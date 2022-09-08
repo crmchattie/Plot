@@ -16,7 +16,6 @@ class TaskCell: UITableViewCell {
     
     var participants: [User] = []
     let thumbnailsCount = 8
-    weak var activityDataStore: ActivityDataStore?
     var thumbnails: [UIImageView] = []
     var task: Activity?
     

@@ -140,13 +140,13 @@ class ActivitiesFetcher: NSObject {
         currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.activitiesRemoved {
                 userActivities[snapshot.key] = nil
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
         currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.activitiesChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { activityList in
+                ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key) { activityList in
                     for activity in activityList {
                         userActivities[activity.activityID ?? ""] = activity
                     }
@@ -156,7 +156,7 @@ class ActivitiesFetcher: NSObject {
         })
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([Activity])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([Activity])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

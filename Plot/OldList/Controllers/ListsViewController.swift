@@ -10,11 +10,7 @@ import UIKit
 import Firebase
 import GoogleSignIn
 
-protocol ListDataStore: AnyObject {
-    func getParticipants(forList list: ListType, completion: @escaping ([User])->())
-}
-
-class ListsViewController: UIViewController, ActivityDetailShowing {
+class ListsViewController: UIViewController, ObjectDetailShowing {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -292,6 +288,14 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
         setupSearchController()
     }
     
+    func showActivityIndicator() {
+        
+    }
+    
+    func hideActivityIndicator() {
+        
+    }
+    
 }
 
 extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
@@ -349,7 +353,6 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         } else if !filteredTasks.isEmpty {
             let task = filteredTasks[indexPath.row]
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-            cell.activityDataStore = self
             if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                 task.listColor = color
             }
@@ -378,99 +381,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableView.automaticDimension
         }
     }
-}
 
-extension ListsViewController: ActivityDataStore {
-    func showActivityIndicator() {
-        if let tabController = self.tabBarController {
-            self.showSpinner(onView: tabController.view)
-        }
-        self.navigationController?.view.isUserInteractionEnabled = false
-    }
-    
-    func hideActivityIndicator() {
-        self.navigationController?.view.isUserInteractionEnabled = true
-        self.removeSpinner()
-    }
-    
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.participants[activityID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.participants[activityID] = participants
-            completion(participants)
-        }
-    }
-}
-
-extension ListsViewController: ListDataStore {
-    func getParticipants(forList list: ListType, completion: @escaping ([User])->()) {
-        guard let id = list.id, let participantsIDs = list.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.participants[id]
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if list.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.participants[id] = participants
-            completion(participants)
-        }
-    }
 }
 
 extension ListsViewController: UpdateFilter {

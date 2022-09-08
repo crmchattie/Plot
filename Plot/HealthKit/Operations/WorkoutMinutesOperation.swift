@@ -23,33 +23,33 @@ class WorkoutMinutesOperation: AsyncOperation {
     
     private func startFetchRequest() {
         HealthKitService.getAllWorkouts(startDate: startDate.lastYear, endDate: startDate) { [weak self] workouts, errorList  in
-            guard let workouts = workouts, let errorList = errorList, errorList.isEmpty, let _self = self else {
+            guard let workouts = workouts, !workouts.isEmpty, let errorList = errorList, errorList.isEmpty, let _self = self else {
                 self?.finish()
                 return
             }
             
-            if
-                // Most recent workout
-                let workout = workouts.last {
-                let workoutTotalMinutes = workout.endDate.timeIntervalSince(workout.startDate)
-                                    
-                var metricMinutes = HealthMetric(type: HealthMetricType.workoutMinutes, total: workoutTotalMinutes, date: workout.endDate, unitName: "hrs", rank: -1)
-                metricMinutes.hkSample = workout
-                
-                var averageWorkoutTime: Double = 0
-                
-                workouts.forEach { workout in                    
-                    let interval = workout.endDate.timeIntervalSince(workout.startDate)
-                    averageWorkoutTime += interval
+            var workout: HKWorkout = workouts.last!
+                            
+            var averageWorkoutTime: Double = 0
+            
+            workouts.forEach { currentWorkout in
+                let interval = currentWorkout.endDate.timeIntervalSince(currentWorkout.startDate)
+                averageWorkoutTime += interval
+                if currentWorkout.startDate > workout.startDate {
+                    workout = currentWorkout
                 }
-                                    
-                if averageWorkoutTime != 0 {
-                    averageWorkoutTime /= Double(workouts.count)
-                    metricMinutes.average = averageWorkoutTime
-                }
-
-                _self.delegate?.insertMetric(_self, metricMinutes, HealthMetricCategory.workouts.rawValue)
             }
+            
+            var metricMinutes = HealthMetric(type: HealthMetricType.workoutMinutes, total: workout.endDate.timeIntervalSince(workout.startDate), date: workout.endDate, unitName: "hrs", rank: -1)
+            metricMinutes.hkSample = workout
+                                
+            if averageWorkoutTime != 0 {
+                averageWorkoutTime /= Double(workouts.count)
+                metricMinutes.average = averageWorkoutTime
+            }
+
+            _self.delegate?.insertMetric(_self, metricMinutes, HealthMetricCategory.workouts.rawValue)
+            
             self?.finish()
         }
     }

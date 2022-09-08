@@ -11,7 +11,7 @@ import Firebase
 
 let kShowCompletedTasks = "showCompletedTasks"
 
-class ListViewController: UIViewController, ActivityDetailShowing {
+class ListViewController: UIViewController, ObjectDetailShowing {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -258,10 +258,13 @@ class ListViewController: UIViewController, ActivityDetailShowing {
     @objc fileprivate func listInfo() {
         let destination = ListDetailViewController(networkController: self.networkController)
         destination.list = list
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-        destination.navigationItem.leftBarButtonItem = cancelBarButton
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        ParticipantsFetcher.getParticipants(forList: list) { (participants) in
+            destination.selectedFalconUsers = participants
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
     }
     
     @objc fileprivate func filter() {
@@ -288,6 +291,14 @@ class ListViewController: UIViewController, ActivityDetailShowing {
         } else {
             return true
         }
+    }
+    
+    func showActivityIndicator() {
+        
+    }
+    
+    func hideActivityIndicator() {
+        
     }
 }
 
@@ -338,7 +349,6 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if filteredTasks.indices.contains(indexPath.row) {
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-            cell.activityDataStore = self
             let task = filteredTasks[indexPath.row]
             if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                 task.listColor = color
@@ -357,59 +367,6 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
             showTaskDetail(task: task)
         } else {
             newItem()
-        }
-    }
-}
-
-extension ListViewController: ActivityDataStore {
-    func showActivityIndicator() {
-        if let tabController = self.tabBarController {
-            self.showSpinner(onView: tabController.view)
-        }
-        self.navigationController?.view.isUserInteractionEnabled = false
-    }
-    
-    func hideActivityIndicator() {
-        self.navigationController?.view.isUserInteractionEnabled = true
-        self.removeSpinner()
-    }
-    
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.participants[activityID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.participants[activityID] = participants
-            completion(participants)
         }
     }
 }

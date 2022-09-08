@@ -71,8 +71,8 @@ extension EventCell {
     }
     
     func loadParticipantsThumbnail(activity: Activity) {
-        self.activityDataStore?.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
-            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+        ParticipantsFetcher.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
+            ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                 self?.updateParticipantsThumbnail(activity: activity, acceptedParticipants: acceptedParticipant)
                 for i in 0..<acceptedParticipant.count {
                     let user = acceptedParticipant[i]

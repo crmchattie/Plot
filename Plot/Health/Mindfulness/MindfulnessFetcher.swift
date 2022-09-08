@@ -114,7 +114,7 @@ class MindfulnessFetcher: NSObject {
         
         currentUserMindfulnessChangeHandle = userMindfulnessDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.mindfulnessChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { mindfulnessList in
+                MindfulnessFetcher.getDataFromSnapshot(ID: snapshot.key) { mindfulnessList in
                     for mindfulness in mindfulnessList {
                         userMindfulnesses[mindfulness.id] = mindfulness
                     }
@@ -126,13 +126,13 @@ class MindfulnessFetcher: NSObject {
         currentUserMindfulnessRemoveHandle = userMindfulnessDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.mindfulnessRemoved {
                 userMindfulnesses[snapshot.key] = nil
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                MindfulnessFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([Mindfulness])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([Mindfulness])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

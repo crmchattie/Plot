@@ -170,40 +170,6 @@ class InvitationsFetcher: NSObject {
         })
     }
     
-    class func getAcceptedParticipant(forActivity activity: Activity, allParticipants participants: [User], completion: @escaping ([User])->Void) {
-        if participants.count > 0 {
-            let dispatchGroup = DispatchGroup()
-            var acceptedParticipant: [User] = []
-            for user in participants {
-                dispatchGroup.enter()
-                guard let userID = user.id else {
-                    dispatchGroup.leave()
-                    continue
-                }
-                
-                // If user is admin of the activity it won't have an invitation
-                // It should be considered as accepted
-                if userID == activity.admin {
-                    acceptedParticipant.append(user)
-                    dispatchGroup.leave()
-                    continue
-                }
-                
-                InvitationsFetcher.activityInvitation(forUser: userID, activityID: activity.activityID!) { (invitation) in
-                    if let invitation = invitation, invitation.status == .accepted {
-                        acceptedParticipant.append(user)
-                    }
-                    dispatchGroup.leave()
-                }
-            }
-            dispatchGroup.notify(queue: .main) {
-                completion(acceptedParticipant)
-            }
-        } else {
-            completion([])
-        }
-    }
-    
     class func updateInvitations(forActivity activity: Activity, selectedParticipants: [User], completion: @escaping ()->()) {
         updateInvitations(forActivity: activity, selectedParticipants: selectedParticipants, defaultStatus: nil, completion: completion)
     }

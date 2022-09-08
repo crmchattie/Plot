@@ -271,10 +271,19 @@ extension HealthService {
             return
         }
         //this code is inefficient
-        userHealthDatabaseRef = Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey)
-        userHealthDatabaseRef.observeSingleEvent(of: .value) { dataSnapshot in
+        userHealthDatabaseRef = Database.database().reference().child(userHealthEntity).child(currentUserID)
+        userHealthDatabaseRef.child(healthkitWorkoutsKey).observeSingleEvent(of: .value) { dataSnapshot in
             if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
-                self.userHealthDatabaseRef.observe(.childAdded, with: { snapshot in
+                self.userHealthDatabaseRef.child(healthkitWorkoutsKey).observe(.childAdded, with: { snapshot in
+                    if dataSnapshotValue[snapshot.key] == nil {
+                        self.grabHealth {}
+                    }
+                })
+            }
+        }
+        userHealthDatabaseRef.child(healthkitMindfulnessKey).observeSingleEvent(of: .value) { dataSnapshot in
+            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
+                self.userHealthDatabaseRef.child(healthkitMindfulnessKey).observe(.childAdded, with: { snapshot in
                     if dataSnapshotValue[snapshot.key] == nil {
                         self.grabHealth {}
                     }

@@ -97,13 +97,13 @@ class FinancialMemberFetcher: NSObject {
         
         currentUserMembersChangeHandle = userMembersDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.membersChanged {
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                FinancialMemberFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
 
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([MXMember])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([MXMember])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

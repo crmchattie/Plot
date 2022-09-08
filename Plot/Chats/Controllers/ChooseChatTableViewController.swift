@@ -365,7 +365,6 @@ class ChooseChatTableViewController: UITableViewController {
         
         cell.delegate = self
         
-        cell.chatsViewControllerDataStore = self
         cell.configureCell(for: indexPath, conversations: filteredConversations)
         return cell
         
@@ -409,45 +408,6 @@ class ChooseChatTableViewController: UITableViewController {
                 self.removeMessageAlert()
                 self.dismiss(animated: true, completion: nil)
             })
-        }
-    }
-}
-
-extension ChooseChatTableViewController: ChatsViewControllerDataStore {
-    func getParticipants(forConversation conversation: Conversation, completion: @escaping ([User])->()) {
-        guard let chatID = conversation.chatID, let participantsIDs = conversation.chatParticipantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.chatParticipants[chatID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            if id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.chatParticipants[chatID] = participants
-            completion(participants)
         }
     }
 }

@@ -73,26 +73,6 @@ extension UserCell {
     }
     
     func loadParticipantsThumbnail(conversation: Conversation) {
-        self.chatsViewControllerDataStore?.getParticipants(forConversation: conversation, completion: { [weak self] (users) in
-            for i in 0..<users.count {
-                let user = users[i]
-                
-                if i > 8 {
-                    return
-                }
-                
-                guard let icon = self?.thumbnails[i], let url = user.thumbnailPhotoURL else {
-                    continue
-                }
-            
-                
-                icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in
-                    guard image != nil else { return }
-                    guard cacheType != SDImageCacheType.memory, cacheType != SDImageCacheType.disk else {
-                        return
-                    }
-                })
-            }
-        })
+        
     }
 }

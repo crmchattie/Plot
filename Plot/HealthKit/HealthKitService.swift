@@ -435,6 +435,14 @@ class HealthKitService {
         healthStore.save(samples, withCompletion: completion)
     }
     
+    class func deleteSample(sample: HKSample, completion: @escaping (Bool, Error?) -> Void) {
+        healthStore.delete(sample, withCompletion: completion)
+    }
+    
+    class func deleteSamples(samples: [HKSample], completion: @escaping (Bool, Error?) -> Void) {
+        healthStore.delete(samples, withCompletion: completion)
+    }
+    
     class func grabSpecificWorkoutSample(uuid: UUID, completion: @escaping ([HKWorkout]?, Error?) -> Void) {
         
         let predicate = HKQuery.predicateForObject(with: uuid)

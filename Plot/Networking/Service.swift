@@ -1107,7 +1107,7 @@ class Service {
         
     }
     
-    func triggerUpdateMXUser(completion: @escaping ((String?), Error?) -> ()) {
+    func triggerUpdateMXUser(completion: @escaping (([String: String]?), Error?) -> ()) {
         let baseURL: URL = {
             return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/triggerUpdateMXUser")!
         }()
@@ -1131,7 +1131,7 @@ class Service {
         }
     }
     
-    func deleteMXMember(current_member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
+    func deleteMXMember(current_member_guid: String, completion: @escaping (([String: String]?), Error?) -> ()) {
         let baseURL: URL = {
             return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/deleteMXMember")!
         }()

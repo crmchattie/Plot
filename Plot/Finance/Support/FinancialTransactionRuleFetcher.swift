@@ -68,26 +68,26 @@ class FinancialTransactionRuleFetcher: NSObject {
         currentUserTransactionRulesAddHandle = userTransactionRulesDatabaseRef.observe(.childAdded, with: { snapshot in
             if !self.IDs.contains(snapshot.key) {
                 if let completion = self.transactionRulesAdded {
-                    self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                    FinancialTransactionRuleFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
                 }
             }
         })
         
         currentUserTransactionRulesChangeHandle = userTransactionRulesDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.transactionRulesChanged {
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                FinancialTransactionRuleFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
         currentUserTransactionRulesRemoveHandle = userTransactionRulesDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.transactionRulesRemoved {
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                FinancialTransactionRuleFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([TransactionRule])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([TransactionRule])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

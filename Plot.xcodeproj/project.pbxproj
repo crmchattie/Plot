@@ -103,6 +103,7 @@
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
 		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
 		105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */; };
+		10623B9428CA2CF800E05AF0 /* ParticipantsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */; };
 		106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */; };
 		106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D4258C10FE00D02658 /* ChartValueFormatter.swift */; };
 		106431D9258C15B900D02658 /* SummaryTimeBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */; };
@@ -680,6 +681,7 @@
 		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailCell.swift; sourceTree = "<group>"; };
 		105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailCell.swift; sourceTree = "<group>"; };
+		10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantsFetcher.swift; sourceTree = "<group>"; };
 		106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHorizontalBarChart.swift; sourceTree = "<group>"; };
 		106431D4258C10FE00D02658 /* ChartValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartValueFormatter.swift; sourceTree = "<group>"; };
 		106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryTimeBarChartCell.swift; sourceTree = "<group>"; };
@@ -1289,7 +1291,6 @@
 				10E8E506259295260076BE42 /* HeaderContainerCell.swift */,
 				10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */,
 				1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */,
-				F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -1804,6 +1805,8 @@
 				10E93D5424BE43B600F6EE18 /* VerticalStackView.swift */,
 				F9B82C9325FAB2690072BE74 /* ReusableView.swift */,
 				F902FFC82613B55900EF5881 /* ColorHash.swift */,
+				F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */,
+				10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2044,6 +2047,7 @@
 				1082C89324F0A8C800CF6491 /* Health */,
 				1082C89224F0A8B000CF6491 /* Finance */,
 				4BAEE44D21272B380045AB10 /* Settings */,
+				26E8E3A4238B2C81000F30C8 /* Notfications */,
 				10E93D5B24BE47A600F6EE18 /* Map */,
 				10B3E50628B1462600E1713D /* Lists */,
 				100FE7042892D95700D3124C /* Calendar */,
@@ -2125,7 +2129,6 @@
 				4BAEE44E21272B380045AB10 /* AccountSettingsTableViewCell.swift */,
 				4BAEE46221272B380045AB10 /* AccountSettingsController+nameEditing.swift */,
 				4BAEE46321272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift */,
-				26E8E3A4238B2C81000F30C8 /* Notfications */,
 				4BAEE45021272B380045AB10 /* Menu */,
 			);
 			path = Settings;
@@ -3634,6 +3637,7 @@
 				10F3033024EC6FF800C04B8F /* MXAccount.swift in Sources */,
 				269105ED253E8DD700A02C5F /* BalloonMarker.swift in Sources */,
 				10E0D7BB25959C9000B0F83C /* ActivityService.swift in Sources */,
+				10623B9428CA2CF800E05AF0 /* ParticipantsFetcher.swift in Sources */,
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
 				10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */,
 				F9B82C8325FAB1670072BE74 /* AnalyticsViewController.swift in Sources */,

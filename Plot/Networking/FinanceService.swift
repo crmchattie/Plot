@@ -101,6 +101,7 @@ class FinanceService {
     
     func grabFinances(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
+            self?.triggerUpdateMXUser()
             self?.observeAccountsForCurrentUser {}
             self?.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
                 self?.transactionRules = transactionRules
@@ -111,7 +112,6 @@ class FinanceService {
                         completion()
                         self?.isRunning = false
                     }
-                    self?.hasLoadedFinancials = true
                 }
             })
             self?.observeTransactionRulesForCurrentUser {}
@@ -133,10 +133,8 @@ class FinanceService {
     }
     
     func triggerUpdateMXUser() {
-        hasLoadedFinancials = false
-        Service.shared.triggerUpdateMXUser() { [weak self] (search, err) in
+        Service.shared.triggerUpdateMXUser() { [weak self] (json, err) in
             self?.hasLoadedFinancials = true
-            print("tiggeredUpdateMXUser")
         }
     }
     

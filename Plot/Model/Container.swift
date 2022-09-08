@@ -61,7 +61,7 @@ class ContainerFunctions {
             reference.child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(ID).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.mindfulnessIDs ?? [] {
-            reference.child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(ID).child(containerIDEntity).setValue(container.id)
+            reference.child(userHealthEntity).child(currentUserId).child(healthkitMindfulnessKey).child(ID).child(containerIDEntity).setValue(container.id)
         }
     }
     

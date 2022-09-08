@@ -35,22 +35,23 @@ class EKCalendarEventOp: AsyncOperation {
                         self?.finish()
                         return
                     }
-                    self?.update(activity: activity)
-                    let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                    activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                        let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        var values: [String : Any] = ["calendarExport": true,
-                                                      "calendarID": self?.event.calendar.calendarIdentifier as Any,
-                                                      "calendarName": self?.event.calendar.title as Any,
-                                                      "calendarSource": CalendarSourceOptions.apple.name as Any,
-                                                      "externalActivityID": self?.event.calendarItemIdentifier as Any]
-                        if let CGColor = self?.event.calendar.cgColor {
-                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
-                        }
-                        userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
-                            self?.finish()
+                    self?.update(activity: activity) { activity in
+                        let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+                        activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            var values: [String : Any] = ["calendarExport": true,
+                                                          "calendarID": self?.event.calendar.calendarIdentifier as Any,
+                                                          "calendarName": self?.event.calendar.title as Any,
+                                                          "calendarSource": CalendarSourceOptions.apple.name as Any,
+                                                          "externalActivityID": self?.event.calendarItemIdentifier as Any]
+                            if let CGColor = self?.event.calendar.cgColor {
+                                values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                            }
+                            userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
+                                self?.finish()
+                            })
                         })
-                    })
+                    }
                 })
             }
             else if !snapshot.exists() {
@@ -60,25 +61,26 @@ class EKCalendarEventOp: AsyncOperation {
                 }
                 let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                 reference.updateChildValues(calendarEventActivityValue) { (_, _) in
-                    let activity = weakSelf.createActivity(for: activityID)
-                    let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                    activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                        let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        var values: [String : Any] = ["isGroupActivity": false,
-                                                      "badge": 0,
-                                                      "calendarExport": true,
-                                                      "calendarID": self?.event.calendar.calendarIdentifier as Any,
-                                                      "calendarName": self?.event.calendar.title as Any,
-                                                      "calendarSource": CalendarSourceOptions.apple.name as Any,
-                                                      "externalActivityID": self?.event.calendarItemIdentifier as Any,
-                                                      "showExtras": activity.showExtras as Any]
-                        if let CGColor = self?.event.calendar.cgColor {
-                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
-                        }
-                        userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
-                            self?.finish()
+                    weakSelf.createActivity(for: activityID) { activity in
+                        let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+                        activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            var values: [String : Any] = ["isGroupActivity": false,
+                                                          "badge": 0,
+                                                          "calendarExport": true,
+                                                          "calendarID": self?.event.calendar.calendarIdentifier as Any,
+                                                          "calendarName": self?.event.calendar.title as Any,
+                                                          "calendarSource": CalendarSourceOptions.apple.name as Any,
+                                                          "externalActivityID": self?.event.calendarItemIdentifier as Any,
+                                                          "showExtras": activity.showExtras as Any]
+                            if let CGColor = self?.event.calendar.cgColor {
+                                values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                            }
+                            userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
+                                self?.finish()
+                            })
                         })
-                    })
+                    }
                 }
             }
             else {
@@ -87,15 +89,18 @@ class EKCalendarEventOp: AsyncOperation {
         })
     }
     
-    private func createActivity(for activityID: String) -> Activity {
+    private func createActivity(for activityID: String, completion: @escaping (Activity) -> Void) {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        update(activity: activity)
-        return activity
+        update(activity: activity) { activity in
+            activity.activityType = CustomType.iOSCalendarEvent.categoryText
+            activity.category = ActivityCategory.categorize(activity).rawValue
+            completion(activity)
+        }
     }
     
-    private func update(activity: Activity) {
-        activity.name = event.title
+    private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
         activity.isEvent = true
+        activity.name = event.title
         activity.activityDescription = event.notes
         if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location {
             let coordinates = geoLocation.coordinate
@@ -107,8 +112,6 @@ class EKCalendarEventOp: AsyncOperation {
             activity.locationName = nil
             activity.locationAddress = nil
         }
-        activity.category = ActivityCategory.categorize(activity).rawValue
-        activity.activityType = CustomType.iOSCalendarEvent.categoryText
         activity.allDay = event.isAllDay
         activity.startTimeZone = event.timeZone?.identifier
         activity.endTimeZone = event.timeZone?.identifier
@@ -116,6 +119,7 @@ class EKCalendarEventOp: AsyncOperation {
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
         activity.admin = Auth.auth().currentUser?.uid
+        completion(activity)
         
     }
     

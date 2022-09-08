@@ -10,7 +10,7 @@ import UIKit
 import Combine
 import Firebase
 
-class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
+class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     
     var networkController: NetworkController { viewModel.networkController }
     
@@ -122,103 +122,8 @@ class AnalyticsDetailViewController: UIViewController, ActivityDetailShowing {
             .store(in: &cancellables)
     }
     
-    // MARK: - Actions
-    
-    private func showTranscationDetail(transaction: Transaction) {
-        let destination = FinanceTransactionViewController(networkController: self.networkController)
-        destination.transaction = transaction
-        destination.delegate = self
-        self.getParticipants(transaction: transaction, account: nil) { (participants) in
-            destination.selectedFalconUsers = participants
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-    }
-    
-    private func showAccountDetail(account: MXAccount) {
-        let destination = FinanceAccountViewController(networkController: self.networkController)
-        destination.account = account
-        destination.delegate = self
-        self.getParticipants(transaction: nil, account: account) { (participants) in
-            destination.selectedFalconUsers = participants
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-    }
-    
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
-    }
-    
-    // MARK: - Data
-    
-    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
-        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = transaction.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if transaction.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = account.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if account.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else {
-            let participants: [User] = []
-            completion(participants)
-        }
     }
 }
 

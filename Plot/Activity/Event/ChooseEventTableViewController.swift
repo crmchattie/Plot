@@ -238,7 +238,6 @@ class ChooseEventTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
-        cell.activityDataStore = self
         let event = filteredEvents[indexPath.row]
         if let calendarID = event.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
             event.calendarColor = color
@@ -308,11 +307,5 @@ extension ChooseEventTableViewController { /* hiding keyboard */
         } else {
             self.searchBar?.endEditing(true)
         }
-    }
-}
-
-extension ChooseEventTableViewController: ActivityDataStore {
-    func getParticipants(forActivity event: Activity, completion: @escaping ([User])->()) {
-        
     }
 }

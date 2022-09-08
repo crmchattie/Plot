@@ -130,7 +130,7 @@ class FinancialAccountFetcher: NSObject {
         
         currentUserAccountsChangeHandle = userAccountsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.accountsChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { accountsList in
+                FinancialAccountFetcher.getDataFromSnapshot(ID: snapshot.key) { accountsList in
                     for account in accountsList {
                         if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: account) {
                             userAccounts[account.guid] = userAccount
@@ -142,7 +142,7 @@ class FinancialAccountFetcher: NSObject {
         })
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([MXAccount])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([MXAccount])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

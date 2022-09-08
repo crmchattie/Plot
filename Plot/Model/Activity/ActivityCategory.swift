@@ -52,7 +52,7 @@ enum ActivityCategory: String, CaseIterable {
     
     // MARK: - Utility
     static func categorize(_ activity: Activity) -> ActivityCategory {
-        let text = "\(activity.name?.lowercased() ?? "") \(activity.notes?.lowercased() ?? "")"
+        let text = "\(activity.name?.lowercased() ?? "") \(activity.notes?.lowercased() ?? "") \(activity.activityDescription?.lowercased() ?? "")"
         let elements = text.split(separator: " ")
         
         for (category, keywords) in keywordsMap {

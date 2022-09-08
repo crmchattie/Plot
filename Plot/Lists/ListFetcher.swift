@@ -161,7 +161,7 @@ class ListFetcher: NSObject {
         
         currentUserListChangeHandle = userListDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.listChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { listsList in
+                ListFetcher.getDataFromSnapshot(ID: snapshot.key) { listsList in
                     for list in listsList {
                         userLists[list.id ?? ""] = list
                     }
@@ -173,13 +173,13 @@ class ListFetcher: NSObject {
         currentUserListRemoveHandle = userListDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.listRemoved {
                 userLists[snapshot.key] = nil
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                ListFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([ListType])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([ListType])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -247,7 +247,6 @@ class ListFetcher: NSObject {
             return
         }
         for list in prebuiltLists {
-            print(list.name)
             let createList = ListActions(list: list, active: false, selectedFalconUsers: [])
             createList.createNewList()
         }

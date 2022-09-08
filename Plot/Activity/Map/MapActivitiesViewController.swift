@@ -380,9 +380,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath)
          if let eventCell = cell as? EventCell {
-               eventCell.updateInvitationDelegate = calendarViewController
-               eventCell.activityDataStore = calendarViewController
-               
+               eventCell.updateInvitationDelegate = calendarViewController               
                let activity = activities[indexPath.row]
                var invitation: Invitation?
                if let activityID = activity.activityID, let value = invitations[activityID] {

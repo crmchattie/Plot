@@ -174,7 +174,10 @@ class CalendarInfoViewController: UITableViewController {
     fileprivate func calendarInfo(calendar: CalendarType) {
         let destination = CalendarDetailViewController(networkController: self.networkController)
         destination.calendar = calendar
-        navigationController?.pushViewController(destination, animated: true)
+        ParticipantsFetcher.getParticipants(forCalendar: calendar) { (participants) in
+            destination.selectedFalconUsers = participants
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
     }
         
     @objc func updatePrimaryCalendar(_ sender: TapGesture) {

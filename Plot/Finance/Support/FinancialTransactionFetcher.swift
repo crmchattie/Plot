@@ -154,7 +154,7 @@ class FinancialTransactionFetcher: NSObject {
         
         currentUserTransactionsChangeHandle = userTransactionsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.transactionsChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { transactionsList in
+                FinancialTransactionFetcher.getDataFromSnapshot(ID: snapshot.key) { transactionsList in
                     for transaction in transactionsList {
                         if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: transaction) {
                             userTransactions[transaction.guid] = userTransaction
@@ -166,7 +166,7 @@ class FinancialTransactionFetcher: NSObject {
         })
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([Transaction])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([Transaction])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

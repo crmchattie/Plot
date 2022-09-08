@@ -70,7 +70,7 @@ class HealthKitSampleBuilder {
         
         mindfulness = Mindfulness(from: hkMindfulness)
         let hkSampleID = hkMindfulness.uuid.uuidString
-        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(hkSampleID).child(containerIDEntity)
+        let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitMindfulnessKey).child(hkSampleID).child(containerIDEntity)
         healthkitWorkoutsReference.observeSingleEvent(of: .value) { snapshot in
             if snapshot.exists(), let ID = snapshot.value as? String {
                 mindfulness.containerID = ID

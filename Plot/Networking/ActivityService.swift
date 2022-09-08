@@ -235,10 +235,6 @@ class ActivityService {
                 completion()
             } else if !activitiesInitialAdd.isEmpty {
                 for activity in activitiesInitialAdd {
-//                    print(activity.name)
-//                    print(activity.activityID)
-//                    print(activity.startDate)
-//                    print(activity.endDate)
                     if activity.recurrences != nil {
                         if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
                             self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []

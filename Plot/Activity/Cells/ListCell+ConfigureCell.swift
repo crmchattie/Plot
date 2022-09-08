@@ -43,7 +43,7 @@ extension ListCell {
     }
     
     func loadParticipantsThumbnail(list: ListType) {
-        self.listDataStore?.getParticipants(forList: list, completion: { [weak self] (participants) in
+        ParticipantsFetcher.getParticipants(forList: list, completion: { [weak self] (participants) in
             for i in 0..<participants.count {
                 let user = participants[i]
                 if Auth.auth().currentUser?.uid == user.id {

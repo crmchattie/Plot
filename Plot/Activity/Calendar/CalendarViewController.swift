@@ -41,11 +41,7 @@ protocol UpdateInvitationDelegate: AnyObject {
     func updateInvitation(invitation: Invitation)
 }
 
-protocol ActivityDataStore: AnyObject {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->())
-}
-
-class CalendarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate, ActivityDetailShowing {
+class CalendarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance, UIGestureRecognizerDelegate, ObjectDetailShowing {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -651,7 +647,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             let activity = filteredPinnedActivities[indexPath.row]
             if activity.isTask ?? false {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-                cell.activityDataStore = self
                 if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     activity.listColor = color
                 }
@@ -660,7 +655,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
                 cell.updateInvitationDelegate = self
-                cell.activityDataStore = self
                 var invitation: Invitation? = nil
                 if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
                     activity.calendarColor = color
@@ -675,7 +669,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             let activity = filteredActivities[indexPath.row]
             if activity.isTask ?? false {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-                cell.activityDataStore = self
                 if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     activity.listColor = color
                 }
@@ -684,7 +677,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
                 cell.updateInvitationDelegate = self
-                cell.activityDataStore = self
                 var invitation: Invitation? = nil
                 if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
                     activity.calendarColor = color
@@ -787,47 +779,6 @@ extension CalendarViewController: UpdateInvitationDelegate {
                 self.networkController.activityService.invitations[invitation.activityID] = invitation
                 NotificationCenter.default.post(name: .eventsUpdated, object: nil)
             }
-        }
-    }
-}
-
-extension CalendarViewController: ActivityDataStore {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.participants[activityID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.participants[activityID] = participants
-            completion(participants)
         }
     }
 }

@@ -195,7 +195,6 @@ class ChooseTaskTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-        cell.activityDataStore = self
         let task = filteredTasks[indexPath.row]
         if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
             task.listColor = color
@@ -263,11 +262,5 @@ extension ChooseTaskTableViewController { /* hiding keyboard */
         } else {
             self.searchBar?.endEditing(true)
         }
-    }
-}
-
-extension ChooseTaskTableViewController: ActivityDataStore {
-    func getParticipants(forActivity task: Activity, completion: @escaping ([User])->()) {
-        
     }
 }

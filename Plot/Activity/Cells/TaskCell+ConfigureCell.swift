@@ -56,8 +56,7 @@ extension TaskCell {
     }
     
     func loadParticipantsThumbnail(activity: Activity) {
-        self.activityDataStore?.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
-            
+        ParticipantsFetcher.getParticipants(forActivity: activity, completion: { [weak self] (participants) in
             self?.updateParticipantsThumbnail(activity: activity, acceptedParticipants: participants)
             for i in 0..<participants.count {
                 let user = participants[i]

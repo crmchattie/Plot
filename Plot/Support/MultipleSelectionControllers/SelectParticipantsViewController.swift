@@ -88,7 +88,7 @@ class SelectParticipantsViewController: UIViewController {
                         if $0.titleFirstLetter == "" {
                             return false
                         }
-                        if let id = $0.id, let userStatus = userInvitationStatus[id]?.description {
+                        else if let id = $0.id, let userStatus = userInvitationStatus[id]?.description {
                             return userStatus == status
                         }
                         else if status == Status.uninvited.description {
@@ -109,13 +109,31 @@ class SelectParticipantsViewController: UIViewController {
             }
         }
         else {
-            let firstLetters = filteredUsers.map { $0.titleFirstLetter }
-            let uniqueFirstLetters = Array(Set(firstLetters))
-            sortedFirstLetters = uniqueFirstLetters.sorted()
-            sections = sortedFirstLetters.map { firstLetter in
+            sortedFirstLetters = [Status.participating.description, Status.uninvited.description]
+            sections = sortedFirstLetters.map { status in
                 return self.filteredUsers
-                    .filter { $0.titleFirstLetter == firstLetter && $0.titleFirstLetter != "" }
+                    .filter {
+                        if $0.titleFirstLetter == "" {
+                            return false
+                        }
+                        else if priorSelectedUsers.contains($0) && status == Status.participating.description {
+                            return true
+                        }
+                        else if !priorSelectedUsers.contains($0) && status == Status.uninvited.description {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
                     .sorted { $0.name ?? "" < $1.name ?? "" }
+            }
+            for section in sections {
+                if section.isEmpty {
+                    if let index = sections.firstIndex(of: section) {
+                        sortedFirstLetters.remove(at: index)
+                        sections.remove(at: index)
+                    }
+                }
             }
         }
         

@@ -76,8 +76,8 @@ class MindfulnessViewController: FormViewController {
         } else {
             active = true
             title = "Mindfulness"
-            
         }
+        
         configureTableView()
         setupRightBarButton()
         initializeForm()

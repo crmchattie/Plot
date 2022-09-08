@@ -243,8 +243,6 @@ class FinanceTransactionViewController: FormViewController {
                 if let value = row.value {
                     let date = self.isodateFormatter.string(from: value)
                     self.transaction.transacted_at = date
-//                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transacted_at")
-//                    reference.setValue(date)
                 }
             }
             
@@ -338,8 +336,6 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value {
                     self.transaction.amount = value
-//                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("amount")
-//                    reference.setValue(value)
                 }
             }
             
@@ -460,8 +456,6 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }.onChange({ row in
                 self.transaction.account_name = row.value
-//                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("account_name")
-//                reference.setValue(row.value)
             })
             
             <<< LabelRow("Group") { row in

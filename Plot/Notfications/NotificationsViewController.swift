@@ -16,6 +16,9 @@ class NotificationsViewController: UIViewController {
     let notificationsText = NSLocalizedString("Notifications", comment: "")
 
     var segmentedControl: UISegmentedControl!
+    
+    var networkController = NetworkController()
+    
     var invitedActivities: [Activity] = []
     var filteredInvitedActivities: [Activity] = []
     var notificationActivities: [Activity] = []
@@ -23,7 +26,6 @@ class NotificationsViewController: UIViewController {
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
     let invitationsFetcher = InvitationsFetcher()
-    var networkController = NetworkController()
     
     var invitations = [String: Invitation]()
     var users = [User]()
@@ -227,21 +229,9 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             button.addTarget(self, action: #selector(NotificationsViewController.notificationButtonTapped(_:)), for: .touchUpInside)
             button.tag = indexPath.row
             cell.accessoryView = button
-            if notification.aps.category == Identifiers.chatCategory {
-                button.setImage(UIImage(named: "chat"), for: .normal)
-                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-            } else if notification.aps.category == Identifiers.activityCategory {
+            if notification.aps.category == Identifiers.eventCategory {
                 button.setImage(UIImage(named: "activity"), for: .normal)
                 cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-            } else if notification.aps.category == Identifiers.checklistCategory {
-                button.setImage(UIImage(named: "list"), for: .normal)
-                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
-            } else if notification.aps.category == Identifiers.grocerylistCategory {
-                button.setImage(UIImage(named: "list"), for: .normal)
-                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
-            } else if notification.aps.category == Identifiers.activitylistCategory {
-                button.setImage(UIImage(named: "list"), for: .normal)
-                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 36, height: 30)
             }
             return cell
         } else {
@@ -249,7 +239,6 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             if let eventCell = cell as? EventCell {
                 eventCell.updateInvitationDelegate = self
-                eventCell.activityDataStore = self
                 let activity = filteredInvitedActivities[indexPath.row]
                 var invitation: Invitation?
                 if let activityID = activity.activityID, let value = invitations[activityID] {
@@ -262,65 +251,14 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         if segmentedControl.selectedSegmentIndex == 0 {
             let notification = notifications[indexPath.row]
-            if notification.aps.category == Identifiers.chatCategory {
-                if let chatID = notification.chatID, let chat = conversations.first(where: { (chat) -> Bool in
-                    chat.chatID == chatID
-                }) {
-                    openChatDetailView(forChat: chat)
-                }
-            } else if notification.aps.category == Identifiers.activityCategory {
+            if notification.aps.category == Identifiers.eventCategory {
                 if let activityID = notification.activityID {
                     if let activity = notificationActivities.first(where: { (activity) -> Bool in
                         activity.activityID == activityID
                     }) {
                         openActivityDetailView(forActivity: activity)
-                    }
-                }
-            } else if notification.aps.category == Identifiers.checklistCategory {
-                if let checklistID = notification.checklistID {
-                    if let list = listList.first(where: { (list) -> Bool in
-                        list.ID == checklistID
-                    }) {
-                        if let checklist = list.checklist {
-                            let destination = ChecklistViewController()
-                            destination.hidesBottomBarWhenPushed = true
-                            destination.checklist = checklist
-                            destination.comingFromLists = true
-                            destination.connectedToAct = checklist.activityID != nil
-                            destination.users = self.users
-                            destination.filteredUsers = self.filteredUsers
-                            destination.activities = self.notificationActivities
-                            destination.conversations = self.conversations
-                            self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
-                                destination.selectedFalconUsers = participants
-                                self.navigationController?.pushViewController(destination, animated: true)
-                            }
-                        }
-                    }
-                }
-            } else if notification.aps.category == Identifiers.grocerylistCategory {
-                if let grocerylistID = notification.grocerylistID {
-                    if let list = listList.first(where: { (list) -> Bool in
-                        list.ID == grocerylistID
-                    }) {
-                        if let grocerylist = list.grocerylist {
-                            let destination = GrocerylistViewController()
-                            destination.hidesBottomBarWhenPushed = true
-                            destination.grocerylist = grocerylist
-                            destination.comingFromLists = true
-                            destination.connectedToAct = grocerylist.activityID != nil
-                            destination.users = self.users
-                            destination.filteredUsers = self.filteredUsers
-                            destination.activities = self.notificationActivities
-                            destination.conversations = self.conversations
-                            self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
-                                destination.selectedFalconUsers = participants
-                                self.navigationController?.pushViewController(destination, animated: true)
-                            }
-                        }
                     }
                 }
             }
@@ -348,65 +286,12 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         if segmentedControl.selectedSegmentIndex == 0 {
             if sender.tag >= 0 && sender.tag < notifications.count {
                 let notification = notifications[sender.tag]
-                if notification.aps.category == Identifiers.chatCategory {
-                    print("Identifiers.chatCategory")
-                    if let chatID = notification.chatID, let chat = conversations.first(where: { (chat) -> Bool in
-                        chat.chatID == chatID
-                    }) {
-                        print("openChatDetailView")
-                        openChatDetailView(forChat: chat)
-                    }
-                }
-                else if notification.aps.category == Identifiers.activityCategory {
+                if notification.aps.category == Identifiers.eventCategory {
                     if let activityID = notification.activityID {
                         if let activity = notificationActivities.first(where: { (activity) -> Bool in
                             activity.activityID == activityID
                         }) {
                             openActivityDetailView(forActivity: activity)
-                        }
-                    }
-                } else if notification.aps.category == Identifiers.checklistCategory {
-                    if let checklistID = notification.checklistID {
-                        if let list = listList.first(where: { (list) -> Bool in
-                            list.ID == checklistID
-                        }) {
-                            if let checklist = list.checklist {
-                                let destination = ChecklistViewController()
-                                destination.hidesBottomBarWhenPushed = true
-                                destination.checklist = checklist
-                                destination.comingFromLists = true
-                                destination.connectedToAct = checklist.activityID != nil
-                                destination.users = self.users
-                                destination.filteredUsers = self.filteredUsers
-                                destination.activities = self.notificationActivities
-                                destination.conversations = self.conversations
-                                self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil) { (participants) in
-                                    destination.selectedFalconUsers = participants
-                                    self.navigationController?.pushViewController(destination, animated: true)
-                                }
-                            }
-                        }
-                    }
-                } else if notification.aps.category == Identifiers.grocerylistCategory {
-                    if let grocerylistID = notification.grocerylistID {
-                        if let list = listList.first(where: { (list) -> Bool in
-                            list.ID == grocerylistID
-                        }) {
-                            if let grocerylist = list.grocerylist {
-                                let destination = GrocerylistViewController()
-                                destination.hidesBottomBarWhenPushed = true
-                                destination.grocerylist = grocerylist
-                                destination.comingFromLists = true
-                                destination.connectedToAct = grocerylist.activityID != nil
-                                destination.users = self.users
-                                destination.filteredUsers = self.filteredUsers
-                                destination.activities = self.notificationActivities
-                                destination.conversations = self.conversations
-                                self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil) { (participants) in
-                                    destination.selectedFalconUsers = participants
-                                    self.navigationController?.pushViewController(destination, animated: true)
-                                }
-                            }
                         }
                     }
                 }
@@ -419,111 +304,12 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = invitations[activity.activityID ?? ""]
-        self.getParticipants(forActivity: activity) { (participants) in
-            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+        ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
+            ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                 destination.acceptedParticipant = acceptedParticipant
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
-        }
-    }
-    
-    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, completion: @escaping ([User])->()) {
-        if let grocerylist = grocerylist, let ID = grocerylist.ID, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if grocerylist.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let checklist = checklist, let ID = checklist.ID, let participantsIDs = checklist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if checklist.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let packinglist = packinglist, let ID = packinglist.ID, let participantsIDs = packinglist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if packinglist.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else {
-            return
         }
     }
     
@@ -584,47 +370,6 @@ extension NotificationsViewController: UpdateInvitationDelegate {
             if result {
                 self.invitations[invitation.activityID] = invitation
             }
-        }
-    }
-}
-
-extension NotificationsViewController: ActivityDataStore {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.activitiesParticipants[activityID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.activitiesParticipants[activityID] = participants
-            completion(participants)
         }
     }
 }

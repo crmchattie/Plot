@@ -126,7 +126,7 @@ class FinancialHoldingFetcher: NSObject {
         
         currentUserHoldingsChangeHandle = userHoldingsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.holdingsChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { holdingsList in
+                FinancialHoldingFetcher.getDataFromSnapshot(ID: snapshot.key) { holdingsList in
                     for holding in holdingsList {
                         if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: holding) {
                             userHoldings[holding.guid] = userHolding
@@ -138,7 +138,7 @@ class FinancialHoldingFetcher: NSObject {
         })
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([MXHolding])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([MXHolding])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

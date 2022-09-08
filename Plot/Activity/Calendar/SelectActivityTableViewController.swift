@@ -302,7 +302,6 @@ class SelectActivityTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
         
         cell.updateInvitationDelegate = self
-        cell.activityDataStore = self
         
         if indexPath.section == 0 {
             let activity = filteredPinnedActivities[indexPath.row]
@@ -341,8 +340,8 @@ class SelectActivityTableViewController: UITableViewController {
         destination.hidesBottomBarWhenPushed = true
         destination.activity = activity
         destination.invitation = invitations[activity.activityID ?? ""]
-        self.getParticipants(forActivity: activity) { (participants) in
-            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+        ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
+            ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                 destination.acceptedParticipant = acceptedParticipant
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
@@ -470,45 +469,6 @@ extension SelectActivityTableViewController: UpdateInvitationDelegate {
             if result {
                 self.invitations[invitation.activityID] = invitation
             }
-        }
-    }
-}
-
-extension SelectActivityTableViewController: ActivityDataStore {
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-
-        let group = DispatchGroup()
-        let olderParticipants = self.activitiesParticipants[activityID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            if id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.activitiesParticipants[activityID] = participants
-            completion(participants)
         }
     }
 }

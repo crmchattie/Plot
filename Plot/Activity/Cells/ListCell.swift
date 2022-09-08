@@ -16,7 +16,6 @@ class ListCell: UITableViewCell {
     
     var participants: [User] = []
     let thumbnailsCount = 8
-    weak var listDataStore: ListDataStore?
     var thumbnails: [UIImageView] = []
     var list: ListType?
     

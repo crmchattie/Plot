@@ -98,7 +98,6 @@ class FinanceBarChartViewController: UIViewController {
         extendedLayoutIncludesOpaqueBars = true
         
         
-        
         barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
         navigationItem.rightBarButtonItem = barButton
         
@@ -271,77 +270,6 @@ class FinanceBarChartViewController: UIViewController {
         }
     }
     
-    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
-        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = transaction.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if transaction.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = account.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if account.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else {
-            let participants: [User] = []
-            completion(participants)
-        }
-    }
-    
     func showActivityIndicator() {
         if let tabController = self.tabBarController {
             self.showSpinner(onView: tabController.view)
@@ -412,7 +340,7 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
             let destination = FinanceTransactionViewController(networkController: networkController)
             destination.transaction = transaction
             destination.delegate = self
-            self.getParticipants(transaction: transaction, account: nil) { (participants) in
+            ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
@@ -421,7 +349,7 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
             let destination = FinanceAccountViewController(networkController: networkController)
             destination.account = account
             destination.delegate = self
-            self.getParticipants(transaction: nil, account: account) { (participants) in
+            ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }

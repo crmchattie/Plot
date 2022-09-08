@@ -352,111 +352,6 @@ class FinanceDetailViewController: UIViewController {
         }
     }
     
-    func getParticipants(transaction: Transaction?, account: MXAccount?, holding: MXHolding?, completion: @escaping ([User])->()) {
-        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = transaction.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if transaction.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = account.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            
-            for id in participantsIDs {
-                if account.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let holding = holding, let participantsIDs = holding.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = holding.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            
-            for id in participantsIDs {
-                if holding.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else {
-            let participants: [User] = []
-            completion(participants)
-        }
-    }
-    
     func openTransactionDetails(transactionDetails: TransactionDetails) {
         let accounts = transactions.compactMap({ $0.account_guid })
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: transactions, transactions: transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
@@ -607,7 +502,7 @@ extension FinanceDetailViewController: UICollectionViewDelegate, UICollectionVie
             if section.subType == "Transactions" {
                 let destination = FinanceTransactionViewController(networkController: self.networkController)
                 destination.transaction = object[indexPath.item]
-                self.getParticipants(transaction: object[indexPath.item], account: nil, holding: nil) { (participants) in
+                ParticipantsFetcher.getParticipants(forTransaction: object[indexPath.item]) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
@@ -616,7 +511,7 @@ extension FinanceDetailViewController: UICollectionViewDelegate, UICollectionVie
             if section.subType == "Accounts" {
                 let destination = FinanceAccountViewController(networkController: self.networkController)
                 destination.account = object[indexPath.item]
-                self.getParticipants(transaction: nil, account: object[indexPath.item], holding: nil) { (participants) in
+                ParticipantsFetcher.getParticipants(forAccount: object[indexPath.item]) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
@@ -625,7 +520,7 @@ extension FinanceDetailViewController: UICollectionViewDelegate, UICollectionVie
             if section.subType == "Investments" {
                 let destination = FinanceHoldingViewController(networkController: self.networkController)
                 destination.holding = object[indexPath.item]
-                self.getParticipants(transaction: nil, account: nil, holding: object[indexPath.item]) { (participants) in
+                ParticipantsFetcher.getParticipants(forHolding: object[indexPath.item]) { (participants) in
                     destination.selectedFalconUsers = participants
                     self.navigationController?.pushViewController(destination, animated: true)
                 }

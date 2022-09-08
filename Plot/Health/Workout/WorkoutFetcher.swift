@@ -114,7 +114,7 @@ class WorkoutFetcher: NSObject {
         
         currentUserWorkoutsChangeHandle = userWorkoutsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.workoutsChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { workoutsList in
+                WorkoutFetcher.getDataFromSnapshot(ID: snapshot.key) { workoutsList in
                     for workout in workoutsList {
                         userWorkouts[workout.id] = workout
                     }
@@ -126,7 +126,7 @@ class WorkoutFetcher: NSObject {
         currentUserWorkoutsRemoveHandle = userWorkoutsDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.workoutsRemoved {
                 userWorkouts[snapshot.key] = nil
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                WorkoutFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
@@ -134,7 +134,7 @@ class WorkoutFetcher: NSObject {
     
 
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([Workout])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([Workout])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

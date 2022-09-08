@@ -118,7 +118,7 @@ class MealFetcher: NSObject {
         
         currentUserMealsChangeHandle = userMealsDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.mealsChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { mealsList in
+                MealFetcher.getDataFromSnapshot(ID: snapshot.key) { mealsList in
                     for meal in mealsList {
                         userMeals[meal.id] = meal
                     }
@@ -130,13 +130,13 @@ class MealFetcher: NSObject {
         currentUserMealsRemoveHandle = userMealsDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.mealsRemoved {
                 userMeals[snapshot.key] = nil
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                MealFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([Meal])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([Meal])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

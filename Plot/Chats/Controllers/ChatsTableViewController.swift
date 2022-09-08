@@ -31,15 +31,6 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
-//update to change first controller shown
-//protocol ManageAppearanceChat: AnyObject {
-//  func manageAppearanceChat(_ chatsController: ChatsTableViewController, didFinishLoadingWith state: Bool )
-//}
-
-protocol ChatsViewControllerDataStore: AnyObject {
-    func getParticipants(forConversation conversation: Conversation, completion: @escaping ([User])->())
-}
-
 class ChatsTableViewController: UITableViewController {
     
     fileprivate let userCellID = "userCellID"
@@ -267,9 +258,7 @@ class ChatsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellID, for: indexPath) as? UserCell ?? UserCell()
         
         cell.delegate = self
-        
-        cell.chatsViewControllerDataStore = self
-        
+                
         if indexPath.section == 0 {
             cell.configureCell(for: indexPath, conversations: filteredPinnedConversations)
         } else {
@@ -358,45 +347,6 @@ extension ChatsTableViewController: MessagesDelegate {
         chatLogController = nil
         messagesFetcher?.delegate = nil
         messagesFetcher = nil
-    }
-}
-
-extension ChatsTableViewController: ChatsViewControllerDataStore {
-    func getParticipants(forConversation conversation: Conversation, completion: @escaping ([User])->()) {
-        guard let chatID = conversation.chatID, let participantsIDs = conversation.chatParticipantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.chatParticipants[chatID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            if id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.chatParticipants[chatID] = participants
-            completion(participants)
-        }
     }
 }
 

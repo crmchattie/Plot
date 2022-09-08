@@ -81,7 +81,6 @@ class CalendarFetcher: NSObject {
         var userCalendars: [String: CalendarType] = [:]
         
         userCalendarDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            print("observeCalendarForCurrentUser")
             print(snapshot.exists())
             guard snapshot.exists() else {
                 self.uploadInitialPlotCalendars()
@@ -162,7 +161,7 @@ class CalendarFetcher: NSObject {
         
         currentUserCalendarChangeHandle = userCalendarDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.calendarChanged {
-                self.getDataFromSnapshot(ID: snapshot.key) { calendarsList in
+                CalendarFetcher.getDataFromSnapshot(ID: snapshot.key) { calendarsList in
                     for calendar in calendarsList {
                         userCalendars[calendar.id ?? ""] = calendar
                     }
@@ -174,13 +173,13 @@ class CalendarFetcher: NSObject {
         currentUserCalendarRemoveHandle = userCalendarDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.calendarRemoved {
                 userCalendars[snapshot.key] = nil
-                self.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                CalendarFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         
     }
     
-    func getDataFromSnapshot(ID: String, completion: @escaping ([CalendarType])->()) {
+    class func getDataFromSnapshot(ID: String, completion: @escaping ([CalendarType])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }

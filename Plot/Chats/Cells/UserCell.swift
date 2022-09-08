@@ -19,7 +19,6 @@ class UserCell: UITableViewCell {
     
     let thumbnailsCount = 9
     var thumbnails: [UIImageView] = []
-    weak var chatsViewControllerDataStore: ChatsViewControllerDataStore?
     var conversation: Conversation?
     weak var delegate: ChatCellDelegate?
     

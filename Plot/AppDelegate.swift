@@ -14,30 +14,32 @@ import GoogleSignIn
 import FacebookCore
 
 enum Identifiers {
-    static let viewChatsAction = "VIEW_CHAT_IDENTIFIER"
-    static let viewActivitiesAction = "VIEW_ACTIVITIES_IDENTIFIER"
-    static let viewListsAction = "VIEW_LISTS_IDENTIFIER"
-    static let replyAction = "REPLY_ACTION"
-    static let chatCategory = "CHAT_CATEGORY"
-    static let activityCategory = "ACTIVITY_CATEGORY"
-    static let checklistCategory = "CHECKLIST_CATEGORY"
-    static let grocerylistCategory = "GROCERYLIST_CATEGORY"
-    static let activitylistCategory = "ACTIVITYLIST_CATEGORY"
-    static let mealCategory = "MEAL_CATEGORY"
+    static let eventCategory = "EVENT_CATEGORY"
+    static let taskCategory = "TASK_CATEGORY"
     static let workoutCategory = "WORKOUT_CATEGORY"
     static let mindfulnessCategory = "MINDFULNESS_CATEGORY"
     static let transactionCategory = "TRANSACTION_CATEGORY"
     static let accountCategory = "ACCOUNT_CATEGORY"
+    static let listCategory = "LIST_CATEGORY"
+    static let calendarCategory = "CALENDAR_CATEGORY"
+    
+//    static let viewEventsAction = "VIEW_EVENTS_IDENTIFIER"
+//
+//    static let viewChatsAction = "VIEW_CHAT_IDENTIFIER"
+//    static let viewListsAction = "VIEW_LISTS_IDENTIFIER"
+//    static let replyAction = "REPLY_ACTION"
+//    static let chatCategory = "CHAT_CATEGORY"
+//    static let checklistCategory = "CHECKLIST_CATEGORY"
+//    static let grocerylistCategory = "GROCERYLIST_CATEGORY"
+//    static let activitylistCategory = "ACTIVITYLIST_CATEGORY"
+//    static let mealCategory = "MEAL_CATEGORY"
 }
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var chatLogController: ChatLogController? = nil
-    var messagesFetcher: MessagesFetcher? = nil
     var notifications: [PLNotification] = []
     var participants: [String: [User]] = [:]
-    let invitationsFetcher = InvitationsFetcher()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
@@ -100,28 +102,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             guard granted else { return }
             
-            let activityCategory = UNNotificationCategory(
-                identifier: Identifiers.activityCategory, actions: [],
+            let eventCategory = UNNotificationCategory(
+                identifier: Identifiers.eventCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
-            let chatCategory = UNNotificationCategory(
-                identifier: Identifiers.chatCategory, actions: [],
-                intentIdentifiers: [], options: [])
-            
-            let checklistCategory = UNNotificationCategory(
-                identifier: Identifiers.checklistCategory, actions: [],
-                intentIdentifiers: [], options: [])
-            
-            let grocerylistCategory = UNNotificationCategory(
-                identifier: Identifiers.grocerylistCategory, actions: [],
-                intentIdentifiers: [], options: [])
-            
-            let activitylistCategory = UNNotificationCategory(
-                identifier: Identifiers.activitylistCategory, actions: [],
-                intentIdentifiers: [], options: [])
-            
-            let mealCategory = UNNotificationCategory(
-                identifier: Identifiers.mealCategory, actions: [],
+            let taskCategory = UNNotificationCategory(
+                identifier: Identifiers.taskCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
             let workoutCategory = UNNotificationCategory(
@@ -140,9 +126,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: Identifiers.accountCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
+            let listCategory = UNNotificationCategory(
+                identifier: Identifiers.listCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
+            let calendarCategory = UNNotificationCategory(
+                identifier: Identifiers.calendarCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
+//            let chatCategory = UNNotificationCategory(
+//                identifier: Identifiers.chatCategory, actions: [],
+//                intentIdentifiers: [], options: [])
+//
+//            let checklistCategory = UNNotificationCategory(
+//                identifier: Identifiers.checklistCategory, actions: [],
+//                intentIdentifiers: [], options: [])
+//
+//            let grocerylistCategory = UNNotificationCategory(
+//                identifier: Identifiers.grocerylistCategory, actions: [],
+//                intentIdentifiers: [], options: [])
+//
+//            let activitylistCategory = UNNotificationCategory(
+//                identifier: Identifiers.activitylistCategory, actions: [],
+//                intentIdentifiers: [], options: [])
+//
+//            let mealCategory = UNNotificationCategory(
+//                identifier: Identifiers.mealCategory, actions: [],
+//                intentIdentifiers: [], options: [])
+            
             
             // 3
-            UNUserNotificationCenter.current().setNotificationCategories([chatCategory, activityCategory, checklistCategory, grocerylistCategory, activitylistCategory, mealCategory, workoutCategory, mindfulnessCategory, transactionCategory, accountCategory])
+            UNUserNotificationCenter.current().setNotificationCategories([eventCategory, taskCategory, workoutCategory, mindfulnessCategory, transactionCategory, accountCategory, listCategory, calendarCategory])
             
             //get application instance ID
             Messaging.messaging().token { (token, error) in
@@ -304,429 +318,141 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         saveUserNotification(notification: response.notification)
         
         // 2
-        if let aps = userInfo["aps"] as? [String: AnyObject] {
+        if let _ = userInfo["aps"] as? [String: AnyObject] {
             switch response.actionIdentifier {
-            case Identifiers.viewChatsAction:
-                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
-            case Identifiers.viewActivitiesAction:
-                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
-            case Identifiers.viewListsAction:
-                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
+//            case Identifiers.viewChatsAction:
+//                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
+//            case Identifiers.viewEventsAction:
+//                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
+//            case Identifiers.viewListsAction:
+//                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
-                if let chatID = userInfo["chatID"] as? String {
-                    let groupChatDataReference = Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder)
-                    groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                        dictionary.updateValue(chatID as AnyObject, forKey: "id")
-                        
-                        if let membersIDs = dictionary["chatParticipantsIDs"] as? [String:AnyObject] {
-                            dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "chatParticipantsIDs")
-                        }
-                        
-                        let conversation = Conversation(dictionary: dictionary)
-                        
-                        if conversation.chatName == nil {
-                            conversation.chatName = aps["alert"]!["title"] as? String
-                        }
-                        
-                        self.chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-                        self.messagesFetcher = MessagesFetcher()
-                        self.messagesFetcher?.delegate = self
-                        self.messagesFetcher?.loadMessagesData(for: conversation)
-                    })
-                } else if let activityID = userInfo["activityID"] as? String {
-                    let groupChatDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                    groupChatDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                        dictionary.updateValue(activityID as AnyObject, forKey: "id")
-                        
-                        if let membersIDs = dictionary["chatParticipantsIDs"] as? [String:AnyObject] {
-                            dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "chatParticipantsIDs")
-                        }
-                        
-                        let activity = Activity(dictionary: dictionary)
-                        
-                        self.getParticipants(forActivity: activity) { (participants) in
-                            InvitationsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                    let destination = EventViewController(networkController: tabBarController.networkController)
-                                    destination.acceptedParticipant = acceptedParticipant
-                                    destination.selectedFalconUsers = participants
-                                    destination.hidesBottomBarWhenPushed = true
-                                    destination.activity = activity
-                                    tabBarController.selectedIndex = 1
-                                    tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                    if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                        homeNavigationController.pushViewController(destination, animated: true)
-                                        
+                if let activityID = userInfo["activityID"] as? String {
+                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
+                        if let activity = activities.first {
+                            if activity.isTask ?? false {
+                                ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
+                                    if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                        let destination = TaskViewController(networkController: masterController.networkController)
+                                        destination.selectedFalconUsers = participants
+                                        destination.task = activity
+                                        destination.hidesBottomBarWhenPushed = true
+                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                        let navigationViewController = UINavigationController(rootViewController: destination)
+                                        masterController.present(navigationViewController, animated: true)
                                     }
-                                    
                                 }
-                            }
-                        }
-                        
-                    })
-                } else if let checklistID = userInfo["checklistID"] as? String {
-                    let ref = Database.database().reference()
-                    ref.child(checklistsEntity).child(checklistID).observeSingleEvent(of: .value, with: { checklistSnapshot in
-                        if checklistSnapshot.exists(), let checklistSnapshotValue = checklistSnapshot.value {
-                            if let checklist = try? FirebaseDecoder().decode(Checklist.self, from: checklistSnapshotValue) {
-                                let destination = ChecklistViewController()
-                                destination.checklist = checklist
-                                destination.comingFromLists = true
-                                destination.connectedToAct = false
-                                self.getParticipants(grocerylist: nil, checklist: checklist, packinglist: nil, activitylist: nil) { (participants) in
-                                    destination.selectedFalconUsers = participants
-                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                        tabBarController.selectedIndex = 1
-                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                            homeNavigationController.pushViewController(destination, animated: true)
-                                            
+                            } else {
+                                ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
+                                    ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
+                                        if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                            let destination = EventViewController(networkController: masterController.networkController)
+                                            destination.acceptedParticipant = acceptedParticipant
+                                            destination.selectedFalconUsers = participants
+                                            destination.activity = activity
+                                            destination.hidesBottomBarWhenPushed = true
+                                            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                            destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                            let navigationViewController = UINavigationController(rootViewController: destination)
+                                            masterController.present(navigationViewController, animated: true)
                                         }
-                                        
                                     }
                                 }
                             }
                         }
-                    })
-                } else if let grocerylistID = userInfo["grocerylistID"] as? String {
-                    let ref = Database.database().reference()
-                    ref.child(grocerylistsEntity).child(grocerylistID).observeSingleEvent(of: .value, with: { grocerylistSnapshot in
-                        if grocerylistSnapshot.exists(), let grocerylistSnapshotValue = grocerylistSnapshot.value {
-                            if let grocerylist = try? FirebaseDecoder().decode(Grocerylist.self, from: grocerylistSnapshotValue) {
-                                let destination = GrocerylistViewController()
-                                destination.grocerylist = grocerylist
-                                destination.comingFromLists = true
-                                destination.connectedToAct = false
-                                self.getParticipants(grocerylist: grocerylist, checklist: nil, packinglist: nil, activitylist: nil) { (participants) in
-                                    destination.selectedFalconUsers = participants
-                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                        tabBarController.selectedIndex = 1
-                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                            homeNavigationController.pushViewController(destination, animated: true)
-                                            
-                                        }
-                                        
-                                    }
-                                }
-                            }
-                        }
-                    })
-                } else if let activitylistID = userInfo["activitylistID"] as? String {
-                    let ref = Database.database().reference()
-                    ref.child(activitylistsEntity).child(activitylistID).observeSingleEvent(of: .value, with: { activitylistSnapshot in
-                        if activitylistSnapshot.exists(), let activitylistSnapshotValue = activitylistSnapshot.value {
-                            if let activitylist = try? FirebaseDecoder().decode(Activitylist.self, from: activitylistSnapshotValue) {
-                                let destination = ActivitylistViewController()
-                                destination.activitylist = activitylist
-                                destination.comingFromLists = true
-                                destination.connectedToAct = false
-                                self.getParticipants(grocerylist: nil, checklist: nil, packinglist: nil, activitylist: activitylist) { (participants) in
-                                    destination.selectedFalconUsers = participants
-                                    if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                        tabBarController.selectedIndex = 1
-                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                            homeNavigationController.pushViewController(destination, animated: true)
-                                            
-                                        }
-                                        
-                                    }
-                                }
-                            }
-                        }
-                    })
+                    }
                 } else if let transactionID = userInfo["transactionID"] as? String {
-                    let ref = Database.database().reference()
-                    ref.child(financialTransactionsEntity).child(transactionID).observeSingleEvent(of: .value, with: { snapshot in
-                        if snapshot.exists(), let snapshotValue = snapshot.value {
-                            if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
-                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                    let destination = FinanceTransactionViewController(networkController: tabBarController.networkController)
+                    FinancialTransactionFetcher.getDataFromSnapshot(ID: transactionID) { transactions in
+                        if let transaction = transactions.first {
+                            ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = FinanceTransactionViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
                                     destination.transaction = transaction
-                                    self.getParticipants(transaction: transaction, account: nil) { (participants) in
-                                        destination.selectedFalconUsers = participants
-                                        tabBarController.selectedIndex = 1
-                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                            homeNavigationController.pushViewController(destination, animated: true)
-                                            
-                                        }
-                                    }
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
                                 }
                             }
                         }
-                    })
+                    }
                 } else if let accountID = userInfo["accountID"] as? String {
-                    let ref = Database.database().reference()
-                    ref.child(financialAccountsEntity).child(accountID).observeSingleEvent(of: .value, with: { snapshot in
-                        if snapshot.exists(), let snapshotValue = snapshot.value {
-                            if let account = try? FirebaseDecoder().decode(MXAccount.self, from: snapshotValue) {
-                                if let tabBarController = self.window?.rootViewController as? GeneralTabBarController {
-                                    let destination = FinanceAccountViewController(networkController: tabBarController.networkController)
+                    FinancialAccountFetcher.getDataFromSnapshot(ID: accountID) { accounts in
+                        if let account = accounts.first {
+                            ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = FinanceAccountViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
                                     destination.account = account
-                                    self.getParticipants(transaction: nil, account: account) { (participants) in
-                                        destination.selectedFalconUsers = participants
-                                        tabBarController.selectedIndex = 1
-                                        tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-                                        if let homeNavigationController = tabBarController.viewControllers?[1] as? UINavigationController {
-                                            homeNavigationController.pushViewController(destination, animated: true)
-                                            
-                                        }
-                                    }
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
                                 }
                             }
                         }
-                    })
+                    }
+                } else if let holdingID = userInfo["holdingID"] as? String {
+                    FinancialHoldingFetcher.getDataFromSnapshot(ID: holdingID) { holdings in
+                        if let holding = holdings.first {
+                            ParticipantsFetcher.getParticipants(forHolding: holding) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = FinanceHoldingViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
+                                    destination.holding = holding
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
+                                }
+                            }
+                        }
+                    }
+                } else if let listID = userInfo["listID"] as? String {
+                    ListFetcher.getDataFromSnapshot(ID: listID) { lists in
+                        if let list = lists.first {
+                            ParticipantsFetcher.getParticipants(forList: list) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = ListDetailViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
+                                    destination.list = list
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
+                                }
+                            }
+                        }
+                    }
+                } else if let calendarID = userInfo["calendarID"] as? String {
+                    CalendarFetcher.getDataFromSnapshot(ID: calendarID) { calendars in
+                        if let calendar = calendars.first {
+                            ParticipantsFetcher.getParticipants(forCalendar: calendar) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = CalendarDetailViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
+                                    destination.calendar = calendar
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
         
         // 4
         completionHandler()
-    }
-    
-    func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?, completion: @escaping ([User])->()) {
-        if let grocerylist = grocerylist, let ID = grocerylist.ID, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if grocerylist.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let checklist = checklist, let ID = checklist.ID, let participantsIDs = checklist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if checklist.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let activitylist = activitylist, let ID = activitylist.ID, let participantsIDs = activitylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if activitylist.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let packinglist = packinglist, let ID = packinglist.ID, let participantsIDs = packinglist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if packinglist.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else {
-            return
-        }
-    }
-    
-    func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let activityID = activity.activityID, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
-        
-        let group = DispatchGroup()
-        let olderParticipants = self.participants[activityID]
-        var participants: [User] = []
-        for id in participantsIDs {
-            // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
-                continue
-            }
-            
-            if let first = olderParticipants?.filter({$0.id == id}).first {
-                participants.append(first)
-                continue
-            }
-            
-            group.enter()
-            let participantReference = Database.database().reference().child("users").child(id)
-            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    let user = User(dictionary: dictionary)
-                    participants.append(user)
-                }
-                
-                group.leave()
-            })
-        }
-        
-        group.notify(queue: .main) {
-            self.participants[activityID] = participants
-            completion(participants)
-        }
-    }
-    
-    func getParticipants(transaction: Transaction?, account: MXAccount?, completion: @escaping ([User])->()) {
-        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = transaction.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            for id in participantsIDs {
-                if transaction.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
-            let group = DispatchGroup()
-            let ID = account.guid
-            let olderParticipants = self.participants[ID]
-            var participants: [User] = []
-            
-            for id in participantsIDs {
-                if account.admin == currentUserID && id == currentUserID {
-                    continue
-                }
-                
-                if let first = olderParticipants?.filter({$0.id == id}).first {
-                    participants.append(first)
-                    continue
-                }
-                
-                group.enter()
-                let participantReference = Database.database().reference().child("users").child(id)
-                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
-                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                        let user = User(dictionary: dictionary)
-                        participants.append(user)
-                    }
-                    
-                    group.leave()
-                })
-            }
-            
-            group.notify(queue: .main) {
-                self.participants[ID] = participants
-                completion(participants)
-            }
-        } else {
-            let participants: [User] = []
-            completion(participants)
-        }
     }
 }
 
@@ -746,52 +472,6 @@ extension AppDelegate : MessagingDelegate {
     // Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
     // To enable direct data messages, you can set Messaging.messaging().shouldEstablishDirectChannel to true.
     // [END ios_10_data_message]
-}
-
-extension AppDelegate: MessagesDelegate {
-    
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
-    }
-    
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
-        }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        
-        if #available(iOS 11.0, *) {
-        } else {
-            self.chatLogController?.startCollectionViewAtBottom()
-        }
-        
-        if let tabBarController = window?.rootViewController as? GeneralTabBarController {
-            
-            tabBarController.selectedIndex = 1
-            
-            tabBarController.presentedViewController?.dismiss(animated: true, completion: nil)
-            
-            if let homeNavigationController = tabBarController.viewControllers?[0] as? UINavigationController {
-                
-                homeNavigationController.pushViewController(destination, animated: true)
-                chatLogController = nil
-                messagesFetcher?.delegate = nil
-                messagesFetcher = nil
-                
-            }
-            
-        }
-        
-    }
 }
 
 extension Notification.Name {

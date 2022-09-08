@@ -175,7 +175,10 @@ class ListInfoViewController: UITableViewController {
     fileprivate func listInfo(list: ListType) {
         let destination = ListDetailViewController(networkController: self.networkController)
         destination.list = list
-        navigationController?.pushViewController(destination, animated: true)
+        ParticipantsFetcher.getParticipants(forList: list) { (participants) in
+            destination.selectedFalconUsers = participants
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
     }
         
     @objc func updatePrimaryList(_ sender: TapGesture) {

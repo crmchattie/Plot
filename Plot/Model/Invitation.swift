@@ -9,7 +9,7 @@
 import Foundation
 
 enum Status: Int, Codable {
-    case pending, accepted, declined, uninvited
+    case pending, accepted, declined, uninvited, participating
     
     var description: String {
         get {
@@ -22,6 +22,8 @@ enum Status: Int, Codable {
                 return "Declined"
             case .uninvited:
                 return "Invite"
+            case .participating:
+                return "Participants"
             }
         }
     }

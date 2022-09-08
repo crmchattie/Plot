@@ -38,7 +38,7 @@ extension CalendarViewController {
                 }
                 
                 dispatchGroup.enter()
-                getParticipants(forActivity: activity) { allParticipants in
+                ParticipantsFetcher.getParticipants(forActivity: activity) { allParticipants in
                     var participants = allParticipants.filter({$0.id != currentUserID})
                     participants = participants.filter({$0.id != activity.admin})
                     if participants.count > 0 {
