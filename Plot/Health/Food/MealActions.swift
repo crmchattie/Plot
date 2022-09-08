@@ -51,7 +51,7 @@ class MealActions: NSObject {
             return
         }
         
-        guard let active = active, let ID = ID, let _ = selectedFalconUsers else {
+        guard let active = active, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
         
@@ -93,7 +93,7 @@ class MealActions: NSObject {
             
             // Create activity
             if let activity = ActivityBuilder.createActivity(from: meal) {
-                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                let activityActions = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
                 activityActions.createNewActivity()
             }
         } else {

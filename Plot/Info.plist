@@ -89,11 +89,11 @@
 		<true/>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>To select a profile photo or send photo or video via message</string>
+	<string>To select a profile photo and/or add photos to events and tasks</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>To help you keep track of your events</string>
 	<key>NSCameraUsageDescription</key>
-	<string>To take photos and videos for messages and/or profile pic</string>
+	<string>To take photos and videos for events, tasks and/or profile pic</string>
 	<key>NSContactsUsageDescription</key>
 	<string>To find your friends who also use Plot</string>
 	<key>NSFaceIDUsageDescription</key>

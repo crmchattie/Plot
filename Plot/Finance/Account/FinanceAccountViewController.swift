@@ -23,9 +23,6 @@ class FinanceAccountViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     
-    var userNames : [String] = []
-    var userNamesString: String = ""
-    
     var active: Bool = false
     
     weak var delegate : UpdateAccountDelegate?
@@ -100,23 +97,6 @@ class FinanceAccountViewController: FormViewController {
             title = "Account"
             active = true
             numberFormatter.currencyCode = account.currency_code
-            
-            var participantCount = self.selectedFalconUsers.count
-            // If user is creating this activity (admin)
-            if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
-            } else {
-                self.userNamesString = "1 participant"
-            }
-            
-            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-            }
             
         } else if let currentUser = Auth.auth().currentUser?.uid {
             title = "New Account"
@@ -224,8 +204,6 @@ class FinanceAccountViewController: FormViewController {
 //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                }).onChange { row in
-//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("description")
-//                    reference.setValue(row.value)
 //                    self.account.description = row.value
 //                }
             
@@ -264,8 +242,6 @@ class FinanceAccountViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value, let type = MXAccountType(rawValue: value) {
                     self.account.type = type
-//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("type")
-//                    reference.setValue(value)
                 }
             }
         
@@ -306,8 +282,6 @@ class FinanceAccountViewController: FormViewController {
                 }.onChange { row in
                     if let value = row.value, let subtype = MXAccountSubType(rawValue: value) {
                         self.account.subtype = subtype
-//                        let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("subtype")
-//                        reference.setValue(value)
                     }
                 }
         }
@@ -377,9 +351,6 @@ class FinanceAccountViewController: FormViewController {
                     } else {
                         self.account.balances = [self.isodateFormatter.string(from: Date()): self.account.balance]
                     }
-//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid)
-//                    reference.child("balance").setValue(self.account.balance)
-//                    reference.child("balances").setValue(self.account.balances)
                 }
             }
         
@@ -398,7 +369,6 @@ class FinanceAccountViewController: FormViewController {
                     if let value = row.value {
                         self.updateTheDate()
                         self.account.available_balance = value
-//                        Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("available_balance").setValue(value)
                     }
                 }
         }
@@ -433,8 +403,6 @@ class FinanceAccountViewController: FormViewController {
                         self.updateTheDate()
                         let date = self.isodateFormatter.string(from: value)
                         self.account.payment_due_at = date
-//                        let reference = Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("payment_due_at")
-//                        reference.setValue(date)
                     }
                 }
         }
@@ -454,12 +422,35 @@ class FinanceAccountViewController: FormViewController {
                     if let value = row.value {
                         self.updateTheDate()
                         self.account.minimum_payment = value
-//                        Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("minimum_payment").setValue(value)
                     }
                 }
         }
         
         form.last!
+        
+            <<< LabelRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
+                    row.value = String(self.selectedFalconUsers.count + 1)
+                } else {
+                    row.value = String(self.selectedFalconUsers.count)
+                }
+            }.onCellSelection({ _, row in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
+            }
+            
             <<< LabelRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -482,24 +473,6 @@ class FinanceAccountViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }
             }
-        
-        //            <<< ButtonRow("Participants") { row in
-        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                row.cell.textLabel?.textAlignment = .left
-        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                row.cell.accessoryType = .disclosureIndicator
-        //                row.title = row.tag
-        //                if active {
-        //                    row.title = self.userNamesString
-        //                }
-        //                }.onCellSelection({ _,_ in
-        //                    self.openParticipantsInviter()
-        //                }).cellUpdate { cell, row in
-        //                    cell.accessoryType = .disclosureIndicator
-        //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                    cell.textLabel?.textAlignment = .left
-        //                }
     }
     
     fileprivate func updateTheDate() {
@@ -534,6 +507,7 @@ class FinanceAccountViewController: FormViewController {
                 uniqueUsers.append(participant)
             }
         }
+        destination.ownerID = account.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -588,39 +562,21 @@ class FinanceAccountViewController: FormViewController {
 
 extension FinanceAccountViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
-            if !selectedFalconUsers.isEmpty {
-                self.selectedFalconUsers = selectedFalconUsers
-                
-                var participantCount = self.selectedFalconUsers.count
-                // If user is creating this activity (admin)
-                if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
-                } else {
-                    self.userNamesString = "1 participant"
-                }
-                
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-                
+        if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
+            self.selectedFalconUsers = selectedFalconUsers
+            if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
+                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
             } else {
-                self.selectedFalconUsers = selectedFalconUsers
-                inviteesRow.title = "1 participant"
-                inviteesRow.updateCell()
+                inviteesRow.value = String(self.selectedFalconUsers.count)
             }
+            inviteesRow.updateCell()
             
             if active {
                 self.showActivityIndicator()
                 let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createAccount.updateAccountParticipants()
                 self.hideActivityIndicator()
-                
             }
-            
         }
     }
 }

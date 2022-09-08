@@ -37,6 +37,9 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     
     var participants: [String: [User]] = [:]
     
+    var updatingTasks = true
+    var updatingEvents = true
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         tableView.register(TableViewHeader.self,
@@ -69,6 +72,19 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
                                                                 headerCellID) as? TableViewHeader ?? TableViewHeader()
         if sections.count > 1 {
             let section = sections[section]
+            if section == .tasks {
+                if updatingTasks {
+                    header.spinnerView.startAnimating()
+                } else {
+                    header.spinnerView.stopAnimating()
+                }
+            } else {
+                if updatingTasks {
+                    header.spinnerView.startAnimating()
+                } else {
+                    header.spinnerView.stopAnimating()
+                }
+            }
             header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             header.titleLabel.text = section.name
             header.subTitleLabel.isHidden = false

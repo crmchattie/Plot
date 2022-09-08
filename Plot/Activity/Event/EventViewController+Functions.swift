@@ -13,7 +13,6 @@ import Eureka
 import SplitRow
 import ViewRow
 import EventKit
-import UserNotifications
 import CodableFirebase
 import RRuleSwift
 import HealthKit
@@ -213,9 +212,6 @@ extension EventViewController {
             dispatchGroup.enter()
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, tasks, health, transactions in
                 self.container = container
-                for task in tasks ?? [] {
-                    print(task.name)
-                }
                 self.taskList = tasks ?? []
                 self.healthList = health ?? []
                 self.purchaseList = transactions ?? []
@@ -452,7 +448,7 @@ extension EventViewController {
     }
     
     func scheduleReminder() {
-        guard let activity = activity, let activityReminder = activity.reminder, let startDate = activity.startDate, let endDate = activity.endDate, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
+        guard let activity = activity, let activityReminder = activity.reminder, let startDate = activity.startDate, let endDate = activity.endDate, let allDay = activity.allDay else {
             return
         }
         let center = UNUserNotificationCenter.current()
@@ -464,12 +460,14 @@ extension EventViewController {
         content.title = "\(String(describing: activity.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: activity.startTimeZone, endTimeZone: activity.endTimeZone)
         content.subtitle = formattedDate.0
         if let reminder = EventAlert(rawValue: activityReminder) {
             let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
             var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: startTimeZone)!
+            if let timeZone = activity.startTimeZone {
+                calendar.timeZone = TimeZone(identifier: timeZone)!
+            }
             let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                         repeats: false)
@@ -587,7 +585,7 @@ extension EventViewController {
             }
         }
         
-        destination.ownerID = self.activity.admin
+        destination.ownerID = activity.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -623,12 +621,11 @@ extension EventViewController {
             }
             dispatchGroup.notify(queue: .main) {
                 destination.userInvitationStatus = self.userInvitationStatus
-                InvitationsFetcher.getAcceptedParticipant(forActivity: self.activity, allParticipants: self.selectedFalconUsers) { acceptedParticipant in
-                    self.acceptedParticipant = acceptedParticipant
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+                self.navigationController?.pushViewController(destination, animated: true)
+
             }
         } else {
+            print("else")
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }

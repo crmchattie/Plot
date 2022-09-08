@@ -211,6 +211,9 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedCalendarEventActivities), name: .hasLoadedCalendarEventActivities, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -229,7 +232,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     
     @objc fileprivate func tasksUpdated() {
-        self.updatingTasks = false
         scrollToFirstTask({ (tasks) in
             if self.sortedTasks != tasks {
                 self.sortedTasks = tasks
@@ -252,10 +254,8 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     }
     
     @objc fileprivate func eventsUpdated() {
-        self.updatingEvents = false
         scrollToFirstActivityWithDate({ (events) in
             if self.sortedEvents != events {
-                print("self.sortedEvents != events")
                 self.sortedEvents = events
                 if !events.isEmpty {
                     if self.activitiesSections.firstIndex(of: .calendar) == nil {
@@ -290,7 +290,6 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
     
     @objc fileprivate func financeUpdated() {
         self.grabFinancialItems { (sections, groups) in
-            self.updatingFinances = false
             if self.financeSections != sections || self.financeGroups != groups {
                 self.financeSections = sections
                 self.financeGroups = groups
@@ -313,6 +312,27 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
         }
     }
     
+    @objc fileprivate func hasLoadedCalendarEventActivities() {
+        self.updatingEvents = false
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    @objc fileprivate func hasLoadedListTaskActivities() {
+        self.updatingTasks = false
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    @objc fileprivate func hasLoadedFinancials() {
+        self.updatingFinances = false
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
     func setNavBar() {
         navigationItem.title = {
             let dateFormatter = DateFormatter()
@@ -320,10 +340,15 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
             return dateFormatter.string(from: Date())
         }()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "settings"),
+        let settingsBarButton = UIBarButtonItem(image: UIImage(named: "settings"),
                                                            style: .plain,
                                                            target: self,
                                                            action: #selector(goToSettings))
+        let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"),
+                                                           style: .plain,
+                                                           target: self,
+                                                           action: #selector(goToNotifications))
+        navigationItem.leftBarButtonItems = [notificationsBarButton, settingsBarButton]
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                             target: self,
                                                             action: #selector(newItem))
@@ -476,6 +501,16 @@ class MasterActivityContainerController: UIViewController, ActivityDetailShowing
             let destination = CalendarViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
+        } else if section == .time {
+            if !sortedTasks.isEmpty {
+                let destination = ListsViewController(networkController: networkController)
+                destination.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(destination, animated: true)
+            } else if !sortedEvents.isEmpty {
+                let destination = CalendarViewController(networkController: networkController)
+                destination.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(destination, animated: true)
+            }
         } else if section == .health, !healthMetrics.isEmpty {
             let destination = HealthViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
@@ -498,13 +533,13 @@ extension MasterActivityContainerController {
     
     @objc func goToNotifications() {
         let destination = NotificationsViewController()
-        destination.notificationActivities = networkController.activityService.events
-        destination.invitedActivities = networkController.activityService.invitedActivities
-        destination.invitations = networkController.activityService.invitations
-        destination.users = networkController.userService.users
-        destination.filteredUsers = networkController.userService.users
-        destination.conversations = networkController.conversationService.conversations
-        destination.listList = networkController.listService.listList
+//        destination.notificationActivities = networkController.activityService.events
+//        destination.invitedActivities = networkController.activityService.invitedActivities
+//        destination.invitations = networkController.activityService.invitations
+//        destination.users = networkController.userService.users
+//        destination.filteredUsers = networkController.userService.users
+//        destination.conversations = networkController.conversationService.conversations
+//        destination.listList = networkController.listService.listList
         destination.sortInvitedActivities()
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)

@@ -39,9 +39,6 @@ class MindfulnessViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     
-    var userNames : [String] = []
-    var userNamesString: String = ""
-    
     //added for EventViewController
     var movingBackwards: Bool = false
     var active: Bool = false
@@ -74,29 +71,12 @@ class MindfulnessViewController: FormViewController {
             active = false
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
-                mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil)
+                mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil, user_created: true)
             }
         } else {
             active = true
             title = "Mindfulness"
             
-            var participantCount = self.selectedFalconUsers.count
-            
-            // If user is creating this activity (admin)
-            if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
-            } else {
-                self.userNamesString = "1 participant"
-            }
-            
-            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-            }
         }
         configureTableView()
         setupRightBarButton()
@@ -106,7 +86,7 @@ class MindfulnessViewController: FormViewController {
         
         if active {
             for row in form.allRows {
-                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
+                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -393,29 +373,28 @@ class MindfulnessViewController: FormViewController {
             }
         
         
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if active {
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = self.userNamesString
-//                }
-//            }.onCellSelection({ _,_ in
-//                self.openParticipantsInviter()
-//            }).cellUpdate { cell, row in
-//                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textAlignment = .left
-//                if row.title == "Participants" {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                } else {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                }
-//            }
-        
+        <<< LabelRow("Participants") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
+                row.value = String(self.selectedFalconUsers.count + 1)
+            } else {
+                row.value = String(self.selectedFalconUsers.count)
+            }
+        }.onCellSelection({ _, row in
+            self.openParticipantsInviter()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.textLabel?.textAlignment = .left
+        }
         
         if delegate == nil && active {
             form.last!
@@ -597,7 +576,7 @@ class MindfulnessViewController: FormViewController {
                 uniqueUsers.append(participant)
             }
         }
-        
+        destination.ownerID = mindfulness.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -665,28 +644,14 @@ class MindfulnessViewController: FormViewController {
 
 extension MindfulnessViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
-            if !selectedFalconUsers.isEmpty {
-                self.selectedFalconUsers = selectedFalconUsers
-                var participantCount = self.selectedFalconUsers.count
-                // If user is creating this activity (admin)
-                if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
-                } else {
-                    self.userNamesString = "1 participant"
-                }
-                
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-                
+        if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
+            self.selectedFalconUsers = selectedFalconUsers
+            if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
+                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
             } else {
-                self.selectedFalconUsers = selectedFalconUsers
-                inviteesRow.title = "1 participant"
-                inviteesRow.updateCell()
+                inviteesRow.value = String(self.selectedFalconUsers.count)
             }
+            inviteesRow.updateCell()
             
             if active {
                 self.showActivityIndicator()

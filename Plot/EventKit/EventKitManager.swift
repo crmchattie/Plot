@@ -189,7 +189,6 @@ class EventKitManager {
                 completion()
                 return
             }
-            print("syncActivitiesToEventKit completion")
             weakSelf.isRunningTasks = false
             completion()
         }

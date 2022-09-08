@@ -35,9 +35,6 @@ class FinanceTransactionViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     
-    var userNames : [String] = []
-    var userNamesString: String = ""
-    
     var active: Bool = false
     var sectionChanged: Bool = false
     
@@ -86,7 +83,7 @@ class FinanceTransactionViewController: FormViewController {
             }
         } else if !(transaction?.user_created ?? false) {
             for row in form.rows {
-                if row.tag == "Account" || row.tag == "Transacted On" || row.tag == "Name" {
+                if row.tag == "Account" || row.tag == "Transacted On" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -101,26 +98,11 @@ class FinanceTransactionViewController: FormViewController {
     
     fileprivate func setupVariables() {
         if let _ = transaction {
+            print(transaction.guid)
+            
             title = "Transaction"
             active = true
             numberFormatter.currencyCode = transaction.currency_code
-            
-            var participantCount = self.selectedFalconUsers.count
-            // If user is creating this activity (admin)
-            if transaction.admin == nil || transaction.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
-            } else {
-                self.userNamesString = "1 participant"
-            }
-            
-            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-            }
             
             if transaction.admin == nil, let currentUser = Auth.auth().currentUser?.uid {
                 let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("admin")
@@ -231,9 +213,7 @@ class FinanceTransactionViewController: FormViewController {
 //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
 //                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                }).onChange { row in
-//                    let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("transactionDescription")
 //                    self.transaction.transactionDescription = row.value
-//                    reference.setValue(row.value)
 //                }
             
             <<< DateInlineRow("Transacted On") {
@@ -541,6 +521,29 @@ class FinanceTransactionViewController: FormViewController {
                 cell.textLabel?.textAlignment = .left
             }
         
+            <<< LabelRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if transaction.admin == nil || transaction.admin == Auth.auth().currentUser?.uid {
+                    row.value = String(self.selectedFalconUsers.count + 1)
+                } else {
+                    row.value = String(self.selectedFalconUsers.count)
+                }
+            }.onCellSelection({ _, row in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
+            }
+        
             <<< LabelRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -563,28 +566,6 @@ class FinanceTransactionViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }
             }
-        
-            
-            
-//        form +++
-//            Section()
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if active {
-//                    row.title = self.userNamesString
-//                }
-//                }.onCellSelection({ _,_ in
-//                    self.openParticipantsInviter()
-//                }).cellUpdate { cell, row in
-//                    cell.accessoryType = .disclosureIndicator
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
-//                }
         
         if delegate == nil {
             form.last!
@@ -740,6 +721,7 @@ class FinanceTransactionViewController: FormViewController {
                 uniqueUsers.append(participant)
             }
         }
+        destination.ownerID = transaction.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -858,45 +840,20 @@ extension FinanceTransactionViewController: UpdateTransactionLevelDelegate {
 
 extension FinanceTransactionViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants"), let currentUser = Auth.auth().currentUser?.uid {
-            if !selectedFalconUsers.isEmpty {
-                self.selectedFalconUsers = selectedFalconUsers
-                var participantCount = self.selectedFalconUsers.count
-                // If user is creating this activity (admin)
-                if transaction.admin == nil || transaction.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
-                } else {
-                    self.userNamesString = "1 participant"
-                }
-                
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-                
+        if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
+            self.selectedFalconUsers = selectedFalconUsers
+            if transaction.admin == nil || transaction.admin == Auth.auth().currentUser?.uid {
+                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
             } else {
-                self.selectedFalconUsers = selectedFalconUsers
-                inviteesRow.title = "1 participant"
-                inviteesRow.updateCell()
+                inviteesRow.value = String(self.selectedFalconUsers.count)
             }
+            inviteesRow.updateCell()
             
             if active {
                 self.showActivityIndicator()
                 let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createTransaction.updateTransactionParticipants()
                 self.hideActivityIndicator()
-            }
-            
-            transaction.participantsIDs = []
-            if transaction.admin == currentUser {
-                transaction.participantsIDs!.append(currentUser)
-            }
-            
-            for selectedUser in selectedFalconUsers {
-                guard let id = selectedUser.id else { continue }
-                transaction.participantsIDs!.append(id)
             }
         }
     }

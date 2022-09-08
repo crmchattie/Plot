@@ -13,7 +13,6 @@ import Eureka
 import SplitRow
 import ViewRow
 import EventKit
-import UserNotifications
 import CodableFirebase
 import RRuleSwift
 import HealthKit
@@ -63,8 +62,6 @@ class TaskViewController: FormViewController {
     var eventIndex: Int = 0
     
     var grocerylistIndex: Int = -1
-    var userNames : [String] = []
-    var userNamesString: String = ""
     var thumbnailImage: String = ""
     var segmentRowValue: String = "Health"
     var activityID = String()
@@ -124,24 +121,6 @@ class TaskViewController: FormViewController {
         
         setupRightBarButton()
         initializeForm()
-        
-        var participantCount = self.selectedFalconUsers.count
-        
-        // If user is creating this activity (admin)
-        if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
-            participantCount += 1
-        }
-        
-        if participantCount > 1 {
-            self.userNamesString = "\(participantCount) participants"
-        } else {
-            self.userNamesString = "1 participant"
-        }
-        
-        if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-            inviteesRow.title = self.userNamesString
-            inviteesRow.updateCell()
-        }
         
         purchaseUsers = self.selectedFalconUsers
         
@@ -325,29 +304,6 @@ class TaskViewController: FormViewController {
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
         
-        
-        //            <<< ButtonRow("Participants") { row in
-        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                row.cell.textLabel?.textAlignment = .left
-        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        //                row.cell.accessoryType = .disclosureIndicator
-        //                row.title = row.tag
-        //                if self.selectedFalconUsers.count > 0 {
-        //                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                    row.title = self.userNamesString
-        //                }
-        //                }.onCellSelection({ _,_ in
-        //                    self.openParticipantsInviter()
-        //                }).cellUpdate { cell, row in
-        //                    cell.accessoryType = .disclosureIndicator
-        //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                    cell.textLabel?.textAlignment = .left
-        //                    if row.title == "Participants" {
-        //                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        //                    } else {
-        //                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                    }
-        //                }
         
 //        <<< SwitchRow("Start Date") {
 //            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -832,6 +788,29 @@ class TaskViewController: FormViewController {
                     self.scheduleReminder()
                 }
             }
+        }
+        
+        <<< LabelRow("Participants") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
+                row.value = String(self.selectedFalconUsers.count + 1)
+            } else {
+                row.value = String(self.selectedFalconUsers.count)
+            }
+        }.onCellSelection({ _, row in
+            self.openParticipantsInviter()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.textLabel?.textAlignment = .left
         }
         
         <<< LabelRow("List") { row in

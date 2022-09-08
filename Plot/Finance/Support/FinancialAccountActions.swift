@@ -142,10 +142,8 @@ class AccountActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userFinancialAccountsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["name": "\(account.name)", "groupAccount": false]
+            let values:[String : Any] = ["name": "\(account.name)", "should_link": false]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                //trigger firebase observer to update
-                userReference.child("groupAccount").setValue(true)
                 connectingMembersGroup.leave()
             })
         }

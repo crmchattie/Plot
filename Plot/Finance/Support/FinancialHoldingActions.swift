@@ -140,7 +140,7 @@ class HoldingActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userFinancialHoldingsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["description": holding.description, "groupHolding": false]
+            let values:[String : Any] = ["description": holding.description, "should_link": false]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })

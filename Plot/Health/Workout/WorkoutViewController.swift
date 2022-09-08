@@ -35,9 +35,6 @@ class WorkoutViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     
-    var userNames : [String] = []
-    var userNamesString: String = ""
-    
     fileprivate var productIndex: Int = 0
     
     let numberFormatter = NumberFormatter()
@@ -71,34 +68,18 @@ class WorkoutViewController: FormViewController {
         navigationItem.largeTitleDisplayMode = .never
         
         numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumFractionDigits = 0
         
         if workout != nil {
             title = "Workout"
             
             active = true
             
-            var participantCount = self.selectedFalconUsers.count
-            
-            // If user is creating this activity (admin)
-            if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
-            } else {
-                self.userNamesString = "1 participant"
-            }
-            
-            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-            }
         } else {
             title = "New Workout"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
-                workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil)
+                workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, user_created: true)
             }
         }
         configureTableView()
@@ -109,7 +90,7 @@ class WorkoutViewController: FormViewController {
         
         if active {
             for row in form.allRows {
-                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" {
+                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -497,28 +478,28 @@ class WorkoutViewController: FormViewController {
             self.updateCalories()
         })
         
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if active {
-//                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.title = self.userNamesString
-//                }
-//            }.onCellSelection({ _,_ in
-//                self.openParticipantsInviter()
-//            }).cellUpdate { cell, row in
-//                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textAlignment = .left
-//                if row.title == "Participants" {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                } else {
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                }
-//            }
+        <<< LabelRow("Participants") { row in
+            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.textLabel?.textAlignment = .left
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
+                row.value = String(self.selectedFalconUsers.count + 1)
+            } else {
+                row.value = String(self.selectedFalconUsers.count)
+            }
+        }.onCellSelection({ _, row in
+            self.openParticipantsInviter()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.textLabel?.textAlignment = .left
+        }
         
         if delegate == nil && active {
             form.last!
@@ -709,7 +690,7 @@ class WorkoutViewController: FormViewController {
                 uniqueUsers.append(participant)
             }
         }
-        
+        destination.ownerID = workout.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -765,26 +746,17 @@ class WorkoutViewController: FormViewController {
 
 extension WorkoutViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
+        if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
+            self.selectedFalconUsers = selectedFalconUsers
             if !selectedFalconUsers.isEmpty {
-                self.selectedFalconUsers = selectedFalconUsers
-                var participantCount = self.selectedFalconUsers.count
-                // If user is creating this activity (admin)
                 if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
+                    inviteesRow.value = String(self.selectedFalconUsers.count + 1)
                 } else {
-                    self.userNamesString = "1 participant"
+                    inviteesRow.value = String(self.selectedFalconUsers.count)
                 }
-                
-                inviteesRow.title = self.userNamesString
                 inviteesRow.updateCell()
-                
             } else {
-                self.selectedFalconUsers = selectedFalconUsers
-                inviteesRow.title = "1 participant"
+                inviteesRow.value = String(1)
                 inviteesRow.updateCell()
             }
             

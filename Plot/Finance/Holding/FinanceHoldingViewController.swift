@@ -26,9 +26,6 @@ class FinanceHoldingViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     
-    var userNames : [String] = []
-    var userNamesString: String = ""
-    
     var active: Bool = false
     
     //added for EventViewController
@@ -91,22 +88,6 @@ class FinanceHoldingViewController: FormViewController {
             active = true
             numberFormatter.currencyCode = holding.currency_code
             
-            var participantCount = self.selectedFalconUsers.count
-            // If user is creating this activity (admin)
-            if holding.admin == nil || holding.admin == Auth.auth().currentUser?.uid {
-                participantCount += 1
-            }
-            
-            if participantCount > 1 {
-                self.userNamesString = "\(participantCount) participants"
-            } else {
-                self.userNamesString = "1 participant"
-            }
-            
-            if let inviteesRow: ButtonRow = self.form.rowBy(tag: "Participants") {
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-            }
         } else if let currentUser = Auth.auth().currentUser?.uid {
             title = "New Investment"
             let ID = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).childByAutoId().key ?? ""
@@ -194,6 +175,22 @@ class FinanceHoldingViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }
+        
+//            <<< TextAreaRow("Description") {
+//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.placeholder = $0.tag
+//                $0.value = holding.holdingDescription
+//                }.cellUpdate({ (cell, row) in
+//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                }).onChange { row in
+//                    self.holding.holdingDescription = row.value
+//                }
             
         if let symbol = holding.symbol, symbol != holding.description {
             form.last!
@@ -246,32 +243,12 @@ class FinanceHoldingViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value, let type = MXHoldingType(rawValue: value) {
                     self.holding.holding_type = type
-//                    let reference = Database.database().reference().child(financialAccountsEntity).child(self.holding.guid).child("holding_type")
-//                    reference.setValue(value)
                 }
             }
         }
-                
-//            <<< TextAreaRow("Description") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                $0.placeholder = $0.tag
-//                $0.value = holding.holdingDescription
-//                }.cellUpdate({ (cell, row) in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//                }).onChange { row in
-                      
-//                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("holdingDescription")
-//                    self.holding.holdingDescription = row.value
-//                    reference.setValue(row.value)
-//                }
-            
+             
         form.last!
+            
             <<< LabelRow("Last Updated") {
                 $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -302,8 +279,6 @@ class FinanceHoldingViewController: FormViewController {
                 if let value = row.value {
                     self.updateTheDate()
                     self.holding.cost_basis = value
-//                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("cost_basis")
-//                    reference.setValue(value)
                 }
             }
         }
@@ -323,8 +298,6 @@ class FinanceHoldingViewController: FormViewController {
                 if let value = row.value {
                     self.updateTheDate()
                     self.holding.market_value = value
-//                    let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("market_value")
-//                    reference.setValue(value)
                 }
             }
             
@@ -419,9 +392,30 @@ class FinanceHoldingViewController: FormViewController {
                 }
             }.onChange({ row in
                 self.holding.account_name = row.value
-//                let reference = Database.database().reference().child(financialHoldingsEntity).child(self.holding.guid).child("account_name")
-//                reference.setValue(row.value)
             })
+        
+            <<< LabelRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if holding.admin == nil || holding.admin == Auth.auth().currentUser?.uid {
+                    row.value = String(self.selectedFalconUsers.count + 1)
+                } else {
+                    row.value = String(self.selectedFalconUsers.count)
+                }
+            }.onCellSelection({ _, row in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
+            }
         
             <<< LabelRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -445,28 +439,6 @@ class FinanceHoldingViewController: FormViewController {
                     cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 }
             }
-        
-            
-            
-//        form +++
-//            Section()
-//            <<< ButtonRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.accessoryType = .disclosureIndicator
-//                row.title = row.tag
-//                if active {
-//                    row.title = self.userNamesString
-//                }
-//                }.onCellSelection({ _,_ in
-//                    self.openParticipantsInviter()
-//                }).cellUpdate { cell, row in
-//                    cell.accessoryType = .disclosureIndicator
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
-//                }
         
     }
     
@@ -502,6 +474,7 @@ class FinanceHoldingViewController: FormViewController {
                 uniqueUsers.append(participant)
             }
         }
+        destination.ownerID = holding.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -556,43 +529,20 @@ class FinanceHoldingViewController: FormViewController {
 
 extension FinanceHoldingViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants"), let currentUser = Auth.auth().currentUser?.uid {
-            if !selectedFalconUsers.isEmpty {
-                self.selectedFalconUsers = selectedFalconUsers
-                var participantCount = self.selectedFalconUsers.count
-                // If user is creating this activity (admin)
-                if holding.admin == nil || holding.admin == Auth.auth().currentUser?.uid {
-                    participantCount += 1
-                }
-                
-                if participantCount > 1 {
-                    self.userNamesString = "\(participantCount) participants"
-                } else {
-                    self.userNamesString = "1 participant"
-                }
-                
-                inviteesRow.title = self.userNamesString
-                inviteesRow.updateCell()
-                
+        if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
+            self.selectedFalconUsers = selectedFalconUsers
+            if holding.admin == nil || holding.admin == Auth.auth().currentUser?.uid {
+                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
             } else {
-                self.selectedFalconUsers = selectedFalconUsers
-                inviteesRow.title = "1 participant"
-                inviteesRow.updateCell()
+                inviteesRow.value = String(self.selectedFalconUsers.count)
             }
+            inviteesRow.updateCell()
+            
             if active {
                 self.showActivityIndicator()
                 let createHolding = HoldingActions(holding: self.holding, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createHolding.updateHoldingParticipants()
                 self.hideActivityIndicator()
-            }
-            
-            holding.participantsIDs = []
-            if holding.admin == currentUser {
-                holding.participantsIDs!.append(currentUser)
-            }
-            for selectedUser in selectedFalconUsers {
-                guard let id = selectedUser.id else { continue }
-                holding.participantsIDs!.append(id)
             }
         }
     }

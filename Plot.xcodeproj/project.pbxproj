@@ -163,8 +163,8 @@
 		1092E26B28B7AE960018FCAA /* GPlotTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E26A28B7AE960018FCAA /* GPlotTaskOp.swift */; };
 		1092E26D28B7D91F0018FCAA /* CustomType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E26C28B7D91F0018FCAA /* CustomType.swift */; };
 		1092E27128B7E4440018FCAA /* TimeInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */; };
-		1092E27328B7E5600018FCAA /* TaskInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */; };
-		1092E27528B7E5750018FCAA /* TaskAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27428B7E5750018FCAA /* TaskAccountView.swift */; };
+		1092E27328B7E5600018FCAA /* ListInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27228B7E5600018FCAA /* ListInfoViewController.swift */; };
+		1092E27528B7E5750018FCAA /* ListAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27428B7E5750018FCAA /* ListAccountView.swift */; };
 		1092E27828B923A70018FCAA /* SignInAppleGoogleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27728B923A70018FCAA /* SignInAppleGoogleViewController.swift */; };
 		1092E27A28B927BC0018FCAA /* TableViewObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27928B927BC0018FCAA /* TableViewObject.swift */; };
 		1092E27C28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */; };
@@ -487,8 +487,6 @@
 		4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE577212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift */; };
 		4BAEE5CF212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE579212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift */; };
 		4BAEE5D0212735E50045AB10 /* SelectParticipantsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE57A212735E50045AB10 /* SelectParticipantsViewController.swift */; };
-		4BAEE5D1212735E50045AB10 /* SelectedParticipantsCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE57B212735E50045AB10 /* SelectedParticipantsCollectionView.swift */; };
-		4BAEE5D2212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE57C212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift */; };
 		4BAEE5D3212735E50045AB10 /* RoundProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE57E212735E50045AB10 /* RoundProgressView.swift */; };
 		4BAEE5D4212735E50045AB10 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE580212735E50045AB10 /* UIView+Extensions.swift */; };
 		4BAEE5D5212735E50045AB10 /* AnnouncementShowing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE581212735E50045AB10 /* AnnouncementShowing.swift */; };
@@ -742,8 +740,8 @@
 		1092E26A28B7AE960018FCAA /* GPlotTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPlotTaskOp.swift; sourceTree = "<group>"; };
 		1092E26C28B7D91F0018FCAA /* CustomType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomType.swift; sourceTree = "<group>"; };
 		1092E27028B7E4440018FCAA /* TimeInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInfoViewController.swift; sourceTree = "<group>"; };
-		1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskInfoViewController.swift; sourceTree = "<group>"; };
-		1092E27428B7E5750018FCAA /* TaskAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskAccountView.swift; sourceTree = "<group>"; };
+		1092E27228B7E5600018FCAA /* ListInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListInfoViewController.swift; sourceTree = "<group>"; };
+		1092E27428B7E5750018FCAA /* ListAccountView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListAccountView.swift; sourceTree = "<group>"; };
 		1092E27728B923A70018FCAA /* SignInAppleGoogleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInAppleGoogleViewController.swift; sourceTree = "<group>"; };
 		1092E27928B927BC0018FCAA /* TableViewObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewObject.swift; sourceTree = "<group>"; };
 		1092E27B28B92C750018FCAA /* SignInAppleGoogleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInAppleGoogleTableViewCell.swift; sourceTree = "<group>"; };
@@ -1069,8 +1067,6 @@
 		4BAEE577212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SelectParticipantsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		4BAEE579212735E50045AB10 /* CollectionViewLeftAlignFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewLeftAlignFlowLayout.swift; sourceTree = "<group>"; };
 		4BAEE57A212735E50045AB10 /* SelectParticipantsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectParticipantsViewController.swift; sourceTree = "<group>"; };
-		4BAEE57B212735E50045AB10 /* SelectedParticipantsCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectedParticipantsCollectionView.swift; sourceTree = "<group>"; };
-		4BAEE57C212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectedParticipantsCollectionViewCell.swift; sourceTree = "<group>"; };
 		4BAEE57E212735E50045AB10 /* RoundProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundProgressView.swift; sourceTree = "<group>"; };
 		4BAEE580212735E50045AB10 /* UIView+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		4BAEE581212735E50045AB10 /* AnnouncementShowing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnouncementShowing.swift; sourceTree = "<group>"; };
@@ -1591,8 +1587,8 @@
 		1092E26E28B7E37E0018FCAA /* Reminders */ = {
 			isa = PBXGroup;
 			children = (
-				1092E27228B7E5600018FCAA /* TaskInfoViewController.swift */,
-				1092E27428B7E5750018FCAA /* TaskAccountView.swift */,
+				1092E27228B7E5600018FCAA /* ListInfoViewController.swift */,
+				1092E27428B7E5750018FCAA /* ListAccountView.swift */,
 			);
 			path = Reminders;
 			sourceTree = "<group>";
@@ -2057,6 +2053,7 @@
 				105F345A2885EB2F007531EB /* Repeat */,
 				10B3E52628B6AEB900E1713D /* Tags */,
 				1092E28328BD28470018FCAA /* Filter */,
+				4BAEE48821272C5E0045AB10 /* ContactsControllers */,
 				1051AC99244F8C470066761C /* OldList */,
 				4BAEE4A421272D880045AB10 /* Chats */,
 				4BAEE4AB21272D880045AB10 /* ChatLog */,
@@ -2290,7 +2287,6 @@
 			children = (
 				4BAEE53A2127312D0045AB10 /* Cells */,
 				4BAEE53B212731510045AB10 /* Controllers */,
-				4BAEE48821272C5E0045AB10 /* ContactsControllers */,
 				4BAEE4B121272D880045AB10 /* CreateNewChatControllers */,
 				4BAEE53E212732180045AB10 /* UserDetailsControllers */,
 				4BAEE53D212731CF0045AB10 /* AdminPanelControllers */,
@@ -2666,7 +2662,6 @@
 				4BAEE577212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift */,
 				4BAEE578212735E50045AB10 /* FlowLayout */,
 				4BAEE57A212735E50045AB10 /* SelectParticipantsViewController.swift */,
-				4BAEE57B212735E50045AB10 /* SelectedParticipantsCollectionView.swift */,
 			);
 			path = MultipleSelectionControllers;
 			sourceTree = "<group>";
@@ -2675,7 +2670,6 @@
 			isa = PBXGroup;
 			children = (
 				4BAEE575212735E50045AB10 /* ParticipantTableViewCell.swift */,
-				4BAEE57C212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -3279,7 +3273,6 @@
 				10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */,
 				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
 				4B5E99DE212CC0C0001F067F /* InAppNotificationManager.swift in Sources */,
-				4BAEE5D1212735E50045AB10 /* SelectedParticipantsCollectionView.swift in Sources */,
 				26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */,
 				108C37F7289C089500DC4998 /* HKCategorySampleViewController.swift in Sources */,
 				10BA3BCE259BEDF9005D98EC /* SetupCell.swift in Sources */,
@@ -3351,12 +3344,11 @@
 				260C87CC24FF600900715A64 /* AsyncOperation.swift in Sources */,
 				4BAEE5B7212735E50045AB10 /* INSPhotosTransitionAnimator.swift in Sources */,
 				4BAEE46D21272B380045AB10 /* SwitchObject.swift in Sources */,
-				1092E27528B7E5750018FCAA /* TaskAccountView.swift in Sources */,
+				1092E27528B7E5750018FCAA /* ListAccountView.swift in Sources */,
 				103E968A22C2B309007D6668 /* PurchaseRow.swift in Sources */,
 				10C766E325321732003C8E1F /* FinanceTransactionRuleViewController.swift in Sources */,
 				F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */,
 				4BAEE49821272C5E0045AB10 /* ViewPlaceholder.swift in Sources */,
-				4BAEE5D2212735E50045AB10 /* SelectedParticipantsCollectionViewCell.swift in Sources */,
 				4BAEE46821272B380045AB10 /* ChangeNumberVerificationController.swift in Sources */,
 				10B3E50528B1105600E1713D /* SubtaskViewController.swift in Sources */,
 				269105EF253E8DD700A02C5F /* XYMarkerView.swift in Sources */,
@@ -3516,7 +3508,7 @@
 				10B3E4FF28AEAC4E00E1713D /* ListType.swift in Sources */,
 				10E0F616259A727000A1D86E /* ListService.swift in Sources */,
 				10ED76C426403CA7002838F5 /* TrackingService.swift in Sources */,
-				1092E27328B7E5600018FCAA /* TaskInfoViewController.swift in Sources */,
+				1092E27328B7E5600018FCAA /* ListInfoViewController.swift in Sources */,
 				4BAEE5F0212735E50045AB10 /* RevealableView.swift in Sources */,
 				10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */,
 				4BAEE50021272D890045AB10 /* UserInfoTableViewController.swift in Sources */,

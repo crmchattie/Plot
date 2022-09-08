@@ -12,20 +12,10 @@ import Firebase
 class SelectParticipantsViewController: UIViewController {
     
     let falconUsersCellID = "falconUsersCellID"
-    let selectedParticipantsCollectionViewCellID = "SelectedParticipantsCollectionViewCellID"
     
-    var filteredUsers = [User]() {
-        didSet {
-            checkIfThereAnyUsers()
-            configureSections()
-        }
-    }
-    
-    var userInvitationStatus: [String: Status] = [:] {
-        didSet {
-            configureSections()
-        }
-    }
+    var filteredUsers = [User]()
+    var userInvitationStatus: [String: Status] = [:]
+    var priorSelectedUsers = [User]()
     
     var chatLogController: ChatLogController? = nil
     var messagesFetcher: MessagesFetcher? = nil
@@ -35,7 +25,6 @@ class SelectParticipantsViewController: UIViewController {
     var sortedFirstLetters = [String]()
     var sections = [[User]]()
     var selectedFalconUsers = [User]()
-    var priorSelectedUsers = [User]()
     var conversations = [Conversation]()
     var searchBar: UISearchBar?
     let tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -48,6 +37,9 @@ class SelectParticipantsViewController: UIViewController {
         setupSearchController()
         setupMainView()
         setupTableView()
+        checkIfThereAnyUsers()
+        configureSections()
+
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -79,17 +71,23 @@ class SelectParticipantsViewController: UIViewController {
     }
     
     fileprivate var isInitialLoad = true
-    fileprivate func configureSections() {
+    
+    func configureSections() {
         if isInitialLoad {
             _ = filteredUsers.map { $0.isSelected = false }
             isInitialLoad = false
         }
+        
+        selectPriorUsers(priorSelectedUsers: priorSelectedUsers)
         
         if userInvitationStatus.count > 0 {
             sortedFirstLetters = [Status.accepted.description, Status.pending.description, Status.declined.description, Status.uninvited.description]
             sections = sortedFirstLetters.map { status in
                 return self.filteredUsers
                     .filter {
+                        if $0.titleFirstLetter == "" {
+                            return false
+                        }
                         if let id = $0.id, let userStatus = userInvitationStatus[id]?.description {
                             return userStatus == status
                         }
@@ -120,6 +118,10 @@ class SelectParticipantsViewController: UIViewController {
                     .sorted { $0.name ?? "" < $1.name ?? "" }
             }
         }
+        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     func checkIfThereAnyUsers() {
@@ -142,17 +144,7 @@ class SelectParticipantsViewController: UIViewController {
     }
     
     func setupRightBarButton(with title: String) {
-        if #available(iOS 11.0, *) {
-            let rightBarButton = UIButton(type: .system)
-            rightBarButton.setTitle(title, for: .normal)
-            //      rightBarButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
-            rightBarButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-            rightBarButton.titleLabel?.adjustsFontForContentSizeCategory = true
-            rightBarButton.addTarget(self, action: #selector(rightBarButtonTapped), for: .touchUpInside)
-            navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
-        } else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: title, style: .plain, target: self, action: #selector(rightBarButtonTapped))
-        }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
         navigationItem.rightBarButtonItem?.isEnabled = false
     }
     
@@ -265,10 +257,6 @@ class SelectParticipantsViewController: UIViewController {
         tableView.setEditing(true, animated: false)
         tableView.register(ParticipantTableViewCell.self, forCellReuseIdentifier: falconUsersCellID)
         tableView.separatorStyle = .none
-        
-        if !priorSelectedUsers.isEmpty{
-            selectPriorUsers(priorSelectedUsers: priorSelectedUsers)
-        }
     }
     
     fileprivate func setupSearchController() {
@@ -309,17 +297,17 @@ class SelectParticipantsViewController: UIViewController {
     func didDeselectUser(at indexPath: IndexPath) {
         let user = sections[indexPath.section][indexPath.row]
         
-        if let findex = filteredUsers.firstIndex(of: user) {
-            filteredUsers[findex].isSelected = false
+        if let index = filteredUsers.firstIndex(of: user) {
+            filteredUsers[index].isSelected = false
         }
         
         if let index = users.firstIndex(of: user) {
             users[index].isSelected = false
         }
         
-        if let selectedFalconUserIndexInCollectionView = selectedFalconUsers.firstIndex(of: user) {
-            selectedFalconUsers[selectedFalconUserIndexInCollectionView].isSelected = false
-            selectedFalconUsers.remove(at: selectedFalconUserIndexInCollectionView)
+        if let index = selectedFalconUsers.firstIndex(of: user) {
+            selectedFalconUsers[index].isSelected = false
+            selectedFalconUsers.remove(at: index)
         }
         
         sections[indexPath.section][indexPath.row].isSelected = false
@@ -336,7 +324,6 @@ class SelectParticipantsViewController: UIViewController {
     
     func selectPriorUsers(priorSelectedUsers: [User]) {
         for user in priorSelectedUsers {
-            
             if let filteredUsersIndex = filteredUsers.firstIndex(of: user) {
                 filteredUsers[filteredUsersIndex].isSelected = true
             }
@@ -345,8 +332,8 @@ class SelectParticipantsViewController: UIViewController {
                 users[usersIndex].isSelected = true
             }
             
-            if let selectedFalconUserIndexInCollectionView = priorSelectedUsers.firstIndex(of: user) {
-                priorSelectedUsers[selectedFalconUserIndexInCollectionView].isSelected = true
+            if let index = priorSelectedUsers.firstIndex(of: user) {
+                priorSelectedUsers[index].isSelected = true
                 selectedFalconUsers.append(user)
             }
                         

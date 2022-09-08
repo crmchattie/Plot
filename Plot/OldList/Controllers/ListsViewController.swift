@@ -54,7 +54,7 @@ class ListsViewController: UIViewController, ActivityDetailShowing {
     
     var participants: [String: [User]] = [:]
     
-    var filters: [filter] = [.search, .taskCategory]
+    var filters: [filter] = [.search, .showCompletedTasks, .taskCategory]
     var filterDictionary = [String: [String]]()
     
     override func viewDidLoad() {

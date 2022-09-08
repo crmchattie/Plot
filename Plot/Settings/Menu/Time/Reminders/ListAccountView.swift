@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TaskAccountView: UIView {
+class ListAccountView: UIView {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor

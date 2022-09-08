@@ -28,8 +28,6 @@ class SubtaskViewController: FormViewController {
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
     var checklist: Checklist!
-    var userNames : [String] = []
-    var userNamesString: String = ""
     var startDateTime: Date?
     var endDateTime: Date?
     
@@ -57,7 +55,6 @@ class SubtaskViewController: FormViewController {
             } else {
                 subtask.activityID = UUID().uuidString
             }
-            userNamesString = "Participants"
             if let participants = subtask.participantsIDs {
                 for ID in participants {
                     // users equals ACTIVITY selected falcon users
@@ -176,19 +173,27 @@ class SubtaskViewController: FormViewController {
                     cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 })
             
-//            <<< ButtonRow("Participants") { row in
+//            <<< LabelRow("Participants") { row in
 //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                row.cell.accessoryType = .disclosureIndicator
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.selectionStyle = .default
 //                row.title = row.tag
-//                }.onCellSelection({ _,_ in
-//                    self.openParticipantsInviter()
-//                }).cellUpdate { cell, row in
-//                    cell.accessoryType = .disclosureIndicator
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
+//                if active {
+//                    row.value = String(self.selectedFalconUsers.count)
+//                } else {
+//                    row.value = String(1)
+//                }
+//            }.onCellSelection({ _, row in
+//                self.openParticipantsInviter()
+//            }).cellUpdate { cell, row in
+//                cell.accessoryType = .disclosureIndicator
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                cell.textLabel?.textAlignment = .left
 //            }
         
             <<< CheckRow("Completed") {
@@ -1003,6 +1008,7 @@ class SubtaskViewController: FormViewController {
                 uniqueUsers.append(participant)
             }
         }
+        destination.ownerID = subtask.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -1075,17 +1081,16 @@ class SubtaskViewController: FormViewController {
 
 extension SubtaskViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-//        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
-//            if !selectedFalconUsers.isEmpty {
-//                self.userNamesString = "\(self.selectedFalconUsers.count + 1) participants"
-//                inviteesRow.title = self.userNamesString
-//                inviteesRow.updateCell()
-//            } else {
-//                inviteesRow.title = "Participants"
-//                inviteesRow.updateCell()
-//            }
-//            self.selectedFalconUsers = selectedFalconUsers
-//        }
+        if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
+            self.selectedFalconUsers = selectedFalconUsers
+            if !selectedFalconUsers.isEmpty {
+                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
+                inviteesRow.updateCell()
+            } else {
+                inviteesRow.value = String(1)
+                inviteesRow.updateCell()
+            }
+        }
     }
 }
 

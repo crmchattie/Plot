@@ -120,6 +120,12 @@ class TableViewHeader: UITableViewHeaderFooterView {
         return label
     }()
     
+    let spinnerView: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .medium)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         setupViews()
@@ -133,10 +139,12 @@ class TableViewHeader: UITableViewHeaderFooterView {
         addSubview(view)
         view.addSubview(titleLabel)
         view.addSubview(subTitleLabel)
-        
+        view.addSubview(spinnerView)
         view.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 0, left: 15, bottom: 5, right: 15))
         titleLabel.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         subTitleLabel.anchor(top: view.topAnchor, leading: nil, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        spinnerView.anchor(top: nil, leading: titleLabel.trailingAnchor, bottom: nil, trailing: nil, padding: .init(top: 0, left: 10, bottom: 0, right: 0))
+        spinnerView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
         let viewTap = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
         view.addGestureRecognizer(viewTap)                
     }

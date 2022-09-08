@@ -33,8 +33,6 @@ class ScheduleViewController: FormViewController {
     var checklist: Checklist!
     var startDateTime: Date?
     var endDateTime: Date?
-    var userNames : [String] = []
-    var userNamesString: String = ""
     
     var scheduleID = String()
     
@@ -60,7 +58,6 @@ class ScheduleViewController: FormViewController {
             } else {
                 schedule.activityID = UUID().uuidString
             }
-            userNamesString = "Participants"
             if let participants = schedule.participantsIDs {
                 for ID in participants {
                     // users equals ACTIVITY selected falcon users
@@ -219,19 +216,27 @@ class ScheduleViewController: FormViewController {
                 }
             }
             
-//            <<< ButtonRow("Participants") { row in
+//            <<< LabelRow("Participants") { row in
 //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textAlignment = .left
 //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //                row.cell.accessoryType = .disclosureIndicator
+//                row.cell.textLabel?.textAlignment = .left
+//                row.cell.selectionStyle = .default
 //                row.title = row.tag
-//                }.onCellSelection({ _,_ in
-//                    self.openParticipantsInviter()
-//                }).cellUpdate { cell, row in
-//                    cell.accessoryType = .disclosureIndicator
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.textLabel?.textAlignment = .left
+//                if active {
+//                    row.value = String(self.selectedFalconUsers.count)
+//                } else {
+//                    row.value = String(1)
+//                }
+//            }.onCellSelection({ _, row in
+//                self.openParticipantsInviter()
+//            }).cellUpdate { cell, row in
+//                cell.accessoryType = .disclosureIndicator
+//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                cell.textLabel?.textAlignment = .left
 //            }
             
             <<< SwitchRow("All-day") {
@@ -275,7 +280,9 @@ class ScheduleViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: schedule.startTimeZone ?? "UTC")
+                    if let timeZone = schedule.startTimeZone {
+                        $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
+                    }
                     $0.value = Date(timeIntervalSince1970: self.schedule!.startDateTime as! TimeInterval)
                     if self.schedule.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
@@ -285,7 +292,6 @@ class ScheduleViewController: FormViewController {
                     }
                     $0.updateCell()
                 } else {
-                    $0.dateFormatter?.timeZone = .current
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
@@ -320,10 +326,6 @@ class ScheduleViewController: FormViewController {
                         }
                         if let startTimeZone = self?.schedule.startTimeZone {
                             cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
-                        } else if self!.active {
-                            cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                        } else {
-                            cell.datePicker.timeZone = .current
                         }
                     }
                     cell.detailTextLabel?.textColor = cell.tintColor
@@ -375,7 +377,9 @@ class ScheduleViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 if self.active {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: schedule.endTimeZone ?? "UTC")
+                    if let timeZone = schedule.endTimeZone {
+                        $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
+                    }
                     $0.value = Date(timeIntervalSince1970: self.schedule!.endDateTime as! TimeInterval)
                     if self.schedule.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
@@ -385,7 +389,6 @@ class ScheduleViewController: FormViewController {
                     }
                     $0.updateCell()
                 } else {
-                    $0.dateFormatter?.timeZone = .current
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
@@ -407,10 +410,6 @@ class ScheduleViewController: FormViewController {
                     row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
                     if let endTimeZone = self?.schedule.endTimeZone {
                         cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
-                    } else if self!.active {
-                        cell.datePicker.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                    } else {
-                        cell.datePicker.timeZone = .current
                     }
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
@@ -731,7 +730,7 @@ class ScheduleViewController: FormViewController {
     }
     
     func scheduleReminder() {
-        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = schedule.allDay, let startTimeZone = schedule.startTimeZone, let endTimeZone = schedule.endTimeZone else {
+        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = schedule.allDay else {
             return
         }
         let center = UNUserNotificationCenter.current()
@@ -743,12 +742,14 @@ class ScheduleViewController: FormViewController {
         content.title = "\(String(describing: schedule.name!)) Reminder"
         content.sound = UNNotificationSound.default
         var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: schedule.startTimeZone, endTimeZone: schedule.endTimeZone)
         content.subtitle = formattedDate.0
         if let reminder = EventAlert(rawValue: scheduleReminder) {
             let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
             var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: startTimeZone)!
+            if let timeZone = schedule.startTimeZone {
+                calendar.timeZone = TimeZone(identifier: timeZone)!
+            }
             let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                         repeats: false)
@@ -801,6 +802,7 @@ class ScheduleViewController: FormViewController {
                 uniqueUsers.append(participant)
             }
         }
+        destination.ownerID = schedule.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
@@ -984,17 +986,16 @@ extension ScheduleViewController: UpdateTimeZoneDelegate {
 
 extension ScheduleViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
-//        if let inviteesRow: ButtonRow = form.rowBy(tag: "Participants") {
-//            if !selectedFalconUsers.isEmpty {
-//                self.userNamesString = "\(self.selectedFalconUsers.count + 1) participants"
-//                inviteesRow.title = self.userNamesString
-//                inviteesRow.updateCell()
-//            } else {
-//                inviteesRow.title = "Participants"
-//                inviteesRow.updateCell()
-//            }
-//            self.selectedFalconUsers = selectedFalconUsers
-//        }
+        if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
+            self.selectedFalconUsers = selectedFalconUsers
+            if !selectedFalconUsers.isEmpty {
+                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
+                inviteesRow.updateCell()
+            } else {
+                inviteesRow.value = String(1)
+                inviteesRow.updateCell()
+            }
+        }
     }
 }
 

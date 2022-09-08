@@ -155,15 +155,15 @@ class EventCell: UITableViewCell {
         
         nameLabel.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: badgeLabel.leftAnchor, constant: -5).isActive = true
         
         startLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         startLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        startLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        startLabel.rightAnchor.constraint(equalTo: badgeLabel.leftAnchor, constant: -5).isActive = true
 //
         activityTypeLabel.topAnchor.constraint(equalTo: startLabel.bottomAnchor, constant: 2).isActive = true
         activityTypeLabel.leftAnchor.constraint(equalTo: activityImageView.leftAnchor, constant: 10).isActive = true
-        activityTypeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        activityTypeLabel.rightAnchor.constraint(equalTo: badgeLabel.leftAnchor, constant: -5).isActive = true
         
         activityTypeButton.topAnchor.constraint(equalTo: activityImageView.topAnchor, constant: 10).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
@@ -178,14 +178,15 @@ class EventCell: UITableViewCell {
         invitationSegmentHeightConstraint = invitationSegmentedControl.heightAnchor.constraint(equalToConstant: invitationSegmentHeightConstant)
         invitationSegmentHeightConstraint.isActive = true
         
-        muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 1).isActive = true
-        muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor, constant: 1).isActive = true
+        muteIndicator.leftAnchor.constraint(equalTo: nameLabel.rightAnchor, constant: 5).isActive = true
+        muteIndicator.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor).isActive = true
         muteIndicator.widthAnchor.constraint(equalToConstant: 15).isActive = true
         muteIndicator.heightAnchor.constraint(equalToConstant: 15).isActive = true
         
-        badgeLabel.topAnchor.constraint(equalTo: activityTypeButton.bottomAnchor, constant: 10).isActive = true
-        badgeLabel.rightAnchor.constraint(equalTo: activityImageView.rightAnchor, constant: -10).isActive = true
-        badgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
+        badgeLabel.centerYAnchor.constraint(equalTo: activityTypeButton.centerYAnchor).isActive = true
+        badgeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        badgeLabel.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        badgeLabel.heightAnchor.constraint(equalToConstant: 25).isActive = true
         
         invitationSegmentedControl.addTarget(self, action: #selector(EventCell.indexChangedSegmentedControl(_:)), for: .valueChanged)
     }

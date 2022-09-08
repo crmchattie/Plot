@@ -43,7 +43,6 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
 //            headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
 //        }
         view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
-        
         if let headerTitle = view as? UITableViewHeaderFooterView {
           headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
@@ -51,6 +50,11 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 30
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let user = sections[indexPath.section][indexPath.row]
+        cell.isSelected = user.isSelected
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -67,10 +71,8 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
         cell.selectedBackgroundView = backgroundView
         
         let user = sections[indexPath.section][indexPath.row]
-        
-        DispatchQueue.main.async {
-            cell.isSelected = user.isSelected
-        }
+
+        cell.isSelected = user.isSelected
         
         if let name = user.name {
             cell.title.text = name
@@ -96,14 +98,8 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
         cell.allowSelection = true
         
         if self.ownerID == user.id {
-//            cell.rightSubtitle.text = "~admin"
             cell.allowSelection = false
         }
-//        else if let userID = user.id, let status = self.userInvitationStatus[userID] {
-//            cell.rightSubtitle.text = status.description
-//        } else {
-//            cell.rightSubtitle.text = ""
-//        }
         
         guard let url = user.thumbnailPhotoURL else { return cell }
         cell.icon.sd_setImage(with: URL(string: url), placeholderImage:  UIImage(named: "UserpicIcon"), options: [.progressiveLoad, .continueInBackground], completed: { (image, error, cacheType, url) in

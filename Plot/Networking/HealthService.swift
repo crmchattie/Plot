@@ -49,6 +49,8 @@ class HealthService {
     
     var askedforAuthorization: Bool = false
     
+    var isRunning: Bool = true
+    
     func grabHealth(_ completion: @escaping () -> Void) {
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
@@ -60,7 +62,16 @@ class HealthService {
                         self?.healthMetricSections = Array(metrics.keys)
                         self?.healthMetrics = metrics
                         self?.observeHealthForCurrentUser()
+                        if self?.isRunning ?? true {
+                            completion()
+                            self?.isRunning = false
+                        }
+                    }
+                } else {
+                    self?.observeHealthForCurrentUser()
+                    if self?.isRunning ?? true {
                         completion()
+                        self?.isRunning = false
                     }
                 }
                 //want to delete but not sure what I am doing yet

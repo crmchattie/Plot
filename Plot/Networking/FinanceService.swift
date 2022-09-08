@@ -12,6 +12,7 @@ import CodableFirebase
 
 extension NSNotification.Name {
     static let financeUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeUpdated")
+    static let hasLoadedFinancials = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedFinancials")
 }
 
 class FinanceService {
@@ -75,6 +76,11 @@ class FinanceService {
             }
         }
     }
+    var hasLoadedFinancials = false {
+        didSet {
+            NotificationCenter.default.post(name: .hasLoadedFinancials, object: nil)
+        }
+    }
     var memberAccountsDict = [MXMember: [MXAccount]]()
     var transactionRules = [TransactionRule]()
     var institutionDict = [String: String]()
@@ -100,8 +106,12 @@ class FinanceService {
                 self?.transactionRules = transactionRules
                 self?.observeTransactionsForCurrentUser {
 //                    self?.removePendingTransactions()
-                    completion()
 //                    self?.grabTransactionAttributes()
+                    if self?.isRunning ?? true {
+                        completion()
+                        self?.isRunning = false
+                    }
+                    self?.hasLoadedFinancials = true
                 }
             })
             self?.observeTransactionRulesForCurrentUser {}
@@ -123,7 +133,9 @@ class FinanceService {
     }
     
     func triggerUpdateMXUser() {
-        Service.shared.triggerUpdateMXUser() { (search, err) in
+        hasLoadedFinancials = false
+        Service.shared.triggerUpdateMXUser() { [weak self] (search, err) in
+            self?.hasLoadedFinancials = true
             print("tiggeredUpdateMXUser")
         }
     }

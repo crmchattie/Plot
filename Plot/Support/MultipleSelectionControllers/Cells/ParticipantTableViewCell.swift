@@ -53,14 +53,11 @@ class ParticipantTableViewCell: UITableViewCell {
         subtitle.adjustsFontForContentSizeCategory = true
         subtitle.textAlignment = .right
         subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        
         return subtitle
-    }()
-    
+    }()    
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-        
+        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)        
         gestureReconizer = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
         addGestureRecognizer(gestureReconizer)
         
@@ -92,6 +89,7 @@ class ParticipantTableViewCell: UITableViewCell {
         rightSubtitle.leadingAnchor.constraint(equalTo: subtitle.trailingAnchor, constant: 10).isActive = true
         rightSubtitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         rightSubtitle.heightAnchor.constraint(equalToConstant: 23).isActive = true
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -100,7 +98,6 @@ class ParticipantTableViewCell: UITableViewCell {
     
     @objc func cellTapped() {
         guard allowSelection, let indexPath = selectParticipantsViewController.tableView.indexPathForView(self) else { return }
-        
         if isSelected {
             selectParticipantsViewController.didDeselectUser(at: indexPath)
             isSelected = false
@@ -112,7 +109,6 @@ class ParticipantTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
         icon.image = UIImage(named: "UserpicIcon")
         title.text = ""
         subtitle.text = ""
@@ -122,5 +118,6 @@ class ParticipantTableViewCell: UITableViewCell {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
+        
     }
 }

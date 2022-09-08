@@ -309,7 +309,7 @@ enum SectionType: Hashable, CaseIterable {
         case .ingredients, .groceryItems, .restaurantItems: return "Food Products"
         case .calendar: return "Set up Calendar by connecting your Apple Calendar or Gmail Account"
         case .time: return "Set up Time by connecting your Apple or Gmail Account"
-        case .health: return "Set up Health by connecting the Apple Health App"
+        case .health: return "Set up Health by connecting to the Apple Health App"
         case .finances: return "Set up Finances by connecting your existing financial accounts"
         case .activitySummary: return "Activity Summary"
         case .calendarSummary: return "Calendar Summary"

@@ -47,7 +47,7 @@ class TimeInfoViewController: UITableViewController {
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         if indexPath.row == 0 {
-            cell.textLabel?.text = "Tasks Info"
+            cell.textLabel?.text = "Lists Info"
             cell.isUserInteractionEnabled = true
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }
@@ -60,7 +60,7 @@ class TimeInfoViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
-            let destination = TaskInfoViewController()
+            let destination = ListInfoViewController()
             destination.networkController = self.networkController
             self.navigationController?.pushViewController(destination, animated: true)
         }

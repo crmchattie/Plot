@@ -31,7 +31,7 @@ struct Mindfulness: Codable, Equatable, Hashable {
     var containerID: String?
     var hkSampleID: String?
     
-    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, startDateTime: Date?, endDateTime: Date?) {
+    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, startDateTime: Date?, endDateTime: Date?, user_created: Bool?) {
         self.id = id
         self.name = name
         self.admin = admin
@@ -39,6 +39,7 @@ struct Mindfulness: Codable, Equatable, Hashable {
         self.createdDate = createdDate
         self.startDateTime = startDateTime
         self.endDateTime = endDateTime
+        self.user_created = user_created
     }
         
     init(from mindfuless: HKCategorySample) {

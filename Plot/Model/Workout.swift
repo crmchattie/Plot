@@ -33,7 +33,7 @@ struct Workout: Codable, Equatable, Hashable {
     var containerID: String?
     var hkSampleID: String?
     
-    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?) {
+    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?, user_created: Bool?) {
         self.id = id
         self.name = name
         self.admin = admin
@@ -44,6 +44,7 @@ struct Workout: Codable, Equatable, Hashable {
         self.endDateTime = endDateTime
         self.length = length
         self.totalEnergyBurned = totalEnergyBurned
+        self.user_created = user_created
     }
     
     init(from hkWorkout: HKWorkout) {
@@ -54,7 +55,9 @@ struct Workout: Codable, Equatable, Hashable {
         self.startDateTime = hkWorkout.startDate
         self.endDateTime = hkWorkout.endDate
         self.length = hkWorkout.duration
-        self.totalEnergyBurned = hkWorkout.totalEnergyBurned?.doubleValue(for: .kilocalorie())
+        if let totalEnergyBurned = hkWorkout.totalEnergyBurned {
+            self.totalEnergyBurned = totalEnergyBurned.doubleValue(for: .kilocalorie())
+        }
     }
 }
 

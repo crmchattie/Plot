@@ -24,6 +24,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if !activitiesSections.isEmpty {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: activitiesControllerCell, for: indexPath) as! ActivitiesControllerCell
                 cell.delegate = self
+                cell.updatingTasks = updatingTasks
+                cell.updatingEvents = updatingEvents
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 cell.networkController = networkController
                 cell.sections = activitiesSections
@@ -172,13 +174,18 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             sectionHeader.titleLabel.text = section.name
             sectionHeader.sectionType = section
             if section == .time {
-                sectionHeader.subTitleLabel.isHidden = true
-                sectionHeader.delegate = nil
                 if !activitiesSections.isEmpty {
-                    if updatingTasks && updatingEvents {
-                        sectionHeader.spinnerView.startAnimating()
+                    if activitiesSections.count > 1 {
+                        sectionHeader.subTitleLabel.isHidden = true
+                        sectionHeader.delegate = nil
                     } else {
-                        sectionHeader.spinnerView.stopAnimating()
+                        if updatingTasks && updatingEvents {
+                            sectionHeader.spinnerView.startAnimating()
+                        } else {
+                            sectionHeader.spinnerView.stopAnimating()
+                        }
+                        sectionHeader.subTitleLabel.isHidden = false
+                        sectionHeader.delegate = self
                     }
                 }
             } else if section == .health {

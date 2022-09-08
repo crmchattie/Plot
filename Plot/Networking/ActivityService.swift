@@ -16,6 +16,8 @@ extension NSNotification.Name {
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
     static let calendarsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarsUpdated")
     static let listsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".listsUpdated")
+    static let hasLoadedCalendarEventActivities = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedCalendarEventActivities")
+    static let hasLoadedListTaskActivities = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedListTaskActivities")
 }
 
 class ActivityService {
@@ -138,15 +140,22 @@ class ActivityService {
             }
         }
     }
+    var hasLoadedCalendarEventActivities = false {
+        didSet {
+            NotificationCenter.default.post(name: .hasLoadedCalendarEventActivities, object: nil)
+        }
+    }
+    var hasLoadedListTaskActivities = false {
+        didSet {
+            NotificationCenter.default.post(name: .hasLoadedListTaskActivities, object: nil)
+        }
+    }
 
     var calendarIDs = [String: CalendarType]()
     var listIDs = [String: ListType]()
     
     var primaryCalendar = String()
     var primaryList = String()
-    
-    var hasLoadedCalendarEventActivities = false
-    var hasLoadedListTaskActivities = false
     
     var eventKitManager: EventKitManager = {
         let eventKitService = EventKitService()
@@ -186,17 +195,29 @@ class ActivityService {
                 self?.grabPlotCalendars()
                 self?.grabPrimaryList({ (list) in
                     if list == ListSourceOptions.apple.name {
-                        self?.grabEKReminders {}
+                        self?.grabEKReminders {
+                            self?.hasLoadedListTaskActivities = true
+                        }
                     } else if list == ListSourceOptions.google.name {
-                        self?.grabGTasks {}
+                        self?.grabGTasks {
+                            self?.hasLoadedListTaskActivities = true
+                        }
+                    } else {
+                        self?.hasLoadedListTaskActivities = true
                     }
                     self?.grabLists()
                 })
                 self?.grabPrimaryCalendar({ (calendar) in
                     if calendar == CalendarSourceOptions.apple.name {
-                        self?.grabEKEvents {}
+                        self?.grabEKEvents {
+                            self?.hasLoadedCalendarEventActivities = true
+                        }
                     } else if calendar == CalendarSourceOptions.google.name {
-                        self?.grabGEvents {}
+                        self?.grabGEvents {
+                            self?.hasLoadedCalendarEventActivities = true
+                        }
+                    } else {
+                        self?.hasLoadedCalendarEventActivities = true
                     }
                     self?.grabCalendars()
                 })

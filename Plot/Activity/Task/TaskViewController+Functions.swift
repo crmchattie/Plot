@@ -13,7 +13,6 @@ import Eureka
 import SplitRow
 import ViewRow
 import EventKit
-import UserNotifications
 import CodableFirebase
 import RRuleSwift
 import HealthKit
@@ -435,6 +434,7 @@ extension TaskViewController {
                 uniqueUsers.append(participant)
             }
         }
+        destination.ownerID = task.admin
         destination.users = uniqueUsers
         destination.filteredUsers = uniqueUsers
         if !selectedFalconUsers.isEmpty {
