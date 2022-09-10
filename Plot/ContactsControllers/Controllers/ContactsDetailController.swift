@@ -58,15 +58,15 @@ class ContactsDetailController: UITableViewController {
         if indexPath.section == 0 {
             cell.imageView?.image = UIImage(named: "UserpicIcon")
             cell.textLabel?.text = contactName
-            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 20)
+            cell.textLabel?.font = UIFont.title3.with(weight: .bold)
         } else if indexPath.section == 1 {
             cell.imageView?.image = nil
             cell.textLabel?.text = phoneNumberKit.format(phoneNumbers[indexPath.row], toType: .national)
-            cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
+            cell.textLabel?.font = .preferredFont(forTextStyle: .body)
         } else {
             cell.textLabel?.textColor = FalconPalette.defaultBlue
             cell.textLabel?.text = "Invite to Plot"
-            cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
+            cell.textLabel?.font = .preferredFont(forTextStyle: .body)
         }
         return cell
     }

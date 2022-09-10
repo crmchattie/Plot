@@ -17,14 +17,14 @@ class EnterVerificationContainerView: UIView {
     titleNumber.translatesAutoresizingMaskIntoConstraints = false
     titleNumber.textAlignment = .center
     titleNumber.textColor = ThemeManager.currentTheme().generalTitleColor
-    titleNumber.font = UIFont.systemFont(ofSize: 32)
+    titleNumber.font = .preferredFont(forTextStyle: .title1)
     return titleNumber
   }()
   
   let subtitleText: UILabel = {
     let subtitleText = UILabel()
     subtitleText.translatesAutoresizingMaskIntoConstraints = false
-    subtitleText.font = UIFont.preferredFont(forTextStyle: .body)
+    subtitleText.font = UIFont.preferredFont(forTextStyle: .title3)
     subtitleText.adjustsFontForContentSizeCategory = true
     subtitleText.textAlignment = .center
     subtitleText.textColor = ThemeManager.currentTheme().generalTitleColor

@@ -164,6 +164,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Website"
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -175,6 +176,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         label.text = "Website"
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -190,6 +192,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Phone Number"
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -198,6 +201,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -206,6 +210,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -214,6 +219,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -223,6 +229,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -232,6 +239,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -241,6 +249,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -250,6 +259,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -259,6 +269,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -268,6 +279,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -277,6 +289,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -285,6 +298,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -294,6 +308,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -303,6 +318,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -312,6 +328,8 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -321,6 +339,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -330,6 +349,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -339,6 +359,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -348,6 +369,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -357,6 +379,7 @@ class PlaceDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
    

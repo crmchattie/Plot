@@ -53,6 +53,7 @@ class AttractionDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isUserInteractionEnabled = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
 
@@ -61,6 +62,7 @@ class AttractionDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
 
@@ -69,6 +71,7 @@ class AttractionDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

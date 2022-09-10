@@ -104,7 +104,7 @@ class ListDetailViewController: FormViewController {
         } else if let currentUser = Auth.auth().currentUser?.uid {
             title = "New List"
             let ID = Database.database().reference().child(userListEntity).child(currentUser).childByAutoId().key ?? ""
-            list = ListType(id: ID, name: nil, color: nil, source: ListSourceOptions.plot.name)
+            list = ListType(id: ID, name: nil, color: nil, source: ListSourceOptions.plot.name, admin: currentUser)
         }
     }
     

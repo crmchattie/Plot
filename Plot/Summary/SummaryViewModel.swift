@@ -108,7 +108,7 @@ class SummaryViewModel: SummaryViewModelInterface {
         pFormatter.minimumFractionDigits = 1
         pFormatter.multiplier = 1
         data.setValueFormatter(DefaultValueFormatter(formatter: pFormatter))
-        data.setValueFont(.systemFont(ofSize: 11, weight: .light))
+        data.setValueFont(UIFont.caption2.with(weight: .light))
         data.setValueTextColor(.white)
         completion(data)
     }
@@ -198,7 +198,7 @@ class SummaryViewModel: SummaryViewModelInterface {
             dataSet.drawValuesEnabled = false
             dataSet.circleRadius = 3
             dataSet.drawCircleHoleEnabled = false
-            dataSet.valueFont = .systemFont(ofSize: 9)
+            dataSet.valueFont = UIFont.caption2.with(weight: .regular)
             dataSet.formSize = 15
             dataSet.lineWidth = 0
             

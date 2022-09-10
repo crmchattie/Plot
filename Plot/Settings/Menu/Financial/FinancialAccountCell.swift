@@ -14,6 +14,7 @@ class FinancialAccountCell: UITableViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

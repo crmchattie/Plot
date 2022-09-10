@@ -40,6 +40,7 @@ class WorkoutDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -75,6 +76,7 @@ class WorkoutDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Workout:"
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
    

@@ -40,6 +40,7 @@ class EventDetailCell: UICollectionViewCell {
         label.attributedText = NSAttributedString(string: "Go to Ticketmaster", attributes:
         [.underlineStyle: NSUnderlineStyle.single.rawValue])
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -59,6 +60,7 @@ class EventDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Other Dates:"
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
    

@@ -16,6 +16,7 @@ class RecipeDetailViewCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.numberOfLines = 0
         label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
 

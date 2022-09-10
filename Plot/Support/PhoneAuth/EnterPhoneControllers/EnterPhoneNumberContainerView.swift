@@ -19,9 +19,7 @@ class EnterPhoneNumberContainerView: UIView {
         title.textAlignment = .center
         title.text = "Phone number"
         title.textColor = ThemeManager.currentTheme().generalTitleColor
-        title.font = UIFont.systemFont(ofSize: 32)
-        title.sizeToFit()
-        
+        title.font = .preferredFont(forTextStyle: .title1)
         return title
     }()
     
@@ -31,9 +29,7 @@ class EnterPhoneNumberContainerView: UIView {
         instructions.textAlignment = .center
         instructions.numberOfLines = 2
         instructions.textColor = ThemeManager.currentTheme().generalTitleColor
-        instructions.font = UIFont.systemFont(ofSize: 18)
-        instructions.sizeToFit()
-        
+        instructions.font = .preferredFont(forTextStyle: .title3)
         return instructions
     }()
     
@@ -48,7 +44,8 @@ class EnterPhoneNumberContainerView: UIView {
         selectCountry.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         selectCountry.layer.cornerRadius = 10
         selectCountry.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
-        selectCountry.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+        selectCountry.titleLabel?.font = .preferredFont(forTextStyle: .title3)
+        selectCountry.titleLabel?.adjustsFontForContentSizeCategory = true
         return selectCountry
     }()
     
@@ -60,7 +57,6 @@ class EnterPhoneNumberContainerView: UIView {
         countryCode.textColor = ThemeManager.currentTheme().generalTitleColor
         countryCode.font = UIFont.preferredFont(forTextStyle: .title3)
         countryCode.adjustsFontForContentSizeCategory = true
-        countryCode.sizeToFit()
         return countryCode
     }()
     

@@ -264,11 +264,8 @@ class SelectActivityTableViewController: UITableViewController {
         
         if let headerTitle = view as? UITableViewHeaderFooterView {
             headerTitle.textLabel?.textColor = FalconPalette.defaultBlue
-            //      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 10)
             headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
             headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
-            headerTitle.textLabel?.minimumScaleFactor = 0.1
-            headerTitle.textLabel?.adjustsFontSizeToFitWidth = true
         }
     }
     

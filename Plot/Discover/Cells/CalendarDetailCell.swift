@@ -58,6 +58,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -93,6 +94,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -118,6 +120,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Starts"
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -126,6 +129,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -156,6 +160,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Ends"
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -164,6 +169,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -194,6 +200,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "Reminder"
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -203,6 +210,7 @@ class CalendarDetailCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "None"
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
    

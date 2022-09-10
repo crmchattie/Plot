@@ -61,7 +61,7 @@ extension LineChartView {
         xAxis.valueFormatter = WeekdayAxisValueFormatter()
         
         let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
-                                  font: .systemFont(ofSize: 12),
+                                  font: .preferredFont(forTextStyle: .caption1),
                                   textColor: .white,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
                                   xAxisValueFormatter: DayAxisValueFormatter(chart: self), units: "")

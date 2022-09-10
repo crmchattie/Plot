@@ -131,7 +131,7 @@ fileprivate class ActionButton: UIButton {
         imageView?.tintColor = .black
         imageView?.contentMode = .bottom
         titleLabel?.textAlignment = .center
-        titleLabel?.font = .systemFont(ofSize: 14)
+        titleLabel?.font = .preferredFont(forTextStyle: .subheadline)
         backgroundColor = .white
         layer.masksToBounds = true
         layer.cornerRadius = 11.0

@@ -28,8 +28,9 @@ class HeaderCell: UICollectionReusableView {
         let label = UILabel()
         label.text = "Activity Type"
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = .boldSystemFont(ofSize: 22)
+        label.font = UIFont.title2.with(weight: .bold)
         label.isUserInteractionEnabled = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -37,8 +38,9 @@ class HeaderCell: UICollectionReusableView {
         let label = UILabel()
         label.text = "See All"
         label.textColor = .systemBlue
-        label.font = .systemFont(ofSize: 18)
+        label.font = UIFont.body.with(weight: .regular)
         label.isUserInteractionEnabled = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

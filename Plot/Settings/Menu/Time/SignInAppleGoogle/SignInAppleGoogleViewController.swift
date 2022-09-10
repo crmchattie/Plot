@@ -37,6 +37,8 @@ class SignInAppleGoogleViewController: UITableViewController {
     let apple = TableViewObject(icon: UIImage(named: "apple"), title: "Sign in with Apple")
     let google = TableViewObject(icon: UIImage(named: "google"), title: "Sign in with Google")
     
+    let customFont = UIFont(name: "Roboto-Medium", size: 17)!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -98,10 +100,10 @@ class SignInAppleGoogleViewController: UITableViewController {
             cell.accessoryType = .none
             if firstSection[indexPath.row].title == "Sign in with Google" {
                 cell.backgroundColor = ThemeManager.currentTheme().googleSignInBackgroundColor
-                cell.title.font = UIFont(name: "Roboto-Medium", size: 17)
+                cell.title.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: customFont)
             } else {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.title.font = .boldSystemFont(ofSize: 17)
+                cell.title.font = UIFont.body.with(weight: .bold)
             }
             return cell
         } else {
@@ -110,10 +112,10 @@ class SignInAppleGoogleViewController: UITableViewController {
             cell.accessoryType = .none
             if secondSection[indexPath.row].title == "Sign in with Google" {
                 cell.backgroundColor = ThemeManager.currentTheme().googleSignInBackgroundColor
-                cell.title.font = UIFont(name: "Roboto-Medium", size: 17)
+                cell.title.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: customFont)
             } else {
                 cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.title.font = .boldSystemFont(ofSize: 17)
+                cell.title.font = UIFont.body.with(weight: .bold)
             }
             return cell
         }

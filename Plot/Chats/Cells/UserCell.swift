@@ -58,17 +58,11 @@ class UserCell: UITableViewCell {
     //channel time of last sent text in specific chat
     let timeLabel: UILabel = {
         let label = UILabel()
-        //      label.font = UIFont.systemFont(ofSize: 12)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.minimumScaleFactor = 0.1
-        label.adjustsFontSizeToFitWidth = true
-        
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
         label.textAlignment = .left
-        
         return label
     }()
     
@@ -76,28 +70,20 @@ class UserCell: UITableViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        //      label.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
-        label.minimumScaleFactor = 0.1
-        label.adjustsFontSizeToFitWidth = true
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
     //channel view last text in specific chat
     let messageLabel: UILabel = {
         let label = UILabel()
-        //      label.font = UIFont.systemFont(ofSize: 13)
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
-        
         return label
     }()
     
@@ -112,10 +98,7 @@ class UserCell: UITableViewCell {
         badgeLabel.textAlignment = .center
         badgeLabel.layer.masksToBounds = true
         badgeLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        badgeLabel.adjustsFontForContentSizeCategory = true
-        badgeLabel.minimumScaleFactor = 0.1
-        badgeLabel.adjustsFontSizeToFitWidth = true
-        
+        badgeLabel.adjustsFontForContentSizeCategory = true        
         return badgeLabel
     }()
     

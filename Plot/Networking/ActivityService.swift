@@ -16,6 +16,7 @@ extension NSNotification.Name {
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
     static let calendarsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarsUpdated")
     static let listsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".listsUpdated")
+    static let calendarActivitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarActivitiesUpdated")
     static let hasLoadedCalendarEventActivities = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedCalendarEventActivities")
     static let hasLoadedListTaskActivities = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedListTaskActivities")
 }
@@ -100,6 +101,7 @@ class ActivityService {
                 }
                 return activity1.finalDate ?? Date.distantPast < activity2.finalDate ?? Date.distantPast
             }
+            NotificationCenter.default.post(name: .calendarActivitiesUpdated, object: nil)
         }
     }
     
@@ -174,56 +176,52 @@ class ActivityService {
     fileprivate var sharedContainer : UserDefaults?
     
     func grabActivities(_ completion: @escaping () -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            self?.observeActivitiesForCurrentUser({
-                if self?.isRunning ?? true {
-                    completion()
-                    self?.grabOtherActivities()
-                    self?.isRunning = false
-                }
-            })
-        }
+        self.observeActivitiesForCurrentUser({
+            if self.isRunning {
+                completion()
+                self.grabOtherActivities()
+                self.isRunning = false
+            }
+        })
     }
     
     func grabOtherActivities() {
-        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            self?.fetchInvitations()
-            self?.observeInvitationForCurrentUser()
-            self?.addRepeatingActivities(activities: self?.activities ?? [], completion: { newActivities in
-                self?.activities = newActivities
-                self?.grabPlotLists()
-                self?.grabPlotCalendars()
-                self?.grabPrimaryList({ (list) in
-                    if list == ListSourceOptions.apple.name {
-                        self?.grabEKReminders {
-                            self?.hasLoadedListTaskActivities = true
-                        }
-                    } else if list == ListSourceOptions.google.name {
-                        self?.grabGTasks {
-                            self?.hasLoadedListTaskActivities = true
-                        }
-                    } else {
-                        self?.hasLoadedListTaskActivities = true
+        self.fetchInvitations()
+        self.observeInvitationForCurrentUser()
+        self.addRepeatingActivities(activities: self.activities, completion: { newActivities in
+            self.activities = newActivities
+            self.grabPlotLists()
+            self.grabPlotCalendars()
+            self.grabPrimaryList({ (list) in
+                if list == ListSourceOptions.apple.name {
+                    self.grabEKReminders {
+                        self.hasLoadedListTaskActivities = true
                     }
-                    self?.grabLists()
-                })
-                self?.grabPrimaryCalendar({ (calendar) in
-                    if calendar == CalendarSourceOptions.apple.name {
-                        self?.grabEKEvents {
-                            self?.hasLoadedCalendarEventActivities = true
-                        }
-                    } else if calendar == CalendarSourceOptions.google.name {
-                        self?.grabGEvents {
-                            self?.hasLoadedCalendarEventActivities = true
-                        }
-                    } else {
-                        self?.hasLoadedCalendarEventActivities = true
+                } else if list == ListSourceOptions.google.name {
+                    self.grabGTasks {
+                        self.hasLoadedListTaskActivities = true
                     }
-                    self?.grabCalendars()
-                })
+                } else {
+                    self.hasLoadedListTaskActivities = true
+                }
+                self.grabLists()
             })
-            self?.saveDataToSharedContainer(activities: self?.activities ?? [])
-        }
+            self.grabPrimaryCalendar({ (calendar) in
+                if calendar == CalendarSourceOptions.apple.name {
+                    self.grabEKEvents {
+                        self.hasLoadedCalendarEventActivities = true
+                    }
+                } else if calendar == CalendarSourceOptions.google.name {
+                    self.grabGEvents {
+                        self.hasLoadedCalendarEventActivities = true
+                    }
+                } else {
+                    self.hasLoadedCalendarEventActivities = true
+                }
+                self.grabCalendars()
+            })
+        })
+        self.saveDataToSharedContainer(activities: self.activities)
     }
     
     func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
@@ -643,15 +641,28 @@ extension ActivityService {
         for activity in activities {
             // Handles recurring events.
             if let rules = activity.recurrences, !rules.isEmpty {
-                let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
-                let dates = iCalUtility()
-                    .recurringDates(forRules: rules, ruleStartDate: activity.startDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
-                let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
-                for date in dates {
-                    let newActivity = activity.copy() as! Activity
-                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
-                    newActivities.append(newActivity)
+                if activity.isTask ?? false {
+                    let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                    let dates = iCalUtility()
+                        .recurringDates(forRules: rules, ruleStartDate: activity.endDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                    for date in dates {
+                        let newActivity = activity.copy() as! Activity
+                        newActivity.recurrenceStartDate = activity.endDate
+                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                        newActivities.append(newActivity)
+                    }
+                } else {
+                    let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
+                    let dates = iCalUtility()
+                        .recurringDates(forRules: rules, ruleStartDate: activity.startDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                    let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
+                    for date in dates {
+                        let newActivity = activity.copy() as! Activity
+                        newActivity.recurrenceStartDate = activity.startDate
+                        newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                        newActivities.append(newActivity)
+                    }
                 }
             } else {
                 newActivities.append(activity)

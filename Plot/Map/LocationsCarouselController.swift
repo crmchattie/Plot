@@ -63,8 +63,8 @@ class LocationCell: LBTAListCell<LocationStruct> {
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
         label.textAlignment = .left
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -74,6 +74,7 @@ class LocationCell: LBTAListCell<LocationStruct> {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -83,6 +84,7 @@ class LocationCell: LBTAListCell<LocationStruct> {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

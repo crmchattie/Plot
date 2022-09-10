@@ -14,6 +14,7 @@ class CalendarAccountView: UIView {
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -22,6 +23,7 @@ class CalendarAccountView: UIView {
 //        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
 //        label.font = UIFont.preferredFont(forTextStyle: .callout)
 //        label.numberOfLines = 1
+//        label.adjustsFontForContentSizeCategory = true
 //        return label
 //    }()
     

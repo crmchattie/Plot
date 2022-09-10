@@ -164,6 +164,7 @@ class WeatherCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.isUserInteractionEnabled = false
         label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -173,6 +174,7 @@ class WeatherCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.isUserInteractionEnabled = false
         label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -182,6 +184,7 @@ class WeatherCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.isUserInteractionEnabled = false
         label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

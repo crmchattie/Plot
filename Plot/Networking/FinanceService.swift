@@ -100,25 +100,23 @@ class FinanceService {
     var isRunning: Bool = true
     
     func grabFinances(_ completion: @escaping () -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            self?.triggerUpdateMXUser()
-            self?.observeAccountsForCurrentUser {}
-            self?.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
-                self?.transactionRules = transactionRules
-                self?.observeTransactionsForCurrentUser {
-//                    self?.removePendingTransactions()
-//                    self?.grabTransactionAttributes()
-                    if self?.isRunning ?? true {
-                        completion()
-                        self?.isRunning = false
-                    }
+        self.triggerUpdateMXUser()
+        self.observeAccountsForCurrentUser {}
+        self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
+            self.transactionRules = transactionRules
+            self.observeTransactionsForCurrentUser {
+//                    self.removePendingTransactions()
+//                    self.grabTransactionAttributes()
+                if self.isRunning {
+                    completion()
+                    self.isRunning = false
                 }
-            })
-            self?.observeTransactionRulesForCurrentUser {}
-            self?.observeHoldingsForCurrentUser()
-            self?.observeMembersForCurrentUser {}
+            }
+        })
+        self.observeTransactionRulesForCurrentUser {}
+        self.observeHoldingsForCurrentUser()
+        self.observeMembersForCurrentUser {}
 
-        }
     }
     
     func setupMembersAccountsDict() {

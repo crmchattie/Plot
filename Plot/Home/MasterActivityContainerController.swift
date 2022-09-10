@@ -410,7 +410,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         for activity in allActivities {
             if let endDate = activity.endDateWTZ {
-                if (currentDate < endDate) || (activity.allDay ?? false && calendar.compare(currentDate, to: endDate, toGranularity: .day) != .orderedDescending) {
+                if currentDate < endDate {
                     if index < totalNumberOfActivities - (numberOfActivities - 1) {
                         if events.count < numberOfActivities {
                             events.append(allActivities[index])

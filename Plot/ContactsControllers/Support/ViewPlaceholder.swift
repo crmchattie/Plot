@@ -87,17 +87,19 @@ class ViewPlaceholder: UIView {
         backgroundColor = .clear
         translatesAutoresizingMaskIntoConstraints = false
         
-        title.font = .systemFont(ofSize: 18)
+        title.font = .preferredFont(forTextStyle: .body)
         title.textColor = ThemeManager.currentTheme().generalSubtitleColor
         title.textAlignment = .center
         title.numberOfLines = 0
         title.translatesAutoresizingMaskIntoConstraints = false
+        title.adjustsFontForContentSizeCategory = true
         
-        subtitle.font = .systemFont(ofSize: 13)
+        subtitle.font = .preferredFont(forTextStyle: .footnote)
         subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
         subtitle.textAlignment = .center
         subtitle.numberOfLines = 0
         subtitle.translatesAutoresizingMaskIntoConstraints = false
+        subtitle.adjustsFontForContentSizeCategory = true
         
         addSubview(title)
         

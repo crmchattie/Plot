@@ -77,15 +77,13 @@ class HealthService {
             self?.askedforAuthorization = askedforAuthorization
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
                 HealthKitService.authorized = true
-                DispatchQueue.main.async {
-                    self?.healthMetricSections = Array(metrics.keys)
-                    self?.healthMetrics = metrics
-                    self?.observeWorkoutsForCurrentUser {}
-                    self?.observeMindfulnesssForCurrentUser {}
-                    if self?.isRunning ?? true {
-                        completion()
-                        self?.isRunning = false
-                    }
+                self?.healthMetricSections = Array(metrics.keys)
+                self?.healthMetrics = metrics
+                self?.observeWorkoutsForCurrentUser {}
+                self?.observeMindfulnesssForCurrentUser {}
+                if self?.isRunning ?? true {
+                    completion()
+                    self?.isRunning = false
                 }
             }
         }

@@ -66,7 +66,6 @@ class EventCell: UITableViewCell {
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
         label.textAlignment = .left
         return label
     }()
@@ -113,8 +112,6 @@ class EventCell: UITableViewCell {
         badgeLabel.layer.masksToBounds = true
         badgeLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         badgeLabel.adjustsFontForContentSizeCategory = true
-        badgeLabel.minimumScaleFactor = 0.1
-        badgeLabel.adjustsFontSizeToFitWidth = true
         return badgeLabel
     }()
     

@@ -170,8 +170,6 @@ class SelectChatTableViewController: UITableViewController {
 //      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 10)
         headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
         headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
-        headerTitle.textLabel?.minimumScaleFactor = 0.1
-        headerTitle.textLabel?.adjustsFontSizeToFitWidth = true
     }
   }
   
@@ -192,7 +190,7 @@ class SelectChatTableViewController: UITableViewController {
       cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
       cell.imageView?.image = UIImage(named: "groupChat")
       cell.imageView?.contentMode = .scaleAspectFit
-      cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
+      cell.textLabel?.font = .preferredFont(forTextStyle: .body)
       cell.textLabel?.text = actions[indexPath.row]
       cell.textLabel?.textColor = FalconPalette.defaultBlue
       return cell

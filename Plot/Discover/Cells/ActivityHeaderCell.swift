@@ -27,7 +27,8 @@ class ActivityHeaderCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.font = UIFont.title3.with(weight: .bold)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

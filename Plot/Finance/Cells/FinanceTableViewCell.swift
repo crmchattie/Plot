@@ -84,6 +84,7 @@ class FinanceTableViewCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -93,6 +94,7 @@ class FinanceTableViewCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .right
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -102,6 +104,7 @@ class FinanceTableViewCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -111,6 +114,7 @@ class FinanceTableViewCell: UITableViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

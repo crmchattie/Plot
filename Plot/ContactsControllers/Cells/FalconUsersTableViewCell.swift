@@ -26,6 +26,7 @@ class FalconUsersTableViewCell: UITableViewCell {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = UIFont.preferredFont(forTextStyle: .headline)
         title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.adjustsFontForContentSizeCategory = true
         return title
     }()
     
@@ -34,7 +35,7 @@ class FalconUsersTableViewCell: UITableViewCell {
         subtitle.translatesAutoresizingMaskIntoConstraints = false
         subtitle.font = UIFont.preferredFont(forTextStyle: .subheadline)
         subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        
+        subtitle.adjustsFontForContentSizeCategory = true
         return subtitle
     }()
     

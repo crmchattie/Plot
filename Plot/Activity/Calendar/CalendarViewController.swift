@@ -138,8 +138,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(calendarActivitiesUpdated), name: .calendarActivitiesUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -152,13 +151,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         applyCalendarTheme()
     }
     
-    @objc fileprivate func eventsUpdated() {
-        filteredPinnedActivities = pinnedActivities
-        filteredActivities = activities
-        activityView.tableView.reloadData()
-    }
-    
-    @objc fileprivate func tasksUpdated() {
+    @objc fileprivate func calendarActivitiesUpdated() {
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
         activityView.tableView.reloadData()
@@ -419,7 +412,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         for activity in self.filteredActivities {
             if let endDate = activity.endDateWTZ {
-                if (date < endDate) || (activity.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
+                if date < endDate {
                     activityFound = true
                     break
                 }

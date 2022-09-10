@@ -183,7 +183,7 @@ class HealthDetailViewController: UIViewController {
         rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
         
         let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
-                                  font: .systemFont(ofSize: 12),
+                                  font: UIFont.caption2.with(weight: .regular),
                                   textColor: .white,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
                                   xAxisValueFormatter: dayAxisValueFormatter!, units: viewModel.healthMetric.unitName)

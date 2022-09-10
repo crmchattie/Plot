@@ -24,6 +24,7 @@ class StackedBarChartCell: UITableViewCell {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = .secondaryLabel
         return label
     }()
@@ -31,6 +32,7 @@ class StackedBarChartCell: UITableViewCell {
     private lazy var valueLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = .label
         label.numberOfLines = 0
         return label
@@ -154,12 +156,14 @@ private class CategoryTimeView: UIStackView {
     var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
 
     var subtitleLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
 

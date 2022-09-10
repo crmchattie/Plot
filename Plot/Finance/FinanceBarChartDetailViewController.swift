@@ -198,7 +198,7 @@ class FinanceBarChartViewController: UIViewController {
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
         xAxis.valueFormatter = dayAxisValueFormatter
         xAxis.labelPosition = .bottom
-        xAxis.labelFont = .systemFont(ofSize: 10)
+        xAxis.labelFont = UIFont.caption2.with(weight: .regular)
         xAxis.granularity = 1
         xAxis.labelCount = 5
                                 
@@ -210,13 +210,13 @@ class FinanceBarChartViewController: UIViewController {
         rightAxisFormatter.maximumFractionDigits = 0
         let rightAxis = chartView.rightAxis
         rightAxis.enabled = true
-        rightAxis.labelFont = .systemFont(ofSize: 10)
+        rightAxis.labelFont = UIFont.caption2.with(weight: .regular)
         rightAxis.labelCount = 8
         rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
         rightAxis.spaceTop = 0.15
 
         let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
-                                  font: .systemFont(ofSize: 12),
+                                  font: UIFont.caption2.with(weight: .regular),
                                   textColor: .white,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
                                   xAxisValueFormatter: dayAxisValueFormatter!, units: units)

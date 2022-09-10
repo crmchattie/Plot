@@ -42,9 +42,10 @@ class SetupCell: BaseContainerCollectionViewCell {
     let typeLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = UIFont.boldSystemFont(ofSize: 22)
+        label.font = UIFont.title2.with(weight: .bold)
         label.numberOfLines = 1
         label.textAlignment = .left
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -54,6 +55,7 @@ class SetupCell: BaseContainerCollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -61,7 +63,8 @@ class SetupCell: BaseContainerCollectionViewCell {
         let button = UIButton(type: .system)
         button.backgroundColor = .systemBlue
         button.setTitle("Get Started", for: .normal)
-        button.titleLabel?.font = .boldSystemFont(ofSize: 15)
+        button.titleLabel?.font = UIFont.subheadline.with(weight: .bold)
+        button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.setTitleColor(.white, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.clipsToBounds = true

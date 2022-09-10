@@ -32,7 +32,6 @@ class ParticipantTableViewCell: UITableViewCell {
         title.font = UIFont.preferredFont(forTextStyle: .headline)
         title.adjustsFontForContentSizeCategory = true
         title.textColor = ThemeManager.currentTheme().generalTitleColor
-        
         return title
     }()
     

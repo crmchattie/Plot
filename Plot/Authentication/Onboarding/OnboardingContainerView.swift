@@ -24,11 +24,8 @@ class OnboardingContainerView: UIView {
         let welcomeTitle = UILabel()
         welcomeTitle.translatesAutoresizingMaskIntoConstraints = false
         welcomeTitle.text = "Welcome to Plot"
-        //    welcomeTitle.font = UIFont.systemFont(ofSize: 20)
         welcomeTitle.font = UIFont.preferredFont(forTextStyle: .title3)
         welcomeTitle.adjustsFontForContentSizeCategory = true
-        welcomeTitle.minimumScaleFactor = 0.1
-        welcomeTitle.adjustsFontSizeToFitWidth = true
         welcomeTitle.textAlignment = .center
         welcomeTitle.textColor = ThemeManager.currentTheme().generalTitleColor
         return welcomeTitle
@@ -41,11 +38,8 @@ class OnboardingContainerView: UIView {
         startMessaging.setTitle("Start Plotting", for: .normal)
         startMessaging.setTitleColor(FalconPalette.defaultBlue, for: .normal)
         startMessaging.titleLabel?.backgroundColor = .clear
-        //    startMessaging.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         startMessaging.titleLabel?.font = UIFont.preferredFont(forTextStyle: .title3)
         startMessaging.titleLabel?.adjustsFontForContentSizeCategory = true
-        startMessaging.titleLabel?.minimumScaleFactor = 0.1
-        startMessaging.titleLabel?.adjustsFontSizeToFitWidth = true        
         return startMessaging
     }()
     

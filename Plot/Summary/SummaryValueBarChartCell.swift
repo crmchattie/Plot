@@ -31,7 +31,7 @@ class SummaryValueBarChartCell: UICollectionViewCell {
                 numberFormatter.maximumFractionDigits = 0
                 let valuesNumberFormatter = ChartValueFormatter(numberFormatter: numberFormatter)
                 chartData.setDrawValues(true)
-                chartData.setValueFont(.systemFont(ofSize: 12.5))
+                chartData.setValueFont(UIFont.footnote.with(weight: .regular))
                 chartData.setValueFormatter(valuesNumberFormatter)
                 chartData.barWidth = barWidth
                 chartView.data = chartData
@@ -48,7 +48,7 @@ class SummaryValueBarChartCell: UICollectionViewCell {
                 let xAxis = chartView.xAxis
                 xAxis.valueFormatter = IndexAxisValueFormatter(values: values)
                 xAxis.labelPosition = .bottom
-                xAxis.labelFont = .systemFont(ofSize: 10)
+                xAxis.labelFont = UIFont.caption2.with(weight: .regular)
                 xAxis.granularity = 1
                 xAxis.labelCount = 5
                 xAxis.drawGridLinesEnabled = false
@@ -61,7 +61,7 @@ class SummaryValueBarChartCell: UICollectionViewCell {
                 rightAxisFormatter.maximumFractionDigits = 0
                 let rightAxis = chartView.rightAxis
                 rightAxis.enabled = true
-                rightAxis.labelFont = .systemFont(ofSize: 10)
+                rightAxis.labelFont = UIFont.caption2.with(weight: .regular)
                 rightAxis.labelCount = 8
                 rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
                 rightAxis.spaceTop = 0.15
@@ -75,7 +75,7 @@ class SummaryValueBarChartCell: UICollectionViewCell {
                 l.drawInside = false
                 l.form = .circle
                 l.formSize = 9
-                l.font = UIFont(name: "HelveticaNeue-Light", size: 11)!
+                l.font = UIFont.caption2.with(weight: .regular)
                 l.xEntrySpace = 4
                 
 //

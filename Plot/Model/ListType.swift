@@ -33,17 +33,18 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     var muted: Bool?
     var category: String?
     
-    init(id: String, name: String?, color: String?, source: String) {
+    init(id: String, name: String?, color: String?, source: String, admin: String?) {
         self.id = id
         self.name = name
         self.color = color
         self.source = source
+        self.admin = admin
     }
 }
 
 let prebuiltLists: [ListType] = [defaultList]
 
-let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name)
+let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil)
 
 enum ListSourceOptions: String, CaseIterable {
     case plot = "Plot"

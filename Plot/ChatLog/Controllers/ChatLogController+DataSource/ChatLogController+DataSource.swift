@@ -253,7 +253,7 @@ extension ChatLogController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: 0, height: 0)
       }
       let infoMessageHeight = messagesFetcher.estimateFrameForText(width: infoMessageWidth, text: messageText,
-                                                                   font: UIFont.systemFont(ofSize: 12)).height + 10
+                                                                   font: .preferredFont(forTextStyle: .caption1)).height + 10
       return CGSize(width: infoMessageWidth, height: infoMessageHeight)
     }
     

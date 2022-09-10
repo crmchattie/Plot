@@ -12,7 +12,6 @@ class InformationMessageCell: RevealableCollectionViewCell {
 
   let information: UILabel = {
     let information = UILabel()
-//    information.font = UIFont.systemFont(ofSize: 12)
     information.font = UIFont.preferredFont(forTextStyle: .caption2)
     information.adjustsFontForContentSizeCategory = true
     information.numberOfLines = 0

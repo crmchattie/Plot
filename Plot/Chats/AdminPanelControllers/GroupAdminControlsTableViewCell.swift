@@ -13,7 +13,6 @@ class GroupAdminControlsTableViewCell: UITableViewCell {
   var title: UILabel = {
     var title = UILabel()
     title.translatesAutoresizingMaskIntoConstraints = false
-//    title.font = UIFont.systemFont(ofSize: 18)
     title.font = UIFont.preferredFont(forTextStyle: .body)
     title.adjustsFontForContentSizeCategory = true
     title.textColor = FalconPalette.defaultBlue

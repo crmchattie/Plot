@@ -58,7 +58,6 @@ class TaskCell: UITableViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.sizeToFit()
         label.textAlignment = .left
         return label
     }()
@@ -97,8 +96,6 @@ class TaskCell: UITableViewCell {
         badgeLabel.layer.masksToBounds = true
         badgeLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         badgeLabel.adjustsFontForContentSizeCategory = true
-        badgeLabel.minimumScaleFactor = 0.1
-        badgeLabel.adjustsFontSizeToFitWidth = true
         return badgeLabel
     }()
     

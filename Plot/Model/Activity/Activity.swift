@@ -43,6 +43,7 @@ class Activity: NSObject, NSCopying, Codable {
     //
     // Both Google and iCloud events are transfomed into this expression.
     var recurrences: [String]?
+    var recurrenceStartDate: Date?
     var reminder: String?
     var notes: String?
     var checklistIDs: [String]?

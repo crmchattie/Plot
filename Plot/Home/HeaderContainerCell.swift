@@ -27,8 +27,9 @@ class HeaderContainerCell: UICollectionReusableView {
         let label = UILabel()
         label.text = "Activity Type"
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = .boldSystemFont(ofSize: 30)
+        label.font = UIFont.title1.with(weight: .bold)
         label.isUserInteractionEnabled = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -42,8 +43,9 @@ class HeaderContainerCell: UICollectionReusableView {
         let label = UILabel()
         label.text = "See All"
         label.textColor = .systemBlue
-        label.font = .systemFont(ofSize: 18)
+        label.font = UIFont.body.with(weight: .regular)
         label.isUserInteractionEnabled = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -106,8 +108,9 @@ class TableViewHeader: UITableViewHeaderFooterView {
         let label = UILabel()
         label.text = "Activity Type"
         label.textColor = ThemeManager.currentTheme().generalTitleColor
-        label.font = .boldSystemFont(ofSize: 22)
+        label.font = UIFont.title2.with(weight: .bold)
         label.isUserInteractionEnabled = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -115,8 +118,9 @@ class TableViewHeader: UITableViewHeaderFooterView {
         let label = UILabel()
         label.text = "See All"
         label.textColor = .systemBlue
-        label.font = .systemFont(ofSize: 18)
+        label.font = UIFont.body.with(weight: .regular)
         label.isUserInteractionEnabled = true
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

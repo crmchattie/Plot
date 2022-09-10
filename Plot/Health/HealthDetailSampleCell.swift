@@ -40,7 +40,6 @@ class HealthDetailSampleCell: UITableViewCell {
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
         label.textAlignment = .left
         return label
     }()

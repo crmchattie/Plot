@@ -16,9 +16,8 @@ class ChangeEmailView: UIView {
         title.textAlignment = .center
         title.text = "Email Address"
         title.textColor = ThemeManager.currentTheme().generalTitleColor
-        title.font = UIFont.systemFont(ofSize: 32)
-        title.sizeToFit()
-        
+        title.font = .preferredFont(forTextStyle: .title1)
+        title.adjustsFontForContentSizeCategory = true
         return title
     }()
     
@@ -28,9 +27,8 @@ class ChangeEmailView: UIView {
         instructions.textAlignment = .center
         instructions.numberOfLines = 2
         instructions.textColor = ThemeManager.currentTheme().generalTitleColor
-        instructions.font = UIFont.systemFont(ofSize: 18)
-        instructions.sizeToFit()
-        
+        instructions.font = .preferredFont(forTextStyle: .body)
+        instructions.adjustsFontForContentSizeCategory = true
         return instructions
     }()
     

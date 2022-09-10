@@ -195,7 +195,7 @@ class ContactsController: UITableViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.imageView?.image = UIImage(named: "groupChat")
             cell.imageView?.contentMode = .scaleAspectFit
-            cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
+            cell.textLabel?.font = .preferredFont(forTextStyle: .body)
             cell.textLabel?.text = actions[indexPath.row]
             cell.textLabel?.textColor = FalconPalette.defaultBlue
             return cell

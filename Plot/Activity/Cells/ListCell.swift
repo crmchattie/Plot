@@ -73,8 +73,6 @@ class ListCell: UITableViewCell {
         badgeLabel.layer.masksToBounds = true
         badgeLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         badgeLabel.adjustsFontForContentSizeCategory = true
-        badgeLabel.minimumScaleFactor = 0.1
-        badgeLabel.adjustsFontSizeToFitWidth = true
         return badgeLabel
     }()
     

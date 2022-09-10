@@ -28,7 +28,6 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         label.adjustsFontForContentSizeCategory = true
         label.textColor = ThemeManager.currentTheme().generalTitleColor
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.sizeToFit()
         label.textAlignment = .left
         label.numberOfLines = 0
         return label

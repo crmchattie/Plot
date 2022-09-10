@@ -123,7 +123,8 @@ extension CustomSegmentedControl {
                 button.tag = index
                 button.addTarget(self, action:#selector(CustomSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
                 button.setTitle(buttonTitles[index], for: .normal)
-                button.titleLabel?.font = .boldSystemFont(ofSize: 20)
+                button.titleLabel?.font = UIFont.title3.with(weight: .bold)
+                button.titleLabel?.adjustsFontForContentSizeCategory = true
                 button.setTitleColor(buttonColor, for: .normal)
                 buttons.append(button)
             }
@@ -231,7 +232,8 @@ extension CustomMultiSegmentedControl {
                 let button = RoundedButton(type: .system)
                 button.addTarget(self, action:#selector(CustomMultiSegmentedControl.buttonAction(sender:)), for: .touchUpInside)
                 button.setTitle(buttonTitle, for: .normal)
-                button.titleLabel?.font = .boldSystemFont(ofSize: 20)
+                button.titleLabel?.font = UIFont.title3.with(weight: .bold)
+                button.titleLabel?.adjustsFontForContentSizeCategory = true
                 button.tintColor = unselectedTintColor
                 button.backgroundColor = unselectedBackgroundColor
                 buttons.append(button)

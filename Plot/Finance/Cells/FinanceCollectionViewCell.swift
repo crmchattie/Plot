@@ -328,6 +328,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
 
@@ -337,6 +338,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .right
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -346,6 +348,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .right
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -354,6 +357,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -362,6 +366,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         label.textColor = ThemeManager.currentTheme().generalSubtitleColor
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

@@ -220,7 +220,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             let notification = notifications[indexPath.row]
             cell.textLabel?.text = notification.description
-            cell.textLabel?.sizeToFit()
+            cell.textLabel?.adjustsFontForContentSizeCategory = true
             cell.textLabel?.numberOfLines = 0
             cell.textLabel?.lineBreakMode = .byWordWrapping
             cell.textLabel?.textColor = theme.generalTitleColor

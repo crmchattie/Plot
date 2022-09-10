@@ -854,7 +854,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
             if members[indexPath.row].id == conversationAdminID {
                 let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
                 label.text = "admin"
-                label.font = UIFont.systemFont(ofSize: 13)
+                label.font = .preferredFont(forTextStyle: .footnote)
                 label.textColor = ThemeManager.currentTheme().generalSubtitleColor
             }
             

@@ -46,7 +46,6 @@ class UserProfileContainerView: UIView {
         addPhotoLabel.text = "Add\nphoto"
         addPhotoLabel.font = UIFont.preferredFont(forTextStyle: .title3)
         addPhotoLabel.adjustsFontForContentSizeCategory = true
-        addPhotoLabel.adjustsFontSizeToFitWidth = true
         addPhotoLabel.numberOfLines = 2
         addPhotoLabel.textColor = FalconPalette.defaultBlue
         addPhotoLabel.textAlignment = .center
@@ -55,10 +54,8 @@ class UserProfileContainerView: UIView {
     
     var name: PasteRestrictedTextField = {
         let name = PasteRestrictedTextField()
-        //    name.font = UIFont.systemFont(ofSize: 20)
         name.font = UIFont.preferredFont(forTextStyle: .title3)
         name.adjustsFontForContentSizeCategory = true
-        name.adjustsFontSizeToFitWidth = true
         name.enablesReturnKeyAutomatically = true
         name.translatesAutoresizingMaskIntoConstraints = false
         name.textAlignment = .center
@@ -76,7 +73,6 @@ class UserProfileContainerView: UIView {
         let phone = PasteRestrictedTextField()
         phone.font = UIFont.preferredFont(forTextStyle: .title3)
         phone.adjustsFontForContentSizeCategory = true
-        phone.adjustsFontSizeToFitWidth = true
         phone.translatesAutoresizingMaskIntoConstraints = false
         phone.textAlignment = .center
         phone.keyboardType = .numberPad
@@ -90,7 +86,7 @@ class UserProfileContainerView: UIView {
     
     let email: PasteRestrictedTextField = {
         let textField = PasteRestrictedTextField()
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.font = UIFont.preferredFont(forTextStyle: .title3)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.textAlignment = .center
         textField.keyboardType = .emailAddress
@@ -118,8 +114,7 @@ class UserProfileContainerView: UIView {
         bio.translatesAutoresizingMaskIntoConstraints = false
         bio.layer.cornerRadius = 10
         bio.textAlignment = .center
-        //    bio.font = UIFont.systemFont(ofSize: 16)
-        bio.font = UIFont.preferredFont(forTextStyle: .body)
+        bio.font = UIFont.preferredFont(forTextStyle: .title3)
         bio.adjustsFontForContentSizeCategory = true
         bio.isScrollEnabled = false
         bio.textContainerInset = UIEdgeInsets(top: 15, left: 35, bottom: 15, right: 35)
@@ -136,7 +131,7 @@ class UserProfileContainerView: UIView {
     let bioPlaceholderLabel: UILabel = {
         let bioPlaceholderLabel = UILabel()
         bioPlaceholderLabel.text = "Bio"
-        bioPlaceholderLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        bioPlaceholderLabel.font = UIFont.preferredFont(forTextStyle: .title3)
         bioPlaceholderLabel.adjustsFontForContentSizeCategory = true
         bioPlaceholderLabel.sizeToFit()
         bioPlaceholderLabel.textAlignment = .center
