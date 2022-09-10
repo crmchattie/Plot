@@ -68,6 +68,12 @@ class MindfulnessActions: NSObject {
         mindfulness.participantsIDs = membersIDs.0
         mindfulness.lastModifiedDate = Date()
         
+        if mindfulness.hkSampleID == nil {
+            createHealthKit()
+        }
+        
+        mindfulness.hkSampleID = nil
+        
         let groupMindfulnessReference = Database.database().reference().child(mindfulnessEntity).child(ID)
 
         do {
@@ -85,6 +91,25 @@ class MindfulnessActions: NSObject {
             connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
         } else {
             Analytics.logEvent("update_mindfulness", parameters: [String: Any]())
+        }
+    }
+    
+    func createHealthKit() {
+        if let _ = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {
+            if mindfulness.containerID == nil {
+                self.createActivity()
+            }
+        }
+    }
+    
+    func createActivity() {
+        if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID {
+            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
+            activityActions.createNewActivity()
+            //will update activity.containerID and mindfulness.containerID
+            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulness.id], mealIDs: nil, transactionIDs: nil)
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
         }
     }
     

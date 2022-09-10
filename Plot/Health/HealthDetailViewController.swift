@@ -242,12 +242,9 @@ class HealthDetailViewController: UIViewController {
             print("steps")
         case .workout:
             if let hkWorkout = sample as? HKWorkout {
-                HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: hkWorkout) { workout in
-                    guard workout != nil else { return }
-                    let destination = WorkoutViewController(networkController: self.networkController)
-                    destination.workout = workout
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+                let destination = WorkoutViewController(networkController: self.networkController)
+                destination.workout = Workout(from: hkWorkout)
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         case .heartRate:
             print("steps")
@@ -258,23 +255,17 @@ class HealthDetailViewController: UIViewController {
         case .mindfulness:
             print("steps")
             if let hkMindfulness = sample as? HKCategorySample {
-                HealthKitSampleBuilder.createMindfulnessFromHKMindfulness(from: hkMindfulness, completion: { mindfulness in
-                    guard mindfulness != nil else { return }
-                    let destination = MindfulnessViewController(networkController: self.networkController)
-                    destination.mindfulness = mindfulness
-                    self.navigationController?.pushViewController(destination, animated: true)
-                })
+                let destination = MindfulnessViewController(networkController: self.networkController)
+                destination.mindfulness = Mindfulness(from: hkMindfulness)
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         case .activeEnergy:
             print("steps")
         case .workoutMinutes:
             if let hkWorkout = sample as? HKWorkout {
-                HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: hkWorkout) { workout in
-                    guard workout != nil else { return }
-                    let destination = WorkoutViewController(networkController: self.networkController)
-                    destination.workout = workout
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+                let destination = WorkoutViewController(networkController: self.networkController)
+                destination.workout = Workout(from: hkWorkout)
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         case .flightsClimbed:
             print("steps")

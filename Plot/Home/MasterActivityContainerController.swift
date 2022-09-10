@@ -348,7 +348,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                                                            style: .plain,
                                                            target: self,
                                                            action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItems = [notificationsBarButton, settingsBarButton]
+        navigationItem.leftBarButtonItems = [settingsBarButton, notificationsBarButton]
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                             target: self,
                                                             action: #selector(newItem))

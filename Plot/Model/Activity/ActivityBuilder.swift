@@ -24,9 +24,6 @@ class ActivityBuilder {
         activity.activityType = "Workout"
         activity.category = "Workout"
         activity.name = workout.name
-        if let totalEnergyBurned = workout.totalEnergyBurned, let type = workout.type {
-            activity.activityDescription = "\(String(describing: type)) - \(totalEnergyBurned.clean) calories"
-        }
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)

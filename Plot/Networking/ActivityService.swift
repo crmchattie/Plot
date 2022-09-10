@@ -176,9 +176,9 @@ class ActivityService {
     func grabActivities(_ completion: @escaping () -> Void) {
         DispatchQueue.main.async { [weak self] in
             self?.observeActivitiesForCurrentUser({
-                self?.grabOtherActivities()
                 if self?.isRunning ?? true {
                     completion()
+                    self?.grabOtherActivities()
                     self?.isRunning = false
                 }
             })

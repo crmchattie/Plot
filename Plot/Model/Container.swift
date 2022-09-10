@@ -40,7 +40,7 @@ struct Container: Codable, Equatable, Hashable {
 
 class ContainerFunctions {
     class func updateContainerAndStuffInside(container: Container) {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {return}
+        guard let _ = Auth.auth().currentUser?.uid else {return}
         let reference = Database.database().reference()
         do {
             let value = try FirebaseEncoder().encode(container)
@@ -58,10 +58,10 @@ class ContainerFunctions {
             reference.child(financialTransactionsEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.workoutIDs ?? [] {
-            reference.child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey).child(ID).child(containerIDEntity).setValue(container.id)
+            reference.child(workoutsEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.mindfulnessIDs ?? [] {
-            reference.child(userHealthEntity).child(currentUserId).child(healthkitMindfulnessKey).child(ID).child(containerIDEntity).setValue(container.id)
+            reference.child(mindfulnessEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
     }
     
@@ -105,48 +105,75 @@ class ContainerFunctions {
                     dispatchGroup.enter()
                     let dataReference = Database.database().reference().child(financialTransactionsEntity).child(transactionID)
                     dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists(), let snapshotValue = snapshot.value {
-                            if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
-                                transactions.append(transaction)
-                            }
+                        if snapshot.exists(), let snapshotValue = snapshot.value, let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
+                            transactions.append(transaction)
                         }
                         dispatchGroup.leave()
                     })
                 }
+                
                 for workoutID in container.workoutIDs ?? [] {
-                    dispatchGroup.enter()
-                    if let uuid = UUID(uuidString: workoutID) {
-                        HealthKitService.grabSpecificWorkoutSample(uuid: uuid) { samples, err in
-                            if let sample = samples?.first {
-                                HealthKitSampleBuilder.createWorkoutFromHKWorkout(from: sample) { workout in
-                                    guard workout != nil else {
-                                        dispatchGroup.leave()
-                                        return }
-                                    var health = HealthContainer()
-                                    health.workout = workout
-                                    healths.append(health)
-                                    dispatchGroup.leave()
+                    if let currentUserID = Auth.auth().currentUser?.uid {
+                        dispatchGroup.enter()
+                        let ref = Database.database().reference()
+                        var dataReference = ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(identifierKey)
+                        dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let hkWorkoutID = snapshot.value as? String {
+                                if let uuid = UUID(uuidString: hkWorkoutID) {
+                                    HealthKitService.grabSpecificWorkoutSample(uuid: uuid) { samples, err in
+                                        if let sample = samples?.first {
+                                            let workout = Workout(from: sample)
+                                            var health = HealthContainer()
+                                            health.workout = workout
+                                            healths.append(health)
+                                            dispatchGroup.leave()
+                                        }
+                                    }
                                 }
+                            } else {
+                                dataReference = ref.child(workoutsEntity).child(workoutID)
+                                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                                    if snapshot.exists(), let snapshotValue = snapshot.value, let workout = try? FirebaseDecoder().decode(Workout.self, from: snapshotValue) {
+                                        var health = HealthContainer()
+                                        health.workout = workout
+                                        healths.append(health)
+                                    }
+                                    dispatchGroup.leave()
+                                })
                             }
-                        }
+                        })
                     }
                 }
                 for mindfulnessID in container.mindfulnessIDs ?? [] {
-                    dispatchGroup.enter()
-                    if let uuid = UUID(uuidString: mindfulnessID) {
-                        HealthKitService.grabSpecificCategorySample(uuid: uuid, identifier: .mindfulSession) { samples, err in
-                            if let sample = samples?.first {
-                                HealthKitSampleBuilder.createMindfulnessFromHKMindfulness(from: sample) { mindfulness in
-                                    guard mindfulness != nil else {
-                                        dispatchGroup.leave()
-                                        return }
-                                    var health = HealthContainer()
-                                    health.mindfulness = mindfulness
-                                    healths.append(health)
-                                    dispatchGroup.leave()
+                    if let currentUserID = Auth.auth().currentUser?.uid {
+                        dispatchGroup.enter()
+                        let ref = Database.database().reference()
+                        var dataReference = ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulnessID).child(identifierKey)
+                        dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.exists(), let hkSampleID = snapshot.value as? String {
+                                if let uuid = UUID(uuidString: hkSampleID) {
+                                    HealthKitService.grabSpecificCategorySample(uuid: uuid, identifier: .mindfulSession) { samples, err in
+                                        if let sample = samples?.first {
+                                            let mindfulness = Mindfulness(from: sample)
+                                            var health = HealthContainer()
+                                            health.mindfulness = mindfulness
+                                            healths.append(health)
+                                            dispatchGroup.leave()
+                                        }
+                                    }
                                 }
+                            } else {
+                                dataReference = ref.child(mindfulnessEntity).child(mindfulnessID)
+                                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                                    if snapshot.exists(), let snapshotValue = snapshot.value, let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: snapshotValue) {
+                                        var health = HealthContainer()
+                                        health.mindfulness = mindfulness
+                                        healths.append(health)
+                                    }
+                                    dispatchGroup.leave()
+                                })
                             }
-                        }
+                        })
                     }
                 }
             }

@@ -136,7 +136,7 @@ extension CustomSegmentedControl {
     }
 }
 
-protocol CustomMultiSegmentedControlDelegate:class {
+protocol CustomMultiSegmentedControlDelegate: AnyObject {
     func changeToIndex(indexes:[Int])
 }
 

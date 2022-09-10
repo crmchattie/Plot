@@ -116,11 +116,15 @@ class MindfulnessViewController: FormViewController {
     
     func setupRightBarButton() {
         if !active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-        }
-        if navigationItem.leftBarButtonItem != nil {
-            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            let plusBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = plusBarButton
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
+        } else {
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = plusBarButton
+            navigationItem.rightBarButtonItem?.isEnabled = true
         }
     }
     
@@ -129,7 +133,21 @@ class MindfulnessViewController: FormViewController {
     }
     
     @objc fileprivate func create() {
-        if active {
+        showActivityIndicator()
+        let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+        createMindfulness.createNewMindfulness()
+        self.delegate?.updateMindfulness(mindfulness: self.mindfulness)
+        DispatchQueue.main.async {
+            self.hideActivityIndicator()
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+                self.updateDiscoverDelegate?.itemCreated()
+            }
+        }
+        
+        if active && false {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Update Mindfulness", style: .default, handler: { (_) in
@@ -184,7 +202,6 @@ class MindfulnessViewController: FormViewController {
                 
             }))
             
-            
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 print("User click Dismiss button")
             }))
@@ -193,51 +210,6 @@ class MindfulnessViewController: FormViewController {
                 print("completion block")
             })
             
-        } else {
-            showActivityIndicator()
-            createHealthKit() { hkSampleID in
-                self.mindfulness.hkSampleID = hkSampleID
-                let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createMindfulness.createNewMindfulness()
-                self.delegate?.updateMindfulness(mindfulness: self.mindfulness)
-                DispatchQueue.main.async {
-                    self.hideActivityIndicator()
-                    if self.navigationItem.leftBarButtonItem != nil {
-                        self.dismiss(animated: true, completion: nil)
-                    } else {
-                        self.navigationController?.popViewController(animated: true)
-                        self.updateDiscoverDelegate?.itemCreated()
-                    }
-                }
-            }
-        }
-    }
-    
-    func createHealthKit(completion: @escaping (String?) -> Void) {
-        var hkSampleID: String?
-        if let hkMindfulness = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {
-            hkSampleID = hkMindfulness.uuid.uuidString
-            HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in
-                if let hkSampleID = hkSampleID, self.delegate == nil {
-                    self.createActivity(hkSampleID: hkSampleID) {
-                        completion(hkSampleID)
-                    }
-                } else {
-                    completion(hkSampleID)
-                }
-            }
-        }
-    }
-    
-    func createActivity(hkSampleID: String, completion: @escaping () -> Void) {
-        if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID {
-            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-            activityActions.createNewActivity()
-            //will update activity.containerID and mindfulness.containerID
-            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [hkSampleID], mealIDs: nil, transactionIDs: nil)
-            ContainerFunctions.updateContainerAndStuffInside(container: container)
-            completion()
         }
     }
     

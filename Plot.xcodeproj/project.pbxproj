@@ -1912,11 +1912,11 @@
 				26836B50251338E800AFC2D7 /* HeartRateOperation.swift */,
 				261FAF76251C661D008636DF /* AnnualAverageWeightOperation.swift */,
 				261FAF78251C69C0008636DF /* WeightOperation.swift */,
+				263508A9258D76B000F57ACB /* MindfulnessOperation.swift */,
 				26317C2F251DB250007CC315 /* WorkoutOperation.swift */,
 				1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */,
 				26958552255A7355008FEE9B /* NutritionOperation.swift */,
 				26BDCDCB2582097700E850CF /* SleepOperation.swift */,
-				263508A9258D76B000F57ACB /* MindfulnessOperation.swift */,
 				10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);

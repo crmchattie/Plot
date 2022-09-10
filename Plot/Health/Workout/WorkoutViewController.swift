@@ -90,7 +90,7 @@ class WorkoutViewController: FormViewController {
         
         if active {
             for row in form.allRows {
-                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" {
+                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" && row.tag == "Body Weight" {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
@@ -116,11 +116,15 @@ class WorkoutViewController: FormViewController {
     
     func setupRightBarButton() {
         if !active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
-        }
-        if navigationItem.leftBarButtonItem != nil {
-            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            let plusBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = plusBarButton
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
+        } else {
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = plusBarButton
+            navigationItem.rightBarButtonItem?.isEnabled = true
         }
     }
     
@@ -129,7 +133,21 @@ class WorkoutViewController: FormViewController {
     }
     
     @objc fileprivate func create() {
-        if active {
+        showActivityIndicator()
+        let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+        createNewWorkout.createNewWorkout()
+        self.delegate?.updateWorkout(workout: self.workout)
+        DispatchQueue.main.async {
+            self.hideActivityIndicator()
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+                self.updateDiscoverDelegate?.itemCreated()
+            }
+        }
+        
+        if active && false {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Update Workout", style: .default, handler: { (_) in
@@ -191,53 +209,6 @@ class WorkoutViewController: FormViewController {
             self.present(alert, animated: true, completion: {
                 print("completion block")
             })
-        } else {
-            showActivityIndicator()
-            createHealthKit() { hkSampleID in
-                self.workout.hkSampleID = hkSampleID
-                let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createNewWorkout.createNewWorkout()
-                self.delegate?.updateWorkout(workout: self.workout)
-                DispatchQueue.main.async {
-                    self.hideActivityIndicator()
-                    if self.navigationItem.leftBarButtonItem != nil {
-                        self.dismiss(animated: true, completion: nil)
-                    } else {
-                        self.navigationController?.popViewController(animated: true)
-                        self.updateDiscoverDelegate?.itemCreated()
-                    }
-                }
-            }
-        }
-        
-    }
-    
-    func createHealthKit(completion: @escaping (String?) -> Void) {
-        var hkSampleID: String?
-        if let hkWorkout = HealthKitSampleBuilder.createHKWorkout(from: workout) {
-            hkSampleID = hkWorkout.uuid.uuidString
-            HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
-                if let hkSampleID = hkSampleID, self.delegate == nil {
-                    self.createActivity(hkSampleID: hkSampleID) {
-                        completion(hkSampleID)
-                    }
-                } else {
-                    completion(hkSampleID)
-                }
-            }
-        }
-    }
-    
-    func createActivity(hkSampleID: String, completion: @escaping () -> Void) {
-        if let activity = ActivityBuilder.createActivity(from: self.workout), let activityID = activity.activityID {
-            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-            activityActions.createNewActivity()
-            
-            //will update activity.containerID and workout.containerID
-            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [hkSampleID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
-            ContainerFunctions.updateContainerAndStuffInside(container: container)
-            completion()
         }
     }
     
@@ -374,7 +345,15 @@ class WorkoutViewController: FormViewController {
         }.cellUpdate { cell, row in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        }
+        }.onChange({ row in
+            print("changed")
+            if let value = row.value {
+                if let currentUser = Auth.auth().currentUser?.uid {
+                    let reference = Database.database().reference().child(userWorkoutsEntity).child(currentUser).child(self.workout.id).child("totalEnergyBurned")
+                    reference.setValue(value)
+                }
+            }
+        })
         
         <<< DateTimeInlineRow("Starts") {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -630,8 +609,8 @@ class WorkoutViewController: FormViewController {
     fileprivate func updateCalories() {
         if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Body Weight"), let weightValue = weightRow.value, let length = workout.length {
             let workoutType = workout.hkWorkoutActivityType
-            self.workout.totalEnergyBurned = Double(length / 60) * workoutType.calories * Double(weightValue)
-            caloriesRow.value = self.workout.totalEnergyBurned
+            let totalEnergyBurned = Double(length / 60) * workoutType.calories * Double(weightValue)
+            caloriesRow.value = totalEnergyBurned
             caloriesRow.updateCell()
         }
     }

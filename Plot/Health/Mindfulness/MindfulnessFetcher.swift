@@ -59,6 +59,7 @@ class MindfulnessFetcher: NSObject {
                             if snapshot.exists(), let snapshotValue = snapshot.value {
                                 if let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: snapshotValue), let userMindfulness = userMindfulnesses[ID] {
                                     var _mindfulness = mindfulness
+                                    _mindfulness.hkSampleID = userMindfulness.hkSampleID
                                     _mindfulness.badge = userMindfulness.badge
                                     _mindfulness.muted = userMindfulness.muted
                                     _mindfulness.pinned = userMindfulness.pinned
@@ -99,6 +100,7 @@ class MindfulnessFetcher: NSObject {
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: snapshotValue), let userMindfulness = userMindfulnesses[ID] {
                                         var _mindfulness = mindfulness
+                                        _mindfulness.hkSampleID = userMindfulness.hkSampleID
                                         _mindfulness.badge = userMindfulness.badge
                                         _mindfulness.muted = userMindfulness.muted
                                         _mindfulness.pinned = userMindfulness.pinned
@@ -147,6 +149,7 @@ class MindfulnessFetcher: NSObject {
                         if mindfulnessSnapshot.exists(), let mindfulnessSnapshotValue = mindfulnessSnapshot.value {
                             if let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: mindfulnessSnapshotValue) {
                                 var _mindfulness = mindfulness
+                                _mindfulness.hkSampleID = userMindfulness.hkSampleID
                                 _mindfulness.badge = userMindfulness.badge
                                 _mindfulness.muted = userMindfulness.muted
                                 _mindfulness.pinned = userMindfulness.pinned

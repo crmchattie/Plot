@@ -12,10 +12,14 @@ import Firebase
 
 extension NSNotification.Name {
     static let healthUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthUpdated")
+    static let workoutsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".workoutsUpdated")
+    static let mindfulnessUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".mindfulnessUpdated")
 }
 
 class HealthService {
     let healhKitManager = HealthKitManager()
+    let workoutFetcher = WorkoutFetcher()
+    let mindfulnessFetcher = MindfulnessFetcher()
     
     fileprivate var userHealthDatabaseRef: DatabaseReference!
     fileprivate var currentUserHealthAddHandle = DatabaseHandle()
@@ -43,6 +47,22 @@ class HealthService {
         }
     }
     
+    var workoutsFB: [Workout] = [] {
+        didSet {
+            if oldValue != workoutsFB {
+                NotificationCenter.default.post(name: .workoutsUpdated, object: nil)
+            }
+        }
+    }
+    
+    var mindfulnessesFB: [Mindfulness] = [] {
+        didSet {
+            if oldValue != mindfulnessesFB {
+                NotificationCenter.default.post(name: .mindfulnessUpdated, object: nil)
+            }
+        }
+    }
+    
     var nutrition = [String: [HKQuantitySample]]()
     var workouts = [String: [HKWorkout]]()
     var mindfulnesses = [HKCategorySample]()
@@ -56,25 +76,136 @@ class HealthService {
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.askedforAuthorization = askedforAuthorization
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
-                if !metrics.isEmpty {
-                    HealthKitService.authorized = true
-                    DispatchQueue.main.async {
-                        self?.healthMetricSections = Array(metrics.keys)
-                        self?.healthMetrics = metrics
-                        self?.observeHealthForCurrentUser()
-                        if self?.isRunning ?? true {
-                            completion()
-                            self?.isRunning = false
-                        }
-                    }
-                } else {
-                    self?.observeHealthForCurrentUser()
+                HealthKitService.authorized = true
+                DispatchQueue.main.async {
+                    self?.healthMetricSections = Array(metrics.keys)
+                    self?.healthMetrics = metrics
+                    self?.observeWorkoutsForCurrentUser {}
+                    self?.observeMindfulnesssForCurrentUser {}
                     if self?.isRunning ?? true {
                         completion()
                         self?.isRunning = false
                     }
                 }
-                //want to delete but not sure what I am doing yet
+            }
+        }
+    }
+    
+    func observeWorkoutsForCurrentUser(_ completion: @escaping () -> Void) {
+        print("observeWorkoutsForCurrentUser")
+        workoutFetcher.observeWorkoutForCurrentUser(workoutsInitialAdd: { [weak self] workoutsInitialAdd  in
+            if !workoutsInitialAdd.isEmpty {
+                if self!.workoutsFB.isEmpty {
+                    self?.workoutsFB = workoutsInitialAdd
+                }
+                for workout in workoutsInitialAdd {
+                    if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
+                        self?.workoutsFB[index] = workout
+                    } else {
+                        self?.workoutsFB.append(workout)
+                    }
+                }
+                completion()
+            } else {
+                completion()
+            }
+        }, workoutsAdded: { [weak self] workoutsAdded in
+            for workout in workoutsAdded {
+                if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
+                    self?.workoutsFB[index] = workout
+                } else {
+                    self?.workoutsFB.append(workout)
+                }
+            }
+        }, workoutsRemoved: { [weak self] workoutsRemoved in
+            for workout in workoutsRemoved {
+                if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
+                    self?.workoutsFB.remove(at: index)
+                }
+            }
+        }, workoutsChanged: { [weak self] workoutsChanged in
+            for workout in workoutsChanged {
+                if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
+                    self?.workoutsFB[index] = workout
+                } else {
+                    self?.workoutsFB.append(workout)
+                }
+            }
+        })
+    }
+    
+    func observeMindfulnesssForCurrentUser(_ completion: @escaping () -> Void) {
+        mindfulnessFetcher.observeMindfulnessForCurrentUser(mindfulnessInitialAdd: { [weak self] mindfulnessInitialAdd in
+            if !mindfulnessInitialAdd.isEmpty {
+                if self!.mindfulnessesFB.isEmpty {
+                    self?.mindfulnessesFB = mindfulnessInitialAdd
+                }
+                for mindfulness in mindfulnessInitialAdd {
+                    if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
+                        self?.mindfulnessesFB[index] = mindfulness
+                    } else {
+                        self?.mindfulnessesFB.append(mindfulness)
+                    }
+                }
+                completion()
+            } else {
+                completion()
+            }
+        }, mindfulnessAdded: { [weak self] mindfulnessAdded in
+            for mindfulness in mindfulnessAdded {
+                if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
+                    self?.mindfulnessesFB[index] = mindfulness
+                } else {
+                    self?.mindfulnessesFB.append(mindfulness)
+                }
+            }
+        }, mindfulnessRemoved: { [weak self] mindfulnessRemoved in
+            for mindfulness in mindfulnessRemoved {
+                if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
+                    self?.mindfulnessesFB.remove(at: index)
+                }
+            }
+        }, mindfulnessChanged: { [weak self] mindfulnessChanged in
+            for mindfulness in mindfulnessChanged {
+                if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
+                    self?.mindfulnessesFB[index] = mindfulness
+                } else {
+                    self?.mindfulnessesFB.append(mindfulness)
+                }
+            }
+        })
+    }
+}
+
+extension HealthService {
+    func observeHealthForCurrentUser() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        //this code is inefficient
+        userHealthDatabaseRef = Database.database().reference().child(userHealthEntity).child(currentUserID)
+        userHealthDatabaseRef.child(healthkitWorkoutsKey).observeSingleEvent(of: .value) { dataSnapshot in
+            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
+                self.userHealthDatabaseRef.child(healthkitWorkoutsKey).observe(.childAdded, with: { snapshot in
+                    if dataSnapshotValue[snapshot.key] == nil {
+                        self.grabHealth {}
+                    }
+                })
+            }
+        }
+        userHealthDatabaseRef.child(healthkitMindfulnessKey).observeSingleEvent(of: .value) { dataSnapshot in
+            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
+                self.userHealthDatabaseRef.child(healthkitMindfulnessKey).observe(.childAdded, with: { snapshot in
+                    if dataSnapshotValue[snapshot.key] == nil {
+                        self.grabHealth {}
+                    }
+                })
+            }
+        }
+    }
+}
+
+//want to delete but not sure what I am doing yet
 //                else {
 //                    var metrics: [String: [HealthMetric]] = [:]
 //                    HealthKitService.authorized = false
@@ -96,9 +227,9 @@ class HealthService {
 //                                for nutrient in mealNutrients {
 //                                    var double: Double = 0
 //                                    let type = HKQuantityTypeIdentifier(rawValue: nutrient.quantityType.identifier)
-//                                    
+//
 //                                    self?.nutrition[type.name, default: []].append(nutrient)
-//                                    
+//
 //                                    if nutrient.quantityType.is(compatibleWith: .gram()) {
 //                                        double = nutrient.quantity.doubleValue(for: .gram())
 //                                    } else if nutrient.quantityType.is(compatibleWith: .jouleUnit(with: .kilo)) {
@@ -111,7 +242,7 @@ class HealthService {
 //                                }
 //                            }
 //                        }
-//                        
+//
 //                        for (type, list) in nutrients {
 //                            if let dailyTotal = latestNutrients[type] {
 //                                let average = list.reduce(0, +) / Double(list.count)
@@ -148,7 +279,7 @@ class HealthService {
 //                                }
 //                            }
 //                        }
-//                        
+//
 //                        dispatchGroup.leave()
 //                    }
 //                    dispatchGroup.enter()
@@ -166,15 +297,15 @@ class HealthService {
 //                                self?.workouts[type, default: []].append(workout)
 //                            }
 //                        }
-//                        
+//
 //                        for (_, workouts) in self!.workouts {
 //                            if
 //                                // Most recent workout
 //                                let workout = workouts.last {
 //                                let total = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-//                                
+//
 //                                var metric = HealthMetric(type: HealthMetricType.workout, total: total, date: Date().dayAfter, unitName: "calories", rank: 7)
-//                                
+//
 //                                let workoutType = workout.workoutActivityType
 //                                if workoutType == .functionalStrengthTraining {
 //                                    metric.rank = 2
@@ -187,17 +318,17 @@ class HealthService {
 //                                } else if workoutType == .highIntensityIntervalTraining {
 //                                    metric.rank = 6
 //                                }
-//                                
+//
 //                                metric.hkSample = workout
-//                                
+//
 //                                var averageEnergyBurned: Double = 0
-//                                
+//
 //                                    workouts.forEach { workout in
 //                                        let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
 //                                        averageEnergyBurned += totalEnergyBurned
-//                                        
+//
 //                                    }
-//                                
+//
 //                                if averageEnergyBurned != 0 {
 //                                    averageEnergyBurned /= Double(workouts.count)
 //                                    metric.average = averageEnergyBurned
@@ -205,10 +336,10 @@ class HealthService {
 //                                metrics[HealthMetricCategory.workouts.rawValue, default: []].append(metric)
 //                            }
 //                        }
-//                        
+//
 //                        dispatchGroup.leave()
 //                    }
-//                    
+//
 //                    dispatchGroup.enter()
 //                    self?.mindfulnessFetcher.fetchMindfulness { [self] firebaseMindfulnesses in
 //                        guard !firebaseMindfulnesses.isEmpty else {
@@ -220,7 +351,7 @@ class HealthService {
 //                                self?.mindfulnesses.append(mindfulness)
 //                            }
 //                        }
-//                        
+//
 //                        let endDate = Date()
 //                        var startDay = endDate.lastYear.dayBefore
 //                        var interval = NSDateInterval(start: startDay, duration: 86400)
@@ -231,26 +362,26 @@ class HealthService {
 //                                startDay = startDay.advanced(by: 86400)
 //                                interval = NSDateInterval(start: startDay, duration: 86400)
 //                            }
-//                            
+//
 //                            let timeSum = mindfuless.endDate.timeIntervalSince(mindfuless.startDate)
 //                            map[startDay, default: 0] += timeSum
 //                            sum += timeSum
-//                            
+//
 //                        }
-//                        
+//
 //                        let sortedDates = Array(map.sorted(by: { $0.0 < $1.0 }))
 //                        let average = sum / Double(map.count)
-//                        
+//
 //                        if let last = sortedDates.last?.key, let val = map[last] {
 //                            var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
 //                            metric.average = average
-//                            
+//
 //                            metrics[HealthMetricCategory.general.rawValue, default: []].append(metric)
 //                        }
-//                        
+//
 //                        dispatchGroup.leave()
 //                    }
-//                    
+//
 //                    dispatchGroup.notify(queue: .main) {
 //                        if !metrics.isEmpty {
 //                            self?.healthMetrics = metrics
@@ -260,35 +391,3 @@ class HealthService {
 //                        completion()
 //                    }
 //                }
-            }
-        }
-    }
-}
-
-extension HealthService {
-    func observeHealthForCurrentUser() {
-        guard let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        //this code is inefficient
-        userHealthDatabaseRef = Database.database().reference().child(userHealthEntity).child(currentUserID)
-        userHealthDatabaseRef.child(healthkitWorkoutsKey).observeSingleEvent(of: .value) { dataSnapshot in
-            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
-                self.userHealthDatabaseRef.child(healthkitWorkoutsKey).observe(.childAdded, with: { snapshot in
-                    if dataSnapshotValue[snapshot.key] == nil {
-                        self.grabHealth {}
-                    }
-                })
-            }
-        }
-        userHealthDatabaseRef.child(healthkitMindfulnessKey).observeSingleEvent(of: .value) { dataSnapshot in
-            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
-                self.userHealthDatabaseRef.child(healthkitMindfulnessKey).observe(.childAdded, with: { snapshot in
-                    if dataSnapshotValue[snapshot.key] == nil {
-                        self.grabHealth {}
-                    }
-                })
-            }
-        }
-    }
-}

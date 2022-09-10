@@ -69,6 +69,12 @@ class WorkoutActions: NSObject {
         workout.participantsIDs = membersIDs.0
         workout.lastModifiedDate = Date()
         
+        if workout.hkSampleID == nil {
+            createHealthKit()
+        }
+        
+        workout.hkSampleID = nil
+        
         let groupWorkoutReference = Database.database().reference().child(workoutsEntity).child(ID)
 
         do {
@@ -86,6 +92,26 @@ class WorkoutActions: NSObject {
             connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
         } else {
             Analytics.logEvent("update_workout", parameters: [String: Any]())
+        }
+    }
+    
+    func createHealthKit() {
+        if let _ = HealthKitSampleBuilder.createHKWorkout(from: workout) {
+            if workout.containerID == nil {
+                self.createActivity()
+            }
+        }
+    }
+    
+    func createActivity() {
+        if let activity = ActivityBuilder.createActivity(from: self.workout), let activityID = activity.activityID {
+            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
+            activityActions.createNewActivity()
+            
+            //will update activity.containerID and workout.containerID
+            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.id], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
         }
     }
     

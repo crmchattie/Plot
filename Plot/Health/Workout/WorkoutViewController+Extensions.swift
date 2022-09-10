@@ -15,6 +15,7 @@ extension WorkoutViewController {
     func setupLists() {
         guard delegate == nil && active else { return }
         let dispatchGroup = DispatchGroup()
+        
         if let containerID = workout.containerID {
             dispatchGroup.enter()
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, tasks, _, transactions in
@@ -22,6 +23,29 @@ extension WorkoutViewController {
                 self.taskList = tasks ?? []
                 self.eventList = activities ?? []
                 self.purchaseList = transactions ?? []
+                dispatchGroup.leave()
+            }
+        } else if let currentUserID = Auth.auth().currentUser?.uid {
+            var reference = Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(workout.id).child(identifierKey)
+            dispatchGroup.enter()
+            reference.observeSingleEvent(of: .value) { snapshot in
+                if snapshot.exists(), let ID = snapshot.value as? String {
+                    reference = Database.database().reference().child(workoutsEntity).child(ID).child(containerIDEntity)
+                    dispatchGroup.enter()
+                    reference.observeSingleEvent(of: .value) { snapshot in
+                        if snapshot.exists(), let containerID = snapshot.value as? String {
+                            dispatchGroup.enter()
+                            ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, tasks, _, transactions in
+                                self.container = container
+                                self.taskList = tasks ?? []
+                                self.eventList = activities ?? []
+                                self.purchaseList = transactions ?? []
+                                dispatchGroup.leave()
+                            }
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
                 dispatchGroup.leave()
             }
         }

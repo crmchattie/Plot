@@ -176,10 +176,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if section == .time {
                 if !activitiesSections.isEmpty {
                     if activitiesSections.count > 1 {
+                        sectionHeader.spinnerView.stopAnimating()
                         sectionHeader.subTitleLabel.isHidden = true
                         sectionHeader.delegate = nil
                     } else {
-                        if updatingTasks && updatingEvents {
+                        if updatingTasks || updatingEvents {
                             sectionHeader.spinnerView.startAnimating()
                         } else {
                             sectionHeader.spinnerView.stopAnimating()

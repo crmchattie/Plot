@@ -44,6 +44,14 @@ struct Mindfulness: Codable, Equatable, Hashable {
         
     init(from mindfuless: HKCategorySample) {
         self.id = mindfuless.uuid.uuidString
+        self.hkSampleID = mindfuless.uuid.uuidString
+        self.name = "Mindfulness"
+        self.startDateTime = mindfuless.startDate
+        self.endDateTime = mindfuless.endDate
+    }
+    
+    init(forInitialSave id: String, mindfuless: HKCategorySample) {
+        self.id = id
         self.name = "Mindfulness"
         self.startDateTime = mindfuless.startDate
         self.endDateTime = mindfuless.endDate

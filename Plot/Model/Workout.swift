@@ -59,6 +59,15 @@ struct Workout: Codable, Equatable, Hashable {
             self.totalEnergyBurned = totalEnergyBurned.doubleValue(for: .kilocalorie())
         }
     }
+    
+    init(forInitialSave id: String, hkWorkout: HKWorkout) {
+        self.id = id
+        self.name = hkWorkout.workoutActivityType.name
+        self.type = hkWorkout.workoutActivityType.name
+        self.startDateTime = hkWorkout.startDate
+        self.endDateTime = hkWorkout.endDate
+        self.length = hkWorkout.duration
+    }
 }
 
 func ==(lhs: Workout, rhs: Workout) -> Bool {

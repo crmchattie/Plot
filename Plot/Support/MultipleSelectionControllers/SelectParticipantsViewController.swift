@@ -50,7 +50,6 @@ class SelectParticipantsViewController: UIViewController {
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
@@ -75,11 +74,10 @@ class SelectParticipantsViewController: UIViewController {
     func configureSections() {
         if isInitialLoad {
             _ = filteredUsers.map { $0.isSelected = false }
+            selectPriorUsers(priorSelectedUsers: priorSelectedUsers)
             isInitialLoad = false
         }
-        
-        selectPriorUsers(priorSelectedUsers: priorSelectedUsers)
-        
+                
         if userInvitationStatus.count > 0 {
             sortedFirstLetters = [Status.accepted.description, Status.pending.description, Status.declined.description, Status.uninvited.description]
             sections = sortedFirstLetters.map { status in
@@ -116,10 +114,10 @@ class SelectParticipantsViewController: UIViewController {
                         if $0.titleFirstLetter == "" {
                             return false
                         }
-                        else if priorSelectedUsers.contains($0) && status == Status.participating.description {
+                        else if selectedFalconUsers.contains($0) && status == Status.participating.description {
                             return true
                         }
-                        else if !priorSelectedUsers.contains($0) && status == Status.uninvited.description {
+                        else if !selectedFalconUsers.contains($0) && status == Status.uninvited.description {
                             return true
                         } else {
                             return false
@@ -135,6 +133,13 @@ class SelectParticipantsViewController: UIViewController {
                     }
                 }
             }
+//            let firstLetters = filteredUsers.map { $0.titleFirstLetter }
+//            let uniqueFirstLetters = Array(Set(firstLetters))
+//            sortedFirstLetters = uniqueFirstLetters.sorted()
+//            sections = sortedFirstLetters.map { firstLetter in
+//                 return self.filteredUsers
+//                    .filter { $0.titleFirstLetter == firstLetter && $0.titleFirstLetter != "" }
+
         }
         
         DispatchQueue.main.async {
@@ -302,6 +307,8 @@ class SelectParticipantsViewController: UIViewController {
         
         selectedFalconUsers.append(sections[indexPath.section][indexPath.row])
         
+        configureSections()
+        
         let set1 = Set(selectedFalconUsers)
         let set2 = Set(priorSelectedUsers)
 
@@ -329,6 +336,8 @@ class SelectParticipantsViewController: UIViewController {
         }
         
         sections[indexPath.section][indexPath.row].isSelected = false
+        
+        configureSections()
         
         let set1 = Set(selectedFalconUsers)
         let set2 = Set(priorSelectedUsers)

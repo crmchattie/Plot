@@ -28,18 +28,18 @@ class WorkoutOperation: AsyncOperation {
     
     private func startFetchRequest() {
         HealthKitService.getWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate.lastYear, endDate: startDate) { [weak self] workouts, error  in
-            guard let workouts = workouts, error == nil, let _self = self, let currentUserId = Auth.auth().currentUser?.uid else {
+            guard let workouts = workouts, error == nil, let _self = self, let currentUserID = Auth.auth().currentUser?.uid else {
                 self?.finish()
                 return
             }
 
-            let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserId).child(healthkitWorkoutsKey)
+            let healthkitWorkoutsReference = Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey)
             healthkitWorkoutsReference.observeSingleEvent(of: .value) { dataSnapshot in
                 var existingWorkoutKeys: [String: Any] = [:]
                 if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
                     existingWorkoutKeys = dataSnapshotValue
                 }
-            
+                            
                 if
                     // Most recent workout
                     let workout = workouts.last {
@@ -57,11 +57,25 @@ class WorkoutOperation: AsyncOperation {
                             
                             // Only create activities that past lastSync date time
                             if (_self.lastSyncDate == nil || (workout.startDate >= _self.lastSyncDate!)) && existingWorkoutKeys[workout.uuid.uuidString] == nil {
+                                let ref = Database.database().reference()
+                                var workoutID = UUID().uuidString
                                 var activityID = UUID().uuidString
-                                if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
-                                    activityID = newId
+                                if let newWorkoutId = ref.child(userWorkoutsEntity).child(currentUserID).childByAutoId().key {
+                                    workoutID = newWorkoutId
                                 }
-
+                                if let newActivityId = ref.child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
+                                    activityID = newActivityId
+                                }
+                                
+                                ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(workout.uuid.uuidString).child(identifierKey).setValue(workoutID)
+                                
+                                ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(identifierKey).setValue(workout.uuid.uuidString)
+                                                                
+                                let workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
+                                
+                                let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
+                                workoutActions.createNewWorkout()
+                                
                                 let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
                                 activity.category = "Workout"
                                 activity.name = workout.workoutActivityType.name
@@ -73,14 +87,13 @@ class WorkoutOperation: AsyncOperation {
                                 activity.endTimeZone = TimeZone.current.identifier
 
                                 activity.allDay = false
-                                
-                                let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                                activity.containerID = containerID
                                                                 
                                 let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
                                 activityActions.createNewActivity()
                                 
-                                let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.uuid.uuidString], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+                                let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                                
+                                let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workoutID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
                                 containers.append(container)
                                 
                                 
@@ -94,7 +107,7 @@ class WorkoutOperation: AsyncOperation {
                     
                     _self.delegate?.insertMetric(_self, metricCalories, HealthMetricCategory.workouts.rawValue, containers)
                 }
-
+                
                 self?.finish()
             }
         }
