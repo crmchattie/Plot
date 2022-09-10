@@ -792,7 +792,7 @@ extension EventViewController {
     }
     
     @objc func createNewActivity() {        
-        if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
+        if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, let recurrenceStartDate = activity.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
@@ -812,7 +812,12 @@ extension EventViewController {
                 //update activity's recurrence to stop repeating just before this event
                 var oldActivityRule = oldRecurrenceRule
                 //will equal true if first instance of repeating event
-                if let dateIndex = oldActivityRule.allOccurrences().firstIndex(of: startDate) {
+                let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
+                let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: recurrenceStartDate)
+                let dates = iCalUtility()
+                    .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                
+                if let dateIndex = dates.firstIndex(of: startDate) {
                     if dateIndex == 0 {
                         //update all instances of activity
                         if self.activity.recurrences == nil {

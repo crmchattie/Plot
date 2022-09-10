@@ -182,7 +182,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             return false
         }
         if !flaggedTasks.isEmpty {
-            let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "")
+            let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "", admin: nil)
             taskList[flaggedList] = flaggedTasks
             listOfLists.insert(flaggedList, at: 0)
         }
@@ -194,7 +194,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             return false
         }
         if !scheduledTasks.isEmpty {
-            let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "")
+            let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "", admin: nil)
             taskList[scheduledList] = scheduledTasks
             listOfLists.insert(scheduledList, at: 0)
         }
@@ -206,7 +206,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             return false
         }
         if !dailyTasks.isEmpty {
-            let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "")
+            let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "", admin: nil)
             taskList[dailyList] = dailyTasks
             listOfLists.insert(dailyList, at: 0)
         }

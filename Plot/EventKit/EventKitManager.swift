@@ -131,7 +131,7 @@ class EventKitManager {
     func convertCalendarsToPlot(calendars: [EKCalendar]) -> [CalendarType] {
         var calendarTypes = [CalendarType]()
         for calendar in calendars {
-            let calendarType = CalendarType(id: calendar.calendarIdentifier, name: calendar.title, color: CIColor(cgColor: calendar.cgColor).stringRepresentation, source: CalendarSourceOptions.apple.name)
+            let calendarType = CalendarType(id: calendar.calendarIdentifier, name: calendar.title, color: CIColor(cgColor: calendar.cgColor).stringRepresentation, source: CalendarSourceOptions.apple.name, admin: nil)
             calendarTypes.append(calendarType)
         }
         return calendarTypes
@@ -205,7 +205,7 @@ class EventKitManager {
     func convertListsToPlot(lists: [EKCalendar]) -> [ListType] {
         var listTypes = [ListType]()
         for list in lists {
-            let listType = ListType(id: list.calendarIdentifier, name: list.title, color: CIColor(cgColor: list.cgColor).stringRepresentation, source: ListSourceOptions.apple.name)
+            let listType = ListType(id: list.calendarIdentifier, name: list.title, color: CIColor(cgColor: list.cgColor).stringRepresentation, source: ListSourceOptions.apple.name, admin: nil)
             listTypes.append(listType)
         }
         return listTypes
