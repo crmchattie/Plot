@@ -364,7 +364,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if filteredTasks.indices.contains(indexPath.row) {
             let task = filteredTasks[indexPath.row]
-            showTaskDetail(task: task)
+            showTaskDetailPush(task: task)
         } else {
             newItem()
         }

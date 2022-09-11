@@ -15,8 +15,7 @@ fileprivate let healthDetailSampleCellID = "HealthDetailSampleCellID"
 fileprivate let chartViewHeight: CGFloat = 200
 fileprivate let chartViewTopMargin: CGFloat = 10
 
-class HealthDetailViewController: UIViewController {
-    
+class HealthDetailViewController: UIViewController, ObjectDetailShowing {
     private var viewModel: HealthDetailViewModelInterface
     var dayAxisValueFormatter: DayAxisValueFormatter?
     var backgroundChartViewHeightAnchor: NSLayoutConstraint?
@@ -62,6 +61,8 @@ class HealthDetailViewController: UIViewController {
     lazy var barButton = UIBarButtonItem()
     
     var networkController: NetworkController
+    
+    lazy var participants = [String : [User]]()
         
     init(viewModel: HealthDetailViewModelInterface, networkController: NetworkController) {
         self.viewModel = viewModel
@@ -242,9 +243,12 @@ class HealthDetailViewController: UIViewController {
             print("steps")
         case .workout:
             if let hkWorkout = sample as? HKWorkout {
-                let destination = WorkoutViewController(networkController: self.networkController)
-                destination.workout = Workout(from: hkWorkout)
-                self.navigationController?.pushViewController(destination, animated: true)
+                let hkSampleID = hkWorkout.uuid.uuidString
+                print(hkSampleID)
+                if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
+                    print("found workout")
+                    showWorkoutDetailPush(workout: workout)
+                }
             }
         case .heartRate:
             print("steps")
@@ -255,21 +259,31 @@ class HealthDetailViewController: UIViewController {
         case .mindfulness:
             print("steps")
             if let hkMindfulness = sample as? HKCategorySample {
-                let destination = MindfulnessViewController(networkController: self.networkController)
-                destination.mindfulness = Mindfulness(from: hkMindfulness)
-                self.navigationController?.pushViewController(destination, animated: true)
+                let hkSampleID = hkMindfulness.uuid.uuidString
+                if let mindfulness = self.networkController.healthService.mindfulnesses.first(where: {$0.hkSampleID == hkSampleID }) {
+                    showMindfulnessDetailPush(mindfulness: mindfulness)
+                }
             }
         case .activeEnergy:
             print("steps")
         case .workoutMinutes:
             if let hkWorkout = sample as? HKWorkout {
-                let destination = WorkoutViewController(networkController: self.networkController)
-                destination.workout = Workout(from: hkWorkout)
-                self.navigationController?.pushViewController(destination, animated: true)
+                let hkSampleID = hkWorkout.uuid.uuidString
+                if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
+                    showWorkoutDetailPush(workout: workout)
+                }
             }
         case .flightsClimbed:
             print("steps")
         }
+    }
+        
+    func showActivityIndicator() {
+        
+    }
+    
+    func hideActivityIndicator() {
+    
     }
 }
 

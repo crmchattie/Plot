@@ -40,8 +40,8 @@ class WorkoutActions: NSObject {
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
-        Database.database().reference().child(userWorkoutsEntity).child(memberID).child(ID).removeAllObservers()
-        Database.database().reference().child(userWorkoutsEntity).child(memberID).child(ID).removeValue()
+            Database.database().reference().child(userWorkoutsEntity).child(memberID).child(ID).removeAllObservers()
+            Database.database().reference().child(userWorkoutsEntity).child(memberID).child(ID).removeValue()
         }
                 
     }
@@ -72,9 +72,7 @@ class WorkoutActions: NSObject {
         if workout.hkSampleID == nil {
             createHealthKit()
         }
-        
-        workout.hkSampleID = nil
-        
+                
         let groupWorkoutReference = Database.database().reference().child(workoutsEntity).child(ID)
 
         do {

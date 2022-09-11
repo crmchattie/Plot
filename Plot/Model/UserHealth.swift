@@ -14,6 +14,7 @@ let healthkitWorkoutsKey = "healthkit-workouts"
 let healthkitMindfulnessKey = "healthkit-mindfulness"
 let lastSyncDateKey = "lastSyncDate"
 let identifierKey = "identifier"
+let hkSampleIDKey = "hkSampleID"
 
 struct UserHealth: Codable, Equatable {
     let identifier: String

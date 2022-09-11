@@ -69,10 +69,11 @@ class WorkoutOperation: AsyncOperation {
                                 
                                 ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(workout.uuid.uuidString).child(identifierKey).setValue(workoutID)
                                 
-                                ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(identifierKey).setValue(workout.uuid.uuidString)
+                                ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(hkSampleIDKey).setValue(workout.uuid.uuidString)
+                                ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child("totalEnergyBurned").setValue(totalEnergyBurned.clean)
                                                                 
                                 let workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
-                                
+                                                                
                                 let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
                                 workoutActions.createNewWorkout()
                                 

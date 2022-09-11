@@ -47,21 +47,9 @@ struct Workout: Codable, Equatable, Hashable {
         self.user_created = user_created
     }
     
-    init(from hkWorkout: HKWorkout) {
-        self.id = hkWorkout.uuid.uuidString
-        self.hkSampleID = hkWorkout.uuid.uuidString
-        self.name = hkWorkout.workoutActivityType.name
-        self.type = hkWorkout.workoutActivityType.name
-        self.startDateTime = hkWorkout.startDate
-        self.endDateTime = hkWorkout.endDate
-        self.length = hkWorkout.duration
-        if let totalEnergyBurned = hkWorkout.totalEnergyBurned {
-            self.totalEnergyBurned = totalEnergyBurned.doubleValue(for: .kilocalorie())
-        }
-    }
-    
     init(forInitialSave id: String, hkWorkout: HKWorkout) {
         self.id = id
+        self.hkSampleID = hkWorkout.uuid.uuidString
         self.name = hkWorkout.workoutActivityType.name
         self.type = hkWorkout.workoutActivityType.name
         self.startDateTime = hkWorkout.startDate
@@ -72,6 +60,24 @@ struct Workout: Codable, Equatable, Hashable {
 
 func ==(lhs: Workout, rhs: Workout) -> Bool {
     return lhs.id == rhs.id
+}
+
+struct UserWorkout: Codable, Equatable, Hashable {
+    var totalEnergyBurned: Double?
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
+    var healthExport: Bool?
+    var hkSampleID: String?
+    
+    init(workout: Workout) {
+        self.totalEnergyBurned = workout.totalEnergyBurned
+        self.badge = workout.badge
+        self.pinned = workout.pinned
+        self.muted = workout.muted
+        self.healthExport = workout.healthExport
+        self.hkSampleID = workout.hkSampleID
+    }
 }
 
 extension Workout {

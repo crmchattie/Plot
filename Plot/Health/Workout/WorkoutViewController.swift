@@ -72,9 +72,8 @@ class WorkoutViewController: FormViewController {
         
         if workout != nil {
             title = "Workout"
-            
             active = true
-            
+            print(workout.id)
         } else {
             title = "New Workout"
             if let currentUserID = Auth.auth().currentUser?.uid {
@@ -286,7 +285,7 @@ class WorkoutViewController: FormViewController {
             cell.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
         }.onChange({ row in
-            self.updateCalories()
+//            self.updateCalories()
             if let currentUser = Auth.auth().currentUser?.uid, let value = row.value {
                 Database.database().reference().child("users").child(currentUser).child("weight").setValue(value)
             }
@@ -326,7 +325,7 @@ class WorkoutViewController: FormViewController {
             cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
         }.onChange({ row in
             self.workout.type = row.value
-            self.updateCalories()
+//            self.updateCalories()
             if row.value == nil {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             } else if self.workout.name != "WorkoutName" {
@@ -346,11 +345,10 @@ class WorkoutViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
         }.onChange({ row in
-            print("changed")
             if let value = row.value {
                 if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userWorkoutsEntity).child(currentUser).child(self.workout.id).child("totalEnergyBurned")
-                    reference.setValue(value)
+                    reference.setValue(value.clean)
                 }
             }
         })
@@ -454,7 +452,7 @@ class WorkoutViewController: FormViewController {
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
         }.onChange({ _ in
-            self.updateCalories()
+//            self.updateCalories()
         })
         
         <<< LabelRow("Participants") { row in

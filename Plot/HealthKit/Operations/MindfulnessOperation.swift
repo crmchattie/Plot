@@ -68,7 +68,7 @@ class MindfulnessOperation: AsyncOperation {
                         
                         ref.child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey).child(sample.uuid.uuidString).child(identifierKey).setValue(mindfulnessID)
                         
-                        ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulnessID).child(identifierKey).setValue(sample.uuid.uuidString)
+                        ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulnessID).child(hkSampleIDKey).setValue(sample.uuid.uuidString)
                                                         
                         let mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
                         

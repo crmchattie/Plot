@@ -327,15 +327,16 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //            case Identifiers.viewListsAction:
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
-                if let activityID = userInfo["activityID"] as? String {
-                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
+                if let eventID = userInfo["eventID"] as? String {
+                    ActivitiesFetcher.getDataFromSnapshot(ID: eventID) { activities in
                         if let activity = activities.first {
-                            if activity.isTask ?? false {
-                                ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
+                            ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
+                                ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                     if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
-                                        let destination = TaskViewController(networkController: masterController.networkController)
+                                        let destination = EventViewController(networkController: masterController.networkController)
+                                        destination.acceptedParticipant = acceptedParticipant
                                         destination.selectedFalconUsers = participants
-                                        destination.task = activity
+                                        destination.activity = activity
                                         destination.hidesBottomBarWhenPushed = true
                                         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
                                         destination.navigationItem.leftBarButtonItem = cancelBarButton
@@ -343,21 +344,22 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                         masterController.present(navigationViewController, animated: true)
                                     }
                                 }
-                            } else {
-                                ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-                                    ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                        if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
-                                            let destination = EventViewController(networkController: masterController.networkController)
-                                            destination.acceptedParticipant = acceptedParticipant
-                                            destination.selectedFalconUsers = participants
-                                            destination.activity = activity
-                                            destination.hidesBottomBarWhenPushed = true
-                                            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                            destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                            let navigationViewController = UINavigationController(rootViewController: destination)
-                                            masterController.present(navigationViewController, animated: true)
-                                        }
-                                    }
+                            }
+                        }
+                    }
+                } else if let taskID = userInfo["taskID"] as? String {
+                    ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { activities in
+                        if let activity = activities.first {
+                            ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = TaskViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
+                                    destination.task = activity
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
                                 }
                             }
                         }
@@ -438,6 +440,40 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                     let destination = CalendarDetailViewController(networkController: masterController.networkController)
                                     destination.selectedFalconUsers = participants
                                     destination.calendar = calendar
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
+                                }
+                            }
+                        }
+                    }
+                } else if let workoutID = userInfo["workoutID"] as? String {
+                    WorkoutFetcher.getDataFromSnapshot(ID: workoutID) { workouts in
+                        if let workout = workouts.first {
+                            ParticipantsFetcher.getParticipants(forWorkout: workout) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = WorkoutViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
+                                    destination.workout = workout
+                                    destination.hidesBottomBarWhenPushed = true
+                                    let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                                    destination.navigationItem.leftBarButtonItem = cancelBarButton
+                                    let navigationViewController = UINavigationController(rootViewController: destination)
+                                    masterController.present(navigationViewController, animated: true)
+                                }
+                            }
+                        }
+                    }
+                } else if let mindfulnessID = userInfo["mindfulnessID"] as? String {
+                    MindfulnessFetcher.getDataFromSnapshot(ID: mindfulnessID) { mindfulnesses in
+                        if let mindfulness = mindfulnesses.first {
+                            ParticipantsFetcher.getParticipants(forMindfulness: mindfulness) { (participants) in
+                                if let masterController = self.window?.rootViewController as? MasterActivityContainerController {
+                                    let destination = MindfulnessViewController(networkController: masterController.networkController)
+                                    destination.selectedFalconUsers = participants
+                                    destination.mindfulness = mindfulness
                                     destination.hidesBottomBarWhenPushed = true
                                     let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
                                     destination.navigationItem.leftBarButtonItem = cancelBarButton

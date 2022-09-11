@@ -71,9 +71,7 @@ class MindfulnessActions: NSObject {
         if mindfulness.hkSampleID == nil {
             createHealthKit()
         }
-        
-        mindfulness.hkSampleID = nil
-        
+                
         let groupMindfulnessReference = Database.database().reference().child(mindfulnessEntity).child(ID)
 
         do {

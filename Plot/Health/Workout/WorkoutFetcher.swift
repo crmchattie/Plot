@@ -35,7 +35,7 @@ class WorkoutFetcher: NSObject {
         self.workoutsRemoved = workoutsRemoved
         self.workoutsChanged = workoutsChanged
         
-        var userWorkouts: [String: Workout] = [:]
+        var userWorkouts: [String: UserWorkout] = [:]
         
         userWorkoutsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
@@ -50,7 +50,7 @@ class WorkoutFetcher: NSObject {
                 let workoutIDs = snapshot.value as? [String: AnyObject] ?? [:]
                 for (ID, userWorkoutInfo) in workoutIDs {
                     var handle = UInt.max
-                    if let userWorkout = try? FirebaseDecoder().decode(Workout.self, from: userWorkoutInfo) {
+                    if let userWorkout = try? FirebaseDecoder().decode(UserWorkout.self, from: userWorkoutInfo) {
                         userWorkouts[ID] = userWorkout
                         group.enter()
                         counter += 1
@@ -120,7 +120,7 @@ class WorkoutFetcher: NSObject {
             if let completion = self.workoutsChanged {
                 WorkoutFetcher.getDataFromSnapshot(ID: snapshot.key) { workoutsList in
                     for workout in workoutsList {
-                        userWorkouts[workout.id] = workout
+                        userWorkouts[workout.id] = UserWorkout(workout: workout)
                     }
                     completion(workoutsList)
                 }
@@ -148,7 +148,7 @@ class WorkoutFetcher: NSObject {
         group.enter()
         ref.child(userWorkoutsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let userWorkoutInfo = snapshot.value {
-                if let userWorkout = try? FirebaseDecoder().decode(Workout.self, from: userWorkoutInfo) {
+                if let userWorkout = try? FirebaseDecoder().decode(UserWorkout.self, from: userWorkoutInfo) {
                     ref.child(workoutsEntity).child(ID).observeSingleEvent(of: .value, with: { workoutSnapshot in
                         if workoutSnapshot.exists(), let workoutSnapshotValue = workoutSnapshot.value {
                             if let workout = try? FirebaseDecoder().decode(Workout.self, from: workoutSnapshotValue) {
@@ -181,17 +181,17 @@ class WorkoutFetcher: NSObject {
         }
     }
     
-    func getUserDataFromSnapshot(ID: String, completion: @escaping ([Workout])->()) {
+    func getUserDataFromSnapshot(ID: String, completion: @escaping ([UserWorkout])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         let ref = Database.database().reference()
-        var workouts: [Workout] = []
+        var workouts: [UserWorkout] = []
         let group = DispatchGroup()
         group.enter()
         ref.child(userWorkoutsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let userWorkoutInfo = snapshot.value {
-                if let userWorkout = try? FirebaseDecoder().decode(Workout.self, from: userWorkoutInfo) {
+                if let userWorkout = try? FirebaseDecoder().decode(UserWorkout.self, from: userWorkoutInfo) {
                     workouts.append(userWorkout)
                     group.leave()
                 }

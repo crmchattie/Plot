@@ -707,9 +707,9 @@ extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
     
     func cellTapped(activity: Activity) {
         if activity.isTask ?? false {
-            showTaskDetail(task: activity)
+            showTaskDetailPush(task: activity)
         } else {
-            showEventDetail(event: activity)
+            showEventDetailPush(event: activity)
         }
     }
     

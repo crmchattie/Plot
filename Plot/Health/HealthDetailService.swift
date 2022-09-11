@@ -394,8 +394,6 @@ class HealthDetailService: HealthDetailServiceInterface {
             var map: [Date: Double] = [:]
             var sum: Double = 0
             
-            print("midDay \(midDay)")
-            print("interval \(interval)")
             let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
             let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
             if sleepValues.contains(.asleep) {
@@ -403,14 +401,10 @@ class HealthDetailService: HealthDetailServiceInterface {
             } else {
                 typeOfSleep = .inBed
             }
-            print("typeOfSleep \(typeOfSleep.rawValue)")
-            
             for sample in samples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
                     midDay = midDay.advanced(by: 86400)
                     interval = NSDateInterval(start: midDay, duration: 86400)
-                    print("midDay \(midDay)")
-                    print("interval \(interval)")
                     let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
                     let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
                     if sleepValues.contains(.asleep) {
@@ -418,16 +412,10 @@ class HealthDetailService: HealthDetailServiceInterface {
                     } else {
                         typeOfSleep = .inBed
                     }
-                    print("typeOfSleep \(typeOfSleep.rawValue)")
                 }
                 if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
-                    print("continuing \(midDay)")
-                    print("sample.endDate.localTime \(sample.endDate.localTime)")
                     continue
                 }
-                
-                print("not continuing \(midDay)")
-                print("sample.endDate.localTime \(sample.endDate.localTime)")
                 
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
                 map[interval.endDate, default: 0] += timeSum

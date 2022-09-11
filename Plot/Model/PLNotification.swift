@@ -9,47 +9,20 @@
 import Foundation
 
 class PLNotification: NSObject, Codable, NSCoding {
-    let chatID: String?
-    let activityID: String?
-    let checklistID: String?
-    let grocerylistID: String?
-    let activitylistID: String?
-    let mealID: String?
-    let workoutID: String?
-    let mindfulnessID: String?
-    let transactionID: String?
-    let accountID: String?
+    let objectID: String?
     let googleCAE: String?
     let gcmMessageID: String?
     let aps: Aps
 
     enum CodingKeys: String, CodingKey {
         case googleCAE = "google.c.a.e"
-        case chatID
+        case objectID
         case gcmMessageID = "gcm.message_id"
         case aps
-        case activityID
-        case checklistID
-        case grocerylistID
-        case activitylistID
-        case mealID
-        case workoutID
-        case mindfulnessID
-        case transactionID
-        case accountID
     }
     
-    init(chatID: String?, activityID: String?, checklistID: String?, grocerylistID: String?, activitylistID: String?, mealID: String?, workoutID: String?, mindfulnessID: String?, transactionID: String?, accountID: String?, googleCAE: String?, gcmMessageID: String?, aps: Aps) {
-        self.chatID = chatID
-        self.activityID = activityID
-        self.checklistID = checklistID
-        self.grocerylistID = grocerylistID
-        self.activitylistID = activitylistID
-        self.mealID = mealID
-        self.workoutID = workoutID
-        self.mindfulnessID = mindfulnessID
-        self.transactionID = transactionID
-        self.accountID = accountID
+    init(objectID: String?, googleCAE: String?, gcmMessageID: String?, aps: Aps) {
+        self.objectID = objectID
         self.googleCAE = googleCAE
         self.gcmMessageID = gcmMessageID
         self.aps = aps
@@ -60,30 +33,12 @@ class PLNotification: NSObject, Codable, NSCoding {
             return nil
         }
         
-        let chatID = decoder.decodeObject(forKey: CodingKeys.chatID.rawValue) as? String
-        let activityID = decoder.decodeObject(forKey: CodingKeys.activityID.rawValue) as? String
-        let checklistID = decoder.decodeObject(forKey: CodingKeys.checklistID.rawValue) as? String
-        let grocerylistID = decoder.decodeObject(forKey: CodingKeys.grocerylistID.rawValue) as? String
-        let activitylistID = decoder.decodeObject(forKey: CodingKeys.activitylistID.rawValue) as? String
-        let mealID = decoder.decodeObject(forKey: CodingKeys.mealID.rawValue) as? String
-        let workoutID = decoder.decodeObject(forKey: CodingKeys.workoutID.rawValue) as? String
-        let mindfulnessID = decoder.decodeObject(forKey: CodingKeys.mindfulnessID.rawValue) as? String
-        let transactionID = decoder.decodeObject(forKey: CodingKeys.transactionID.rawValue) as? String
-        let accountID = decoder.decodeObject(forKey: CodingKeys.accountID.rawValue) as? String
+        let objectID = decoder.decodeObject(forKey: CodingKeys.objectID.rawValue) as? String
         let googleCAE = decoder.decodeObject(forKey: CodingKeys.googleCAE.rawValue) as? String
         let gcmMessageID = decoder.decodeObject(forKey: CodingKeys.gcmMessageID.rawValue) as? String
         
         self.init(
-            chatID: chatID,
-            activityID: activityID,
-            checklistID: checklistID,
-            grocerylistID: grocerylistID,
-            activitylistID: activitylistID,
-            mealID: mealID,
-            workoutID: workoutID,
-            mindfulnessID: mindfulnessID,
-            transactionID: transactionID,
-            accountID: accountID,
+            objectID: objectID,
             googleCAE: googleCAE,
             gcmMessageID: gcmMessageID,
             aps: aps
@@ -91,82 +46,107 @@ class PLNotification: NSObject, Codable, NSCoding {
     }
     
     func encode(with coder: NSCoder) {
-        coder.encode(self.chatID, forKey: CodingKeys.chatID.rawValue)
-        coder.encode(self.activityID, forKey: CodingKeys.activityID.rawValue)
-        coder.encode(self.checklistID, forKey: CodingKeys.checklistID.rawValue)
-        coder.encode(self.grocerylistID, forKey: CodingKeys.grocerylistID.rawValue)
-        coder.encode(self.activitylistID, forKey: CodingKeys.activitylistID.rawValue)
-        coder.encode(self.mealID, forKey: CodingKeys.mealID.rawValue)
-        coder.encode(self.workoutID, forKey: CodingKeys.workoutID.rawValue)
-        coder.encode(self.mindfulnessID, forKey: CodingKeys.mindfulnessID.rawValue)
-        coder.encode(self.transactionID, forKey: CodingKeys.transactionID.rawValue)
-        coder.encode(self.accountID, forKey: CodingKeys.accountID.rawValue)
+        coder.encode(self.objectID, forKey: CodingKeys.objectID.rawValue)
         coder.encode(self.googleCAE, forKey: CodingKeys.googleCAE.rawValue)
         coder.encode(self.gcmMessageID, forKey: CodingKeys.gcmMessageID.rawValue)
         coder.encode(self.aps, forKey: CodingKeys.aps.rawValue)
     }
     
     override var description: String {
-        if aps.category == "CHAT_CATEGORY" {
-            return "\(self.aps.alert.title) sent you a message"
-        }
-        else if aps.category == "ACTIVITY_CATEGORY" {
+        if aps.category == Identifiers.eventCategory {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
-                let newBody = body.replacingOccurrences(of: "The activity", with: "The \(newSubtitle) activity")
+                let newBody = body.replacingOccurrences(of: "The event", with: "The \(newSubtitle) event")
                 return "\(newBody) by \(self.aps.alert.title)"
             } else {
-                return "\(self.aps.alert.title) invited you to a new activity"
+                return "\(self.aps.alert.title) invited you to a new event"
             }
-        } else if aps.category == "CHECKLIST_CATEGORY" {
+        } else if aps.category == Identifiers.taskCategory {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
-                let newBody = body.replacingOccurrences(of: "The checklist", with: "The \(newSubtitle) checklist")
+                let newBody = body.replacingOccurrences(of: "The task", with: "The \(newSubtitle) task")
                 return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a task"
             }
-        } else if aps.category == "GROCERYLIST_CATEGORY" {
-            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
-                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
-                let newBody = body.replacingOccurrences(of: "The grocery list", with: "The \(newSubtitle) grocery list")
-                return "\(newBody) by \(self.aps.alert.title)"
-            }
-        } else if aps.category == "ACTIVITYLIST_CATEGORY" {
-            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
-                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
-                let newBody = body.replacingOccurrences(of: "The activity list", with: "The \(newSubtitle) activity list")
-                return "\(newBody) by \(self.aps.alert.title)"
-            }
-        } else if aps.category == "MEAL_CATEGORY" {
-            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
-                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
-                let newBody = body.replacingOccurrences(of: "The meal", with: "The \(newSubtitle) meal")
-                return "\(newBody) by \(self.aps.alert.title)"
-            }
-        } else if aps.category == "WORKOUT_CATEGORY" {
+        } else if aps.category == Identifiers.workoutCategory {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
                 let newBody = body.replacingOccurrences(of: "The workout", with: "The \(newSubtitle) workout")
                 return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a workout"
             }
-        } else if aps.category == "MINDFULNESS_CATEGORY" {
+        } else if aps.category == Identifiers.mindfulnessCategory {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
                 let newBody = body.replacingOccurrences(of: "The mindfulness", with: "The \(newSubtitle) mindfulness")
                 return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a mindfulness session"
             }
-        } else if aps.category == "TRANSACTION_CATEGORY" {
+        } else if aps.category == Identifiers.transactionCategory {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
                 let newBody = body.replacingOccurrences(of: "The transaction", with: "The \(newSubtitle) transaction")
                 return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a transaction"
             }
-        } else if aps.category == "ACCOUNT_CATEGORY" {
+        } else if aps.category == Identifiers.accountCategory {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
                 let newBody = body.replacingOccurrences(of: "The financial account", with: "The \(newSubtitle) financial account")
                 return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a financial account"
+            }
+        } else if aps.category == Identifiers.calendarCategory {
+            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+                let newBody = body.replacingOccurrences(of: "The calendar", with: "The \(newSubtitle) calendar")
+                return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a calendar"
+            }
+        } else if aps.category == Identifiers.listCategory {
+            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+                let newBody = body.replacingOccurrences(of: "The list", with: "The \(newSubtitle) list")
+                return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a list"
             }
         }
+//        else if aps.category == "CHAT_CATEGORY" {
+//            return "\(self.aps.alert.title) sent you a message"
+//        }
+//        else if aps.category == "CHECKLIST_CATEGORY" {
+//            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+//                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+//                let newBody = body.replacingOccurrences(of: "The checklist", with: "The \(newSubtitle) checklist")
+//                return "\(newBody) by \(self.aps.alert.title)"
+//            }
+//        } else if aps.category == "GROCERYLIST_CATEGORY" {
+//            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+//                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+//                let newBody = body.replacingOccurrences(of: "The grocery list", with: "The \(newSubtitle) grocery list")
+//                return "\(newBody) by \(self.aps.alert.title)"
+//            }
+//        } else if aps.category == "ACTIVITYLIST_CATEGORY" {
+//            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+//                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+//                let newBody = body.replacingOccurrences(of: "The activity list", with: "The \(newSubtitle) activity list")
+//                return "\(newBody) by \(self.aps.alert.title)"
+//            }
+//        }
+//        else if aps.category == "MEAL_CATEGORY" {
+//            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+//                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+//                let newBody = body.replacingOccurrences(of: "The meal", with: "The \(newSubtitle) meal")
+//                return "\(newBody) by \(self.aps.alert.title)"
+//            }
+//        }
         
         return ""
     }

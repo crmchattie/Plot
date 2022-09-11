@@ -47,25 +47,21 @@ class HealthService {
         }
     }
     
-    var workoutsFB: [Workout] = [] {
+    var workouts: [Workout] = [] {
         didSet {
-            if oldValue != workoutsFB {
+            if oldValue != workouts {
                 NotificationCenter.default.post(name: .workoutsUpdated, object: nil)
             }
         }
     }
     
-    var mindfulnessesFB: [Mindfulness] = [] {
+    var mindfulnesses: [Mindfulness] = [] {
         didSet {
-            if oldValue != mindfulnessesFB {
+            if oldValue != mindfulnesses {
                 NotificationCenter.default.post(name: .mindfulnessUpdated, object: nil)
             }
         }
     }
-    
-    var nutrition = [String: [HKQuantitySample]]()
-    var workouts = [String: [HKWorkout]]()
-    var mindfulnesses = [HKCategorySample]()
     
     var askedforAuthorization: Bool = false
     
@@ -90,17 +86,16 @@ class HealthService {
     }
     
     func observeWorkoutsForCurrentUser(_ completion: @escaping () -> Void) {
-        print("observeWorkoutsForCurrentUser")
         workoutFetcher.observeWorkoutForCurrentUser(workoutsInitialAdd: { [weak self] workoutsInitialAdd  in
             if !workoutsInitialAdd.isEmpty {
-                if self!.workoutsFB.isEmpty {
-                    self?.workoutsFB = workoutsInitialAdd
+                if self!.workouts.isEmpty {
+                    self?.workouts = workoutsInitialAdd
                 }
                 for workout in workoutsInitialAdd {
-                    if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
-                        self?.workoutsFB[index] = workout
+                    if let index = self?.workouts.firstIndex(where: {$0.id == workout.id}) {
+                        self?.workouts[index] = workout
                     } else {
-                        self?.workoutsFB.append(workout)
+                        self?.workouts.append(workout)
                     }
                 }
                 completion()
@@ -109,24 +104,24 @@ class HealthService {
             }
         }, workoutsAdded: { [weak self] workoutsAdded in
             for workout in workoutsAdded {
-                if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
-                    self?.workoutsFB[index] = workout
+                if let index = self?.workouts.firstIndex(where: {$0.id == workout.id}) {
+                    self?.workouts[index] = workout
                 } else {
-                    self?.workoutsFB.append(workout)
+                    self?.workouts.append(workout)
                 }
             }
         }, workoutsRemoved: { [weak self] workoutsRemoved in
             for workout in workoutsRemoved {
-                if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
-                    self?.workoutsFB.remove(at: index)
+                if let index = self?.workouts.firstIndex(where: {$0.id == workout.id}) {
+                    self?.workouts.remove(at: index)
                 }
             }
         }, workoutsChanged: { [weak self] workoutsChanged in
             for workout in workoutsChanged {
-                if let index = self?.workoutsFB.firstIndex(where: {$0.id == workout.id}) {
-                    self?.workoutsFB[index] = workout
+                if let index = self?.workouts.firstIndex(where: {$0.id == workout.id}) {
+                    self?.workouts[index] = workout
                 } else {
-                    self?.workoutsFB.append(workout)
+                    self?.workouts.append(workout)
                 }
             }
         })
@@ -135,14 +130,14 @@ class HealthService {
     func observeMindfulnesssForCurrentUser(_ completion: @escaping () -> Void) {
         mindfulnessFetcher.observeMindfulnessForCurrentUser(mindfulnessInitialAdd: { [weak self] mindfulnessInitialAdd in
             if !mindfulnessInitialAdd.isEmpty {
-                if self!.mindfulnessesFB.isEmpty {
-                    self?.mindfulnessesFB = mindfulnessInitialAdd
+                if self!.mindfulnesses.isEmpty {
+                    self?.mindfulnesses = mindfulnessInitialAdd
                 }
                 for mindfulness in mindfulnessInitialAdd {
-                    if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
-                        self?.mindfulnessesFB[index] = mindfulness
+                    if let index = self?.mindfulnesses.firstIndex(where: {$0.id == mindfulness.id}) {
+                        self?.mindfulnesses[index] = mindfulness
                     } else {
-                        self?.mindfulnessesFB.append(mindfulness)
+                        self?.mindfulnesses.append(mindfulness)
                     }
                 }
                 completion()
@@ -151,24 +146,24 @@ class HealthService {
             }
         }, mindfulnessAdded: { [weak self] mindfulnessAdded in
             for mindfulness in mindfulnessAdded {
-                if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
-                    self?.mindfulnessesFB[index] = mindfulness
+                if let index = self?.mindfulnesses.firstIndex(where: {$0.id == mindfulness.id}) {
+                    self?.mindfulnesses[index] = mindfulness
                 } else {
-                    self?.mindfulnessesFB.append(mindfulness)
+                    self?.mindfulnesses.append(mindfulness)
                 }
             }
         }, mindfulnessRemoved: { [weak self] mindfulnessRemoved in
             for mindfulness in mindfulnessRemoved {
-                if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
-                    self?.mindfulnessesFB.remove(at: index)
+                if let index = self?.mindfulnesses.firstIndex(where: {$0.id == mindfulness.id}) {
+                    self?.mindfulnesses.remove(at: index)
                 }
             }
         }, mindfulnessChanged: { [weak self] mindfulnessChanged in
             for mindfulness in mindfulnessChanged {
-                if let index = self?.mindfulnessesFB.firstIndex(where: {$0.id == mindfulness.id}) {
-                    self?.mindfulnessesFB[index] = mindfulness
+                if let index = self?.mindfulnesses.firstIndex(where: {$0.id == mindfulness.id}) {
+                    self?.mindfulnesses[index] = mindfulness
                 } else {
-                    self?.mindfulnessesFB.append(mindfulness)
+                    self?.mindfulnesses.append(mindfulness)
                 }
             }
         })

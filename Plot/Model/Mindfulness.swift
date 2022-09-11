@@ -41,17 +41,10 @@ struct Mindfulness: Codable, Equatable, Hashable {
         self.endDateTime = endDateTime
         self.user_created = user_created
     }
-        
-    init(from mindfuless: HKCategorySample) {
-        self.id = mindfuless.uuid.uuidString
-        self.hkSampleID = mindfuless.uuid.uuidString
-        self.name = "Mindfulness"
-        self.startDateTime = mindfuless.startDate
-        self.endDateTime = mindfuless.endDate
-    }
     
     init(forInitialSave id: String, mindfuless: HKCategorySample) {
         self.id = id
+        self.hkSampleID = mindfuless.uuid.uuidString
         self.name = "Mindfulness"
         self.startDateTime = mindfuless.startDate
         self.endDateTime = mindfuless.endDate
@@ -60,4 +53,21 @@ struct Mindfulness: Codable, Equatable, Hashable {
 
 func ==(lhs: Mindfulness, rhs: Mindfulness) -> Bool {
     return lhs.id == rhs.id
+}
+
+struct UserMindfulness: Codable, Equatable, Hashable {
+    var badge: Int?
+    var pinned: Bool?
+    var muted: Bool?
+    var healthExport: Bool?
+    var hkSampleID: String?
+    var identifier: String?
+    
+    init(mindfulness: Mindfulness) {
+        self.badge = mindfulness.badge
+        self.pinned = mindfulness.pinned
+        self.muted = mindfulness.muted
+        self.healthExport = mindfulness.healthExport
+        self.hkSampleID = mindfulness.hkSampleID
+    }
 }

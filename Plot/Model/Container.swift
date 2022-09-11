@@ -80,100 +80,47 @@ class ContainerFunctions {
                 container = contain
                 for activityID in container.activityIDs ?? [] {
                     dispatchGroup.enter()
-                    let dataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                    dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
-                            let activity = Activity(dictionary: snapshotValue)
-                            activities.append(activity)
-
-                        }
+                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in
+                        activities.append(contentsOf: fetched)
                         dispatchGroup.leave()
-                    })
+                    }
                 }
                 for taskID in container.taskIDs ?? [] {
                     dispatchGroup.enter()
-                    let dataReference = Database.database().reference().child(activitiesEntity).child(taskID).child(messageMetaDataFirebaseFolder)
-                    dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
-                            let task = Activity(dictionary: snapshotValue)
-                            tasks.append(task)
-                        }
+                    ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
+                        tasks.append(contentsOf: fetched)
                         dispatchGroup.leave()
-                    })
+                    }
                 }
                 for transactionID in container.transactionIDs ?? [] {
                     dispatchGroup.enter()
-                    let dataReference = Database.database().reference().child(financialTransactionsEntity).child(transactionID)
-                    dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if snapshot.exists(), let snapshotValue = snapshot.value, let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue) {
-                            transactions.append(transaction)
-                        }
+                    FinancialTransactionFetcher.getDataFromSnapshot(ID: transactionID) { fetched in
+                        transactions.append(contentsOf: fetched)
                         dispatchGroup.leave()
-                    })
+                    }
                 }
                 
                 for workoutID in container.workoutIDs ?? [] {
-                    if let currentUserID = Auth.auth().currentUser?.uid {
-                        dispatchGroup.enter()
-                        let ref = Database.database().reference()
-                        var dataReference = ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(identifierKey)
-                        dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                            if snapshot.exists(), let hkWorkoutID = snapshot.value as? String {
-                                if let uuid = UUID(uuidString: hkWorkoutID) {
-                                    HealthKitService.grabSpecificWorkoutSample(uuid: uuid) { samples, err in
-                                        if let sample = samples?.first {
-                                            let workout = Workout(from: sample)
-                                            var health = HealthContainer()
-                                            health.workout = workout
-                                            healths.append(health)
-                                            dispatchGroup.leave()
-                                        }
-                                    }
-                                }
-                            } else {
-                                dataReference = ref.child(workoutsEntity).child(workoutID)
-                                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                                    if snapshot.exists(), let snapshotValue = snapshot.value, let workout = try? FirebaseDecoder().decode(Workout.self, from: snapshotValue) {
-                                        var health = HealthContainer()
-                                        health.workout = workout
-                                        healths.append(health)
-                                    }
-                                    dispatchGroup.leave()
-                                })
-                            }
-                        })
+                    dispatchGroup.enter()
+                    WorkoutFetcher.getDataFromSnapshot(ID: workoutID) { fetched in
+                        if let workout = fetched.first {
+                            print(workout.name)
+                            var health = HealthContainer()
+                            health.workout = workout
+                            healths.append(health)
+                            dispatchGroup.leave()
+                        }
                     }
                 }
                 for mindfulnessID in container.mindfulnessIDs ?? [] {
-                    if let currentUserID = Auth.auth().currentUser?.uid {
-                        dispatchGroup.enter()
-                        let ref = Database.database().reference()
-                        var dataReference = ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulnessID).child(identifierKey)
-                        dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                            if snapshot.exists(), let hkSampleID = snapshot.value as? String {
-                                if let uuid = UUID(uuidString: hkSampleID) {
-                                    HealthKitService.grabSpecificCategorySample(uuid: uuid, identifier: .mindfulSession) { samples, err in
-                                        if let sample = samples?.first {
-                                            let mindfulness = Mindfulness(from: sample)
-                                            var health = HealthContainer()
-                                            health.mindfulness = mindfulness
-                                            healths.append(health)
-                                            dispatchGroup.leave()
-                                        }
-                                    }
-                                }
-                            } else {
-                                dataReference = ref.child(mindfulnessEntity).child(mindfulnessID)
-                                dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                                    if snapshot.exists(), let snapshotValue = snapshot.value, let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: snapshotValue) {
-                                        var health = HealthContainer()
-                                        health.mindfulness = mindfulness
-                                        healths.append(health)
-                                    }
-                                    dispatchGroup.leave()
-                                })
-                            }
-                        })
+                    dispatchGroup.enter()
+                    MindfulnessFetcher.getDataFromSnapshot(ID: mindfulnessID) { fetched in
+                        if let mindfulness = fetched.first {
+                            var health = HealthContainer()
+                            health.mindfulness = mindfulness
+                            healths.append(health)
+                            dispatchGroup.leave()
+                        }
                     }
                 }
             }

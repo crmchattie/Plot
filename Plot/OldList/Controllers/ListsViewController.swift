@@ -369,7 +369,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             openList(list: list)
         } else {
             let task = filteredTasks[indexPath.row]
-            showTaskDetail(task: task)
+            showTaskDetailPush(task: task)
         }
     }
     

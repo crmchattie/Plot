@@ -90,9 +90,7 @@ class EventViewController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print(activity.activityID)
-        
+                
         setupMainView()
         
         if activity != nil {

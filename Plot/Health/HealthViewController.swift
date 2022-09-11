@@ -153,9 +153,6 @@ class HealthViewController: UIViewController {
     
     func openMetric(metric: HealthMetric) {
         let healthDetailService = HealthDetailService()
-        healthDetailService.workouts = networkController.healthService.workouts
-        healthDetailService.mindfulnesses = networkController.healthService.mindfulnesses
-        healthDetailService.nutrition = networkController.healthService.nutrition
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: healthDetailService)
         let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
         healthDetailViewController.segmentedControl.selectedSegmentIndex = metric.grabSegment()

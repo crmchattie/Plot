@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import CodableFirebase
 
-class NotificationsViewController: UIViewController {
+class NotificationsViewController: UIViewController, ObjectDetailShowing {
     
     let invitationsText = NSLocalizedString("Invitations", comment: "")
     let notificationsText = NSLocalizedString("Notifications", comment: "")
@@ -22,9 +22,6 @@ class NotificationsViewController: UIViewController {
     var invitedActivities: [Activity] = []
     var filteredInvitedActivities: [Activity] = []
     var notificationActivities: [Activity] = []
-    var listList = [ListContainer]()
-    var chatLogController: ChatLogController? = nil
-    var messagesFetcher: MessagesFetcher? = nil
     let invitationsFetcher = InvitationsFetcher()
     
     var invitations = [String: Invitation]()
@@ -225,9 +222,6 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             cell.textLabel?.lineBreakMode = .byWordWrapping
             cell.textLabel?.textColor = theme.generalTitleColor
             let button = UIButton(type: .system)
-            button.isUserInteractionEnabled = true
-            button.addTarget(self, action: #selector(NotificationsViewController.notificationButtonTapped(_:)), for: .touchUpInside)
-            button.tag = indexPath.row
             cell.accessoryView = button
             if notification.aps.category == Identifiers.eventCategory {
                 button.setImage(UIImage(named: "activity"), for: .normal)
@@ -253,50 +247,13 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if segmentedControl.selectedSegmentIndex == 0 {
             let notification = notifications[indexPath.row]
-            if notification.aps.category == Identifiers.eventCategory {
-                if let activityID = notification.activityID {
-                    if let activity = notificationActivities.first(where: { (activity) -> Bool in
-                        activity.activityID == activityID
-                    }) {
-                        openActivityDetailView(forActivity: activity)
-                    }
-                }
-            }
+            openNotification(forNotification: notification)
         } else {
             let activity = filteredInvitedActivities[indexPath.row]
             openActivityDetailView(forActivity: activity)
             
         }
         tableView.deselectRow(at: indexPath, animated: false)
-    }
-    
-    func openChatDetailView(forChat chat: Conversation) {
-        chatLogController = ChatLogController(collectionViewLayout: AutoSizingCollectionViewFlowLayout())
-        messagesFetcher = MessagesFetcher()
-        messagesFetcher?.delegate = self
-        messagesFetcher?.loadMessagesData(for: chat)
-    }
-    
-    func openActivityDetailView(forActivity activity: Activity) {
-        loadActivity(activity: activity)
-        
-    }
-    
-    @objc func notificationButtonTapped(_ sender: UIButton) {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            if sender.tag >= 0 && sender.tag < notifications.count {
-                let notification = notifications[sender.tag]
-                if notification.aps.category == Identifiers.eventCategory {
-                    if let activityID = notification.activityID {
-                        if let activity = notificationActivities.first(where: { (activity) -> Bool in
-                            activity.activityID == activityID
-                        }) {
-                            openActivityDetailView(forActivity: activity)
-                        }
-                    }
-                }
-            }
-        }
     }
     
     func loadActivity(activity: Activity) {
@@ -324,43 +281,82 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
     }
-}
-
-extension NotificationsViewController: MessagesDelegate {
     
-    func messages(shouldChangeMessageStatusToReadAt reference: DatabaseReference) {
-        chatLogController?.updateMessageStatus(messageRef: reference)
+    func openActivityDetailView(forActivity activity: Activity) {
+        loadActivity(activity: activity)
     }
     
-    func messages(shouldBeUpdatedTo messages: [Message], conversation: Conversation) {
-        
-        chatLogController?.hidesBottomBarWhenPushed = true
-        chatLogController?.messagesFetcher = messagesFetcher
-        chatLogController?.messages = messages
-        chatLogController?.conversation = conversation
-        //chatLogController?.activityID = activityID
-        
-        if let membersIDs = conversation.chatParticipantsIDs, let uid = Auth.auth().currentUser?.uid, membersIDs.contains(uid) {
-            chatLogController?.observeTypingIndicator()
-            chatLogController?.configureTitleViewWithOnlineStatus()
+    func openNotification(forNotification notification: PLNotification) {
+        let category = notification.aps.category
+        if let ID = notification.objectID {
+            if category == Identifiers.eventCategory {
+                ActivitiesFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forActivity: fetch) { (participants) in
+                            ParticipantsFetcher.getAcceptedParticipant(forActivity: fetch, allParticipants: participants) { acceptedParticipant in
+                                self.showEventDetailPush(event: fetch)
+                            }
+                        }
+                    }
+                }
+            } else if category == Identifiers.taskCategory {
+                ActivitiesFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forActivity: fetch) { (participants) in
+                            self.showTaskDetailPush(task: fetch)
+                        }
+                    }
+                }
+            } else if category == Identifiers.transactionCategory {
+                FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forTransaction: fetch) { (participants) in
+                            self.showTransactionDetailPush(transaction: fetch)
+                        }
+                    }
+                }
+            } else if category == Identifiers.accountCategory {
+                FinancialAccountFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forAccount: fetch) { (participants) in
+                            self.showAccountDetailPush(account: fetch)
+                        }
+                    }
+                }
+            } else if category == Identifiers.workoutCategory {
+                WorkoutFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forWorkout: fetch) { (participants) in
+                            self.showWorkoutDetailPush(workout: fetch)
+                        }
+                    }
+                }
+            } else if category == Identifiers.mindfulnessCategory {
+                MindfulnessFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forMindfulness: fetch) { (participants) in
+                            self.showMindfulnessDetailPush(mindfulness: fetch)
+                        }
+                    }
+                }
+            } else if category == Identifiers.listCategory {
+                ListFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forList: fetch) { (participants) in
+                            self.showListDetailPush(list: fetch)
+                        }
+                    }
+                }
+            } else if category == Identifiers.calendarCategory {
+                CalendarFetcher.getDataFromSnapshot(ID: ID) { fetched in
+                    if let fetch = fetched.first {
+                        ParticipantsFetcher.getParticipants(forCalendar: fetch) { (participants) in
+                            self.showCalendarDetailPush(calendar: fetch)
+                        }
+                    }
+                }
+            }
         }
-        
-        chatLogController?.messagesFetcher.collectionDelegate = chatLogController
-        guard let destination = chatLogController else { return }
-        
-        self.chatLogController?.startCollectionViewAtBottom()
-        
-        
-        // If we're presenting a modal sheet
-        if let presentedViewController = presentedViewController as? UINavigationController {
-            presentedViewController.pushViewController(destination, animated: true)
-        } else {
-            navigationController?.pushViewController(destination, animated: true)
-        }
-        
-        chatLogController = nil
-        messagesFetcher?.delegate = nil
-        messagesFetcher = nil
     }
 }
 
@@ -371,11 +367,5 @@ extension NotificationsViewController: UpdateInvitationDelegate {
                 self.invitations[invitation.activityID] = invitation
             }
         }
-    }
-}
-
-extension NotificationsViewController: ChooseChatDelegate {
-    func chosenChat(chatID: String, activityID: String?, grocerylistID: String?, checklistID: String?, packinglistID: String?, activitylistID: String?) {
-
     }
 }

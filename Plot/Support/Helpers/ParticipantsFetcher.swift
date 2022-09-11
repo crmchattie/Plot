@@ -235,6 +235,70 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
+    class func getParticipants(forWorkout workout: Workout, completion: @escaping ([User])->()) {
+        if let participantsIDs = workout.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if workout.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
+            completion(participants)
+        }
+    }
+    
+    class func getParticipants(forMindfulness mindfulness: Mindfulness, completion: @escaping ([User])->()) {
+        if let participantsIDs = mindfulness.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if mindfulness.admin == currentUserID && id == currentUserID {
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
+            completion(participants)
+        }
+    }
+    
     class func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?, completion: @escaping ([User])->()) {
         if let grocerylist = grocerylist, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
