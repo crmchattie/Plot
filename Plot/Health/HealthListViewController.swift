@@ -1,17 +1,16 @@
 //
-//  HealthViewController.swift
+//  HealthListViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/21/20.
-//  Copyright © 2020 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 9/12/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
 //
-
-import UIKit
 
 fileprivate let healthMetricCellID = "HealthMetricCellID"
 fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 
-class HealthViewController: UIViewController, ObjectDetailShowing {
+
+class HealthListViewController: UIViewController, ObjectDetailShowing {
     var participants = [String : [User]]()
     
     func showActivityIndicator() {
@@ -35,12 +34,6 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     
     let healhKitManager = HealthKitManager()
     
-    var healthMetricSections: [HealthMetricCategory] {
-        return networkController.healthService.healthMetricSections
-    }
-    var healthMetrics: [HealthMetricCategory: [HealthMetric]] {
-        return networkController.healthService.healthMetrics
-    }
     var workouts: [Workout] {
         return networkController.healthService.workouts
     }
@@ -65,12 +58,9 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        title = "Health"
-        
         collectionView.dataSource = self
         collectionView.delegate = self
              
-        setupData()
         configureView()
         addObservers()
     }
@@ -85,17 +75,11 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func setupData() {
-        filteredHealthMetricSections = healthMetricSections
-        filteredHealthMetrics = healthMetrics
-        if healthMetricSections.contains(.workouts) {
-            filteredHealthMetricSections.append(.workoutsList)
+        if filteredHealthMetricSections.contains(.workoutsList) {
             filteredHealthMetrics[.workoutsList] = workouts
-        }
-        if let generalMetrics = healthMetrics[.general], generalMetrics.contains(where: {$0.type == HealthMetricType.mindfulness }) {
-            filteredHealthMetricSections.append(.mindfulnessList)
+        } else if filteredHealthMetricSections.contains(.mindfulnessList) {
             filteredHealthMetrics[.mindfulnessList] = mindfulness
         }
-                        
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -127,47 +111,26 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
         ])
         
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
-        collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = view.backgroundColor
         
     }
     
     @objc fileprivate func newItem() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
-//        alert.addAction(UIAlertAction(title: "Meal", style: .default, handler: { (_) in
-//            let destination = MealViewController(networkController: self.networkController)
-//            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-//            destination.navigationItem.leftBarButtonItem = cancelBarButton
-//            let navigationViewController = UINavigationController(rootViewController: destination)
-//            self.present(navigationViewController, animated: true, completion: nil)
-//        }))
-        
-        alert.addAction(UIAlertAction(title: "Workout", style: .default, handler: { (_) in
+        if filteredHealthMetricSections.contains(.workoutsList) {
             let destination = WorkoutViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Mindfulness", style: .default, handler: { (_) in
+        } else if filteredHealthMetricSections.contains(.mindfulnessList) {
             let destination = MindfulnessViewController(networkController: self.networkController)
             destination.hidesBottomBarWhenPushed = true
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
+        }
     }
     
     @objc fileprivate func filter() {
@@ -180,13 +143,7 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     }
     
     func openMetric(metric: AnyHashable) {
-        if let healthMetric = metric as? HealthMetric {
-            let healthDetailService = HealthDetailService()
-            let healthDetailViewModel = HealthDetailViewModel(healthMetric: healthMetric, healthDetailService: healthDetailService)
-            let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
-            healthDetailViewController.segmentedControl.selectedSegmentIndex = healthMetric.grabSegment()
-            navigationController?.pushViewController(healthDetailViewController, animated: true)
-        } else if let workout = metric as? Workout {
+        if let workout = metric as? Workout {
             showWorkoutDetailPush(workout: workout)
         } else if let mindfulness = metric as? Mindfulness {
             showMindfulnessDetailPush(mindfulness: mindfulness)
@@ -194,19 +151,13 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     }
 }
 
-extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
+extension HealthListViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return filteredHealthMetricSections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let key = filteredHealthMetricSections[section]
-        if key == .workoutsList || key == .mindfulnessList {
-            if filteredHealthMetrics[key]?.count ?? 0 < 10 {
-                return filteredHealthMetrics[key]?.count ?? 0
-            }
-            return 10
-        }
         return filteredHealthMetrics[key]?.count ?? 0
     }
     
@@ -242,49 +193,12 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
         return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width, height: 40)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionView.elementKindSectionHeader {
-            let key = filteredHealthMetricSections[indexPath.section]
-            let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
-            sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            sectionHeader.titleLabel.text = key.name
-            sectionHeader.delegate = self
-            if (key == .workoutsList || key == .mindfulnessList) && filteredHealthMetrics[key]?.count ?? 0 > 10 {
-                sectionHeader.sectionType = key
-                sectionHeader.view.isUserInteractionEnabled = true
-                sectionHeader.subTitleLabel.isHidden = false
-            } else {
-                sectionHeader.view.isUserInteractionEnabled = false
-                sectionHeader.subTitleLabel.isHidden = true
-            }
-            return sectionHeader
-        } else { //No footer in this case but can add option for that
-            return UICollectionReusableView()
-        }
-    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
     }
 }
 
-extension HealthViewController: SectionHeaderDelegate {
-    func viewTapped(sectionType: HealthMetricCategory) {
-        let destination = HealthListViewController(networkController: networkController)
-        destination.title = sectionType.name
-        destination.filteredHealthMetricSections = [sectionType]
-        if let healthMetrics = filteredHealthMetrics[sectionType] {
-            destination.filteredHealthMetrics = [sectionType: healthMetrics]
-        }
-        navigationController?.pushViewController(destination, animated: true)
-    }
-}
-
-extension HealthViewController: UpdateFilter {
+extension HealthListViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
         self.filterDictionary = filterDictionary
         updateCollectionViewWFilters()

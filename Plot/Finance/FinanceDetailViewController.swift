@@ -51,15 +51,6 @@ class FinanceDetailViewController: UIViewController {
     var holdings: [MXHolding] {
         return networkController.financeService.holdings
     }
-    var institutionDict: [String: String] {
-        return networkController.financeService.institutionDict
-    }
-    var users: [User] {
-        return networkController.userService.users
-    }
-    var filteredUsers: [User] {
-        return networkController.userService.users
-    }
     var selectedIndex = 2
             
     var setSections = [SectionType]()

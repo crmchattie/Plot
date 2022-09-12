@@ -105,70 +105,99 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         activityTypeButton.setImage(nil, for: .normal)
     }
     
-    func configure(_ healthMetric: HealthMetric) {
-        let isToday = NSCalendar.current.isDateInToday(healthMetric.date)
-        var timeAgo = isToday ? "today" : timeAgoSinceDate(healthMetric.date)
-        var title = healthMetric.type.name
-        if case HealthMetricType.workout = healthMetric.type, let hkWorkout = healthMetric.hkSample as? HKWorkout {
-            title = hkWorkout.workoutActivityType.name
-            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
-        }
-        else if case HealthMetricType.nutrition(let value) = healthMetric.type {
-            title = value
-        }
-        
-        titleLabel.text = title
-        
-        var total = "\(Int(healthMetric.total))"
-        var subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
-        
-        if case HealthMetricType.weight = healthMetric.type {
-            total = healthMetric.total.clean
-            subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
-        }
-        else if case HealthMetricType.sleep = healthMetric.type {
-            total = TimeInterval(healthMetric.total).stringTimeShort
-            subtitleLabelText = "\(total) \(timeAgo)"
-        }
-        else if case HealthMetricType.mindfulness = healthMetric.type, let hkCategorySample = healthMetric.hkSample as? HKCategorySample {
-            total = hkCategorySample.endDate.timeIntervalSince(hkCategorySample.startDate).stringTimeShort
-            timeAgo = NSCalendar.current.isDateInToday(hkCategorySample.endDate) ? "today" : timeAgoSinceDate(hkCategorySample.endDate)
-            subtitleLabelText = "\(total) \(timeAgo)"
-        }
-        else if case HealthMetricType.workoutMinutes = healthMetric.type, let hkWorkout = healthMetric.hkSample as? HKWorkout {
-            total = hkWorkout.endDate.timeIntervalSince(hkWorkout.startDate).stringTimeShort
-            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
-            subtitleLabelText = "\(total) \(timeAgo)"
-        }
-        
-        subtitleLabel.text = subtitleLabelText
-        
-        if let averageValue = healthMetric.average {
-            var averageText = "\(Int(averageValue)) \(healthMetric.unitName) on average"
-            if case HealthMetricType.weight = healthMetric.type {
-                averageText = "\(averageValue.clean) \(healthMetric.unitName) on average"
-            }
-            else if case HealthMetricType.sleep = healthMetric.type {
-                let shortTime = TimeInterval(averageValue).stringTimeShort
-                averageText = "\(shortTime) on average"
-            }
-            else if case HealthMetricType.mindfulness = healthMetric.type {
-                let shortTime = TimeInterval(averageValue).stringTimeShort
-                averageText = "\(shortTime) on average"
-            }
-            else if case HealthMetricType.workoutMinutes = healthMetric.type {
-                let shortTime = TimeInterval(averageValue).stringTimeShort
-                averageText = "\(shortTime) on average"
-            }
-            
-            detailLabel.text = averageText
-        }
-
-        updateImage(healthMetric)
-        
+    func configure(_ metric: AnyHashable) {
         titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         subtitleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
         detailLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+
+        if let healthMetric = metric as? HealthMetric {
+            let isToday = NSCalendar.current.isDateInToday(healthMetric.date)
+            var timeAgo = isToday ? "today" : timeAgoSinceDate(healthMetric.date)
+            var title = healthMetric.type.name
+            if case HealthMetricType.workout = healthMetric.type, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+                title = hkWorkout.workoutActivityType.name
+                timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
+            }
+            else if case HealthMetricType.nutrition(let value) = healthMetric.type {
+                title = value
+            }
+            
+            titleLabel.text = title
+            
+            var total = "\(Int(healthMetric.total))"
+            var subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
+            
+            if case HealthMetricType.weight = healthMetric.type {
+                total = healthMetric.total.clean
+                subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
+            }
+            else if case HealthMetricType.sleep = healthMetric.type {
+                total = TimeInterval(healthMetric.total).stringTimeShort
+                subtitleLabelText = "\(total) \(timeAgo)"
+            }
+            else if case HealthMetricType.mindfulness = healthMetric.type, let hkCategorySample = healthMetric.hkSample as? HKCategorySample {
+                total = hkCategorySample.endDate.timeIntervalSince(hkCategorySample.startDate).stringTimeShort
+                timeAgo = NSCalendar.current.isDateInToday(hkCategorySample.endDate) ? "today" : timeAgoSinceDate(hkCategorySample.endDate)
+                subtitleLabelText = "\(total) \(timeAgo)"
+            }
+            else if case HealthMetricType.workoutMinutes = healthMetric.type, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+                total = hkWorkout.endDate.timeIntervalSince(hkWorkout.startDate).stringTimeShort
+                timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
+                subtitleLabelText = "\(total) \(timeAgo)"
+            }
+            
+            subtitleLabel.text = subtitleLabelText
+            
+            if let averageValue = healthMetric.average {
+                var averageText = "\(Int(averageValue)) \(healthMetric.unitName) on average"
+                if case HealthMetricType.weight = healthMetric.type {
+                    averageText = "\(averageValue.clean) \(healthMetric.unitName) on average"
+                }
+                else if case HealthMetricType.sleep = healthMetric.type {
+                    let shortTime = TimeInterval(averageValue).stringTimeShort
+                    averageText = "\(shortTime) on average"
+                }
+                else if case HealthMetricType.mindfulness = healthMetric.type {
+                    let shortTime = TimeInterval(averageValue).stringTimeShort
+                    averageText = "\(shortTime) on average"
+                }
+                else if case HealthMetricType.workoutMinutes = healthMetric.type {
+                    let shortTime = TimeInterval(averageValue).stringTimeShort
+                    averageText = "\(shortTime) on average"
+                }
+                
+                detailLabel.text = averageText
+            }
+
+            updateImage(healthMetric)
+        } else if let workout = metric as? Workout {
+            titleLabel.text = workout.name
+            let timeAgo = NSCalendar.current.isDateInToday(workout.endDateTime ?? Date()) ? "today" : timeAgoSinceDate(workout.endDateTime ?? Date())
+            if let totalEnergyBurned = workout.totalEnergyBurned {
+                let total = "\(Int(totalEnergyBurned))"
+                subtitleLabel.text = "\(total) calories \(timeAgo)"
+            } else if let length = workout.length {
+                let total = TimeInterval(length).stringTimeShort
+                subtitleLabel.text = "\(total) \(timeAgo)"
+            } else {
+                subtitleLabel.text = "\(timeAgo)"
+            }
+            detailLabel.text = nil
+            let workoutActivityType = workout.hkWorkoutActivityType
+            activityTypeButton.setImage(UIImage(named: workoutActivityType.image), for: .normal)
+        } else if let mindfulness = metric as? Mindfulness {
+            titleLabel.text = mindfulness.name
+            let timeAgo = NSCalendar.current.isDateInToday(mindfulness.endDateTime ?? Date()) ? "today" : timeAgoSinceDate(mindfulness.endDateTime ?? Date())
+            if let length = mindfulness.length {
+                let total = TimeInterval(length).stringTimeShort
+                subtitleLabel.text = "\(total) \(timeAgo)"
+            } else {
+                subtitleLabel.text = "\(timeAgo)"
+            }
+            detailLabel.text = nil
+            activityTypeButton.setImage(UIImage(named: "mindfulness"), for: .normal)
+        }
+        
     }
     
     func updateImage(_ healthMetric: HealthMetric) {

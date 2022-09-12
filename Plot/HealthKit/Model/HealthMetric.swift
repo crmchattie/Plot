@@ -9,7 +9,7 @@
 import Foundation
 import HealthKit
 
-struct HealthMetric: Equatable {
+struct HealthMetric: Equatable, Hashable {
     let type: HealthMetricType
     let total: Double
     let date: Date
@@ -40,7 +40,7 @@ struct HealthMetric: Equatable {
     }
 }
 
-enum HealthMetricType {
+enum HealthMetricType: Hashable {
     case steps
     case nutrition(String)
     case workout
@@ -126,6 +126,9 @@ enum HealthMetricCategory: String {
     case general
     case workouts
     case nutrition
+    case workoutsList
+    case mindfulnessList
+    
     
     var rank: Int {
         get {
@@ -136,6 +139,27 @@ enum HealthMetricCategory: String {
                 return 2
             case .nutrition:
                 return 3
+            case .workoutsList:
+                return 4
+            case .mindfulnessList:
+                return 5
+            }
+        }
+    }
+    
+    var name: String {
+        get {
+            switch self {
+            case .general:
+                return "General Summary"
+            case .workouts:
+                return "Workout Summary"
+            case .nutrition:
+                return "Nutrition Summary"
+            case .workoutsList:
+                return "Recent Workouts"
+            case .mindfulnessList:
+                return "Recent Mindfulness Sessions"
             }
         }
     }

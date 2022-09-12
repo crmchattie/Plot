@@ -32,7 +32,7 @@ class FlightsClimbedOperation: AsyncOperation {
             
             var metric = HealthMetric(type: HealthMetricType.flightsClimbed, total: dailyTotal, date: recentStatDate, unitName: "floors", rank: HealthMetricType.flightsClimbed.rank)
             metric.average = annualAverage
-            _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue)
+            _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
             self?.finish()
 
         }

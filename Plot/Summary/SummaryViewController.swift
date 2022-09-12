@@ -110,7 +110,7 @@ class SummaryViewController: UIViewController {
         collectionView.register(SummaryPieChartCell.self, forCellWithReuseIdentifier: summaryPieChartCell)
         collectionView.register(SummaryValueBarChartCell.self, forCellWithReuseIdentifier: summaryValueBarChartCell)
         collectionView.register(SummaryTimeBarChartCell.self, forCellWithReuseIdentifier: summaryTimeBarChartCell)
-        collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
+        collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
@@ -194,9 +194,11 @@ extension SummaryViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
-            let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
+            let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! HeaderCell
             let section = viewModel.sections[indexPath.section]
             sectionHeader.titleLabel.text = section.name
+            sectionHeader.subTitleLabel.isHidden = true
+            sectionHeader.view.isUserInteractionEnabled = false
             return sectionHeader
         } else { //No footer in this case but can add option for that
             return UICollectionReusableView()

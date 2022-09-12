@@ -11,6 +11,7 @@ protocol FinanceControllerCellDelegate: AnyObject {
     func openAccountDetails(accountDetails: AccountDetails)
     func openMember(member: MXMember)
     func openHolding(holding: MXHolding)
+    func openTransaction(transaction: Transaction)
 }
 
 class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -91,7 +92,11 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
                 cell.accountDetails = object[indexPath.item]
             } else if let object = object as? [MXHolding] {
                 cell.holding = object[indexPath.item]
-            }
+            } else if let object = object as? [Transaction] {
+                cell.firstPosition = true
+                cell.lastPosition = true
+                cell.transaction = object[indexPath.item]
+            } 
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
@@ -122,6 +127,8 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
             } else if let object = object as? [AccountDetails] {
                 dummyCell.accountDetails = object[indexPath.item]
             } else if let object = object as? [Transaction] {
+                dummyCell.firstPosition = true
+                dummyCell.lastPosition = true
                 dummyCell.transaction = object[indexPath.item]
             } else if let object = object as? [MXAccount] {
                 dummyCell.account = object[indexPath.item]
@@ -180,6 +187,11 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
             if section.subType == "Balance Sheet" {
                 let accountDetails = object[indexPath.item]
                 delegate?.openAccountDetails(accountDetails: accountDetails)
+            }
+        } else if let object = object as? [Transaction] {
+            if section.subType == "Transactions" {
+                let transaction = object[indexPath.item]
+                delegate?.openTransaction(transaction: transaction)
             }
         } else if let object = object as? [MXHolding] {
             if section.subType == "Investments" {

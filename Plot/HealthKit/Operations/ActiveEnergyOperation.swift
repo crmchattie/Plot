@@ -33,7 +33,7 @@ class ActiveEnergyOperation: AsyncOperation {
             metric.average = annualAverage
             metric.unit = .kilocalorie()
             
-            _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.workouts.rawValue)
+            _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.workouts)
             self?.finish()
             
         }

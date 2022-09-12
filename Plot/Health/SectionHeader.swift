@@ -8,10 +8,14 @@
 
 import Foundation
 
+protocol SectionHeaderDelegate: AnyObject {
+    func viewTapped(sectionType: HealthMetricCategory)
+}
+
 class SectionHeader: UICollectionReusableView {
-    weak var delegate: HeaderCellDelegate?
+    weak var delegate: SectionHeaderDelegate?
     
-    var sectionType: SectionType!
+    var sectionType: HealthMetricCategory!
     
     let view: UIView = {
         let view = UIView()

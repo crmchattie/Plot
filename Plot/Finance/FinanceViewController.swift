@@ -425,9 +425,8 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 return groups[sec]?.count ?? 0
             }
             return 10
-        } else {
-            return groups[sec]?.count ?? 0
         }
+        return groups[sec]?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -621,7 +620,6 @@ extension FinanceViewController: HeaderCellDelegate {
     func viewTapped(sectionType: SectionType) {
         let destination = FinanceDetailViewController(networkController: networkController)
         destination.title = sectionType.name
-        destination.networkController = networkController
         destination.setSections = [sectionType]
         destination.selectedIndex = selectedIndex
         navigationController?.pushViewController(destination, animated: true)

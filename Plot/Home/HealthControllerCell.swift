@@ -25,8 +25,8 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
         return collectionView
     }()
     
-    var healthMetricSections: [String] = []
-    var healthMetrics: [String: [HealthMetric]] = [:] {
+    var healthMetricSections: [HealthMetricCategory] = []
+    var healthMetrics: [HealthMetricCategory: [HealthMetric]] = [:] {
         didSet {
             setupViews()
             collectionView.reloadData()
@@ -107,7 +107,10 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
             sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
             sectionHeader.subTitleLabel.isHidden = true
-            sectionHeader.titleLabel.text = key.capitalized
+            if key == .general {
+                sectionHeader.titleLabel.text = "General"
+            }
+            sectionHeader.view.isUserInteractionEnabled = false
             return sectionHeader
         } else { //No footer in this case but can add option for that
             return UICollectionReusableView()

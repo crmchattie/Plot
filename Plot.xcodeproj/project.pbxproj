@@ -104,6 +104,8 @@
 		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
 		105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */; };
 		10623B9428CA2CF800E05AF0 /* ParticipantsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */; };
+		10623B9628CF7C4500E05AF0 /* HealthListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */; };
+		10623B9828CF7D5F00E05AF0 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */; };
 		106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */; };
 		106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D4258C10FE00D02658 /* ChartValueFormatter.swift */; };
 		106431D9258C15B900D02658 /* SummaryTimeBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */; };
@@ -213,7 +215,6 @@
 		10B541E225479D3100CC9023 /* MealViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E125479D3100CC9023 /* MealViewController.swift */; };
 		10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */; };
 		10B541EA25479D6500CC9023 /* MenuProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */; };
-		10B645432578494D00C49A13 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B645422578494D00C49A13 /* SectionHeader.swift */; };
 		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
 		10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* SectionType.swift */; };
 		10B6B31625410D37008037AD /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B6B31525410D37008037AD /* TagsViewController.swift */; };
@@ -682,6 +683,8 @@
 		105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailCell.swift; sourceTree = "<group>"; };
 		105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailCell.swift; sourceTree = "<group>"; };
 		10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantsFetcher.swift; sourceTree = "<group>"; };
+		10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthListViewController.swift; sourceTree = "<group>"; };
+		10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHorizontalBarChart.swift; sourceTree = "<group>"; };
 		106431D4258C10FE00D02658 /* ChartValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartValueFormatter.swift; sourceTree = "<group>"; };
 		106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryTimeBarChartCell.swift; sourceTree = "<group>"; };
@@ -791,7 +794,6 @@
 		10B541E125479D3100CC9023 /* MealViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViewController.swift; sourceTree = "<group>"; };
 		10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryProductDetailViewController.swift; sourceTree = "<group>"; };
 		10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuProductDetailViewController.swift; sourceTree = "<group>"; };
-		10B645422578494D00C49A13 /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
 		10B656CD24AFB0E7006686FA /* SectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionType.swift; sourceTree = "<group>"; };
 		10B6B31525410D37008037AD /* TagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsViewController.swift; sourceTree = "<group>"; };
@@ -1389,12 +1391,13 @@
 			isa = PBXGroup;
 			children = (
 				1082C89624F0A91500CF6491 /* HealthViewController.swift */,
+				10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */,
 				26836B542514916B00AFC2D7 /* HealthMetricCell.swift */,
 				26B453AA254F8FCA00C63093 /* HealthDetailService.swift */,
 				269105F92549D66800A02C5F /* HealthDetailViewModel.swift */,
 				269105E5253D464300A02C5F /* HealthDetailViewController.swift */,
 				26D37B692556004B00F7131B /* HealthDetailSampleCell.swift */,
-				10B645422578494D00C49A13 /* SectionHeader.swift */,
+				10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */,
 				108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */,
 				108C37F6289C089500DC4998 /* HKCategorySampleViewController.swift */,
 				10B2BC04257D389A00E3A798 /* Mood */,
@@ -3564,6 +3567,7 @@
 				10B3E52128B6943000E1713D /* FlightsClimbedOperation.swift in Sources */,
 				261FAF77251C661D008636DF /* AnnualAverageWeightOperation.swift in Sources */,
 				10C50FA22274ED9200111033 /* CalendarViewController+TableRowActionHandlers.swift in Sources */,
+				10623B9628CF7C4500E05AF0 /* HealthListViewController.swift in Sources */,
 				105CB18C25129F130000D3D8 /* FinanceTransactionViewController.swift in Sources */,
 				26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */,
 				10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */,
@@ -3641,6 +3645,7 @@
 				4BAEE51121272D890045AB10 /* BaseMediaMessageCell.swift in Sources */,
 				10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */,
 				F9B82C8325FAB1670072BE74 /* AnalyticsViewController.swift in Sources */,
+				10623B9828CF7D5F00E05AF0 /* SectionHeader.swift in Sources */,
 				10DF1F1025D2EDF4009FABA7 /* CalendarAccountView.swift in Sources */,
 				1092E28128BA7C3D0018FCAA /* WorkoutMinutesOperation.swift in Sources */,
 				F9DD17032613E67300B8374D /* AnalyticsBarChartCell.swift in Sources */,
@@ -3715,7 +3720,6 @@
 				269105F6253E8E2E00A02C5F /* DayAxisValueFormatter.swift in Sources */,
 				1092E26528B7AE1A0018FCAA /* GFetchListTasksOp.swift in Sources */,
 				108C37FB28A14F6E00DC4998 /* Container.swift in Sources */,
-				10B645432578494D00C49A13 /* SectionHeader.swift in Sources */,
 				4BB46C6A2136E6F8005405BB /* ChatLogHistoryFetcher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

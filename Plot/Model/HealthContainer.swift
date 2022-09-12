@@ -31,7 +31,7 @@ struct HealthContainer: Codable, Equatable {
     }
     
     var total: Double {
-        return meal?.nutrition?.calories ?? workout?.totalEnergyBurned ?? mindfulness?.endDateTime?.timeIntervalSince(mindfulness?.startDateTime ?? Date()) ?? 0
+        return meal?.nutrition?.calories ?? workout?.totalEnergyBurned ?? mindfulness?.length ?? 0
     }
     
     var unitName: String {

@@ -125,6 +125,23 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         if let group = financeGroups[section] as? [MXMember] {
                             height += CGFloat(group.count * 70)
                         }
+                    } else if section == .transactions {
+                        let object = financeGroups[section]
+                        if let object = object as? [Transaction] {
+                            let totalItems = object.count - 1
+                            for index in 0...totalItems {
+                                let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+                                dummyCell.firstPosition = true
+                                dummyCell.lastPosition = true
+                                dummyCell.transaction = object[index]
+                                dummyCell.layoutIfNeeded()
+                                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+                                height += estimatedSize.height
+                                if index == totalItems {
+                                    height += 10
+                                }
+                            }
+                        }
                     } else if section == .investments {
                         let object = financeGroups[section]
                         if let object = object as? [MXHolding] {

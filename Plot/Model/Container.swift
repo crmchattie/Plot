@@ -71,7 +71,6 @@ class ContainerFunctions {
         var tasks = [Activity]()
         var healths = [HealthContainer]()
         var transactions = [Transaction]()
-        
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         let dataReference = Database.database().reference().child(containerEntity).child(id)
@@ -79,6 +78,7 @@ class ContainerFunctions {
             if snapshot.exists(), let snapshotValue = snapshot.value, let contain = try? FirebaseDecoder().decode(Container.self, from: snapshotValue) {
                 container = contain
                 for activityID in container.activityIDs ?? [] {
+                    print("container activityID \(activityID)")
                     dispatchGroup.enter()
                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in
                         activities.append(contentsOf: fetched)
@@ -86,6 +86,7 @@ class ContainerFunctions {
                     }
                 }
                 for taskID in container.taskIDs ?? [] {
+                    print("container taskID \(taskID)")
                     dispatchGroup.enter()
                     ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
                         tasks.append(contentsOf: fetched)
@@ -93,6 +94,7 @@ class ContainerFunctions {
                     }
                 }
                 for transactionID in container.transactionIDs ?? [] {
+                    print("container transactionID \(transactionID)")
                     dispatchGroup.enter()
                     FinancialTransactionFetcher.getDataFromSnapshot(ID: transactionID) { fetched in
                         transactions.append(contentsOf: fetched)
@@ -101,6 +103,7 @@ class ContainerFunctions {
                 }
                 
                 for workoutID in container.workoutIDs ?? [] {
+                    print("container workoutID \(workoutID)")
                     dispatchGroup.enter()
                     WorkoutFetcher.getDataFromSnapshot(ID: workoutID) { fetched in
                         if let workout = fetched.first {
@@ -113,6 +116,7 @@ class ContainerFunctions {
                     }
                 }
                 for mindfulnessID in container.mindfulnessIDs ?? [] {
+                    print("container mindfulnessID \(mindfulnessID)")
                     dispatchGroup.enter()
                     MindfulnessFetcher.getDataFromSnapshot(ID: mindfulnessID) { fetched in
                         if let mindfulness = fetched.first {

@@ -15,7 +15,7 @@ class HealthKitManager {
     
     private let lock = NSLock()
     private var queue: OperationQueue
-    private var metrics: [String: [HealthMetric]]
+    private var metrics: [HealthMetricCategory: [HealthMetric]]
     private var containers: [Container]
     private var isRunning: Bool
     private var saveContainersDispatchGroup: DispatchGroup!
@@ -27,7 +27,7 @@ class HealthKitManager {
         self.queue = OperationQueue()
     }
     
-    func loadHealthKitActivities(_ completion: @escaping ([String: [HealthMetric]], Bool) -> Void) {
+    func loadHealthKitActivities(_ completion: @escaping ([HealthMetricCategory: [HealthMetric]], Bool) -> Void) {
         guard !isRunning else {
             completion([:], false)
             return
@@ -228,12 +228,12 @@ class HealthKitManager {
 }
 
 extension HealthKitManager: MetricOperationDelegate {
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String) {
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: HealthMetricCategory) {
         lock.lock(); defer { lock.unlock() }
         metrics[category, default: []].append(metric)
     }
     
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ containers: [Container]) {
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: HealthMetricCategory, _ containers: [Container]) {
         lock.lock(); defer { lock.unlock() }
         metrics[category, default: []].append(metric)
         self.containers.append(contentsOf: containers)
@@ -241,6 +241,6 @@ extension HealthKitManager: MetricOperationDelegate {
 }
 
 protocol MetricOperationDelegate: AnyObject {
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String)
-    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: String, _ containers: [Container])
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: HealthMetricCategory)
+    func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: HealthMetricCategory, _ containers: [Container])
 }

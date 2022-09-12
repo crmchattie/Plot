@@ -25,21 +25,18 @@ class HealthService {
     fileprivate var currentUserHealthAddHandle = DatabaseHandle()
     var healthAdded: (()->())?
 
-    var healthMetricSections: [String] = [] {
+    var healthMetricSections: [HealthMetricCategory] = [] {
         didSet {
             if oldValue != healthMetricSections {
                 healthMetricSections.sort(by: { (v1, v2) -> Bool in
-                    if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
-                        return cat1.rank < cat2.rank
-                    }
-                    return false
+                    return v1.rank < v2.rank
                 })
                 NotificationCenter.default.post(name: .healthUpdated, object: nil)
             }
         }
     }
     
-    var healthMetrics: [String: [HealthMetric]] = [:] {
+    var healthMetrics: [HealthMetricCategory: [HealthMetric]] = [:] {
         didSet {
             if oldValue != healthMetrics {
                 NotificationCenter.default.post(name: .healthUpdated, object: nil)
@@ -50,6 +47,9 @@ class HealthService {
     var workouts: [Workout] = [] {
         didSet {
             if oldValue != workouts {
+                workouts.sort(by: {
+                    $0.startDateTime ?? Date.distantPast > $1.startDateTime ?? Date.distantPast
+                })
                 NotificationCenter.default.post(name: .workoutsUpdated, object: nil)
             }
         }
@@ -58,6 +58,9 @@ class HealthService {
     var mindfulnesses: [Mindfulness] = [] {
         didSet {
             if oldValue != mindfulnesses {
+                mindfulnesses.sort(by: {
+                    $0.startDateTime ?? Date.distantPast > $1.startDateTime ?? Date.distantPast
+                })
                 NotificationCenter.default.post(name: .mindfulnessUpdated, object: nil)
             }
         }

@@ -106,7 +106,7 @@ class WorkoutOperation: AsyncOperation {
                         metricCalories.average = averageEnergyBurned
                     }
                     
-                    _self.delegate?.insertMetric(_self, metricCalories, HealthMetricCategory.workouts.rawValue, containers)
+                    _self.delegate?.insertMetric(_self, metricCalories, HealthMetricCategory.workouts, containers)
                 }
                 
                 self?.finish()

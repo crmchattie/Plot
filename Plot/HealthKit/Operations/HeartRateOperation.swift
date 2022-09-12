@@ -40,7 +40,7 @@ class HeartRateOperation: AsyncOperation {
             var metric = HealthMetric(type: HealthMetricType.heartRate, total: heartRate, date: date, unitName: "bpm", rank: HealthMetricType.heartRate.rank)
             metric.average = _self.annualAverageHeartRate
             
-            _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue)
+            _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
             self?.finish()
         }
     }

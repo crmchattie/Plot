@@ -51,31 +51,28 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var updatingHealth = true
     var updatingFinances = true
     
-    var healthMetricSections: [String] {
+    var healthMetricSections: [HealthMetricCategory] {
         var healthMetricSections = Array(healthMetrics.keys)
         healthMetricSections.sort(by: { (v1, v2) -> Bool in
-            if let cat1 = HealthMetricCategory(rawValue: v1), let cat2 = HealthMetricCategory(rawValue: v2) {
-                return cat1.rank < cat2.rank
-            }
-            return false
+            return v1.rank < v2.rank
         })
         return healthMetricSections
     }
-    var healthMetrics: [String: [HealthMetric]] {
+    var healthMetrics: [HealthMetricCategory: [HealthMetric]] {
         var metrics = networkController.healthService.healthMetrics
-        if let generalMetrics = metrics[HealthMetricCategory.general.rawValue] {
-            metrics[HealthMetricCategory.general.rawValue] = generalMetrics.filter({ $0.type.name == HealthMetricType.steps.name || $0.type.name == HealthMetricType.sleep.name || $0.type.name == HealthMetricType.heartRate.name || $0.type.name == HealthMetricType.flightsClimbed.name })
-            if metrics[HealthMetricCategory.general.rawValue] == [] {
-                metrics[HealthMetricCategory.general.rawValue] = nil
+        if let generalMetrics = metrics[HealthMetricCategory.general] {
+            metrics[HealthMetricCategory.general] = generalMetrics.filter({ $0.type == HealthMetricType.steps || $0.type == HealthMetricType.sleep || $0.type == HealthMetricType.heartRate || $0.type == HealthMetricType.flightsClimbed })
+            if metrics[HealthMetricCategory.general] == [] {
+                metrics[HealthMetricCategory.general] = nil
             }
         }
-        if let workoutMetrics = metrics[HealthMetricCategory.workouts.rawValue] {
-            metrics[HealthMetricCategory.general.rawValue]?.append(contentsOf: workoutMetrics.filter({ $0.type.name == HealthMetricType.activeEnergy.name || $0.type.name == HealthMetricType.workoutMinutes.name}))
-            metrics[HealthMetricCategory.workouts.rawValue] = nil
+        if let workoutMetrics = metrics[HealthMetricCategory.workouts] {
+            metrics[HealthMetricCategory.general]?.append(contentsOf: workoutMetrics.filter({ $0.type == HealthMetricType.activeEnergy || $0.type == HealthMetricType.workoutMinutes}))
+            metrics[HealthMetricCategory.workouts] = nil
         }
-        if let nutritionMetrics = metrics[HealthMetricCategory.nutrition.rawValue] {
-            metrics[HealthMetricCategory.general.rawValue]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name}))
-            metrics[HealthMetricCategory.nutrition.rawValue] = nil
+        if let nutritionMetrics = metrics[HealthMetricCategory.nutrition] {
+            metrics[HealthMetricCategory.general]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name }))
+            metrics[HealthMetricCategory.nutrition] = nil
         }
         return metrics
     }
@@ -383,16 +380,16 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     
     func scrollToFirstTask(_ completion: @escaping ([Activity]) -> Void) {
         let allTasks = networkController.activityService.tasks
-        var tasks = [Activity]()
         if allTasks.count < 3 {
             completion(allTasks)
             return
         } else {
+            var tasks = [Activity]()
             for index in 0...2 {
                 tasks.append(allTasks[index])
             }
+            completion(tasks)
         }
-        completion(tasks)
     }
     
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
@@ -439,7 +436,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         accountLevel = .bs_type
         transactionLevel = .group
         
-        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .investments]
+        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .investments, .transactions]
         
         let members = networkController.financeService.members
         let accounts = networkController.financeService.accounts
@@ -478,6 +475,20 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                             sections.append(section)
                             groups[section] = transactionsList
                             self.transactionsDictionary = transactionsDict
+                        }
+                    }
+                } else if section.subType == "Transactions" {
+                    let filteredTransactions = transactions.filter({$0.should_link ?? true})
+                    if !filteredTransactions.isEmpty {
+                        sections.append(section)
+                        if filteredTransactions.count < 3 {
+                            groups[section] = filteredTransactions
+                        } else {
+                            var finalTransactions = [Transaction]()
+                            for index in 0...2 {
+                                finalTransactions.append(filteredTransactions[index])
+                            }
+                            groups[section] = finalTransactions
                         }
                     }
                 }
@@ -755,6 +766,16 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
         destination.holding = holding
         destination.hidesBottomBarWhenPushed = true
         ParticipantsFetcher.getParticipants(forHolding: holding) { (participants) in
+            destination.selectedFalconUsers = participants
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
+    func openTransaction(transaction: Transaction) {
+        let destination = FinanceTransactionViewController(networkController: self.networkController)
+        destination.transaction = transaction
+        destination.hidesBottomBarWhenPushed = true
+        ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
             destination.selectedFalconUsers = participants
             self.navigationController?.pushViewController(destination, animated: true)
         }

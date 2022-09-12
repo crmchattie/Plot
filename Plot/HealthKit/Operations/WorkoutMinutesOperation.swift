@@ -48,7 +48,7 @@ class WorkoutMinutesOperation: AsyncOperation {
                 metricMinutes.average = averageWorkoutTime
             }
 
-            _self.delegate?.insertMetric(_self, metricMinutes, HealthMetricCategory.workouts.rawValue)
+            _self.delegate?.insertMetric(_self, metricMinutes, HealthMetricCategory.workouts)
             
             self?.finish()
         }

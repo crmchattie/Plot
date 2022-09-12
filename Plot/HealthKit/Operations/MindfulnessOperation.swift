@@ -104,7 +104,7 @@ class MindfulnessOperation: AsyncOperation {
                     var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
                     metric.hkSample = samples.last
                     metric.average = average
-                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general.rawValue, containers)
+                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general, containers)
                     
                 }
                 
