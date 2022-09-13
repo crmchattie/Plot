@@ -107,7 +107,6 @@ class ContainerFunctions {
                     dispatchGroup.enter()
                     WorkoutFetcher.getDataFromSnapshot(ID: workoutID) { fetched in
                         if let workout = fetched.first {
-                            print(workout.name)
                             var health = HealthContainer()
                             health.workout = workout
                             healths.append(health)

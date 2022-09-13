@@ -82,12 +82,12 @@ class ActivityActions: NSObject {
             return
         }
         
-        guard let active = active, let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
+        guard let active = active, let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserId = Auth.auth().currentUser?.uid else {
             return
         }
         
         if !active {
-            activity.admin = Auth.auth().currentUser?.uid
+            activity.admin = currentUserId
         }
         
         let membersIDs = fetchMembersIDs()
@@ -98,6 +98,7 @@ class ActivityActions: NSObject {
         let firebaseDictionary = activity.toAnyObject()
         
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
+        
         
         if active {
             Analytics.logEvent("update_activity", parameters: [
@@ -285,12 +286,10 @@ class ActivityActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers else {
+        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return (membersIDs, membersIDsDictionary)
         }
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
-                
+                        
         // Only append current user when admin/creator of the activity
         if activity.admin == currentUserID {
             membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
@@ -307,7 +306,7 @@ class ActivityActions: NSObject {
     }
     
     func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
-        guard let activity = activity else {
+        guard let activity = activity, let currentUserID = Auth.auth().currentUser?.uid else {
             self.dispatchGroup.leave()
             return
         }
@@ -320,29 +319,73 @@ class ActivityActions: NSObject {
         })
         for memberID in memberIDs {
             if activity.isTask ?? false {
-                let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
-                let values: [String : Any] = ["isGroupActivity": false,
-                                              "badge": 0,
-                                              "listID": activity.listID as Any,
-                                              "listName": activity.listName as Any,
-                                              "listSource": activity.listSource as Any,
-                                              "listColor": activity.listColor as Any,
-                                              "showExtras": activity.showExtras as Any]
-                userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                    connectingMembersGroup.leave()
-                })
+                if memberID == currentUserID {
+                    let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+                    let values: [String : Any] = ["isGroupActivity": true,
+                                                  "badge": 0,
+                                                  "listID": activity.listID as Any,
+                                                  "listName": activity.listName as Any,
+                                                  "listSource": activity.listSource as Any,
+                                                  "listColor": activity.listColor as Any,
+                                                  "showExtras": activity.showExtras as Any]
+                    userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                        let listReference = Database.database().reference().child(listEntity).child(activity.listID ?? "").child(listTasksEntity)
+                        listReference.child(activityID).setValue(true)
+                        connectingMembersGroup.leave()
+                    })
+                } else {
+                    ListFetcher.fetchListsForUser(id: memberID) { lists in
+                        if let list = lists.first(where: { $0.name == "Default"}) {
+                            let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+                            let values: [String : Any] = ["isGroupActivity": true,
+                                                          "badge": 0,
+                                                          "listID": list.id as Any,
+                                                          "listName": list.name as Any,
+                                                          "listSource": list.source as Any,
+                                                          "listColor": list.color as Any,
+                                                          "showExtras": activity.showExtras as Any]
+                            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                                let listReference = Database.database().reference().child(listEntity).child(list.id ?? "").child(listTasksEntity)
+                                listReference.child(activityID).setValue(true)
+                                connectingMembersGroup.leave()
+                            })
+                        }
+                    }
+                }
             } else {
-                let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
-                let values: [String : Any] = ["isGroupActivity": false,
-                                              "badge": 0,
-                                              "calendarID": activity.calendarID as Any,
-                                              "calendarName": activity.calendarName as Any,
-                                              "calendarSource": activity.calendarSource as Any,
-                                              "calendarColor": activity.calendarColor as Any,
-                                              "showExtras": activity.showExtras as Any]
-                userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                    connectingMembersGroup.leave()
-                })
+                if memberID == currentUserID {
+                    let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+                    let values: [String : Any] = ["isGroupActivity": true,
+                                                  "badge": 0,
+                                                  "calendarID": activity.calendarID as Any,
+                                                  "calendarName": activity.calendarName as Any,
+                                                  "calendarSource": activity.calendarSource as Any,
+                                                  "calendarColor": activity.calendarColor as Any,
+                                                  "showExtras": activity.showExtras as Any]
+                    userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                        let calendarReference = Database.database().reference().child(calendarEntity).child(activity.calendarID ?? "").child(calendarEventsEntity)
+                        calendarReference.child(activityID).setValue(true)
+                        connectingMembersGroup.leave()
+                    })
+                } else {
+                    CalendarFetcher.fetchCalendarsForUser(id: memberID) { calendars in
+                        if let calendar = calendars.first(where: { $0.name == "Default"}) {
+                            let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
+                            let values: [String : Any] = ["isGroupActivity": true,
+                                                          "badge": 0,
+                                                          "calendarID": calendar.id as Any,
+                                                          "calendarName": calendar.name as Any,
+                                                          "calendarSource": calendar.source as Any,
+                                                          "calendarColor": calendar.color as Any,
+                                                          "showExtras": activity.showExtras as Any]
+                            userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
+                                let calendarReference = Database.database().reference().child(calendarEntity).child(calendar.id ?? "").child(calendarEventsEntity)
+                                calendarReference.child(activityID).setValue(true)
+                                connectingMembersGroup.leave()
+                            })
+                        }
+                    }
+                }
             }
         }
     }

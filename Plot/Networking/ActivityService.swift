@@ -190,8 +190,6 @@ class ActivityService {
         self.observeInvitationForCurrentUser()
         self.addRepeatingActivities(activities: self.activities, completion: { newActivities in
             self.activities = newActivities
-            self.grabPlotLists()
-            self.grabPlotCalendars()
             self.grabPrimaryList({ (list) in
                 if list == ListSourceOptions.apple.name {
                     self.grabEKReminders {
@@ -204,6 +202,7 @@ class ActivityService {
                 } else {
                     self.hasLoadedListTaskActivities = true
                 }
+                self.grabPlotLists()
                 self.grabLists()
             })
             self.grabPrimaryCalendar({ (calendar) in
@@ -218,6 +217,7 @@ class ActivityService {
                 } else {
                     self.hasLoadedCalendarEventActivities = true
                 }
+                self.grabPlotCalendars()
                 self.grabCalendars()
             })
         })
@@ -386,6 +386,7 @@ class ActivityService {
                 self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
             } else {
                 self?.calendars[CalendarSourceOptions.plot.name] = calendarInitialAdd
+                self?.grabCalendarEvents()
             }
         }, calendarAdded: { [weak self] calendarAdded in
             if self?.calendars[CalendarSourceOptions.plot.name] != nil {
@@ -498,6 +499,7 @@ class ActivityService {
                 self?.lists[ListSourceOptions.plot.name] = plotLists
             } else {
                 self?.lists[ListSourceOptions.plot.name] = listInitialAdd
+                self?.grabListTasks()
             }
         }, listAdded: { [weak self] listAdded in
             if self?.lists[ListSourceOptions.plot.name] != nil {
@@ -591,6 +593,26 @@ class ActivityService {
             }
             sharedContainer.set(activitiesArray, forKey: "ActivitiesArray")
             sharedContainer.synchronize()
+        }
+    }
+    
+    func grabCalendarEvents() {
+        if let plotCalendars = self.calendars[CalendarSourceOptions.plot.name] {
+            activitiesFetcher.grabActivitiesViaCalendar(calendars: plotCalendars) { [weak self]  activities in
+                self?.addRepeatingActivities(activities: activities, completion: { activities in
+                    self?.activities.append(contentsOf: activities)
+                })
+            }
+        }
+    }
+    
+    func grabListTasks() {
+        if let plotLists = self.lists[ListSourceOptions.plot.name] {
+            activitiesFetcher.grabActivitiesViaList(lists: plotLists) { [weak self] activities in
+                self?.addRepeatingActivities(activities: activities, completion: { activities in
+                    self?.activities.append(contentsOf: activities)
+                })
+            }
         }
     }
 }

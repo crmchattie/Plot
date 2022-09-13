@@ -251,4 +251,43 @@ class CalendarFetcher: NSObject {
             createCalendar.createNewCalendar()
         }
     }
+    
+    class func fetchCalendarsForUser(id: String, completion: @escaping ([CalendarType])->()) {
+        let ref = Database.database().reference()
+        let userCalendarDatabaseRef = ref.child(userCalendarEntity).child(id)
+        
+        var calendars: [CalendarType] = []
+                
+        userCalendarDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists() {
+                let group = DispatchGroup()
+                group.enter()
+                let calendarIDs = snapshot.value as? [String: AnyObject] ?? [:]
+                for (ID, userCalendarInfo) in calendarIDs {
+                    if let userCalendar = try? FirebaseDecoder().decode(CalendarType.self, from: userCalendarInfo) {
+                        ref.child(calendarEntity).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+                            if snapshot.exists(), let snapshotValue = snapshot.value {
+                                if let calendar = try? FirebaseDecoder().decode(CalendarType.self, from: snapshotValue) {
+                                    var _calendar = calendar
+                                    _calendar.color = userCalendar.color
+                                    _calendar.badge = userCalendar.badge
+                                    _calendar.muted = userCalendar.muted
+                                    _calendar.pinned = userCalendar.pinned
+                                    calendars.append(_calendar)
+                                    group.leave()
+                                }
+                            } else {
+                                group.leave()
+                            }
+                        })
+                    }
+                }
+                group.notify(queue: .main) {
+                    completion(calendars)
+                }
+            } else {
+                completion([])
+            }
+        })
+    }
 }

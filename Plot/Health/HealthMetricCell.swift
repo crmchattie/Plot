@@ -174,7 +174,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             titleLabel.text = workout.name
             let timeAgo = NSCalendar.current.isDateInToday(workout.endDateTime ?? Date()) ? "today" : timeAgoSinceDate(workout.endDateTime ?? Date())
             if let totalEnergyBurned = workout.totalEnergyBurned {
-                let total = "\(Int(totalEnergyBurned))"
+                let total = totalEnergyBurned.clean
                 subtitleLabel.text = "\(total) calories \(timeAgo)"
             } else if let length = workout.length {
                 let total = TimeInterval(length).stringTimeShort
@@ -192,7 +192,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
                 let total = TimeInterval(length).stringTimeShort
                 subtitleLabel.text = "\(total) \(timeAgo)"
             } else {
-                subtitleLabel.text = "\(timeAgo)"
+                subtitleLabel.text = "\(timeAgo.capitalized)"
             }
             detailLabel.text = nil
             activityTypeButton.setImage(UIImage(named: "mindfulness"), for: .normal)

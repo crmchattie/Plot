@@ -12,6 +12,7 @@ import CodableFirebase
 
 let calendarEntity = "calendars"
 let userCalendarEntity = "user-calendars"
+let calendarEventsEntity = "calendar-events"
 
 struct CalendarType: Codable, Equatable, Hashable, Comparable {
     static func < (lhs: CalendarType, rhs: CalendarType) -> Bool {
@@ -34,6 +35,7 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var eventIDs: [String: Bool]?
     
     init(id: String, name: String?, color: String?, source: String, admin: String?) {
         self.id = id

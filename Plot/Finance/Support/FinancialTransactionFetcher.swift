@@ -20,6 +20,8 @@ class FinancialTransactionFetcher: NSObject {
     var transactionsInitialAdd: (([Transaction])->())?
     var transactionsAdded: (([Transaction])->())?
     var transactionsChanged: (([Transaction])->())?
+    
+    var userTransactions: [String: UserTransaction] = [:]
         
     func observeTransactionForCurrentUser(transactionsInitialAdd: @escaping ([Transaction])->(), transactionsAdded: @escaping ([Transaction])->(), transactionsChanged: @escaping ([Transaction])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -32,9 +34,7 @@ class FinancialTransactionFetcher: NSObject {
         self.transactionsInitialAdd = transactionsInitialAdd
         self.transactionsAdded = transactionsAdded
         self.transactionsChanged = transactionsChanged
-        
-        var userTransactions: [String: UserTransaction] = [:]
-        
+                
         userTransactionsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 transactionsInitialAdd([])
@@ -49,13 +49,13 @@ class FinancialTransactionFetcher: NSObject {
                 for (ID, userTransactionInfo) in transactionIDs {
                     var handle = UInt.max
                     if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
-                        userTransactions[ID] = userTransaction
+                        self.userTransactions[ID] = userTransaction
                         group.enter()
                         counter += 1
                         handle = ref.child(financialTransactionsEntity).child(ID).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
                             if snapshot.exists(), let snapshotValue = snapshot.value {
-                                if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue), let userTransaction = userTransactions[ID] {
+                                if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue), let userTransaction = self.userTransactions[ID] {
                                     var _transaction = transaction
                                     if let value = userTransaction.description {
                                         _transaction.description = value
@@ -106,17 +106,17 @@ class FinancialTransactionFetcher: NSObject {
         })
         
         currentUserTransactionsAddHandle = userTransactionsDatabaseRef.observe(.childAdded, with: { snapshot in
-            if userTransactions[snapshot.key] == nil {
+            if self.userTransactions[snapshot.key] == nil {
                 if let completion = self.transactionsAdded {
                     var handle = UInt.max
                     let ID = snapshot.key
                     self.getUserDataFromSnapshot(ID: ID) { transactionsList in
                         for userTransaction in transactionsList {
-                            userTransactions[ID] = userTransaction
+                            self.userTransactions[ID] = userTransaction
                             handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
-                                    if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue), let userTransaction = userTransactions[ID] {
+                                    if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue), let userTransaction = self.userTransactions[ID] {
                                         var _transaction = transaction
                                         if let value = userTransaction.description {
                                             _transaction.description = value
@@ -157,7 +157,7 @@ class FinancialTransactionFetcher: NSObject {
                 FinancialTransactionFetcher.getDataFromSnapshot(ID: snapshot.key) { transactionsList in
                     for transaction in transactionsList {
                         if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: transaction) {
-                            userTransactions[transaction.guid] = userTransaction
+                            self.userTransactions[transaction.guid] = userTransaction
                         }
                     }
                     completion(transactionsList)
@@ -236,6 +236,73 @@ class FinancialTransactionFetcher: NSObject {
         let group = DispatchGroup()
         group.enter()
         ref.child(userFinancialTransactionsEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let userTransactionInfo = snapshot.value {
+                if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
+                    transactions.append(userTransaction)
+                    group.leave()
+                }
+            }
+        })
+        group.notify(queue: .main) {
+            completion(transactions)
+        }
+    }
+    
+    func grabTransactionsViaAccounts(accounts: [MXAccount], completion: @escaping ([Transaction])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        var transactions: [Transaction] = []
+        let group = DispatchGroup()
+        let filteredAccounts = accounts.filter({ $0.admin != currentUserID })
+        for account in filteredAccounts {
+            group.enter()
+            let reference = Database.database().reference()
+            reference.child(financialTransactionsEntity).queryOrdered(byChild: "account_guid").queryEqual(toValue: account.guid).observeSingleEvent(of: .childAdded, with: { (snapshot) in
+                if snapshot.exists(), let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshot), self.userTransactions[transaction.guid] == nil, let admin = transaction.admin {
+                    self.getUserDataFromSnapshotViaUser(ID: transaction.guid, userID: admin) { transactionList in
+                        if let userTransaction = transactionList.first {
+                            var _transaction = transaction
+                            if let value = userTransaction.description {
+                                _transaction.description = value
+                            }
+                            if let value = userTransaction.group {
+                                _transaction.group = value
+                            }
+                            if let value = userTransaction.top_level_category {
+                                _transaction.top_level_category = value
+                            }
+                            if let value = userTransaction.category {
+                                _transaction.category = value
+                            }
+                            if let value = userTransaction.tags {
+                                _transaction.tags = value
+                            }
+                            if let value = userTransaction.should_link {
+                                _transaction.should_link = value
+                            }
+                            if let value = userTransaction.date_for_reports, value != "" {
+                                _transaction.date_for_reports = value
+                            }
+                            transactions.append(_transaction)
+                        }
+                    }
+                }
+            })
+        }
+        
+        group.notify(queue: .global()) {
+            completion(transactions)
+        }
+    }
+    
+    func getUserDataFromSnapshotViaUser(ID: String, userID: String, completion: @escaping ([UserTransaction])->()) {
+        let ref = Database.database().reference()
+        var transactions: [UserTransaction] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userFinancialTransactionsEntity).child(userID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let userTransactionInfo = snapshot.value {
                 if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
                     transactions.append(userTransaction)

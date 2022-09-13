@@ -138,9 +138,8 @@ class ListActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userListEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["isGroupList": false, "listColor": list.color as Any]
+            let values:[String : Any] = ["isGroupList": true, "listColor": list.color as Any]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                userReference.child("isGroupList").setValue(true)
                 connectingMembersGroup.leave()
             })
         }

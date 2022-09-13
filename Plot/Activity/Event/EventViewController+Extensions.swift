@@ -74,7 +74,7 @@ extension EventViewController: UpdateActivityLevelDelegate {
 
 extension EventViewController: UpdateCalendarDelegate {
     func update(calendar: CalendarType) {
-        if let row: LabelRow = form.rowBy(tag: "Calendar") {
+        if let row: LabelRow = form.rowBy(tag: "Calendar"), let calendarID = calendar.id {
             row.value = calendar.name
             row.updateCell()
             activity.calendarID = calendar.id
@@ -83,8 +83,12 @@ extension EventViewController: UpdateCalendarDelegate {
             activity.calendarSource = calendar.source
             guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["calendarID": calendar.id as Any, "calendarName": calendar.name as Any, "calendarColor": calendar.color as Any, "calendarSource": calendar.source as Any]
+            let values:[String : Any] = ["calendarID": calendarID as Any, "calendarName": calendar.name as Any, "calendarColor": calendar.color as Any, "calendarSource": calendar.source as Any]
             userReference.updateChildValues(values)
+
+            let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
+            calendarReference.child(self.activityID).setValue(true)
+            
         }
     }
 }

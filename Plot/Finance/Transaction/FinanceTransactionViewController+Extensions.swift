@@ -13,7 +13,7 @@ import Eureka
 
 extension FinanceTransactionViewController {
     func setupLists() {
-        guard delegate == nil && active else { return }
+        guard delegate == nil && active && status else { return }
         let dispatchGroup = DispatchGroup()
         if let containerID = transaction.containerID {
             dispatchGroup.enter()

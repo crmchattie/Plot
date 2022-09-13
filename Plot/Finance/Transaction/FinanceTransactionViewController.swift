@@ -561,7 +561,7 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
         
-        if delegate == nil {
+        if delegate == nil && status {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor

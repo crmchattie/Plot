@@ -51,23 +51,23 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
         view.backgroundColor = theme.generalBackgroundColor
         navigationController?.navigationBar.backgroundColor = theme.barBackgroundColor
         
-        let segmentTextContent = [
-            notificationsText,
-            invitationsText
-        ]
-        
-        // Segmented control as the custom title view.
-        segmentedControl = UISegmentedControl(items: segmentTextContent)
-        if #available(iOS 13.0, *) {
-            segmentedControl.overrideUserInterfaceStyle = theme.userInterfaceStyle
-        } else {
-            // Fallback on earlier versions
-        }
-        
-        segmentedControl.selectedSegmentIndex = 0
-        segmentedControl.autoresizingMask = .flexibleWidth
-        segmentedControl.addTarget(self, action: #selector(action(_:)), for: .valueChanged)
-        view.addSubview(segmentedControl)
+//        let segmentTextContent = [
+//            notificationsText,
+//            invitationsText
+//        ]
+//
+//        // Segmented control as the custom title view.
+//        segmentedControl = UISegmentedControl(items: segmentTextContent)
+//        if #available(iOS 13.0, *) {
+//            segmentedControl.overrideUserInterfaceStyle = theme.userInterfaceStyle
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//
+//        segmentedControl.selectedSegmentIndex = 0
+//        segmentedControl.autoresizingMask = .flexibleWidth
+//        segmentedControl.addTarget(self, action: #selector(action(_:)), for: .valueChanged)
+//        view.addSubview(segmentedControl)
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         
@@ -85,6 +85,9 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
         tableView.sectionHeaderHeight = 0
         tableView.rowHeight = UITableView.automaticDimension
         view.addSubview(tableView)
+
+        tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
         tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
         tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
                 
@@ -99,11 +102,11 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func changeTheme() {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        if #available(iOS 13.0, *) {
-            segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        } else {
-            // Fallback on earlier versions
-        }
+//        if #available(iOS 13.0, *) {
+//            segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
+//        } else {
+//            // Fallback on earlier versions
+//        }
         tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
@@ -122,34 +125,35 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc func userNotification(notification: NSNotification) {
-         if segmentedControl.selectedSegmentIndex == 0 {
-             self.tableView.reloadData()
-         }
+//         if segmentedControl.selectedSegmentIndex == 0 {
+//             self.tableView.reloadData()
+//         }
+        self.tableView.reloadData()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: 10, width: view.frame.width * 0.75, height: 30)
-        var frame = view.frame
-        frame.origin.y = segmentedControl.frame.maxY + 10
-        frame.size.height -= frame.origin.y
-        tableView.frame = frame
-    }
+//    override func viewDidLayoutSubviews() {
+//        super.viewDidLayoutSubviews()
+//        segmentedControl.frame = CGRect(x: view.frame.width * 0.125, y: 10, width: view.frame.width * 0.75, height: 30)
+//        var frame = view.frame
+//        frame.origin.y = segmentedControl.frame.maxY + 10
+//        frame.size.height -= frame.origin.y
+//        tableView.frame = frame
+//    }
     
     deinit {
         NotificationCenter.default.removeObserver(self, name: .userNotification, object: nil)
     }
     
     /// IBAction for the segmented control.
-    @IBAction func action(_ sender: UISegmentedControl) {
-        if sender.selectedSegmentIndex == 0 {
-            self.title = notificationsText
-        } else {
-            self.title = invitationsText
-        }
-        
-        self.tableView.reloadData()
-    }
+//    @IBAction func action(_ sender: UISegmentedControl) {
+//        if sender.selectedSegmentIndex == 0 {
+//            self.title = notificationsText
+//        } else {
+//            self.title = invitationsText
+//        }
+//
+//        self.tableView.reloadData()
+//    }
     
     @IBAction func done(_ sender: AnyObject) {
         self.dismiss(animated: true, completion: nil)
@@ -193,66 +197,91 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
         
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            if notifications.isEmpty {
-                checkIfThereAnyNotifications(isEmpty: true)
-            } else {
-                checkIfThereAnyNotifications(isEmpty: false)
-            }
-            return notifications.count
+//        if segmentedControl.selectedSegmentIndex == 0 {
+//            if notifications.isEmpty {
+//                checkIfThereAnyNotifications(isEmpty: true)
+//            } else {
+//                checkIfThereAnyNotifications(isEmpty: false)
+//            }
+//            return notifications.count
+//        } else {
+//            if filteredInvitedActivities.isEmpty {
+//                checkIfThereAnyActivities(isEmpty: true)
+//            } else {
+//                checkIfThereAnyActivities(isEmpty: false)
+//            }
+//            return filteredInvitedActivities.count
+//        }
+        
+        if notifications.isEmpty {
+            checkIfThereAnyNotifications(isEmpty: true)
         } else {
-            if filteredInvitedActivities.isEmpty {
-                checkIfThereAnyActivities(isEmpty: true)
-            } else {
-                checkIfThereAnyActivities(isEmpty: false)
-            }
-            return filteredInvitedActivities.count
+            checkIfThereAnyNotifications(isEmpty: false)
         }
+        return notifications.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            let theme = ThemeManager.currentTheme()
-            let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            let notification = notifications[indexPath.row]
-            cell.textLabel?.text = notification.description
-            cell.textLabel?.adjustsFontForContentSizeCategory = true
-            cell.textLabel?.numberOfLines = 0
-            cell.textLabel?.lineBreakMode = .byWordWrapping
-            cell.textLabel?.textColor = theme.generalTitleColor
-            let button = UIButton(type: .system)
-            cell.accessoryView = button
-            if notification.aps.category == Identifiers.eventCategory {
-                button.setImage(UIImage(named: "activity"), for: .normal)
-                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-            }
-            return cell
-        } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath)
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            if let eventCell = cell as? EventCell {
-                eventCell.updateInvitationDelegate = self
-                let activity = filteredInvitedActivities[indexPath.row]
-                var invitation: Invitation?
-                if let activityID = activity.activityID, let value = invitations[activityID] {
-                    invitation = value
-                }
-                eventCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
-            }
-            return cell
+//        if segmentedControl.selectedSegmentIndex == 0 {
+//            let theme = ThemeManager.currentTheme()
+//            let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
+//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            let notification = notifications[indexPath.row]
+//            cell.textLabel?.text = notification.description
+//            cell.textLabel?.adjustsFontForContentSizeCategory = true
+//            cell.textLabel?.numberOfLines = 0
+//            cell.textLabel?.lineBreakMode = .byWordWrapping
+//            cell.textLabel?.textColor = theme.generalTitleColor
+//            let button = UIButton(type: .system)
+//            cell.accessoryView = button
+//            if notification.aps.category == Identifiers.eventCategory {
+//                button.setImage(UIImage(named: "activity"), for: .normal)
+//                cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+//            }
+//            return cell
+//        } else {
+//            let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath)
+//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            if let eventCell = cell as? EventCell {
+//                eventCell.updateInvitationDelegate = self
+//                let activity = filteredInvitedActivities[indexPath.row]
+//                var invitation: Invitation?
+//                if let activityID = activity.activityID, let value = invitations[activityID] {
+//                    invitation = value
+//                }
+//                eventCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+//            }
+//            return cell
+//        }
+        let theme = ThemeManager.currentTheme()
+        let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
+        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        let notification = notifications[indexPath.row]
+        cell.textLabel?.text = notification.description
+        cell.textLabel?.adjustsFontForContentSizeCategory = true
+        cell.textLabel?.numberOfLines = 0
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.textColor = theme.generalTitleColor
+        let button = UIButton(type: .system)
+        cell.accessoryView = button
+        if notification.aps.category == Identifiers.eventCategory {
+            button.setImage(UIImage(named: "activity"), for: .normal)
+            cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
         }
+        return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            let notification = notifications[indexPath.row]
-            openNotification(forNotification: notification)
-        } else {
-            let activity = filteredInvitedActivities[indexPath.row]
-            openActivityDetailView(forActivity: activity)
-            
-        }
+//        if segmentedControl.selectedSegmentIndex == 0 {
+//            let notification = notifications[indexPath.row]
+//            openNotification(forNotification: notification)
+//        } else {
+//            let activity = filteredInvitedActivities[indexPath.row]
+//            openActivityDetailView(forActivity: activity)
+//
+//        }
+        let notification = notifications[indexPath.row]
+        openNotification(forNotification: notification)
         tableView.deselectRow(at: indexPath, animated: false)
     }
     

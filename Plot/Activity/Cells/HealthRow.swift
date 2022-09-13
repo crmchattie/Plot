@@ -79,7 +79,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         var imageName = "activity"
         
         if let workout = healthMetric.workout {
-            let total = "\(Int(healthMetric.total))"
+            let total = "\(healthMetric.total.clean)"
             subLabel.text = "\(total) \(healthMetric.unitName)"
             let workoutActivityType = workout.hkWorkoutActivityType
             imageName = workoutActivityType.image

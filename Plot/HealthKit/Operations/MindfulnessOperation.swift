@@ -69,8 +69,11 @@ class MindfulnessOperation: AsyncOperation {
                         ref.child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey).child(sample.uuid.uuidString).child(identifierKey).setValue(mindfulnessID)
                         
                         ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulnessID).child(hkSampleIDKey).setValue(sample.uuid.uuidString)
+                        
+                        let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                                                         
-                        let mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
+                        var mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
+                        mindfulnessFB.containerID = containerID
                         
                         let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
                         mindfulnessActions.createNewMindfulness()
@@ -86,11 +89,11 @@ class MindfulnessOperation: AsyncOperation {
                         activity.endTimeZone = TimeZone.current.identifier
 
                         activity.allDay = false
+                        
+                        activity.containerID = containerID
                                                 
                         let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
                         activityActions.createNewActivity()
-                        
-                        let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                         
                         let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulnessID], mealIDs: nil, transactionIDs: nil)
                         containers.append(container)

@@ -12,6 +12,7 @@ import CodableFirebase
 
 let listEntity = "lists"
 let userListEntity = "user-lists"
+let listTasksEntity = "list-tasks"
 
 struct ListType: Codable, Equatable, Hashable, Comparable {
     static func < (lhs: ListType, rhs: ListType) -> Bool {
@@ -32,6 +33,7 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     var pinned: Bool?
     var muted: Bool?
     var category: String?
+    var taskIDs: [String: Bool]?
     
     init(id: String, name: String?, color: String?, source: String, admin: String?) {
         self.id = id

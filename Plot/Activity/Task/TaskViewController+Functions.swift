@@ -781,10 +781,10 @@ extension TaskViewController {
             } else {
                 self.task.startDateTime = nil
                 self.task.hasStartTime = false
-                if let currentUserID = Auth.auth().currentUser?.uid, active {
-                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("startDateTime")
-                    userReference.removeValue()
-                }
+//                if let currentUserID = Auth.auth().currentUser?.uid, active {
+//                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("startDateTime")
+//                    userReference.removeValue()
+//                }
             }
             self.updateRepeatReminder()
         }
@@ -813,10 +813,10 @@ extension TaskViewController {
             } else {
                 self.task.endDateTime = nil
                 self.task.hasDeadlineTime = false
-                if let currentUserID = Auth.auth().currentUser?.uid, active {
-                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("endDateTime")
-                    userReference.removeValue()
-                }
+//                if let currentUserID = Auth.auth().currentUser?.uid, active {
+//                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("endDateTime")
+//                    userReference.removeValue()
+//                }
             }
             self.updateRepeatReminder()
         }

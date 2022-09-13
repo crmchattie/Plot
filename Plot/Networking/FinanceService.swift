@@ -101,10 +101,12 @@ class FinanceService {
     
     func grabFinances(_ completion: @escaping () -> Void) {
         self.triggerUpdateMXUser()
-        self.observeAccountsForCurrentUser {}
+        self.observeAccountsForCurrentUser {
+        }
         self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
+                self.grabAccountTransactions()
 //                    self.removePendingTransactions()
 //                    self.grabTransactionAttributes()
                 if self.isRunning {
@@ -430,6 +432,12 @@ class FinanceService {
                 self.transactionGroups.append(contentsOf: array)
             }
         })
+    }
+    
+    func grabAccountTransactions() {
+        transactionFetcher.grabTransactionsViaAccounts(accounts: accounts) { [weak self] transactions in
+            self?.transactions.append(contentsOf: transactions)
+        }
     }
     
     private func updateExistingTransactionsFB(transactions: [Transaction]) {

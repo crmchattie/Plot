@@ -74,7 +74,7 @@ extension TaskViewController: UpdateActivityLevelDelegate {
 
 extension TaskViewController: UpdateListDelegate {
     func update(list: ListType) {
-        if let row: LabelRow = form.rowBy(tag: "List") {
+        if let row: LabelRow = form.rowBy(tag: "List"), let listID = list.id {
             row.value = list.name
             row.updateCell()
             task.listID = list.id
@@ -85,6 +85,9 @@ extension TaskViewController: UpdateListDelegate {
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["listID": list.id as Any, "listName": list.name as Any, "listColor": list.color as Any, "listSource": list.source as Any]
             userReference.updateChildValues(values)
+            
+            let listReference = Database.database().reference().child(listEntity).child(listID).child(listTasksEntity)
+            listReference.child(self.activityID).setValue(true)
         }
     }
 }

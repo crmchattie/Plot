@@ -68,7 +68,7 @@ class WorkoutViewController: FormViewController {
         navigationItem.largeTitleDisplayMode = .never
         
         numberFormatter.numberStyle = .decimal
-        numberFormatter.maximumFractionDigits = 0
+        numberFormatter.maximumFractionDigits = 1
         
         if workout != nil {
             title = "Workout"
@@ -348,7 +348,7 @@ class WorkoutViewController: FormViewController {
             if let value = row.value {
                 if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userWorkoutsEntity).child(currentUser).child(self.workout.id).child("totalEnergyBurned")
-                    reference.setValue(value.clean)
+                    reference.setValue(value)
                 }
             }
         })

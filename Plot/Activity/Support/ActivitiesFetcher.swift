@@ -21,6 +21,7 @@ class ActivitiesFetcher: NSObject {
     var activitiesAdded: (([Activity])->())?
     var activitiesRemoved: (([Activity])->())?
     var activitiesChanged: (([Activity])->())?
+    var userActivities: [String: Activity] = [:]
             
     func observeActivityForCurrentUser(activitiesInitialAdd: @escaping ([Activity])->(), activitiesAdded: @escaping ([Activity])->(), activitiesRemoved: @escaping ([Activity])->(), activitiesChanged: @escaping ([Activity])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -34,9 +35,7 @@ class ActivitiesFetcher: NSObject {
         self.activitiesAdded = activitiesAdded
         self.activitiesRemoved = activitiesRemoved
         self.activitiesChanged = activitiesChanged
-        
-        var userActivities: [String: Activity] = [:]
-                        
+                                
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 activitiesInitialAdd([])
@@ -52,12 +51,12 @@ class ActivitiesFetcher: NSObject {
                     var handle = UInt.max
                     if let dictionary = userActivityInfo as? [String: AnyObject] {
                         let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
-                        userActivities[ID] = userActivity
+                        self.userActivities[ID] = userActivity
                         group.enter()
                         counter += 1
                         handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
-                            if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = userActivities[ID] {
+                            if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = self.userActivities[ID] {
                                 let activity = Activity(dictionary: snapshotValue)
                                 activity.showExtras = userActivity.showExtras
                                 activity.calendarID = userActivity.calendarID
@@ -100,16 +99,16 @@ class ActivitiesFetcher: NSObject {
         })
         
         currentUserActivitiesAddHandle = userActivitiesDatabaseRef.observe(.childAdded, with: { snapshot in
-            if userActivities[snapshot.key] == nil {
+            if self.userActivities[snapshot.key] == nil {
                 if let completion = self.activitiesAdded {
                     var handle = UInt.max
                     let ID = snapshot.key
                     self.getUserDataFromSnapshot(ID: ID) { activityList in
                         for userActivity in activityList {
-                            userActivities[ID] = userActivity
+                            self.userActivities[ID] = userActivity
                             handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
-                                if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = userActivities[ID] {
+                                if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = self.userActivities[ID] {
                                     let activity = Activity(dictionary: snapshotValue)
                                     activity.showExtras = userActivity.showExtras
                                     activity.calendarID = userActivity.calendarID
@@ -139,7 +138,7 @@ class ActivitiesFetcher: NSObject {
         
         currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.activitiesRemoved {
-                userActivities[snapshot.key] = nil
+                self.userActivities[snapshot.key] = nil
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
@@ -148,7 +147,7 @@ class ActivitiesFetcher: NSObject {
             if let completion = self.activitiesChanged {
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key) { activityList in
                     for activity in activityList {
-                        userActivities[activity.activityID ?? ""] = activity
+                        self.userActivities[activity.activityID ?? ""] = activity
                     }
                     completion(activityList)
                 }
@@ -222,6 +221,159 @@ class ActivitiesFetcher: NSObject {
             }
         })
         group.notify(queue: .main) {
+            completion(activities)
+        }
+    }
+    
+    func grabActivitiesViaCalendar(calendars: [CalendarType], completion: @escaping ([Activity])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        var activities: [Activity] = []
+        let group = DispatchGroup()
+        let filteredCalendars = calendars.filter({ $0.admin != currentUserID })
+        for calendar in filteredCalendars {
+            if let eventIDs = calendar.eventIDs?.keys {
+                for ID in eventIDs {
+                    if self.userActivities[ID] == nil, let admin = calendar.admin {
+                        group.enter()
+                        self.getDataFromSnapshotViaCalendar(ID: ID, userID: admin, calendar: calendar) { activityList in
+                            for activity in activityList {
+                                self.userActivities[activity.activityID ?? ""] = activity
+                            }
+                            activities.append(contentsOf: activityList)
+                            group.leave()
+                        }
+                    }
+                }
+            }
+        }
+        group.notify(queue: .global()) {
+            completion(activities)
+        }
+    }
+    
+    func getDataFromSnapshotViaCalendar(ID: String, userID: String, calendar: CalendarType, completion: @escaping ([Activity])->()) {
+        let ref = Database.database().reference()
+        var activities: [Activity] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userActivitiesEntity).child(userID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let dictionary = snapshot.value as? [String: AnyObject] {
+                let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
+                ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+                    if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
+                        let activity = Activity(dictionary: activitySnapshotValue)
+                        activity.showExtras = userActivity.showExtras
+                        activity.calendarID = calendar.id
+                        activity.calendarName = calendar.name
+                        activity.calendarColor = calendar.color
+                        activity.calendarSource = calendar.source
+                        activity.listID = userActivity.listID
+                        activity.listName = userActivity.listName
+                        activity.listColor = userActivity.listColor
+                        activity.listSource = userActivity.listSource
+                        activity.userIsCompleted = userActivity.userIsCompleted
+                        activity.userCompletedDate = userActivity.userCompletedDate
+                        activity.calendarExport = true
+                        activity.externalActivityID = nil
+                        activity.reminder = nil
+                        activity.badge = nil
+                        activity.muted = nil
+                        activity.pinned = nil
+                        activities.append(activity)
+                    }
+                    group.leave()
+                })
+            } else {
+                ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+                    if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
+                        let activity = Activity(dictionary: activitySnapshotValue)
+                        activities.append(activity)
+                    }
+                    group.leave()
+                })
+            }
+        })
+        group.notify(queue: .global()) {
+            completion(activities)
+        }
+    }
+    
+    func grabActivitiesViaList(lists: [ListType], completion: @escaping ([Activity])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        var activities: [Activity] = []
+        let group = DispatchGroup()
+        let filteredLists = lists.filter({ $0.admin != currentUserID })
+        for list in filteredLists {
+            if let taskIDs = list.taskIDs?.keys {
+                for ID in taskIDs {
+                    if self.userActivities[ID] == nil, let admin = list.admin {
+                        group.enter()
+                        self.getDataFromSnapshotViaList(ID: ID, userID: admin, list: list) { activityList in
+                            for activity in activityList {
+                                self.userActivities[activity.activityID ?? ""] = activity
+                            }
+                            activities.append(contentsOf: activityList)
+                            group.leave()
+                        }
+                    }
+                }
+            }
+        }
+        
+        group.notify(queue: .global()) {
+            completion(activities)
+        }
+    }
+    
+    func getDataFromSnapshotViaList(ID: String, userID: String, list: ListType, completion: @escaping ([Activity])->()) {
+        let ref = Database.database().reference()
+        var activities: [Activity] = []
+        let group = DispatchGroup()
+        group.enter()
+        ref.child(userActivitiesEntity).child(userID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists(), let dictionary = snapshot.value as? [String: AnyObject] {
+                let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
+                ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+                    if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
+                        let activity = Activity(dictionary: activitySnapshotValue)
+                        activity.showExtras = userActivity.showExtras
+                        activity.calendarID = userActivity.calendarID
+                        activity.calendarName = userActivity.calendarName
+                        activity.calendarColor = userActivity.calendarColor
+                        activity.calendarSource = userActivity.calendarSource
+                        activity.listID = list.id
+                        activity.listName = list.name
+                        activity.listColor = list.color
+                        activity.listSource = list.source
+                        activity.userIsCompleted = userActivity.userIsCompleted
+                        activity.userCompletedDate = userActivity.userCompletedDate
+                        activity.calendarExport = true
+                        activity.externalActivityID = nil
+                        activity.reminder = nil
+                        activity.badge = nil
+                        activity.muted = nil
+                        activity.pinned = nil
+                        activities.append(activity)
+                    }
+                    group.leave()
+                })
+            } else {
+                ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+                    if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
+                        let activity = Activity(dictionary: activitySnapshotValue)
+                        activities.append(activity)
+                    }
+                    group.leave()
+                })
+            }
+        })
+        group.notify(queue: .global()) {
             completion(activities)
         }
     }
