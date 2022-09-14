@@ -89,6 +89,11 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
         }
+        if let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = transaction?.participantsIDs, !participantsIDs.contains(currentUser) {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {

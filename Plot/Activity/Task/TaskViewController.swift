@@ -141,6 +141,12 @@ class TaskViewController: FormViewController {
                 self.purchaseDict[user] = 0.00
             }
         }
+        
+        if let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = task?.participantsIDs, !participantsIDs.contains(currentUser) {
+            for row in form.rows {
+                row.baseCell.isUserInteractionEnabled = false
+            }
+        }
     }
     
     fileprivate func setupMainView() {
