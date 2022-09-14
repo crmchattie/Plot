@@ -35,6 +35,7 @@ struct MXMember: Codable, Equatable, Hashable {
     var user_id: String?
     var oauth_window_uri: String?
     var participantsIDs: [String]?
+    var admin: String?
 }
 
 enum ConnectionStatus: String, CaseIterable, Codable {

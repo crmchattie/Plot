@@ -157,9 +157,9 @@ enum HealthMetricCategory: String {
             case .nutrition:
                 return "Nutrition Summary"
             case .workoutsList:
-                return "Recent Workouts"
+                return "Workouts"
             case .mindfulnessList:
-                return "Recent Mindfulness Sessions"
+                return "Mindfulness Sessions"
             }
         }
     }

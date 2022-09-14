@@ -14,9 +14,7 @@ import Firebase
 import Charts
 
 class FinanceBarChartViewController: UIViewController {
-    
-    weak var delegate : UpdateFinancialsDelegate?
-    
+        
     private let kFinanceTableViewCell = "FinanceTableViewCell"
         
     let isodateFormatter = ISO8601DateFormatter()
@@ -129,18 +127,11 @@ class FinanceBarChartViewController: UIViewController {
         
         fetchData(useAll: false)
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if let transactions = viewModel.transactions, !transactions.isEmpty {
-            self.delegate?.updateTransactions(transactions: transactions)
-        } else if let accounts = viewModel.accounts, !accounts.isEmpty {
-            self.delegate?.updateAccounts(accounts: accounts)
-        }
-    }
-    
+        
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+
     }
     
     @objc fileprivate func changeTheme() {
@@ -148,6 +139,12 @@ class FinanceBarChartViewController: UIViewController {
         view.backgroundColor = theme.generalBackgroundColor
         backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        DispatchQueue.main.async {
+            self.fetchData(useAll: false)
+        }
     }
     
     private func configureView() {
@@ -339,7 +336,6 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
             let transaction = transactions[indexPath.row]
             let destination = FinanceTransactionViewController(networkController: networkController)
             destination.transaction = transaction
-            destination.delegate = self
             ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
@@ -348,30 +344,11 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
             let account = accounts[indexPath.row]
             let destination = FinanceAccountViewController(networkController: networkController)
             destination.account = account
-            destination.delegate = self
             ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         }
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-}
-
-extension FinanceBarChartViewController: UpdateAccountDelegate {
-    func updateAccount(account: MXAccount) {
-        if let index = viewModel.accounts!.firstIndex(of: account) {
-            viewModel.accounts![index] = account
-            fetchData(useAll: true)
-        }
-    }
-}
-
-extension FinanceBarChartViewController: UpdateTransactionDelegate {
-    func updateTransaction(transaction: Transaction) {
-        if let index = viewModel.transactions!.firstIndex(of: transaction) {
-            viewModel.transactions![index] = transaction
-            fetchData(useAll: true)
-        }
     }
 }

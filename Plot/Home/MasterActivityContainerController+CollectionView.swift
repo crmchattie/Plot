@@ -128,7 +128,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     } else if section == .transactions {
                         let object = financeGroups[section]
                         if let object = object as? [Transaction] {
-                            let totalItems = object.count - 1
+                            let totalItems = object.count > 3 ? 2: object.count - 1
                             for index in 0...totalItems {
                                 let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
                                 dummyCell.firstPosition = true

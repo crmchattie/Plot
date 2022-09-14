@@ -17,6 +17,7 @@ protocol UpdateTransactionDelegate: AnyObject {
 
 class FinanceTransactionViewController: FormViewController {
     var transaction: Transaction!
+    
     var container: Container!
     var eventList = [Activity]()
     var eventIndex: Int = 0

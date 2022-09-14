@@ -33,9 +33,7 @@ class FinanceDetailViewController: UIViewController {
         collectionView.contentInset.bottom = 0
         return collectionView
     }()
-    
-    let customSegmented = CustomSegmentedControl(buttonImages: nil, buttonTitles: ["D","W","M", "Y"], selectedIndex: 2, selectedStrings: ["Day", "Week", "Month", "Year"])
-    
+        
     var user: MXUser {
         return networkController.financeService.mxUser
     }
@@ -51,7 +49,6 @@ class FinanceDetailViewController: UIViewController {
     var holdings: [MXHolding] {
         return networkController.financeService.holdings
     }
-    var selectedIndex = 2
             
     var setSections = [SectionType]()
     var sections = [SectionType]()
@@ -64,18 +61,22 @@ class FinanceDetailViewController: UIViewController {
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
-    var startDate = Date().startOfMonth
-    var endDate = Date().endOfMonth
-    
     var hasViewAppeared = false
     
     var participants: [String: [User]] = [:]
+    
+    var filters: [filter] = []
+    var filterDictionary = [String: [String]]()
+    
+    var startDate = Date().localTime.startOfMonth
+    var endDate = Date().localTime.endOfMonth
+    
+    let viewPlaceholder = ViewPlaceholder()
             
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
                 
-        customSegmented.delegate = self
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -83,11 +84,35 @@ class FinanceDetailViewController: UIViewController {
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         
-        updateIndex()
         setupMainView()
         addObservers()
-        updateCollectionView()
         
+        if setSections.contains(.transactions) {
+            let filteredTransactions = transactions.filter { (transaction) -> Bool in
+                if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                    if transactionDate > startDate && endDate > transactionDate {
+                        return true
+                    }
+                } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                    if transactionDate > startDate && endDate > transactionDate {
+                        return true
+                    }
+                }
+                return false
+            }
+            self.sections.append(.transactions)
+            self.groups[.transactions] = filteredTransactions
+            filters = [.search, .financeAccount, .startDate, .endDate]
+            
+        } else if setSections.contains(.financialAccounts) {
+            self.sections.append(.financialAccounts)
+            self.groups[.financialAccounts] = accounts
+            filters = [.search]
+        } else if setSections.contains(.investments) {
+            self.sections.append(.investments)
+            self.groups[.investments] = holdings
+            filters = [.search, .financeAccount]
+        }
     }
     
     deinit {
@@ -104,7 +129,6 @@ class FinanceDetailViewController: UIViewController {
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         collectionView.reloadData()
         
     }
@@ -123,65 +147,38 @@ class FinanceDetailViewController: UIViewController {
         collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        navigationItem.rightBarButtonItem = newItemBarButton
-        
-        customSegmented.selectedIndex = selectedIndex
-        
-        if setSections.contains(.transactions) {
-            customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-            customSegmented.constrainHeight(30)
-                            
-            view.addSubview(customSegmented)
-            view.addSubview(collectionView)
+        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
 
-            customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-            collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
-        } else {
-            view.addSubview(collectionView)
-            collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        }
+        view.addSubview(collectionView)
+        collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
     }
     
     @objc fileprivate func newItem() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Transaction", style: .default, handler: { (_) in
+        if setSections.contains(.transactions) {
             let destination = FinanceTransactionViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Investment", style: .default, handler: { (_) in
+        } else if setSections.contains(.investments) {
             let destination = FinanceHoldingViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Account", style: .default, handler: { (_) in
-            print("User click Edit button")
+        } else if setSections.contains(.financialAccounts) {
             self.newAccount()
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Transaction Rule", style: .default, handler: { (_) in
-            print("User click Edit button")
-            let destination = FinanceTransactionRuleViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
+        }
+    }
+    
+    @objc fileprivate func filter() {
+        let destination = FilterViewController(networkController: networkController)
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        destination.delegate = self
+        destination.filters = filters
+        destination.filterDictionary = filterDictionary
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     @objc func newAccount() {
@@ -215,130 +212,109 @@ class FinanceDetailViewController: UIViewController {
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
-    private func updateIndex() {
-        if selectedIndex == 0 {
-            startDate = Date().localTime.startOfDay
-            endDate = Date().localTime.endOfDay
-        } else if selectedIndex == 1 {
-            startDate = Date().localTime.startOfWeek
-            endDate = Date().localTime.endOfWeek
-        } else if selectedIndex == 2 {
-            startDate = Date().localTime.startOfMonth
-            endDate = Date().localTime.endOfMonth
-        } else {
-            startDate = Date().localTime.startOfYear
-            endDate = Date().localTime.endOfYear
-        }
-        updateCollectionView()
-    }
-    
     private func updateCollectionView() {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
-        var accountLevel: AccountCatLevel!
-        var transactionLevel: TransactionCatLevel!
-        accountLevel = .none
-        transactionLevel = .none
                         
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
-                        
-        let dispatchGroup = DispatchGroup()
-        
+                
         for section in setSections {
-            dispatchGroup.enter()
-            if section.type == "Issues" {
-                dispatchGroup.enter()
-                var challengedMembers = [MXMember]()
-                for member in members {
-                    dispatchGroup.enter()
-                    if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending {
-                        challengedMembers.append(member)
-                    }
-                    dispatchGroup.leave()
+            if section.type == "Accounts" {
+                var filteredAccounts = accounts
+                if let value = filterDictionary["search"] {
+                    let searchText = value[0]
+                    filteredAccounts = filteredAccounts.filter({ (account) -> Bool in
+                        return account.name.lowercased().contains(searchText.lowercased())
+                    })
                 }
-                if !challengedMembers.isEmpty {
+                if !filteredAccounts.isEmpty {
                     self.sections.append(section)
-                    self.groups[section] = challengedMembers
-                    dispatchGroup.leave()
-                } else {
-                    dispatchGroup.leave()
-                }
-            } else if section.type == "Accounts" {
-                if section.subType == "Balance Sheet" {
-                    dispatchGroup.enter()
-                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, accountsDict) in
-                        if !accountsList.isEmpty {
-                            self.sections.append(section)
-                            self.groups[section] = accountsList
-                        }
-                        dispatchGroup.leave()
-                    }
-                } else if section.subType == "Accounts" {
-                    dispatchGroup.enter()
-                    if !accounts.isEmpty {
-                        self.sections.append(section)
-                        self.groups[section] = accounts
-                        dispatchGroup.leave()
-                    } else {
-                        dispatchGroup.leave()
-                    }
+                    self.groups[section] = filteredAccounts
                 }
             } else if section.type == "Transactions" {
-                if section.subType == "Income Statement" {
-                    dispatchGroup.enter()
-                    let accounts = transactions.compactMap({ $0.account_guid })
-                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: accounts) { (transactionsList, transactionsDict) in
-                        if !transactionsList.isEmpty {
-                            self.sections.append(section)
-                            self.groups[section] = transactionsList
-                        }
-                        dispatchGroup.leave()
-                    }
-                } else if section.subType == "Transactions" {
-                    if !transactions.isEmpty {
-                        dispatchGroup.enter()
-                        var filteredTransactions = transactions.filter { (transaction) -> Bool in
-                            if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                                if transactionDate > startDate && endDate > transactionDate {
-                                    return true
-                                }
-                            } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                                if transactionDate > startDate && endDate > transactionDate {
-                                    return true
-                                }
+                var filteredTransactions = transactions
+                if let value = filterDictionary["search"] {
+                    let searchText = value[0]
+                    filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
+                        return transaction.description.lowercased().contains(searchText.lowercased())
+                    })
+                }
+                if let accounts = filterDictionary["financeAccount"] {
+                    filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
+                        accounts.contains(transaction.account_guid ?? "")
+                    })
+                }
+                if let filterStartDate = filterDictionary["startDate"], let filterEndDate = filterDictionary["endDate"] {
+                    startDate = isodateFormatter.date(from: filterStartDate[0]) ?? Date.distantPast
+                    endDate = isodateFormatter.date(from: filterEndDate[0]) ?? Date.distantFuture
+                    
+                    filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
+                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                            if transactionDate > startDate && endDate > transactionDate {
+                                return true
                             }
-                            return false
-                        }
-                        if !filteredTransactions.isEmpty {
-                            self.sections.append(section)
-                            filteredTransactions.sort { (transaction1, transaction2) -> Bool in
-                                if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                                    if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
-                                        return date1 > date2
-                                    }
-                                    return transaction1.description < transaction2.description
-                                }
-                                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
+                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                            if transactionDate > startDate && endDate > transactionDate {
+                                return true
                             }
-                            self.groups[section] = filteredTransactions
-                            dispatchGroup.leave()
-                        } else {
-                            dispatchGroup.leave()
                         }
+                        return false
                     }
                 }
+                else if let filterStartDate = filterDictionary["startDate"] {
+                    startDate = isodateFormatter.date(from: filterStartDate[0]) ?? Date.distantPast
+                    filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
+                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                            if transactionDate > startDate {
+                                return true
+                            }
+                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                            if transactionDate > startDate {
+                                return true
+                            }
+                        }
+                        return false
+                    }
+                }
+                else if let filterEndDate = filterDictionary["endDate"] {
+                    endDate = isodateFormatter.date(from: filterEndDate[0]) ?? Date.distantFuture
+                    filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
+                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                            if endDate > transactionDate {
+                                return true
+                            }
+                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                            if endDate > transactionDate {
+                                return true
+                            }
+                        }
+                        return false
+                    }
+                }
+                self.sections.append(section)
+                self.groups[section] = filteredTransactions
             } else if section.type == "Investments" {
-                if !holdings.isEmpty {
+                var filteredHoldings = holdings
+                if let value = filterDictionary["search"] {
+                    let searchText = value[0]
+                    filteredHoldings = filteredHoldings.filter({ (holding) -> Bool in
+                        return holding.description.lowercased().contains(searchText.lowercased())
+                    })
+                }
+                if let accounts =  filterDictionary["financeAccount"] {
+                    filteredHoldings = filteredHoldings.filter { (holding) -> Bool in
+                        accounts.contains(holding.account_guid ?? "")
+                    }
+                }
+                if !filteredHoldings.isEmpty {
                     self.sections.append(section)
-                    self.groups[section] = holdings
+                    self.groups[section] = filteredHoldings
                 }
             }
-            dispatchGroup.leave()
         }
-        
-        dispatchGroup.notify(queue: .main) {
+        DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
@@ -347,7 +323,6 @@ class FinanceDetailViewController: UIViewController {
         let accounts = transactions.compactMap({ $0.account_guid })
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: transactions, transactions: transactions, filterAccounts: accounts, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-//        financeDetailViewController.delegate = self
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -355,7 +330,6 @@ class FinanceDetailViewController: UIViewController {
     func openAccountDetails(accountDetails: AccountDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: accounts, accounts: accounts, transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
-//        financeDetailViewController.delegate = self
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -363,6 +337,11 @@ class FinanceDetailViewController: UIViewController {
 
 extension FinanceDetailViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
+        if sections.count == 0 {
+            viewPlaceholder.add(for: collectionView, title: .emptySearch, subtitle: .emptySearch, priority: .medium, position: .fill)
+        } else {
+            viewPlaceholder.remove(from: collectionView, priority: .medium)
+        }
         return sections.count
     }
     
@@ -540,10 +519,10 @@ extension FinanceDetailViewController: EndedWebViewDelegate {
     }
 }
 
-extension FinanceDetailViewController: CustomSegmentedControlDelegate {
-    func changeToIndex(index:Int) {
-        selectedIndex = index
-        updateIndex()
+extension FinanceDetailViewController: UpdateFilter {
+    func updateFilter(filterDictionary : [String: [String]]) {
+        self.filterDictionary = filterDictionary
+        updateCollectionView()
     }
 }
 

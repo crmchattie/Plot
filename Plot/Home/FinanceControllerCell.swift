@@ -12,6 +12,7 @@ protocol FinanceControllerCellDelegate: AnyObject {
     func openMember(member: MXMember)
     func openHolding(holding: MXHolding)
     func openTransaction(transaction: Transaction)
+    func viewTappedFinance(sectionType: SectionType)
 }
 
 class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -70,6 +71,12 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sec = sections[section]
+        if sec == .transactions {
+            if groups[sec]?.count ?? 0 < 3 {
+                return groups[sec]?.count ?? 0
+            }
+            return 3
+        }
         return groups[sec]?.count ?? 0
     }
     
@@ -154,8 +161,16 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
         let section = sections[indexPath.section]
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
         header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        header.delegate = self
+        header.sectionType = section
         header.titleLabel.text = section.name
-        header.subTitleLabel.isHidden = true
+        if section == .transactions && groups[section]?.count ?? 0 > 3 {
+            header.view.isUserInteractionEnabled = true
+            header.subTitleLabel.isHidden = false
+        } else {
+            header.view.isUserInteractionEnabled = false
+            header.subTitleLabel.isHidden = true
+        }
         return header
     }
     
@@ -204,5 +219,11 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
                 delegate?.openMember(member: member)
             }
         }
+    }
+}
+
+extension FinanceControllerCell: HeaderCellDelegate {
+    func viewTapped(sectionType: SectionType) {
+        delegate?.viewTappedFinance(sectionType: sectionType)
     }
 }

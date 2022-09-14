@@ -40,11 +40,16 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     var mindfulness: [Mindfulness] {
         return networkController.healthService.mindfulnesses
     }
+    
+    var healthMetricSections = [HealthMetricCategory]()
+    var healthMetrics = [HealthMetricCategory: [AnyHashable]]()
     var filteredHealthMetricSections = [HealthMetricCategory]()
     var filteredHealthMetrics = [HealthMetricCategory: [AnyHashable]]()
     
-    var filters: [filter] = [.search, .healthCategory]
+    var filters: [filter] = []
     var filterDictionary = [String: [String]]()
+    
+    let viewPlaceholder = ViewPlaceholder()
     
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -61,6 +66,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
         collectionView.dataSource = self
         collectionView.delegate = self
              
+        setupData()
         configureView()
         addObservers()
     }
@@ -75,11 +81,15 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func setupData() {
-        if filteredHealthMetricSections.contains(.workoutsList) {
-            filteredHealthMetrics[.workoutsList] = workouts
-        } else if filteredHealthMetricSections.contains(.mindfulnessList) {
-            filteredHealthMetrics[.mindfulnessList] = mindfulness
+        filteredHealthMetricSections = healthMetricSections
+        filteredHealthMetrics = healthMetrics
+        
+        if filteredHealthMetrics[.workoutsList] != nil {
+            filters = [.search, .workoutCategory]
+        } else if filteredHealthMetrics[.mindfulnessList] != nil {
+            filters = [.search]
         }
+        
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -96,8 +106,13 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     private func configureView() {
         extendedLayoutIncludesOpaqueBars = true
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-//        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
-        navigationItem.rightBarButtonItems = [newItemBarButton]
+        let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        
+        if !filters.isEmpty {
+            navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+        } else {
+            navigationItem.rightBarButtonItems = [newItemBarButton]
+        }
         
         view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
         
@@ -153,6 +168,11 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
 
 extension HealthListViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
+        if filteredHealthMetricSections.count == 0 {
+            viewPlaceholder.add(for: collectionView, title: .emptySearch, subtitle: .emptySearch, priority: .medium, position: .fill)
+        } else {
+            viewPlaceholder.remove(from: collectionView, priority: .medium)
+        }
         return filteredHealthMetricSections.count
     }
     
@@ -205,54 +225,47 @@ extension HealthListViewController: UpdateFilter {
     }
     
     func updateCollectionViewWFilters() {
-//        filteredHealthMetricSections = healthMetricSections
-//        filteredHealthMetrics = healthMetrics
-//        let dispatchGroup = DispatchGroup()
-//        if let value = filterDictionary["calendarView"], let view = CalendarView(rawValue: value[0].lowercased()), self.calendarView != view {
-//            self.calendarView = view
-//        }
-//        if let value = filterDictionary["search"] {
-//            dispatchGroup.enter()
-//            self.calendarView = .list
-//            let searchText = value[0]
-//            filteredPinnedActivities = filteredPinnedActivities.filter({ (activity) -> Bool in
-//                    if let name = activity.name {
-//                        return name.lowercased().contains(searchText.lowercased())
-//                    }
-//                    return ("").lowercased().contains(searchText.lowercased())
-//                })
-//            filteredActivities = filteredActivities.filter({ (activity) -> Bool in
-//                    if let name = activity.name {
-//                        return name.lowercased().contains(searchText.lowercased())
-//                    }
-//                    return ("").lowercased().contains(searchText.lowercased())
-//                })
-//            dispatchGroup.leave()
-//        }
-//        if let categories = filterDictionary["calendarCategory"] {
-//            dispatchGroup.enter()
-//            self.calendarView = .list
-//            filteredPinnedActivities = filteredPinnedActivities.filter({ (activity) -> Bool in
-//                if let category = activity.category {
-//                    return categories.contains(category)
-//                }
-//                return false
-//            })
-//            filteredActivities = filteredActivities.filter({ (activity) -> Bool in
-//                if let category = activity.category {
-//                    return categories.contains(category)
-//                }
-//                return false
-//            })
-//            dispatchGroup.leave()
-//        }
-//
-//        dispatchGroup.notify(queue: .main) {
-//            self.activityView.tableView.reloadData()
-//            self.activityView.tableView.layoutIfNeeded()
-//            self.handleReloadActivities(animated: false)
-//            self.saveCalendarView()
-//        }
+        filteredHealthMetricSections = []
+        filteredHealthMetrics = [:]
+        
+        if filterDictionary.isEmpty {
+            setupData()
+        } else {
+            if filteredHealthMetrics[.workoutsList] != nil {
+                var filteredWorkouts = workouts
+                if let value = filterDictionary["search"] {
+                    let searchText = value[0]
+                    filteredWorkouts = filteredWorkouts.filter({ (workout) -> Bool in
+                        return workout.name.lowercased().contains(searchText.lowercased())
+                    })
+                }
+                if let filteredWorkoutCategories = filterDictionary["workoutCategory"] {
+                    filteredWorkouts = filteredWorkouts.filter { (workout) -> Bool in
+                        return filteredWorkoutCategories.contains(workout.type ?? "")
+                    }
+                }
+                if !filteredWorkouts.isEmpty {
+                    filteredHealthMetricSections.append(.workoutsList)
+                    filteredHealthMetrics[.workoutsList] = filteredWorkouts
+                }
+            } else if filteredHealthMetrics[.mindfulnessList] != nil {
+                var filteredMindfulness = mindfulness
+                if let value = filterDictionary["search"] {
+                    let searchText = value[0]
+                    filteredMindfulness = filteredMindfulness.filter({ (mindfulness) -> Bool in
+                        return mindfulness.name.lowercased().contains(searchText.lowercased())
+                    })
+                }
+                if !filteredMindfulness.isEmpty {
+                    filteredHealthMetricSections.append(.mindfulnessList)
+                    filteredHealthMetrics[.mindfulnessList] = filteredMindfulness
+                }
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
         
 }

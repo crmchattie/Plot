@@ -481,15 +481,17 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     let filteredTransactions = transactions.filter({$0.should_link ?? true})
                     if !filteredTransactions.isEmpty {
                         sections.append(section)
-                        if filteredTransactions.count < 3 {
-                            groups[section] = filteredTransactions
-                        } else {
-                            var finalTransactions = [Transaction]()
-                            for index in 0...2 {
-                                finalTransactions.append(filteredTransactions[index])
-                            }
-                            groups[section] = finalTransactions
-                        }
+                        groups[section] = filteredTransactions
+                        
+//                        if filteredTransactions.count < 3 {
+//                            groups[section] = filteredTransactions
+//                        } else {
+//                            var finalTransactions = [Transaction]()
+//                            for index in 0...2 {
+//                                finalTransactions.append(filteredTransactions[index])
+//                            }
+//                            groups[section] = finalTransactions
+//                        }
                     }
                 }
             } else if section.type == "Investments" {
@@ -785,6 +787,13 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
         openMXConnect(current_member_guid: member.guid)
     }
     
+    func viewTappedFinance(sectionType: SectionType) {
+        let destination = FinanceDetailViewController(networkController: networkController)
+        destination.title = sectionType.name
+        destination.setSections = [sectionType]
+        navigationController?.pushViewController(destination, animated: true)
+    }
+    
     func openMXConnect(current_member_guid: String?) {
         let destination = WebViewController()
         destination.current_member_guid = current_member_guid
@@ -796,23 +805,6 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     }
     
 }
-
-//extension MasterActivityContainerController: UpdateFinancialsDelegate {
-//    func updateTransactions(transactions: [Transaction]) {
-//        for transaction in transactions {
-//            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
-//                networkController.financeService.transactions[index] = transaction
-//            }
-//        }
-//    }
-//    func updateAccounts(accounts: [MXAccount]) {
-//        for account in accounts {
-//            if let index = networkController.financeService.accounts.firstIndex(where: {$0.guid == account.guid}) {
-//                networkController.financeService.accounts[index] = account
-//            }
-//        }
-//    }
-//}
 
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {

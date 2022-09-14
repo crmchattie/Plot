@@ -196,15 +196,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
         searchBar?.showsCancelButton = true
         tableView.tableHeaderView = searchBar
     }
-    
-    func checkIfThereAreAnyResults(isEmpty: Bool) {
-        guard isEmpty else {
-            viewPlaceholder.remove(from: tableView, priority: .medium)
-            return
-        }
-        viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasks, priority: .medium, position: .top)
-    }
-    
+
     func handleReloadTableAftersearchBarCancelButtonClicked() {
         if !showCompletedTasks {
             filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })

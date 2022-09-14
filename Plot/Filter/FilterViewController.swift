@@ -270,7 +270,7 @@ class FilterViewController: FormViewController {
                     }
                 }
                 .onChange { [weak self] row in
-                    if (row.tag == "eventStartDate" || row.tag == "eventEndDate"), let dateString = row.value?.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'") {
+                    if (row.tag == "startDate" || row.tag == "eventEndDate" || row.tag == "date"), let dateString = row.value?.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'") {
                         self?.filterDictionary["\(filter.rawValue)"] = [dateString]
                     }
                 }

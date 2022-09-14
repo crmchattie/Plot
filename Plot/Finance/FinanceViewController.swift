@@ -91,8 +91,10 @@ class FinanceViewController: UIViewController {
     
     var financeLevel: FinanceLevel = .all
     
-    var filters: [filter] = [.financeLevel, .financeAccount]
+    var filters: [filter] = [.search, .financeLevel, .financeAccount]
     var filterDictionary = [String: [String]]()
+    
+    let viewPlaceholder = ViewPlaceholder()
             
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -261,6 +263,7 @@ class FinanceViewController: UIViewController {
     private func updateCollectionView() {
         var accountLevel: AccountCatLevel!
         var transactionLevel: TransactionCatLevel!
+        
         if let level = filterDictionary["financeLevel"], level[0] == "Top" {
             accountLevel = .bs_type
             transactionLevel = .group
@@ -271,126 +274,120 @@ class FinanceViewController: UIViewController {
             financeLevel = .all
         }
         
+        self.saveFinanceLevel()
+        
         let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
                 
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
-                        
-        let dispatchGroup = DispatchGroup()
         
+        var filteredAccounts = accounts
+        var filteredAccountsString = accounts.map({ $0.guid })
+        if let accountsString = filterDictionary["financeAccount"]  {
+            filteredAccounts = filteredAccounts.filter({ accountsString.contains($0.guid) })
+            filteredAccountsString = accountsString
+        }
+                                
         for section in setSections {
-            dispatchGroup.enter()
-            if section.type == "Issues" {
-                dispatchGroup.enter()
+            if section.type == "Issues" && filterDictionary["search"] == nil {
                 var challengedMembers = [MXMember]()
                 for member in members {
-                    dispatchGroup.enter()
-                    if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending {
-                        challengedMembers.append(member)
+                    if let _ = filterDictionary["financeAccount"] {
+                        if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending && (filteredAccounts.first(where: {$0.member_guid == member.guid}) != nil) {
+                            challengedMembers.append(member)
+                        }
+                    } else if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending {
+                            challengedMembers.append(member)
                     }
-                    dispatchGroup.leave()
                 }
                 if !challengedMembers.isEmpty {
                     self.sections.append(section)
                     self.groups[section] = challengedMembers
-                    dispatchGroup.leave()
-                } else {
-                    dispatchGroup.leave()
                 }
             } else if section.type == "Accounts" {
-                if section.subType == "Balance Sheet" {
-                    dispatchGroup.enter()
-                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, accountsDict) in
+                if section.subType == "Balance Sheet" && filterDictionary["search"] == nil {
+                    categorizeAccounts(accounts: filteredAccounts, level: accountLevel) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
                             self.sections.append(section)
                             self.groups[section] = accountsList
                             self.accountsDictionary = accountsDict
                         }
-                        dispatchGroup.leave()
                     }
                 } else if section.subType == "Accounts" {
-                    dispatchGroup.enter()
-                    if !accounts.isEmpty {
+                    if let value = filterDictionary["search"] {
+                        let searchText = value[0]
+                        filteredAccounts = filteredAccounts.filter({ (account) -> Bool in
+                            return account.name.lowercased().contains(searchText.lowercased())
+                        })
+                    }
+                    if !filteredAccounts.isEmpty {
                         self.sections.append(section)
-                        self.groups[section] = accounts
-                        dispatchGroup.leave()
-                    } else {
-                        dispatchGroup.leave()
+                        self.groups[section] = filteredAccounts
                     }
                 }
             } else if section.type == "Transactions" {
-                if section.subType == "Income Statement" {
-                    dispatchGroup.enter()
-                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: filterDictionary["financeAccount"]) { (transactionsList, transactionsDict) in
+                if section.subType == "Income Statement" && filterDictionary["search"] == nil {
+                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: filteredAccountsString) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             self.sections.append(section)
                             self.groups[section] = transactionsList
                             self.transactionsDictionary = transactionsDict
                         }
-                        dispatchGroup.leave()
                     }
                 } else if section.subType == "Transactions" {
                     if !transactions.isEmpty {
-                        dispatchGroup.enter()
-                        var filteredTransactions = transactions.filter { (transaction) -> Bool in
-                            if let accounts = filterDictionary["financeAccount"] {
-                                if let account = transaction.account_guid {
-                                    if accounts.contains(account) {
-                                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                                            if transactionDate > startDate && endDate > transactionDate {
-                                                return true
-                                            }
-                                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                                            if transactionDate > startDate && endDate > transactionDate {
-                                                return true
-                                            }
-                                        }
-                                    }
+                        var filteredTransactions = transactions
+                        if let value = filterDictionary["search"] {
+                            let searchText = value[0]
+                            filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
+                                return transaction.description.lowercased().contains(searchText.lowercased())
+                            })
+                        }
+                        if let _ = filterDictionary["financeAccount"] {
+                            filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
+                                filteredAccountsString.contains(transaction.account_guid ?? "")
+                            })
+                        }
+                        filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
+                            if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
+                                if transactionDate > startDate && endDate > transactionDate {
+                                    return true
                                 }
-                                return false
-                            } else {
-                                if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                                    if transactionDate > startDate && endDate > transactionDate {
-                                        return true
-                                    }
-                                } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                                    if transactionDate > startDate && endDate > transactionDate {
-                                        return true
-                                    }
+                            } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                                if transactionDate > startDate && endDate > transactionDate {
+                                    return true
                                 }
                             }
                             return false
-                        }
+                        })
                         if !filteredTransactions.isEmpty {
                             self.sections.append(section)
-                            filteredTransactions.sort { (transaction1, transaction2) -> Bool in
-                                if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                                    if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
-                                        return date1 > date2
-                                    }
-                                    return transaction1.description < transaction2.description
-                                }
-                                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
-                            }
                             self.groups[section] = filteredTransactions
-                            dispatchGroup.leave()
-                        } else {
-                            dispatchGroup.leave()
                         }
                     }
                 }
             } else if section.type == "Investments" {
-                if !holdings.isEmpty {
+                var filteredHoldings = holdings
+                if let value = filterDictionary["search"] {
+                    let searchText = value[0]
+                    filteredHoldings = filteredHoldings.filter({ (holding) -> Bool in
+                        return holding.description.lowercased().contains(searchText.lowercased())
+                    })
+                }
+                if let _ = filterDictionary["financeAccount"] {
+                    filteredHoldings = filteredHoldings.filter { (holding) -> Bool in
+                        filteredAccountsString.contains(holding.account_guid ?? "")
+                    }
+                }
+                if !filteredHoldings.isEmpty {
                     self.sections.append(section)
-                    self.groups[section] = holdings
+                    self.groups[section] = filteredHoldings
                 }
             }
-            dispatchGroup.leave()
         }
         
-        dispatchGroup.notify(queue: .main) {
+        DispatchQueue.main.async {
             self.collectionView.reloadData()
-            self.saveFinanceLevel()
         }
     }
     
@@ -415,6 +412,11 @@ class FinanceViewController: UIViewController {
 
 extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
+        if sections.count == 0 {
+            viewPlaceholder.add(for: collectionView, title: .emptySearch, subtitle: .emptySearch, priority: .medium, position: .fill)
+        } else {
+            viewPlaceholder.remove(from: collectionView, priority: .medium)
+        }
         return sections.count
     }
     
@@ -621,47 +623,9 @@ extension FinanceViewController: HeaderCellDelegate {
         let destination = FinanceDetailViewController(networkController: networkController)
         destination.title = sectionType.name
         destination.setSections = [sectionType]
-        destination.selectedIndex = selectedIndex
         navigationController?.pushViewController(destination, animated: true)
     }
 }
-
-//extension FinanceViewController: UpdateFinancialsDelegate {
-//    func updateTransactions(transactions: [Transaction]) {
-//        for transaction in transactions {
-//            if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
-//                networkController.financeService.transactions[index] = transaction
-//            }
-//        }
-//        updateCollectionView()
-//    }
-//    func updateAccounts(accounts: [MXAccount]) {
-//        for account in accounts {
-//            if let index = networkController.financeService.accounts.firstIndex(of: account) {
-//                networkController.financeService.accounts[index] = account
-//            }
-//        }
-//        updateCollectionView()
-//    }
-//}
-//
-//extension FinanceViewController: UpdateAccountDelegate {
-//    func updateAccount(account: MXAccount) {
-//        if let index = networkController.financeService.accounts.firstIndex(of: account) {
-//            networkController.financeService.accounts[index] = account
-//            updateCollectionView()
-//        }
-//    }
-//}
-//
-//extension FinanceViewController: UpdateTransactionDelegate {
-//    func updateTransaction(transaction: Transaction) {
-//        if let index = networkController.financeService.transactions.firstIndex(of: transaction) {
-//            networkController.financeService.transactions[index] = transaction
-//            updateCollectionView()
-//        }
-//    }
-//}
 
 extension FinanceViewController: EndedWebViewDelegate {
     func updateMXMembers() {

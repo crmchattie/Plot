@@ -7,13 +7,14 @@
 //
 
 import Foundation
+import HealthKit
 
 enum filter: String {
-    case search
+    case search, startDate, endDate, date
     //recipes
     case cuisine, excludeCuisine, diet, intolerances, recipeType
     //ticketmaster
-    case eventType, eventStartDate, eventEndDate, location
+    case eventType, location
     //workouts
     case workoutType, muscles, duration, equipment, equipmentLevel
     //foursquare
@@ -21,7 +22,7 @@ enum filter: String {
     //calendar
     case calendarView, calendarCategory
     //health
-    case healthCategory
+    case healthCategory, workoutCategory
     //finance
     case financeAccount, financeLevel
     //task
@@ -29,15 +30,16 @@ enum filter: String {
     
     var activity: String {
         switch self {
-        case .search: return "Search"
+        case .search: return ""
         case .cuisine: return "Recipes"
         case .excludeCuisine: return "Recipes"
         case .diet: return "Recipes"
         case .intolerances: return "Recipes"
         case .recipeType: return "Recipes"
         case .eventType: return "Events"
-        case .eventStartDate: return "Events"
-        case .eventEndDate: return "Events"
+        case .startDate: return ""
+        case .endDate: return ""
+        case .date: return ""
         case .location: return ""
         case .workoutType: return "Workouts"
         case .muscles: return "Workouts"
@@ -51,13 +53,14 @@ enum filter: String {
         case .fsSightseeingCategoryId: return "Place"
         case .fsRecreationCategoryId: return "Place"
         case .fsShoppingCategoryId: return "Place"
-        case .calendarView: return "View"
-        case .calendarCategory: return "Categories"
-        case .healthCategory: return "Categories"
-        case .financeAccount: return "Accounts"
-        case .financeLevel: return "Level"
-        case .taskCategory: return "Categories"
-        case .showCompletedTasks: return "Show"
+        case .calendarView: return "Calendar"
+        case .calendarCategory: return "Calendar"
+        case .healthCategory: return "Health"
+        case .workoutCategory: return "Health"
+        case .financeAccount: return "Finance"
+        case .financeLevel: return "Finance"
+        case .taskCategory: return "Tasks"
+        case .showCompletedTasks: return "Tasks"
         }
     }
     
@@ -70,8 +73,9 @@ enum filter: String {
         case .intolerances: return "multiple"
         case .recipeType: return "single"
         case .eventType: return "single"
-        case .eventStartDate: return "date"
-        case .eventEndDate: return "date"
+        case .startDate: return "date"
+        case .endDate: return "date"
+        case .date: return "date"
         case .location: return "input"
         case .workoutType: return "single"
         case .muscles: return "multiple"
@@ -88,6 +92,7 @@ enum filter: String {
         case .calendarView: return "single"
         case .calendarCategory: return "multiple"
         case .healthCategory: return "multiple"
+        case .workoutCategory: return "multiple"
         case .financeAccount: return "multiple"
         case .financeLevel: return "single"
         case .taskCategory: return "multiple"
@@ -104,8 +109,9 @@ enum filter: String {
         case .intolerances: return "Intolerances"
         case .recipeType: return "Type"
         case .eventType: return "Type"
-        case .eventStartDate: return "Start Date"
-        case .eventEndDate: return "End Date"
+        case .startDate: return "Start Date"
+        case .endDate: return "End Date"
+        case .date: return "End Date"
         case .location: return "Location"
         case .workoutType: return "Type"
         case .muscles: return "Muscles"
@@ -118,6 +124,7 @@ enum filter: String {
         case .calendarView: return "View"
         case .calendarCategory: return "Categories"
         case .healthCategory: return "Categories"
+        case .workoutCategory: return "Categories"
         case .financeAccount: return "Accounts"
         case .financeLevel: return "Level"
         case .taskCategory: return "Categories"
@@ -134,8 +141,9 @@ enum filter: String {
         case .intolerances: return "Exclude one or more intolerances"
         case .recipeType: return "Choose type of recipe"
         case .eventType: return "Choose type of event"
-        case .eventStartDate: return "Filter events with a start date after this date"
-        case .eventEndDate: return "Filter events with an end date before this date"
+        case .startDate: return "Filter with a start date after this date"
+        case .endDate: return "Filter with an end date before this date"
+        case .date: return "Filter based on this date"
         case .location: return "Filter events via location"
         case .workoutType: return "Workout includes type e.g. has cardio component"
         case .muscles: return "Workout includes one or more muscles"
@@ -148,6 +156,7 @@ enum filter: String {
         case .calendarView: return "Update view of calendar"
         case .calendarCategory: return "Filter based on categories"
         case .healthCategory: return "Filter based on categories"
+        case .workoutCategory: return "Filter based on workout categories"
         case .financeAccount: return "Filter based on account(s) included"
         case .financeLevel: return "Filter cash flow/balances sections based on level of detail shown"
         case .taskCategory: return "Filter based on categories"
@@ -164,8 +173,9 @@ enum filter: String {
         case .intolerances: return ["Dairy", "Egg", "Gluten", "Grain", "Peanut", "Seafood", "Sesame", "Shellfish", "Soy", "Sulfite", "Tree Nut", "Wheat"]
         case .recipeType: return ["Main Course", "Side Dish", "Dessert", "Appetizer", "Salad", "Bread", "Breakfast", "Soup", "Beverage", "Sauce", "Marinade", "Fingerfood", "Snack", "Drink"]
         case .eventType: return ["Music", "Sports", "Arts & Theatre", "Family", "Film", "Miscellaneous"]
-        case .eventStartDate: return []
-        case .eventEndDate: return []
+        case .startDate: return []
+        case .endDate: return []
+        case .date: return []
         case .location: return []
         case .workoutType: return ["Yoga", "Stretch", "Cardio", "Strength", "HIIT"]
         case .muscles: return ["Biceps", "Knees", "Lower Back", "Shoulders", "Calves", "Middle Back / Lats", "Spine", "Chest", "Glutes & Hip Flexors", "Quadriceps", "Upper Back & Lower Traps", "Hamstrings", "Abs", "Triceps", "Ankles", "Forearms", "Obliques", "Neck & Upper Traps"]
@@ -182,6 +192,12 @@ enum filter: String {
         case .calendarView: return ["List", "Daily"]
         case .calendarCategory: return []
         case .healthCategory: return []
+        case .workoutCategory:
+            if #available(iOS 14.0, *) {
+                return HKWorkoutActivityType.allCases.map({$0.name})
+            } else {
+                return HKWorkoutActivityType.oldAllCases.map({$0.name})
+            }
         case .taskCategory: return []
         case .showCompletedTasks: return ["Yes", "No"]
         case .financeAccount: return []

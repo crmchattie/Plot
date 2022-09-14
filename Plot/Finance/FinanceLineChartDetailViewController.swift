@@ -13,15 +13,8 @@ import Charts
 fileprivate let chartViewHeight: CGFloat = 200
 fileprivate let chartViewTopMargin: CGFloat = 10
 
-protocol UpdateFinancialsDelegate: AnyObject {
-    func updateTransactions(transactions: [Transaction])
-    func updateAccounts(accounts: [MXAccount])
-}
-
 class FinanceLineChartDetailViewController: UIViewController {
-    
-    weak var delegate : UpdateFinancialsDelegate?
-    
+        
     private let kFinanceTableViewCell = "FinanceTableViewCell"
     
     let isodateFormatter = ISO8601DateFormatter()
@@ -83,7 +76,6 @@ class FinanceLineChartDetailViewController: UIViewController {
         self.viewModel = viewModel
         self.networkController = networkController
         super.init(nibName: nil, bundle: nil)
-        //self.viewModel.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -136,17 +128,9 @@ class FinanceLineChartDetailViewController: UIViewController {
                 
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if let transactions = viewModel.transactions, !transactions.isEmpty {
-            self.delegate?.updateTransactions(transactions: transactions)
-        } else if let accounts = viewModel.accounts, !accounts.isEmpty {
-            self.delegate?.updateAccounts(accounts: accounts)
-        }
-    }
-    
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
     }
     
     @objc fileprivate func changeTheme() {
@@ -154,6 +138,12 @@ class FinanceLineChartDetailViewController: UIViewController {
         view.backgroundColor = theme.generalBackgroundColor
         backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
         chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        DispatchQueue.main.async {
+            self.fetchData(useAll: false)
+        }
     }
     
     private func configureView() {
@@ -293,7 +283,6 @@ extension FinanceLineChartDetailViewController: UITableViewDelegate, UITableView
             let transaction = transactions[indexPath.row]
             let destination = FinanceTransactionViewController(networkController: networkController)
             destination.transaction = transaction
-            destination.delegate = self
             ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
@@ -302,7 +291,6 @@ extension FinanceLineChartDetailViewController: UITableViewDelegate, UITableView
             let account = accounts[indexPath.row]
             let destination = FinanceAccountViewController(networkController: networkController)
             destination.account = account
-            destination.delegate = self
             ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
                 destination.selectedFalconUsers = participants
                 self.navigationController?.pushViewController(destination, animated: true)
@@ -317,22 +305,4 @@ enum TimeSegmentType: Int {
     case week
     case month
     case year
-}
-
-extension FinanceLineChartDetailViewController: UpdateAccountDelegate {
-    func updateAccount(account: MXAccount) {
-        if let index = viewModel.accounts!.firstIndex(of: account) {
-            viewModel.accounts![index] = account
-            fetchData(useAll: true)
-        }
-    }
-}
-
-extension FinanceLineChartDetailViewController: UpdateTransactionDelegate {
-    func updateTransaction(transaction: Transaction) {
-        if let index = viewModel.transactions!.firstIndex(of: transaction) {
-            viewModel.transactions![index] = transaction
-            fetchData(useAll: true)
-        }
-    }
 }
