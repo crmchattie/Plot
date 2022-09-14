@@ -99,7 +99,6 @@ class ActivityActions: NSObject {
         
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
         
-        
         if active {
             Analytics.logEvent("update_activity", parameters: [
                 "activity_name": activity.name ?? "name" as NSObject,
@@ -134,12 +133,10 @@ class ActivityActions: NSObject {
             let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             updateParticipants(membersIDs: membersIDs)
             groupActivityReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
-        }
-        
-        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-            InvitationsFetcher.updateInvitations(forActivity:activity, selectedParticipants: selectedFalconUsers) {
+            
+            InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
             }
-        })
+        }
     }
     
     func updateActivity(firebaseDictionary: [String: AnyObject]) {
@@ -190,11 +187,17 @@ class ActivityActions: NSObject {
         self.dispatchGroup.enter()
         self.dispatchGroup.enter()
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
-        connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
-        self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-            InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
-            }
-        })
+        
+        if let containerID = activity.containerID {
+            ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+            self.dispatchGroup.leave()
+        } else {
+            connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
+            self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+                InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
+                }
+            })
+        }
         
         // Save to calendar
         guard let currentUserId = Auth.auth().currentUser?.uid else {
@@ -319,7 +322,7 @@ class ActivityActions: NSObject {
         })
         for memberID in memberIDs {
             if activity.isTask ?? false {
-                if memberID == currentUserID {
+                if memberID == currentUserID, activity.listID != nil {
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                     let values: [String : Any] = ["isGroupActivity": true,
                                                   "badge": 0,
@@ -353,7 +356,7 @@ class ActivityActions: NSObject {
                     }
                 }
             } else {
-                if memberID == currentUserID {
+                if memberID == currentUserID, activity.calendarID != nil {
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                     let values: [String : Any] = ["isGroupActivity": true,
                                                   "badge": 0,
@@ -412,11 +415,11 @@ class ActivityActions: NSObject {
             if participantsSet.contains(member) {
                 Database.database().reference().child(userActivitiesEntity).child(member).child(activityID).removeValue()
             }
-            
-            dispatchGroup.enter()
-            
-            connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
         }
+        
+        dispatchGroup.enter()
+        
+        connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
     }
     
     func storeReminder() {

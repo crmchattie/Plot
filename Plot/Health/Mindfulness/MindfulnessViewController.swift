@@ -72,6 +72,11 @@ class MindfulnessViewController: FormViewController {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
                 mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil, user_created: true)
+                
+                //need to fix; sloppy code that is used to stop an event from being created
+                if let container = container {
+                    mindfulness.containerID = container.id
+                }
             }
         } else {
             active = true
@@ -345,27 +350,30 @@ class MindfulnessViewController: FormViewController {
             }
         
         
-        <<< LabelRow("Participants") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
-                row.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                row.value = String(self.selectedFalconUsers.count)
+        if delegate == nil {
+            form.last!
+            <<< LabelRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
+                    row.value = String(self.selectedFalconUsers.count + 1)
+                } else {
+                    row.value = String(self.selectedFalconUsers.count)
+                }
+            }.onCellSelection({ _, row in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
-        }.onCellSelection({ _, row in
-            self.openParticipantsInviter()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            cell.textLabel?.textAlignment = .left
         }
         
         if delegate == nil && active {
@@ -456,11 +464,11 @@ class MindfulnessViewController: FormViewController {
                                     }
                                     $0.multivaluedRowToInsertAt = { index in
                                         self.purchaseIndex = index
-                                        self.openTransaction()
+                                        self.openPurchases()
                                         return PurchaseRow()
                                             .onCellSelection() { cell, row in
                                                 self.purchaseIndex = index
-                                                self.openTransaction()
+                                                self.openPurchases()
                                                 cell.cellResignFirstResponder()
                                         }
 
@@ -627,8 +635,12 @@ extension MindfulnessViewController: UpdateInvitees {
             
             if active {
                 self.showActivityIndicator()
-                let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createMindfulness.createNewMindfulness()
+                if let container = container {
+                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+                } else {
+                    let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createMindfulness.createNewMindfulness()
+                }
                 self.hideActivityIndicator()
             }
             

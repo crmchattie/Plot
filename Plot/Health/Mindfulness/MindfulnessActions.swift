@@ -51,7 +51,7 @@ class MindfulnessActions: NSObject {
             return
         }
         
-        guard let active = active, let ID = ID, let _ = selectedFalconUsers else {
+        guard let active = active, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
         
@@ -86,7 +86,12 @@ class MindfulnessActions: NSObject {
         if !active {
             Analytics.logEvent("new_mindfulness", parameters: [String: Any]())
             dispatchGroup.enter()
-            connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
+            if let containerID = mindfulness.containerID {
+                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+                dispatchGroup.leave()
+            } else {
+                connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
+            }
         } else {
             Analytics.logEvent("update_mindfulness", parameters: [String: Any]())
         }
@@ -101,13 +106,16 @@ class MindfulnessActions: NSObject {
     }
     
     func createActivity() {
-        if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID {
+        if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID, let active = active {
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
             activityActions.createNewActivity()
             //will update activity.containerID and mindfulness.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulness.id], mealIDs: nil, transactionIDs: nil)
+            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulness.id], mealIDs: nil, transactionIDs: nil, participantsIDs: mindfulness.participantsIDs)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
+            if active {
+                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers ?? [])
+            }
         }
     }
     
@@ -190,11 +198,11 @@ class MindfulnessActions: NSObject {
             if participantsSet.contains(member) {
                 Database.database().reference().child(userMindfulnessEntity).child(member).child(ID).removeValue()
             }
-            
-            dispatchGroup.enter()
-            
-            connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+        
+        connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {

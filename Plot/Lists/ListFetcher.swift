@@ -261,10 +261,10 @@ class ListFetcher: NSObject {
         userListDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists() {
                 let group = DispatchGroup()
-                group.enter()
                 let listIDs = snapshot.value as? [String: AnyObject] ?? [:]
                 for (ID, userListInfo) in listIDs {
                     if let userList = try? FirebaseDecoder().decode(ListType.self, from: userListInfo) {
+                        group.enter()
                         ref.child(listEntity).child(ID).observeSingleEvent(of: .value, with: { snapshot in
                             if snapshot.exists(), let snapshotValue = snapshot.value {
                                 if let list = try? FirebaseDecoder().decode(ListType.self, from: snapshotValue) {
@@ -274,11 +274,9 @@ class ListFetcher: NSObject {
                                     _list.muted = userList.muted
                                     _list.pinned = userList.pinned
                                     lists.append(_list)
-                                    group.leave()
                                 }
-                            } else {
-                                group.leave()
                             }
+                            group.leave()
                         })
                     }
                 }

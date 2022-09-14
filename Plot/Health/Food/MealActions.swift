@@ -180,11 +180,11 @@ class MealActions: NSObject {
             if participantsSet.contains(member) {
                 Database.database().reference().child(userMealsEntity).child(member).child(ID).removeValue()
             }
-            
-            dispatchGroup.enter()
-            
-            connectMembersToGroupMeal(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+        connectMembersToGroupMeal(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {

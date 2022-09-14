@@ -67,7 +67,7 @@ extension WorkoutViewController {
                 $0.value = purchase
             }.onCellSelection() { cell, row in
                 self.purchaseIndex = row.indexPath!.row
-                self.openTransaction()
+                self.openPurchases()
                 cell.cellResignFirstResponder()
             }, at: mvs.count - 1)
         }
@@ -95,7 +95,15 @@ extension WorkoutViewController {
                 destination.users = self.selectedFalconUsers
                 destination.filteredUsers = self.selectedFalconUsers
                 destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
+                if let container = self.container {
+                    destination.container = container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: [self.workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.workout.participantsIDs)
+                    destination.container = self.container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }))
             alert.addAction(UIAlertAction(title: "Existing Task", style: .default, handler: { (_) in
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
@@ -141,9 +149,15 @@ extension WorkoutViewController {
                 destination.users = self.selectedFalconUsers
                 destination.filteredUsers = self.selectedFalconUsers
                 destination.delegate = self
-                destination.startDateTime = self.workout.startDateTime
-                destination.endDateTime = self.workout.endDateTime
-                self.navigationController?.pushViewController(destination, animated: true)
+                if let container = self.container {
+                    destination.container = container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: [self.workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.workout.participantsIDs)
+                    destination.container = self.container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }))
             alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
@@ -167,7 +181,7 @@ extension WorkoutViewController {
         }
     }
     
-    func openTransaction() {
+    func openPurchases() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
@@ -186,10 +200,17 @@ extension WorkoutViewController {
                 destination.movingBackwards = true
                 destination.users = self.selectedFalconUsers
                 destination.filteredUsers = self.selectedFalconUsers
-                self.navigationController?.pushViewController(destination, animated: true)
+                if let container = self.container {
+                    destination.container = container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: [self.workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.workout.participantsIDs)
+                    destination.container = self.container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
-                print("Existing")
                 let destination = ChooseTransactionTableViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
@@ -199,7 +220,7 @@ extension WorkoutViewController {
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let mvs = self.form.sectionBy(tag: "Transactions") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
+                    mvs.remove(at: self.purchaseIndex)
                 }
             }))
             self.present(alert, animated: true)
@@ -208,12 +229,15 @@ extension WorkoutViewController {
     
     func updateLists() {
         if container != nil {
-            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: container.workoutIDs, mindfulnessIDs: container.mindfulnessIDs, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+            container = Container(id: container.id, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: container.workoutIDs, mindfulnessIDs: container.mindfulnessIDs, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: workout.participantsIDs)
         } else {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: [workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+            container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: [workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: workout.participantsIDs)
         }
         ContainerFunctions.updateContainerAndStuffInside(container: container)
+        if active {
+            ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+        }
     }
     
     func sortSchedule() {
@@ -368,7 +392,7 @@ extension WorkoutViewController: UpdateTransactionDelegate {
                     $0.value = transaction
                 }.onCellSelection() { cell, row in
                     self.purchaseIndex = row.indexPath!.row
-                    self.openTransaction()
+                    self.openPurchases()
                     cell.cellResignFirstResponder()
                 }, at: purchaseIndex)
             } else {
@@ -399,7 +423,7 @@ extension WorkoutViewController: ChooseTransactionDelegate {
                     $0.value = transaction
                 }.onCellSelection() { cell, row in
                     self.purchaseIndex = row.indexPath!.row
-                    self.openTransaction()
+                    self.openPurchases()
                     cell.cellResignFirstResponder()
                 }, at: purchaseIndex)
             } else {

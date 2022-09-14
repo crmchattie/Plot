@@ -172,10 +172,12 @@ class AccountActions: NSObject {
                 Database.database().reference().child(userFinancialAccountsEntity).child(member).child(ID).removeValue()
             }
             
-            dispatchGroup.enter()
-            
-            connectMembersToGroupAccount(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+        
+        connectMembersToGroupAccount(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {

@@ -213,10 +213,6 @@ class FinanceDetailViewController: UIViewController {
     }
     
     private func updateCollectionView() {
-        guard currentReachabilityStatus != .notReachable else {
-            return
-        }
-                        
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
                 
@@ -293,8 +289,10 @@ class FinanceDetailViewController: UIViewController {
                         return false
                     }
                 }
-                self.sections.append(section)
-                self.groups[section] = filteredTransactions
+                if !filteredTransactions.isEmpty {
+                    self.sections.append(section)
+                    self.groups[section] = filteredTransactions
+                }
             } else if section.type == "Investments" {
                 var filteredHoldings = holdings
                 if let value = filterDictionary["search"] {

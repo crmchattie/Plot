@@ -29,6 +29,8 @@ class ActivityBuilder {
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
+        activity.participantsIDs = workout.participantsIDs
+        
         return activity
     }
     
@@ -51,7 +53,7 @@ class ActivityBuilder {
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
-        
+        activity.participantsIDs = mindfulness.participantsIDs
         return activity
     }
     
@@ -74,23 +76,18 @@ class ActivityBuilder {
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
-        
+        activity.participantsIDs = meal.participantsIDs
         return activity
     }
     
     class func createActivity(from transaction: Transaction) -> Activity? {
         let isodateFormatter = ISO8601DateFormatter()
-        let numberFormatter = NumberFormatter()
-        numberFormatter.currencyCode = transaction.currency_code
         var start = Date()
         var end = Date()
         
-        if let reportDate = transaction.date_for_reports, reportDate != "", let date = isodateFormatter.date(from: reportDate) {
-            start = date
-            end = date
-        } else if let date = isodateFormatter.date(from: transaction.transacted_at) {
-            start = date
-            end = date
+        if let date = isodateFormatter.date(from: transaction.transacted_at) {
+            start = date.UTCTime
+            end = date.UTCTime
         } else {
             return nil
         }
@@ -102,14 +99,13 @@ class ActivityBuilder {
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.activityType = "Transaction"
-        activity.category = "Transaction"
         activity.name = transaction.description
-        activity.activityDescription = "\(String(describing: numberFormatter.string(for: transaction.amount)))"
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
+        activity.participantsIDs = transaction.participantsIDs
         return activity
     }
 }

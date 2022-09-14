@@ -122,6 +122,9 @@ class FinanceTransactionViewController: FormViewController {
             let date = isodateFormatter.string(from: Date())
             transaction = Transaction(description: "Name", amount: 0.0, created_at: date, guid: ID, user_guid: currentUser, type: .debit, status: .posted, category: "Uncategorized", top_level_category: "Uncategorized", user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
+            if let container = container {
+                transaction.containerID = container.id
+            }
         }
         
         status = transaction.status == .posted
@@ -521,6 +524,8 @@ class FinanceTransactionViewController: FormViewController {
                 cell.textLabel?.textAlignment = .left
             }
         
+        if delegate == nil {
+            form.last!
             <<< LabelRow("Participants") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
@@ -543,6 +548,9 @@ class FinanceTransactionViewController: FormViewController {
                 cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                 cell.textLabel?.textAlignment = .left
             }
+        }
+        
+        form.last!
         
             <<< LabelRow("Tags") { row in
                 row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -576,7 +584,7 @@ class FinanceTransactionViewController: FormViewController {
                     } else {
                         // Fallback on earlier versions
                     }
-                    $0.options = ["Tasks", "Events", "Transactions"]
+                    $0.options = ["Tasks", "Events", "Health"]
                     $0.value = "Tasks"
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -687,7 +695,8 @@ class FinanceTransactionViewController: FormViewController {
     func createRule() {
         let destination = FinanceTransactionRuleViewController(networkController: networkController)
         destination.transaction = transaction
-        self.navigationController?.pushViewController(destination, animated: true)
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     @objc fileprivate func openLevel(level: String, value: String, otherValue: String?) {
@@ -851,8 +860,12 @@ extension FinanceTransactionViewController: UpdateInvitees {
             
             if active {
                 self.showActivityIndicator()
-                let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createTransaction.updateTransactionParticipants()
+                if let container = container {
+                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+                } else {
+                    let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createTransaction.updateTransactionParticipants()
+                }
                 self.hideActivityIndicator()
             }
         }

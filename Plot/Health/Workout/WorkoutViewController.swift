@@ -79,6 +79,10 @@ class WorkoutViewController: FormViewController {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
                 workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, user_created: true)
+                //need to fix; sloppy code that is used to stop an event from being created
+                if let container = container {
+                    workout.containerID = container.id
+                }
             }
         }
         configureTableView()
@@ -455,27 +459,30 @@ class WorkoutViewController: FormViewController {
 //            self.updateCalories()
         })
         
-        <<< LabelRow("Participants") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
-                row.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                row.value = String(self.selectedFalconUsers.count)
+        if delegate == nil {
+            form.last!
+            <<< LabelRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
+                    row.value = String(self.selectedFalconUsers.count + 1)
+                } else {
+                    row.value = String(self.selectedFalconUsers.count)
+                }
+            }.onCellSelection({ _, row in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
-        }.onCellSelection({ _, row in
-            self.openParticipantsInviter()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            cell.textLabel?.textAlignment = .left
         }
         
         if delegate == nil && active {
@@ -566,11 +573,11 @@ class WorkoutViewController: FormViewController {
                                     }
                                     $0.multivaluedRowToInsertAt = { index in
                                         self.purchaseIndex = index
-                                        self.openTransaction()
+                                        self.openPurchases()
                                         return PurchaseRow()
                                             .onCellSelection() { cell, row in
                                                 self.purchaseIndex = index
-                                                self.openTransaction()
+                                                self.openPurchases()
                                                 cell.cellResignFirstResponder()
                                         }
 
@@ -739,8 +746,12 @@ extension WorkoutViewController: UpdateInvitees {
             
             if active {
                 showActivityIndicator()
-                let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
-                createWorkout.updateWorkoutParticipants()
+                if let container = container {
+                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+                } else {
+                    let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
+                    createWorkout.updateWorkoutParticipants()
+                }
                 hideActivityIndicator()
             }
             

@@ -1866,6 +1866,13 @@ extension Date {
         return Date(timeIntervalSince1970: timezoneEpochOffset)
     }
     
+    var UTCTime: Date {
+        let timezoneOffset =  TimeZone.current.secondsFromGMT()
+        let epochDate = self.timeIntervalSince1970
+        let timezoneEpochOffset = (epochDate - Double(timezoneOffset))
+        return Date(timeIntervalSince1970: timezoneEpochOffset)
+    }
+    
     var startOfDay: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!

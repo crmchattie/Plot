@@ -23,21 +23,15 @@ extension TaskViewController: UpdateInvitees {
             
             if active {
                 showActivityIndicator()
-                let createActivity = ActivityActions(activity: task, active: active, selectedFalconUsers: selectedFalconUsers)
-                createActivity.updateActivityParticipants()
-                
-//                for list in listList {
-//                    if let grocerylist = list.grocerylist {
-//                        let createGrocerylist = GrocerylistActions(grocerylist: grocerylist, active: active, selectedFalconUsers: selectedFalconUsers)
-//                        createGrocerylist.updateGrocerylistParticipants()
-//                    } else if let checklist = list.checklist {
-//                        let createChecklist = ChecklistActions(checklist: checklist, active: active, selectedFalconUsers: selectedFalconUsers)
-//                        createChecklist.updateChecklistParticipants()
-//                    }
-//                }
+                if let container = container {
+                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+                } else {
+                    let createActivity = ActivityActions(activity: task, active: active, selectedFalconUsers: selectedFalconUsers)
+                    createActivity.updateActivityParticipants()
+                }
                 hideActivityIndicator()
             }
-            decimalRowFunc()
+//            decimalRowFunc()
         }
     }
 }

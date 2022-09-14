@@ -170,18 +170,13 @@ class GrocerylistActions: NSObject {
             if participantsSet.contains(member) {
                 Database.database().reference().child(userGrocerylistsEntity).child(member).child(ID).removeValue()
             }
-            if let chatID = grocerylist.conversationID { Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").updateChildValues(membersIDs.1)
-            }
             
-            dispatchGroup.enter()
-            
-            if let chatID = grocerylist.conversationID {
-                dispatchGroup.enter()
-                connectMembersToGroupChat(memberIDs: membersIDs.0, chatID: chatID)
-            }
-            
-            connectMembersToGroupGrocerylist(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+                    
+        connectMembersToGroupGrocerylist(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func connectMembersToGroupChat(memberIDs: [String], chatID: String) {

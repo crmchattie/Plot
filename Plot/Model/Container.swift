@@ -27,7 +27,7 @@ struct Container: Codable, Equatable, Hashable {
     var transactionIDs: [String]?
     var participantsIDs: [String]?
     
-    init(id: String, activityIDs: [String]?, taskIDs: [String]?, workoutIDs: [String]?, mindfulnessIDs: [String]?, mealIDs: [String]?, transactionIDs: [String]?) {
+    init(id: String, activityIDs: [String]?, taskIDs: [String]?, workoutIDs: [String]?, mindfulnessIDs: [String]?, mealIDs: [String]?, transactionIDs: [String]?, participantsIDs: [String]?) {
         self.id = id
         self.activityIDs = activityIDs
         self.taskIDs = taskIDs
@@ -35,6 +35,7 @@ struct Container: Codable, Equatable, Hashable {
         self.mindfulnessIDs = mindfulnessIDs
         self.mealIDs = mealIDs
         self.transactionIDs = transactionIDs
+        self.participantsIDs = participantsIDs
     }
 }
 
@@ -65,8 +66,62 @@ class ContainerFunctions {
         }
     }
     
+    class func updateParticipants(containerID: String, selectedFalconUsers: [User]) {
+        guard let _ = Auth.auth().currentUser?.uid else {return}
+        
+        let dataReference = Database.database().reference().child(containerEntity).child(containerID)
+        dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let snapshotValue = snapshot.value, let container = try? FirebaseDecoder().decode(Container.self, from: snapshotValue) {
+                let reference = Database.database().reference()
+                reference.child(containerEntity).child(container.id).updateChildValues(["participantsIDs": container.participantsIDs as AnyObject])
+                
+                for activityID in container.activityIDs ?? [] {
+                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in
+                        if let fetch = fetched.first {
+                            let create = ActivityActions(activity: fetch, active: true, selectedFalconUsers: selectedFalconUsers)
+                            create.updateActivityParticipants()
+                        }
+                    }
+                }
+                for taskID in container.taskIDs ?? [] {
+                    ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
+                        if let fetch = fetched.first {
+                            let create = ActivityActions(activity: fetch, active: true, selectedFalconUsers: selectedFalconUsers)
+                            create.updateActivityParticipants()
+                        }
+                    }
+                }
+                for transactionID in container.transactionIDs ?? [] {
+                    FinancialTransactionFetcher.getDataFromSnapshot(ID: transactionID) { fetched in
+                        if let fetch = fetched.first {
+                            let create = TransactionActions(transaction: fetch, active: true, selectedFalconUsers: selectedFalconUsers)
+                            create.updateTransactionParticipants()
+                        }
+                    }
+                }
+                
+                for workoutID in container.workoutIDs ?? [] {
+                    WorkoutFetcher.getDataFromSnapshot(ID: workoutID) { fetched in
+                        if let fetch = fetched.first {
+                            let create = WorkoutActions(workout: fetch, active: true, selectedFalconUsers: selectedFalconUsers)
+                            create.updateWorkoutParticipants()
+                        }
+                    }
+                }
+                for mindfulnessID in container.mindfulnessIDs ?? [] {
+                    MindfulnessFetcher.getDataFromSnapshot(ID: mindfulnessID) { fetched in
+                        if let fetch = fetched.first {
+                            let create = MindfulnessActions(mindfulness: fetch, active: true, selectedFalconUsers: selectedFalconUsers)
+                            create.updateMindfulnessParticipants()
+                        }
+                    }
+                }
+            }
+        })
+    }
+    
     class func grabContainerAndStuffInside(id: String, completion: @escaping (Container, [Activity]?, [Activity]?, [HealthContainer]?, [Transaction]?) -> Void) {
-        var container = Container(id: id, activityIDs: nil, taskIDs: nil, workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+        var container = Container(id: id, activityIDs: nil, taskIDs: nil, workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: nil)
         var activities = [Activity]()
         var tasks = [Activity]()
         var healths = [HealthContainer]()
@@ -78,7 +133,6 @@ class ContainerFunctions {
             if snapshot.exists(), let snapshotValue = snapshot.value, let contain = try? FirebaseDecoder().decode(Container.self, from: snapshotValue) {
                 container = contain
                 for activityID in container.activityIDs ?? [] {
-                    print("container activityID \(activityID)")
                     dispatchGroup.enter()
                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in
                         activities.append(contentsOf: fetched)
@@ -86,7 +140,6 @@ class ContainerFunctions {
                     }
                 }
                 for taskID in container.taskIDs ?? [] {
-                    print("container taskID \(taskID)")
                     dispatchGroup.enter()
                     ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
                         tasks.append(contentsOf: fetched)
@@ -94,7 +147,6 @@ class ContainerFunctions {
                     }
                 }
                 for transactionID in container.transactionIDs ?? [] {
-                    print("container transactionID \(transactionID)")
                     dispatchGroup.enter()
                     FinancialTransactionFetcher.getDataFromSnapshot(ID: transactionID) { fetched in
                         transactions.append(contentsOf: fetched)
@@ -103,7 +155,6 @@ class ContainerFunctions {
                 }
                 
                 for workoutID in container.workoutIDs ?? [] {
-                    print("container workoutID \(workoutID)")
                     dispatchGroup.enter()
                     WorkoutFetcher.getDataFromSnapshot(ID: workoutID) { fetched in
                         if let workout = fetched.first {
@@ -115,7 +166,6 @@ class ContainerFunctions {
                     }
                 }
                 for mindfulnessID in container.mindfulnessIDs ?? [] {
-                    print("container mindfulnessID \(mindfulnessID)")
                     dispatchGroup.enter()
                     MindfulnessFetcher.getDataFromSnapshot(ID: mindfulnessID) { fetched in
                         if let mindfulness = fetched.first {

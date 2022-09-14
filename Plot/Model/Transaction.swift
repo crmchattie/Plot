@@ -210,35 +210,6 @@ enum TransactionType: String, Codable, CaseIterable {
     }
 }
 
-//
-//    var categoryLists: [TransactionCategory] {
-//        switch self {
-//        case .autoTransport: return ["Auto Insurance", "Auto Payment", "Gas", "Parking", "Public Transportation", "Service & Parts", .autoTransport]
-//        case "Bills"Utilities: return ["Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills"Utilities]
-//        case .businessServices: return [.advertising, .legal, .officeSupplies, .printing, .shipping, .businessServices]
-//        case .education: return [.booksSupplies, .studentLoan, .tuition, .education]
-//        case .electronicsSoftware: return [.electronicsSoftware]
-//        case .entertainment: return [.amusement, .arts, .moviesDvds, .music, .newspapersMagazines, .entertainment]
-//        case .feesCharges: return [.atmFee, .bankingFee, .financeCharge, .lateFee, .serviceFee, .tradeCommissions, .feesCharges]
-//        case .financial: return [.financialAdvisor, .lifeInsurance, .financial]
-//        case .foodDining: return [.alcoholBars, .coffeeShops, .fastFood, .groceries, .restaurants, .foodDining]
-//        case .giftsDonations: return [.charity, .gift, .giftsDonations]
-//        case .healthFitness: return [.dentist, .doctor, .eyecare, .gym, .healthInsurance, .pharmacy, .sports, .healthFitness]
-//        case .home: return [.furnishings, .homeImprovement, .homeInsurance, .homeServices, .homeSupplies, .lawnGarden, .mortgageRent, .home]
-//        case "Income": return [.bonus, .interestIncome, .paycheck, .reimbursement, .rentalIncome, "Income"]
-//        case .investments: return [.buy, .deposit, .dividendCapGains, .sell, .withdrawal, .investments]
-//        case "Kids": return [.allowance, .babySupplies, .babysitterDaycare, .childSupport, "Kids"Activities, .toys, "Kids"]
-//        case .personalCare: return [.hair, .laundry, .spaMassage, .personalCare]
-//        case .pets: return [.petFoodSupplies, .petGrooming, .veterinary, .pets]
-//        case .shopping: return [.books, .clothing, .hobbies, .sportingGoods, .shopping]
-//        case .taxes: return [.federalTax, .localTax, .propertyTax, .salesTax, .stateTax, .taxes]
-//        case "Transfer": return [.creditCardPayment, "Transfer"CashSpending, "Transfer", .mortgagePayment]
-//        case .travel: return [.airTravel, .hotel, .rentalCarTaxi, .vacation, .travel]
-//        case "Uncategorized": return [.cash, .check, "Uncategorized"]
-//        }
-//    }
-
-
 struct TransactionDetails: Codable, Equatable, Hashable {
     var uuid = UUID().uuidString
     var name: String

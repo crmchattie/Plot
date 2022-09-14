@@ -168,10 +168,12 @@ class CalendarActions: NSObject {
                 Database.database().reference().child(userCalendarEntity).child(member).child(ID).removeValue()
             }
             
-            dispatchGroup.enter()
-            
-            connectMembersToGroupCalendar(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+        
+        connectMembersToGroupCalendar(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {

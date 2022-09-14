@@ -261,10 +261,10 @@ class CalendarFetcher: NSObject {
         userCalendarDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists() {
                 let group = DispatchGroup()
-                group.enter()
                 let calendarIDs = snapshot.value as? [String: AnyObject] ?? [:]
                 for (ID, userCalendarInfo) in calendarIDs {
                     if let userCalendar = try? FirebaseDecoder().decode(CalendarType.self, from: userCalendarInfo) {
+                        group.enter()
                         ref.child(calendarEntity).child(ID).observeSingleEvent(of: .value, with: { snapshot in
                             if snapshot.exists(), let snapshotValue = snapshot.value {
                                 if let calendar = try? FirebaseDecoder().decode(CalendarType.self, from: snapshotValue) {
@@ -274,11 +274,9 @@ class CalendarFetcher: NSObject {
                                     _calendar.muted = userCalendar.muted
                                     _calendar.pinned = userCalendar.pinned
                                     calendars.append(_calendar)
-                                    group.leave()
                                 }
-                            } else {
-                                group.leave()
                             }
+                            group.leave()
                         })
                     }
                 }

@@ -170,10 +170,12 @@ class HoldingActions: NSObject {
                 Database.database().reference().child(userFinancialHoldingsEntity).child(member).child(ID).removeValue()
             }
             
-            dispatchGroup.enter()
-            
-            connectMembersToGroupHolding(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+        
+        connectMembersToGroupHolding(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {

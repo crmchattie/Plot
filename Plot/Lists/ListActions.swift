@@ -168,10 +168,12 @@ class ListActions: NSObject {
                 Database.database().reference().child(userListEntity).child(member).child(ID).removeValue()
             }
             
-            dispatchGroup.enter()
-            
-            connectMembersToGroupList(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+        
+        connectMembersToGroupList(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {

@@ -50,7 +50,6 @@ final class ScheduleCell: Cell<Activity>, CellType {
     //blue dot on the left of cell
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "activity"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button

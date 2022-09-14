@@ -59,47 +59,37 @@ class WorkoutOperation: AsyncOperation {
                             if (_self.lastSyncDate == nil || (workout.startDate >= _self.lastSyncDate!)) && existingWorkoutKeys[workout.uuid.uuidString] == nil {
                                 let ref = Database.database().reference()
                                 var workoutID = UUID().uuidString
-                                var activityID = UUID().uuidString
+                                
                                 if let newWorkoutId = ref.child(userWorkoutsEntity).child(currentUserID).childByAutoId().key {
                                     workoutID = newWorkoutId
-                                }
-                                if let newActivityId = ref.child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
-                                    activityID = newActivityId
                                 }
                                 
                                 ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(workout.uuid.uuidString).child(identifierKey).setValue(workoutID)
                                 
                                 ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(hkSampleIDKey).setValue(workout.uuid.uuidString)
                                 ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child("totalEnergyBurned").setValue(totalEnergyBurned)
-                                
-                                let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                                                                
+                                                                                                
                                 var workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
-                                workoutFB.containerID = containerID
                                 
-                                let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-                                activity.category = "Workout"
-                                activity.name = workout.workoutActivityType.name
-                                activity.activityDescription = "\(totalEnergyBurned.clean) calories"
-                                
-                                activity.startDateTime = NSNumber(value: workout.startDate.timeIntervalSince1970)
-                                activity.endDateTime = NSNumber(value: workout.endDate.timeIntervalSince1970)
-                                activity.startTimeZone = TimeZone.current.identifier
-                                activity.endTimeZone = TimeZone.current.identifier
+                                if let activity = ActivityBuilder.createActivity(from: workoutFB), let activityID = activity.activityID {
+                                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
 
-                                activity.allDay = false
-                                activity.containerID = containerID
-                                
-                                let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
-                                workoutActions.createNewWorkout()
-                                                                
-                                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                                activityActions.createNewActivity()
-                                
-                                let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workoutID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
-                                containers.append(container)
-                                
-                                
+                                    workoutFB.containerID = containerID
+                                    
+                                    let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
+                                    workoutActions.createNewWorkout()
+                                    
+                                    activity.containerID = containerID
+                                    
+                                    let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                                    activityActions.createNewActivity()
+                                    
+                                    let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workoutID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: [currentUserID])
+                                    containers.append(container)
+                                } else {
+                                    let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
+                                    workoutActions.createNewWorkout()
+                                }
                             }
                         }
                     

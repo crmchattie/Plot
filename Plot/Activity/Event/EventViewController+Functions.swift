@@ -360,12 +360,15 @@ extension EventViewController {
             }
         } else if type == "container" {
             if container != nil {
-                container = Container(id: container.id, activityIDs: container.activityIDs, taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+                container = Container(id: container.id, activityIDs: container.activityIDs, taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: activity.participantsIDs)
             } else {
                 let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                container = Container(id: containerID, activityIDs: [activityID], taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}))
+                container = Container(id: containerID, activityIDs: [activityID], taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: activity.participantsIDs)
             }
             ContainerFunctions.updateContainerAndStuffInside(container: container)
+            if active {
+                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+            }
         } else {
             if listList.isEmpty {
                 activity.checklistIDs = nil
@@ -640,11 +643,10 @@ extension EventViewController {
         destination.delegate = self
         destination.scheduleList = scheduleList
         destination.acceptedParticipant = acceptedParticipant
-        destination.startDateTime = startDateTime
-        destination.endDateTime = endDateTime
+        destination.startDateTime = activity.startDate
+        destination.endDateTime = activity.endDate
         destination.activities = activities
         destination.activity = activity
-        
         self.navigationController?.pushViewController(destination, animated: true)
     
     }
@@ -671,7 +673,15 @@ extension EventViewController {
                 destination.users = self.selectedFalconUsers
                 destination.filteredUsers = self.selectedFalconUsers
                 destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
+                if let container = self.container {
+                    destination.container = container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: [self.activityID], taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.activity.participantsIDs)
+                    destination.container = self.container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }))
             alert.addAction(UIAlertAction(title: "Existing Task", style: .default, handler: { (_) in
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
@@ -712,9 +722,17 @@ extension EventViewController {
                 let destination = FinanceTransactionViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                destination.users = self.acceptedParticipant
-                destination.filteredUsers = self.acceptedParticipant
-                self.navigationController?.pushViewController(destination, animated: true)
+                destination.users = self.selectedFalconUsers
+                destination.filteredUsers = self.selectedFalconUsers
+                if let container = self.container {
+                    destination.container = container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: [self.activityID], taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.activity.participantsIDs)
+                    destination.container = self.container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
                 let destination = ChooseTransactionTableViewController(networkController: self.networkController)
@@ -738,11 +756,15 @@ extension EventViewController {
             let destination = WorkoutViewController(networkController: networkController)
             destination.workout = workout
             destination.delegate = self
+            destination.users = self.selectedFalconUsers
+            destination.filteredUsers = self.selectedFalconUsers
             self.navigationController?.pushViewController(destination, animated: true)
         } else if healthList.indices.contains(healthIndex), let mindfulness = healthList[healthIndex].mindfulness {
             let destination = MindfulnessViewController(networkController: networkController)
             destination.mindfulness = mindfulness
             destination.delegate = self
+            destination.users = self.selectedFalconUsers
+            destination.filteredUsers = self.selectedFalconUsers
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -750,13 +772,33 @@ extension EventViewController {
                 let destination = WorkoutViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                destination.users = self.selectedFalconUsers
+                destination.filteredUsers = self.selectedFalconUsers
+                if let container = self.container {
+                    destination.container = container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: [self.activityID], taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.activity.participantsIDs)
+                    destination.container = self.container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }))
             alert.addAction(UIAlertAction(title: "New Mindfulness", style: .default, handler: { (_) in
                 let destination = MindfulnessViewController(networkController: self.networkController)
                 destination.delegate = self
                 destination.movingBackwards = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                destination.users = self.selectedFalconUsers
+                destination.filteredUsers = self.selectedFalconUsers
+                if let container = self.container {
+                    destination.container = container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: [self.activityID], taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.activity.participantsIDs)
+                    destination.container = self.container
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let mvs = self.form.sectionBy(tag: "Health") as? MultivaluedSection {

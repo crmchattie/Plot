@@ -70,6 +70,10 @@ class EventViewController: FormViewController {
     // Participants with accepted invites
     var acceptedParticipant: [User] = []
     var weather: [DailyWeatherElement]!
+    
+    var transaction: Transaction!
+    var workout: Workout!
+    var mindfulness: Mindfulness!
         
     var active = false
     var sectionChanged: Bool = false
@@ -113,18 +117,32 @@ class EventViewController: FormViewController {
         } else {
             title = "New Event"
             if let currentUserID = Auth.auth().currentUser?.uid {
-                //create new activityID for auto updating items (schedule, purchases, checklist)
-                activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                let original = Date()
-                let rounded = Date(timeIntervalSinceReferenceDate:
-                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                
-                if let calendar = calendar {
-                    activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? "", calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                if let transaction = transaction, let activity = ActivityBuilder.createActivity(from: transaction), let activityID = activity.activityID {
+                    self.activity = activity
+                    self.activityID = activityID
+                } else if let workout = workout, let activity = ActivityBuilder.createActivity(from: workout), let activityID = activity.activityID {
+                    self.activity = activity
+                    self.activityID = activityID
+                } else if let mindfulness = mindfulness, let activity = ActivityBuilder.createActivity(from: mindfulness), let activityID = activity.activityID {
+                    self.activity = activity
+                    self.activityID = activityID
                 } else {
-                    let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.name == "Default"}
-                    activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? "", calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                    //create new activityID for auto updating items (schedule, purchases, checklist)
+                    activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    
+                    if let calendar = calendar {
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? "", calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                    } else {
+                        let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.name == "Default"}
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? "", calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
 
+                    }
+                }
+                if let container = container {
+                    activity.containerID = container.id
                 }
             }
         }
@@ -201,8 +219,8 @@ class EventViewController: FormViewController {
             $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
-            if self.active {
-                $0.value = self.activity.name
+            if let activity = activity, let name = activity.name {
+                $0.value = name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 $0.cell.textField.becomeFirstResponder()
@@ -226,8 +244,8 @@ class EventViewController: FormViewController {
             $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             $0.placeholder = $0.tag
-            if self.active && self.activity.activityDescription != "nothing" && self.activity.activityDescription != nil {
-                $0.value = self.activity.activityDescription
+            if let activity = activity, let description = activity.activityDescription, description != "nothing" {
+                $0.value = description
             }
         }.cellUpdate({ (cell, row) in
             cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -240,7 +258,7 @@ class EventViewController: FormViewController {
         <<< ButtonRow("Location") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textAlignment = .left
-            if self.active, let localName = activity.locationName, localName != "locationName" {
+            if let activity = activity, let localName = activity.locationName, localName != "locationName" {
                 row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                 row.cell.accessoryType = .detailDisclosureButton
                 row.title = localName
@@ -271,8 +289,8 @@ class EventViewController: FormViewController {
             $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             $0.title = $0.tag
-            if self.active {
-                $0.value = self.activity.allDay
+            if let activity = activity, let allDay = activity.allDay {
+                $0.value = allDay
             } else {
                 $0.value = false
                 self.activity.allDay = false
@@ -310,7 +328,7 @@ class EventViewController: FormViewController {
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
-            if self.active {
+            if let activity = activity {
                 if let timeZone = activity.startTimeZone {
                     $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                 }
@@ -337,7 +355,6 @@ class EventViewController: FormViewController {
                     self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
             }
-            self.startDateTime = $0.value
         }.onChange { [weak self] row in
             let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
             if row.value?.compare(endRow.value!) == .orderedDescending {
@@ -345,7 +362,6 @@ class EventViewController: FormViewController {
                 endRow.updateCell()
             }
             self!.activity.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-            self!.startDateTime = row.value
             if self!.active {
                 self!.updateRepeatReminder()
             }
@@ -392,7 +408,7 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
             row.hidden = true
-            if active, let timeZone = activity.startTimeZone {
+            if let activity = activity, let timeZone = activity.startTimeZone {
                 row.value = timeZone
             }
         }.onCellSelection({ _,_ in
@@ -411,7 +427,7 @@ class EventViewController: FormViewController {
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
-            if self.active {
+            if let activity = activity {
                 if let timeZone = activity.endTimeZone {
                     $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                 }
@@ -438,7 +454,6 @@ class EventViewController: FormViewController {
                     self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
             }
-            self.endDateTime = $0.value
         }.onChange { [weak self] row in
             let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
             if row.value?.compare(startRow.value!) == .orderedAscending {
@@ -446,7 +461,6 @@ class EventViewController: FormViewController {
                 startRow.updateCell()
             }
             self!.activity.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-            self!.endDateTime = row.value
             //                    self!.weatherRow()
         }.onExpandInlineRow { [weak self] cell, row, inlineRow in
             inlineRow.cellUpdate { (cell, row) in
@@ -491,14 +505,9 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
             row.hidden = true
-            
-            if active, let timeZone = activity.endTimeZone {
+            if let activity = activity, let timeZone = activity.endTimeZone {
                 row.value = timeZone
             }
-//            else {
-//                row.value = TimeZone.current.identifier
-//                activity.endTimeZone = TimeZone.current.identifier
-//            }
         }.onCellSelection({ _,_ in
             self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
         }).cellUpdate { cell, row in
@@ -515,7 +524,7 @@ class EventViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if self.active, let recurrences = self.activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
+            if let activity = activity, let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
                 row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
             } else {
                 row.value = "Never"
@@ -535,7 +544,7 @@ class EventViewController: FormViewController {
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
             row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
             row.title = row.tag
-            if self.active, let value = self.activity.reminder {
+            if let activity = activity, let value = activity.reminder {
                 row.value = EventAlert(rawValue: value)
             } else {
                 row.value = EventAlert.None
@@ -569,28 +578,33 @@ class EventViewController: FormViewController {
             }
         }
         
-        <<< LabelRow("Participants") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
-                row.value = String(self.acceptedParticipant.count + 1)
-            } else {
-                row.value = String(self.acceptedParticipant.count)
+        if delegate == nil {
+            form.last!
+            <<< LabelRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
+                    row.value = String(self.acceptedParticipant.count + 1)
+                } else {
+                    row.value = String(self.acceptedParticipant.count)
+                }
+            }.onCellSelection({ _, row in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
-        }.onCellSelection({ _, row in
-            self.openParticipantsInviter()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            cell.textLabel?.textAlignment = .left
         }
+        
+        form.last!
         
         <<< LabelRow("Calendar") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
@@ -599,8 +613,8 @@ class EventViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if self.active && self.activity.calendarName != nil {
-                row.value = self.activity.calendarName
+            if let activity = activity, let calendarName = activity.calendarName {
+                row.value = calendarName
             } else {
                 row.value = "Default"
             }
@@ -622,8 +636,8 @@ class EventViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if self.active && self.activity.category != nil {
-                row.value = self.activity.category
+            if let activity = activity, let category = activity.category {
+                row.value = category
             } else {
                 row.value = "Uncategorized"
             }

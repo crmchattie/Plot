@@ -116,6 +116,9 @@ class TaskViewController: FormViewController {
                     task.category = list?.category
 
                 }
+                if let container = container {
+                    task.containerID = container.id
+                }
             }
         }
         
@@ -796,29 +799,33 @@ class TaskViewController: FormViewController {
             }
         }
         
-        <<< LabelRow("Participants") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
-                row.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                row.value = String(self.selectedFalconUsers.count)
+        if delegate == nil {
+            form.last!
+            <<< LabelRow("Participants") { row in
+                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.textLabel?.textAlignment = .left
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
+                    row.value = String(self.selectedFalconUsers.count + 1)
+                } else {
+                    row.value = String(self.selectedFalconUsers.count)
+                }
+            }.onCellSelection({ _, row in
+                self.openParticipantsInviter()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textAlignment = .left
             }
-        }.onCellSelection({ _, row in
-            self.openParticipantsInviter()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            cell.textLabel?.textAlignment = .left
         }
         
+        form.last!
         <<< LabelRow("List") { row in
             row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
             row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor

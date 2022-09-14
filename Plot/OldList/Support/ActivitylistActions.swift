@@ -174,19 +174,12 @@ class ActivitylistActions: NSObject {
         for member in difference {
             if participantsSet.contains(member) {
                 Database.database().reference().child(userActivitylistsEntity).child(member).child(ID).removeValue()
-            }
-            if let chatID = activitylist.conversationID { Database.database().reference().child("groupChats").child(chatID).child(messageMetaDataFirebaseFolder).child("chatParticipantsIDs").updateChildValues(membersIDs.1)
-            }
-            
-            dispatchGroup.enter()
-            
-            if let chatID = activitylist.conversationID {
-                dispatchGroup.enter()
-                connectMembersToGroupChat(memberIDs: membersIDs.0, chatID: chatID)
-            }
-            
-            connectMembersToGroupActivitylist(memberIDs: membersIDs.0, ID: ID)
+            }            
         }
+        dispatchGroup.enter()
+                    
+        connectMembersToGroupActivitylist(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func connectMembersToGroupChat(memberIDs: [String], chatID: String) {

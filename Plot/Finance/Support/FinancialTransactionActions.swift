@@ -53,7 +53,7 @@ class TransactionActions: NSObject {
             return
         }
         
-        guard let active = active, let _ = transaction, let ID = ID, let _ = selectedFalconUsers else {
+        guard let active = active, let _ = transaction, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
         
@@ -80,7 +80,12 @@ class TransactionActions: NSObject {
                 "connected_to_activity": transaction.activityID ?? "none" as NSObject
             ])
             dispatchGroup.enter()
-            connectMembersToGroupTransaction(memberIDs: membersIDs.0, ID: ID)
+            if let containerID = transaction.containerID {
+                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+                dispatchGroup.leave()
+            } else {
+                connectMembersToGroupTransaction(memberIDs: membersIDs.0, ID: ID)
+            }
         } else {
             Analytics.logEvent("update_transaction", parameters: [
                 "connected_to_activity": transaction.activityID ?? "none" as NSObject
@@ -166,10 +171,12 @@ class TransactionActions: NSObject {
                 Database.database().reference().child(userFinancialTransactionsEntity).child(member).child(ID).removeValue()
             }
             
-            dispatchGroup.enter()
-            
-            connectMembersToGroupTransaction(memberIDs: membersIDs.0, ID: ID)
         }
+        
+        dispatchGroup.enter()
+        
+        connectMembersToGroupTransaction(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {

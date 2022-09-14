@@ -58,45 +58,36 @@ class MindfulnessOperation: AsyncOperation {
                     if (_self.lastSyncDate == nil || (sample.startDate >= _self.lastSyncDate!)) && existingMindfulnessKeys[sample.uuid.uuidString] == nil {
                         let ref = Database.database().reference()
                         var mindfulnessID = UUID().uuidString
-                        var activityID = UUID().uuidString
+
                         if let newMindfulnessId = ref.child(userMindfulnessEntity).child(currentUserID).childByAutoId().key {
                             mindfulnessID = newMindfulnessId
-                        }
-                        if let newActivityId = ref.child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
-                            activityID = newActivityId
                         }
                         
                         ref.child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey).child(sample.uuid.uuidString).child(identifierKey).setValue(mindfulnessID)
                         
                         ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulnessID).child(hkSampleIDKey).setValue(sample.uuid.uuidString)
-                        
-                        let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                                                        
+                                                                                
                         var mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
-                        mindfulnessFB.containerID = containerID
                         
-                        let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
-                        mindfulnessActions.createNewMindfulness()
-                                                
-                        
-                        let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-                        activity.category = "Mindfulness"
-                        activity.name = "Mindfulness Session"
-                        
-                        activity.startDateTime = NSNumber(value: sample.startDate.timeIntervalSince1970)
-                        activity.endDateTime = NSNumber(value: sample.endDate.timeIntervalSince1970)
-                        activity.startTimeZone = TimeZone.current.identifier
-                        activity.endTimeZone = TimeZone.current.identifier
+                        if let activity = ActivityBuilder.createActivity(from: mindfulnessFB), let activityID = activity.activityID {
+                            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
 
-                        activity.allDay = false
-                        
-                        activity.containerID = containerID
-                                                
-                        let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                        activityActions.createNewActivity()
-                        
-                        let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulnessID], mealIDs: nil, transactionIDs: nil)
-                        containers.append(container)
+                            mindfulnessFB.containerID = containerID
+                            
+                            let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
+                            mindfulnessActions.createNewMindfulness()
+                            
+                            activity.containerID = containerID
+                            
+                            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                            activityActions.createNewActivity()
+                            
+                            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulnessID], mealIDs: nil, transactionIDs: nil, participantsIDs: [currentUserID])
+                            containers.append(container)
+                        } else {
+                            let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
+                            mindfulnessActions.createNewMindfulness()
+                        }
                     }
                 }
                 

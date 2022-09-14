@@ -260,7 +260,7 @@ class FilterViewController: FormViewController {
                     $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
                     $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
                     $0.title = filter.titleText
-                    $0.dateFormatter?.dateStyle = .full
+                    $0.dateFormatter?.dateStyle = .long
                     if filterDictionary["\(filter.rawValue)"] != nil, let value = filterDictionary["\(filter.rawValue)"], let date = value[0].toDate() {
                         $0.value = date
                         $0.updateCell()
@@ -268,9 +268,20 @@ class FilterViewController: FormViewController {
                         $0.value = Date()
                         $0.updateCell()
                     }
-                }
-                .onChange { [weak self] row in
-                    if (row.tag == "startDate" || row.tag == "eventEndDate" || row.tag == "date"), let dateString = row.value?.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'") {
+                }.onExpandInlineRow { cell, row, inlineRow in
+                    inlineRow.cellUpdate { (cell, row) in
+                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                        if #available(iOS 13.4, *) {
+                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        }
+                        else {
+                            cell.datePicker.datePickerMode = .dateAndTime
+                        }
+                    }
+                    cell.detailTextLabel?.textColor = cell.tintColor
+                }.onChange { [weak self] row in
+                    if (row.tag == "startDate" || row.tag == "endDate" || row.tag == "date"), let dateString = row.value?.toString(dateFormat: "YYYY-MM-dd'T'HH:mm:ss'Z'") {
                         self?.filterDictionary["\(filter.rawValue)"] = [dateString]
                     }
                 }

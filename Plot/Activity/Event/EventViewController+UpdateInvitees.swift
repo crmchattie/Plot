@@ -25,11 +25,15 @@ extension EventViewController: UpdateInvitees {
             
             if active {
                 showActivityIndicator()
-                let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-                createActivity.updateActivityParticipants()
+                if let container = container {
+                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+                } else {
+                    let createActivity = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
+                    createActivity.updateActivityParticipants()
+                }
                 hideActivityIndicator()
             }
-            decimalRowFunc()
+//            decimalRowFunc()
         }
     }
 }

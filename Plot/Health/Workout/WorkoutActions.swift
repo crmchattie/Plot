@@ -51,7 +51,7 @@ class WorkoutActions: NSObject {
             return
         }
         
-        guard let active = active, let ID = ID, let _ = selectedFalconUsers else {
+        guard let active = active, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
         
@@ -70,7 +70,7 @@ class WorkoutActions: NSObject {
         workout.lastModifiedDate = Date()
         
         if workout.hkSampleID == nil {
-            createHealthKit()
+            createHealthKit(memberIDs: membersIDs.0)
         }
                 
         let groupWorkoutReference = Database.database().reference().child(workoutsEntity).child(ID)
@@ -87,28 +87,33 @@ class WorkoutActions: NSObject {
         if !active {
             Analytics.logEvent("new_workout", parameters: [String: Any]())
             dispatchGroup.enter()
-            connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
+            if let containerID = workout.containerID {
+                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+                dispatchGroup.leave()
+            } else {
+                connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
+            }
         } else {
             Analytics.logEvent("update_workout", parameters: [String: Any]())
         }
     }
     
-    func createHealthKit() {
+    func createHealthKit(memberIDs: [String]) {
         if let _ = HealthKitSampleBuilder.createHKWorkout(from: workout) {
             if workout.containerID == nil {
-                self.createActivity()
+                self.createActivity(memberIDs: memberIDs)
             }
         }
     }
     
-    func createActivity() {
+    func createActivity(memberIDs: [String]) {
         if let activity = ActivityBuilder.createActivity(from: self.workout), let activityID = activity.activityID {
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
             activityActions.createNewActivity()
             
             //will update activity.containerID and workout.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.id], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil)
+            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.id], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: memberIDs)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
         }
     }
@@ -192,11 +197,11 @@ class WorkoutActions: NSObject {
             if participantsSet.contains(member) {
                 Database.database().reference().child(userWorkoutsEntity).child(member).child(ID).removeValue()
             }
-            
-            dispatchGroup.enter()
-            
-            connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
         }
+        dispatchGroup.enter()
+        
+        connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
+
     }
     
     func incrementBadgeForReciever(ID: String?, participantsIDs: [String]) {
