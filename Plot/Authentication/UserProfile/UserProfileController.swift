@@ -21,7 +21,7 @@ class UserProfileController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         view.addSubview(userProfileContainerView)
         
         configureNavigationBar()
@@ -47,10 +47,10 @@ class UserProfileController: UIViewController {
     }
     
     fileprivate func configureColorsAccordingToTheme() {
-        userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        userProfileContainerView.name.textColor = .label
+        userProfileContainerView.bio.textColor = .label
+        userProfileContainerView.bio.keyboardAppearance = .default
+        userProfileContainerView.name.keyboardAppearance = .default
         userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image != nil)
     }
     

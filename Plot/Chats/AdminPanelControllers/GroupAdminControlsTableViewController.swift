@@ -164,14 +164,14 @@ class GroupAdminControlsTableViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = [UIRectEdge.top, UIRectEdge.bottom]
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
     }
     
     fileprivate func setupTableView() {
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.sectionIndexBackgroundColor = .systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.register(FalconUsersTableViewCell.self, forCellReuseIdentifier: membersCellID)
         tableView.register(GroupAdminControlsTableViewCell.self, forCellReuseIdentifier: adminControlsCellID)
         tableView.register(ChatActivitiesTableViewCell.self, forCellReuseIdentifier: eventCellID)
@@ -191,8 +191,8 @@ class GroupAdminControlsTableViewController: UITableViewController {
     }
     
     fileprivate func setupColorsAccordingToTheme() {
-        groupProfileTableHeaderContainer.name.textColor = ThemeManager.currentTheme().generalTitleColor
-        groupProfileTableHeaderContainer.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        groupProfileTableHeaderContainer.name.textColor = .label
+        groupProfileTableHeaderContainer.name.keyboardAppearance = .default
     }
     
     fileprivate func manageControlsAppearance() {
@@ -381,7 +381,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     
     func updateGroupName() {
         if members.count > 2 && (groupProfileTableHeaderContainer.name.text!.count == 0 || groupProfileTableHeaderContainer.name.text!.trimmingCharacters(in: .whitespaces).isEmpty) {
-            groupProfileTableHeaderContainer.name.attributedPlaceholder = NSAttributedString(string:"Update Group Name", attributes:[NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+            groupProfileTableHeaderContainer.name.attributedPlaceholder = NSAttributedString(string:"Update Group Name", attributes:[NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
             groupProfileTableHeaderContainer.name.becomeFirstResponder()
         }
     }
@@ -434,9 +434,9 @@ class GroupAdminControlsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            headerTitle.textLabel?.textColor = .secondaryLabel
             headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
             headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
         }
@@ -849,20 +849,20 @@ class GroupAdminControlsTableViewController: UITableViewController {
             
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: membersCellID, for: indexPath) as? FalconUsersTableViewCell ?? FalconUsersTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             
             if members[indexPath.row].id == conversationAdminID {
                 let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
                 label.text = "admin"
                 label.font = .preferredFont(forTextStyle: .footnote)
-                label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                label.textColor = .secondaryLabel
             }
             
             if let name = members[indexPath.row].name {
                 cell.title.text = name
             }
             if members[indexPath.row].id == Auth.auth().currentUser?.uid {
-                cell.subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.subtitle.textColor = .secondaryLabel
                 cell.subtitle.text = "You"
             } else {
                 if let statusString = members[indexPath.row].onlineStatus as? String {
@@ -870,13 +870,13 @@ class GroupAdminControlsTableViewController: UITableViewController {
                         cell.subtitle.textColor = FalconPalette.defaultBlue
                         cell.subtitle.text = statusString
                     } else {
-                        cell.subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        cell.subtitle.textColor = .secondaryLabel
                         let date = Date(timeIntervalSince1970: TimeInterval(statusString)!)
                         let subtitle = "Last seen " + timeAgoSinceDate(date)
                         cell.subtitle.text = subtitle
                     }
                 } else if let statusTimeinterval = members[indexPath.row].onlineStatus as? TimeInterval {
-                    cell.subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.subtitle.textColor = .secondaryLabel
                     let date = Date(timeIntervalSince1970: statusTimeinterval/1000)
                     let subtitle = "Last seen " + timeAgoSinceDate(date)
                     cell.subtitle.text = subtitle
@@ -903,38 +903,38 @@ class GroupAdminControlsTableViewController: UITableViewController {
             return cell
         } else if sections[indexPath.section - 2] == "Activities" {
             let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? ChatActivitiesTableViewCell ?? ChatActivitiesTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             
             cell.configureCell(for: activities[indexPath.row])
             return cell
         } else if sections[indexPath.section - 2] == "Checklists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             
             cell.configureCell(checklist: checklists[indexPath.row], grocerylist: nil, packinglist: nil, activitylist: nil)
             return cell
         } else if sections[indexPath.section - 2] == "Grocery Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             
             cell.configureCell(checklist: nil, grocerylist: grocerylists[indexPath.row], packinglist: nil, activitylist: nil)
             return cell
         } else if sections[indexPath.section - 2] == "Activity Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             
             cell.configureCell(checklist: nil, grocerylist: nil, packinglist: nil, activitylist: activitylists[indexPath.row])
             return cell
         } else if sections[indexPath.section - 2] == "Packing Lists" {
             let cell = tableView.dequeueReusableCell(withIdentifier: listCellID, for: indexPath) as? ChatListTableViewCell ?? ChatListTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             
             cell.configureCell(checklist: nil, grocerylist: nil, packinglist: packinglists[indexPath.row], activitylist: nil)
             return cell
         } else {
             let cell = UITableViewCell(style: UITableViewCell.CellStyle.default,
                                        reuseIdentifier: "default")
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             return cell
         }
     }

@@ -20,7 +20,7 @@ class BaseContainerCollectionViewCell: UICollectionViewCell {
     
     override var isHighlighted: Bool {
         didSet {
-            self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(isHighlighted ? 0.7 : 1)
+            self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(isHighlighted ? 0.7 : 1)
         }
     }
         
@@ -28,7 +28,7 @@ class BaseContainerCollectionViewCell: UICollectionViewCell {
         self.backgroundView = UIView()
         addSubview(self.backgroundView!)
         self.backgroundView?.fillSuperview()
-        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground
         self.backgroundView?.layer.cornerRadius = 10
         self.backgroundView?.layer.masksToBounds = true
         self.backgroundView?.layer.shadowOpacity = 0.1
@@ -39,7 +39,7 @@ class BaseContainerCollectionViewCell: UICollectionViewCell {
             
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground
     }
     
 }
@@ -58,7 +58,7 @@ class BaseContainerTableViewCell: UITableViewCell {
         self.backgroundView = UIView()
         addSubview(self.backgroundView!)
         self.backgroundView?.fillSuperview()
-        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground
         self.backgroundView?.layer.cornerRadius = 10
         self.backgroundView?.layer.masksToBounds = true
         self.backgroundView?.layer.shadowOpacity = 0.1
@@ -69,11 +69,11 @@ class BaseContainerTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
+        self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(highlighted ? 0.7 : 1)
     }
 }

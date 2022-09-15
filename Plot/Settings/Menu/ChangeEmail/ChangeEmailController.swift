@@ -16,7 +16,7 @@ class ChangeEmailController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         configureChangeEmailView()
     }
     
@@ -27,7 +27,7 @@ class ChangeEmailController: UIViewController {
         changeEmailView.nextView.isEnabled = false
         
         changeEmailView.instructions.text = "Please enter your email."
-        let attributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor]
+        let attributes = [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel]
         changeEmailView.email.attributedPlaceholder = NSAttributedString(string: "New Email", attributes: attributes)
         let leftBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(leftBarButtonDidTap))
         navigationItem.leftBarButtonItem = leftBarButton

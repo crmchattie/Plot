@@ -22,7 +22,7 @@ class TaskCell: UITableViewCell {
     //name of activity
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -55,7 +55,7 @@ class TaskCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
         label.textAlignment = .left
@@ -67,7 +67,7 @@ class TaskCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -78,7 +78,7 @@ class TaskCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -115,7 +115,7 @@ class TaskCell: UITableViewCell {
     
     let checkImage: UIImageView = {
         let view = UIImageView()
-        view.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        view.tintColor = .secondaryLabel
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -131,7 +131,7 @@ class TaskCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
@@ -198,7 +198,7 @@ class TaskCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
         nameLabel.text = nil
         endLabel.text = nil
         activityTypeLabel.text = nil
@@ -210,7 +210,7 @@ class TaskCell: UITableViewCell {
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
+        activityImageView.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(highlighted ? 0.7 : 1)
     }
     
     @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {

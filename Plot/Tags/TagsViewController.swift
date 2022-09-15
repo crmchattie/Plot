@@ -42,8 +42,8 @@ class TagsViewController: FormViewController {
 
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -69,24 +69,24 @@ class TagsViewController: FormViewController {
                                 $0.tag = "tagsfields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                         $0.title = "Add New Tag"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        cell.backgroundColor = .secondarySystemGroupedBackground
                                         cell.textLabel?.textAlignment = .left
                                         
                                     }
                                 }
                                 $0.multivaluedRowToInsertAt = { index in
                                     return TextRow() {
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                                        $0.cell.textField?.textColor = .label
+                                        $0.placeholderColor = .secondaryLabel
                                         $0.placeholder = "Tag"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                        row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                        cell.backgroundColor = .secondarySystemGroupedBackground
+                                        cell.textField?.textColor = .label
+                                        row.placeholderColor = .secondaryLabel
                                     }
                                 }
         }
@@ -95,14 +95,14 @@ class TagsViewController: FormViewController {
             for item in items {
                 var mvs = (form.sectionBy(tag: "tagsfields") as! MultivaluedSection)
                 mvs.insert(TextRow(){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textField?.textColor = .label
+                    $0.placeholderColor = .secondaryLabel
                     $0.value = item
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textField?.textColor = .label
+                    row.placeholderColor = .secondaryLabel
                 } , at: mvs.count - 1)
             }
         }

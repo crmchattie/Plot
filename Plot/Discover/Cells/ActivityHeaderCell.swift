@@ -15,7 +15,7 @@ class ActivityHeaderCell: UICollectionViewCell {
     
     var activityType: CustomType! {
         didSet {
-            nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+            nameLabel.textColor = .label
             nameLabel.text = activityType.name
             logoImageView.image = UIImage(named: activityType.image)!.withRenderingMode(.alwaysTemplate)
             logoImageView.tintColor = colors[intColor]
@@ -26,7 +26,7 @@ class ActivityHeaderCell: UICollectionViewCell {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.title3.with(weight: .bold)
         label.adjustsFontForContentSizeCategory = true
         return label
@@ -45,7 +45,7 @@ class ActivityHeaderCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        imageView.tintColor = .secondaryLabel
         return imageView
     }()
     
@@ -54,7 +54,7 @@ class ActivityHeaderCell: UICollectionViewCell {
     
     override var isHighlighted: Bool {
         didSet {
-            self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(isHighlighted ? 0.7 : 1)
+            self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(isHighlighted ? 0.7 : 1)
         }
     }
     
@@ -63,7 +63,7 @@ class ActivityHeaderCell: UICollectionViewCell {
         backgroundView = UIView()
         addSubview(backgroundView!)
         backgroundView?.fillSuperview()
-        backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundView?.backgroundColor = .secondarySystemGroupedBackground
 
         if firstPosition && lastPosition {
             backgroundView?.roundCorners(corners: [.allCorners], radius: 10)

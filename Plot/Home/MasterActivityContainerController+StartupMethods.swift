@@ -10,20 +10,6 @@ import Foundation
 import Firebase
 
 extension MasterActivityContainerController {
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        guard UIApplication.shared.applicationState == .inactive else {
-            return
-        }
-        
-        if self.traitCollection.userInterfaceStyle == .dark {
-            let theme = Theme.Dark
-            ThemeManager.applyTheme(theme: theme)
-        } else if self.traitCollection.userInterfaceStyle == .light {
-            let theme = Theme.Default
-            ThemeManager.applyTheme(theme: theme)
-        }
-    }
     
     func loadVariables() {
         isNewUser = Auth.auth().currentUser == nil
@@ -59,7 +45,7 @@ extension MasterActivityContainerController {
     }
     
     func showLaunchScreen() {
-        launchScreenView.backgroundColor = ThemeManager.currentTheme().launchBackgroundColor
+        launchScreenView.backgroundColor = .secondarySystemGroupedBackground
         navigationController?.view.addSubview(launchScreenView)
         launchScreenView.fillSuperview()
         launchScreenView.addSubview(plotLogoView)

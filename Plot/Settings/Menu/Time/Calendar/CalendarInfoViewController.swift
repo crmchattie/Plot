@@ -30,7 +30,7 @@ class CalendarInfoViewController: UITableViewController {
         title = "Calendars Information"
         
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
@@ -151,11 +151,11 @@ class CalendarInfoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         cell.accessoryType = .disclosureIndicator
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
-        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        cell.textLabel?.textColor = .label
         let section = sections[indexPath.section]
         let calendarsSorted = calendars[section]?.sorted()
         cell.textLabel?.text = calendarsSorted?[indexPath.row].name

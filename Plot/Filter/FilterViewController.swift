@@ -47,7 +47,7 @@ class FilterViewController: FormViewController {
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
   
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -59,8 +59,8 @@ class FilterViewController: FormViewController {
 
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelFilter))
 
@@ -91,7 +91,7 @@ class FilterViewController: FormViewController {
         
         form +++ Section()
             <<< ButtonRow("Restore Default Filters") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textAlignment = .center
                 row.cell.textLabel?.textColor = FalconPalette.defaultBlue
                 row.cell.accessoryType = .none
@@ -109,18 +109,18 @@ class FilterViewController: FormViewController {
                     $0.title = filter.titleText
                     $0.value = false
                     $0.cell.accessoryView = UIImageView(image: UIImage(systemName: "chevron.down"))
-                    $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.accessoryView?.tintColor = .label
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     }.cellUpdate({ (cell, row) in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
+                        cell.detailTextLabel?.textColor = .secondaryLabel
                     }).onCellSelection({ (cell, row) in
                         let name = row.value! ? "chevron.up" : "chevron.down"
                         cell.accessoryView = UIImageView(image: UIImage(systemName: name))
-                        cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.accessoryView?.tintColor = .label
                         row.updateCell()
                     })
                 for choice in filter.choices {
@@ -137,9 +137,9 @@ class FilterViewController: FormViewController {
                                 row.value = choice
                             }
                             cell.accessoryType = .checkmark
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
+                            cell.textLabel?.textColor = .label
+                            cell.detailTextLabel?.textColor = .secondaryLabel
                         }.onChange({ row in
                             if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                                 let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
@@ -160,18 +160,18 @@ class FilterViewController: FormViewController {
                         $0.title = filter.titleText
                         $0.value = false
                         $0.cell.accessoryView = UIImageView(image: UIImage(systemName: "chevron.down"))
-                        $0.cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.cell.accessoryView?.tintColor = .label
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                        $0.cell.textLabel?.textColor = .label
+                        $0.cell.detailTextLabel?.textColor = .secondaryLabel
                         }.cellUpdate({ (cell, row) in
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
+                            cell.textLabel?.textColor = .label
+                            cell.detailTextLabel?.textColor = .secondaryLabel
                         }).onCellSelection({ (cell, row) in
                             let name = row.value! ? "chevron.up" : "chevron.down"
                             cell.accessoryView = UIImageView(image: UIImage(systemName: name))
-                            cell.accessoryView?.tintColor = ThemeManager.currentTheme().generalTitleColor
+                            cell.accessoryView?.tintColor = .label
                             row.updateCell()
                         })
                     for choice in filter.choices {
@@ -188,9 +188,9 @@ class FilterViewController: FormViewController {
                                     row.value = choice
                                 }
                                 cell.accessoryType = .checkmark
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
+                                cell.textLabel?.textColor = .label
+                                cell.detailTextLabel?.textColor = .secondaryLabel
                         }.onChange({ row in
                             if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                                 let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
@@ -222,14 +222,14 @@ class FilterViewController: FormViewController {
             } else if filter.typeOfSection == "input" {
                 form +++ Section(filter.descriptionText)
                 <<< ButtonRow("\(filter.rawValue)") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textAlignment = .left
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = filter.titleText
                 if row.tag == "location", let location = filterDictionary["location"] {
                     row.cell.accessoryType = .detailDisclosureButton
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     row.title = location[0]
                 }
                 }.onCellSelection({ _,row in
@@ -238,17 +238,17 @@ class FilterViewController: FormViewController {
                     }
                 }).cellUpdate { cell, row in
                     if row.tag == "location" {
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.textLabel?.textAlignment = .left
                         if row.title == "Location" {
                             cell.accessoryType = .disclosureIndicator
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            cell.textLabel?.textColor = .secondaryLabel
                         } else if let value = row.title, !value.isEmpty {
                             cell.accessoryType = .detailDisclosureButton
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                            cell.textLabel?.textColor = .label
                         } else {
                             cell.accessoryType = .disclosureIndicator
-                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                            cell.textLabel?.textColor = .secondaryLabel
                             cell.textLabel?.text = "Location"
                         }
                     }
@@ -256,9 +256,9 @@ class FilterViewController: FormViewController {
             } else if filter.typeOfSection == "date" {
                 form +++ Section(filter.descriptionText)
                 <<< DateInlineRow("\(filter.rawValue)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = filter.titleText
                     $0.dateFormatter?.dateStyle = .long
                     if filterDictionary["\(filter.rawValue)"] != nil, let value = filterDictionary["\(filter.rawValue)"], let date = value[0].toDate() {
@@ -270,8 +270,8 @@ class FilterViewController: FormViewController {
                     }
                 }.onExpandInlineRow { cell, row, inlineRow in
                     inlineRow.cellUpdate { (cell, row) in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.backgroundColor = .secondarySystemGroupedBackground
+                        row.cell.tintColor = .secondarySystemGroupedBackground
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
                         }
@@ -288,9 +288,9 @@ class FilterViewController: FormViewController {
             } else if filter.typeOfSection == "search" {
                 form +++ Section(filter.descriptionText)
                 <<< TextRow("\(filter.rawValue)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textField?.textColor = .label
+                    $0.placeholderColor = .secondaryLabel
                     $0.placeholder = $0.tag?.capitalized
                     if filterDictionary["\(filter.rawValue)"] != nil, let value = filterDictionary["\(filter.rawValue)"] {
                         $0.value = value[0]
@@ -330,9 +330,9 @@ class FilterViewController: FormViewController {
                                         row.value = choice
                                     }
                                     cell.accessoryType = .checkmark
-                                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                    cell.backgroundColor = .secondarySystemGroupedBackground
+                                    cell.textLabel?.textColor = .label
+                                    cell.detailTextLabel?.textColor = .secondaryLabel
                             }.onChange({ row in
                                 if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                                     let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
@@ -382,9 +382,9 @@ class FilterViewController: FormViewController {
                                                 row.value = choice
                                             }
                                             cell.accessoryType = .checkmark
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                            cell.backgroundColor = .secondarySystemGroupedBackground
+                                            cell.textLabel?.textColor = .label
+                                            cell.detailTextLabel?.textColor = .secondaryLabel
                                     }.onChange({ row in
                                         if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                                             let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
@@ -439,9 +439,9 @@ class FilterViewController: FormViewController {
                                         row.value = choice
                                     }
                                     cell.accessoryType = .checkmark
-                                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                    cell.backgroundColor = .secondarySystemGroupedBackground
+                                    cell.textLabel?.textColor = .label
+                                    cell.detailTextLabel?.textColor = .secondaryLabel
                             }.onChange({ row in
                                 if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                                     let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
@@ -491,9 +491,9 @@ class FilterViewController: FormViewController {
                                                 row.value = choice
                                             }
                                             cell.accessoryType = .checkmark
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                            cell.backgroundColor = .secondarySystemGroupedBackground
+                                            cell.textLabel?.textColor = .label
+                                            cell.detailTextLabel?.textColor = .secondaryLabel
                                     }.onChange({ row in
                                         if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                                             let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
@@ -549,9 +549,9 @@ class FilterViewController: FormViewController {
                                     row.value = choice
                                 }
                                 cell.accessoryType = .checkmark
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
+                                cell.textLabel?.textColor = .label
+                                cell.detailTextLabel?.textColor = .secondaryLabel
                         }.onChange({ row in
                             if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                                 let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])

@@ -57,11 +57,11 @@ class MoodViewController: FormViewController {
     }
     
     fileprivate func configureTableView() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.allowsMultipleSelectionDuringEditing = false
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         definesPresentationContext = true
@@ -114,9 +114,9 @@ class MoodViewController: FormViewController {
             SelectableSection<ListCheckRow<String>>(nil, selectionType: .singleSelection(enableDeselection: false))
             
             <<< DateTimeInlineRow("Time") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .full
@@ -126,8 +126,8 @@ class MoodViewController: FormViewController {
                     self!.mood.moodDate = row.value
                 }.onExpandInlineRow { cell, row, inlineRow in
                     inlineRow.cellUpdate() { cell, row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.backgroundColor = .secondarySystemGroupedBackground
+                        row.cell.tintColor = .secondarySystemGroupedBackground
                         cell.datePicker.datePickerMode = .dateAndTime
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
@@ -139,18 +139,18 @@ class MoodViewController: FormViewController {
                     }
                     cell.detailTextLabel?.textColor = cell.tintColor
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                 }
         
         MoodType.allCases.forEach { mood in
             form.last!
                 <<< ListCheckRow<String>() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
                     $0.cell.tintColor = FalconPalette.defaultBlue
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .label
                     $0.title = mood.rawValue.capitalized
                     $0.cell.imageView?.image = UIImage(named: mood.image)
                     $0.selectableValue = mood.rawValue.capitalized
@@ -160,10 +160,10 @@ class MoodViewController: FormViewController {
                     }
                 }.cellSetup { cell, row in
                     cell.accessoryType = .checkmark
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
                     cell.tintColor = FalconPalette.defaultBlue
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .label
                 }.onChange({ (row) in
                     if let value = row.value {
                         self.mood.mood = MoodType(rawValue: value)
@@ -174,17 +174,17 @@ class MoodViewController: FormViewController {
         
         form.last!
             <<< TextAreaRow("Notes") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.textColor = .label
+                $0.cell.placeholderLabel?.textColor = .secondaryLabel
                 $0.placeholder = $0.tag
                 $0.value = mood.notes
                 }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textView?.textColor = .label
+                    cell.placeholderLabel?.textColor = .secondaryLabel
                 }).onChange() { [weak self] row in
                     self!.mood.notes = row.value
                 }

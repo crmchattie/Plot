@@ -191,7 +191,7 @@ extension CustomRecurrenceViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isPickerViewCell(at: indexPath) {
             let cell = tableView.dequeueReusableCell(withIdentifier: CellID.pickerViewCell, for: indexPath) as! PickerViewCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.delegate = self
             cell.style = pickerViewStyle
             cell.frequency = recurrenceRule.frequency
@@ -206,7 +206,7 @@ extension CustomRecurrenceViewController {
             return cell
         } else if isSelectorViewCell(at: indexPath) {
             let cell = tableView.dequeueReusableCell(withIdentifier: CellID.monthOrDaySelectorCell, for: indexPath) as! MonthOrDaySelectorCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.delegate = self
             cell.tintColor = tintColor
             cell.style = recurrenceRule.frequency == .monthly ? .day : .month
@@ -218,7 +218,7 @@ extension CustomRecurrenceViewController {
             if cell == nil {
                 cell = UITableViewCell(style: .value1, reuseIdentifier: CellID.customRecurrenceViewCell)
             }
-            cell?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell?.backgroundColor = .secondarySystemGroupedBackground
             cell?.accessoryType = .none
 
             if indexPath.row == 0 {
@@ -237,7 +237,7 @@ extension CustomRecurrenceViewController {
             if cell == nil {
                 cell = UITableViewCell(style: .default, reuseIdentifier: CellID.commonCell)
             }
-            cell?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell?.backgroundColor = .secondarySystemGroupedBackground
             cell?.textLabel?.text = Constant.weekdaySymbols()[indexPath.row]
             if recurrenceRule.byweekday.contains(Constant.weekdays[indexPath.row]) {
                 cell?.accessoryType = .checkmark
@@ -330,7 +330,7 @@ extension CustomRecurrenceViewController {
         navigationItem.title = LocalizedString("RecurrencePicker.textLabel.custom")
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: LocalizedString("Done"), style: .done, target: self, action: #selector(doneButtonTapped(_:)))
         tableView.tintColor = tintColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         let bundle = Bundle.main
         tableView.register(UINib(nibName: "PickerViewCell", bundle: bundle), forCellReuseIdentifier: CellID.pickerViewCell)
         tableView.register(UINib(nibName: "MonthOrDaySelectorCell", bundle: bundle), forCellReuseIdentifier: CellID.monthOrDaySelectorCell)

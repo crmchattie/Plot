@@ -59,13 +59,13 @@ class GroceryProductDetailViewController: FormViewController {
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
 
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
 
         let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
@@ -99,9 +99,9 @@ class GroceryProductDetailViewController: FormViewController {
         Section()
             
         <<< LabelRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = $0.tag
             if let product = product {
                 $0.value = product.title.capitalized
@@ -113,36 +113,36 @@ class GroceryProductDetailViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, _ in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }
         
         if let product = product, let number_of_servings = product.number_of_servings, let serving_size = product.serving_size {
             form.last!
             <<< LabelRow("Servings") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.value = "\(number_of_servings) servings per \(serving_size)"
                 }.cellUpdate { cell, _ in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                 }
         }
         
         form.last!
         <<< DecimalRow("Amount") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textField?.textColor = .secondaryLabel
             $0.title = $0.tag
             $0.formatter = numberFormatter
             if let product = product {
                 $0.value = product.amount
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textField?.textColor = .secondaryLabel
         }.onChange { row in
             self.product.amount = row.value
             self.timer?.invalidate()
@@ -180,14 +180,14 @@ class GroceryProductDetailViewController: FormViewController {
             for nutrient in nutrients {
                 if let title = nutrient.name, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = "\(title.capitalized)"
                         $0.value = "\(String(format: "%.0f", amount)) \(unit.capitalized)"
                     }.cellUpdate { cell, _ in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
                     }, at: section!.count)
                 }
             }

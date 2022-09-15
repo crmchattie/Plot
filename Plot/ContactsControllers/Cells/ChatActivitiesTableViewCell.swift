@@ -15,7 +15,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     
     lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -26,7 +26,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     lazy var locationNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -37,7 +37,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
     lazy var dateTimeLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -78,9 +78,9 @@ class ChatActivitiesTableViewCell: UITableViewCell {
         nameLabel.text = ""
         locationNameLabel.text = ""
         dateTimeLabel.text = ""
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        locationNameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        dateTimeLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        nameLabel.textColor = .label
+        locationNameLabel.textColor = .secondaryLabel
+        dateTimeLabel.textColor = .secondaryLabel
     }
     
     func configureCell(for activity: Activity) {

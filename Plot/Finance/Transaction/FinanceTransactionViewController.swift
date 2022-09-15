@@ -133,8 +133,8 @@ class FinanceTransactionViewController: FormViewController {
     
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -180,9 +180,9 @@ class FinanceTransactionViewController: FormViewController {
             Section(footer: "If status is pending, values cannot be changed")
             
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .label
+                $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
                 if active {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
@@ -192,9 +192,9 @@ class FinanceTransactionViewController: FormViewController {
                     $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .label
+                row.placeholderColor = .secondaryLabel
             }.onChange { row in
                 if let value = row.value {
                     if let currentUser = Auth.auth().currentUser?.uid {
@@ -210,25 +210,25 @@ class FinanceTransactionViewController: FormViewController {
             }
             
 //            <<< TextAreaRow("Description") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+//                $0.cell.textView?.textColor = .label
+//                $0.cell.placeholderLabel?.textColor = .secondaryLabel
 //                $0.placeholder = $0.tag
 //                $0.value = transaction.transactionDescription
 //                }.cellUpdate({ (cell, row) in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    cell.backgroundColor = .secondarySystemGroupedBackground
+//                    cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+//                    cell.textView?.textColor = .label
+//                    cell.placeholderLabel?.textColor = .secondaryLabel
 //                }).onChange { row in
 //                    self.transaction.transactionDescription = row.value
 //                }
             
             <<< DateInlineRow("Transacted On") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .secondaryLabel
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
                 $0.title = $0.tag
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
@@ -236,8 +236,8 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.tintColor = .secondarySystemGroupedBackground
                     cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
@@ -256,9 +256,9 @@ class FinanceTransactionViewController: FormViewController {
             }
             
             <<< DateInlineRow("Financial Profile Date") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .secondaryLabel
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
                 if let reportDate = transaction.date_for_reports, reportDate != "", let date = isodateFormatter.date(from: reportDate) {
@@ -268,8 +268,8 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate() { cell, row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.tintColor = .secondarySystemGroupedBackground
                     cell.datePicker.datePickerMode = .dateAndTime
                     if #available(iOS 13.4, *) {
                         cell.datePicker.preferredDatePickerStyle = .wheels
@@ -292,9 +292,9 @@ class FinanceTransactionViewController: FormViewController {
         
         
             <<< PushRow<String>("Type") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.title = row.tag
                 if let type = transaction.type {
                     row.value = type.name
@@ -308,17 +308,17 @@ class FinanceTransactionViewController: FormViewController {
                 to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
                     to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 if !(self.transaction?.user_created ?? false) {
                     row.cell.accessoryType = .none
                 }
@@ -334,14 +334,14 @@ class FinanceTransactionViewController: FormViewController {
             
             <<< DecimalRow("Amount") {
                 $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
                 $0.value = transaction.amount
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .secondaryLabel
             }.onChange { row in
                 if let value = row.value {
                     self.transaction.amount = value
@@ -350,13 +350,13 @@ class FinanceTransactionViewController: FormViewController {
             
             //need to add change to amount or amount per rows
             <<< IntRow("splitNumber") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .secondaryLabel
                 $0.title = "Split amount by"
                 $0.value = transaction.splitNumber
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .secondaryLabel
             }.onChange { row in
                 let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
                 if let value = row.value {
@@ -374,8 +374,8 @@ class FinanceTransactionViewController: FormViewController {
             
             <<< DecimalRow("Per Person Amount") {
                 $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.formatter = numberFormatter
                 $0.hidden = "$splitNumber == nil || $splitNumber == 0"
@@ -383,26 +383,26 @@ class FinanceTransactionViewController: FormViewController {
                     $0.value = transaction.amount / Double(splitNumber)
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .secondaryLabel
             }
             
             <<< TextRow("Status") {
                 $0.cell.isUserInteractionEnabled = false
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.value = transaction.status.name
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .secondaryLabel
             }
             
             <<< CheckRow("Should Link") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.tintColor = FalconPalette.defaultBlue
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .label
                 $0.cell.accessoryType = .checkmark
                 $0.value = self.transaction.should_link ?? true
                 if $0.value ?? false {
@@ -413,10 +413,10 @@ class FinanceTransactionViewController: FormViewController {
                     $0.cell.tintAdjustmentMode = .dimmed
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.tintColor = FalconPalette.defaultBlue
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .label
                 cell.accessoryType = .checkmark
                 row.cell.tintAdjustmentMode = row.value ?? false ? .automatic : .dimmed
             }.onChange { row in
@@ -429,9 +429,9 @@ class FinanceTransactionViewController: FormViewController {
             }
             
             <<< PushRow<String>("Account") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.title = row.tag
                 if let value = transaction.account_name {
                     row.value = value
@@ -449,17 +449,17 @@ class FinanceTransactionViewController: FormViewController {
                 to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
                     to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 if !(self.transaction?.user_created ?? false) {
                     row.cell.accessoryType = .none
                 }
@@ -468,9 +468,9 @@ class FinanceTransactionViewController: FormViewController {
             })
             
             <<< LabelRow("Group") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -480,16 +480,16 @@ class FinanceTransactionViewController: FormViewController {
                 self.openLevel(level: row.tag!, value: row.value!, otherValue: nil)
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         
             <<< LabelRow("Category") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -499,16 +499,16 @@ class FinanceTransactionViewController: FormViewController {
                 self.openLevel(level: row.tag!, value: row.value!, otherValue: self.transaction.category)
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         
             <<< LabelRow("Subcategory") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -518,18 +518,18 @@ class FinanceTransactionViewController: FormViewController {
                 self.openLevel(level: row.tag!, value: row.value!, otherValue: self.transaction.top_level_category)
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         
         if delegate == nil {
             form.last!
             <<< LabelRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -543,9 +543,9 @@ class FinanceTransactionViewController: FormViewController {
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         }
@@ -553,9 +553,9 @@ class FinanceTransactionViewController: FormViewController {
         form.last!
         
             <<< LabelRow("Tags") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .label
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -564,31 +564,26 @@ class FinanceTransactionViewController: FormViewController {
                 self.openTags()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .label
                 cell.textLabel?.textAlignment = .left
                 if let tags = self.transaction.tags, !tags.isEmpty {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textColor = .label
                 } else {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.textLabel?.textColor = .secondaryLabel
                 }
             }
         
         if delegate == nil && status {
             form.last!
             <<< SegmentedRow<String>("sections"){
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    if #available(iOS 13.0, *) {
-                        $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-                    } else {
-                        // Fallback on earlier versions
-                    }
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
                     $0.options = ["Tasks", "Events", "Health"]
                     $0.value = "Tasks"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
                     }.onChange({ _ in
                         self.sectionChanged = true
                     })
@@ -601,10 +596,10 @@ class FinanceTransactionViewController: FormViewController {
                                     $0.hidden = "!$sections == 'Tasks'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("taskButton"){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                             $0.title = "Connect Task"
                                             }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.backgroundColor = .secondarySystemGroupedBackground
                                                 cell.textLabel?.textAlignment = .left
                                                 cell.height = { 60 }
                                             }
@@ -627,10 +622,10 @@ class FinanceTransactionViewController: FormViewController {
                                     $0.hidden = "!$sections == 'Events'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("scheduleButton"){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                             $0.title = "Connect Event"
                                             }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.backgroundColor = .secondarySystemGroupedBackground
                                                 cell.textLabel?.textAlignment = .left
                                                 cell.height = { 60 }
                                             }
@@ -653,10 +648,10 @@ class FinanceTransactionViewController: FormViewController {
                                     $0.hidden = "$sections != 'Health'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow(){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                             $0.title = "Connect Health"
                                             }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.backgroundColor = .secondarySystemGroupedBackground
                                                 cell.textLabel?.textAlignment = .left
                                                 cell.height = { 60 }
                                             }
@@ -877,7 +872,7 @@ extension FinanceTransactionViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == FalconPalette.defaultBlue {
             textView.text = nil
-            textView.textColor = ThemeManager.currentTheme().generalTitleColor
+            textView.textColor = .label
         }
         
         

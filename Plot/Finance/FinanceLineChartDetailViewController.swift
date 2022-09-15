@@ -106,14 +106,17 @@ class FinanceLineChartDetailViewController: UIViewController {
         }
 
         addObservers()
-        changeTheme()
+        
+        view.backgroundColor = .systemGroupedBackground
+        backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
+        chartView.backgroundColor = .secondarySystemGroupedBackground
         
         view.addSubview(activityIndicator)
         
         view.addSubview(segmentedControl)
         segmentedControl.selectedSegmentIndex = selectedIndex
 
-        backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
         view.addSubview(backgroundChartView)
         backgroundChartView.addSubview(chartView)
         chartView.delegate = self
@@ -129,16 +132,9 @@ class FinanceLineChartDetailViewController: UIViewController {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
     }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-    }
+
     
     @objc fileprivate func financeUpdated() {
         DispatchQueue.main.async {
@@ -180,7 +176,7 @@ class FinanceLineChartDetailViewController: UIViewController {
         tableView.separatorStyle = .none
         tableView.register(FinanceTableViewCell.self, forCellReuseIdentifier: kFinanceTableViewCell)
         tableView.allowsMultipleSelectionDuringEditing = false
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
@@ -269,7 +265,7 @@ extension FinanceLineChartDetailViewController: UITableViewDelegate, UITableView
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             cell.transaction = transactions[indexPath.row]
         } else if let accounts = viewModel.accounts, !accounts.isEmpty {

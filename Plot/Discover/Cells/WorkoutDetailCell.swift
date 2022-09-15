@@ -37,7 +37,7 @@ class WorkoutDetailCell: UICollectionViewCell {
     
     let notesLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -52,7 +52,7 @@ class WorkoutDetailCell: UICollectionViewCell {
 //
 //    let getWorkoutLabel: UILabel = {
 //        let label = UILabel()
-//        label.textColor = ThemeManager.currentTheme().generalTitleColor
+//        label.textColor = .label
 //        label.font = UIFont.preferredFont(forTextStyle: .body)
 //        label.attributedText = NSAttributedString(string: "Go to Workout", attributes:
 //        [.underlineStyle: NSUnderlineStyle.single.rawValue])
@@ -66,13 +66,13 @@ class WorkoutDetailCell: UICollectionViewCell {
 //        imageView.layer.masksToBounds = true
 //        imageView.contentMode = .scaleAspectFit
 //        imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
-//        imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+//        imageView.tintColor = .secondaryLabel
 //        return imageView
 //    }()
     
     let extraLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Workout:"

@@ -22,7 +22,7 @@ class TimeInfoViewController: UITableViewController {
         
         title = "Time Information"
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
     }
@@ -42,18 +42,18 @@ class TimeInfoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         cell.accessoryType = .disclosureIndicator
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         if indexPath.row == 0 {
             cell.textLabel?.text = "Lists Info"
             cell.isUserInteractionEnabled = true
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel?.textColor = .label
         }
         else if indexPath.row == 1 {
             cell.textLabel?.text = "Calendars Info"
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel?.textColor = .label
         }
         return cell
     }

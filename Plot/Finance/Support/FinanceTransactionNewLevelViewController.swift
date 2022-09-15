@@ -50,9 +50,9 @@ class FinanceTransactionNewLevelViewController: FormViewController {
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
 
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         tableView.allowsMultipleSelectionDuringEditing = false
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         
@@ -104,9 +104,9 @@ class FinanceTransactionNewLevelViewController: FormViewController {
         form +++
             Section()
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .label
+                $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
                 if let name = name {
                     $0.value = name
@@ -116,9 +116,9 @@ class FinanceTransactionNewLevelViewController: FormViewController {
                     $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .label
+                row.placeholderColor = .secondaryLabel
             }.onChange() { [unowned self] row in
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -130,9 +130,9 @@ class FinanceTransactionNewLevelViewController: FormViewController {
         if level == "Subcategory" || level == "Category" {
             form.last!
             <<< PushRow<String>("Levels") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.options = []
                 if self.level == "Subcategory" {
                     row.title = "Associated Category"
@@ -160,17 +160,17 @@ class FinanceTransactionNewLevelViewController: FormViewController {
                 to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
                     to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
             }.onChange({ row in
                 self.otherValue = row.value
             })

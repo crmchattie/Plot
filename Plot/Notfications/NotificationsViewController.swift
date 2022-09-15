@@ -47,9 +47,8 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
                         
         self.title = notificationsText
         
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        navigationController?.navigationBar.backgroundColor = theme.barBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
+        navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
         
 //        let segmentTextContent = [
 //            notificationsText,
@@ -58,11 +57,6 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
 //
 //        // Segmented control as the custom title view.
 //        segmentedControl = UISegmentedControl(items: segmentTextContent)
-//        if #available(iOS 13.0, *) {
-//            segmentedControl.overrideUserInterfaceStyle = theme.userInterfaceStyle
-//        } else {
-//            // Fallback on earlier versions
-//        }
 //
 //        segmentedControl.selectedSegmentIndex = 0
 //        segmentedControl.autoresizingMask = .flexibleWidth
@@ -78,9 +72,9 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
         tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: notificationCellID)
         tableView.isUserInteractionEnabled = true
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.indicatorStyle = .default
+        tableView.sectionIndexBackgroundColor = .systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorColor = .clear
         tableView.sectionHeaderHeight = 0
         tableView.rowHeight = UITableView.automaticDimension
@@ -96,22 +90,9 @@ class NotificationsViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(userNotification(notification:)), name: .userNotification, object: nil)
     }
-    
-    @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-//        if #available(iOS 13.0, *) {
-//            segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-//        } else {
-//            // Fallback on earlier versions
-//        }
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.reloadData()
-    }
+
     
     func sortInvitedActivities() {
         var invitationValues = Array(invitations.values)
@@ -223,15 +204,14 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 //        if segmentedControl.selectedSegmentIndex == 0 {
-//            let theme = ThemeManager.currentTheme()
 //            let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
-//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            cell.backgroundColor = .secondarySystemGroupedBackground
 //            let notification = notifications[indexPath.row]
 //            cell.textLabel?.text = notification.description
 //            cell.textLabel?.adjustsFontForContentSizeCategory = true
 //            cell.textLabel?.numberOfLines = 0
 //            cell.textLabel?.lineBreakMode = .byWordWrapping
-//            cell.textLabel?.textColor = theme.generalTitleColor
+//            cell.textLabel?.textColor = .label
 //            let button = UIButton(type: .system)
 //            cell.accessoryView = button
 //            if notification.aps.category == Identifiers.eventCategory {
@@ -241,7 +221,7 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
 //            return cell
 //        } else {
 //            let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath)
-//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//            cell.backgroundColor = .secondarySystemGroupedBackground
 //            if let eventCell = cell as? EventCell {
 //                eventCell.updateInvitationDelegate = self
 //                let activity = filteredInvitedActivities[indexPath.row]
@@ -253,15 +233,14 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
 //            }
 //            return cell
 //        }
-        let theme = ThemeManager.currentTheme()
         let cell = tableView.dequeueReusableCell(withIdentifier: notificationCellID, for: indexPath)
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         let notification = notifications[indexPath.row]
         cell.textLabel?.text = notification.description
         cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.textLabel?.numberOfLines = 0
         cell.textLabel?.lineBreakMode = .byWordWrapping
-        cell.textLabel?.textColor = theme.generalTitleColor
+        cell.textLabel?.textColor = .label
         let button = UIButton(type: .system)
         cell.accessoryView = button
         if notification.aps.category == Identifiers.eventCategory {

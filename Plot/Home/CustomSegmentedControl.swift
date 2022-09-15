@@ -18,7 +18,7 @@ class CustomSegmentedControl: UIView {
     private var selectedStrings:[String]!
     private var buttons: [UIButton]!
     
-    var buttonColor: UIColor = ThemeManager.currentTheme().generalSubtitleColor
+    var buttonColor: UIColor = .secondaryLabel
     var selectedButtonColor: UIColor = .systemBlue
         
     weak var delegate: CustomSegmentedControlDelegate?
@@ -147,7 +147,7 @@ class CustomMultiSegmentedControl: UIView {
     private var buttons: [UIButton]!
     
     var unselectedTintColor: UIColor = .systemBlue
-    var unselectedBackgroundColor: UIColor = ThemeManager.currentTheme().generalBackgroundColor
+    var unselectedBackgroundColor: UIColor = .systemGroupedBackground
     var selectedTintColor: UIColor = UIColor.white
     var selectedBackgroundColor: UIColor = .systemBlue
         

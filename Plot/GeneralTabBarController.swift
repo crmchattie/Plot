@@ -56,14 +56,6 @@ class GeneralTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if self.traitCollection.userInterfaceStyle == .dark {
-            let theme = Theme.Dark
-            ThemeManager.applyTheme(theme: theme)
-        } else {
-            let theme = Theme.Default
-            ThemeManager.applyTheme(theme: theme)
-        }
-        
         appDelegate.loadNotifications()
         
         homeController.delegate = self
@@ -74,10 +66,10 @@ class GeneralTabBarController: UITabBarController {
     }
     
     fileprivate func configureTabBar(){
-        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor], for: .normal)
-        tabBar.unselectedItemTintColor = ThemeManager.currentTheme().generalSubtitleColor
-        tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBar.barStyle = ThemeManager.currentTheme().barStyle
+        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel], for: .normal)
+        tabBar.unselectedItemTintColor = .secondaryLabel
+        tabBar.barTintColor = .systemGroupedBackground
+        tabBar.barStyle = .default
         tabBar.isTranslucent = false
         tabBar.layer.borderWidth = 0.50
         tabBar.layer.borderColor = UIColor.clear.cgColor
@@ -86,8 +78,8 @@ class GeneralTabBarController: UITabBarController {
         if #available(iOS 15, *) {
             let tabBarApperance = UITabBarAppearance()
             tabBarApperance.configureWithOpaqueBackground()
-            tabBarApperance.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-            UITabBar.appearance().barTintColor = ThemeManager.currentTheme().barBackgroundColor
+            tabBarApperance.backgroundColor = .systemGroupedBackground
+            UITabBar.appearance().barTintColor = .systemGroupedBackground
             UITabBar.appearance().scrollEdgeAppearance = tabBarApperance
             UITabBar.appearance().standardAppearance = tabBarApperance
         }
@@ -96,7 +88,7 @@ class GeneralTabBarController: UITabBarController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if onceToken == 0 {
-            splashContainer.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            splashContainer.backgroundColor = .systemGroupedBackground
             view.addSubview(splashContainer)
             splashContainer.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
             splashContainer.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
@@ -104,21 +96,6 @@ class GeneralTabBarController: UITabBarController {
             splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
         onceToken = 1
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        guard UIApplication.shared.applicationState == .inactive else {
-            return
-        }
-        if self.traitCollection.userInterfaceStyle == .dark {
-            let theme = Theme.Dark
-            ThemeManager.applyTheme(theme: theme)
-        } else if self.traitCollection.userInterfaceStyle == .light {
-            let theme = Theme.Default
-            ThemeManager.applyTheme(theme: theme)
-        }
-        configureTabBar()
     }
     
     fileprivate func loadVariables() {
@@ -154,7 +131,7 @@ class GeneralTabBarController: UITabBarController {
         let controller = UINavigationController(rootViewController: viewController)
         controller.navigationBar.prefersLargeTitles = true
         controller.navigationItem.largeTitleDisplayMode = .always
-        controller.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+        controller.navigationBar.backgroundColor = .systemGroupedBackground
         let tabBarItem = UITabBarItem(title: nil, image: icon, selectedImage: selectedIcon)
         tabBarItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
         controller.tabBarItem = tabBarItem
@@ -185,11 +162,11 @@ class GeneralTabBarController: UITabBarController {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     func showLaunchScreen() {
-        launchScreenView.backgroundColor = ThemeManager.currentTheme().launchBackgroundColor
+        launchScreenView.backgroundColor = .secondarySystemGroupedBackground
         view.addSubview(launchScreenView)
         launchScreenView.fillSuperview()
         launchScreenView.addSubview(plotLogoView)

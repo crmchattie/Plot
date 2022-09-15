@@ -47,7 +47,6 @@ class LocationFinderTableViewController: UIViewController {
         searchBar = UISearchBar()
         searchBar?.delegate = self
         searchBar?.searchBarStyle = .minimal
-        searchBar?.changeBackgroundColor(to: ThemeManager.currentTheme().searchBarColor)
         searchBar?.placeholder = "Search"
         searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         searchResultsTableView.tableHeaderView = searchBar
@@ -57,7 +56,7 @@ class LocationFinderTableViewController: UIViewController {
     fileprivate func setupMainView() {
         extendedLayoutIncludesOpaqueBars = true
         navigationItem.title = "Location"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
     }
     
     fileprivate func setupTableView() {
@@ -76,7 +75,7 @@ class LocationFinderTableViewController: UIViewController {
         }
         searchResultsTableView.delegate = self
         searchResultsTableView.dataSource = self
-        searchResultsTableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        searchResultsTableView.indicatorStyle = .default
         searchResultsTableView.sectionIndexBackgroundColor = view.backgroundColor
         searchResultsTableView.backgroundColor = view.backgroundColor
         searchResultsTableView.separatorStyle = .none
@@ -142,9 +141,9 @@ extension LocationFinderTableViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let searchResult = searchResults[indexPath.row]
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
+        cell.textLabel?.textColor = .label
+        cell.detailTextLabel?.textColor = .secondaryLabel
         cell.textLabel?.text = searchResult.title
         cell.detailTextLabel?.text = searchResult.subtitle
         return cell
@@ -159,9 +158,9 @@ extension LocationFinderTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            headerTitle.textLabel?.textColor = .label
         }
     }
 
@@ -211,7 +210,7 @@ extension LocationFinderTableViewController {
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         searchBar.setShowsCancelButton(true, animated: true)
         
         return true

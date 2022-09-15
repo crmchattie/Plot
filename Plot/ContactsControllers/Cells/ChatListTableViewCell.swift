@@ -12,7 +12,7 @@ class ChatListTableViewCell: UITableViewCell {
     
     lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -40,7 +40,7 @@ class ChatListTableViewCell: UITableViewCell {
     override func prepareForReuse() {
       super.prepareForReuse()
       nameLabel.text = ""
-      nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+      nameLabel.textColor = .label
     }
     
     func configureCell(checklist: Checklist?, grocerylist: Grocerylist?, packinglist: Packinglist?, activitylist: Activitylist?) {

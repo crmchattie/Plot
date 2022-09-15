@@ -9,36 +9,7 @@
 
 import UIKit
 
-let SelectedThemeKey = "SelectedTheme"
-
-extension NSNotification.Name {
-    static let themeUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".themeUpdated")
-}
-
 struct ThemeManager {
-    
-    static func applyTheme(theme: Theme) {
-        userDefaults.updateObject(for: userDefaults.selectedTheme, with: theme.rawValue)
-        
-        UITabBar.appearance().barStyle = theme.barStyle
-        UINavigationBar.appearance().isTranslucent = false
-        UINavigationBar.appearance().barStyle = theme.barStyle
-        UINavigationBar.appearance().barTintColor = UIColor { (traitCollection) -> UIColor in
-            if traitCollection.userInterfaceStyle == .dark {
-                return .black
-            } else {
-                return #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
-            }
-        }
-        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
-        UINavigationBar.appearance().titleTextAttributes = textAttributes
-        UINavigationBar.appearance().largeTitleTextAttributes = textAttributes
-        UINavigationBar.appearance().shadowImage = UIImage()
-        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: theme.generalTitleColor]
-        
-        NotificationCenter.default.post(name: .themeUpdated, object: nil)
-    }
-    
     static func currentTheme() -> Theme {
         if let storedTheme = userDefaults.currentIntObjectState(for: userDefaults.selectedTheme) {
             return Theme(rawValue: storedTheme)!
@@ -54,160 +25,6 @@ struct ThemeManager {
 
 enum Theme: Int {
     case Default, Dark
-    
-    @available(iOS 12.0, *)
-    var userInterfaceStyle: UIUserInterfaceStyle {
-        switch self {
-        case .Default:
-            return .light
-        case .Dark:
-            return .dark
-        }
-    }
-    
-    var generalBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
-        case .Dark:
-            return .black
-        }
-    }
-    
-    var cellBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return .white
-        case .Dark:
-            return #colorLiteral(red: 0.161149174, green: 0.1603732407, blue: 0.1725786328, alpha: 1)
-        }
-    }
-    
-    var googleSignInBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor("#FFFFFF")
-        case .Dark:
-            return UIColor("#4285F4")
-        }
-    }
-    
-    var chatBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return .white
-        case .Dark:
-            return .black
-        }
-    }
-    
-    var launchBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return .white
-        case .Dark:
-            return .black
-        }
-    }
-    
-    var barBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return #colorLiteral(red: 0.9489266276, green: 0.9490858912, blue: 0.9747040868, alpha: 1)
-        case .Dark:
-            return .black
-        }
-    }
-    
-    var segmentedControlBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return .white
-        case .Dark:
-            return .gray
-        }
-    }
-    
-    var generalTitleColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor.black
-        case .Dark:
-            return UIColor.white
-        }
-    }
-    
-    var tintColor: UIColor {
-        switch self {
-        case .Default:
-            return .systemBlue
-        case .Dark:
-            return .systemBlue
-        }
-    }
-    
-    var generalSubtitleColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red:0.67, green:0.67, blue:0.67, alpha:1.0)
-        case .Dark:
-            return UIColor(red:0.67, green:0.67, blue:0.67, alpha:1.0)
-        }
-    }
-    
-    var cellSelectionColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red: 245.0/255.0, green: 245.0/255.0, blue: 245.0/255.0, alpha: 1.0)
-        case .Dark:
-            return UIColor(red: 10.0/255.0, green: 10.0/255.0, blue: 10.0/255.0, alpha: 1.0)
-        }
-    }
-    
-    var inputTextViewColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red: 0.90, green: 0.90, blue: 0.90, alpha: 1.0)
-        case .Dark:
-            return UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.0)
-        }
-    }
-    
-    var controlButtonsColor: UIColor {
-        switch self {
-        case .Default:
-            return   UIColor(red:0.94, green:0.94, blue:0.96, alpha:1.0)
-        case .Dark:
-            return UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.0)
-        }
-    }
-    
-    var searchBarColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 0.5)
-        case .Dark:
-            return UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 0.8)
-        }
-    }
-    
-    var mediaPickerControllerBackgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red: 209.0/255.0, green: 213.0/255.0, blue: 218.0/255.0, alpha: 1.0)
-        case .Dark:
-            return UIColor(red: 0.10, green: 0.10, blue: 0.10, alpha: 1.0)
-        }
-    }
-    
-    var splashImage: UIImage {
-        switch self {
-        case .Default:
-            return UIImage(named: "whiteSplash")!
-        case .Dark:
-            return UIImage(named: "blackSplash")!
-        }
-    }
     
     var typingIndicatorURL: URL? {
         switch self {
@@ -248,7 +65,7 @@ enum Theme: Int {
     var incomingBubble: UIImage {
         switch self {
         case .Default:
-            return UIImage(named: "DarkPigeonBubbleIncomingFull")!.resizableImage(withCapInsets: UIEdgeInsets(top: 14, left: 22, bottom: 17, right: 20))//UIImage(named: "PigeonBubbleIncomingFull")!.resizableImage(withCapInsets: UIEdgeInsetsMake(14, 22, 17, 20))
+            return UIImage(named: "DarkPigeonBubbleIncomingFull")!.resizableImage(withCapInsets: UIEdgeInsets(top: 14, left: 22, bottom: 17, right: 20))
         case .Dark:
             return UIImage(named: "DarkPigeonBubbleIncomingFull")!.resizableImage(withCapInsets: UIEdgeInsets(top: 14, left: 22, bottom: 17, right: 20))
         }
@@ -260,74 +77,6 @@ enum Theme: Int {
             return UIImage(named: "PigeonBubbleOutgoingFull")!.resizableImage(withCapInsets: UIEdgeInsets(top: 14, left: 14, bottom: 17, right: 28))
         case .Dark: //DarkPigeonBubbleOutgoingFull
             return UIImage(named: "PigeonBubbleOutgoingFull")!.resizableImage(withCapInsets: UIEdgeInsets(top: 14, left: 14, bottom: 17, right: 28))
-        }
-    }
-    
-    var keyboardAppearance: UIKeyboardAppearance {
-        switch self {
-        case .Default:
-            return  .default
-        case .Dark:
-            return .dark
-        }
-    }
-    
-    var barStyle: UIBarStyle {
-        switch self {
-        case .Default:
-            return .default
-        case .Dark:
-            return .black
-        }
-    }
-    
-    var statusBarStyle: UIStatusBarStyle {
-        switch self {
-        case .Default:
-            if #available(iOS 13.0, *) {
-                return .darkContent
-            } else {
-                return .default
-            }
-        case .Dark:
-            return .lightContent
-        }
-    }
-    
-    var scrollBarStyle: UIScrollView.IndicatorStyle {
-        switch self {
-        case .Default:
-            return .default
-        case .Dark:
-            return .white
-        }
-    }
-    
-    var backgroundColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red: 245.0/255.0, green: 245.0/255.0, blue: 245.0/255.0, alpha: 1.0)
-        case .Dark:
-            return UIColor.black
-        }
-    }
-    
-    var secondaryColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red: 242.0/255.0, green: 101.0/255.0, blue: 34.0/255.0, alpha: 1.0)
-        case .Dark:
-            return UIColor(red: 34.0/255.0, green: 128.0/255.0, blue: 66.0/255.0, alpha: 1.0)
-            
-        }
-    }
-    
-    var controlButtonColor: UIColor {
-        switch self {
-        case .Default:
-            return UIColor(red: 0.94, green: 0.94, blue: 0.96, alpha: 1.0)
-        case .Dark:
-            return UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.0)
         }
     }
 }

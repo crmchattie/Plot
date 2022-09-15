@@ -36,7 +36,7 @@ class UserProfileContainerView: UIView {
         profileImageView.layer.masksToBounds = true
         profileImageView.layer.cornerRadius = 48
         profileImageView.isUserInteractionEnabled = true
-        profileImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        profileImageView.backgroundColor = .secondarySystemGroupedBackground
         return profileImageView
     }()
     
@@ -63,8 +63,8 @@ class UserProfileContainerView: UIView {
         name.borderStyle = .none
         name.autocorrectionType = .no
         name.returnKeyType = .done
-        name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        name.textColor = ThemeManager.currentTheme().generalTitleColor
+        name.keyboardAppearance = .default
+        name.textColor = .label
         
         return name
     }()
@@ -79,8 +79,8 @@ class UserProfileContainerView: UIView {
         phone.placeholder = "Phone number"
         phone.borderStyle = .none
 //        phone.isEnabled = false
-        phone.textColor = ThemeManager.currentTheme().generalTitleColor
-        phone.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        phone.textColor = .label
+        phone.keyboardAppearance = .default
         return phone
     }()
     
@@ -91,13 +91,13 @@ class UserProfileContainerView: UIView {
         textField.textAlignment = .center
         textField.keyboardType = .emailAddress
         textField.attributedPlaceholder = NSAttributedString(string: "Email",
-                                     attributes: [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+                                     attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
         textField.borderStyle = .none
         textField.layer.cornerRadius = 10
         textField.autocorrectionType = .no
-        textField.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        textField.textColor = ThemeManager.currentTheme().generalTitleColor
-        textField.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        textField.backgroundColor = .secondarySystemGroupedBackground
+        textField.textColor = .label
+        textField.keyboardAppearance = .default
         return textField
     }()
     
@@ -105,7 +105,7 @@ class UserProfileContainerView: UIView {
         let userData = UIView()
         userData.translatesAutoresizingMaskIntoConstraints = false
         userData.layer.cornerRadius = 10
-        userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        userData.backgroundColor = .secondarySystemGroupedBackground
         return userData
     }()
     
@@ -118,11 +118,10 @@ class UserProfileContainerView: UIView {
         bio.adjustsFontForContentSizeCategory = true
         bio.isScrollEnabled = false
         bio.textContainerInset = UIEdgeInsets(top: 15, left: 35, bottom: 15, right: 35)
-        bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        bio.textColor = ThemeManager.currentTheme().generalTitleColor
-        bio.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        bio.backgroundColor = .secondarySystemGroupedBackground
+        bio.textColor = .label
+        bio.indicatorStyle = .default
+        bio.keyboardAppearance = .default
         bio.textContainer.lineBreakMode = .byTruncatingTail
         bio.returnKeyType = .done
         return bio
@@ -137,7 +136,7 @@ class UserProfileContainerView: UIView {
         bioPlaceholderLabel.textAlignment = .center
         bioPlaceholderLabel.backgroundColor = .clear
         bioPlaceholderLabel.translatesAutoresizingMaskIntoConstraints = false
-        bioPlaceholderLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        bioPlaceholderLabel.textColor = .secondaryLabel
         return bioPlaceholderLabel
     }()
     
@@ -145,7 +144,7 @@ class UserProfileContainerView: UIView {
         let countLabel = UILabel()
         countLabel.translatesAutoresizingMaskIntoConstraints = false
         countLabel.sizeToFit()
-        countLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        countLabel.textColor = .secondaryLabel
         countLabel.font = UIFont.preferredFont(forTextStyle: .body)
         countLabel.adjustsFontForContentSizeCategory = true
         countLabel.isHidden = true
@@ -158,7 +157,7 @@ class UserProfileContainerView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        backgroundColor = .systemGroupedBackground
         
         addSubview(profileImageView)
         addSubview(addPhotoLabel)

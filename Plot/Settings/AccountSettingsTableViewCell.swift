@@ -22,7 +22,7 @@ class AccountSettingsTableViewCell: UITableViewCell {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = UIFont.preferredFont(forTextStyle: .body)
         title.adjustsFontForContentSizeCategory = true
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         return title
     }()
     
@@ -51,8 +51,8 @@ class AccountSettingsTableViewCell: UITableViewCell {
     }
     
     fileprivate func setColor() {
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        backgroundColor = .secondarySystemGroupedBackground
+        title.textColor = .label
     }
     
     override func prepareForReuse() {

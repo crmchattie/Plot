@@ -114,19 +114,11 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }()
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if self.traitCollection.userInterfaceStyle == .dark {
-            let theme = Theme.Dark
-            ThemeManager.applyTheme(theme: theme)
-        } else {
-            let theme = Theme.Default
-            ThemeManager.applyTheme(theme: theme)
-        }
-        
         appDelegate.loadNotifications()
         showLaunchScreen()
         setOnlineStatus()
@@ -142,7 +134,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if onceToken == 0 {
-            splashContainer.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            splashContainer.backgroundColor = .systemGroupedBackground
             view.addSubview(splashContainer)
             splashContainer.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
             splashContainer.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
@@ -167,14 +159,14 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
 
     func setupViews() {
-        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
+        navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
         navigationController?.navigationBar.layoutIfNeeded()
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .always
 
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
+        collectionView.indicatorStyle = .default
+        collectionView.backgroundColor = .systemGroupedBackground
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
@@ -200,7 +192,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
@@ -211,21 +202,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedCalendarEventActivities), name: .hasLoadedCalendarEventActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
-        navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
-        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.reloadData()
-        
     }
     
     @objc fileprivate func tasksUpdated() {
@@ -364,7 +340,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         if currentReachabilityStatus == .notReachable {
             navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
                                                                   activityPriority: .high,
-                                                                  color: ThemeManager.currentTheme().generalTitleColor)
+                                                                  color: .label)
         }
         
         let connectedReference = Database.database().reference(withPath: ".info/connected")
@@ -373,7 +349,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             if self.currentReachabilityStatus != .notReachable {
                 self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
             } else {
-                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
+                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: .label)
             }
         })
     }

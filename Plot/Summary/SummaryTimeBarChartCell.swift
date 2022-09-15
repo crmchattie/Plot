@@ -72,7 +72,7 @@ class SummaryTimeBarChartCell: UICollectionViewCell {
                 l.font = UIFont.caption2.with(weight: .regular)
                 l.xEntrySpace = 4
 
-                let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
+                let marker = XYMarkerView(color: .secondaryLabel,
                                           font: .systemFont(ofSize: 12),
                                           textColor: .white,
                                           insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),

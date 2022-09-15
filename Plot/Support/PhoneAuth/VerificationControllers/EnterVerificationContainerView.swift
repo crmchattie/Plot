@@ -16,7 +16,7 @@ class EnterVerificationContainerView: UIView {
     let titleNumber = UILabel()
     titleNumber.translatesAutoresizingMaskIntoConstraints = false
     titleNumber.textAlignment = .center
-    titleNumber.textColor = ThemeManager.currentTheme().generalTitleColor
+    titleNumber.textColor = .label
     titleNumber.font = .preferredFont(forTextStyle: .title1)
     return titleNumber
   }()
@@ -27,7 +27,7 @@ class EnterVerificationContainerView: UIView {
     subtitleText.font = UIFont.preferredFont(forTextStyle: .title3)
     subtitleText.adjustsFontForContentSizeCategory = true
     subtitleText.textAlignment = .center
-    subtitleText.textColor = ThemeManager.currentTheme().generalTitleColor
+    subtitleText.textColor = .label
     subtitleText.text = "We have sent you an SMS with the code"
     
     return subtitleText
@@ -40,12 +40,12 @@ class EnterVerificationContainerView: UIView {
     verificationCode.translatesAutoresizingMaskIntoConstraints = false
     verificationCode.textAlignment = .center
     verificationCode.keyboardType = .numberPad
-    verificationCode.textColor = ThemeManager.currentTheme().generalTitleColor
-    verificationCode.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-    verificationCode.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    verificationCode.textColor = .label
+    verificationCode.keyboardAppearance = .default
+    verificationCode.backgroundColor = .secondarySystemGroupedBackground
     verificationCode.layer.cornerRadius = 10
 		verificationCode.attributedPlaceholder = NSAttributedString(string: "Code", attributes: [NSAttributedString.Key.foregroundColor:
-      ThemeManager.currentTheme().generalSubtitleColor])    
+      UIColor.secondaryLabel])
     return verificationCode
   }()
   
@@ -57,8 +57,8 @@ class EnterVerificationContainerView: UIView {
     resend.contentVerticalAlignment = .center
     resend.contentHorizontalAlignment = .center
     resend.setTitleColor(FalconPalette.defaultBlue, for: .normal)
-    resend.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .highlighted)
-    resend.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .disabled)
+    resend.setTitleColor(.secondaryLabel, for: .highlighted)
+    resend.setTitleColor(.secondaryLabel, for: .disabled)
     
     return resend
   }()
@@ -70,8 +70,8 @@ class EnterVerificationContainerView: UIView {
       next.contentVerticalAlignment = .center
       next.contentHorizontalAlignment = .center
       next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
-      next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .highlighted)
-      next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .disabled)
+      next.setTitleColor(.secondaryLabel, for: .highlighted)
+      next.setTitleColor(.secondaryLabel, for: .disabled)
       
       return next
     }()

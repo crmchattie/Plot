@@ -120,11 +120,11 @@ class SchedulerViewController: FormViewController {
     }
     
     fileprivate func configureTableView() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView.allowsMultipleSelectionDuringEditing = false
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         definesPresentationContext = true
@@ -184,25 +184,25 @@ class SchedulerViewController: FormViewController {
                     Section()
                     
                     <<< ActiveDaysRow("\(index)") {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.delegate = self
                         $0.value = dailyTimes[index].activeDays ?? []
                     }
                     
                     <<< TextRow("Length\(index)") {
                         $0.cell.isUserInteractionEnabled = false
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                        $0.cell.textField?.textColor = .secondaryLabel
                         $0.title = "Length"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textField?.textColor = .secondaryLabel
                     }
                     
                     <<< DateTimeInlineRow("\(type.categoryText)\(index)") {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                        $0.cell.textLabel?.textColor = .label
+                        $0.cell.detailTextLabel?.textColor = .secondaryLabel
                         $0.title = "\(type.categoryText)"
                         $0.minuteInterval = 5
                         $0.dateFormatter?.dateStyle = .none
@@ -213,8 +213,8 @@ class SchedulerViewController: FormViewController {
                         self!.scheduler.dailyTimes![index].startTime = row.value
                     }.onExpandInlineRow { cell, row, inlineRow in
                         inlineRow.cellUpdate() { cell, row in
-                            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                            row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                            row.cell.backgroundColor = .secondarySystemGroupedBackground
+                            row.cell.tintColor = .secondarySystemGroupedBackground
                             cell.datePicker.datePickerMode = .time
                             if #available(iOS 13.4, *) {
                                 cell.datePicker.preferredDatePickerStyle = .wheels
@@ -226,15 +226,15 @@ class SchedulerViewController: FormViewController {
                         }
                         cell.detailTextLabel?.textColor = cell.tintColor
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
+                        cell.detailTextLabel?.textColor = .secondaryLabel
                     }
                 
                     <<< DateTimeInlineRow("\(type.subcategoryText)\(index)") {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                        $0.cell.textLabel?.textColor = .label
+                        $0.cell.detailTextLabel?.textColor = .secondaryLabel
                         $0.title = "\(type.subcategoryText)"
                         $0.minuteInterval = 5
                         $0.dateFormatter?.dateStyle = .none
@@ -245,8 +245,8 @@ class SchedulerViewController: FormViewController {
                         self!.scheduler.dailyTimes![index].endTime = row.value
                     }.onExpandInlineRow { cell, row, inlineRow in
                         inlineRow.cellUpdate() { cell, row in
-                            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                            row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                            row.cell.backgroundColor = .secondarySystemGroupedBackground
+                            row.cell.tintColor = .secondarySystemGroupedBackground
                             cell.datePicker.datePickerMode = .time
                             if #available(iOS 13.4, *) {
                                 cell.datePicker.preferredDatePickerStyle = .wheels
@@ -258,18 +258,18 @@ class SchedulerViewController: FormViewController {
                         }
                         cell.detailTextLabel?.textColor = cell.tintColor
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
+                        cell.detailTextLabel?.textColor = .secondaryLabel
                     }
                 
                 <<< ButtonRow("Add Additional Schedule for Other Days") { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .center
                     row.cell.accessoryType = .none
                     row.title = row.tag
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                     }.onCellSelection({ _,_ in
                         self.addSection()
                     })
@@ -296,9 +296,9 @@ class SchedulerViewController: FormViewController {
             var section = self.form.allSections[0]
             if let buttonRow: ButtonRow = self.form.rowBy(tag: "Add Additional Schedule"), let buttonRowIndex = buttonRow.indexPath?.item {
                 section.insert(DateTimeInlineRow("\(type.subcategoryText)\(index)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = "\(type.subcategoryText)"
                     $0.minuteInterval = 5
                     $0.dateFormatter?.dateStyle = .none
@@ -309,8 +309,8 @@ class SchedulerViewController: FormViewController {
                     self!.scheduler.dailyTimes![index].endTime = row.value
                 }.onExpandInlineRow { cell, row, inlineRow in
                     inlineRow.cellUpdate() { cell, row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.backgroundColor = .secondarySystemGroupedBackground
+                        row.cell.tintColor = .secondarySystemGroupedBackground
                         cell.datePicker.datePickerMode = .time
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
@@ -322,15 +322,15 @@ class SchedulerViewController: FormViewController {
                     }
                     cell.detailTextLabel?.textColor = cell.tintColor
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                 }, at: buttonRowIndex)
                 
                 section.insert(DateTimeInlineRow("\(type.categoryText)\(index)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = "\(type.categoryText)"
                     $0.minuteInterval = 5
                     $0.dateFormatter?.dateStyle = .none
@@ -341,8 +341,8 @@ class SchedulerViewController: FormViewController {
                     self!.scheduler.dailyTimes![index].startTime = row.value
                 }.onExpandInlineRow { cell, row, inlineRow in
                     inlineRow.cellUpdate() { cell, row in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.backgroundColor = .secondarySystemGroupedBackground
+                        row.cell.tintColor = .secondarySystemGroupedBackground
                         cell.datePicker.datePickerMode = .time
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
@@ -354,23 +354,23 @@ class SchedulerViewController: FormViewController {
                     }
                     cell.detailTextLabel?.textColor = cell.tintColor
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                 }, at: buttonRowIndex)
                 
                 section.insert(TextRow("Length\(index)") {
                     $0.cell.isUserInteractionEnabled = false
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textField?.textColor = .secondaryLabel
                     $0.title = "Length"
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textField?.textColor = .secondaryLabel
                 }, at: buttonRowIndex)
                 
                 section.insert(ActiveDaysRow("\(index)") {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
                     $0.delegate = self
                     $0.value = scheduler.dailyTimes![index].activeDays ?? []
                 }, at: buttonRowIndex)

@@ -71,8 +71,8 @@ class ChooseListViewController: FormViewController {
     
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -99,10 +99,10 @@ class ChooseListViewController: FormViewController {
             for list in lists[section]?.sorted(by: { $0.name ?? "" < $1.name ?? "" }) ?? [] {
                 form.last!
                     <<< ListCheckRow<String>() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.cell.tintColor = FalconPalette.defaultBlue
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.textLabel?.textColor = .label
+                        $0.cell.detailTextLabel?.textColor = .label
                         $0.title = list.name
                         $0.selectableValue = list.name
                         if let listID = self.listID, list.id == listID {
@@ -110,10 +110,10 @@ class ChooseListViewController: FormViewController {
                         }
                     }.cellSetup { cell, row in
                         cell.accessoryType = .checkmark
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.tintColor = FalconPalette.defaultBlue
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textColor = .label
+                        cell.detailTextLabel?.textColor = .label
                     }.onChange({ (row) in
                         if let _ = row.value {
                             self.delegate?.update(list: list)

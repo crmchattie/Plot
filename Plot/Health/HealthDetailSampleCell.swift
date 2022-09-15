@@ -15,7 +15,7 @@ class HealthDetailSampleCell: UITableViewCell {
     
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -25,7 +25,7 @@ class HealthDetailSampleCell: UITableViewCell {
     
     let titleLabelRight: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -38,7 +38,7 @@ class HealthDetailSampleCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .left
         return label
@@ -48,7 +48,7 @@ class HealthDetailSampleCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -105,10 +105,10 @@ class HealthDetailSampleCell: UITableViewCell {
     }
     
     func configure(_ sample: HKSample) {
-        titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        titleLabelRight.textColor = ThemeManager.currentTheme().generalTitleColor
-        subtitleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        detailLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        titleLabel.textColor = .label
+        titleLabelRight.textColor = .label
+        subtitleLabel.textColor = .secondaryLabel
+        detailLabel.textColor = .secondaryLabel
         
         let interval = NSDateInterval(start: sample.startDate, end: sample.endDate)
         titleLabel.text = interval.duration.stringTime

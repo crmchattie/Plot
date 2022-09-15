@@ -36,7 +36,6 @@ extension EventCell {
             } else {
                 invitationSegmentedControl.selectedSegmentIndex = -1
             }
-            invitationSegmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         } else {
             invitationSegmentedControlTopAnchor.constant = 0
             invitationSegmentHeightConstraint.constant = 0

@@ -76,7 +76,6 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .healthUpdated, object: nil)
     }
     
@@ -95,14 +94,6 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
         }
     }
     
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        collectionView.indicatorStyle = theme.scrollBarStyle
-        collectionView.backgroundColor = theme.generalBackgroundColor
-        collectionView.reloadData()
-    }
-    
     private func configureView() {
         extendedLayoutIncludesOpaqueBars = true
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
@@ -114,7 +105,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
             navigationItem.rightBarButtonItems = [newItemBarButton]
         }
         
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
         view.addSubview(collectionView)
         
@@ -126,7 +117,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
         ])
         
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.indicatorStyle = .default
         collectionView.backgroundColor = view.backgroundColor
         
     }

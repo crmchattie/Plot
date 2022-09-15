@@ -70,8 +70,8 @@ class ListDetailViewController: FormViewController {
     
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -131,9 +131,9 @@ class ListDetailViewController: FormViewController {
             Section()
         
         <<< TextRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textField?.textColor = .label
+            $0.placeholderColor = .secondaryLabel
             $0.placeholder = $0.tag
             if self.active {
                 $0.value = self.list.name
@@ -149,13 +149,13 @@ class ListDetailViewController: FormViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textField?.textColor = .label
         }
         
         <<< ColorPushRow<UIColor>("Color") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
             row.title = row.tag
             row.cell.detailTextLabel?.text = nil
 //            row.cell.accessoryType = .disclosureIndicator
@@ -171,8 +171,8 @@ class ListDetailViewController: FormViewController {
             to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
                 to.tableView.separatorStyle = .none
                 if let index = row.indexPath?.row {
                     cell.selectionStyle = .none
@@ -183,8 +183,8 @@ class ListDetailViewController: FormViewController {
                 }
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
             cell.detailTextLabel?.text = nil
         }.onChange() { [unowned self] row in
             if let color = row.value {
@@ -199,18 +199,18 @@ class ListDetailViewController: FormViewController {
         if list.source == ListSourceOptions.plot.name {
             form.last!
             <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.textColor = .label
+                $0.cell.placeholderLabel?.textColor = .secondaryLabel
                 $0.placeholder = $0.tag
                 if self.active && self.list.description != "nothing" && self.list.description != nil {
                     $0.value = self.list.description
                 }
             }.cellUpdate({ (cell, row) in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                cell.textView?.textColor = .label
             }).onChange() { [unowned self] row in
                 self.list.description = row.value
                 if row.value == nil, self.active, let id = list.id {
@@ -220,9 +220,9 @@ class ListDetailViewController: FormViewController {
             }
             
 //            <<< LabelRow("Category") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.backgroundColor = .secondarySystemGroupedBackground
+//                row.cell.textLabel?.textColor = .label
+//                row.cell.detailTextLabel?.textColor = .secondaryLabel
 //                row.cell.accessoryType = .disclosureIndicator
 //                row.cell.selectionStyle = .default
 //                row.title = row.tag
@@ -235,16 +235,16 @@ class ListDetailViewController: FormViewController {
 //                self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
 //            }).cellUpdate { cell, row in
 //                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textLabel?.textColor = .label
+//                cell.detailTextLabel?.textColor = .secondaryLabel
 //                cell.textLabel?.textAlignment = .left
 //            }
             
             <<< LabelRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -258,9 +258,9 @@ class ListDetailViewController: FormViewController {
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         }
@@ -383,7 +383,7 @@ extension ListDetailViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == FalconPalette.defaultBlue {
             textView.text = nil
-            textView.textColor = ThemeManager.currentTheme().generalTitleColor
+            textView.textColor = .label
         }
         
         

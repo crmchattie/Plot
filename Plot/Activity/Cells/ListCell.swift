@@ -22,7 +22,7 @@ class ListCell: UITableViewCell {
     //name of activity
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -55,7 +55,7 @@ class ListCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -96,7 +96,7 @@ class ListCell: UITableViewCell {
         label.backgroundColor = .clear
         label.layer.cornerRadius = 10
         label.text = "1"
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.textAlignment = .center
         label.layer.masksToBounds = true
         label.font = UIFont.preferredFont(forTextStyle: .headline)
@@ -106,7 +106,7 @@ class ListCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
@@ -152,7 +152,7 @@ class ListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
         nameLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
@@ -162,7 +162,7 @@ class ListCell: UITableViewCell {
         
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
+        activityImageView.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(highlighted ? 0.7 : 1)
     }
 }
 

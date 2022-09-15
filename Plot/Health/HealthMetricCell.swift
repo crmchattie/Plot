@@ -13,7 +13,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
 
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -26,7 +26,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .left
         label.numberOfLines = 0
@@ -37,7 +37,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .left
@@ -106,9 +106,9 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
     }
     
     func configure(_ metric: AnyHashable) {
-        titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        subtitleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        detailLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        titleLabel.textColor = .label
+        subtitleLabel.textColor = .label
+        detailLabel.textColor = .secondaryLabel
 
         if let healthMetric = metric as? HealthMetric {
             let isToday = NSCalendar.current.isDateInToday(healthMetric.date)

@@ -67,37 +67,17 @@ class SelectActivityTableViewController: UITableViewController {
         super.viewDidLoad()
         
         configureTableView()
-        setupSearchController()
-        addObservers()
-        
+        setupSearchController()        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         handleReloadTable()
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(updateUsers), name: .falconUsersUpdated, object: nil)
-        //        print("Activity Observers added")
-    }
-    
-    
-    @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = view.backgroundColor
-        tableView.backgroundColor = view.backgroundColor
-        tableView.reloadData()
-    }
+
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -113,10 +93,10 @@ class SelectActivityTableViewController: UITableViewController {
         tableView.delegate = self
         tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
 //        let newActivityBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newActivity))
 //        navigationItem.rightBarButtonItem = newActivityBarButton
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -161,7 +141,7 @@ class SelectActivityTableViewController: UITableViewController {
 //        if currentReachabilityStatus == .notReachable {
 //            navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
 //                                                                  activityPriority: .high,
-//                                                                  color: ThemeManager.currentTheme().generalTitleColor)
+//                                                                  color: .label)
 //        }
 //
 //        let connectedReference = Database.database().reference(withPath: ".info/connected")
@@ -170,7 +150,7 @@ class SelectActivityTableViewController: UITableViewController {
 //            if self.currentReachabilityStatus != .notReachable {
 //                self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
 //            } else {
-//                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
+//                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: .label)
 //            }
 //        })
 //    }
@@ -254,12 +234,12 @@ class SelectActivityTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().inputTextViewColor
+        view.tintColor = .systemGroupedBackground
         
         //    if section == 0 {
-        //      view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        //      view.tintColor = .systemGroupedBackground
         //    } else {
-        //      view.tintColor = ThemeManager.currentTheme().inputTextViewColor
+        //      view.tintColor = .systemGroupedBackground
         //    }
         
         if let headerTitle = view as? UITableViewHeaderFooterView {
@@ -398,7 +378,7 @@ extension SelectActivityTableViewController: UISearchBarDelegate, UISearchContro
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         guard #available(iOS 11.0, *) else {
             searchBar.setShowsCancelButton(true, animated: true)
             return true

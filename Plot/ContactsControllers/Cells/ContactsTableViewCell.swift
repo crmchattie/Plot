@@ -23,7 +23,7 @@ class ContactsTableViewCell: UITableViewCell {
         var title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = UIFont.preferredFont(forTextStyle: .headline)
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         title.adjustsFontForContentSizeCategory = true
         return title
     }()
@@ -50,7 +50,7 @@ class ContactsTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         title.text = ""
         icon.image = UIImage(named: "UserpicIcon")
     }

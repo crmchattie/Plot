@@ -17,8 +17,8 @@ class SetupCell: BaseContainerCollectionViewCell {
             imageView.image = UIImage(named: sectionType.image)!.withRenderingMode(.alwaysTemplate)
             imageView.tintColor = colors[intColor]
             imageView.contentMode = .scaleAspectFit
-            imageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            containerImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            imageView.backgroundColor = .secondarySystemGroupedBackground
+            containerImageView.backgroundColor = .secondarySystemGroupedBackground
             typeLabel.text = sectionType.type
             descriptionLabel.text = sectionType.subType
             setupViews()
@@ -41,7 +41,7 @@ class SetupCell: BaseContainerCollectionViewCell {
     
     let typeLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.title2.with(weight: .bold)
         label.numberOfLines = 1
         label.textAlignment = .left
@@ -51,7 +51,7 @@ class SetupCell: BaseContainerCollectionViewCell {
     
     let descriptionLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .center
@@ -118,8 +118,8 @@ class SetupCell: BaseContainerCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        typeLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        descriptionLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        typeLabel.textColor = .label
+        descriptionLabel.textColor = .label
         
     }
 }

@@ -74,9 +74,9 @@ class SplashScreenContainer: UIView {
         
         let biometricsButton = UIButton()
         biometricsButton.setTitle(title, for: .normal)
-        biometricsButton.setTitleColor(ThemeManager.currentTheme().generalTitleColor, for: .normal)
+        biometricsButton.setTitleColor(.label, for: .normal)
         biometricsButton.addTarget(self, action: #selector(authenticationWithTouchID), for: .touchUpInside)
-        biometricsButton.backgroundColor = ThemeManager.currentTheme().controlButtonColor
+        biometricsButton.backgroundColor = .systemGroupedBackground
         biometricsButton.layer.cornerRadius = 20
         biometricsButton.translatesAutoresizingMaskIntoConstraints = false
         

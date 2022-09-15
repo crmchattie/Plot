@@ -81,15 +81,14 @@ class AccountSettingsController: UITableViewController {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(clearUserData), name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(emailVerified), name: .emailVerified, object: nil)
     }
     
     fileprivate func configureTableView() {
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.sectionHeaderHeight = 0
         tableView.separatorStyle = .none
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.tableHeaderView = userProfileContainerView
         tableView.register(AccountSettingsTableViewCell.self, forCellReuseIdentifier: accountSettingsCellId)
     }
@@ -104,21 +103,21 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.email.delegate = self
         userProfileContainerView.name.delegate = self
         userProfileContainerView.phone.delegate = self
-        userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        userProfileContainerView.email.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.phone.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.email.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        userProfileContainerView.backgroundColor = .systemGroupedBackground
+        userProfileContainerView.bio.backgroundColor = .secondarySystemGroupedBackground
+        userProfileContainerView.userData.backgroundColor = .secondarySystemGroupedBackground
+        userProfileContainerView.email.backgroundColor = .secondarySystemGroupedBackground
+        userProfileContainerView.name.textColor = .label
+        userProfileContainerView.phone.textColor = .label
+        userProfileContainerView.bio.textColor = .label
+        userProfileContainerView.email.textColor = .label
+        userProfileContainerView.bio.keyboardAppearance = .default
+        userProfileContainerView.name.keyboardAppearance = .default
     }
 
     func configureNavigationBar() {
-//        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-//        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
+//        navigationController?.navigationBar.barStyle = .default
+//        navigationController?.navigationBar.barTintColor = .systemGroupedBackground
         doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
         navigationItem.rightBarButtonItem = doneBarButton
     }
@@ -140,43 +139,12 @@ class AccountSettingsController: UITableViewController {
             dismiss(animated: true, completion: nil)
         }
     }
-
-    @objc fileprivate func changeTheme() {
-        nightMode.isSelected = Bool(ThemeManager.currentTheme().rawValue)
-        
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = view.backgroundColor
-        
-        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
-        navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
-        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-        
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        
-        userProfileContainerView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        userProfileContainerView.bio.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        userProfileContainerView.userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        userProfileContainerView.email.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        userProfileContainerView.profileImageView.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-        userProfileContainerView.userData.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-        userProfileContainerView.name.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.phone.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.layer.borderColor = ThemeManager.currentTheme().inputTextViewColor.cgColor
-        userProfileContainerView.bio.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.email.textColor = ThemeManager.currentTheme().generalTitleColor
-        userProfileContainerView.bio.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        userProfileContainerView.name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        tableView.reloadData()
-    }
     
     fileprivate func managePresense() {
         if currentReachabilityStatus == .notReachable {
             navigationItemActivityIndicator.showActivityIndicator(for: navigationItem, with: .connecting,
                                                                   activityPriority: .high,
-                                                                  color: ThemeManager.currentTheme().generalTitleColor)
+                                                                  color: .label)
         }
         
         let connectedReference = Database.database().reference(withPath: ".info/connected")
@@ -185,7 +153,7 @@ class AccountSettingsController: UITableViewController {
             if self.currentReachabilityStatus != .notReachable {
                 self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
             } else {
-                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: ThemeManager.currentTheme().generalTitleColor)
+                self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: .label)
             }
         })
     }
@@ -198,17 +166,6 @@ class AccountSettingsController: UITableViewController {
         avatarOpener.delegate = self
         avatarOpener.handleAvatarOpening(avatarView: userProfileContainerView.profileImageView, at: self, isEditButtonEnabled: true, title: .user)
         cancelBarButtonPressed()
-    }
-    
-    @objc fileprivate func rightBarButtonDidTap(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
-        if sender.isSelected {
-            let theme = Theme.Dark
-            ThemeManager.applyTheme(theme: theme)
-        } else {
-            let theme = Theme.Default
-            ThemeManager.applyTheme(theme: theme)
-        }
     }
     
     @objc func clearUserData() {

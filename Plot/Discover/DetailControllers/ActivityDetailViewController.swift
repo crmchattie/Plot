@@ -90,9 +90,9 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
+        collectionView.indicatorStyle = .default
+        collectionView.backgroundColor = .systemGroupedBackground
     
                         
         if favAct.isEmpty {
@@ -104,12 +104,10 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         
-        addObservers()
-
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     func setActivity() {
@@ -300,31 +298,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        
-        navigationController?.navigationBar.barStyle = ThemeManager.currentTheme().barStyle
-        navigationController?.navigationBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        let textAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalTitleColor]
-        navigationController?.navigationBar.titleTextAttributes = textAttributes
-        navigationController?.navigationBar.largeTitleTextAttributes = textAttributes
-        navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-        
-        tabBarController?.tabBar.barTintColor = ThemeManager.currentTheme().barBackgroundColor
-        tabBarController?.tabBar.barStyle = ThemeManager.currentTheme().barStyle
-        
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        collectionView.reloadData()
-        
     }
     
     @objc func goToMap(activity: Activity) {

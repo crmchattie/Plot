@@ -88,14 +88,14 @@ class ViewPlaceholder: UIView {
         translatesAutoresizingMaskIntoConstraints = false
         
         title.font = .preferredFont(forTextStyle: .body)
-        title.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        title.textColor = .secondaryLabel
         title.textAlignment = .center
         title.numberOfLines = 0
         title.translatesAutoresizingMaskIntoConstraints = false
         title.adjustsFontForContentSizeCategory = true
         
         subtitle.font = .preferredFont(forTextStyle: .footnote)
-        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        subtitle.textColor = .secondaryLabel
         subtitle.textAlignment = .center
         subtitle.numberOfLines = 0
         subtitle.translatesAutoresizingMaskIntoConstraints = false

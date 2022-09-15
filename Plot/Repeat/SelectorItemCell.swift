@@ -20,7 +20,7 @@ internal class SelectorItemCell: UICollectionViewCell {
 
     internal func setItemSelected(_ selected: Bool) {
         isItemSelected = selected
-        backgroundColor = selected ? tintColor : ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = selected ? tintColor : .secondarySystemGroupedBackground
         if self.traitCollection.userInterfaceStyle == .dark {
             textLabel.textColor = .white
         } else {

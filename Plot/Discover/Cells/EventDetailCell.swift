@@ -35,7 +35,7 @@ class EventDetailCell: UICollectionViewCell {
     let getTixLabel: UILabel = {
         let label = UILabel()
 //        label.textColor = FalconPalette.ticketmaster
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.attributedText = NSAttributedString(string: "Go to Ticketmaster", attributes:
         [.underlineStyle: NSUnderlineStyle.single.rawValue])
@@ -50,13 +50,13 @@ class EventDetailCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        imageView.tintColor = .secondaryLabel
         return imageView
     }()
     
     let extraLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Other Dates:"

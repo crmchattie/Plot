@@ -52,7 +52,7 @@ extension UILocalizedIndexedCollation {
         for index in 0 ..< unsortedSections.count { if unsortedSections[index].count > 0 {
             sectionTitles.append(self.sectionTitles[index])
             sections.append(self.sortedArray(from: unsortedSections[index], collationStringSelector: collationStringSelector) as AnyObject)
-            }
+        }
         }
         
         return (sections, sectionTitles)
@@ -284,7 +284,7 @@ extension Date {
         dateFormatter.dateFormat = "MM/dd/yy"
         return dateFormatter.string(from: self)
     }
-
+    
     func getTimeStringForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
@@ -298,7 +298,7 @@ extension Date {
         dateFormatter.pmSymbol = "PM"
         return dateFormatter.string(from: self)
     }
-
+    
     func dayOfWeekForActivityWTZ(timeZone: String?) -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
@@ -329,7 +329,7 @@ extension Date {
         dateFormatter.dateFormat = "MM/dd/yy"
         return dateFormatter.string(from: self)
     }
-
+    
     func getTimeStringForActivity() -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
@@ -340,7 +340,7 @@ extension Date {
         dateFormatter.pmSymbol = "PM"
         return dateFormatter.string(from: self)
     }
-
+    
     func dayOfWeekForActivity() -> String {
         let dateFormatter = DateFormatter()
         let locale = Locale(identifier: "en_US_POSIX")
@@ -448,7 +448,7 @@ extension Date {
         let cal = Calendar(identifier: .gregorian)
         let endHour = cal.date(byAdding: .hour, value: 1, to: self)!
         return "\(monthAndDay), \(dateFormatter.string(from: self))-\(dateFormatter.string(from: endHour))"
-
+        
     }
     
     func dayNumberOfWeek() -> Int {
@@ -486,7 +486,7 @@ func timestampOfLastMessage(_ date: Date) -> String {
     //  } else {
     //    return date.getTimeStringFromUTC()
     //  }
-
+    
     if now.getShortDateStringFromUTC() != date.getShortDateStringFromUTC() {  // not today
         if components.weekOfYear! >= 1 { // last week
             return date.getShortDateStringFromUTC()
@@ -682,7 +682,7 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
         if let endTimeZone = activity.endTimeZone {
             endDateFormatter.timeZone = TimeZone(identifier: endTimeZone)
         }
-    
+        
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .ordinal
         
@@ -721,7 +721,7 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
                 value += "All Day"
             }
         }
-
+        
         if !allDay {
             if numberOfLines == 1 {
                 value += "\n"
@@ -743,7 +743,7 @@ func dateTimeValue(forTask task: Activity) -> String {
         let allDay = !(task.hasDeadlineTime ?? false)
         let endDateFormatter = DateFormatter()
         endDateFormatter.dateFormat = "d"
-    
+        
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .ordinal
         
@@ -783,7 +783,7 @@ func timeAgoSinceDate(_ date:Date, numericDates:Bool = false) -> String {
     let earliest = now < date ? now : date
     let latest = (earliest == now) ? date : now
     let components = calendar.dateComponents(unitFlags, from: earliest, to: latest)
-        
+    
     if (components.year! > 1) {
         return "\(components.year!) years ago"
     } else if (components.year! == 1){
@@ -964,13 +964,13 @@ extension UINavigationItem {
         //    button.backgroundColor = .clear
         //    button.setTitle(title, for: .normal)
         //    button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        //    button.titleLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //    button.titleLabel?.textColor = .label
         //    button.addTarget(self, action: #selector(getInfoAction), for: .touchUpInside)
         //    navigationItem.titleView = button
         
         let one = UILabel()
         one.text = title
-        one.textColor = ThemeManager.currentTheme().generalTitleColor
+        one.textColor = .label
         //    one.font = UIFont.systemFont(ofSize: 17)
         one.font = UIFont.preferredFont(forTextStyle: .body)
         one.adjustsFontForContentSizeCategory = true
@@ -983,7 +983,7 @@ extension UINavigationItem {
         two.font = UIFont.preferredFont(forTextStyle: .subheadline)
         two.adjustsFontForContentSizeCategory = true
         two.textAlignment = .center
-        two.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        two.textColor = .secondaryLabel
         two.sizeToFit()
         
         let stackView = UIStackView(arrangedSubviews: [one, two])
@@ -1303,13 +1303,13 @@ func uploadImageToFirebaseStorage(_ image: UIImage, quality: CGFloat, completion
 func uploadDocToFirebaseStorage(_ url: URL, contentType: String, name: String, completion: @escaping (_  url: String) -> ()) {
     let fileName = UUID().uuidString
     let ref = Storage.storage().reference().child(documentsEntity).child(fileName)
-
+    
     let localFile = url
     // Create the file metadata
     let metadata = StorageMetadata()
     metadata.contentType = contentType
     metadata.customMetadata = ["name": name, "type": url.pathExtension]
-        
+    
     ref.putFile(from: localFile, metadata: metadata) { (metadata, error) in
         guard error == nil else { completion(""); return }
         ref.downloadURL(completion: { (url, error) in
@@ -1558,7 +1558,7 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
     
     var description : String { return rawValue }
     
-//    static let allValues = [None, At_time_of_event, Fifteen_Minutes, Half_Hour, One_Hour, One_Day, One_Week, One_Month]
+    //    static let allValues = [None, At_time_of_event, Fifteen_Minutes, Half_Hour, One_Hour, One_Day, One_Week, One_Month]
     
     var timeInterval: Double {
         switch self {
@@ -1625,7 +1625,7 @@ enum EventRepeat : String, Comparable, CustomStringConvertible, CaseIterable {
     case Custom = "Custom"
     
     var description : String { return rawValue }
-        
+    
 }
 
 public func runUserBadgeUpdate(firstChild: String) {
@@ -1890,20 +1890,20 @@ extension Date {
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         return cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
     }
-
+    
     var endOfWeek: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         return cal.date(byAdding: .day, value: 7, to: startOfWeek)!
     }
-
+    
     var startOfMonth: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         let components = cal.dateComponents([.year, .month], from: self)
         return cal.date(from: components)!
     }
-
+    
     var endOfMonth: Date {
         var components = DateComponents()
         components.month = 1
@@ -1916,13 +1916,13 @@ extension Date {
         let components = cal.dateComponents([.year], from: self)
         return  cal.date(from: components)!
     }
-
+    
     var endOfYear: Date {
         var components = DateComponents()
         components.year = 1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfYear)!
     }
-
+    
     func isMonday() -> Bool {
         let calendar = Calendar(identifier: .gregorian)
         let components = calendar.dateComponents([.weekday], from: self)
@@ -1933,9 +1933,9 @@ extension Date {
         let calendar = Calendar.current
         // omitting fractions of seconds for simplicity
         let dateComponents = calendar.dateComponents([.hour, .minute, .second], from: self)
-
+        
         let dateSeconds = dateComponents.hour! * 3600 + dateComponents.minute! * 60 + dateComponents.second!
-
+        
         return TimeInterval(dateSeconds)
     }
     
@@ -1957,19 +1957,19 @@ extension TimeInterval {
     private var milliseconds: Int {
         return Int((truncatingRemainder(dividingBy: 1)) * 1000)
     }
-
+    
     private var seconds: Int {
         return Int(self) % 60
     }
-
+    
     private var minutes: Int {
         return (Int(self) / 60 ) % 60
     }
-
+    
     private var hours: Int {
         return Int(self) / 3600
     }
-
+    
     var stringTime: String {
         var time = ""
         if hours > 0 {
@@ -2030,26 +2030,26 @@ public extension String {
 }
 
 extension UIColor {
-  
-  convenience init(_ hex: String, alpha: CGFloat = 1.0) {
-    var cString = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     
-    if cString.hasPrefix("#") { cString.removeFirst() }
-    
-    if cString.count != 6 {
-      self.init("ff0000") // return red color for wrong hex input
-      return
+    convenience init(_ hex: String, alpha: CGFloat = 1.0) {
+        var cString = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        
+        if cString.hasPrefix("#") { cString.removeFirst() }
+        
+        if cString.count != 6 {
+            self.init("ff0000") // return red color for wrong hex input
+            return
+        }
+        
+        var rgbValue: UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
+        
+        self.init(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+                  green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+                  blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+                  alpha: alpha)
     }
     
-    var rgbValue: UInt64 = 0
-    Scanner(string: cString).scanHexInt64(&rgbValue)
-    
-    self.init(red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-              green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-              blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-              alpha: alpha)
-  }
-
 }
 
 public extension Form {

@@ -67,8 +67,8 @@ class FinanceTransactionLevelViewController: FormViewController {
     
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -91,10 +91,10 @@ class FinanceTransactionLevelViewController: FormViewController {
             for level in levels[section]?.sorted() ?? [] {
                 form.last!
                     <<< ListCheckRow<String>() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.cell.tintColor = FalconPalette.defaultBlue
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.textLabel?.textColor = .label
+                        $0.cell.detailTextLabel?.textColor = .label
                         $0.title = level
                         $0.selectableValue = level
                         if level == self.value {
@@ -102,10 +102,10 @@ class FinanceTransactionLevelViewController: FormViewController {
                         }
                     }.cellSetup { cell, row in
                         cell.accessoryType = .checkmark
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.tintColor = FalconPalette.defaultBlue
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textColor = .label
+                        cell.detailTextLabel?.textColor = .label
                     }.onChange({ (row) in
                         if let value = row.value {
                             self.delegate?.update(value: value, level: self.level)

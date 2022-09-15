@@ -25,7 +25,7 @@ extension ContactsController: UISearchBarDelegate, UISearchControllerDelegate, U
   }
   
   func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-    searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+    searchBar.keyboardAppearance = .default
     guard #available(iOS 11.0, *) else {
      searchBar.setShowsCancelButton(true, animated: true)
       return true

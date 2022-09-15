@@ -31,7 +31,7 @@ class EventCell: UITableViewCell {
     //name of activity
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -64,7 +64,7 @@ class EventCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .left
         return label
@@ -75,7 +75,7 @@ class EventCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -86,7 +86,7 @@ class EventCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -96,7 +96,6 @@ class EventCell: UITableViewCell {
         let items = ["Accept" , "Decline"]
         let segmentedControl = UISegmentedControl(items: items)
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         return segmentedControl
     }()
     
@@ -132,7 +131,7 @@ class EventCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
@@ -193,7 +192,7 @@ class EventCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
         nameLabel.text = nil
         startLabel.text = nil
         activityTypeLabel.text = nil
@@ -205,7 +204,7 @@ class EventCell: UITableViewCell {
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
+        activityImageView.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(highlighted ? 0.7 : 1)
     }
     
     @objc func indexChangedSegmentedControl(_ sender: UISegmentedControl) {

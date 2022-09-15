@@ -15,7 +15,7 @@ class TimestampView: RevealableView {
   override init(frame: CGRect) {
     super.init(frame: frame)
 
-    titleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+    titleLabel.textColor = .secondaryLabel
     titleLabel.font = UIFont.preferredFont(forTextStyle: .caption2)
   }
   

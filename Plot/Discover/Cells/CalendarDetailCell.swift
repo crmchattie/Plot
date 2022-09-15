@@ -35,7 +35,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let nameField: UITextField = {
         let textField = UITextField()
-        textField.textColor = ThemeManager.currentTheme().generalTitleColor
+        textField.textColor = .label
         textField.font = UIFont.preferredFont(forTextStyle: .body)
         textField.placeholder = "Activity Name"
         textField.isUserInteractionEnabled = true
@@ -55,7 +55,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let locationLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -79,7 +79,7 @@ class CalendarDetailCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        imageView.tintColor = .secondaryLabel
         return imageView
     }()
     
@@ -91,7 +91,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let participantsLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -104,7 +104,7 @@ class CalendarDetailCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "chevronRightBlack")!.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        imageView.tintColor = .secondaryLabel
         return imageView
     }()
     
@@ -116,7 +116,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let startLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Starts"
@@ -126,7 +126,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let startDateLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -156,7 +156,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let endLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Ends"
@@ -166,7 +166,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let endDateLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -196,7 +196,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let leftReminderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "Reminder"
         label.numberOfLines = 1
@@ -206,7 +206,7 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let rightReminderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.text = "None"
         label.numberOfLines = 1
@@ -219,10 +219,10 @@ class CalendarDetailCell: UICollectionViewCell {
         nameField.delegate = self
                     
         if locationLabel.text == "Location" {
-            locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            locationLabel.textColor = .secondaryLabel
             locationInfoView.isHidden = true
         } else {
-            locationLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+            locationLabel.textColor = .label
             locationInfoView.isHidden = false
         }
         
@@ -319,10 +319,10 @@ class CalendarDetailCell: UICollectionViewCell {
         }
         
         if labelText == "Location" {
-            locationLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            locationLabel.textColor = .secondaryLabel
             locationInfoView.isHidden = true
         } else {
-            locationLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+            locationLabel.textColor = .label
             locationInfoView.isHidden = false
         }
         
@@ -373,7 +373,7 @@ class CalendarDetailCell: UICollectionViewCell {
             startDateLabel.textColor = FalconPalette.defaultBlue
             endDatePicker.isHidden = true
         } else {
-            startDateLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            startDateLabel.textColor = .secondaryLabel
         }
         self.delegate?.startViewTapped(isHidden: "\(startDatePicker.isHidden)")
     }
@@ -384,7 +384,7 @@ class CalendarDetailCell: UICollectionViewCell {
             endDateLabel.textColor = FalconPalette.defaultBlue
             startDatePicker.isHidden = true
         } else {
-            endDateLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            endDateLabel.textColor = .secondaryLabel
         }
         self.delegate?.startViewTapped(isHidden: "\(endDatePicker.isHidden)")
     }

@@ -18,7 +18,7 @@ class EnterPhoneNumberContainerView: UIView {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.textAlignment = .center
         title.text = "Phone number"
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         title.font = .preferredFont(forTextStyle: .title1)
         return title
     }()
@@ -28,7 +28,7 @@ class EnterPhoneNumberContainerView: UIView {
         instructions.translatesAutoresizingMaskIntoConstraints = false
         instructions.textAlignment = .center
         instructions.numberOfLines = 2
-        instructions.textColor = ThemeManager.currentTheme().generalTitleColor
+        instructions.textColor = .label
         instructions.font = .preferredFont(forTextStyle: .title3)
         return instructions
     }()
@@ -37,11 +37,11 @@ class EnterPhoneNumberContainerView: UIView {
         let selectCountry = UIButton()
         selectCountry.translatesAutoresizingMaskIntoConstraints = false
         selectCountry.setTitle("United States", for: .normal)
-        selectCountry.setTitleColor(ThemeManager.currentTheme().generalTitleColor, for: .normal)
+        selectCountry.setTitleColor(.label, for: .normal)
         selectCountry.contentHorizontalAlignment = .center
         selectCountry.contentVerticalAlignment = .center
         selectCountry.titleLabel?.sizeToFit()
-        selectCountry.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        selectCountry.backgroundColor = .secondarySystemGroupedBackground
         selectCountry.layer.cornerRadius = 10
         selectCountry.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
         selectCountry.titleLabel?.font = .preferredFont(forTextStyle: .title3)
@@ -54,7 +54,7 @@ class EnterPhoneNumberContainerView: UIView {
         countryCode.translatesAutoresizingMaskIntoConstraints = false
         countryCode.text = "+1"
         countryCode.textAlignment = .center
-        countryCode.textColor = ThemeManager.currentTheme().generalTitleColor
+        countryCode.textColor = .label
         countryCode.font = UIFont.preferredFont(forTextStyle: .title3)
         countryCode.adjustsFontForContentSizeCategory = true
         return countryCode
@@ -67,8 +67,8 @@ class EnterPhoneNumberContainerView: UIView {
         phoneNumber.translatesAutoresizingMaskIntoConstraints = false
         phoneNumber.textAlignment = .center
         phoneNumber.keyboardType = .numberPad
-        phoneNumber.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        phoneNumber.textColor = ThemeManager.currentTheme().generalTitleColor        
+        phoneNumber.keyboardAppearance = .default
+        phoneNumber.textColor = .label        
         return phoneNumber
     }()
     
@@ -76,7 +76,7 @@ class EnterPhoneNumberContainerView: UIView {
         var phoneContainer = UIView()
         phoneContainer.translatesAutoresizingMaskIntoConstraints = false
         phoneContainer.layer.cornerRadius = 10
-        phoneContainer.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        phoneContainer.backgroundColor = .secondarySystemGroupedBackground
         return phoneContainer
     }()
     
@@ -87,8 +87,8 @@ class EnterPhoneNumberContainerView: UIView {
         next.contentVerticalAlignment = .center
         next.contentHorizontalAlignment = .center
         next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
-        next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .highlighted)
-        next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .disabled)
+        next.setTitleColor(.secondaryLabel, for: .highlighted)
+        next.setTitleColor(.secondaryLabel, for: .disabled)
         
         return next
     }()

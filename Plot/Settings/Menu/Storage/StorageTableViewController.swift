@@ -27,7 +27,7 @@ class StorageTableViewController: UITableViewController {
         navigationItem.largeTitleDisplayMode = .never
         tableView = UITableView(frame: view.frame, style: .insetGrouped)
         title = "Data and Storage"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
@@ -52,7 +52,7 @@ class StorageTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         cell.accessoryType = .disclosureIndicator
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel?.adjustsFontForContentSizeCategory = true
@@ -68,19 +68,19 @@ class StorageTableViewController: UITableViewController {
                 
                 cell.textLabel?.text = "Clear Cache"
                 cell.isUserInteractionEnabled = true
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
                 
             } else {
                 
                 cell.textLabel?.text = "Cache is Empty"
                 cell.isUserInteractionEnabled = false
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             }
         }
         
         if indexPath.row == 1 {
             cell.textLabel?.text = "Clear Temporary Docs and Data"
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel?.textColor = .label
         }
         return cell
     }

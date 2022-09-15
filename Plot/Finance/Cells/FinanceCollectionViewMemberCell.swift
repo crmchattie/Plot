@@ -32,7 +32,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -41,7 +41,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     
     let infoLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -61,7 +61,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     
     override var isHighlighted: Bool {
         didSet {
-            self.backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(isHighlighted ? 0.7 : 1)
+            self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(isHighlighted ? 0.7 : 1)
         }
     }
     
@@ -70,7 +70,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         backgroundView = UIView()
         addSubview(backgroundView!)
         backgroundView?.fillSuperview()
-        backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundView?.backgroundColor = .secondarySystemGroupedBackground
 
         backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
         backgroundView?.layer.shadowOpacity = 0.1
@@ -92,7 +92,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        nameLabel.textColor = .label
     }
  
 }

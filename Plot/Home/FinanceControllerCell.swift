@@ -60,7 +60,7 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
     }
     
     func setupViews() {
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.backgroundColor = .systemGroupedBackground
         addSubview(collectionView)
         collectionView.fillSuperview()
     }
@@ -107,7 +107,7 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             if let object = object as? [MXMember] {
                 cell.member = object[indexPath.item]
             }
@@ -160,7 +160,7 @@ class FinanceControllerCell: UICollectionViewCell, UICollectionViewDelegate, UIC
                         viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let section = sections[indexPath.section]
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
-        header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        header.backgroundColor = .systemGroupedBackground
         header.delegate = self
         header.sectionType = section
         header.titleLabel.text = section.name

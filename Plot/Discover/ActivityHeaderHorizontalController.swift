@@ -19,26 +19,11 @@ class ActivityHeaderHorizontalController: HorizontalSnappingController, UICollec
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.backgroundColor = .systemGroupedBackground
         
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: cellId)
         
         collectionView.contentInset = .init(top: 0, left: 16, bottom: 10, right: 16)
-        
-        addObservers()
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.reloadData()
         
     }
     

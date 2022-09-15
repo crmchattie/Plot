@@ -53,8 +53,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
+        view.backgroundColor = .systemBackground
         
         showCompletedTasks = getShowCompletedTasksBool()
         
@@ -75,20 +74,8 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
-
-    }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        tableView.indicatorStyle = theme.scrollBarStyle
-        tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
-        tableView.backgroundColor = theme.generalBackgroundColor
-        tableView.reloadData()
-        
     }
     
     @objc fileprivate func tasksUpdated() {
@@ -141,7 +128,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     fileprivate func setupMainView() {
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Tasks"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         if let id = list.id, id != "" {
@@ -173,11 +160,11 @@ class ListViewController: UIViewController, ObjectDetailShowing {
         }
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
         tableView.register(NewTaskCell.self, forCellReuseIdentifier: newTaskCellID)
         
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         tableView.keyboardDismissMode = .onDrag
         tableView.rowHeight = UITableView.automaticDimension
@@ -311,7 +298,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         return view
         
     }
@@ -445,7 +432,7 @@ extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, U
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         searchBar.setShowsCancelButton(true, animated: true)
         return true
     }

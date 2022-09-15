@@ -31,9 +31,9 @@ extension EventViewController {
                         $0.hidden = "$sections != 'Transactions'"
                         $0.tag = user.name
                         $0.useFormatterDuringInput = true
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                        $0.cell.textLabel?.textColor = .label
+                        $0.cell.textField?.textColor = .label
                         $0.title = user.name
                         $0.value = 0.00
                         $0.baseCell.isUserInteractionEnabled = false
@@ -42,9 +42,9 @@ extension EventViewController {
                         formatter.numberStyle = .currency
                         $0.formatter = formatter
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
+                        cell.textField?.textColor = .label
                         
                     }, at: mvsValue.count)
                 }

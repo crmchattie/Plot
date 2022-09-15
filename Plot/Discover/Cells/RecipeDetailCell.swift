@@ -36,11 +36,6 @@ class RecipeDetailCell: UICollectionViewCell {
         ]
         
         segmentedControl = UISegmentedControl(items: segmentTextContent)
-        if #available(iOS 13.0, *) {
-            segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        } else {
-            // Fallback on earlier versions
-        }
         
         segmentedControl.selectedSegmentIndex = 0
         segmentedControl.autoresizingMask = .flexibleWidth

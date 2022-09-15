@@ -25,7 +25,7 @@ class CreateContactTableViewController: UITableViewController {
      
       navigationItem.title = "New Contact"
       tableView.separatorStyle = .none
-      view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+      view.backgroundColor = .systemGroupedBackground
       tableView.register(ContactDataTableViewCell.self, forCellReuseIdentifier: createContactTableViewCellIdentifier)
      
       navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Create", style: .done, target: self, action: #selector(createContact))
@@ -82,27 +82,27 @@ class CreateContactTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
       let cell = tableView.dequeueReusableCell(withIdentifier: createContactTableViewCellIdentifier,
                                                      for: indexPath) as? ContactDataTableViewCell ?? ContactDataTableViewCell()
-      cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-      cell.textField.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-      cell.textField.textColor = ThemeManager.currentTheme().generalTitleColor
+      cell.backgroundColor = .secondarySystemGroupedBackground
+      cell.textField.backgroundColor = .systemGroupedBackground
+      cell.textField.textColor = .label
     
       if indexPath.row == 0 {
           cell.textField.keyboardType = .default
         cell.textField.attributedPlaceholder = NSAttributedString(string:"First name",
-																																	attributes: [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+																																	attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
         cell.textField.text = contact?.givenName
        
       } else if indexPath.row == 1 {
           cell.textField.keyboardType = .default
         cell.textField.attributedPlaceholder = NSAttributedString(string: "Last name",
-																																	attributes: [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+																																	attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
      
         cell.textField.text = contact?.familyName
         
       } else {
         cell.textField.keyboardType = .phonePad
         cell.textField.attributedPlaceholder = NSAttributedString(string:"Phone number",
-																																	attributes: [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor])
+																																	attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
         
         cell.textField.text = contact?.phoneNumbers[0].value.stringValue
       }

@@ -51,7 +51,7 @@ class UserInfoTableViewController: UITableViewController {
     fileprivate func setupMainView() {
         title = "Info"
         extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
         }
@@ -151,7 +151,7 @@ class UserInfoTableViewController: UITableViewController {
             let phoneNumberCell = tableView.dequeueReusableCell(withIdentifier: phoneNumberCellIdentifier,
                                                                 for: indexPath) as? UserInfoPhoneNumberTableViewCell ?? UserInfoPhoneNumberTableViewCell()
             
-            phoneNumberCell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            phoneNumberCell.backgroundColor = .secondarySystemGroupedBackground
             
             if localPhones.contains(contactPhoneNumber.digits) {
                 phoneNumberCell.add.isHidden = true
@@ -165,14 +165,14 @@ class UserInfoTableViewController: UITableViewController {
                 phoneNumberCell.contactStatusHeightConstraint.constant = 40
             }
             
-            phoneNumberCell.phoneLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+            phoneNumberCell.phoneLabel.textColor = .label
             phoneNumberCell.userInfoTableViewController = self
             phoneNumberCell.phoneLabel.text = user?.phoneNumber ?? ""
             //      phoneNumberCell.phoneLabel.font = UIFont.systemFont(ofSize: 17)
             phoneNumberCell.phoneLabel.font = UIFont.preferredFont(forTextStyle: .body)
             phoneNumberCell.phoneLabel.adjustsFontForContentSizeCategory = true
             phoneNumberCell.bio.text = user?.bio ?? ""
-            phoneNumberCell.bio.textColor = ThemeManager.currentTheme().generalTitleColor
+            phoneNumberCell.bio.textColor = .label
             
             return phoneNumberCell
         }

@@ -21,7 +21,7 @@ class NewTaskCell: UITableViewCell {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.text = "New Task"
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
@@ -38,7 +38,7 @@ class NewTaskCell: UITableViewCell {
     
     let plusImage: UIImageView = {
         let view = UIImageView()
-        view.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        view.tintColor = .secondaryLabel
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -48,7 +48,7 @@ class NewTaskCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
 
         contentView.addSubview(activityImageView)
         contentView.addSubview(nameLabel)
@@ -83,12 +83,12 @@ class NewTaskCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        activityImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor.withAlphaComponent(highlighted ? 0.7 : 1)
+        activityImageView.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(highlighted ? 0.7 : 1)
     }
     
 }

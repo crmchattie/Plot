@@ -11,7 +11,7 @@ import UIKit
 class FinancialMemberCell: UITableViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -20,7 +20,7 @@ class FinancialMemberCell: UITableViewCell {
     
     let infoLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true

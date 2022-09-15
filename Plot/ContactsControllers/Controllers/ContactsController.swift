@@ -41,29 +41,13 @@ class ContactsController: UITableViewController {
                 
         configureViewController()
         setupSearchController()
-        addObservers()
         
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.sectionIndexBackgroundColor = view.backgroundColor
-        tableView.backgroundColor = view.backgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.reloadData()
-    }
+
     
     fileprivate func configureViewController() {
         navigationItem.title = "New Chat"
@@ -75,11 +59,11 @@ class ContactsController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         tableView = UITableView(frame: .zero, style: .insetGrouped)
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.indicatorStyle = .default
+        tableView.sectionIndexBackgroundColor = .systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.register(ContactsTableViewCell.self, forCellReuseIdentifier: contactsCellID)
         tableView.register(FalconUsersTableViewCell.self, forCellReuseIdentifier: falconUsersCellID)
         tableView.register(CurrentUserTableViewCell.self, forCellReuseIdentifier: currentUserCellID)
@@ -177,10 +161,10 @@ class ContactsController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         
         if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            headerTitle.textLabel?.textColor = .label
         }
     }
     
@@ -192,7 +176,7 @@ class ContactsController: UITableViewController {
         let headerSection = 0
         if indexPath.section == headerSection {
             let cell = tableView.dequeueReusableCell(withIdentifier: newGroupCellID) ?? UITableViewCell(style: .default, reuseIdentifier: newGroupCellID)
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.imageView?.image = UIImage(named: "groupChat")
             cell.imageView?.contentMode = .scaleAspectFit
             cell.textLabel?.font = .preferredFont(forTextStyle: .body)
@@ -202,7 +186,7 @@ class ContactsController: UITableViewController {
         } else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: falconUsersCellID,
                                                      for: indexPath) as? FalconUsersTableViewCell ?? FalconUsersTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             let user = filteredUsers[indexPath.row]
             cell.configureCell(for: user)
             return cell
@@ -210,7 +194,7 @@ class ContactsController: UITableViewController {
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: contactsCellID,
                                                      for: indexPath) as? ContactsTableViewCell ?? ContactsTableViewCell()
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.icon.image = UIImage(named: "UserpicIcon")
             cell.title.text = filteredContacts[indexPath.row].givenName + " " + filteredContacts[indexPath.row].familyName
             return cell

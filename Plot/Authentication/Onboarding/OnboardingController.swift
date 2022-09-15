@@ -9,33 +9,28 @@
 import UIKit
 
 class OnboardingController: UIViewController {
-
-  let onboardingContainerView = OnboardingContainerView()
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
     
-    //set-up interface with the help of OnboardingContainerView file
-    extendedLayoutIncludesOpaqueBars = true
-    view.addSubview(onboardingContainerView)
-    onboardingContainerView.frame = view.bounds
-    setColorsAccordingToTheme()
-    onboardingContainerView.startMessaging.addTarget(self, action: #selector(startMessagingDidTap), for: .touchUpInside)
-
-  }
-  
-  fileprivate func setColorsAccordingToTheme() {
-    let theme = ThemeManager.currentTheme()
-    ThemeManager.applyTheme(theme: theme)
-    //redundant and why do we pass the generalBackgroundColor back and forth between views
-    view.backgroundColor = ThemeManager.currentTheme().launchBackgroundColor
-    onboardingContainerView.backgroundColor = view.backgroundColor
-  }
+    let onboardingContainerView = OnboardingContainerView()
     
-  //move to next ViewController when user taps on startMessagingDidTap button
-  @objc func startMessagingDidTap () {
-    let destination = AuthPhoneNumberController()
-    navigationController?.pushViewController(destination, animated: true)
-  }
-
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        //set-up interface with the help of OnboardingContainerView file
+        extendedLayoutIncludesOpaqueBars = true
+        view.backgroundColor = .systemGroupedBackground
+        view.addSubview(onboardingContainerView)
+        onboardingContainerView.frame = view.bounds
+        onboardingContainerView.startMessaging.addTarget(self, action: #selector(startMessagingDidTap), for: .touchUpInside)
+        
+    }
+    
+    fileprivate func setColorsAccordingToTheme() {
+    }
+    
+    //move to next ViewController when user taps on startMessagingDidTap button
+    @objc func startMessagingDidTap () {
+        let destination = AuthPhoneNumberController()
+        navigationController?.pushViewController(destination, animated: true)
+    }
+    
 }

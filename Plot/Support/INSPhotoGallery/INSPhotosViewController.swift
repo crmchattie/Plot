@@ -169,11 +169,11 @@ open class INSPhotosViewController: UIViewController, UIPageViewControllerDataSo
  
     
     private func setupOverlayViewInitialItems() {
-        let textColor = view.tintColor ?? UIColor.white
+        let textColor = UIColor.label
         if let overlayView = overlayView as? INSPhotosOverlayView {
             overlayView.photosViewController = self
             #if swift(>=4.0)
-					overlayView.titleTextAttributes = [NSAttributedString.Key.foregroundColor: textColor]
+                overlayView.titleTextAttributes = [NSAttributedString.Key.foregroundColor: textColor]
             #else
                 overlayView.titleTextAttributes = [NSForegroundColorAttributeName: textColor]
             #endif

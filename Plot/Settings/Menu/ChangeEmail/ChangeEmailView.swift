@@ -15,7 +15,7 @@ class ChangeEmailView: UIView {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.textAlignment = .center
         title.text = "Email Address"
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         title.font = .preferredFont(forTextStyle: .title1)
         title.adjustsFontForContentSizeCategory = true
         return title
@@ -26,7 +26,7 @@ class ChangeEmailView: UIView {
         instructions.translatesAutoresizingMaskIntoConstraints = false
         instructions.textAlignment = .center
         instructions.numberOfLines = 2
-        instructions.textColor = ThemeManager.currentTheme().generalTitleColor
+        instructions.textColor = .label
         instructions.font = .preferredFont(forTextStyle: .body)
         instructions.adjustsFontForContentSizeCategory = true
         return instructions
@@ -41,8 +41,8 @@ class ChangeEmailView: UIView {
         email.keyboardType = .emailAddress
         email.autocapitalizationType = .none
         email.autocorrectionType = .no
-        email.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
-        email.textColor = ThemeManager.currentTheme().generalTitleColor
+        email.keyboardAppearance = .default
+        email.textColor = .label
         email.addTarget(ChangeEmailView.self, action: #selector(EnterPhoneNumberController.textFieldDidChange(_:)), for: .editingChanged)
         return email
     }()
@@ -51,7 +51,7 @@ class ChangeEmailView: UIView {
         var emailView = UIView()
         emailView.translatesAutoresizingMaskIntoConstraints = false
         emailView.layer.cornerRadius = 10
-        emailView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        emailView.backgroundColor = .secondarySystemGroupedBackground
         return emailView
     }()
     
@@ -62,8 +62,8 @@ class ChangeEmailView: UIView {
         next.contentVerticalAlignment = .center
         next.contentHorizontalAlignment = .center
         next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
-        next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .highlighted)
-        next.setTitleColor(ThemeManager.currentTheme().generalSubtitleColor, for: .disabled)
+        next.setTitleColor(.secondaryLabel, for: .highlighted)
+        next.setTitleColor(.secondaryLabel, for: .disabled)
         return next
     }()
     

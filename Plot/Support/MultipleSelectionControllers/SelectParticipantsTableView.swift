@@ -35,16 +35,16 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-//        view.tintColor = ThemeManager.currentTheme().inputTextViewColor
+//        view.tintColor = .systemGroupedBackground
 //        if let headerTitle = view as? UITableViewHeaderFooterView {
-//            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            headerTitle.textLabel?.textColor = .secondaryLabel
 //            //      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 10)
 //            headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
 //            headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
 //        }
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         if let headerTitle = view as? UITableViewHeaderFooterView {
-          headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+          headerTitle.textLabel?.textColor = .label
         }
     }
 
@@ -65,7 +65,7 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
         let cell = tableView.dequeueReusableCell(withIdentifier: falconUsersCellID, for: indexPath) as? ParticipantTableViewCell ?? ParticipantTableViewCell()
         cell.selectParticipantsViewController = self
         
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         let backgroundView = UIView()
         backgroundView.backgroundColor = cell.backgroundColor
         cell.selectedBackgroundView = backgroundView
@@ -83,13 +83,13 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
                 cell.subtitle.textColor = FalconPalette.defaultBlue
                 cell.subtitle.text = statusString
             } else {
-                cell.subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.subtitle.textColor = .secondaryLabel
                 let date = Date(timeIntervalSince1970: TimeInterval(statusString)!)
                 let subtitle = "Last seen " + timeAgoSinceDate(date)
                 cell.subtitle.text = subtitle
             }
         } else if let statusTimeinterval = user.onlineStatus as? TimeInterval {
-            cell.subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.subtitle.textColor = .secondaryLabel
             let date = Date(timeIntervalSince1970: statusTimeinterval/1000)
             let subtitle = "Last seen " + timeAgoSinceDate(date)
             cell.subtitle.text = subtitle

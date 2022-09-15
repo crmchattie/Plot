@@ -27,7 +27,7 @@ class SignInAppleGoogleTableViewCell: UITableViewCell {
         var title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.adjustsFontForContentSizeCategory = true
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         return title
     }()
     
@@ -62,7 +62,7 @@ class SignInAppleGoogleTableViewCell: UITableViewCell {
     }
     
     fileprivate func setColor() {
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         iconView.backgroundColor = .white
     }
     

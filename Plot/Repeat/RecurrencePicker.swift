@@ -96,7 +96,7 @@ extension RecurrencePicker {
         if cell == nil {
             cell = UITableViewCell(style: .default, reuseIdentifier: CellID.basicRecurrenceCell)
         }
-        cell?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell?.backgroundColor = .secondarySystemGroupedBackground
         if indexPath.section == 0 {
             cell?.accessoryType = .none
             cell?.textLabel?.text = Constant.basicRecurrenceStrings()[indexPath.row]
@@ -175,7 +175,7 @@ extension RecurrencePicker {
         }
         tableView.separatorStyle = .none
         tableView.tintColor = tintColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         updateSelectedIndexPath(withRule: recurrenceRule)
     }
 

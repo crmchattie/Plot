@@ -70,7 +70,7 @@ class UserInfoPhoneNumberTableViewCell: UITableViewCell {
     
     let phoneLabel: UILabel = {
         let phoneLabel = UILabel()
-        phoneLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        phoneLabel.textColor = .label
         phoneLabel.translatesAutoresizingMaskIntoConstraints = false
         phoneLabel.adjustsFontForContentSizeCategory = true
         return phoneLabel
@@ -81,7 +81,7 @@ class UserInfoPhoneNumberTableViewCell: UITableViewCell {
         contactStatus.font = UIFont.preferredFont(forTextStyle: .subheadline)
         contactStatus.adjustsFontForContentSizeCategory = true
         contactStatus.text = "This user not in your contacts"
-        contactStatus.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        contactStatus.textColor = .secondaryLabel
         contactStatus.translatesAutoresizingMaskIntoConstraints = false
         return contactStatus
     }()
@@ -89,7 +89,7 @@ class UserInfoPhoneNumberTableViewCell: UITableViewCell {
     let bio: UILabel = {
         let bio = UILabel()
         bio.numberOfLines = 0
-        bio.textColor = ThemeManager.currentTheme().generalTitleColor
+        bio.textColor = .label
         bio.translatesAutoresizingMaskIntoConstraints = false
         bio.font = UIFont.preferredFont(forTextStyle: .body)
         bio.adjustsFontForContentSizeCategory = true

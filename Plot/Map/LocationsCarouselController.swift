@@ -61,7 +61,7 @@ class LocationCell: LBTAListCell<LocationStruct> {
     let addressLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .left
         label.adjustsFontForContentSizeCategory = true
@@ -71,7 +71,7 @@ class LocationCell: LBTAListCell<LocationStruct> {
     let categoryLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -81,7 +81,7 @@ class LocationCell: LBTAListCell<LocationStruct> {
     let subcategoryLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -108,7 +108,7 @@ class LocationCell: LBTAListCell<LocationStruct> {
         typeButton.constrainWidth(30)
         typeButton.constrainHeight(30)
         
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = .secondarySystemGroupedBackground
         
         setupShadow(opacity: 0.2, radius: 5, offset: .zero, color: .black)
         layer.cornerRadius = 5

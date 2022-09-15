@@ -160,7 +160,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let webLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Website"
@@ -170,7 +170,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let websiteLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -188,7 +188,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let phoneLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.text = "Phone Number"
@@ -198,7 +198,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let phoneNumberLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -207,7 +207,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let statusLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -216,7 +216,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let hoursLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -225,7 +225,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let monLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -235,7 +235,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let tuesLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -245,7 +245,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let wedLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -255,7 +255,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let thursLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -265,7 +265,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let friLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -275,7 +275,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let satLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -285,7 +285,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let sunLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -295,7 +295,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let featuresLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -304,7 +304,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let oneLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -314,7 +314,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let twoLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -324,7 +324,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let threeLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -335,7 +335,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let fourLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -345,7 +345,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let fiveLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -355,7 +355,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let sixLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -365,7 +365,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let sevenLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true
@@ -375,7 +375,7 @@ class PlaceDetailCell: UICollectionViewCell {
     
     let eightLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.isHidden = true

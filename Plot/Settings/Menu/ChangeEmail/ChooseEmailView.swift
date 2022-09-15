@@ -15,7 +15,7 @@ class ChooseEmailView: UIView {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.textAlignment = .center
         title.text = "Email"
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         title.font = .preferredFont(forTextStyle: .title1)
         title.adjustsFontForContentSizeCategory = true
         return title
@@ -26,7 +26,7 @@ class ChooseEmailView: UIView {
         instructions.translatesAutoresizingMaskIntoConstraints = false
         instructions.textAlignment = .center
         instructions.numberOfLines = 2
-        instructions.textColor = ThemeManager.currentTheme().generalTitleColor
+        instructions.textColor = .label
         instructions.font = .preferredFont(forTextStyle: .body)
         instructions.adjustsFontForContentSizeCategory = true
         return instructions
@@ -36,10 +36,10 @@ class ChooseEmailView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Google", for: .normal)
-        button.setTitleColor(ThemeManager.currentTheme().generalTitleColor, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
-        button.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        button.backgroundColor = .secondarySystemGroupedBackground
         button.layer.cornerRadius = 10
         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
         button.titleLabel?.font = .preferredFont(forTextStyle: .body)
@@ -51,10 +51,10 @@ class ChooseEmailView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Email", for: .normal)
-        button.setTitleColor(ThemeManager.currentTheme().generalTitleColor, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
-        button.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        button.backgroundColor = .secondarySystemGroupedBackground
         button.layer.cornerRadius = 10
         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
         button.titleLabel?.font = .preferredFont(forTextStyle: .body)

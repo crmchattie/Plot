@@ -31,7 +31,7 @@ class NewAdminTableViewCell: UITableViewCell {
 //    title.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
     title.font = UIFont.preferredFont(forTextStyle: .headline)
     title.adjustsFontForContentSizeCategory = true
-    title.textColor = ThemeManager.currentTheme().generalTitleColor
+    title.textColor = .label
     
     return title
   }()
@@ -42,7 +42,7 @@ class NewAdminTableViewCell: UITableViewCell {
 //    subtitle.font = UIFont.systemFont(ofSize: 13)
     subtitle.font = UIFont.preferredFont(forTextStyle: .subheadline)
     subtitle.adjustsFontForContentSizeCategory = true
-    subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+    subtitle.textColor = .secondaryLabel
     
     return subtitle
   }()
@@ -93,8 +93,8 @@ class NewAdminTableViewCell: UITableViewCell {
     icon.image = UIImage(named: "UserpicIcon")
     title.text = ""
     subtitle.text = ""
-    title.textColor = ThemeManager.currentTheme().generalTitleColor
-    subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+    title.textColor = .label
+    subtitle.textColor = .secondaryLabel
   }
   
   override func setSelected(_ selected: Bool, animated: Bool) {

@@ -137,18 +137,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(calendarActivitiesUpdated), name: .calendarActivitiesUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        activityView.tableView.indicatorStyle = theme.scrollBarStyle
-        activityView.tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
-        activityView.tableView.backgroundColor = theme.generalBackgroundColor
-        activityView.tableView.reloadData()
-        applyCalendarTheme()
     }
     
     @objc fileprivate func calendarActivitiesUpdated() {
@@ -158,18 +147,17 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func applyCalendarTheme() {
-        let theme = ThemeManager.currentTheme()
-        activityView.calendar.backgroundColor = theme.generalBackgroundColor
-        activityView.calendar.appearance.weekdayTextColor = theme.generalTitleColor
-        activityView.calendar.appearance.headerTitleColor = theme.generalTitleColor
+        activityView.calendar.backgroundColor = .systemGroupedBackground
+        activityView.calendar.appearance.weekdayTextColor = .label
+        activityView.calendar.appearance.headerTitleColor = .label
         activityView.calendar.appearance.eventDefaultColor = FalconPalette.defaultBlue
         activityView.calendar.appearance.eventSelectionColor = FalconPalette.defaultBlue
-        activityView.calendar.appearance.titleDefaultColor = theme.generalTitleColor
-        activityView.calendar.appearance.titleSelectionColor = theme.generalBackgroundColor
-        activityView.calendar.appearance.selectionColor = theme.generalTitleColor
+        activityView.calendar.appearance.titleDefaultColor = .label
+        activityView.calendar.appearance.titleSelectionColor = .systemGroupedBackground
+        activityView.calendar.appearance.selectionColor = .label
         activityView.calendar.appearance.todayColor = FalconPalette.defaultBlue
         activityView.calendar.appearance.todaySelectionColor = FalconPalette.defaultBlue
-        activityView.arrowButton.tintColor = theme.generalTitleColor
+        activityView.arrowButton.tintColor = .label
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -197,7 +185,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
         
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
         edgesForExtendedLayout = UIRectEdge.top
         
@@ -235,7 +223,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         activityView.tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         activityView.tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
         activityView.tableView.allowsMultipleSelectionDuringEditing = false
-        activityView.tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        activityView.tableView.indicatorStyle = .default
         activityView.tableView.backgroundColor = view.backgroundColor
         activityView.tableView.rowHeight = UITableView.automaticDimension
         

@@ -27,7 +27,7 @@ class OnboardingContainerView: UIView {
         welcomeTitle.font = UIFont.preferredFont(forTextStyle: .title3)
         welcomeTitle.adjustsFontForContentSizeCategory = true
         welcomeTitle.textAlignment = .center
-        welcomeTitle.textColor = ThemeManager.currentTheme().generalTitleColor
+        welcomeTitle.textColor = .label
         return welcomeTitle
     }()
     

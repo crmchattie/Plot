@@ -139,7 +139,7 @@ class ActivityDetailCell: UICollectionViewCell {
 
     let bookmarkButton: UIButton = {
         let button = UIButton(type: .system)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -147,7 +147,7 @@ class ActivityDetailCell: UICollectionViewCell {
     let shareButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "share"), for: .normal)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -155,7 +155,7 @@ class ActivityDetailCell: UICollectionViewCell {
     let plusButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "plus"), for: .normal)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -163,7 +163,7 @@ class ActivityDetailCell: UICollectionViewCell {
     let dotsButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "dots"), for: .normal)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -171,7 +171,6 @@ class ActivityDetailCell: UICollectionViewCell {
     var segmentedControl: UISegmentedControl = {
         let segmentControl = UISegmentedControl(items: ["Place", "Calendar"])
         segmentControl.selectedSegmentIndex = 0
-        segmentControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
         return segmentControl
     }()
         
@@ -232,10 +231,10 @@ class ActivityDetailCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        bookmarkButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        dotsButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        plusButton.tintColor = .label
+        shareButton.tintColor = .label
+        bookmarkButton.tintColor = .label
+        dotsButton.tintColor = .label
 
     }
     

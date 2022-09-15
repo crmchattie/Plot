@@ -15,7 +15,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
     
     lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -28,7 +28,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -39,7 +39,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.isUserInteractionEnabled = true
@@ -60,7 +60,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         textLabel?.text = nil
         textLabel?.textColor = .clear
         
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = .secondarySystemGroupedBackground
         contentView.addSubview(nameLabel)
         contentView.addSubview(dateTimeLabel)
         contentView.addSubview(locationNameLabel)

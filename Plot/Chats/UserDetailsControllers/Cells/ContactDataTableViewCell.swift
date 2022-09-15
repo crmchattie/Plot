@@ -17,7 +17,7 @@ class ContactDataTableViewCell: UITableViewCell {
 //    textField.font = UIFont.systemFont(ofSize: 20)
     textField.font = UIFont.preferredFont(forTextStyle: .title3)
     textField.adjustsFontForContentSizeCategory = true
-    textField.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+    textField.keyboardAppearance = .default
     
     return textField
   }()

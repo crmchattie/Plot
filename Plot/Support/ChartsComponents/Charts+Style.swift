@@ -60,7 +60,7 @@ extension LineChartView {
         xAxis.labelTextColor = .secondaryLabel
         xAxis.valueFormatter = WeekdayAxisValueFormatter()
         
-        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
+        let marker = XYMarkerView(color: .secondaryLabel,
                                   font: .preferredFont(forTextStyle: .caption1),
                                   textColor: .white,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),

@@ -15,7 +15,7 @@ class ChooseEmailController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         configureChangeEmailView()
     }
     

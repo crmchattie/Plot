@@ -160,7 +160,7 @@ class ActivityTypeCell: UICollectionViewCell {
     let bookmarkButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "bookmark"), for: .normal)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -168,7 +168,7 @@ class ActivityTypeCell: UICollectionViewCell {
     let shareButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "share"), for: .normal)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -176,7 +176,7 @@ class ActivityTypeCell: UICollectionViewCell {
     let plusButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "plus"), for: .normal)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -184,14 +184,14 @@ class ActivityTypeCell: UICollectionViewCell {
     let mapButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "map"), for: .normal)
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -200,7 +200,7 @@ class ActivityTypeCell: UICollectionViewCell {
 
     let categoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .footnote)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -209,7 +209,7 @@ class ActivityTypeCell: UICollectionViewCell {
 
     let subcategoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .footnote)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -266,11 +266,11 @@ class ActivityTypeCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        plusButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        shareButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        bookmarkButton.tintColor = ThemeManager.currentTheme().generalTitleColor
-        mapButton.tintColor = ThemeManager.currentTheme().generalTitleColor
+        nameLabel.textColor = .label
+        plusButton.tintColor = .label
+        shareButton.tintColor = .label
+        bookmarkButton.tintColor = .label
+        mapButton.tintColor = .label
         recipe = nil
         workout = nil
         event = nil

@@ -55,8 +55,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
         setupMainView()
         setupTableView()
@@ -75,20 +74,9 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
 
-    }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        tableView.indicatorStyle = theme.scrollBarStyle
-        tableView.sectionIndexBackgroundColor = theme.generalBackgroundColor
-        tableView.backgroundColor = theme.generalBackgroundColor
-        tableView.reloadData()
-        
     }
     
     @objc fileprivate func tasksUpdated() {
@@ -107,7 +95,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Tasks"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
@@ -131,13 +119,13 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         }
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.register(TableViewHeader.self,
                            forHeaderFooterViewReuseIdentifier: headerCellID)
         tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
         tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
         
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         tableView.keyboardDismissMode = .onDrag
         
@@ -312,7 +300,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier:
                                                                 headerCellID) as? TableViewHeader ?? TableViewHeader()
         let section = sections[section]
-        header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        header.backgroundColor = .systemGroupedBackground
         header.titleLabel.text = section.name
         header.subTitleLabel.isHidden = true
         header.sectionType = section

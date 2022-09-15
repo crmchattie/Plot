@@ -210,9 +210,9 @@ class InAppNotificationManager: NSObject {
   
   fileprivate func showInAppNotification(title: String, subtitle: String/*, user: User*/) {
     let announcement = Announcement(title: title, subtitle: subtitle, image: nil, duration: 3,
-                                    backgroundColor: ThemeManager.currentTheme().inputTextViewColor,
-                                    textColor: ThemeManager.currentTheme().generalTitleColor,
-                                    dragIndicatordColor: ThemeManager.currentTheme().generalTitleColor) {}
+                                    backgroundColor: .systemGroupedBackground,
+                                    textColor: .label,
+                                    dragIndicatordColor: .label) {}
     guard let rc = UIApplication.shared.keyWindow?.rootViewController else { return }
     Plot.show(shout: announcement, to: rc)
   }

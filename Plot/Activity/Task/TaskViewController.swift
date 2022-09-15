@@ -157,10 +157,10 @@ class TaskViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
+        tableView.sectionIndexBackgroundColor = .systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
     }
     
@@ -190,9 +190,9 @@ class TaskViewController: FormViewController {
         Section()
         
         <<< TextRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textField?.textColor = .label
+            $0.placeholderColor = .secondaryLabel
             $0.placeholder = $0.tag
             if self.active {
                 $0.value = self.task.name
@@ -208,33 +208,33 @@ class TaskViewController: FormViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textField?.textColor = .label
         }
         
         
         <<< TextAreaRow("Description") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textView?.textColor = .label
+            $0.cell.placeholderLabel?.textColor = .secondaryLabel
             $0.placeholder = $0.tag
             if self.active && self.task.activityDescription != "nothing" && self.task.activityDescription != nil {
                 $0.value = self.task.activityDescription
             }
         }.cellUpdate({ (cell, row) in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+            cell.textView?.textColor = .label
         }).onChange() { [unowned self] row in
             self.task.activityDescription = row.value
         }
         
         <<< CheckRow("Completed") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.tintColor = FalconPalette.defaultBlue
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.cell.accessoryType = .checkmark
             $0.title = $0.tag
             $0.value = task.isCompleted ?? false
@@ -244,7 +244,7 @@ class TaskViewController: FormViewController {
                 $0.cell.tintAdjustmentMode = .dimmed
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.tintColor = FalconPalette.defaultBlue
             cell.accessoryType = .checkmark
             if row.value == false {
@@ -277,9 +277,9 @@ class TaskViewController: FormViewController {
         }
         
         <<< DateTimeInlineRow("Completed On") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = $0.tag
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .medium
@@ -296,8 +296,8 @@ class TaskViewController: FormViewController {
             }
         }.onExpandInlineRow { cell, row, inlineRow in
             inlineRow.cellUpdate { (cell, row) in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.tintColor = .secondarySystemGroupedBackground
                 if #available(iOS 13.4, *) {
                     cell.datePicker.preferredDatePickerStyle = .wheels
                 }
@@ -307,17 +307,17 @@ class TaskViewController: FormViewController {
             }
             cell.detailTextLabel?.textColor = cell.tintColor
         }.onCollapseInlineRow { cell, _, _ in
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.detailTextLabel?.textColor = .secondaryLabel
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         
 //        <<< SwitchRow("Start Date") {
-//            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//            $0.cell.textLabel?.textColor = .label
+//            $0.cell.detailTextLabel?.textColor = .secondaryLabel
 //            $0.title = $0.tag
 //            if self.active, let task = task, let startDate = task.startDate {
 //                $0.value = true
@@ -362,20 +362,20 @@ class TaskViewController: FormViewController {
 //                }
 //            }
 //        }).cellUpdate { cell, row in
-//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.textLabel?.textColor = .label
+//            cell.detailTextLabel?.textColor = .secondaryLabel
 //            if let task = self.task, let startDate = task.startDate {
 //                cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
 //            }
 //        }
 //
 //        <<< DatePickerRow("StartDate") {
-//            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+//            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//            $0.cell.textLabel?.textColor = .label
+//            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+//            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//            $0.cell.tintColor = .secondarySystemGroupedBackground
 //            $0.hidden = true
 //            $0.minuteInterval = 5
 //            if #available(iOS 13.4, *) {
@@ -394,14 +394,14 @@ class TaskViewController: FormViewController {
 //            }
 //            self!.updateStartDate()
 //        }.cellUpdate { cell, row in
-//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.textLabel?.textColor = .label
 //        }
 //
 //        <<< SwitchRow("Start Time") {
-//            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//            $0.cell.textLabel?.textColor = .label
+//            $0.cell.detailTextLabel?.textColor = .secondaryLabel
 //            $0.title = $0.tag
 //            if self.active, let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
 //                $0.value = true
@@ -455,20 +455,20 @@ class TaskViewController: FormViewController {
 //                }
 //            }
 //        }).cellUpdate { cell, row in
-//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.textLabel?.textColor = .label
+//            cell.detailTextLabel?.textColor = .secondaryLabel
 //            if let task = self.task, let startDate = task.startDate {
 //                cell.detailTextLabel?.text = startDate.getTimeString()
 //            }
 //        }
 //
 //        <<< TimePickerRow("StartTime") {
-//            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-//            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+//            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//            $0.cell.textLabel?.textColor = .label
+//            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+//            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//            $0.cell.tintColor = .secondarySystemGroupedBackground
 //            $0.hidden = true
 //            $0.minuteInterval = 5
 //            if #available(iOS 13.4, *) {
@@ -489,14 +489,14 @@ class TaskViewController: FormViewController {
 //            
 //            self!.updateStartDate()
 //        }.cellUpdate { cell, row in
-//            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.textLabel?.textColor = .label
 //        }
 
         <<< SwitchRow("deadlineDateSwitch") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Deadline Date"
             if self.active, let task = task, let endDate = task.endDate {
                 $0.value = true
@@ -543,20 +543,20 @@ class TaskViewController: FormViewController {
                 }
             }
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             if let task = self.task, let endDate = task.endDate {
                 cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
             }
         }
 
         <<< DatePickerRow("DeadlineDate") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.tintColor = .secondarySystemGroupedBackground
             $0.hidden = true
             $0.minuteInterval = 5
             if #available(iOS 13.4, *) {
@@ -575,14 +575,14 @@ class TaskViewController: FormViewController {
             }
             self!.updateDeadlineDate()
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
 
         <<< SwitchRow("deadlineTimeSwitch") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Deadline Time"
             if self.active, let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
                 $0.value = true
@@ -639,20 +639,20 @@ class TaskViewController: FormViewController {
                 }
             }
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             if let task = self.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
                 cell.detailTextLabel?.text = endDate.getTimeString()
             }
         }
 
         <<< TimePickerRow("DeadlineTime") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.tintColor = .secondarySystemGroupedBackground
             $0.hidden = true
             $0.minuteInterval = 5
             if #available(iOS 13.4, *) {
@@ -672,13 +672,13 @@ class TaskViewController: FormViewController {
             }            
             self!.updateDeadlineDate()
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         <<< SwitchRow("Flag") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
             row.title = row.tag
             if let flagged = task.flagged {
                 row.value = flagged
@@ -689,14 +689,14 @@ class TaskViewController: FormViewController {
         }.onChange { [weak self] row in
             self?.task.flagged = row.value
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         <<< PushRow<TaskPriority>("Priority") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
             if self.active, let value = self.task.priority {
                 row.value = TaskPriority(rawValue: value)
@@ -714,17 +714,17 @@ class TaskViewController: FormViewController {
             to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
                 to.tableView.separatorStyle = .none
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
         }.onChange() { [unowned self] row in
             if let priority = row.value?.rawValue {
                 self.task.priority = priority
@@ -732,9 +732,9 @@ class TaskViewController: FormViewController {
         }
         
         <<< LabelRow("Repeat") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
@@ -748,9 +748,9 @@ class TaskViewController: FormViewController {
             self.openRepeat()
         }).cellUpdate { cell, row in
             cell.textLabel?.textAlignment = .left
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
             if self.active, let recurrences = self.task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let endDate = self.task.endDate {
                 row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
@@ -760,9 +760,9 @@ class TaskViewController: FormViewController {
         }
         
         <<< PushRow<EventAlert>("Reminder") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
             if self.active, let value = self.task.reminder {
@@ -779,17 +779,17 @@ class TaskViewController: FormViewController {
             to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
                 to.tableView.separatorStyle = .none
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
         }.onChange() { [unowned self] row in
             if let reminder = row.value?.description {
                 self.task.reminder = reminder
@@ -802,9 +802,9 @@ class TaskViewController: FormViewController {
         if delegate == nil {
             form.last!
             <<< LabelRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -818,18 +818,18 @@ class TaskViewController: FormViewController {
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         }
         
         form.last!
         <<< LabelRow("List") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
@@ -842,16 +842,16 @@ class TaskViewController: FormViewController {
             self.openTaskList()
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
         }
         
         <<< LabelRow("Category") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
@@ -864,18 +864,18 @@ class TaskViewController: FormViewController {
             self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
         }
         
         //        if let _ = task.activityType {
         //            form.last!
         //            <<< LabelRow("Subcategory") { row in
-        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                row.cell.backgroundColor = .secondarySystemGroupedBackground
+        //                row.cell.textLabel?.textColor = .label
+        //                row.cell.detailTextLabel?.textColor = .secondaryLabel
         //                row.cell.accessoryType = .disclosureIndicator
         //                row.cell.selectionStyle = .default
         //                row.title = row.tag
@@ -888,9 +888,9 @@ class TaskViewController: FormViewController {
         //                self.openLevel(value: row.value ?? "Uncategorized", level: "Subcategory")
         //            }).cellUpdate { cell, row in
         //                cell.accessoryType = .disclosureIndicator
-        //                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                cell.backgroundColor = .secondarySystemGroupedBackground
+        //                cell.textLabel?.textColor = .label
+        //                cell.detailTextLabel?.textColor = .secondaryLabel
         //                cell.textLabel?.textAlignment = .left
         //            }
         //        }
@@ -898,8 +898,8 @@ class TaskViewController: FormViewController {
         
         
         <<< SwitchRow("showExtras") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
             row.title = "Show Extras"
             if let showExtras = task.showExtras {
                 row.value = showExtras
@@ -919,62 +919,62 @@ class TaskViewController: FormViewController {
             let values:[String : Any] = ["showExtras": row.value ?? false]
             userReference.updateChildValues(values)
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         <<< ButtonRow("Sub-Tasks") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .secondaryLabel
             row.cell.textLabel?.textAlignment = .left
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
             if let subtaskIDs = self.task.subtaskIDs, !subtaskIDs.isEmpty {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
             }
         }.onCellSelection({ _,_ in
             self.openSubtasks()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
             if let subtaskIDs = self.task.subtaskIDs, !subtaskIDs.isEmpty {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             }
         }
         
         <<< ButtonRow("Checklists") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textAlignment = .left
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
             if self.task.checklistIDs != nil || self.task.grocerylistID != nil || self.task.activitylistIDs != nil {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
             }
         }.onCellSelection({ _,_ in
             self.openList()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
             if let _ = self.task.checklistIDs {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             }
         }
         
         <<< ButtonRow("Media") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textAlignment = .left
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
@@ -982,18 +982,18 @@ class TaskViewController: FormViewController {
         }.onCellSelection({ _,_ in
             self.openMedia()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
             if (self.task.activityPhotos == nil || self.task.activityPhotos!.isEmpty) && (self.task.activityFiles == nil || self.task.activityFiles!.isEmpty) {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             }
         }
         
         <<< LabelRow("Tags") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.accessoryType = .disclosureIndicator
             row.cell.textLabel?.textAlignment = .left
             row.cell.selectionStyle = .default
@@ -1003,25 +1003,22 @@ class TaskViewController: FormViewController {
             self.openTags()
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .label
             cell.textLabel?.textAlignment = .left
             if let tags = self.task.tags, !tags.isEmpty {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             }
         }
         
         if delegate == nil {
             form.last!
             <<< SegmentedRow<String>("sections"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.hidden = "$showExtras == false"
-                if #available(iOS 13.0, *) {
-                    $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-                }
                 $0.options = ["Events", "Health", "Transactions"]
                 if !(task.showExtras ?? true) {
                     $0.value = "Hidden"
@@ -1029,8 +1026,8 @@ class TaskViewController: FormViewController {
                     $0.value = "Events"
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }.onChange({ _ in
                 self.sectionChanged = true
             })
@@ -1043,10 +1040,10 @@ class TaskViewController: FormViewController {
                                     $0.hidden = "!$sections == 'Events'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("scheduleButton"){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                             $0.title = "Connect Event"
                                             }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.backgroundColor = .secondarySystemGroupedBackground
                                                 cell.textLabel?.textAlignment = .left
                                                 cell.height = { 60 }
                                             }
@@ -1069,10 +1066,10 @@ class TaskViewController: FormViewController {
                 $0.hidden = "$sections != 'Health'"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.title = "Connect Health"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.textLabel?.textAlignment = .left
                         cell.height = { 60 }
                     }
@@ -1099,10 +1096,10 @@ class TaskViewController: FormViewController {
                 $0.hidden = "$sections != 'Transactions'"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.title = "Connect Transaction"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.textLabel?.textAlignment = .left
                         cell.height = { 60 }
                     }

@@ -20,7 +20,7 @@ class SwitchTableViewCell: UITableViewCell {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = UIFont.preferredFont(forTextStyle: .body)
         title.adjustsFontForContentSizeCategory = true
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         return title
     }()
     
@@ -37,7 +37,7 @@ class SwitchTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = .secondarySystemGroupedBackground
         selectionStyle = .none
         
         addSubview(switchAccessory)

@@ -75,21 +75,6 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        chartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
@@ -111,14 +96,15 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
             self.title = viewModel.healthMetric.type.name
         }
         
-        addObservers()
-        changeTheme()
+        view.backgroundColor = .systemGroupedBackground
+        backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
+        chartView.backgroundColor = .secondarySystemGroupedBackground
         
         view.addSubview(activityIndicator)
         
         view.addSubview(segmentedControl)
         
-        backgroundChartView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
         view.addSubview(backgroundChartView)
         backgroundChartView.addSubview(chartView)
         chartView.delegate = self
@@ -166,7 +152,7 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         tableView.separatorStyle = .none
         tableView.register(HealthDetailSampleCell.self, forCellReuseIdentifier: healthDetailSampleCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
@@ -183,7 +169,7 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         let rightAxis = chartView.rightAxis
         rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
         
-        let marker = XYMarkerView(color: ThemeManager.currentTheme().generalSubtitleColor,
+        let marker = XYMarkerView(color: .secondaryLabel,
                                   font: UIFont.caption2.with(weight: .regular),
                                   textColor: .white,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
@@ -329,7 +315,7 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
         } else {
             cell.selectionStyle = .none
         }
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         cell.healthMetric = viewModel.healthMetric
         let sample = viewModel.samples[indexPath.row]
         cell.configure(sample)

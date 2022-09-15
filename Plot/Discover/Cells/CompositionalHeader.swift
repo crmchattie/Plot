@@ -25,7 +25,7 @@ class CompositionalHeader: UICollectionReusableView {
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Activity Type"
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.title1.with(weight: .bold)
         label.isUserInteractionEnabled = true
         label.adjustsFontForContentSizeCategory = true
@@ -70,7 +70,7 @@ class CompositionalHeader: UICollectionReusableView {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        titleLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        titleLabel.textColor = .label
         subTitleLabel.tintColor = .systemBlue
         
     }

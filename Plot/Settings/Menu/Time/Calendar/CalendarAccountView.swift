@@ -11,7 +11,7 @@ import UIKit
 class CalendarAccountView: UIView {
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
@@ -20,7 +20,7 @@ class CalendarAccountView: UIView {
     
 //    let infoLabel: UILabel = {
 //        let label = UILabel()
-//        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//        label.textColor = .secondaryLabel
 //        label.font = UIFont.preferredFont(forTextStyle: .callout)
 //        label.numberOfLines = 1
 //        label.adjustsFontForContentSizeCategory = true
@@ -36,7 +36,7 @@ class CalendarAccountView: UIView {
 //        let backgroundView = UIView()
 //        addSubview(backgroundView)
 //        backgroundView.fillSuperview()
-//        backgroundView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//        backgroundView.backgroundColor = .secondarySystemGroupedBackground
 //
 //        backgroundView.roundCorners(corners: [.topLeft, .topRight], radius: 10)
         

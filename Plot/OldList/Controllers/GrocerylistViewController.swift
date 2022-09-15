@@ -96,7 +96,7 @@ class GrocerylistViewController: FormViewController {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -108,8 +108,8 @@ class GrocerylistViewController: FormViewController {
     
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
@@ -302,9 +302,9 @@ class GrocerylistViewController: FormViewController {
             Section()
             
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .label
+                $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
                 if active, let grocerylist = grocerylist {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
@@ -323,17 +323,17 @@ class GrocerylistViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .label
+                row.placeholderColor = .secondaryLabel
         }
         
         if !connectedToAct {
             form.last!
             <<< LabelRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -347,26 +347,26 @@ class GrocerylistViewController: FormViewController {
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         }
         
         form.last!
         <<< TextAreaRow("Notes") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textView?.textColor = .label
+            $0.cell.placeholderLabel?.textColor = .secondaryLabel
             $0.placeholder = $0.tag
             $0.value = grocerylist.notes
             }.cellUpdate({ (cell, row) in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                cell.textView?.textColor = .label
+                cell.placeholderLabel?.textColor = .secondaryLabel
             }).onChange { row in
                 self.grocerylist.notes = row.value
             }
@@ -379,10 +379,10 @@ class GrocerylistViewController: FormViewController {
                                 $0.tag = "recipefields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                         $0.title = "Add New Recipe"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        cell.backgroundColor = .secondarySystemGroupedBackground
                                         cell.textLabel?.textAlignment = .left
                                         
                                     }
@@ -400,17 +400,17 @@ class GrocerylistViewController: FormViewController {
             for (ID, title) in recipes {
                 var mvs = (form.sectionBy(tag: "recipefields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     row.title = title
                 }.onCellSelection({ cell, row in
                     self.recipeID = ID
                     self.recipeIndex = row.indexPath!.row
                     self.openRecipe()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
             }
@@ -422,10 +422,10 @@ class GrocerylistViewController: FormViewController {
                                 $0.tag = "ingredientfields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                         $0.title = "Add New Ingredient"
                                     }.cellUpdate { cell, row in
-                                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        cell.backgroundColor = .secondarySystemGroupedBackground
                                         cell.textLabel?.textAlignment = .left
                                     }
                                 }
@@ -458,29 +458,29 @@ class GrocerylistViewController: FormViewController {
                         section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.name!)"){
                             $0.rowLeftPercentage = 0.75
                             $0.rowLeft = ButtonRow(){ row in
-                                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                row.cell.backgroundColor = .secondarySystemGroupedBackground
                                 row.cell.textLabel?.textAlignment = .left
-                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.textColor = .label
                                 row.cell.textLabel?.numberOfLines = 0
                                 row.title = "\(product.amount ?? 0.0) \(product.unit ?? "") of \(product.name?.capitalized ?? "")"
                             }.onCellSelection({ cell, row in
                                 self.ingredientIndex = index
                                 self.openIngredient()
                             }).cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
+                                cell.textLabel?.textColor = .label
                                 cell.textLabel?.textAlignment = .left
                                 cell.textLabel?.numberOfLines = 0
                             }
                             
                             $0.rowRight = CheckRow() {
-                                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                 $0.cell.tintColor = FalconPalette.defaultBlue
                                 $0.value = product.bool ?? false
                                 $0.cell.accessoryType = .checkmark
                                 $0.cell.tintAdjustmentMode = .dimmed
                             }.cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
                                 cell.tintColor = FalconPalette.defaultBlue
                                 cell.accessoryType = .checkmark
                                 if row.value == false {
@@ -494,7 +494,7 @@ class GrocerylistViewController: FormViewController {
                                 }
                             })
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
                         } , at: section!.count - 1)
                     } else {
                         var aisle = product.aisle?.capitalized ?? ""
@@ -510,29 +510,29 @@ class GrocerylistViewController: FormViewController {
                         section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.name!)"){
                             $0.rowLeftPercentage = 0.75
                             $0.rowLeft = ButtonRow(){ row in
-                                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                row.cell.backgroundColor = .secondarySystemGroupedBackground
                                 row.cell.textLabel?.textAlignment = .left
-                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.textColor = .label
                                 row.cell.textLabel?.numberOfLines = 0
                                 row.title = "\(product.amount ?? 0.0) \(product.unit ?? "") of \(product.name?.capitalized ?? "")"
                             }.onCellSelection({ cell, row in
                                 self.ingredientIndex = index
                                 self.openIngredient()
                             }).cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
+                                cell.textLabel?.textColor = .label
                                 cell.textLabel?.textAlignment = .left
                                 cell.textLabel?.numberOfLines = 0
                             }
                             
                             $0.rowRight = CheckRow() {
-                                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                 $0.cell.tintColor = FalconPalette.defaultBlue
                                 $0.value = product.bool ?? false
                                 $0.cell.accessoryType = .checkmark
                                 $0.cell.tintAdjustmentMode = .dimmed
                             }.cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
                                 cell.tintColor = FalconPalette.defaultBlue
                                 cell.accessoryType = .checkmark
                                 if row.value == false {
@@ -546,7 +546,7 @@ class GrocerylistViewController: FormViewController {
                                 }
                             })
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
                         } , at: 0)
                     }
                 } else if let product = productContainer[index].groceryProduct {
@@ -557,29 +557,29 @@ class GrocerylistViewController: FormViewController {
                         section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.title)"){
                             $0.rowLeftPercentage = 0.75
                             $0.rowLeft = ButtonRow(){ row in
-                                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                row.cell.backgroundColor = .secondarySystemGroupedBackground
                                 row.cell.textLabel?.textAlignment = .left
-                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.textColor = .label
                                 row.cell.textLabel?.numberOfLines = 0
                                 row.title = "\(product.amount ?? 0) \(product.title.capitalized)"
                             }.onCellSelection({ cell, row in
                                 self.ingredientIndex = index
                                 self.openIngredient()
                             }).cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
+                                cell.textLabel?.textColor = .label
                                 cell.textLabel?.textAlignment = .left
                                 cell.textLabel?.numberOfLines = 0
                             }
                             
                             $0.rowRight = CheckRow() {
-                                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                 $0.cell.tintColor = FalconPalette.defaultBlue
                                 $0.value = product.bool ?? false
                                 $0.cell.accessoryType = .checkmark
                                 $0.cell.tintAdjustmentMode = .dimmed
                             }.cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
                                 cell.tintColor = FalconPalette.defaultBlue
                                 cell.accessoryType = .checkmark
                                 if row.value == false {
@@ -593,7 +593,7 @@ class GrocerylistViewController: FormViewController {
                                 }
                             })
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
                         } , at: section!.count - 1)
                     } else {
                         var aisle = product.aisle?.capitalized ?? ""
@@ -609,29 +609,29 @@ class GrocerylistViewController: FormViewController {
                         section!.insert(SplitRow<ButtonRow, CheckRow>("\(product.title)"){
                             $0.rowLeftPercentage = 0.75
                             $0.rowLeft = ButtonRow(){ row in
-                                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                row.cell.backgroundColor = .secondarySystemGroupedBackground
                                 row.cell.textLabel?.textAlignment = .left
-                                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                row.cell.textLabel?.textColor = .label
                                 row.cell.textLabel?.numberOfLines = 0
                                 row.title = "\(product.amount ?? 0) \(product.title.capitalized)"
                             }.onCellSelection({ cell, row in
                                 self.ingredientIndex = index
                                 self.openIngredient()
                             }).cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
+                                cell.textLabel?.textColor = .label
                                 cell.textLabel?.textAlignment = .left
                                 cell.textLabel?.numberOfLines = 0
                             }
                             
                             $0.rowRight = CheckRow() {
-                                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                 $0.cell.tintColor = FalconPalette.defaultBlue
                                 $0.value = product.bool ?? false
                                 $0.cell.accessoryType = .checkmark
                                 $0.cell.tintAdjustmentMode = .dimmed
                             }.cellUpdate { cell, row in
-                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                cell.backgroundColor = .secondarySystemGroupedBackground
                                 cell.tintColor = FalconPalette.defaultBlue
                                 cell.accessoryType = .checkmark
                                 if row.value == false {
@@ -645,7 +645,7 @@ class GrocerylistViewController: FormViewController {
                                 }
                             })
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
                         } , at: 0)
                     }
                 }
@@ -1243,7 +1243,7 @@ extension GrocerylistViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == FalconPalette.defaultBlue {
             textView.text = nil
-            textView.textColor = ThemeManager.currentTheme().generalTitleColor
+            textView.textColor = .label
         }
         
         

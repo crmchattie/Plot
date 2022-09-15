@@ -13,7 +13,7 @@ class RecipeDetailViewCell: UICollectionViewCell {
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Activity Type"
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.numberOfLines = 0
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.adjustsFontForContentSizeCategory = true

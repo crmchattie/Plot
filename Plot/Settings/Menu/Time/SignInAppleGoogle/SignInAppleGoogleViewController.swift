@@ -39,11 +39,22 @@ class SignInAppleGoogleViewController: UITableViewController {
     
     let customFont = UIFont(name: "Roboto-Medium", size: 17)!
     
+    var googleSignInColor: UIColor {
+        return UIColor { (trait) -> UIColor in
+            switch trait.userInterfaceStyle {
+            case .dark:
+                return UIColor("#4285F4")
+            default:
+                return UIColor("#FFFFFF")
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         tableView.rowHeight = 50
         tableView.register(SignInAppleGoogleTableViewCell.self, forCellReuseIdentifier: signInAppleGoogleCellId)
@@ -99,10 +110,10 @@ class SignInAppleGoogleViewController: UITableViewController {
             cell.title.text = firstSection[indexPath.row].title
             cell.accessoryType = .none
             if firstSection[indexPath.row].title == "Sign in with Google" {
-                cell.backgroundColor = ThemeManager.currentTheme().googleSignInBackgroundColor
+                cell.backgroundColor = googleSignInColor
                 cell.title.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: customFont)
             } else {
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.title.font = UIFont.body.with(weight: .bold)
             }
             return cell
@@ -111,10 +122,10 @@ class SignInAppleGoogleViewController: UITableViewController {
             cell.title.text = secondSection[indexPath.row].title
             cell.accessoryType = .none
             if secondSection[indexPath.row].title == "Sign in with Google" {
-                cell.backgroundColor = ThemeManager.currentTheme().googleSignInBackgroundColor
+                cell.backgroundColor = googleSignInColor
                 cell.title.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: customFont)
             } else {
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.title.font = UIFont.body.with(weight: .bold)
             }
             return cell

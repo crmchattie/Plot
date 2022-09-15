@@ -83,7 +83,7 @@ class ChatLogController: UICollectionViewController {
     var refreshControl: UIRefreshControl = {
         var refreshControl = UIRefreshControl()
         refreshControl.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
-        refreshControl.tintColor = ThemeManager.currentTheme().generalTitleColor
+        refreshControl.tintColor = .label
         refreshControl.addTarget(ChatLogController.self, action: #selector(performRefresh), for: .valueChanged)
         
         return refreshControl
@@ -451,8 +451,8 @@ class ChatLogController: UICollectionViewController {
         groupMembersManager.delegate = self
         groupMembersManager.observeMembersChanges(conversation)
         
-        view.backgroundColor = ThemeManager.currentTheme().chatBackgroundColor
-        collectionView?.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        collectionView?.indicatorStyle = .default
         collectionView?.backgroundColor = view.backgroundColor
         collectionView?.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0)
         collectionView?.keyboardDismissMode = .interactive
@@ -497,7 +497,7 @@ class ChatLogController: UICollectionViewController {
         config.backgoundTintColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.0)
         config.borderColor = UIColor(red: 80/255, green: 80/255, blue: 80/255, alpha: 0.0)
         config.menuWidth = 100
-        config.menuSeparatorColor = ThemeManager.currentTheme().generalSubtitleColor
+        config.menuSeparatorColor = .secondaryLabel
         config.menuRowHeight = 40
         config.cornerRadius = 25
     }

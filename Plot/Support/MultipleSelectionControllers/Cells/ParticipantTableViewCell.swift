@@ -31,7 +31,7 @@ class ParticipantTableViewCell: UITableViewCell {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = UIFont.preferredFont(forTextStyle: .headline)
         title.adjustsFontForContentSizeCategory = true
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         return title
     }()
     
@@ -40,7 +40,7 @@ class ParticipantTableViewCell: UITableViewCell {
         subtitle.translatesAutoresizingMaskIntoConstraints = false
         subtitle.font = UIFont.preferredFont(forTextStyle: .subheadline)
         subtitle.adjustsFontForContentSizeCategory = true
-        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        subtitle.textColor = .secondaryLabel
         
         return subtitle
     }()
@@ -51,7 +51,7 @@ class ParticipantTableViewCell: UITableViewCell {
         subtitle.font = UIFont.preferredFont(forTextStyle: .subheadline)
         subtitle.adjustsFontForContentSizeCategory = true
         subtitle.textAlignment = .right
-        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        subtitle.textColor = .secondaryLabel
         return subtitle
     }()    
     
@@ -111,8 +111,8 @@ class ParticipantTableViewCell: UITableViewCell {
         icon.image = UIImage(named: "UserpicIcon")
         title.text = ""
         subtitle.text = ""
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
-        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        title.textColor = .label
+        subtitle.textColor = .secondaryLabel
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -79,7 +79,7 @@ class ChooseChatTableViewController: UITableViewController {
     
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     fileprivate func configureTableView() {
@@ -90,8 +90,8 @@ class ChooseChatTableViewController: UITableViewController {
         tableView.allowsMultipleSelectionDuringEditing = false
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 105
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeChat))
         
@@ -451,7 +451,7 @@ extension ChooseChatTableViewController: UISearchBarDelegate, UISearchController
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         guard #available(iOS 11.0, *) else {
             searchBar.setShowsCancelButton(true, animated: true)
             return true

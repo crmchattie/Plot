@@ -109,7 +109,7 @@ class ChooseEventTableViewController: UITableViewController {
     
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     fileprivate func configureTableView() {        
@@ -118,8 +118,8 @@ class ChooseEventTableViewController: UITableViewController {
         tableView.estimatedRowHeight = 105
         tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
@@ -215,10 +215,10 @@ class ChooseEventTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         
         if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            headerTitle.textLabel?.textColor = .label
         }
     }
     
@@ -284,7 +284,7 @@ extension ChooseEventTableViewController: UISearchBarDelegate, UISearchControlle
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         return true
     }
 }

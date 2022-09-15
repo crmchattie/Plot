@@ -26,7 +26,7 @@ class FinancialAccountsViewController: UITableViewController {
         
         title = "Accounts"
         tableView = UITableView(frame: view.frame, style: .insetGrouped)
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         
@@ -110,14 +110,14 @@ class FinancialAccountsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "Cell")
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         let member = members[indexPath.section]
         if indexPath.row == 0 {
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel!.textColor = .label
             cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)
             cell.textLabel!.text = members[indexPath.section].name
-            cell.detailTextLabel!.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.detailTextLabel!.textColor = .secondaryLabel
             cell.detailTextLabel!.font = UIFont.preferredFont(forTextStyle: .callout)
             let status = members[indexPath.section].connection_status
             if status == .connected {
@@ -141,10 +141,10 @@ class FinancialAccountsViewController: UITableViewController {
             cell.addGestureRecognizer(viewTap)
         } else {
             if let accounts = memberAccountsDict[member] {
-                cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel!.textColor = .label
                 cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)
                 cell.textLabel!.text = accounts[indexPath.row - 1].name
-                cell.detailTextLabel!.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.detailTextLabel!.textColor = .secondaryLabel
                 cell.detailTextLabel!.font = UIFont.preferredFont(forTextStyle: .callout)
                 if accounts[indexPath.row - 1].should_link ?? true {
                     cell.detailTextLabel!.text = "Account Linked to Financial Profile"

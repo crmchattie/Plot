@@ -47,7 +47,7 @@ extension UserCell {
     if conversations[indexPath.row].activities != nil {
         activityButton.tintColor = .systemBlue
     } else {
-        activityButton.tintColor = ThemeManager.currentTheme().generalSubtitleColor
+        activityButton.tintColor = .secondaryLabel
     }
     
     updateParticipantsThumbnail(conversation: conversations[indexPath.row])

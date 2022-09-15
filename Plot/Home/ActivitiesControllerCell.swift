@@ -62,7 +62,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     }
     
     func setupViews() {
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         addSubview(tableView)
         tableView.fillSuperview()
     }
@@ -85,7 +85,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
                     header.spinnerView.stopAnimating()
                 }
             }
-            header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            header.backgroundColor = .systemGroupedBackground
             header.titleLabel.text = section.name
             header.subTitleLabel.isHidden = false
             header.delegate = self

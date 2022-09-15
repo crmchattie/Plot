@@ -62,7 +62,7 @@ class SelectChatTableViewController: UITableViewController {
   }
   
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return ThemeManager.currentTheme().statusBarStyle
+    return .default
   }
   
   fileprivate func setupMainView() {
@@ -75,7 +75,7 @@ class SelectChatTableViewController: UITableViewController {
     extendedLayoutIncludesOpaqueBars = true
     definesPresentationContext = true
     edgesForExtendedLayout = [UIRectEdge.top, UIRectEdge.bottom]
-    view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    view.backgroundColor = .systemGroupedBackground
   }
   
   @objc fileprivate func dismissNavigationController() {
@@ -83,7 +83,7 @@ class SelectChatTableViewController: UITableViewController {
   }
   
   fileprivate func setupTableView() {
-    tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+    tableView.indicatorStyle = .default
     tableView.sectionIndexBackgroundColor = view.backgroundColor
     tableView.backgroundColor = view.backgroundColor
     tableView.register(FalconUsersTableViewCell.self, forCellReuseIdentifier: falconUsersCellID)
@@ -94,7 +94,6 @@ class SelectChatTableViewController: UITableViewController {
     searchBar = UISearchBar()
     searchBar?.delegate = self
     searchBar?.searchBarStyle = .minimal
-    searchBar?.changeBackgroundColor(to: ThemeManager.currentTheme().searchBarColor)
     searchBar?.placeholder = "Search"
     searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
     tableView.tableHeaderView = searchBar
@@ -164,9 +163,9 @@ class SelectChatTableViewController: UITableViewController {
   }
   
   override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-    view.tintColor = ThemeManager.currentTheme().inputTextViewColor
+    view.tintColor = .systemGroupedBackground
     if let headerTitle = view as? UITableViewHeaderFooterView {
-      headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+      headerTitle.textLabel?.textColor = .secondaryLabel
 //      headerTitle.textLabel?.font = UIFont.systemFont(ofSize: 10)
         headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
         headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
@@ -187,7 +186,7 @@ class SelectChatTableViewController: UITableViewController {
     if indexPath.section == headerSection {
       let cell = tableView.dequeueReusableCell(withIdentifier: newGroupCellID) ?? UITableViewCell(style: .default, reuseIdentifier: newGroupCellID)
       
-      cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+      cell.backgroundColor = .secondarySystemGroupedBackground
       cell.imageView?.image = UIImage(named: "groupChat")
       cell.imageView?.contentMode = .scaleAspectFit
       cell.textLabel?.font = .preferredFont(forTextStyle: .body)

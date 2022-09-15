@@ -13,7 +13,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         
     lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -25,7 +25,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.isUserInteractionEnabled = true
@@ -47,7 +47,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         textLabel?.text = nil
         textLabel?.textColor = .clear
         
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = .secondarySystemGroupedBackground
         contentView.addSubview(nameLabel)
         contentView.addSubview(subLabel)
         contentView.addSubview(activityTypeButton)

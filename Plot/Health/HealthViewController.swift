@@ -82,7 +82,6 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .healthUpdated, object: nil)
     }
     
@@ -106,14 +105,6 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
         }
     }
     
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        collectionView.indicatorStyle = theme.scrollBarStyle
-        collectionView.backgroundColor = theme.generalBackgroundColor
-        collectionView.reloadData()
-    }
-    
     private func configureView() {
         extendedLayoutIncludesOpaqueBars = true
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
@@ -125,7 +116,7 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
             navigationItem.rightBarButtonItems = [newItemBarButton]
         }
         
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
         view.addSubview(collectionView)
         
@@ -138,7 +129,7 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
         
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        collectionView.indicatorStyle = .default
         collectionView.backgroundColor = view.backgroundColor
         
     }
@@ -265,7 +256,7 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
         if kind == UICollectionView.elementKindSectionHeader {
             let key = filteredHealthMetricSections[indexPath.section]
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
-            sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            sectionHeader.backgroundColor = .systemGroupedBackground
             sectionHeader.titleLabel.text = key.name
             sectionHeader.delegate = self
             if (key == .workoutsList || key == .mindfulnessList) && filteredHealthMetrics[key]?.count ?? 0 > 10 {

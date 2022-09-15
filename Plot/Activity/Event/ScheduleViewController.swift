@@ -94,8 +94,8 @@ class ScheduleViewController: FormViewController {
     
     fileprivate func setupMainView() {
         
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
@@ -133,9 +133,9 @@ class ScheduleViewController: FormViewController {
             Section()
         
             <<< TextRow("Name") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .label
+                $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
                 if self.active {
                     $0.value = self.schedule.name
@@ -151,75 +151,75 @@ class ScheduleViewController: FormViewController {
                         self.navigationItem.rightBarButtonItem?.isEnabled = true
                     }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textField?.textColor = .label
+                    row.placeholderColor = .secondaryLabel
             }
             
 //            <<< TextRow("Type") {
-//                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.cell.textField?.textColor = .label
+//                $0.placeholderColor = .secondaryLabel
 //                $0.placeholder = $0.tag
 //                if self.active && self.schedule.activityType != nil && self.schedule.activityType != "nothing" {
 //                    $0.value = self.schedule.activityType
 //                }
 //                }.cellUpdate { cell, row in
-//                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                    cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                    row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+//                    cell.backgroundColor = .secondarySystemGroupedBackground
+//                    cell.textField?.textColor = .label
+//                    row.placeholderColor = .secondaryLabel
 //            }
             
             <<< TextAreaRow("Description") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.textColor = .label
+                $0.cell.placeholderLabel?.textColor = .secondaryLabel
                 $0.placeholder = $0.tag
                 if self.active && self.schedule.activityDescription != nil && self.schedule.activityDescription != "nothing" {
                     $0.value = self.schedule.activityDescription
                 }
                 }.cellUpdate({ (cell, row) in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textView?.textColor = .label
+                    cell.placeholderLabel?.textColor = .secondaryLabel
                 })
             
         <<< ButtonRow("Location") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textAlignment = .left
             if self.active, let localName = schedule.locationName, localName != "locationName" {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
                 row.cell.accessoryType = .detailDisclosureButton
                 row.title = localName
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
             }
             }.onCellSelection({ _,_ in
                 self.openLocationFinder()
             }).cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textAlignment = .left
                 if row.title == "Location" {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.textLabel?.textColor = .secondaryLabel
                     cell.accessoryType = .disclosureIndicator
                 } else if let value = row.title, !value.isEmpty {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.textLabel?.textColor = .label
                     cell.accessoryType = .detailDisclosureButton
                 } else {
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.textLabel?.textColor = .secondaryLabel
                     cell.accessoryType = .disclosureIndicator
                     cell.textLabel?.text = "Location"
                 }
             }
             
 //            <<< LabelRow("Participants") { row in
-//                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                row.cell.backgroundColor = .secondarySystemGroupedBackground
+//                row.cell.textLabel?.textColor = .label
+//                row.cell.detailTextLabel?.textColor = .secondaryLabel
 //                row.cell.accessoryType = .disclosureIndicator
 //                row.cell.textLabel?.textAlignment = .left
 //                row.cell.selectionStyle = .default
@@ -233,15 +233,15 @@ class ScheduleViewController: FormViewController {
 //                self.openParticipantsInviter()
 //            }).cellUpdate { cell, row in
 //                cell.accessoryType = .disclosureIndicator
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-//                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-//                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textLabel?.textColor = .label
+//                cell.detailTextLabel?.textColor = .secondaryLabel
 //                cell.textLabel?.textAlignment = .left
 //            }
             
             <<< SwitchRow("All-day") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
                 $0.title = $0.tag
                 if self.active {
                     $0.value = self.schedule.allDay
@@ -265,16 +265,16 @@ class ScheduleViewController: FormViewController {
                     startDate.inlineRow?.updateCell()
                     endDate.inlineRow?.updateCell()
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     
             }
 
             
             <<< DateTimeInlineRow("Starts") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .medium
@@ -312,8 +312,8 @@ class ScheduleViewController: FormViewController {
                     }
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate { (cell, row) in
-                        row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                        row.cell.backgroundColor = .secondarySystemGroupedBackground
+                        row.cell.tintColor = .secondarySystemGroupedBackground
                         if #available(iOS 13.4, *) {
                             cell.datePicker.preferredDatePickerStyle = .wheels
                         }
@@ -334,20 +334,20 @@ class ScheduleViewController: FormViewController {
                         timeZoneRow.evaluateHidden()
                     }
                 }.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                     if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone") {
                         timeZoneRow.hidden = true
                         timeZoneRow.evaluateHidden()
                     }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                 }
             
             <<< LabelRow("startTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -363,15 +363,15 @@ class ScheduleViewController: FormViewController {
                     self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }
             
             <<< DateTimeInlineRow("Ends") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .medium
@@ -406,8 +406,8 @@ class ScheduleViewController: FormViewController {
                     self!.endDateTime = row.value
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.tintColor = .secondarySystemGroupedBackground
                     if let endTimeZone = self?.schedule.endTimeZone {
                         cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
                     }
@@ -428,21 +428,21 @@ class ScheduleViewController: FormViewController {
                     timeZoneRow.evaluateHidden()
                 }
                 }.onCollapseInlineRow { cell, _, _ in
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                     if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone") {
                         timeZoneRow.hidden = true
                         timeZoneRow.evaluateHidden()
                     }
                 }.cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     
                 }
             
             <<< LabelRow("endTimeZone") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -458,15 +458,15 @@ class ScheduleViewController: FormViewController {
                     self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
                 }).cellUpdate { cell, row in
                     cell.accessoryType = .disclosureIndicator
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }
         
             <<< PushRow<EventAlert>("Reminder") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.title = row.tag
                 if self.active, let value = self.schedule.reminder {
                     row.value = EventAlert(rawValue: value)
@@ -482,17 +482,17 @@ class ScheduleViewController: FormViewController {
                 to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                    to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
                     to.tableView.separatorStyle = .none
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
             }.onChange() { [unowned self] row in
                 if let reminder = row.value?.description {
                     self.schedule.reminder = reminder
@@ -504,9 +504,9 @@ class ScheduleViewController: FormViewController {
         
         
             <<< LabelRow("Category") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.selectionStyle = .default
                 row.title = row.tag
@@ -519,9 +519,9 @@ class ScheduleViewController: FormViewController {
                 self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
 
@@ -533,10 +533,10 @@ class ScheduleViewController: FormViewController {
                                 $0.tag = "checklistfields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                         $0.title = "Add New Item"
                                         }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            cell.backgroundColor = .secondarySystemGroupedBackground
                                             cell.textLabel?.textAlignment = .left
                                             
                                     }
@@ -545,24 +545,24 @@ class ScheduleViewController: FormViewController {
                                     return SplitRow<TextRow, CheckRow>(){
                                         $0.rowLeftPercentage = 0.75
                                         $0.rowLeft = TextRow(){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                                            $0.cell.textField?.textColor = .label
+                                            $0.placeholderColor = .secondaryLabel
                                             $0.placeholder = "Item"
                                             }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                                                cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                                                row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                                                cell.backgroundColor = .secondarySystemGroupedBackground
+                                                cell.textField?.textColor = .label
+                                                row.placeholderColor = .secondaryLabel
                                         }
                                         
                                         $0.rowRight = CheckRow() {
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                             $0.cell.tintColor = FalconPalette.defaultBlue
                                             $0.value = false
                                             $0.cell.accessoryType = .checkmark
                                             $0.cell.tintAdjustmentMode = .dimmed
                                             }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.backgroundColor = .secondarySystemGroupedBackground
                                                 cell.tintColor = FalconPalette.defaultBlue
                                                 cell.accessoryType = .checkmark
                                                 if row.value == false {
@@ -572,7 +572,7 @@ class ScheduleViewController: FormViewController {
                                                 }
                                         }
                                         }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            cell.backgroundColor = .secondarySystemGroupedBackground
                                     }
                                     
                                 }
@@ -692,17 +692,17 @@ class ScheduleViewController: FormViewController {
                 mvs.insert(SplitRow<TextRow, CheckRow>() {
                     $0.rowLeftPercentage = 0.75
                     $0.rowLeft = TextRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                        $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                        $0.cell.textField?.textColor = .label
+                        $0.placeholderColor = .secondaryLabel
                         $0.value = item.key
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-                            row.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
+                            cell.textField?.textColor = .label
+                            row.placeholderColor = .secondaryLabel
                     }
                     $0.rowRight = CheckRow() {
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.cell.tintColor = FalconPalette.defaultBlue
                         $0.value = item.value
                         $0.cell.accessoryType = .checkmark
@@ -712,7 +712,7 @@ class ScheduleViewController: FormViewController {
                             $0.cell.tintAdjustmentMode = .dimmed
                         }
                         }.cellUpdate { cell, row in
-                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                            cell.backgroundColor = .secondarySystemGroupedBackground
                             cell.tintColor = FalconPalette.defaultBlue
                             cell.accessoryType = .checkmark
                             if row.value == false {
@@ -722,7 +722,7 @@ class ScheduleViewController: FormViewController {
                             }
                     }
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                 }, at: mvs.count - 1)
                 
             }

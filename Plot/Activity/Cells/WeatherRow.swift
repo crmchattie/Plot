@@ -19,7 +19,7 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
         let collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height), collectionViewLayout: self.collectionViewLayout)
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        collectionView.backgroundColor = .secondarySystemGroupedBackground
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(WeatherCollectionViewCell.self, forCellWithReuseIdentifier: kWeatherCollectionViewCell)
@@ -45,7 +45,7 @@ final class WeatherCell: Cell<[DailyWeatherElement]>, CellType, UICollectionView
         height = { 130 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = .secondarySystemGroupedBackground
         
         contentView.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
@@ -160,7 +160,7 @@ class WeatherCollectionViewCell: UICollectionViewCell {
     
     let dayLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.isUserInteractionEnabled = false
         label.textAlignment = .center
@@ -170,7 +170,7 @@ class WeatherCollectionViewCell: UICollectionViewCell {
     
     let maxLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.isUserInteractionEnabled = false
         label.textAlignment = .center
@@ -180,7 +180,7 @@ class WeatherCollectionViewCell: UICollectionViewCell {
     
     let minLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.isUserInteractionEnabled = false
         label.textAlignment = .center

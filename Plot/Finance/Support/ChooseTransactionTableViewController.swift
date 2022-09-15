@@ -62,7 +62,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     fileprivate func configureView() {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
@@ -114,7 +114,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         return view
         
     }
@@ -128,7 +128,7 @@ class ChooseTransactionTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kFinanceTableViewCell, for: indexPath) as? FinanceTableViewCell ?? FinanceTableViewCell()
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         if let filteredTransactions = filteredTransactions {
             cell.transaction = filteredTransactions[indexPath.row]
         }
@@ -170,7 +170,7 @@ extension ChooseTransactionTableViewController: UISearchBarDelegate, UISearchCon
     }
 
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         return true
     }
 }

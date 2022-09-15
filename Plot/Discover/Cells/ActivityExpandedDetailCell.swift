@@ -165,7 +165,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -174,7 +174,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
 
     let categoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -189,7 +189,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
 
     let subcategoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -198,7 +198,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     
     let subcategoryTextField: UITextField = {
         let textField = UITextField()
-        textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        textField.textColor = .secondaryLabel
         textField.font = UIFont.preferredFont(forTextStyle: .subheadline)
         textField.isUserInteractionEnabled = true
         textField.keyboardType = .numberPad
@@ -240,7 +240,7 @@ class ActivityExpandedDetailCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        nameLabel.textColor = .label
     }
     
     @objc func subcategoryViewTapped(_ sender: UITapGestureRecognizer) {

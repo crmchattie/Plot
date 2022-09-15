@@ -18,7 +18,7 @@ class GroupProfileTableHeaderContainer: UIView {
         profileImageView.layer.masksToBounds = true
         profileImageView.layer.cornerRadius = 48
         profileImageView.isUserInteractionEnabled = true
-        profileImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        profileImageView.backgroundColor = .secondarySystemGroupedBackground
         return profileImageView
     }()
     
@@ -45,7 +45,7 @@ class GroupProfileTableHeaderContainer: UIView {
         name.borderStyle = .none
         name.autocorrectionType = .no
         name.returnKeyType = .done
-        name.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        name.keyboardAppearance = .default
         
         return name
     }()
@@ -54,7 +54,7 @@ class GroupProfileTableHeaderContainer: UIView {
         let userData = UIView()
         userData.translatesAutoresizingMaskIntoConstraints = false
         userData.layer.cornerRadius = 10
-        userData.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        userData.backgroundColor = .secondarySystemGroupedBackground
         return userData
     }()
     
@@ -68,7 +68,7 @@ class GroupProfileTableHeaderContainer: UIView {
         
         userData.addSubview(name)
         
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        backgroundColor = .systemGroupedBackground
         addPhotoLabel.text = addPhotoLabelAdminText
         
         NSLayoutConstraint.activate([

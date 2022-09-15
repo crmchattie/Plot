@@ -25,7 +25,7 @@ class FalconUsersTableViewCell: UITableViewCell {
         var title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = UIFont.preferredFont(forTextStyle: .headline)
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         title.adjustsFontForContentSizeCategory = true
         return title
     }()
@@ -34,7 +34,7 @@ class FalconUsersTableViewCell: UITableViewCell {
         var subtitle = UILabel()
         subtitle.translatesAutoresizingMaskIntoConstraints = false
         subtitle.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        subtitle.textColor = .secondaryLabel
         subtitle.adjustsFontForContentSizeCategory = true
         return subtitle
     }()
@@ -71,8 +71,8 @@ class FalconUsersTableViewCell: UITableViewCell {
         icon.sd_cancelCurrentImageLoad()
         title.text = ""
         subtitle.text = ""
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
-        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        title.textColor = .label
+        subtitle.textColor = .secondaryLabel
     }
     
     func configureCell(for user: User) {
@@ -88,7 +88,7 @@ class FalconUsersTableViewCell: UITableViewCell {
         if let lastSeen = user.onlineStatus as? TimeInterval {
             let date = Date(timeIntervalSince1970: lastSeen/1000)
             let lastSeenTime = "Last seen " + timeAgoSinceDate(date)
-            subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            subtitle.textColor = .secondaryLabel
             subtitle.text = lastSeenTime
         }
         

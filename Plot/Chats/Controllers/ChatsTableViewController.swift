@@ -62,30 +62,12 @@ class ChatsTableViewController: UITableViewController {
         
         print("chat view did load")
         configureTableView()
-        addObservers()
         handleReloadTable()
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.reloadData()
     }
     
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -99,8 +81,8 @@ class ChatsTableViewController: UITableViewController {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(UserCell.self, forCellReuseIdentifier: userCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         tableView.rowHeight = UITableView.automaticDimension
         

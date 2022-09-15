@@ -50,8 +50,8 @@ class ScheduleListViewController: FormViewController {
     }
     
     fileprivate func setupMainView() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
@@ -72,10 +72,10 @@ class ScheduleListViewController: FormViewController {
                                 $0.tag = "Events"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                         $0.title = "Add Sub-Event"
                                         }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            cell.backgroundColor = .secondarySystemGroupedBackground
                                             cell.textLabel?.textAlignment = .left
                                             cell.height = { 60 }
                                         }

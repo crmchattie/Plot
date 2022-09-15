@@ -25,7 +25,7 @@ class FinancialTransactionRulesViewController: UITableViewController {
         
         title = "Transaction Rules"
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newTransactionRule))
@@ -73,10 +73,10 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         
         let rule = transactionRules[indexPath.item]
-        cell.textLabel!.textColor = ThemeManager.currentTheme().generalTitleColor
+        cell.textLabel!.textColor = .label
         cell.textLabel!.font = UIFont.preferredFont(forTextStyle: .body)
         cell.textLabel!.text = rule.match_description
         return cell

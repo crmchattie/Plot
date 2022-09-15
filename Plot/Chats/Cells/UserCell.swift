@@ -60,7 +60,7 @@ class UserCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .left
         return label
@@ -69,7 +69,7 @@ class UserCell: UITableViewCell {
     //channel view name of specific chat
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -81,7 +81,7 @@ class UserCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -126,8 +126,8 @@ class UserCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        chatImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
+        chatImageView.backgroundColor = .secondarySystemGroupedBackground
         
         contentView.addSubview(chatImageView)
         chatImageView.addSubview(nameLabel)
@@ -214,15 +214,15 @@ class UserCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        contentView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        chatImageView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        contentView.backgroundColor = .systemGroupedBackground
+        chatImageView.backgroundColor = .secondarySystemGroupedBackground
         nameLabel.text = ""
         messageLabel.text = nil
         timeLabel.text = nil
         badgeLabel.isHidden = true
         muteIndicator.isHidden = true
         newMessageIndicator.isHidden = true
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
+        nameLabel.textColor = .label
     }
     
     @objc func getInfoAction() {

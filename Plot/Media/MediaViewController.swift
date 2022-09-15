@@ -72,8 +72,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     fileprivate func setupMainView() {
         extendedLayoutIncludesOpaqueBars = true
         
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
         title = photosText
                 
@@ -83,13 +82,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
         ]
         
         // Segmented control as the custom title view.
-        segmentedControl = UISegmentedControl(items: segmentTextContent)
-        if #available(iOS 13.0, *) {
-            segmentedControl.overrideUserInterfaceStyle = theme.userInterfaceStyle
-        } else {
-            // Fallback on earlier versions
-        }
-        
+        segmentedControl = UISegmentedControl(items: segmentTextContent)        
         segmentedControl.selectedSegmentIndex = 0
         segmentedControl.autoresizingMask = .flexibleWidth
         segmentedControl.addTarget(self, action: #selector(action(_:)), for: .valueChanged)
@@ -101,8 +94,8 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
         collectionView.delegate = self
         collectionView.register(MediaImageCell.self, forCellWithReuseIdentifier: cellId)
         collectionView.isUserInteractionEnabled = true
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.indicatorStyle = .default
+        collectionView.backgroundColor = .systemGroupedBackground
         view.addSubview(collectionView)
         
         collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true

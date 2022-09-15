@@ -33,7 +33,7 @@ class CalendarView: UIView {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "up-arrow"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.tintColor = ThemeManager.currentTheme().generalTitleColor
+        button.tintColor = .label
         return button
     }()
 

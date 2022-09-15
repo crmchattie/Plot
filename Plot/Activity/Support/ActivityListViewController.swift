@@ -44,8 +44,8 @@ class ActivityListViewController: FormViewController {
     }
     
     fileprivate func setupMainView() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
@@ -66,10 +66,10 @@ class ActivityListViewController: FormViewController {
                                 $0.tag = "listsfields"
                                 $0.addButtonProvider = { section in
                                     return ButtonRow(){
-                                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                         $0.title = "Add New Checklist"
                                         }.cellUpdate { cell, row in
-                                            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            cell.backgroundColor = .secondarySystemGroupedBackground
                                             cell.textLabel?.textAlignment = .left
                                             
                                     }
@@ -78,17 +78,17 @@ class ActivityListViewController: FormViewController {
                     self.listIndex = index
                     self.openList()
                     return ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     row.title = "Checklist"
                     }.onCellSelection({ _,_ in
                         self.listIndex = index
                         self.openList()
                     }).cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.textLabel?.textAlignment = .left
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.textLabel?.textColor = .label
                     }
                 }
                                 
@@ -98,62 +98,62 @@ class ActivityListViewController: FormViewController {
             if let groceryList = list.grocerylist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     row.title = groceryList.name
                     self.grocerylistIndex = mvs.count - 1
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
             } else if let checklist = list.checklist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     row.title = checklist.name
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
             } else if let activitylist = list.activitylist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     row.title = activitylist.name
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
             } else if let packinglist = list.packinglist {
                 var mvs = (form.sectionBy(tag: "listsfields") as! MultivaluedSection)
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     row.title = packinglist.name
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: mvs.count - 1)
             }
@@ -222,15 +222,15 @@ extension ActivityListViewController: UpdateChecklistDelegate {
         if checklist.name != "CheckListName" {
             if mvs.allRows.count - 1 == listIndex {
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: listIndex)
             }
@@ -257,15 +257,15 @@ extension ActivityListViewController: UpdateActivitylistDelegate {
         if activitylist.name != "ActivityListName" {
             if mvs.allRows.count - 1 == listIndex {
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: listIndex)
             }
@@ -292,15 +292,15 @@ extension ActivityListViewController: UpdatePackinglistDelegate {
         if packinglist.name != "PackingListName" {
             if mvs.allRows.count - 1 == listIndex {
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: listIndex)
             }
@@ -327,16 +327,16 @@ extension ActivityListViewController: UpdateGrocerylistDelegate {
         if grocerylist.name != "GroceryListName" {
             if mvs.allRows.count - 1 == listIndex {
                 mvs.insert(ButtonRow() { row in
-                    row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textAlignment = .left
-                    row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    row.cell.textLabel?.textColor = .label
                     self.grocerylistIndex = listIndex
                 }.onCellSelection({ cell, row in
                     self.listIndex = row.indexPath!.row
                     self.openList()
                 }).cellUpdate { cell, row in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                     cell.textLabel?.textAlignment = .left
                 }, at: listIndex)
             }

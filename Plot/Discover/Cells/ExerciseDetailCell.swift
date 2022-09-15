@@ -48,7 +48,7 @@ class ExerciseDetailCell: UICollectionViewCell {
     
     let numberLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -57,7 +57,7 @@ class ExerciseDetailCell: UICollectionViewCell {
    
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -66,7 +66,7 @@ class ExerciseDetailCell: UICollectionViewCell {
     
     let detailLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true

@@ -106,7 +106,7 @@ class ChooseTaskTableViewController: UITableViewController {
     
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
     
     fileprivate func configureTableView() {
@@ -115,8 +115,8 @@ class ChooseTaskTableViewController: UITableViewController {
         tableView.estimatedRowHeight = 105
         tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
@@ -174,7 +174,7 @@ class ChooseTaskTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
-        view.tintColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.tintColor = .systemGroupedBackground
         return view
         
     }
@@ -239,7 +239,7 @@ extension ChooseTaskTableViewController: UISearchBarDelegate, UISearchController
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         return true
     }
 }

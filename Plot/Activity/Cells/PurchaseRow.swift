@@ -12,7 +12,7 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         
     lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -23,7 +23,7 @@ final class PurchaseCell: Cell<Transaction>, CellType {
     lazy var participantsLabal: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
@@ -32,7 +32,7 @@ final class PurchaseCell: Cell<Transaction>, CellType {
     
     lazy var costLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -47,7 +47,7 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         textLabel?.text = nil
         textLabel?.textColor = .clear
         
-        backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundColor = .secondarySystemGroupedBackground
         contentView.addSubview(nameLabel)
         contentView.addSubview(participantsLabal)
         contentView.addSubview(costLabel)

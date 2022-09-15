@@ -14,7 +14,7 @@ class MessageViewController: UIViewController, UIActivityItemSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+//        view.backgroundColor = .systemGroupedBackground
     
         shareTapped()
 

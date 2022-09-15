@@ -38,7 +38,7 @@ extension TaskViewController: UITextFieldDelegate {
 //        //        createActivityView.activityDescriptionPlaceholderLabel.isHidden = true
 //        if textView.textColor == FalconPalette.defaultBlue {
 //            textView.text = nil
-//            textView.textColor = ThemeManager.currentTheme().generalTitleColor
+//            textView.textColor = .label
 //        }
 //
 //
@@ -96,9 +96,9 @@ extension TaskViewController: UpdateSubtaskListDelegate {
     func updateSubtaskList(subtaskList: [Activity]) {
         if let row: ButtonRow = form.rowBy(tag: "Sub-Tasks") {
             if subtaskList.isEmpty {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
             }
         }
         self.subtaskList = subtaskList
@@ -306,9 +306,9 @@ extension TaskViewController: UpdateMediaDelegate {
         activityReference.updateChildValues(["activityFiles": fileURLs as AnyObject])
         if let mediaRow: ButtonRow = form.rowBy(tag: "Media") {
             if self.task.activityPhotos == nil || self.task.activityPhotos!.isEmpty || self.task.activityFiles == nil || self.task.activityFiles!.isEmpty {
-                mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                mediaRow.cell.textLabel?.textColor = .secondaryLabel
             } else {
-                mediaRow.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                mediaRow.cell.textLabel?.textColor = .label
             }
         }
     }
@@ -318,9 +318,9 @@ extension TaskViewController: UpdateActivityListDelegate {
     func updateActivityList(listList: [ListContainer]) {
         if let row: ButtonRow = form.rowBy(tag: "Checklist") {
             if listList.isEmpty {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
             }
         }
         self.listList = listList

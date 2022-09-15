@@ -71,30 +71,10 @@ class MapActivitiesViewController: UIViewController, UISearchBarDelegate, Floati
         
         //  Add FloatingPanel to a view with animation.
         fpc.addPanel(toParent: self, animated: true)
-        
-        addObservers()
-                
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        view.backgroundColor = .clear
-        if #available(iOS 13.0, *) {
-            mapView.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        }
-        searchVC.tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        searchVC.tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        searchVC.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        searchVC.tableView.reloadData()
+                        
     }
     
     func myViewDidLoad() {
-        if #available(iOS 13.0, *) {
-            mapView.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-        }
         searchVC.calendarViewController = calendarViewController
         searchVC.conversations = conversations
     }
@@ -313,7 +293,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
         tableView.delegate = self
         tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.isUserInteractionEnabled = true
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         view.addSubview(visualEffectView)
         visualEffectView.contentView.addSubview(tableView)

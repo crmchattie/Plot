@@ -23,7 +23,7 @@ class SwitchTableViewController: UITableViewController {
         tableView.separatorStyle = .none
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         tableView.register(SwitchTableViewCell.self, forCellReuseIdentifier: switchCellID)
     }
     

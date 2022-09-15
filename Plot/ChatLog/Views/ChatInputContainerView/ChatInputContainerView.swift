@@ -76,13 +76,13 @@ class ChatInputContainerView: UIView {
 //    textView.font = UIFont.systemFont(ofSize: 16)
     textView.font = UIFont.preferredFont(forTextStyle: .callout)
     textView.adjustsFontForContentSizeCategory = true
-    textView.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+    textView.keyboardAppearance = .default
     textView.isScrollEnabled = false
     textView.layer.cornerRadius = 18
-    textView.textColor = ThemeManager.currentTheme().generalTitleColor
+    textView.textColor = .label
     textView.textContainerInset = InputContainerViewConstants.containerInsetsDefault
-    textView.backgroundColor = ThemeManager.currentTheme().inputTextViewColor
-    textView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+    textView.backgroundColor = .systemGroupedBackground
+    textView.indicatorStyle = .default
     
     return textView
   }()
@@ -91,7 +91,7 @@ class ChatInputContainerView: UIView {
     let placeholderLabel = UILabel()
     placeholderLabel.text = "Message"
     placeholderLabel.sizeToFit()
-    placeholderLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+    placeholderLabel.textColor = .secondaryLabel
     placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
     
     return placeholderLabel
@@ -129,7 +129,7 @@ class ChatInputContainerView: UIView {
   let separator: UIView = {
     let separator = UIView()
     separator.translatesAutoresizingMaskIntoConstraints = false
-    separator.backgroundColor = ThemeManager.currentTheme().generalSubtitleColor
+    separator.backgroundColor = .secondaryLabel
     separator.isHidden = false
     
     return separator
@@ -154,7 +154,7 @@ class ChatInputContainerView: UIView {
     }
     
     attachedImages = UICollectionView(centeredCollectionViewFlowLayout: centeredCollectionViewFlowLayout)
-    backgroundColor = ThemeManager.currentTheme().chatBackgroundColor
+    backgroundColor = .systemGroupedBackground
 		self.autoresizingMask = UIView.AutoresizingMask.flexibleHeight
     
     addSubview(attachButton)

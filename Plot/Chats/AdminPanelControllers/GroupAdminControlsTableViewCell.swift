@@ -25,9 +25,9 @@ class GroupAdminControlsTableViewCell: UITableViewCell {
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     
-    backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+    backgroundColor = .systemGroupedBackground
     contentView.layer.cornerRadius = 10
-    contentView.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+    contentView.backgroundColor = .secondarySystemGroupedBackground
     contentView.translatesAutoresizingMaskIntoConstraints = false
 
     contentView.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true

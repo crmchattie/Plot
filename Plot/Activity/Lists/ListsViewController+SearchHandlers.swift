@@ -37,7 +37,7 @@ extension ListsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.keyboardAppearance = ThemeManager.currentTheme().keyboardAppearance
+        searchBar.keyboardAppearance = .default
         searchBar.setShowsCancelButton(true, animated: true)
         return true
     }

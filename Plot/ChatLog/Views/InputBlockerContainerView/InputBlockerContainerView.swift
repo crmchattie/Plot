@@ -23,7 +23,7 @@ class InputBlockerContainerView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    backgroundColor = ThemeManager.currentTheme().inputTextViewColor
+    backgroundColor = .systemGroupedBackground
     
     addSubview(backButton)
     backButton.topAnchor.constraint(equalTo: topAnchor).isActive = true

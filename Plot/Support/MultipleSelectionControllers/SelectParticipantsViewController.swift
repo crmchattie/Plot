@@ -159,7 +159,7 @@ class SelectParticipantsViewController: UIViewController {
     fileprivate func setupMainView() {
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
     }
     
     func setupNavigationItemTitle(title: String) {
@@ -270,9 +270,9 @@ class SelectParticipantsViewController: UIViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.indicatorStyle = .default
+        tableView.sectionIndexBackgroundColor = .systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.allowsMultipleSelection = true
         tableView.allowsSelection = true
         tableView.allowsSelectionDuringEditing = true
@@ -286,7 +286,6 @@ class SelectParticipantsViewController: UIViewController {
         searchBar = UISearchBar()
         searchBar?.delegate = self
         searchBar?.searchBarStyle = .minimal
-        searchBar?.changeBackgroundColor(to: ThemeManager.currentTheme().searchBarColor)
         searchBar?.placeholder = "Search"
         searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         tableView.tableHeaderView = searchBar

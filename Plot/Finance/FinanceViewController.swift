@@ -120,18 +120,8 @@ class FinanceViewController: UIViewController {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
 
-    }
-    
-    @objc fileprivate func changeTheme() {
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.reloadData()
-        
     }
     
     @objc fileprivate func financeUpdated() {
@@ -143,11 +133,11 @@ class FinanceViewController: UIViewController {
     fileprivate func setupMainView() {
         extendedLayoutIncludesOpaqueBars = true
         
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
+        collectionView.indicatorStyle = .default
+        collectionView.backgroundColor = .systemGroupedBackground
         
-        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        customSegmented.backgroundColor = .systemGroupedBackground
         customSegmented.constrainHeight(30)
                         
         view.addSubview(customSegmented)
@@ -474,7 +464,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             if let object = object as? [MXMember] {
                 cell.member = object[indexPath.item]
             }
@@ -541,7 +531,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let section = sections[indexPath.section]
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
-        header.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        header.backgroundColor = .systemGroupedBackground
         header.delegate = self
         header.sectionType = section
         header.titleLabel.text = section.name

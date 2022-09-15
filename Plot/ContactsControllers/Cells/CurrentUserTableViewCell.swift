@@ -27,7 +27,7 @@ class CurrentUserTableViewCell: UITableViewCell {
     title.translatesAutoresizingMaskIntoConstraints = false
     title.font = UIFont.preferredFont(forTextStyle: .title3)
     title.adjustsFontForContentSizeCategory = true
-    title.textColor = ThemeManager.currentTheme().generalTitleColor
+    title.textColor = .label
     return title
   }()
   
@@ -63,7 +63,7 @@ class CurrentUserTableViewCell: UITableViewCell {
     
     icon.image = UIImage(named: "PersonalStorage")
     title.text = ""
-    title.textColor = ThemeManager.currentTheme().generalTitleColor
+    title.textColor = .label
     
   }
   

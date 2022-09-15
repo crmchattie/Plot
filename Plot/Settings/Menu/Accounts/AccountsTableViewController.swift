@@ -23,7 +23,7 @@ class AccountsTableViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
         title = "Information"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
 
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
@@ -48,15 +48,15 @@ class AccountsTableViewController: UITableViewController {
         if indexPath.row == 0 {
             cell.textLabel?.text = "Time Information"
             cell.isUserInteractionEnabled = true
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel?.textColor = .label
         }
         else if indexPath.row == 1 {
             cell.textLabel?.text = "Financial Information"
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.textLabel?.textColor = .label
         }
 //        else if indexPath.row == 2 {
 //            cell.textLabel?.text = "Health Information"
-//            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+//            cell.textLabel?.textColor = .label
 //        }
         return cell
     }

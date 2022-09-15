@@ -67,23 +67,9 @@ class SummaryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        addObservers()
         configureView()
         fetchData()
         
-    }
-    
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheme), name: .themeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func changeTheme() {
-        let theme = ThemeManager.currentTheme()
-        view.backgroundColor = theme.generalBackgroundColor
-        
-        collectionView.indicatorStyle = theme.scrollBarStyle
-        collectionView.backgroundColor = theme.generalBackgroundColor
-        collectionView.reloadData()
     }
     
     private func configureView() {
@@ -95,14 +81,14 @@ class SummaryViewController: UIViewController {
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         
-        customSegmented.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        customSegmented.backgroundColor = .systemGroupedBackground
         customSegmented.constrainHeight(30)
         customSegmented.delegate = self
                 
-        collectionView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.indicatorStyle = .default
+        collectionView.backgroundColor = .systemGroupedBackground
         collectionView.isUserInteractionEnabled = true
         collectionView.dataSource = self
         collectionView.delegate = self

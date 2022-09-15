@@ -12,7 +12,7 @@ class InstructionsDetailCell: UICollectionViewCell {
 
     let numberLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -22,7 +22,7 @@ class InstructionsDetailCell: UICollectionViewCell {
     let instructionsLabel: UILabel = {
         let label = UILabel()
         label.text = "Activity Type"
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.numberOfLines = 0
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.adjustsFontForContentSizeCategory = true

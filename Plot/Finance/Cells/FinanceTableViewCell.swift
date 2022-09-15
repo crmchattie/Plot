@@ -80,7 +80,7 @@ class FinanceTableViewCell: UITableViewCell {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -90,7 +90,7 @@ class FinanceTableViewCell: UITableViewCell {
     
     let categoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .right
@@ -100,7 +100,7 @@ class FinanceTableViewCell: UITableViewCell {
     
     let middleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -110,7 +110,7 @@ class FinanceTableViewCell: UITableViewCell {
     
     let bottomLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -135,10 +135,10 @@ class FinanceTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        categoryLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        middleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        bottomLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        nameLabel.textColor = .label
+        categoryLabel.textColor = .label
+        middleLabel.textColor = .secondaryLabel
+        bottomLabel.textColor = .secondaryLabel
         
         nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
         categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)

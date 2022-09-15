@@ -26,14 +26,14 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 cell.delegate = self
                 cell.updatingTasks = updatingTasks
                 cell.updatingEvents = updatingEvents
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.networkController = networkController
                 cell.sections = activitiesSections
                 cell.activities = activities
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.intColor = (indexPath.section % 5)
                 cell.sectionType = section
                 return cell
@@ -43,13 +43,13 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if !healthMetrics.isEmpty || networkController.healthService.askedforAuthorization {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthControllerCell, for: indexPath) as! HealthControllerCell
                 cell.delegate = self
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.healthMetricSections = healthMetricSections
                 cell.healthMetrics = healthMetrics
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.intColor = (indexPath.section % 5)
                 cell.sectionType = section
                 return cell
@@ -58,14 +58,14 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if !financeSections.isEmpty {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: financeControllerCell, for: indexPath) as! FinanceControllerCell
                 cell.delegate = self
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.institutionDict = networkController.financeService.institutionDict
                 cell.sections = financeSections
                 cell.groups = financeGroups
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.intColor = (indexPath.section % 5)
                 cell.sectionType = section
                 return cell

@@ -52,13 +52,13 @@ class IngredientDetailViewController: FormViewController {
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return ThemeManager.currentTheme().statusBarStyle
+        return .default
     }
 
     fileprivate func configureTableView() {
         tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
 
         let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(close))
@@ -99,7 +99,7 @@ class IngredientDetailViewController: FormViewController {
             
 //        <<< ViewRow<UIImageView>("Ingredient Image")
 //            .cellSetup { (cell, row) in
-//                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+//                cell.backgroundColor = .secondarySystemGroupedBackground
 //
 //                //  Make the image view occupy the entire row:
 //                cell.viewRightMargin = 0.0
@@ -121,9 +121,9 @@ class IngredientDetailViewController: FormViewController {
 //            }
             
         <<< LabelRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = $0.tag
             if let ingredient = ingredient {
                 $0.value = ingredient.name?.capitalized
@@ -135,14 +135,14 @@ class IngredientDetailViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             }.cellUpdate { cell, _ in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }
         
         <<< DecimalRow("Amount") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.textField.textColor = .secondaryLabel
             $0.formatter = DecimalFormatter()
             $0.useFormatterDuringInput = true
             $0.title = $0.tag
@@ -152,9 +152,9 @@ class IngredientDetailViewController: FormViewController {
             }.cellSetup { cell, _  in
                 cell.textField.keyboardType = .numberPad
             }.cellUpdate { cell, _ in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.textField.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.textField.textColor = .secondaryLabel
             }.onChange() { [unowned self] row in
                 if self.ingredient.recipe == nil {
                     self.ingredient.recipe = ["No Recipe": self.ingredient.amount ?? 0.0]
@@ -187,21 +187,21 @@ class IngredientDetailViewController: FormViewController {
         if active, let ingredient = ingredient, let recipe = self.ingredient.recipe, recipe["No Recipe"] == nil {
             form.last!
             <<< LabelRow("Unit") {
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.value = "\(ingredient.unit?.capitalized ?? "G")"
                 }.cellUpdate { cell, _ in
-                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
                 }
         } else {
             form.last!
             <<< ActionSheetRow<String>("Unit") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.title = row.tag
                 row.selectorTitle = "Choose Ingredient Units"
                 row.value = "\(ingredient.unit ?? "g")"
@@ -226,16 +226,16 @@ class IngredientDetailViewController: FormViewController {
         
         form.last!
         <<< LabelRow("Aisle") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = $0.tag
             if let ingredient = ingredient {
                 $0.value = "\(ingredient.aisle ?? "")"
             }
             }.cellUpdate { cell, _ in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }
         
         form +++
@@ -252,14 +252,14 @@ class IngredientDetailViewController: FormViewController {
             for (recipe, amount) in recipe {
                 form.last!
                 <<< LabelRow() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = recipe.capitalized
                     $0.value = "\(amount) \(ingredient.unit ?? "")"
                     }.cellUpdate { cell, _ in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
                     }
             }
         }
@@ -285,14 +285,14 @@ class IngredientDetailViewController: FormViewController {
             for nutrient in nutrients {
                 if let title = nutrient.name, let amount = nutrient.amount, let unit = nutrient.unit, String(format: "%.0f", amount) != "0" {
                     section!.insert(LabelRow() {
-                    $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                    $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                    $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textLabel?.textColor = .label
+                    $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = "\(title.capitalized)"
                     $0.value = "\(String(format: "%.0f", amount)) \(unit.capitalized)"
                     }.cellUpdate { cell, _ in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
                     }, at: section!.count)
                 }
             }

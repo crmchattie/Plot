@@ -71,14 +71,14 @@ class SelectNewAdminTableViewController: UITableViewController {
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = [UIRectEdge.top, UIRectEdge.bottom]
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
     }
     
     fileprivate func setupTableView() {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        tableView.indicatorStyle = .default
+        tableView.sectionIndexBackgroundColor = .systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.register(NewAdminTableViewCell.self, forCellReuseIdentifier: falconUsersCellID)
         tableView.separatorStyle = .none
         setupRightBarButton(with: "Leave the group")
@@ -157,7 +157,6 @@ class SelectNewAdminTableViewController: UITableViewController {
         searchBar = UISearchBar()
         searchBar?.delegate = self
         searchBar?.searchBarStyle = .minimal
-        searchBar?.changeBackgroundColor(to: ThemeManager.currentTheme().searchBarColor)
         searchBar?.placeholder = "Search"
         searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         tableView.tableHeaderView = searchBar
@@ -184,9 +183,9 @@ class SelectNewAdminTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.tintColor = ThemeManager.currentTheme().inputTextViewColor
+        view.tintColor = .systemGroupedBackground
         if let headerTitle = view as? UITableViewHeaderFooterView {
-            headerTitle.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            headerTitle.textLabel?.textColor = .secondaryLabel
             headerTitle.textLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
             headerTitle.textLabel?.adjustsFontForContentSizeCategory = true
         }
@@ -203,7 +202,7 @@ class SelectNewAdminTableViewController: UITableViewController {
     func selectCell(for indexPath: IndexPath) -> UITableViewCell? {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: falconUsersCellID, for: indexPath) as? NewAdminTableViewCell ?? NewAdminTableViewCell()
-        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        cell.backgroundColor = .secondarySystemGroupedBackground
         cell.selectNewAdminTableViewController = self
         let user = sections[indexPath.section][indexPath.row]
         cell.isSelected = user.isSelected
@@ -223,14 +222,14 @@ class SelectNewAdminTableViewController: UITableViewController {
                 cell.subtitle.textColor = FalconPalette.defaultBlue
                 cell.subtitle.text = statusString
             } else {
-                cell.subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.subtitle.textColor = .secondaryLabel
                 let date = Date(timeIntervalSince1970: TimeInterval(statusString)!)
                 let subtitle = "Last seen " + timeAgoSinceDate(date)
                 cell.subtitle.text = subtitle
             }
             
         } else if let statusTimeinterval = sections[indexPath.section][indexPath.row].onlineStatus as? TimeInterval {
-            cell.subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.subtitle.textColor = .secondaryLabel
             let date = Date(timeIntervalSince1970: statusTimeinterval/1000)
             let subtitle = "Last seen " + timeAgoSinceDate(date)
             cell.subtitle.text = subtitle

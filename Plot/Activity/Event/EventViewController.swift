@@ -182,10 +182,10 @@ class EventViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.indicatorStyle = ThemeManager.currentTheme().scrollBarStyle
-        tableView.sectionIndexBackgroundColor = ThemeManager.currentTheme().generalBackgroundColor
-        tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
+        tableView.indicatorStyle = .default
+        tableView.sectionIndexBackgroundColor = .systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
     }
     
@@ -215,9 +215,9 @@ class EventViewController: FormViewController {
         Section()
         
         <<< TextRow("Name") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.placeholderColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textField?.textColor = .label
+            $0.placeholderColor = .secondaryLabel
             $0.placeholder = $0.tag
             if let activity = activity, let name = activity.name {
                 $0.value = name
@@ -233,61 +233,61 @@ class EventViewController: FormViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textField?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textField?.textColor = .label
         }
         
         
         <<< TextAreaRow("Description") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textView?.textColor = .label
+            $0.cell.placeholderLabel?.textColor = .secondaryLabel
             $0.placeholder = $0.tag
             if let activity = activity, let description = activity.activityDescription, description != "nothing" {
                 $0.value = description
             }
         }.cellUpdate({ (cell, row) in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+            cell.textView?.textColor = .label
         }).onChange() { [unowned self] row in
             self.activity.activityDescription = row.value
         }
         
         <<< ButtonRow("Location") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textAlignment = .left
             if let activity = activity, let localName = activity.locationName, localName != "locationName" {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
                 row.cell.accessoryType = .detailDisclosureButton
                 row.title = localName
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.title = row.tag
             }
         }.onCellSelection({ _,_ in
             self.openLocationFinder()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textAlignment = .left
             if row.title == "Location" {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
                 cell.accessoryType = .disclosureIndicator
             } else if let value = row.title, !value.isEmpty {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
                 cell.accessoryType = .detailDisclosureButton
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
                 cell.accessoryType = .disclosureIndicator
                 cell.textLabel?.text = "Location"
             }
         }
         
         <<< SwitchRow("All-day") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
             $0.title = $0.tag
             if let activity = activity, let allDay = activity.allDay {
                 $0.value = allDay
@@ -314,16 +314,16 @@ class EventViewController: FormViewController {
             startDate.inlineRow?.updateCell()
             endDate.inlineRow?.updateCell()
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         
         //add Soon option to replace time; will require update to end time as well
         <<< DateTimeInlineRow("Starts") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = $0.tag
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .medium
@@ -368,8 +368,8 @@ class EventViewController: FormViewController {
             //                    self!.weatherRow()
         }.onExpandInlineRow { [weak self] cell, row, inlineRow in
             inlineRow.cellUpdate { (cell, row) in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.tintColor = .secondarySystemGroupedBackground
                 if #available(iOS 13.4, *) {
                     cell.datePicker.preferredDatePickerStyle = .wheels
                 }
@@ -390,20 +390,20 @@ class EventViewController: FormViewController {
                 timeZoneRow.evaluateHidden()
             }
         }.onCollapseInlineRow { cell, _, _ in
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.detailTextLabel?.textColor = .secondaryLabel
             if let timeZoneRow: LabelRow = self.form.rowBy(tag: "startTimeZone") {
                 timeZoneRow.hidden = true
                 timeZoneRow.evaluateHidden()
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         <<< LabelRow("startTimeZone") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
@@ -415,14 +415,14 @@ class EventViewController: FormViewController {
             self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         <<< DateTimeInlineRow("Ends") {
-            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            $0.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            $0.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textLabel?.textColor = .label
+            $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = $0.tag
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .medium
@@ -464,8 +464,8 @@ class EventViewController: FormViewController {
             //                    self!.weatherRow()
         }.onExpandInlineRow { [weak self] cell, row, inlineRow in
             inlineRow.cellUpdate { (cell, row) in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.tintColor = ThemeManager.currentTheme().cellBackgroundColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.tintColor = .secondarySystemGroupedBackground
                 if let endTimeZone = self?.activity.endTimeZone {
                     cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
                 }
@@ -486,21 +486,21 @@ class EventViewController: FormViewController {
                 timeZoneRow.evaluateHidden()
             }
         }.onCollapseInlineRow { cell, _, _ in
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.detailTextLabel?.textColor = .secondaryLabel
             if let timeZoneRow: LabelRow = self.form.rowBy(tag: "endTimeZone") {
                 timeZoneRow.hidden = true
                 timeZoneRow.evaluateHidden()
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
             
         }
         
         <<< LabelRow("endTimeZone") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
@@ -512,15 +512,15 @@ class EventViewController: FormViewController {
             self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         
         <<< LabelRow("Repeat") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
@@ -533,16 +533,16 @@ class EventViewController: FormViewController {
             self.openRepeat()
         }).cellUpdate { cell, row in
             cell.textLabel?.textAlignment = .left
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
         }
         
         <<< PushRow<EventAlert>("Reminder") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
             if let activity = activity, let value = activity.reminder {
                 row.value = EventAlert(rawValue: value)
@@ -558,17 +558,17 @@ class EventViewController: FormViewController {
             to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = ThemeManager.currentTheme().barBackgroundColor
-                to.tableView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
                 to.tableView.separatorStyle = .none
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
             }
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
         }.onChange() { [unowned self] row in
             if let reminder = row.value?.description {
                 self.activity.reminder = reminder
@@ -581,9 +581,9 @@ class EventViewController: FormViewController {
         if delegate == nil {
             form.last!
             <<< LabelRow("Participants") { row in
-                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
@@ -597,9 +597,9 @@ class EventViewController: FormViewController {
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
             }
         }
@@ -607,9 +607,9 @@ class EventViewController: FormViewController {
         form.last!
         
         <<< LabelRow("Calendar") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
@@ -622,17 +622,17 @@ class EventViewController: FormViewController {
             self.openCalendar()
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
         }
         
         
         <<< LabelRow("Category") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
@@ -645,18 +645,18 @@ class EventViewController: FormViewController {
             self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
         }
         
         //        if let _ = activity.activityType {
         //            form.last!
         //            <<< LabelRow("Subcategory") { row in
-        //                row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                row.cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                row.cell.backgroundColor = .secondarySystemGroupedBackground
+        //                row.cell.textLabel?.textColor = .label
+        //                row.cell.detailTextLabel?.textColor = .secondaryLabel
         //                row.cell.accessoryType = .disclosureIndicator
         //                row.cell.selectionStyle = .default
         //                row.title = row.tag
@@ -669,16 +669,16 @@ class EventViewController: FormViewController {
         //                self.openLevel(value: row.value ?? "Uncategorized", level: "Subcategory")
         //            }).cellUpdate { cell, row in
         //                cell.accessoryType = .disclosureIndicator
-        //                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                cell.backgroundColor = .secondarySystemGroupedBackground
+        //                cell.textLabel?.textColor = .label
+        //                cell.detailTextLabel?.textColor = .secondaryLabel
         //                cell.textLabel?.textAlignment = .left
         //            }
         //        }
         
         <<< SwitchRow("showExtras") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
             row.title = "Show Extras"
             if let showExtras = activity.showExtras {
                 row.value = showExtras
@@ -698,82 +698,82 @@ class EventViewController: FormViewController {
             let values:[String : Any] = ["showExtras": row.value ?? false]
             userReference.updateChildValues(values)
         }.cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
         }
         
         <<< ButtonRow("Sub-Events") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .secondaryLabel
             row.cell.textLabel?.textAlignment = .left
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
             if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
             }
         }.onCellSelection({ _,_ in
             self.openSchedule()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
             if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             }
         }
         
         <<< ButtonRow("Checklists") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textAlignment = .left
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
             if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                row.cell.textLabel?.textColor = .label
             } else {
-                row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                row.cell.textLabel?.textColor = .secondaryLabel
             }
         }.onCellSelection({ _,_ in
             self.openList()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
             if let _ = self.activity.checklistIDs {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             }
         }
         
         <<< ButtonRow("Media") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textAlignment = .left
-            row.cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            row.cell.textLabel?.textColor = .label
             row.cell.accessoryType = .disclosureIndicator
             row.title = row.tag
             row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
             self.openMedia()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.textAlignment = .left
             if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             }
         }
         
         <<< LabelRow("Tags") { row in
-            row.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.accessoryType = .disclosureIndicator
             row.cell.textLabel?.textAlignment = .left
             row.cell.selectionStyle = .default
@@ -783,31 +783,31 @@ class EventViewController: FormViewController {
             self.openTags()
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-            cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
-            cell.detailTextLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .label
             cell.textLabel?.textAlignment = .left
             if let tags = self.activity.tags, !tags.isEmpty {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.textLabel?.textColor = .label
             } else {
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                cell.textLabel?.textColor = .secondaryLabel
             }
         }
         
         //            <<< TextAreaRow("Notes") {
-        //                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                $0.cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                $0.cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
-        //                $0.cell.placeholderLabel?.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        //                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+        //                $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+        //                $0.cell.textView?.textColor = .label
+        //                $0.cell.placeholderLabel?.textColor = .secondaryLabel
         //                $0.placeholder = $0.tag
         //                $0.hidden = "$showExtras == false"
         //                if self.active && self.activity.notes != "nothing" && self.activity.notes != nil {
         //                    $0.value = self.activity.notes
         //                }
         //                }.cellUpdate({ (cell, row) in
-        //                    cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                    cell.textView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-        //                    cell.textView?.textColor = ThemeManager.currentTheme().generalTitleColor
+        //                    cell.backgroundColor = .secondarySystemGroupedBackground
+        //                    cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+        //                    cell.textView?.textColor = .label
         //                }).onChange() { [unowned self] row in
         //                    self.activity.notes = row.value
         //                }
@@ -815,11 +815,8 @@ class EventViewController: FormViewController {
         if delegate == nil {
             form.last!
             <<< SegmentedRow<String>("sections"){
-                $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.hidden = "$showExtras == false"
-                if #available(iOS 13.0, *) {
-                    $0.cell.segmentedControl.overrideUserInterfaceStyle = ThemeManager.currentTheme().userInterfaceStyle
-                }
                 $0.options = ["Tasks", "Health", "Transactions"]
                 if !(activity.showExtras ?? true) {
                     $0.value = "Hidden"
@@ -827,8 +824,8 @@ class EventViewController: FormViewController {
                     $0.value = "Tasks"
                 }
             }.cellUpdate { cell, row in
-                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
-                cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }.onChange({ _ in
                 self.sectionChanged = true
             })
@@ -841,10 +838,10 @@ class EventViewController: FormViewController {
                                     $0.hidden = "!$sections == 'Tasks'"
                                     $0.addButtonProvider = { section in
                                         return ButtonRow("taskButton"){
-                                            $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
                                             $0.title = "Connect Task"
                                             }.cellUpdate { cell, row in
-                                                cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                                                cell.backgroundColor = .secondarySystemGroupedBackground
                                                 cell.textLabel?.textAlignment = .left
                                                 cell.height = { 60 }
                                             }
@@ -866,10 +863,10 @@ class EventViewController: FormViewController {
                 $0.hidden = "$sections != 'Health'"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.title = "Connect Health"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.textLabel?.textAlignment = .left
                         cell.height = { 60 }
                     }
@@ -896,10 +893,10 @@ class EventViewController: FormViewController {
                 $0.hidden = "$sections != 'Transactions'"
                 $0.addButtonProvider = { section in
                     return ButtonRow(){
-                        $0.cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.title = "Connect Transaction"
                     }.cellUpdate { cell, row in
-                        cell.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+                        cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.textLabel?.textAlignment = .left
                         cell.height = { 60 }
                     }

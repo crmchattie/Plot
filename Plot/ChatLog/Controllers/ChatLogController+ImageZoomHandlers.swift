@@ -44,7 +44,7 @@ extension ChatLogController {
     let title = NSMutableAttributedString(string: titleString , attributes: titleAttributes)
     let date = Date(timeIntervalSince1970:  messagesWithPhotos[photoIndex].timestamp!.doubleValue)
     let timestamp = timeAgoSinceDate(date)
-		let summaryAttributes = [NSAttributedString.Key.foregroundColor: ThemeManager.currentTheme().generalSubtitleColor,
+		let summaryAttributes = [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
 														 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]
     let attributedCaptionSummary = NSMutableAttributedString(string: timestamp, attributes: summaryAttributes)
     

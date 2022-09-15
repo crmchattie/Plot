@@ -36,9 +36,9 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 case .category:
                     topHeightConstraint = 5
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-                    nameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    nameLabel.textColor = .secondaryLabel
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-                    categoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    categoryLabel.textColor = .secondaryLabel
                     
                     if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = amount
@@ -108,9 +108,9 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 case .account:
                     topHeightConstraint = 5
                     nameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-                    nameLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    nameLabel.textColor = .secondaryLabel
                     categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-                    categoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+                    categoryLabel.textColor = .secondaryLabel
                     
                     if let amount = numberFormatter.string(from: accountDetails.balance as NSNumber) {
                         categoryLabel.text = amount
@@ -324,7 +324,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -334,7 +334,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
 
     let categoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalTitleColor
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .right
@@ -344,7 +344,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     
     let subcategoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .right
@@ -354,7 +354,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     
     let middleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -363,7 +363,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     
     let bottomLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -382,7 +382,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         backgroundView = UIView()
         addSubview(backgroundView!)
         backgroundView?.fillSuperview()
-        backgroundView?.backgroundColor = ThemeManager.currentTheme().cellBackgroundColor
+        backgroundView?.backgroundColor = .secondarySystemGroupedBackground
 
         if firstPosition && lastPosition {
             topHeightConstraint = 10
@@ -426,11 +426,11 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         middleLabel.text = nil
         bottomLabel.text = nil
                 
-        nameLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        categoryLabel.textColor = ThemeManager.currentTheme().generalTitleColor
-        subcategoryLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        middleLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
-        bottomLabel.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        nameLabel.textColor = .label
+        categoryLabel.textColor = .label
+        subcategoryLabel.textColor = .secondaryLabel
+        middleLabel.textColor = .secondaryLabel
+        bottomLabel.textColor = .secondaryLabel
         
         nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
         categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)

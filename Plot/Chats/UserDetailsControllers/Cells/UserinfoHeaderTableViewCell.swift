@@ -27,7 +27,7 @@ class UserinfoHeaderTableViewCell: UITableViewCell {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = UIFont.preferredFont(forTextStyle: .headline)
         title.adjustsFontForContentSizeCategory = true
-        title.textColor = ThemeManager.currentTheme().generalTitleColor
+        title.textColor = .label
         return title
     }()
     
@@ -36,7 +36,7 @@ class UserinfoHeaderTableViewCell: UITableViewCell {
         subtitle.translatesAutoresizingMaskIntoConstraints = false
         subtitle.font = UIFont.preferredFont(forTextStyle: .body)
         subtitle.adjustsFontForContentSizeCategory = true
-        subtitle.textColor = ThemeManager.currentTheme().generalSubtitleColor
+        subtitle.textColor = .secondaryLabel
         
         return subtitle
     }()
@@ -45,7 +45,7 @@ class UserinfoHeaderTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
-        backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        backgroundColor = .systemGroupedBackground
         title.backgroundColor = backgroundColor
         icon.backgroundColor = backgroundColor
         

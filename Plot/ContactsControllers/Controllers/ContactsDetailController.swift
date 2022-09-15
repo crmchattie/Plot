@@ -30,7 +30,7 @@ class ContactsDetailController: UITableViewController {
         phoneNumbers = phoneNumberKit.parse(contactPhoneNumbers)
         
         title = "Info"
-        view.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        view.backgroundColor = .systemGroupedBackground
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         extendedLayoutIncludesOpaqueBars = true
         tableView.separatorStyle = .none
@@ -53,8 +53,8 @@ class ContactsDetailController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let identifier = "cell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
-        cell.backgroundColor =  ThemeManager.currentTheme().cellBackgroundColor
-        cell.textLabel?.textColor = ThemeManager.currentTheme().generalTitleColor
+        cell.backgroundColor =  .secondarySystemGroupedBackground
+        cell.textLabel?.textColor = .label
         if indexPath.section == 0 {
             cell.imageView?.image = UIImage(named: "UserpicIcon")
             cell.textLabel?.text = contactName

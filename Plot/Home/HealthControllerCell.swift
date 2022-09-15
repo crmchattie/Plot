@@ -53,7 +53,7 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
     }
     
     func setupViews() {
-        collectionView.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+        collectionView.backgroundColor = .systemGroupedBackground
         addSubview(collectionView)
         collectionView.fillSuperview()
     }
@@ -105,7 +105,7 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
         if kind == UICollectionView.elementKindSectionHeader {
             let key = healthMetricSections[indexPath.section]
             let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: healthMetricSectionHeaderID, for: indexPath) as! SectionHeader
-            sectionHeader.backgroundColor = ThemeManager.currentTheme().generalBackgroundColor
+            sectionHeader.backgroundColor = .systemGroupedBackground
             sectionHeader.subTitleLabel.isHidden = true
             if key == .general {
                 sectionHeader.titleLabel.text = "General"

@@ -16,7 +16,7 @@ class InformationMessageCell: RevealableCollectionViewCell {
     information.adjustsFontForContentSizeCategory = true
     information.numberOfLines = 0
     information.textAlignment = .center
-    information.textColor = ThemeManager.currentTheme().generalSubtitleColor
+    information.textColor = .secondaryLabel
     information.translatesAutoresizingMaskIntoConstraints = false
 
     return information
@@ -29,7 +29,7 @@ class InformationMessageCell: RevealableCollectionViewCell {
 
   override init(frame: CGRect) {
     super.init(frame: frame.integral)
-    backgroundColor = ThemeManager.currentTheme().chatBackgroundColor
+    backgroundColor = .systemGroupedBackground
     contentView.backgroundColor = backgroundColor
     information.backgroundColor = backgroundColor
 
