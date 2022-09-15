@@ -109,17 +109,14 @@ class GrocerylistActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let grocerylist = grocerylist, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = grocerylist, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs, membersIDsDictionary)
         }
         
         guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
         
-        // Only append current user when admin/creator of the grocerylist
-        if grocerylist.admin == currentUserID {
-            membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-            membersIDs.append(currentUserID)
-        }
+        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
+        membersIDs.append(currentUserID)
         
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }

@@ -117,12 +117,11 @@ class ListDetailViewController: FormViewController {
         let createList = ListActions(list: list, active: active, selectedFalconUsers: selectedFalconUsers)
         createList.createNewList()
         self.hideActivityIndicator()
-        
+        self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     

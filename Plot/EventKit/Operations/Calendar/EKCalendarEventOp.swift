@@ -92,6 +92,8 @@ class EKCalendarEventOp: AsyncOperation {
     private func createActivity(for activityID: String, completion: @escaping (Activity) -> Void) {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity) { activity in
+            activity.admin = Auth.auth().currentUser?.uid
+            activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
             activity.activityType = CustomType.iOSCalendarEvent.categoryText
             activity.category = ActivityCategory.categorize(activity).rawValue
             completion(activity)
@@ -101,7 +103,9 @@ class EKCalendarEventOp: AsyncOperation {
     private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
         activity.isEvent = true
         activity.name = event.title
-        activity.activityDescription = event.notes
+        if let notes = event.notes {
+            activity.activityDescription = notes
+        }
         if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location {
             let coordinates = geoLocation.coordinate
             let latitude = coordinates.latitude
@@ -118,9 +122,7 @@ class EKCalendarEventOp: AsyncOperation {
         activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
-        activity.admin = Auth.auth().currentUser?.uid
         completion(activity)
-        
     }
     
     private func deleteActivity() {

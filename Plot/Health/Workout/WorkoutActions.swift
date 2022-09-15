@@ -137,17 +137,14 @@ class WorkoutActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let workout = workout, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = workout, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs, membersIDsDictionary)
         }
         
         guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
         
-        // Only append current user when admin/creator of the workout
-        if workout.admin == currentUserID {
-            membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-            membersIDs.append(currentUserID)
-        }
+        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
+        membersIDs.append(currentUserID)
         
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }

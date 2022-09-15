@@ -139,21 +139,16 @@ class FinanceAccountViewController: FormViewController {
     }
     
     @IBAction func create(_ sender: AnyObject) {
-        if account.user_created ?? false {
-            self.showActivityIndicator()
-            let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createAccount.createNewAccount()
-            self.hideActivityIndicator()
-            
-        }
-        if active {
-            self.delegate?.updateAccount(account: account)
-        }
+        self.showActivityIndicator()
+        let createAccount = AccountActions(account: self.account, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+        createAccount.createNewAccount()
+        self.hideActivityIndicator()
+        self.delegate?.updateAccount(account: account)
+        self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     

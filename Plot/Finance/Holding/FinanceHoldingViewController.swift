@@ -126,18 +126,16 @@ class FinanceHoldingViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         movingBackwards = false
-        if holding.user_created ?? false {
-            self.showActivityIndicator()
-            let createHolding = HoldingActions(holding: self.holding, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createHolding.createNewHolding()
-            self.hideActivityIndicator()
-        }
+        self.showActivityIndicator()
+        let createHolding = HoldingActions(holding: self.holding, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+        createHolding.createNewHolding()
+        self.hideActivityIndicator()
         self.delegate?.updateHolding(holding: holding)
+        self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     

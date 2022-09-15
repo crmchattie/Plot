@@ -89,7 +89,7 @@ class EnterPhoneNumberContainerView: UIView {
         next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
         next.setTitleColor(.secondaryLabel, for: .highlighted)
         next.setTitleColor(.secondaryLabel, for: .disabled)
-        
+        next.titleLabel?.font = UIFont.preferredFont(forTextStyle: .title3)
         return next
     }()
     

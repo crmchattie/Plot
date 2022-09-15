@@ -186,7 +186,6 @@ class ActivityService {
     }
     
     func grabOtherActivities() {
-        self.fetchInvitations()
         self.observeInvitationForCurrentUser()
         self.addRepeatingActivities(activities: self.activities, completion: { newActivities in
             self.activities = newActivities
@@ -646,15 +645,24 @@ extension ActivityService {
     }
     
     func observeInvitationForCurrentUser() {
-        self.invitationsFetcher.observeInvitationForCurrentUser(invitationsAdded: { [weak self] invitationsAdded in
+        self.invitationsFetcher.observeInvitationForCurrentUser(invitationsInitialAdd: { [weak self] invitationsInitialAdd, activitiesForInvitations in
+            if self!.invitations.isEmpty {
+                self?.invitations = invitationsInitialAdd
+                self?.invitedActivities = activitiesForInvitations
+            } else {
+                for (activityID, invitation) in invitationsInitialAdd {
+                    self?.invitations[activityID] = invitation
+                }
+            }
+        }, invitationsAdded: { [weak self] invitationsAdded in
             for invitation in invitationsAdded {
                 self?.invitations[invitation.activityID] = invitation
             }
-        }) { [weak self] (invitationsRemoved) in
+        }, invitationsRemoved: { [weak self] invitationsRemoved in
             for invitation in invitationsRemoved {
                 self?.invitations.removeValue(forKey: invitation.activityID)
             }
-        }
+        })
     }
     
     func addRepeatingActivities(activities: [Activity], completion: @escaping ([Activity])->()) {

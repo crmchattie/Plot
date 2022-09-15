@@ -116,7 +116,6 @@ extension TaskViewController {
     }
     
     func setupLists() {
-        guard delegate == nil else {return}
         let dispatchGroup = DispatchGroup()
         for ID in task.subtaskIDs ?? [] {
             dispatchGroup.enter()
@@ -154,49 +153,52 @@ extension TaskViewController {
         }
         dispatchGroup.notify(queue: .main) {
             self.listRow()
-//            self.decimalRowFunc()
-//            self.purchaseBreakdown()
+//                self.decimalRowFunc()
+//                self.purchaseBreakdown()
         }
     }
 
     
     func listRow() {
-        for activity in eventList {
-            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
-            mvs.insert(ScheduleRow() {
-                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                    activity.calendarColor = color
-                }
-                $0.value = activity
-            }.onCellSelection() { cell, row in
-                self.eventIndex = row.indexPath!.row
-                self.openEvent()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-        }
-        
-        for health in healthList {
-            var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
-            mvs.insert(HealthRow() {
-                $0.value = health
+        if delegate == nil && (!active || (task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+            for activity in eventList {
+                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
+                mvs.insert(ScheduleRow() {
+                    if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                        activity.calendarColor = color
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                        activity.calendarColor = color
+                    }
+                    $0.value = activity
                 }.onCellSelection() { cell, row in
-                    self.healthIndex = row.indexPath!.row
-                    self.openHealth()
+                    self.eventIndex = row.indexPath!.row
+                    self.openEvent()
                     cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
+                }, at: mvs.count - 1)
+            }
             
-        }
-        
-        for purchase in purchaseList {
-            var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
-            mvs.insert(PurchaseRow() {
-                $0.value = purchase
-            }.onCellSelection() { cell, row in
-                self.purchaseIndex = row.indexPath!.row
-                self.openPurchases()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
+            for health in healthList {
+                var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
+                mvs.insert(HealthRow() {
+                    $0.value = health
+                    }.onCellSelection() { cell, row in
+                        self.healthIndex = row.indexPath!.row
+                        self.openHealth()
+                        cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+            }
             
+            for purchase in purchaseList {
+                var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
+                mvs.insert(PurchaseRow() {
+                    $0.value = purchase
+                }.onCellSelection() { cell, row in
+                    self.purchaseIndex = row.indexPath!.row
+                    self.openPurchases()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+            }
         }
     }
     
@@ -217,6 +219,7 @@ extension TaskViewController {
     }
     
     func updateLists(type: String) {
+        print("updateLists")
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "subtasks" {
             var subtaskIDs = [String]()
@@ -240,6 +243,7 @@ extension TaskViewController {
                 container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: [activityID], workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: task.participantsIDs)
             }
             ContainerFunctions.updateContainerAndStuffInside(container: container)
+            task.containerID = container.id
             if active {
                 ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
             }
@@ -774,12 +778,12 @@ extension TaskViewController {
         let createActivity = ActivityActions(activity: activity ?? self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.createNewActivity()
         hideActivityIndicator()
+        self.delegate?.updateTask(task: activity ?? self.task)
+        self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.delegate?.updateTask(task: activity ?? self.task)
-            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     

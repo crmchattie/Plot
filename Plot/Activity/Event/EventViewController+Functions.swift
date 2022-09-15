@@ -182,7 +182,6 @@ extension EventViewController {
     }
     
     func setupLists() {
-        guard delegate == nil else {return}
         let dispatchGroup = DispatchGroup()
         for scheduleID in activity.scheduleIDs ?? [] {
             dispatchGroup.enter()
@@ -227,43 +226,47 @@ extension EventViewController {
 
     
     func listRow() {
-        for task in taskList {
-            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
-            mvs.insert(SubtaskRow() {
-                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    task.listColor = color
-                }
-                $0.value = task
-                $0.cell.delegate = self
-            }.onCellSelection() { cell, row in
-                self.taskIndex = row.indexPath!.row
-                self.openTask()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-        }
-        
-        for health in healthList {
-            var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
-            mvs.insert(HealthRow() {
-                $0.value = health
+        if delegate == nil && (!active || (activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+            for task in taskList {
+                var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+                mvs.insert(SubtaskRow() {
+                    if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                        task.listColor = color
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                        task.listColor = color
+                    }
+                    $0.value = task
+                    $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
-                    self.healthIndex = row.indexPath!.row
-                    self.openHealth()
+                    self.taskIndex = row.indexPath!.row
+                    self.openTask()
                     cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
+                }, at: mvs.count - 1)
+            }
             
-        }
-        
-        for purchase in purchaseList {
-            var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
-            mvs.insert(PurchaseRow() {
-                $0.value = purchase
-            }.onCellSelection() { cell, row in
-                self.purchaseIndex = row.indexPath!.row
-                self.openPurchases()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
+            for health in healthList {
+                var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
+                mvs.insert(HealthRow() {
+                    $0.value = health
+                    }.onCellSelection() { cell, row in
+                        self.healthIndex = row.indexPath!.row
+                        self.openHealth()
+                        cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+            }
             
+            for purchase in purchaseList {
+                var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
+                mvs.insert(PurchaseRow() {
+                    $0.value = purchase
+                }.onCellSelection() { cell, row in
+                    self.purchaseIndex = row.indexPath!.row
+                    self.openPurchases()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+            }
         }
     }
     
@@ -359,6 +362,7 @@ extension EventViewController {
                 groupActivityReference.child("scheduleIDs").removeValue()
             }
         } else if type == "container" {
+            print("update lists container")
             if container != nil {
                 container = Container(id: container.id, activityIDs: container.activityIDs, taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: activity.participantsIDs)
             } else {
@@ -366,6 +370,7 @@ extension EventViewController {
                 container = Container(id: containerID, activityIDs: [activityID], taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: activity.participantsIDs)
             }
             ContainerFunctions.updateContainerAndStuffInside(container: container)
+            activity.containerID = container.id
             if active {
                 ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
             }
@@ -946,12 +951,12 @@ extension EventViewController {
         let createActivity = ActivityActions(activity: activity ?? self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.createNewActivity()
         hideActivityIndicator()
+        self.delegate?.updateActivity(activity: activity ?? self.activity)
+        self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.delegate?.updateActivity(activity: activity ?? self.activity)
-            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     

@@ -142,14 +142,13 @@ class MindfulnessViewController: FormViewController {
         let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
         createMindfulness.createNewMindfulness()
         self.delegate?.updateMindfulness(mindfulness: self.mindfulness)
-        DispatchQueue.main.async {
-            self.hideActivityIndicator()
-            if self.navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
-            } else {
-                self.navigationController?.popViewController(animated: true)
-                self.updateDiscoverDelegate?.itemCreated()
-            }
+        self.updateDiscoverDelegate?.itemCreated()
+        self.hideActivityIndicator()
+        
+        if self.navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
         }
         
         if active && false {
@@ -376,7 +375,7 @@ class MindfulnessViewController: FormViewController {
             }
         }
         
-        if delegate == nil && active {
+        if delegate == nil, active, (mindfulness?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground

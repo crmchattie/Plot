@@ -64,9 +64,9 @@ class ChangeEmailView: UIView {
         next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
         next.setTitleColor(.secondaryLabel, for: .highlighted)
         next.setTitleColor(.secondaryLabel, for: .disabled)
+        next.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         return next
     }()
-    
     
     override init(frame: CGRect) {
         super.init(frame: frame)

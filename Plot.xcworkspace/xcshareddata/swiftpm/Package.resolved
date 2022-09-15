@@ -1,25 +1,23 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "Facebook",
-        "repositoryURL": "https://github.com/facebook/facebook-ios-sdk",
-        "state": {
-          "branch": null,
-          "revision": "46a0b7416b20d86c36227f439026dc8102d5e7e2",
-          "version": "9.2.0"
-        }
-      },
-      {
-        "package": "LBTATools",
-        "repositoryURL": "https://github.com/bhlvoong/LBTATools.git",
-        "state": {
-          "branch": null,
-          "revision": "dce147bfbdc0417a4b430ec220c088629e9dc81d",
-          "version": "1.0.17"
-        }
+  "pins" : [
+    {
+      "identity" : "facebook-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/facebook/facebook-ios-sdk",
+      "state" : {
+        "revision" : "46a0b7416b20d86c36227f439026dc8102d5e7e2",
+        "version" : "9.2.0"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "lbtatools",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bhlvoong/LBTATools.git",
+      "state" : {
+        "revision" : "dce147bfbdc0417a4b430ec220c088629e9dc81d",
+        "version" : "1.0.17"
+      }
+    }
+  ],
+  "version" : 2
 }

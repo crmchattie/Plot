@@ -97,6 +97,7 @@ class TaskViewController: FormViewController {
             taskOld = task.copy() as? Activity
             if task.activityID != nil {
                 activityID = task.activityID!
+                print(activityID)
             }
             if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 task.admin = currentUserID
@@ -108,11 +109,12 @@ class TaskViewController: FormViewController {
             if let currentUserID = Auth.auth().currentUser?.uid {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                print(activityID)
                 if let list = list {
-                    task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? "", listSource: list.source ?? "", isTask: true, isCompleted: false)
+                    task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false)
                 } else {
                     list = lists[ListSourceOptions.plot.name]?.first { $0.name == "Default"}
-                    task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? "", listSource: list?.source ?? "", isTask: true, isCompleted: false)
+                    task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false)
                     task.category = list?.category
 
                 }
@@ -146,6 +148,7 @@ class TaskViewController: FormViewController {
         }
         
         if let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = task?.participantsIDs, !participantsIDs.contains(currentUser) {
+            navigationItem.rightBarButtonItems = []
             for row in form.rows {
                 row.baseCell.isUserInteractionEnabled = false
             }
@@ -1014,7 +1017,7 @@ class TaskViewController: FormViewController {
             }
         }
         
-        if delegate == nil {
+        if delegate == nil && (!active || (task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground

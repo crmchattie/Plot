@@ -162,7 +162,7 @@ extension EventViewController: UpdateScheduleListDelegate {
                 locationAddress[key] = value
             }
         }
-        self.updateLists(type: "schedule")
+        updateLists(type: "schedule")
     }
 }
 
@@ -179,6 +179,8 @@ extension EventViewController: UpdateTaskDelegate {
                 mvs.insert(SubtaskRow() {
                     if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                         task.listColor = color
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                        task.listColor = color
                     }
                     $0.value = task
                     $0.cell.delegate = self
@@ -193,8 +195,8 @@ extension EventViewController: UpdateTaskDelegate {
                     "task_type": task.activityType ?? "basic" as NSObject
                 ])
                 taskList.append(task)
-                updateLists(type: "container")
             }
+            updateLists(type: "container")
         }
     }
 }
@@ -208,6 +210,8 @@ extension EventViewController: ChooseTaskDelegate {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
                 if let listID = mergeTask.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    mergeTask.listColor = color
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
                     mergeTask.listColor = color
                 }
                 $0.value = mergeTask
@@ -382,7 +386,7 @@ extension EventViewController: UpdateActivityListDelegate {
             }
         }
         self.listList = listList
-        self.updateLists(type: "lists")
+        updateLists(type: "lists")
     }
 }
 

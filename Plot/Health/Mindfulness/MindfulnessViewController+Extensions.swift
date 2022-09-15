@@ -13,7 +13,6 @@ import Eureka
 
 extension MindfulnessViewController {
     func setupLists() {
-        guard delegate == nil && active else { return }
         let dispatchGroup = DispatchGroup()
 
         if let containerID = mindfulness.containerID {
@@ -30,46 +29,51 @@ extension MindfulnessViewController {
         dispatchGroup.notify(queue: .main) {
             self.listRow()
         }
-        
     }
     
     func listRow() {
-        for task in taskList {
-            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
-            mvs.insert(SubtaskRow() {
-                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    task.listColor = color
-                }
-                $0.value = task
-                $0.cell.delegate = self
-            }.onCellSelection() { cell, row in
-                self.taskIndex = row.indexPath!.row
-                self.openTask()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-        }
-        for activity in eventList {
-            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
-            mvs.insert(ScheduleRow() {
-                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                    activity.calendarColor = color
-                }
-                $0.value = activity
-            }.onCellSelection() { cell, row in
-                self.eventIndex = row.indexPath!.row
-                self.openEvent()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-        }
-        for purchase in purchaseList {
-            var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
-            mvs.insert(PurchaseRow() {
-                $0.value = purchase
-            }.onCellSelection() { cell, row in
-                self.purchaseIndex = row.indexPath!.row
-                self.openPurchases()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
+        if delegate == nil, active, (mindfulness?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false) {
+            for task in taskList {
+                var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+                mvs.insert(SubtaskRow() {
+                    if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                        task.listColor = color
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                        task.listColor = color
+                    }
+                    $0.value = task
+                    $0.cell.delegate = self
+                }.onCellSelection() { cell, row in
+                    self.taskIndex = row.indexPath!.row
+                    self.openTask()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+            }
+            for activity in eventList {
+                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
+                mvs.insert(ScheduleRow() {
+                    if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                        activity.calendarColor = color
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                        activity.calendarColor = color
+                    }
+                    $0.value = activity
+                }.onCellSelection() { cell, row in
+                    self.eventIndex = row.indexPath!.row
+                    self.openEvent()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+            }
+            for purchase in purchaseList {
+                var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
+                mvs.insert(PurchaseRow() {
+                    $0.value = purchase
+                }.onCellSelection() { cell, row in
+                    self.purchaseIndex = row.indexPath!.row
+                    self.openPurchases()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+            }
         }
     }
     
@@ -235,6 +239,7 @@ extension MindfulnessViewController {
             container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: nil, mindfulnessIDs: [mindfulness.hkSampleID ?? ""], mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: mindfulness.participantsIDs)
         }
         ContainerFunctions.updateContainerAndStuffInside(container: container)
+        mindfulness.containerID = container.id
         if active {
             ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
         }
@@ -270,6 +275,8 @@ extension MindfulnessViewController: UpdateTaskDelegate {
                 mvs.insert(SubtaskRow() {
                     if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                         task.listColor = color
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                        task.listColor = color
                     }
                     $0.value = task
                     $0.cell.delegate = self
@@ -284,8 +291,8 @@ extension MindfulnessViewController: UpdateTaskDelegate {
                     "task_type": task.activityType ?? "basic" as NSObject
                 ])
                 taskList.append(task)
-                updateLists()
             }
+            updateLists()
         }
     }
 }
@@ -299,6 +306,8 @@ extension MindfulnessViewController: ChooseTaskDelegate {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
                 if let listID = mergeTask.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    mergeTask.listColor = color
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
                     mergeTask.listColor = color
                 }
                 $0.value = mergeTask
@@ -332,6 +341,8 @@ extension MindfulnessViewController: UpdateActivityDelegate {
                 mvs.insert(ScheduleRow() {
                     if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
                         activity.calendarColor = color
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                        activity.calendarColor = color
                     }
                     $0.value = activity
                 }.onCellSelection() { cell, row in
@@ -361,6 +372,8 @@ extension MindfulnessViewController: ChooseActivityDelegate {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 if let calendarID = mergeActivity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    mergeActivity.calendarColor = color
+                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
                     mergeActivity.calendarColor = color
                 }
                 $0.value = mergeActivity

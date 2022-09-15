@@ -138,11 +138,16 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(calendarActivitiesUpdated), name: .calendarActivitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
     }
     
     @objc fileprivate func calendarActivitiesUpdated() {
         filteredPinnedActivities = pinnedActivities
         filteredActivities = activities
+        activityView.tableView.reloadData()
+    }
+    
+    @objc fileprivate func invitationsUpdated() {
         activityView.tableView.reloadData()
     }
     

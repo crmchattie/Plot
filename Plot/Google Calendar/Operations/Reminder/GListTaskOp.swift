@@ -94,6 +94,8 @@ class GListTaskOp: AsyncOperation {
         update(activity: activity) { activity in
             activity.category = ActivityCategory.categorize(activity).rawValue
             activity.activityType = CustomType.googleCalendarEvent.categoryText
+            activity.admin = Auth.auth().currentUser?.uid
+            activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
             completion(activity)
         }
     }
@@ -101,11 +103,10 @@ class GListTaskOp: AsyncOperation {
     private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
         activity.name = task.title
         activity.isTask = true
-        activity.activityDescription = task.notes
-        activity.admin = Auth.auth().currentUser?.uid
-        
+        if let notes = task.notes {
+            activity.activityDescription = notes
+        }
         let isodateFormatter = ISO8601DateFormatter()
-        
         if let due = task.due, let date = isodateFormatter.date(from: due) {
             activity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
             activity.hasDeadlineTime = true

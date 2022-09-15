@@ -246,7 +246,9 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 newCalendar()
             } else if section == .health {
                 networkController.healthService.grabHealth {
-                    collectionView.reloadData()
+                    DispatchQueue.main.async {
+                        self.collectionView.reloadData()
+                    }
                 }
             } else {
                 self.openMXConnect(current_member_guid: nil)

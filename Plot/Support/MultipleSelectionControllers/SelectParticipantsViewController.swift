@@ -305,9 +305,7 @@ class SelectParticipantsViewController: UIViewController {
         sections[indexPath.section][indexPath.row].isSelected = true
         
         selectedFalconUsers.append(sections[indexPath.section][indexPath.row])
-        
-        configureSections()
-        
+                
         let set1 = Set(selectedFalconUsers)
         let set2 = Set(priorSelectedUsers)
 
@@ -335,9 +333,7 @@ class SelectParticipantsViewController: UIViewController {
         }
         
         sections[indexPath.section][indexPath.row].isSelected = false
-        
-        configureSections()
-        
+                
         let set1 = Set(selectedFalconUsers)
         let set2 = Set(priorSelectedUsers)
 

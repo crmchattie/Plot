@@ -140,14 +140,12 @@ class WorkoutViewController: FormViewController {
         let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
         createNewWorkout.createNewWorkout()
         self.delegate?.updateWorkout(workout: self.workout)
-        DispatchQueue.main.async {
-            self.hideActivityIndicator()
-            if self.navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
-            } else {
-                self.navigationController?.popViewController(animated: true)
-                self.updateDiscoverDelegate?.itemCreated()
-            }
+        self.updateDiscoverDelegate?.itemCreated()
+        self.hideActivityIndicator()
+        if self.navigationItem.leftBarButtonItem != nil {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
         }
         
         if active && false {
@@ -485,7 +483,7 @@ class WorkoutViewController: FormViewController {
             }
         }
         
-        if delegate == nil && active {
+        if delegate == nil, active, (workout?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground

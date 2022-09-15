@@ -13,7 +13,6 @@ import Eureka
 
 extension FinanceTransactionViewController {
     func setupLists() {
-        guard delegate == nil && active && status else { return }
         let dispatchGroup = DispatchGroup()
         if let containerID = transaction.containerID {
             dispatchGroup.enter()
@@ -29,48 +28,53 @@ extension FinanceTransactionViewController {
         dispatchGroup.notify(queue: .main) {
             self.listRow()
         }
-        
     }
     
     func listRow() {
-        for task in taskList {
-            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
-            mvs.insert(SubtaskRow() {
-                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    task.listColor = color
-                }
-                $0.value = task
-                $0.cell.delegate = self
-            }.onCellSelection() { cell, row in
-                self.taskIndex = row.indexPath!.row
-                self.openTask()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-        }
-        
-        for activity in eventList {
-            var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
-            mvs.insert(ScheduleRow() {
-                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                    activity.calendarColor = color
-                }
-                $0.value = activity
-            }.onCellSelection() { cell, row in
-                self.eventIndex = row.indexPath!.row
-                self.openEvent()
-                cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
-        }
-        for health in healthList {
-            var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
-            mvs.insert(HealthRow() {
-                $0.value = health
+        if delegate == nil && status && (!active || (transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+            for task in taskList {
+                var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+                mvs.insert(SubtaskRow() {
+                    if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                        task.listColor = color
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                        task.listColor = color
+                    }
+                    $0.value = task
+                    $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
-                    self.healthIndex = row.indexPath!.row
-                    self.openHealth()
+                    self.taskIndex = row.indexPath!.row
+                    self.openTask()
                     cell.cellResignFirstResponder()
-            }, at: mvs.count - 1)
+                }, at: mvs.count - 1)
+            }
             
+            for activity in eventList {
+                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
+                mvs.insert(ScheduleRow() {
+                    if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                        activity.calendarColor = color
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                        activity.calendarColor = color
+                    }
+                    $0.value = activity
+                }.onCellSelection() { cell, row in
+                    self.eventIndex = row.indexPath!.row
+                    self.openEvent()
+                    cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+            }
+            for health in healthList {
+                var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
+                mvs.insert(HealthRow() {
+                    $0.value = health
+                    }.onCellSelection() { cell, row in
+                        self.healthIndex = row.indexPath!.row
+                        self.openHealth()
+                        cell.cellResignFirstResponder()
+                }, at: mvs.count - 1)
+                
+            }
         }
     }
     
@@ -248,7 +252,11 @@ extension FinanceTransactionViewController {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: [transaction.guid], participantsIDs: transaction.participantsIDs)
         }
+        transaction.containerID = container.id
         ContainerFunctions.updateContainerAndStuffInside(container: container)
+        if active {
+            ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+        }
     }
     
     func sortSchedule() {
@@ -281,6 +289,8 @@ extension FinanceTransactionViewController: UpdateTaskDelegate {
                 mvs.insert(SubtaskRow() {
                     if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                         task.listColor = color
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                        task.listColor = color
                     }
                     $0.value = task
                     $0.cell.delegate = self
@@ -295,9 +305,8 @@ extension FinanceTransactionViewController: UpdateTaskDelegate {
                     "task_type": task.activityType ?? "basic" as NSObject
                 ])
                 taskList.append(task)
-                updateLists()
-
             }
+            updateLists()
         }
     }
 }
@@ -311,6 +320,8 @@ extension FinanceTransactionViewController: ChooseTaskDelegate {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
                 if let listID = mergeTask.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    mergeTask.listColor = color
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
                     mergeTask.listColor = color
                 }
                 $0.value = mergeTask
@@ -345,6 +356,8 @@ extension FinanceTransactionViewController: UpdateActivityDelegate {
                 mvs.insert(ScheduleRow() {
                     if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
                         activity.calendarColor = color
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                        activity.calendarColor = color
                     }
                     $0.value = activity
                 }.onCellSelection() { cell, row in
@@ -376,6 +389,8 @@ extension FinanceTransactionViewController: ChooseActivityDelegate {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
                 if let calendarID = mergeActivity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    mergeActivity.calendarColor = color
+                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
                     mergeActivity.calendarColor = color
                 }
                 $0.value = mergeActivity

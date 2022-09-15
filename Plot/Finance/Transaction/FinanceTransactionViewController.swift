@@ -90,6 +90,7 @@ class FinanceTransactionViewController: FormViewController {
             }
         }
         if let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = transaction?.participantsIDs, !participantsIDs.contains(currentUser) {
+            navigationItem.rightBarButtonItems = []
             for row in form.rows {
                 row.baseCell.isUserInteractionEnabled = false
             }
@@ -160,18 +161,16 @@ class FinanceTransactionViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         movingBackwards = false
-        if transaction.user_created ?? false {
-            self.showActivityIndicator()
-            let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-            createTransaction.createNewTransaction()
-            self.hideActivityIndicator()
-        }
+        self.showActivityIndicator()
+        let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+        createTransaction.createNewTransaction()
+        self.hideActivityIndicator()
         self.delegate?.updateTransaction(transaction: transaction)
+        self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     
@@ -575,7 +574,7 @@ class FinanceTransactionViewController: FormViewController {
                 }
             }
         
-        if delegate == nil && status {
+        if delegate == nil && status && (!active || (transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground

@@ -103,6 +103,7 @@ class EventViewController: FormViewController {
             activityOld = activity.copy() as? Activity
             if activity.activityID != nil {
                 activityID = activity.activityID!
+                print(activityID)
             }
             if activity.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 activity.admin = currentUserID
@@ -129,19 +130,22 @@ class EventViewController: FormViewController {
                 } else {
                     //create new activityID for auto updating items (schedule, purchases, checklist)
                     activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                    print(activityID)
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     
                     if let calendar = calendar {
-                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? "", calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
                     } else {
-                        let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.name == "Default"}
-                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? "", calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                        let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.name == "Default" }
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
 
                     }
                 }
+                
                 if let container = container {
+                    print(container.id)
                     activity.containerID = container.id
                 }
             }
@@ -171,6 +175,7 @@ class EventViewController: FormViewController {
         }
         
         if let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = activity?.participantsIDs, !participantsIDs.contains(currentUser) {
+            navigationItem.rightBarButtonItems = []
             for row in form.rows {
                 row.baseCell.isUserInteractionEnabled = false
             }
@@ -812,7 +817,7 @@ class EventViewController: FormViewController {
         //                    self.activity.notes = row.value
         //                }
         
-        if delegate == nil {
+        if delegate == nil && (!active || (activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground

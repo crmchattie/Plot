@@ -2064,7 +2064,6 @@
 				1051AC99244F8C470066761C /* OldList */,
 				4BAEE4A421272D880045AB10 /* Chats */,
 				4BAEE4AB21272D880045AB10 /* ChatLog */,
-				4BAEE541212735200045AB10 /* SplashScreen */,
 				4BAEE548212735880045AB10 /* Model */,
 				10F3033324EE03C600C04B8F /* WebView */,
 				4BAEE557212735E50045AB10 /* Support */,
@@ -2603,6 +2602,7 @@
 		4BAEE557212735E50045AB10 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				4BAEE541212735200045AB10 /* SplashScreen */,
 				269105E9253E8DC100A02C5F /* ChartsComponents */,
 				10E93D5224BE43AB00F6EE18 /* Helpers */,
 				4BAEE563212735E50045AB10 /* AudioResources */,
@@ -2666,8 +2666,8 @@
 				4BAEE574212735E50045AB10 /* Cells */,
 				4BAEE576212735E50045AB10 /* SelectParticipantsTableView.swift */,
 				4BAEE577212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift */,
-				4BAEE578212735E50045AB10 /* FlowLayout */,
 				4BAEE57A212735E50045AB10 /* SelectParticipantsViewController.swift */,
+				4BAEE578212735E50045AB10 /* FlowLayout */,
 			);
 			path = MultipleSelectionControllers;
 			sourceTree = "<group>";

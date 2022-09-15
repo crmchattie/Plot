@@ -45,7 +45,7 @@ extension MasterActivityContainerController {
     }
     
     func showLaunchScreen() {
-        launchScreenView.backgroundColor = .secondarySystemGroupedBackground
+        launchScreenView.backgroundColor = .systemGroupedBackground
         navigationController?.view.addSubview(launchScreenView)
         launchScreenView.fillSuperview()
         launchScreenView.addSubview(plotLogoView)

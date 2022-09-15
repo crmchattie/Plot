@@ -111,17 +111,14 @@ class AccountActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let account = account, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = account, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs, membersIDsDictionary)
         }
         
         guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
         
-        // Only append current user when admin/creator of the account
-        if account.admin == currentUserID {
-            membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-            membersIDs.append(currentUserID)
-        }
+        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
+        membersIDs.append(currentUserID)
         
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }

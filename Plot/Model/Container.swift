@@ -50,30 +50,42 @@ class ContainerFunctions {
             print(error)
         }
         for ID in container.activityIDs ?? [] {
+            print(ID)
             reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.taskIDs ?? [] {
+            print(ID)
             reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.transactionIDs ?? [] {
+            print(ID)
             reference.child(financialTransactionsEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.workoutIDs ?? [] {
+            print(ID)
             reference.child(workoutsEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.mindfulnessIDs ?? [] {
+            print(ID)
             reference.child(mindfulnessEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
     }
     
     class func updateParticipants(containerID: String, selectedFalconUsers: [User]) {
-        guard let _ = Auth.auth().currentUser?.uid else {return}
+        guard let currentUserID = Auth.auth().currentUser?.uid else {return}
         
         let dataReference = Database.database().reference().child(containerEntity).child(containerID)
         dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let snapshotValue = snapshot.value, let container = try? FirebaseDecoder().decode(Container.self, from: snapshotValue) {
+                var membersIDs = [String]()
+                membersIDs.append(currentUserID)
+                for selectedUser in selectedFalconUsers {
+                    guard let id = selectedUser.id else { continue }
+                    print(id)
+                    membersIDs.append(id)
+                }
                 let reference = Database.database().reference()
-                reference.child(containerEntity).child(container.id).updateChildValues(["participantsIDs": container.participantsIDs as AnyObject])
+                reference.child(containerEntity).child(container.id).updateChildValues(["participantsIDs": membersIDs as AnyObject])
                 
                 for activityID in container.activityIDs ?? [] {
                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in

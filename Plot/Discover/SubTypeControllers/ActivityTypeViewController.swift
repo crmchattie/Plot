@@ -612,7 +612,7 @@ extension ActivityTypeViewController: UpdateActivityDelegate {
 extension ActivityTypeViewController: ActivityTypeCellDelegate {
     func plusButtonTapped(type: AnyHashable) {
         let snapshot = self.diffableDataSource.snapshot()
-        let section = snapshot.sectionIdentifier(containingItem: type)
+        let _ = snapshot.sectionIdentifier(containingItem: type)
         if activeList {
             self.movingBackwards = false
             if let object = type as? Recipe {

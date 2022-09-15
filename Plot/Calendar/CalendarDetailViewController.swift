@@ -116,12 +116,11 @@ class CalendarDetailViewController: FormViewController {
         let createCalendar = CalendarActions(calendar: calendar, active: active, selectedFalconUsers: selectedFalconUsers)
         createCalendar.createNewCalendar()
         self.hideActivityIndicator()
-        
+        self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
-            self.updateDiscoverDelegate?.itemCreated()
         }
     }
     

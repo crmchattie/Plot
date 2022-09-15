@@ -189,27 +189,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         })
     }
     
-    func fetchMembersIDs() -> ([String], [String:AnyObject]) {
-        var membersIDs = [String]()
-        var membersIDsDictionary = [String:AnyObject]()
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
-        
-        // Only append current user when admin/creator of the activity
-        if self.activity.admin == currentUserID {
-            membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-            membersIDs.append(currentUserID)
-        }
-        
-        for selectedUser in selectedFalconUsers {
-            guard let id = selectedUser.id else { continue }
-            membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
-            membersIDs.append(id)
-        }
-                
-        return (membersIDs, membersIDsDictionary)
-    }
-    
     func scheduleReminder() {
         guard let activity = activity, let activityReminder = activity.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
             return

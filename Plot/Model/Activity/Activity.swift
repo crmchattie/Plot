@@ -295,8 +295,6 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.participantsIDs as AnyObject? {
             dictionary["participantsIDs"] = value
-        } else {
-            dictionary["participantsIDs"] = NSNull()
         }
         
         if let value = self.transportation as AnyObject? {

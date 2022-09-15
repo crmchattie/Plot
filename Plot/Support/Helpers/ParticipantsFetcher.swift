@@ -19,7 +19,7 @@ class ParticipantsFetcher: NSObject {
         var participants: [User] = []
         for id in participantsIDs {
             // Only if the current user is created this activity
-            if activity.admin == currentUserID && id == currentUserID {
+            if id == currentUserID {
                 continue
             }
             
@@ -80,7 +80,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if transaction.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -113,7 +113,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if account.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -145,7 +145,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if holding.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -177,7 +177,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if list.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -209,7 +209,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if calendar.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -241,7 +241,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if workout.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -273,7 +273,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if mindfulness.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -304,7 +304,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if grocerylist.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -328,7 +328,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if checklist.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -352,7 +352,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if activitylist.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 
@@ -376,7 +376,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if packinglist.admin == currentUserID && id == currentUserID {
+                if id == currentUserID {
                     continue
                 }
                 

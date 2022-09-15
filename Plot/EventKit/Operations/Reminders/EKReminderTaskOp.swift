@@ -92,6 +92,8 @@ class EKReminderTaskOp: AsyncOperation {
     private func createActivity(for activityID: String, completion: @escaping (Activity) -> Void) {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity) { activity in
+            activity.admin = Auth.auth().currentUser?.uid
+            activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
             activity.activityType = CustomType.iOSCalendarEvent.categoryText
             activity.category = ActivityCategory.categorize(activity).rawValue
             completion(activity)
@@ -101,7 +103,9 @@ class EKReminderTaskOp: AsyncOperation {
     private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
         activity.isTask = true
         activity.name = reminder.title
-        activity.activityDescription = reminder.notes
+        if let notes = reminder.notes {
+            activity.activityDescription = notes
+        }
         activity.startTimeZone = reminder.timeZone?.identifier
         activity.endTimeZone = reminder.timeZone?.identifier
         activity.recurrences = reminder.recurrenceRules?.map { $0.iCalRuleString() }
@@ -135,7 +139,6 @@ class EKReminderTaskOp: AsyncOperation {
         } else {
             activity.completedDate = nil
         }
-        activity.admin = Auth.auth().currentUser?.uid
         completion(activity)
     }
     

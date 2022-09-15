@@ -133,8 +133,10 @@ class ActivityActions: NSObject {
             let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             updateParticipants(membersIDs: membersIDs)
             groupActivityReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
-            
-            InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
+            if !(activity.isTask ?? false) {
+                InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
+                    
+                }
             }
         }
     }
@@ -194,7 +196,10 @@ class ActivityActions: NSObject {
         } else {
             connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
             self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-                InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
+                if !(activity.isTask ?? false) {
+                    InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
+
+                    }
                 }
             })
         }
@@ -289,15 +294,12 @@ class ActivityActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
+        guard let _ = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return (membersIDs, membersIDsDictionary)
         }
                         
-        // Only append current user when admin/creator of the activity
-        if activity.admin == currentUserID {
-            membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-            membersIDs.append(currentUserID)
-        }
+        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
+        membersIDs.append(currentUserID)
         
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }

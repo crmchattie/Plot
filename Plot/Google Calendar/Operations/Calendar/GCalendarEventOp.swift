@@ -98,6 +98,8 @@ class GCalendarEventOp: AsyncOperation {
         update(activity: activity) { activity in
             activity.category = ActivityCategory.categorize(activity).rawValue
             activity.activityType = CustomType.googleCalendarEvent.categoryText
+            activity.admin = Auth.auth().currentUser?.uid
+            activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
             completion(activity)
         }
     }
@@ -105,9 +107,10 @@ class GCalendarEventOp: AsyncOperation {
     private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
         activity.name = event.summary
         activity.isEvent = true
-        activity.activityDescription = event.descriptionProperty
+        if let descriptionProperty = event.descriptionProperty {
+            activity.activityDescription = descriptionProperty
+        }
         activity.recurrences = event.recurrence
-        activity.admin = Auth.auth().currentUser?.uid
         if let start = event.start?.date, let end = event.end?.date {
             activity.allDay = true
             activity.startDateTime = NSNumber(value: start.date.timeIntervalSince1970)

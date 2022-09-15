@@ -114,17 +114,14 @@ class ChecklistActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let checklist = checklist, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = checklist, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs, membersIDsDictionary)
         }
         
         guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
         
-        // Only append current user when admin/creator of the checklist
-        if checklist.admin == currentUserID {
-            membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-            membersIDs.append(currentUserID)
-        }
+        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
+        membersIDs.append(currentUserID)
         
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }

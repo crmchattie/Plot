@@ -16,8 +16,10 @@ class InvitationsFetcher: NSObject {
     fileprivate var currentUserInvitationsAddHandle = DatabaseHandle()
     fileprivate var currentUserInvitationsRemoveHandle = DatabaseHandle()
     
+    var invitationsInitialAdd: (([String: Invitation], [Activity])->())?
     var invitationsAdded: (([Invitation])->())?
     var invitationsRemoved: (([Invitation])->())?
+    var userInvitations: [String: Invitation] = [:]
     
     func fetchInvitations(completion: @escaping ([String: Invitation], [Activity])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -31,7 +33,7 @@ class InvitationsFetcher: NSObject {
         userInvitationsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let invitationIDs = snapshot.value as? [String: Int] {
                 var invitations: [String: Invitation] = [:]
-                var activiitiesForInvitations: [Activity] = []
+                var activitiesForInvitations: [Activity] = []
                 let group = DispatchGroup()
                 for (invitationID, _) in invitationIDs {
                     group.enter()
@@ -39,12 +41,11 @@ class InvitationsFetcher: NSObject {
                         if invitationSnapshot.exists(), let invitationSnapshotValue = invitationSnapshot.value {
                             if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {
                                 invitations[invitation.activityID] = invitation
-                                
                                 group.enter()
                                 ref.child(activitiesEntity).child(invitation.activityID).observeSingleEvent(of: .value, with: { activitySnapshot in
                                     if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject], let meta = activitySnapshotValue["metaData"] as? [String: AnyObject] {
                                         let activity = Activity(dictionary: meta)
-                                        activiitiesForInvitations.append(activity)
+                                        activitiesForInvitations.append(activity)
                                     }
                                     
                                     group.leave()
@@ -56,7 +57,7 @@ class InvitationsFetcher: NSObject {
                 }
                 
                 group.notify(queue: .main) {
-                    completion(invitations, activiitiesForInvitations)
+                    completion(invitations, activitiesForInvitations)
                 }
             } else {
                 completion([:], [])
@@ -64,7 +65,7 @@ class InvitationsFetcher: NSObject {
         })
     }
     
-    func observeInvitationForCurrentUser(invitationsAdded: @escaping ([Invitation])->(), invitationsRemoved: @escaping ([Invitation])->()) {
+    func observeInvitationForCurrentUser(invitationsInitialAdd: @escaping ([String: Invitation], [Activity])->(), invitationsAdded: @escaping ([Invitation])->(), invitationsRemoved: @escaping ([Invitation])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -72,22 +73,84 @@ class InvitationsFetcher: NSObject {
         let ref = Database.database().reference()
         userInvitationsDatabaseRef = ref.child(userInvitationsEntity).child(currentUserID)
                 
+        self.invitationsInitialAdd = invitationsInitialAdd
         self.invitationsAdded = invitationsAdded
         self.invitationsRemoved = invitationsRemoved
+        
+        userInvitationsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+            guard snapshot.exists(), let invitationIDs = snapshot.value as? [String: Int] else {
+                invitationsInitialAdd([:], [])
+                return
+            }
+            
+            if let completion = self.invitationsInitialAdd {
+                var invitations: [String: Invitation] = [:]
+                var activitiesForInvitations: [Activity] = []
+                let group = DispatchGroup()
+                var counter = 0
+                for (invitationID, _) in invitationIDs {
+                    group.enter()
+                    var handle = UInt.max
+                    handle = ref.child(invitationsEntity).child(invitationID).observe(.value) { snapshot in
+                        ref.removeObserver(withHandle: handle)
+                        if snapshot.exists(), let invitationSnapshotValue = snapshot.value {
+                            if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {
+                                invitations[invitation.activityID] = invitation
+                                self.userInvitations[invitation.activityID] = invitation
+                                group.enter()
+                                ActivitiesFetcher.getDataFromSnapshot(ID: invitation.activityID) { activities in
+                                    if let activity = activities.first {
+                                        if counter > 0 {
+                                            activitiesForInvitations.append(activity)
+                                            group.leave()
+                                            counter -= 1
+                                        } else {
+                                            activitiesForInvitations = [activity]
+                                            completion(invitations, activities)
+                                        }
+                                    } else {
+                                        if counter > 0 {
+                                            group.leave()
+                                            counter -= 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if counter > 0 {
+                            group.leave()
+                            counter -= 1
+                        }
+                    }
+                }
+                group.notify(queue: .main) {
+                    completion(invitations, activitiesForInvitations)
+                }
+            }
+        })
+        
         currentUserInvitationsAddHandle = userInvitationsDatabaseRef.observe(.childAdded, with: { snapshot in
-            if let completion = self.invitationsAdded {
-                let invitationID = snapshot.key
-                let ref = Database.database().reference()
-                var handle = UInt.max
-                handle = ref.child(invitationsEntity).child(invitationID).observe(.childChanged) { _ in
-                    ref.removeObserver(withHandle: handle)
-                    self.getInvitationsFromSnapshot(ID: snapshot.key, completion: completion)
+            if self.userInvitations[snapshot.key] == nil {
+                if let completion = self.invitationsAdded {
+                    let invitationID = snapshot.key
+                    let ref = Database.database().reference()
+                    var handle = UInt.max
+                    handle = ref.child(invitationsEntity).child(invitationID).observe(.value) { snapshot in
+                        ref.removeObserver(withHandle: handle)
+                        if snapshot.exists(), let invitationSnapshotValue = snapshot.value {
+                            if let invitation = try? FirebaseDecoder().decode(Invitation.self, from: invitationSnapshotValue) {
+                                self.userInvitations[invitation.activityID] = invitation
+                                completion([invitation])
+                            }
+                        }
+                    }
                 }
             }
         })
         
         currentUserInvitationsRemoveHandle = userInvitationsDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.invitationsRemoved {
+                self.userInvitations[snapshot.key] = nil
                 self.getInvitationsFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
