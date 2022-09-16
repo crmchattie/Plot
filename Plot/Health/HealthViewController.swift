@@ -58,7 +58,8 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        layout.itemSize = UICollectionViewFlowLayout.automaticSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -232,20 +233,6 @@ extension HealthViewController: UICollectionViewDelegateFlowLayout, UICollection
             let metric = metrics[indexPath.row]
             openMetric(metric: metric)
         }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height: CGFloat = 0
-        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        let key = filteredHealthMetricSections[indexPath.section]
-        if let metrics = filteredHealthMetrics[key] {
-            let metric = metrics[indexPath.row]
-            dummyCell.configure(metric)
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
-            height = estimatedSize.height
-        }
-        return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {

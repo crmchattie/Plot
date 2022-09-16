@@ -51,7 +51,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         return button
     }()
     
-//    private var widthConstraint: NSLayoutConstraint?
+    private var widthConstraint: NSLayoutConstraint?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -65,7 +65,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         addSubview(detailLabel)
         addSubview(activityTypeButton)
 
-//        widthConstraint = widthAnchor.constraint(equalToConstant: 0)
+        widthConstraint = widthAnchor.constraint(equalToConstant: -30)
 
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
         titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 10).isActive = true
@@ -86,12 +86,12 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
     }
     
-//    override func updateConstraints() {
-//        // Set width constraint to superview's width.
-//        widthConstraint?.constant = superview?.bounds.width ?? 0
-//        widthConstraint?.isActive = true
-//        super.updateConstraints()
-//    }
+    override func updateConstraints() {
+        // Set width constraint to superview's width.
+        widthConstraint?.constant = (superview?.bounds.width ?? 0) - 30
+        widthConstraint?.isActive = true
+        super.updateConstraints()
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

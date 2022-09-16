@@ -243,9 +243,24 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         cell.textLabel?.textColor = .label
         let button = UIButton(type: .system)
         cell.accessoryView = button
+        cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
         if notification.aps.category == Identifiers.eventCategory {
-            button.setImage(UIImage(named: "activity"), for: .normal)
+            button.setImage(UIImage(named: "event"), for: .normal)
+        } else if notification.aps.category == Identifiers.taskCategory {
+            button.setImage(UIImage(named: "task"), for: .normal)
+        } else if notification.aps.category == Identifiers.transactionCategory {
+            button.setImage(UIImage(named: "transaction"), for: .normal)
             cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        } else if notification.aps.category == Identifiers.accountCategory {
+            button.setImage(UIImage(named: "financialAccount"), for: .normal)
+        } else if notification.aps.category == Identifiers.workoutCategory {
+            button.setImage(UIImage(named: "workout"), for: .normal)
+        } else if notification.aps.category == Identifiers.mindfulnessCategory {
+            button.setImage(UIImage(named: "mindfulness"), for: .normal)
+        } else if notification.aps.category == Identifiers.listCategory {
+            button.setImage(UIImage(named: "list"), for: .normal)
+        } else if notification.aps.category == Identifiers.calendarCategory {
+            button.setImage(UIImage(named: "calendar"), for: .normal)
         }
         return cell
     }

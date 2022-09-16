@@ -54,7 +54,8 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        layout.itemSize = UICollectionViewFlowLayout.automaticSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -190,19 +191,19 @@ extension HealthListViewController: UICollectionViewDelegateFlowLayout, UICollec
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height: CGFloat = 0
-        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-        let key = filteredHealthMetricSections[indexPath.section]
-        if let metrics = filteredHealthMetrics[key] {
-            let metric = metrics[indexPath.row]
-            dummyCell.configure(metric)
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
-            height = estimatedSize.height
-        }
-        return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
-    }
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//        var height: CGFloat = 0
+//        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+//        let key = filteredHealthMetricSections[indexPath.section]
+//        if let metrics = filteredHealthMetrics[key] {
+//            let metric = metrics[indexPath.row]
+//            dummyCell.configure(metric)
+//            dummyCell.layoutIfNeeded()
+//            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+//            height = estimatedSize.height
+//        }
+//        return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
+//    }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
