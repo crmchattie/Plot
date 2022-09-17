@@ -6,10 +6,6 @@
 //  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
-fileprivate let healthMetricCellID = "HealthMetricCellID"
-fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
-
-
 class HealthListViewController: UIViewController, ObjectDetailShowing {
     var participants = [String : [User]]()
     

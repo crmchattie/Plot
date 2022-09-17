@@ -48,9 +48,18 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         return label
     }()
     
-    let companyImageView = UIImageView(cornerRadius: 8)
-    let statusImageView = UIImageView(cornerRadius: 8)
+    let companyImageView: UIImageView = {
+        let imageView = UIImageView(cornerRadius: 8)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
+    let statusImageView: UIImageView = {
+        let imageView = UIImageView(cornerRadius: 8)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
@@ -73,9 +82,6 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         backgroundView?.backgroundColor = .secondarySystemGroupedBackground
 
         backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
-        backgroundView?.layer.shadowOpacity = 0.1
-        backgroundView?.layer.shadowRadius = 10
-        backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         
         statusImageView.constrainWidth(30)
         statusImageView.constrainHeight(30)

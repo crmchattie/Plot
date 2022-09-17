@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class FinanceCollectionViewCell: UICollectionViewCell {
     
@@ -354,7 +355,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     
     let middleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .secondaryLabel
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
@@ -370,7 +371,11 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    let imageView = UIImageView(cornerRadius: 8)
+    let imageView: UIImageView = {
+        let imageView = UIImageView(cornerRadius: 8)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     var topHeightConstraint = CGFloat()
     var bottomHeightConstraint: CGFloat = 0
@@ -429,7 +434,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         nameLabel.textColor = .label
         categoryLabel.textColor = .label
         subcategoryLabel.textColor = .secondaryLabel
-        middleLabel.textColor = .secondaryLabel
+        middleLabel.textColor = .label
         bottomLabel.textColor = .secondaryLabel
         
         nameLabel.font = UIFont.preferredFont(forTextStyle: .body)

@@ -12,15 +12,16 @@ class SetupCell: BaseContainerCollectionViewCell {
     var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
     var intColor: Int = 0
     
-    var sectionType: SectionType! {
+    var customType: CustomType! {
         didSet {
-            imageView.image = UIImage(named: sectionType.image)!.withRenderingMode(.alwaysTemplate)
+            imageView.image = UIImage(named: customType.image)!.withRenderingMode(.alwaysTemplate)
             imageView.tintColor = colors[intColor]
             imageView.contentMode = .scaleAspectFit
             imageView.backgroundColor = .secondarySystemGroupedBackground
             containerImageView.backgroundColor = .secondarySystemGroupedBackground
-            typeLabel.text = sectionType.type
-            descriptionLabel.text = sectionType.subType
+            button.backgroundColor = colors[intColor]
+            typeLabel.text = customType.categoryText
+            descriptionLabel.text = customType.subcategoryText
             setupViews()
         }
     }
@@ -61,7 +62,6 @@ class SetupCell: BaseContainerCollectionViewCell {
     
     let button: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .systemBlue
         button.setTitle("Get Started", for: .normal)
         button.titleLabel?.font = UIFont.subheadline.with(weight: .bold)
         button.titleLabel?.adjustsFontForContentSizeCategory = true

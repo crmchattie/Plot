@@ -33,10 +33,6 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     }
 }
 
-let taskCellID = "taskCellID"
-let eventCellID = "eventCellID"
-let notificationCellID = "notificationCellID"
-
 protocol UpdateInvitationDelegate: AnyObject {
     func updateInvitation(invitation: Invitation)
 }

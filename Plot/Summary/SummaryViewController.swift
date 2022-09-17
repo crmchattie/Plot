@@ -14,7 +14,6 @@ fileprivate let summaryPieChartCell = "SummaryPieChartCell"
 fileprivate let summaryTimeBarChartCell = "SummaryTimeBarChartCell"
 fileprivate let summaryValueBarChartCell = "SummaryValueBarChartCell"
 fileprivate let summaryHKChartCell = "SummaryHKChartCell"
-fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 
 protocol HomeBaseSummary: AnyObject {
 //    func sendLists(lists: [ListContainer])

@@ -100,7 +100,7 @@ class FinanceTableViewCell: UITableViewCell {
     
     let middleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .secondaryLabel
+        label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -118,7 +118,11 @@ class FinanceTableViewCell: UITableViewCell {
         return label
     }()
     
-    let IV = UIImageView(cornerRadius: 8)
+    let IV: UIImageView = {
+        let imageView = UIImageView(cornerRadius: 8)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
     
     func setupViews() {
         let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
@@ -137,7 +141,7 @@ class FinanceTableViewCell: UITableViewCell {
         super.prepareForReuse()
         nameLabel.textColor = .label
         categoryLabel.textColor = .label
-        middleLabel.textColor = .secondaryLabel
+        middleLabel.textColor = .label
         bottomLabel.textColor = .secondaryLabel
         
         nameLabel.font = UIFont.preferredFont(forTextStyle: .body)

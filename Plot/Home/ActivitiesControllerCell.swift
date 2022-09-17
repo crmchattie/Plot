@@ -30,8 +30,6 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
     var invitations: [String: Invitation] = [:]
     
     let headerCellID = "headerCellID"
-    let taskCellID = "taskCellID"
-    let eventCellID = "eventCellID"
     
     let viewPlaceholder = ViewPlaceholder()
     

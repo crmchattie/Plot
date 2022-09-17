@@ -33,7 +33,7 @@ class FinancialAccountsViewController: UITableViewController {
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newAccount))
         navigationItem.rightBarButtonItem = barButton
         
-        members = Array(memberAccountsDict.keys).sorted(by: {$0.name < $1.name})
+        members = networkController.financeService.members.sorted(by: {$0.name < $1.name})
                 
     }
     
@@ -47,7 +47,7 @@ class FinancialAccountsViewController: UITableViewController {
     
     @objc fileprivate func financeUpdated() {
         DispatchQueue.main.async {
-            self.members = Array(self.memberAccountsDict.keys).sorted(by: {$0.name < $1.name})
+            self.members = self.networkController.financeService.members.sorted(by: {$0.name < $1.name})
             self.tableView.reloadData()
         }
     }

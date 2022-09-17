@@ -26,7 +26,6 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     
     let headerCellID = "headerCellID"
     let listCellID = "listCellID"
-    let taskCellID = "taskCellID"
     
     var sections = [SectionType]()
     var lists = [SectionType: [ListType]]()

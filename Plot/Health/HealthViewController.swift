@@ -8,9 +8,6 @@
 
 import UIKit
 
-fileprivate let healthMetricCellID = "HealthMetricCellID"
-fileprivate let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
-
 class HealthViewController: UIViewController, ObjectDetailShowing {
     var participants = [String : [User]]()
     

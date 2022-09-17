@@ -31,10 +31,6 @@ class BaseContainerCollectionViewCell: UICollectionViewCell {
         self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground
         self.backgroundView?.layer.cornerRadius = 10
         self.backgroundView?.layer.masksToBounds = true
-        self.backgroundView?.layer.shadowOpacity = 0.1
-        self.backgroundView?.layer.shadowRadius = 10
-        self.backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
-        self.backgroundView?.layer.shouldRasterize = true
     }
             
     override func prepareForReuse() {
@@ -61,10 +57,6 @@ class BaseContainerTableViewCell: UITableViewCell {
         self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground
         self.backgroundView?.layer.cornerRadius = 10
         self.backgroundView?.layer.masksToBounds = true
-        self.backgroundView?.layer.shadowOpacity = 0.1
-        self.backgroundView?.layer.shadowRadius = 10
-        self.backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
-        self.backgroundView?.layer.shouldRasterize = true
     }
     
     override func prepareForReuse() {

@@ -75,10 +75,6 @@ class FinanceViewController: UIViewController {
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
-    private let kHeaderCell = "HeaderCell"
-    private let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
-    private let kFinanceCollectionViewMemberCell = "FinanceCollectionViewMemberCell"
-    
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
     
@@ -426,7 +422,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         let object = groups[section]
         let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
         if section != .financialIssues {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
             if indexPath.item == 0 {
                 cell.firstPosition = true
             }
@@ -463,8 +459,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             }
             return cell
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
-            cell.backgroundColor = .secondarySystemGroupedBackground
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
             if let object = object as? [MXMember] {
                 cell.member = object[indexPath.item]
             }
@@ -517,7 +512,13 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
             height = estimatedSize.height
         } else {
-            height = 70
+            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            if let object = object as? [MXMember] {
+                dummyCell.member = object[indexPath.item]
+            }
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+            height = estimatedSize.height
         }
         return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
         
@@ -530,7 +531,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView,
         viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let section = sections[indexPath.section]
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kHeaderCell, for: indexPath) as! HeaderCell
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: kHeaderCell, for: indexPath) as! HeaderCell
         header.backgroundColor = .systemGroupedBackground
         header.delegate = self
         header.sectionType = section

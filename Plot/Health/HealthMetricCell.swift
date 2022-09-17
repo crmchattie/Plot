@@ -198,6 +198,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             activityTypeButton.setImage(UIImage(named: "mindfulness"), for: .normal)
         }
         
+        
     }
     
     func updateImage(_ healthMetric: HealthMetric) {

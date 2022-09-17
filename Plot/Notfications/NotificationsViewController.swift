@@ -10,6 +10,8 @@ import UIKit
 import Firebase
 import CodableFirebase
 
+let notificationCellID = "notificationCellID"
+
 class NotificationsViewController: UIViewController, ObjectDetailShowing {
     
     let invitationsText = NSLocalizedString("Invitations", comment: "")

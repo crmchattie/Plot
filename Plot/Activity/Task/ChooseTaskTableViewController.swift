@@ -46,9 +46,7 @@ class ChooseTaskTableViewController: UITableViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    let taskCellID = "taskCellID"
-    
+        
     var needDelegate = false
     
     var searchBar: UISearchBar?

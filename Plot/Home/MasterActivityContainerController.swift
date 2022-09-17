@@ -14,9 +14,13 @@ import LBTATools
 import HealthKit
 import GoogleSignIn
 
-let activitiesControllerCell = "ActivitiesControllerCell"
-let healthControllerCell = "HealthControllerCell"
-let financeControllerCell = "FinanceControllerCell"
+let taskCellID = "taskCellID"
+let eventCellID = "eventCellID"
+let healthMetricCellID = "HealthMetricCellID"
+let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
+let kHeaderCell = "HeaderCell"
+let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
+let kFinanceCollectionViewMemberCell = "FinanceCollectionViewMemberCell"
 let setupCell = "SetupCell"
 let headerContainerCell = "HeaderCellDelegate"
 
@@ -40,11 +44,15 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     weak var delegate: ManageAppearanceHome?
             
     var sections: [SectionType] = [.time, .health, .finances]
+    var groups = [AnyHashable]()
     
     var activitiesSections = [SectionType]()
     var activities = [SectionType: [Activity]]()
     var sortedEvents = [Activity]()
     var sortedTasks = [Activity]()
+    var invitations: [String: Invitation] {
+        return networkController.activityService.invitations
+    }
     
     var updatingTasks = true
     var updatingEvents = true
@@ -60,19 +68,19 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     var healthMetrics: [HealthMetricCategory: [HealthMetric]] {
         var metrics = networkController.healthService.healthMetrics
-        if let generalMetrics = metrics[HealthMetricCategory.general] {
-            metrics[HealthMetricCategory.general] = generalMetrics.filter({ $0.type == HealthMetricType.steps || $0.type == HealthMetricType.sleep || $0.type == HealthMetricType.heartRate || $0.type == HealthMetricType.flightsClimbed })
-            if metrics[HealthMetricCategory.general] == [] {
-                metrics[HealthMetricCategory.general] = nil
+        if let generalMetrics = metrics[.general] {
+            metrics[.general] = generalMetrics.filter({ $0.type == .steps || $0.type == .sleep || $0.type == .flightsClimbed })
+            if metrics[.general] == [] {
+                metrics[.general] = nil
             }
         }
-        if let workoutMetrics = metrics[HealthMetricCategory.workouts] {
-            metrics[HealthMetricCategory.general]?.append(contentsOf: workoutMetrics.filter({ $0.type == HealthMetricType.activeEnergy || $0.type == HealthMetricType.workoutMinutes}))
-            metrics[HealthMetricCategory.workouts] = nil
+        if let workoutMetrics = metrics[.workouts] {
+            metrics[.general]?.append(contentsOf: workoutMetrics.filter({ $0.type == .activeEnergy || $0.type == .workoutMinutes}))
+            metrics[.workouts] = nil
         }
-        if let nutritionMetrics = metrics[HealthMetricCategory.nutrition] {
-            metrics[HealthMetricCategory.general]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name }))
-            metrics[HealthMetricCategory.nutrition] = nil
+        if let nutritionMetrics = metrics[.nutrition] {
+            metrics[.general]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name }))
+            metrics[.nutrition] = nil
         }
         return metrics
     }
@@ -170,21 +178,23 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
-        
         layout.scrollDirection = UICollectionView.ScrollDirection.vertical
         collectionView.setCollectionViewLayout(layout, animated: true)
         collectionView.dataSource = self
         collectionView.delegate = self
         
         view.addSubview(collectionView)
-        collectionView.fillSuperviewSafeAreaLayoutGuide()
         collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         
-        collectionView.register(ActivitiesControllerCell.self, forCellWithReuseIdentifier: activitiesControllerCell)
-        collectionView.register(HealthControllerCell.self, forCellWithReuseIdentifier: healthControllerCell)
-        collectionView.register(FinanceControllerCell.self, forCellWithReuseIdentifier: financeControllerCell)
+        collectionView.register(TaskCollectionCell.self, forCellWithReuseIdentifier: taskCellID)
+        collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
+        collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
+        collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
+        collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
+        collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
+        collectionView.register(InterSectionHeader.self, forCellWithReuseIdentifier: kHeaderCell)
         collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
-        collectionView.register(HeaderContainerCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerContainerCell)
+        collectionView.register(HeaderContainerCell.self, forCellWithReuseIdentifier: headerContainerCell)
     }
     
     deinit {
@@ -204,6 +214,48 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
     }
     
+    func setupData() {
+        groups = []
+        var list = [AnyHashable]()
+        list.append(SectionType.time)
+        if activitiesSections.isEmpty {
+            list.append(CustomType.time)
+        } else {
+            for section in activitiesSections {
+                if activitiesSections.count > 1 {
+                    list.append(section)
+                }
+                list.append(contentsOf: activities[section] ?? [])
+            }
+        }
+        
+        list.append(SectionType.health)
+        if healthMetricSections.isEmpty {
+            list.append(CustomType.health)
+        } else {
+            for section in healthMetricSections {
+                list.append(SectionType.generalHealth)
+                list.append(contentsOf: healthMetrics[section] ?? [])
+            }
+        }
+        
+        list.append(SectionType.finances)
+        if financeSections.isEmpty {
+            list.append(CustomType.finances)
+        } else {
+            for section in financeSections {
+                list.append(section)
+                list.append(contentsOf: financeGroups[section] ?? [])
+            }
+        }
+        
+        groups = list
+        
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
     @objc fileprivate func tasksUpdated() {
         scrollToFirstTask({ (tasks) in
             if self.sortedTasks != tasks {
@@ -220,7 +272,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     self.activities[.tasks] = nil
                 }
                 DispatchQueue.main.async {
-                    self.collectionView.reloadData()
+                    self.setupData()
                 }
             }
         })
@@ -242,7 +294,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     self.activities[.calendar] = nil
                 }
                 DispatchQueue.main.async {
-                    self.collectionView.reloadData()
+                    self.setupData()
                 }
             }
         })
@@ -257,7 +309,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     @objc fileprivate func healthUpdated() {
         self.updatingHealth = false
         DispatchQueue.main.async {
-            self.collectionView.reloadData()
+            self.setupData()
         }
     }
     
@@ -267,7 +319,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 self.financeSections = sections
                 self.financeGroups = groups
                 DispatchQueue.main.async {
-                    self.collectionView.reloadData()
+                    self.setupData()
                 }
             }
         }
@@ -457,17 +509,15 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     let filteredTransactions = transactions.filter({$0.should_link ?? true})
                     if !filteredTransactions.isEmpty {
                         sections.append(section)
-                        groups[section] = filteredTransactions
-                        
-//                        if filteredTransactions.count < 3 {
-//                            groups[section] = filteredTransactions
-//                        } else {
-//                            var finalTransactions = [Transaction]()
-//                            for index in 0...2 {
-//                                finalTransactions.append(filteredTransactions[index])
-//                            }
-//                            groups[section] = finalTransactions
-//                        }
+                        if filteredTransactions.count < 3 {
+                            groups[section] = filteredTransactions
+                        } else {
+                            var finalTransactions = [Transaction]()
+                            for index in 0...2 {
+                                finalTransactions.append(filteredTransactions[index])
+                            }
+                            groups[section] = finalTransactions
+                        }
                     }
                 }
             } else if section.type == "Investments" {
@@ -503,6 +553,11 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         } else if section == .health, !healthMetrics.isEmpty {
             let destination = HealthViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(destination, animated: true)
+        } else if section == .transactions, let transactions = financeGroups[.transactions], transactions.count > 3 {
+            let destination = FinanceDetailViewController(networkController: networkController)
+            destination.title = SectionType.transactions.name
+            destination.setSections = [.transactions]
             navigationController?.pushViewController(destination, animated: true)
         } else if !financeSections.isEmpty {
             let destination = FinanceViewController(networkController: networkController)
@@ -550,12 +605,6 @@ extension MasterActivityContainerController {
         let discoverController = DiscoverViewController()
         discoverController.networkController = networkController
         present(UINavigationController(rootViewController: discoverController), animated: true)
-    }
-}
-
-extension MasterActivityContainerController: HeaderContainerCellDelegate {
-    func viewTapped(sectionType: SectionType) {
-        goToVC(section: sectionType)
     }
 }
 
@@ -681,7 +730,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
 
 // MARK: - ActivitiesControllerCellDelegate
 
-extension MasterActivityContainerController: ActivitiesControllerCellDelegate {
+extension MasterActivityContainerController: ActivitiesControllerCellDelegate, UpdateInvitationDelegate {
     func headerTapped(sectionType: SectionType) {
         if sectionType == .tasks {
             let destination = ListsViewController(networkController: networkController)
@@ -781,6 +830,7 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     }
     
 }
+
 
 extension MasterActivityContainerController: EndedWebViewDelegate {
     func updateMXMembers() {

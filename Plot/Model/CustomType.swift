@@ -9,7 +9,7 @@
 import Foundation
 
 enum CustomType: String, Equatable, Hashable {
-    case event, task, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment
+    case event, task, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances
     
     var name: String {
         switch self {
@@ -32,6 +32,9 @@ enum CustomType: String, Equatable, Hashable {
         case .mindfulness: return "Mindfulness"
         case .calendar: return "Calendar"
         case .investment: return "Investment"
+        case .time: return "Time"
+        case .health: return "Health"
+        case .finances: return "Finances"
         }
     }
     
@@ -56,6 +59,9 @@ enum CustomType: String, Equatable, Hashable {
         case .mindfulness: return "Add mindfulness minutes"
         case .calendar: return "Add new calendar"
         case .investment: return "Add new investment"
+        case .time: return "Set Up Tasks and Calendar"
+        case .health: return "Set Up Health"
+        case .finances: return "Set Up Finances"
         }
     }
     
@@ -70,6 +76,9 @@ enum CustomType: String, Equatable, Hashable {
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
         case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar, .googleCalendarEvent, .iOSReminder, .googleTask, .investment: return ""
+        case .time: return "Set up Time by connecting your Apple or Gmail Account"
+        case .health: return "Set up Health by connecting to the Apple Health App"
+        case .finances: return "Set up Finances by connecting your existing financial accounts"
         }
     }
     
@@ -91,6 +100,9 @@ enum CustomType: String, Equatable, Hashable {
         case .calendar: return "calendar"
         case .investment: return "investment"
         case .iOSCalendarEvent,.googleCalendarEvent, .iOSReminder, .googleTask: return ""
+        case .time: return "calendar"
+        case .health: return "heart"
+        case .finances: return "money"
         }
     }
 }

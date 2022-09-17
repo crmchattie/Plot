@@ -67,16 +67,10 @@ class ActivityHeaderCell: UICollectionViewCell {
 
         if firstPosition && lastPosition {
             backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
-            backgroundView?.layer.shadowOpacity = 0.1
-            backgroundView?.layer.shadowRadius = 10
-            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         } else if firstPosition {
             backgroundView?.roundCorners(corners: [.topLeft, .topRight], radius: 10)
         } else if lastPosition {
             backgroundView?.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
-            backgroundView?.layer.shadowOpacity = 0.1
-            backgroundView?.layer.shadowRadius = 10
-            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         }
         
         logoImageView.constrainWidth(40)

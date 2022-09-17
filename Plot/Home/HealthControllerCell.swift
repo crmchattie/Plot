@@ -12,14 +12,12 @@ protocol HealthControllerCellDelegate: AnyObject {
 
 class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
     weak var delegate: HealthControllerCellDelegate?
-    
-    let healthMetricCellID = "HealthMetricCellID"
-    let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
-    
+        
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        layout.itemSize = UICollectionViewFlowLayout.automaticSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -82,21 +80,6 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        var height: CGFloat = 0
-//        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
-//        let key = healthMetricSections[indexPath.section]
-//        if let metrics = healthMetrics[key] {
-//            let metric = metrics[indexPath.row]
-//            dummyCell.configure(metric)
-//            dummyCell.layoutIfNeeded()
-//            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
-//            print("estimatedHeight \(estimatedSize.height)")
-//            height = estimatedSize.height
-//        }
-        return CGSize(width: self.collectionView.frame.size.width - 30, height: 85)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: self.collectionView.frame.size.width, height: 40)
     }
@@ -124,5 +107,4 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
             delegate?.cellTapped(metric: metric)
         }
     }
-    
 }

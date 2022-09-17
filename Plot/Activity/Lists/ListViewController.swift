@@ -25,7 +25,6 @@ class ListViewController: UIViewController, ObjectDetailShowing {
             
     let tableView = UITableView(frame: .zero, style: .insetGrouped)
     
-    let taskCellID = "taskCellID"
     let newTaskCellID = "newTaskCellID"
     
     var list: ListType!
