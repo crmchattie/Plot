@@ -40,7 +40,7 @@ class WorkoutMinutesOperation: AsyncOperation {
                 }
             }
             
-            var metricMinutes = HealthMetric(type: HealthMetricType.workoutMinutes, total: workout.endDate.timeIntervalSince(workout.startDate), date: workout.endDate, unitName: "hrs", rank: -1)
+            var metricMinutes = HealthMetric(type: HealthMetricType.workoutMinutes, total: workout.endDate.timeIntervalSince(workout.startDate), date: workout.endDate, unitName: "minutes", rank: -1)
             metricMinutes.hkSample = workout
                                 
             if averageWorkoutTime != 0 {

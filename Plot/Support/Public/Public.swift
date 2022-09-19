@@ -1959,15 +1959,15 @@ extension TimeInterval {
     }
     
     private var seconds: Int {
-        return Int(self) % 60
+        return Int(Double(self).truncatingRemainder(dividingBy: 60))
     }
     
     private var minutes: Int {
-        return (Int(self) / 60 ) % 60
+        return Int((Double(self)/60).rounded())
     }
     
     private var hours: Int {
-        return Int(self) / 3600
+        return Int(Double(self) / 3600)
     }
     
     var stringTime: String {

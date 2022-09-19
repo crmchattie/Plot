@@ -27,11 +27,23 @@ class FinanceLineChartDetailViewController: UIViewController {
     var backgroundChartViewHeightAnchor: NSLayoutConstraint?
     var backgroundChartViewTopAnchor: NSLayoutConstraint?
     
+    lazy var containerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+        
     lazy var backgroundChartView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
 //        view.layer.cornerRadius = 10
 //        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    lazy var bufferView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -110,14 +122,18 @@ class FinanceLineChartDetailViewController: UIViewController {
         view.backgroundColor = .systemGroupedBackground
         backgroundChartView.backgroundColor = .systemBackground
         chartView.backgroundColor = .systemBackground
+        bufferView.backgroundColor = .systemGroupedBackground
         
         view.addSubview(activityIndicator)
         
         view.addSubview(segmentedControl)
-        segmentedControl.selectedSegmentIndex = selectedIndex
-
+        
+        containerView.addSubview(backgroundChartView)
+        containerView.addSubview(bufferView)
         backgroundChartView.addSubview(chartView)
         chartView.delegate = self
+        
+        segmentedControl.selectedSegmentIndex = selectedIndex
         
         view.addSubview(tableView)
         tableView.dataSource = self
@@ -160,16 +176,26 @@ class FinanceLineChartDetailViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         ])
         
+        backgroundChartView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 0).isActive = true
+        backgroundChartView.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 0).isActive = true
+        backgroundChartView.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: 0).isActive = true
+        backgroundChartView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -10).isActive = true
+        
         chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor, constant: 10).isActive = true
         chartView.leftAnchor.constraint(equalTo: backgroundChartView.leftAnchor, constant: 10).isActive = true
         chartView.rightAnchor.constraint(equalTo: backgroundChartView.rightAnchor, constant: -5).isActive = true
-        chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: -20).isActive = true
-        tableView.tableHeaderView = backgroundChartView
-        backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
-        backgroundChartViewHeightAnchor?.isActive = true
-        backgroundChartView.centerXAnchor.constraint(equalTo: tableView.centerXAnchor).isActive = true
-        backgroundChartView.widthAnchor.constraint(equalTo: tableView.widthAnchor).isActive = true
-        backgroundChartView.topAnchor.constraint(equalTo: tableView.topAnchor).isActive = true
+        chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: -10).isActive = true
+        
+        bufferView.topAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: 0).isActive = true
+        bufferView.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 0).isActive = true
+        bufferView.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: 0).isActive = true
+        bufferView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 0).isActive = true
+        
+        containerView.constrainHeight(320)
+        tableView.tableHeaderView = containerView
+        containerView.centerXAnchor.constraint(equalTo: tableView.centerXAnchor).isActive = true
+        containerView.widthAnchor.constraint(equalTo: tableView.widthAnchor).isActive = true
+        containerView.topAnchor.constraint(equalTo: tableView.topAnchor).isActive = true
         tableView.tableHeaderView?.layoutIfNeeded()
         tableView.tableHeaderView = tableView.tableHeaderView
         
@@ -276,12 +302,6 @@ extension FinanceLineChartDetailViewController: ChartViewDelegate {
 }
 
 extension FinanceLineChartDetailViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return UIView()
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat { 0 }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let transactions = viewModel.transactions, !transactions.isEmpty {
