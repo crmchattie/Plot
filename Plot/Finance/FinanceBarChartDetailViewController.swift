@@ -6,7 +6,7 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
-fileprivate let chartViewHeight: CGFloat = 200
+fileprivate let chartViewHeight: CGFloat = 300
 fileprivate let chartViewTopMargin: CGFloat = 10
 
 import UIKit
@@ -30,8 +30,8 @@ class FinanceBarChartViewController: UIViewController {
     lazy var backgroundChartView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 10
-        view.layer.masksToBounds = true
+//        view.layer.cornerRadius = 10
+//        view.layer.masksToBounds = true
         return view
     }()
     
@@ -96,8 +96,8 @@ class FinanceBarChartViewController: UIViewController {
         extendedLayoutIncludesOpaqueBars = true
         
         
-        barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
-        navigationItem.rightBarButtonItem = barButton
+//        barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
+//        navigationItem.rightBarButtonItem = barButton
         
         if let accountDetails = viewModel.accountDetails {
             title = accountDetails.name
@@ -108,16 +108,14 @@ class FinanceBarChartViewController: UIViewController {
         addObservers()
         
         view.backgroundColor = .systemGroupedBackground
-        backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
-        chartView.backgroundColor = .secondarySystemGroupedBackground
+        backgroundChartView.backgroundColor = .systemBackground
+        chartView.backgroundColor = .systemBackground
         
         view.addSubview(activityIndicator)
         
         view.addSubview(segmentedControl)
         segmentedControl.selectedSegmentIndex = selectedIndex
 
-        backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
-        view.addSubview(backgroundChartView)
         backgroundChartView.addSubview(chartView)
         chartView.delegate = self
         
@@ -151,28 +149,29 @@ class FinanceBarChartViewController: UIViewController {
                                               .flexibleRightMargin]
         activityIndicator.startAnimating()
         
-        backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
-        backgroundChartViewTopAnchor = backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
         NSLayoutConstraint.activate([
             segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             segmentedControl.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             
-            backgroundChartViewTopAnchor!,
-            backgroundChartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-            backgroundChartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            backgroundChartViewHeightAnchor!,
-            
-            chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor, constant: 16),
-            chartView.leftAnchor.constraint(equalTo: backgroundChartView.leftAnchor, constant: 16),
-            chartView.rightAnchor.constraint(equalTo: backgroundChartView.rightAnchor, constant: -16),
-            chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: -16),
-            
-            tableView.topAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: 10),
+            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         ])
+        
+        chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor, constant: 10).isActive = true
+        chartView.leftAnchor.constraint(equalTo: backgroundChartView.leftAnchor, constant: 10).isActive = true
+        chartView.rightAnchor.constraint(equalTo: backgroundChartView.rightAnchor, constant: -5).isActive = true
+        chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: -20).isActive = true
+        tableView.tableHeaderView = backgroundChartView
+        backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
+        backgroundChartViewHeightAnchor?.isActive = true
+        backgroundChartView.centerXAnchor.constraint(equalTo: tableView.centerXAnchor).isActive = true
+        backgroundChartView.widthAnchor.constraint(equalTo: tableView.widthAnchor).isActive = true
+        backgroundChartView.topAnchor.constraint(equalTo: tableView.topAnchor).isActive = true
+        tableView.tableHeaderView?.layoutIfNeeded()
+        tableView.tableHeaderView = tableView.tableHeaderView
         
         tableView.separatorStyle = .none
         tableView.register(FinanceTableViewCell.self, forCellReuseIdentifier: kFinanceTableViewCell)
@@ -185,31 +184,25 @@ class FinanceBarChartViewController: UIViewController {
     
     func configureChart() {
         chartView.maxVisibleCount = 60
+
+        chartView.leftAxis.enabled = false
         
         let xAxis = chartView.xAxis
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
         xAxis.valueFormatter = dayAxisValueFormatter
-        xAxis.labelPosition = .bottom
-        xAxis.labelFont = UIFont.caption2.with(weight: .regular)
-        xAxis.granularity = 1
-        xAxis.labelCount = 5
-                                
-        chartView.rightAxis.enabled = true
-        chartView.leftAxis.enabled = false
+        xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         
         let rightAxisFormatter = NumberFormatter()
         rightAxisFormatter.numberStyle = .currency
         rightAxisFormatter.maximumFractionDigits = 0
         let rightAxis = chartView.rightAxis
         rightAxis.enabled = true
-        rightAxis.labelFont = UIFont.caption2.with(weight: .regular)
-        rightAxis.labelCount = 8
+        rightAxis.labelFont = UIFont.caption1.with(weight: .regular)
         rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
-        rightAxis.spaceTop = 0.15
 
-        let marker = XYMarkerView(color: .secondaryLabel,
-                                  font: UIFont.caption2.with(weight: .regular),
-                                  textColor: .white,
+        let marker = XYMarkerView(color: .systemGroupedBackground,
+                                  font: UIFont.body.with(weight: .regular),
+                                  textColor: .label,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
                                   xAxisValueFormatter: dayAxisValueFormatter!, units: units)
         marker.chartView = chartView
@@ -229,6 +222,7 @@ class FinanceBarChartViewController: UIViewController {
     
     private func updateChartViewAppearance(hidden: Bool) {
         chartView.isHidden = hidden
+        tableView.tableHeaderView = hidden ? nil : backgroundChartView
         backgroundChartViewHeightAnchor?.constant = hidden ? 0 : chartViewHeight
         backgroundChartViewTopAnchor?.constant = hidden ? 0 : chartViewTopMargin
         barButton.title = chartView.isHidden ? "Show Chart" : "Hide Chart"

@@ -22,6 +22,10 @@ class Activity: NSObject, NSCopying, Codable {
     var calendarName: String?
     var calendarColor: String?
     var calendarSource: String?
+    var listID: String?
+    var listName: String?
+    var listColor: String?
+    var listSource: String?
     var activityType: String?
     var category: String?
     var activityDescription: String?
@@ -68,10 +72,6 @@ class Activity: NSObject, NSCopying, Codable {
     var userCompletedDate: NSNumber?
     var scheduleIDs: [String]?
     var isSchedule: Bool?
-    var listID: String?
-    var listName: String?
-    var listColor: String?
-    var listSource: String?
     var subtaskIDs: [String]?
     var isSubtask: Bool?
     var hasStartTime: Bool?
@@ -239,6 +239,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.externalActivityID as AnyObject? {
             dictionary["externalActivityID"] = value
+        }
+        
+        if let value = self.calendarExport as AnyObject? {
+            dictionary["calendarExport"] = value
         }
         
         if let value = self.name as AnyObject? {

@@ -104,6 +104,7 @@ class TaskViewController: FormViewController {
             }
             setupLists()
             resetBadgeForSelf()
+            print(task.toAnyObject())
         } else {
             title = "New Task"
             if let currentUserID = Auth.auth().currentUser?.uid {

@@ -259,7 +259,8 @@ class EventKitService {
     }
     
     func fetchReminders(completion: @escaping ([EKReminder]) -> Swift.Void) {
-        let predicate: NSPredicate? = eventStore.predicateForReminders(in: nil)
+        let calendars = eventStore.calendars(for: .reminder).filter { $0.title != "Plot" }
+        let predicate: NSPredicate? = eventStore.predicateForReminders(in: calendars)
         if let aPredicate = predicate {
             eventStore.fetchReminders(matching: aPredicate, completion: {(_ reminders: [Any]?) -> Void in
                 var filteredReminders = [EKReminder]()

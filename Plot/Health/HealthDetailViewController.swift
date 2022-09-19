@@ -12,7 +12,7 @@ import HealthKit
 import Firebase
 
 fileprivate let healthDetailSampleCellID = "HealthDetailSampleCellID"
-fileprivate let chartViewHeight: CGFloat = 200
+fileprivate let chartViewHeight: CGFloat = 300
 fileprivate let chartViewTopMargin: CGFloat = 10
 
 class HealthDetailViewController: UIViewController, ObjectDetailShowing {
@@ -24,8 +24,8 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
     lazy var backgroundChartView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 10
-        view.layer.masksToBounds = true
+//        view.layer.cornerRadius = 10
+//        view.layer.masksToBounds = true
         return view
     }()
     
@@ -83,8 +83,8 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         
         extendedLayoutIncludesOpaqueBars = true
         
-        barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
-        navigationItem.rightBarButtonItem = barButton
+//        barButton = UIBarButtonItem(title: "Hide Chart", style: .plain, target: self, action: #selector(hideUnhideTapped))
+//        navigationItem.rightBarButtonItem = barButton
         
         if case HealthMetricType.workout = viewModel.healthMetric.type, let hkWorkout = viewModel.healthMetric.hkSample as? HKWorkout {
             title = hkWorkout.workoutActivityType.name
@@ -98,14 +98,13 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         
         view.backgroundColor = .systemGroupedBackground
         backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
-        chartView.backgroundColor = .secondarySystemGroupedBackground
+        chartView.backgroundColor = .systemBackground
         
         view.addSubview(activityIndicator)
         
         view.addSubview(segmentedControl)
         
-        backgroundChartView.backgroundColor = .secondarySystemGroupedBackground
-        view.addSubview(backgroundChartView)
+        backgroundChartView.backgroundColor = .systemBackground
         backgroundChartView.addSubview(chartView)
         chartView.delegate = self
         
@@ -126,28 +125,31 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
                                               .flexibleLeftMargin,
                                               .flexibleRightMargin]
         
-        backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
-        backgroundChartViewTopAnchor = backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: chartViewTopMargin)
         NSLayoutConstraint.activate([
             segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             segmentedControl.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
             
-            backgroundChartViewTopAnchor!,
-            backgroundChartView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-            backgroundChartView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            backgroundChartViewHeightAnchor!,
-            
-            chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor, constant: 16),
-            chartView.leftAnchor.constraint(equalTo: backgroundChartView.leftAnchor, constant: 16),
-            chartView.rightAnchor.constraint(equalTo: backgroundChartView.rightAnchor, constant: -16),
-            chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: -16),
-            
-            tableView.topAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: 10),
+            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+            
         ])
+        
+        chartView.topAnchor.constraint(equalTo: backgroundChartView.topAnchor, constant: 10).isActive = true
+        chartView.leftAnchor.constraint(equalTo: backgroundChartView.leftAnchor, constant: 10).isActive = true
+        chartView.rightAnchor.constraint(equalTo: backgroundChartView.rightAnchor, constant: -5).isActive = true
+        chartView.bottomAnchor.constraint(equalTo: backgroundChartView.bottomAnchor, constant: -20).isActive = true
+        
+        tableView.tableHeaderView = backgroundChartView
+        backgroundChartViewHeightAnchor = backgroundChartView.heightAnchor.constraint(equalToConstant: chartViewHeight)
+        backgroundChartViewHeightAnchor?.isActive = true
+        backgroundChartView.centerXAnchor.constraint(equalTo: tableView.centerXAnchor).isActive = true
+        backgroundChartView.widthAnchor.constraint(equalTo: tableView.widthAnchor).isActive = true
+        backgroundChartView.topAnchor.constraint(equalTo: tableView.topAnchor).isActive = true
+        tableView.tableHeaderView?.layoutIfNeeded()
+        tableView.tableHeaderView = tableView.tableHeaderView
         
         tableView.separatorStyle = .none
         tableView.register(HealthDetailSampleCell.self, forCellReuseIdentifier: healthDetailSampleCellID)
@@ -163,15 +165,22 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         chartView.xAxis.valueFormatter = dayAxisValueFormatter
         chartView.xAxis.granularity = 1
         chartView.xAxis.labelCount = 5
-
+        
+        chartView.leftAxis.enabled = false
+        
+        let xAxis = chartView.xAxis
+        xAxis.labelFont = UIFont.caption1.with(weight: .regular)
+                                
         let rightAxisFormatter = NumberFormatter()
         rightAxisFormatter.numberStyle = .decimal
         let rightAxis = chartView.rightAxis
+        rightAxis.enabled = true
+        rightAxis.labelFont = UIFont.caption1.with(weight: .regular)
         rightAxis.valueFormatter = DefaultAxisValueFormatter(formatter: rightAxisFormatter)
         
-        let marker = XYMarkerView(color: .secondaryLabel,
-                                  font: UIFont.caption2.with(weight: .regular),
-                                  textColor: .white,
+        let marker = XYMarkerView(color: .systemGroupedBackground,
+                                  font: UIFont.body.with(weight: .regular),
+                                  textColor: .label,
                                   insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
                                   xAxisValueFormatter: dayAxisValueFormatter!, units: viewModel.healthMetric.unitName)
         marker.chartView = chartView
@@ -292,14 +301,6 @@ extension HealthDetailViewController: ChartViewDelegate {
 }
 
 extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return UIView()
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.samples.count
     }
