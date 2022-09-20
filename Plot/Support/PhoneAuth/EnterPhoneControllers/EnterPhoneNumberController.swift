@@ -11,8 +11,7 @@ import Firebase
 import SafariServices
 import PhoneNumberKit
 
-class EnterPhoneNumberController: UIViewController {
-    
+class EnterPhoneNumberController: UIViewController {    
     let phoneNumberKit = PhoneNumberKit()
     let phoneNumberContainerView = EnterPhoneNumberContainerView()
     let countries = Country().countries

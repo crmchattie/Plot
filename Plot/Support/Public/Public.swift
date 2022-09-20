@@ -1963,7 +1963,7 @@ extension TimeInterval {
     }
     
     private var minutes: Int {
-        return Int((Double(self)/60).rounded())
+        return Int((Double(self) / 60).truncatingRemainder(dividingBy: 60))
     }
     
     private var hours: Int {

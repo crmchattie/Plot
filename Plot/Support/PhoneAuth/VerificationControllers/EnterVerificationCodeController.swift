@@ -11,7 +11,6 @@ import Firebase
 import PhoneNumberKit
 
 class EnterVerificationCodeController: UIViewController {
-    
     let enterVerificationContainerView = EnterVerificationContainerView()
     
     let phoneNumberKit = PhoneNumberKit()

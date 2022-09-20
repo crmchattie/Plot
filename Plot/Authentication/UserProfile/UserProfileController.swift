@@ -11,6 +11,7 @@ import Firebase
 
 class UserProfileController: UIViewController {
     
+    var networkController = NetworkController()
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
@@ -100,28 +101,29 @@ extension UserProfileController {
     
     func checkIfUserDataExists(completionHandler: @escaping CompletionHandler) {
         let nameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("name")
-        nameReference.observe(.value, with: { (snapshot) in
+        nameReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists() {
                 self.userProfileContainerView.name.text = snapshot.value as? String
+                NotificationCenter.default.post(name: .oldUserLoggedIn, object: nil)
             }
         })
         
         let bioReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("bio")
-        bioReference.observe(.value, with: { (snapshot) in
+        bioReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists() {
                 self.userProfileContainerView.bio.text = snapshot.value as? String
             }
         })
         
         let emailReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("email")
-        emailReference.observe(.value, with: { (snapshot) in
+        emailReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists() {
                 self.userProfileContainerView.email.text = snapshot.value as? String
             }
         })
                 
         let photoReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("photoURL")
-        photoReference.observe(.value, with: { (snapshot) in
+        photoReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists() {
                 guard let urlString = snapshot.value as? String else {
                     completionHandler(true)

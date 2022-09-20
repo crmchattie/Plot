@@ -247,7 +247,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("Failed to register: \(error)")
     }
     
-    var orientationLock = UIInterfaceOrientationMask.allButUpsideDown
+    var orientationLock = UIInterfaceOrientationMask.portrait
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         guard Auth.auth().currentUser != nil else { return .portrait }

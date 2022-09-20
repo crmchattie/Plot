@@ -9,6 +9,10 @@
 import Foundation
 import Firebase
 
+extension NSNotification.Name {
+    static let oldUserLoggedIn = NSNotification.Name(Bundle.main.bundleIdentifier! + ".oldUserLoggedIn")
+}
+
 extension MasterActivityContainerController {
     
     func loadVariables() {
@@ -21,6 +25,7 @@ extension MasterActivityContainerController {
         UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
+        self.setupData()
         if !isNewUser {
             networkController.setupKeyVariables {
                 self.collectionView.reloadData()
@@ -30,6 +35,13 @@ extension MasterActivityContainerController {
         } else {
             self.removeLaunchScreenView()
             self.presentOnboardingController()
+        }
+    }
+    
+    @objc func reloadVariables() {
+        networkController.setupKeyVariables {
+            self.collectionView.reloadData()
+            self.networkController.setupOtherVariables()
         }
     }
     

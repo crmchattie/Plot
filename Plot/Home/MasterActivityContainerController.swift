@@ -152,10 +152,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         onceToken = 1
         managePresense()
         
-        //for when a new user signs on and onboarding screen is dismissed
-        if isNewUser {
-            collectionView.reloadData()
-        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -212,6 +208,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedCalendarEventActivities), name: .hasLoadedCalendarEventActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadVariables), name: .oldUserLoggedIn, object: nil)
     }
     
     func setupData() {

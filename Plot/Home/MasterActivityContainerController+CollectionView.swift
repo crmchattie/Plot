@@ -169,7 +169,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         }
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
         cell.backgroundColor = .secondarySystemGroupedBackground
-        cell.intColor = (indexPath.section % 5)
+        cell.intColor = (indexPath.section % 3)
         if let item = object as? CustomType {
             cell.customType = item
         }
@@ -289,7 +289,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else {
             let dummyCell = SetupCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.backgroundColor = .secondarySystemGroupedBackground
-            dummyCell.intColor = (indexPath.section % 5)
+            dummyCell.intColor = (indexPath.section % 3)
             if let item = object as? CustomType {
                 dummyCell.customType = item
             }

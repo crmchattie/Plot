@@ -8,8 +8,8 @@
 
 import Foundation
 
-class SetupCell: BaseContainerCollectionViewCell {    
-    var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
+class SetupCell: BaseContainerCollectionViewCell {
+    var colors : [UIColor] = [FalconPalette.defaultRed, FalconPalette.defaultBlue, FalconPalette.defaultOrange, FalconPalette.defaultDarkBlue, FalconPalette.defaultGreen]
     var intColor: Int = 0
     
     var customType: CustomType! {

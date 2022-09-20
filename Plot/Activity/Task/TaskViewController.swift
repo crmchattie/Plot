@@ -104,13 +104,11 @@ class TaskViewController: FormViewController {
             }
             setupLists()
             resetBadgeForSelf()
-            print(task.toAnyObject())
         } else {
             title = "New Task"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                print(activityID)
                 if let list = list {
                     task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false)
                 } else {
