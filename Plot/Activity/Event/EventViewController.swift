@@ -192,6 +192,7 @@ class EventViewController: FormViewController {
         tableView.sectionIndexBackgroundColor = .systemGroupedBackground
         tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        navigationOptions = .Disabled
     }
     
     func setupRightBarButton() {
@@ -593,11 +594,7 @@ class EventViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
-                    row.value = String(self.acceptedParticipant.count + 1)
-                } else {
-                    row.value = String(self.acceptedParticipant.count)
-                }
+                row.value = String(selectedFalconUsers.count + 1)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in

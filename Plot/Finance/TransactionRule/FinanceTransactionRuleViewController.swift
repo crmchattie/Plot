@@ -80,7 +80,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 navigationItem.leftBarButtonItem?.action = #selector(cancel)
             }
         }
-        
+        navigationOptions = .Disabled
     }
     
     @IBAction func cancel(_ sender: AnyObject) {

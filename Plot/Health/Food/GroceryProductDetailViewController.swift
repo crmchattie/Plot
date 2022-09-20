@@ -75,6 +75,7 @@ class GroceryProductDetailViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Grocery Item"
+        navigationOptions = .Disabled
     }
 
     @objc fileprivate func close() {

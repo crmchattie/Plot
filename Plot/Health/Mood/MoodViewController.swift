@@ -31,8 +31,6 @@ class MoodViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        
-        
         setupVariables()
         configureTableView()
         initializeForm()
@@ -77,6 +75,7 @@ class MoodViewController: FormViewController {
             }
         }
         navigationItem.rightBarButtonItem?.isEnabled = active
+        navigationOptions = .Disabled
     }
     
     @IBAction func cancel(_ sender: AnyObject) {

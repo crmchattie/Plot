@@ -81,13 +81,16 @@ class MindfulnessViewController: FormViewController {
         } else {
             active = true
             title = "Mindfulness"
+            print(mindfulness.id)
+            
+            setupLists()
+            resetBadgeForSelf()
         }
         
         configureTableView()
         setupRightBarButton()
         initializeForm()
         updateLength()
-        setupLists()
         
         if active {
             for row in form.allRows {
@@ -117,6 +120,7 @@ class MindfulnessViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
+        navigationOptions = .Disabled
     }
     
     func setupRightBarButton() {
@@ -255,6 +259,7 @@ class MindfulnessViewController: FormViewController {
                 $0.title = $0.tag
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
+                $0.minuteInterval = 5
                 if self.active {
                     $0.value = self.mindfulness!.startDateTime
                 } else {
@@ -300,6 +305,7 @@ class MindfulnessViewController: FormViewController {
                 $0.title = $0.tag
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
+                $0.minuteInterval = 5
                 if self.active {
                     $0.value = self.mindfulness!.endDateTime
                 } else {
@@ -359,11 +365,7 @@ class MindfulnessViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
-                    row.value = String(self.selectedFalconUsers.count + 1)
-                } else {
-                    row.value = String(self.selectedFalconUsers.count)
-                }
+                row.value = String(selectedFalconUsers.count + 1)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
@@ -620,11 +622,7 @@ extension MindfulnessViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if mindfulness.admin == nil || mindfulness.admin == Auth.auth().currentUser?.uid {
-                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                inviteesRow.value = String(self.selectedFalconUsers.count)
-            }
+            inviteesRow.value = String(selectedFalconUsers.count + 1)
             inviteesRow.updateCell()
             
             if active {

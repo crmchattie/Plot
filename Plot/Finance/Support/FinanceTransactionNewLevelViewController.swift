@@ -55,7 +55,7 @@ class FinanceTransactionNewLevelViewController: FormViewController {
         tableView.indicatorStyle = .default
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = .none
-        
+        navigationOptions = .Disabled
 //        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 //        navigationItem.leftBarButtonItem = cancelBarButton
         let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))

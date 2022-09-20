@@ -51,6 +51,21 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         return button
     }()
     
+    let badgeLabel: UILabel = {
+        let badgeLabel = UILabel()
+        badgeLabel.translatesAutoresizingMaskIntoConstraints = false
+        badgeLabel.backgroundColor = FalconPalette.defaultBlue
+        badgeLabel.layer.cornerRadius = 10
+        badgeLabel.text = "1"
+        badgeLabel.isHidden = true
+        badgeLabel.textColor = .white
+        badgeLabel.textAlignment = .center
+        badgeLabel.layer.masksToBounds = true
+        badgeLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        badgeLabel.adjustsFontForContentSizeCategory = true
+        return badgeLabel
+    }()
+    
     private var widthConstraint: NSLayoutConstraint?
     
     override func awakeFromNib() {
@@ -64,6 +79,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         addSubview(subtitleLabel)
         addSubview(detailLabel)
         addSubview(activityTypeButton)
+        addSubview(badgeLabel)
 
         widthConstraint = widthAnchor.constraint(equalToConstant: -30)
 
@@ -84,6 +100,11 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         activityTypeButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
         activityTypeButton.widthAnchor.constraint(equalToConstant: 29).isActive = true
         activityTypeButton.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        
+        badgeLabel.centerYAnchor.constraint(equalTo: activityTypeButton.centerYAnchor).isActive = true
+        badgeLabel.rightAnchor.constraint(equalTo: activityTypeButton.leftAnchor, constant: -5).isActive = true
+        badgeLabel.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        badgeLabel.heightAnchor.constraint(equalToConstant: 25).isActive = true
     }
     
     override func updateConstraints() {
@@ -102,6 +123,7 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         titleLabel.text = ""
         subtitleLabel.text = ""
         detailLabel.text = ""
+        badgeLabel.isHidden = true
         activityTypeButton.setImage(nil, for: .normal)
     }
     
@@ -185,6 +207,16 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             detailLabel.text = nil
             let workoutActivityType = workout.hkWorkoutActivityType
             activityTypeButton.setImage(UIImage(named: workoutActivityType.image), for: .normal)
+            
+            let badgeString = workout.badge?.toString()
+            let badgeInt = workout.badge ?? 0
+            
+            if badgeInt > 0 {
+                badgeLabel.text = badgeString
+                badgeLabel.isHidden = false
+            } else {
+                badgeLabel.isHidden = true
+            }
         } else if let mindfulness = metric as? Mindfulness {
             titleLabel.text = mindfulness.name
             let timeAgo = NSCalendar.current.isDateInToday(mindfulness.endDateTime ?? Date()) ? "today" : timeAgoSinceDate(mindfulness.endDateTime ?? Date())
@@ -196,7 +228,18 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             }
             detailLabel.text = nil
             activityTypeButton.setImage(UIImage(named: "mindfulness"), for: .normal)
+            
+            let badgeString = mindfulness.badge?.toString()
+            let badgeInt = mindfulness.badge ?? 0
+            
+            if badgeInt > 0 {
+                badgeLabel.text = badgeString
+                badgeLabel.isHidden = false
+            } else {
+                badgeLabel.isHidden = true
+            }
         }
+        
         
         
     }

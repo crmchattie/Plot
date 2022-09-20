@@ -16,11 +16,7 @@ extension EventViewController: UpdateInvitees {
             self.selectedFalconUsers = selectedFalconUsers
             self.acceptedParticipant = acceptedParticipant.filter { selectedFalconUsers.contains($0) }
             
-            if activity.admin == nil || activity.admin == Auth.auth().currentUser?.uid {
-                inviteesRow.value = String(self.acceptedParticipant.count + 1)
-            } else {
-                inviteesRow.value = String(self.acceptedParticipant.count)
-            }
+            inviteesRow.value = String(selectedFalconUsers.count + 1)
             inviteesRow.updateCell()
             
             if active {

@@ -107,7 +107,7 @@ class SubtaskViewController: FormViewController {
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
-        
+        navigationOptions = .Disabled
     }
     
     @IBAction func cancel(_ sender: AnyObject) {
@@ -1083,13 +1083,8 @@ extension SubtaskViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if !selectedFalconUsers.isEmpty {
-                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-                inviteesRow.updateCell()
-            } else {
-                inviteesRow.value = String(1)
-                inviteesRow.updateCell()
-            }
+            inviteesRow.value = String(self.selectedFalconUsers.count + 1)
+            inviteesRow.updateCell()
         }
     }
 }

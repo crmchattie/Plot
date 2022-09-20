@@ -76,6 +76,7 @@ class FilterViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Update Filters"
+        navigationOptions = .Disabled
     }
     
     @objc fileprivate func cancelFilter() {

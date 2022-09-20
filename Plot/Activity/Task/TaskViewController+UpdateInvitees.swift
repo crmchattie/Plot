@@ -14,11 +14,7 @@ extension TaskViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
-                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                inviteesRow.value = String(self.selectedFalconUsers.count)
-            }
+            inviteesRow.value = String(selectedFalconUsers.count + 1)
             inviteesRow.updateCell()
             
             if active {

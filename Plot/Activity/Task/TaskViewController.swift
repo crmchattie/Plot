@@ -164,6 +164,7 @@ class TaskViewController: FormViewController {
         tableView.sectionIndexBackgroundColor = .systemGroupedBackground
         tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        navigationOptions = .Disabled
     }
     
     func setupRightBarButton() {
@@ -811,11 +812,7 @@ class TaskViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if task.admin == nil || task.admin == Auth.auth().currentUser?.uid {
-                    row.value = String(self.selectedFalconUsers.count + 1)
-                } else {
-                    row.value = String(self.selectedFalconUsers.count)
-                }
+                row.value = String(selectedFalconUsers.count + 1)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in

@@ -82,7 +82,7 @@ class ActivityLevelViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        
+        navigationOptions = .Disabled
 //        let barButton = UIBarButtonItem(title: "New Category", style: .plain, target: self, action: #selector(newLevel))
 //        navigationItem.rightBarButtonItem = barButton
     }

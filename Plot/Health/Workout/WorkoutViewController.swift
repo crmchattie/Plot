@@ -74,6 +74,9 @@ class WorkoutViewController: FormViewController {
             title = "Workout"
             active = true
             print(workout.id)
+
+            setupLists()
+            resetBadgeForSelf()
         } else {
             title = "New Workout"
             if let currentUserID = Auth.auth().currentUser?.uid {
@@ -89,12 +92,14 @@ class WorkoutViewController: FormViewController {
         setupRightBarButton()
         initializeForm()
         updateLength()
-        setupLists()
         
         if active {
             for row in form.allRows {
                 if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" && row.tag != "Body Weight" && row.tag != "Name" {
                     row.baseCell.isUserInteractionEnabled = false
+                }
+                if workout.hkSampleID == nil && row.tag == "Calories Burned"  {
+                    row.baseCell.isUserInteractionEnabled = true
                 }
             }
         }
@@ -115,6 +120,7 @@ class WorkoutViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
+        navigationOptions = .Disabled
     }
     
     func setupRightBarButton() {
@@ -330,7 +336,7 @@ class WorkoutViewController: FormViewController {
 //            self.updateCalories()
             if row.value == nil {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
-            } else if self.workout.name != "WorkoutName" {
+            } else if self.workout.name != "Name" {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             }
         })
@@ -348,6 +354,7 @@ class WorkoutViewController: FormViewController {
             cell.textField?.textColor = .secondaryLabel
         }.onChange({ row in
             if let value = row.value {
+                self.workout.totalEnergyBurned = value
                 if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userWorkoutsEntity).child(currentUser).child(self.workout.id).child("totalEnergyBurned")
                     reference.setValue(value)
@@ -362,6 +369,7 @@ class WorkoutViewController: FormViewController {
             $0.title = $0.tag
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
+            $0.minuteInterval = 5
             if self.active {
                 $0.value = self.workout!.startDateTime
             } else {
@@ -407,6 +415,7 @@ class WorkoutViewController: FormViewController {
             $0.title = $0.tag
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
+            $0.minuteInterval = 5
             if self.active {
                 $0.value = self.workout!.endDateTime
             } else {
@@ -467,11 +476,7 @@ class WorkoutViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
-                    row.value = String(self.selectedFalconUsers.count + 1)
-                } else {
-                    row.value = String(self.selectedFalconUsers.count)
-                }
+                row.value = String(selectedFalconUsers.count + 1)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
@@ -719,23 +724,25 @@ class WorkoutViewController: FormViewController {
             completion(selectedFalconUsers)
         }
     }
+    
+    func resetBadgeForSelf() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        let badgeRef = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).child(workout.id).child("badge")
+        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            value = 0
+            mutableData.value = value!
+            return TransactionResult.success(withValue: mutableData)
+        })
+    }
 }
 
 extension WorkoutViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if !selectedFalconUsers.isEmpty {
-                if workout.admin == nil || workout.admin == Auth.auth().currentUser?.uid {
-                    inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-                } else {
-                    inviteesRow.value = String(self.selectedFalconUsers.count)
-                }
-                inviteesRow.updateCell()
-            } else {
-                inviteesRow.value = String(1)
-                inviteesRow.updateCell()
-            }
+            inviteesRow.value = String(selectedFalconUsers.count + 1)
+            inviteesRow.updateCell()
             
             if active {
                 showActivityIndicator()

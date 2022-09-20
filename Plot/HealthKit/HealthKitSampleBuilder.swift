@@ -35,9 +35,11 @@ class HealthKitSampleBuilder {
         
         ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(hkWorkout.uuid.uuidString).child(identifierKey).setValue(workout.id)
         
-        ref.child(userMindfulnessEntity).child(currentUserID).child(workout.id).child(hkSampleIDKey).setValue(hkWorkout.uuid.uuidString)
+        ref.child(userWorkoutsEntity).child(currentUserID).child(workout.id).child(hkSampleIDKey).setValue(hkWorkout.uuid.uuidString)
         
-        HealthKitService.storeSample(sample: hkWorkout) { (_, _) in }
+        HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
+            NotificationCenter.default.post(name: .healthKitUpdated, object: nil)
+        }
         
         return hkWorkout
     }
@@ -55,7 +57,9 @@ class HealthKitSampleBuilder {
         
         ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulness.id).child(hkSampleIDKey).setValue(hkMindfulness.uuid.uuidString)
         
-        HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in }
+        HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in
+            NotificationCenter.default.post(name: .healthKitUpdated, object: nil)
+        }
         
         return hkMindfulness
     }

@@ -50,7 +50,7 @@ class TagsViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Tags"
-        
+        navigationOptions = .Disabled
         let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
         navigationItem.rightBarButtonItem = addBarButton
         

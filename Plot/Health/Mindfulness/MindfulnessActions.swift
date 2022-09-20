@@ -67,11 +67,7 @@ class MindfulnessActions: NSObject {
         let membersIDs = fetchMembersIDs()
         mindfulness.participantsIDs = membersIDs.0
         mindfulness.lastModifiedDate = Date()
-        
-        if mindfulness.hkSampleID == nil {
-            createHealthKit()
-        }
-                
+                        
         let groupMindfulnessReference = Database.database().reference().child(mindfulnessEntity).child(ID)
 
         do {
@@ -79,6 +75,14 @@ class MindfulnessActions: NSObject {
             groupMindfulnessReference.setValue(value)
         } catch let error {
             print(error)
+        }
+        
+        if mindfulness.hkSampleID == nil {
+            createHealthKit()
+        }
+        
+        if mindfulness.containerID == nil {
+            createActivity()
         }
         
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
@@ -99,23 +103,18 @@ class MindfulnessActions: NSObject {
     
     func createHealthKit() {
         if let _ = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {
-            if mindfulness.containerID == nil {
-                self.createActivity()
-            }
+            
         }
     }
     
     func createActivity() {
-        if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID, let active = active {
+        if let activity = ActivityBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID {
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
             activityActions.createNewActivity()
             //will update activity.containerID and mindfulness.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulness.id], mealIDs: nil, transactionIDs: nil, participantsIDs: mindfulness.participantsIDs)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
-            if active {
-                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers ?? [])
-            }
         }
     }
     

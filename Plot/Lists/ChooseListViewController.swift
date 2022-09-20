@@ -78,7 +78,7 @@ class ChooseListViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        
+        navigationOptions = .Disabled
 //        let barButton = UIBarButtonItem(title: "New Reminder", style: .plain, target: self, action: #selector(newCategory))
 //        navigationItem.rightBarButtonItem = barButton
     }

@@ -74,6 +74,7 @@ class FinanceTransactionLevelViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
+        navigationOptions = .Disabled
 //        let newLevelBarButton = UIBarButtonItem(title: "New \(level)", style: .plain, target: self, action: #selector(newLevel))
 //        navigationItem.rightBarButtonItem = newLevelBarButton
     }

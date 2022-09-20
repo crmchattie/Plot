@@ -81,6 +81,8 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .healthUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .workoutsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .mindfulnessUpdated, object: nil)
     }
     
     @objc fileprivate func setupData() {

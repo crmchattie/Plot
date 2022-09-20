@@ -59,6 +59,8 @@ class SubtaskListViewController: FormViewController {
                 
         let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
         navigationItem.rightBarButtonItem = plusBarButton
+        
+        navigationOptions = .Disabled
                 
     }
     

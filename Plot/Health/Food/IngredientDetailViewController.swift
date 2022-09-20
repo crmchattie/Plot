@@ -68,6 +68,7 @@ class IngredientDetailViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Ingredient"
+        navigationOptions = .Disabled
     }
 
     @objc fileprivate func close() {

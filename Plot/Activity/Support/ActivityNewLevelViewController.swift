@@ -47,6 +47,7 @@ class ActivityNewLevelViewController: FormViewController {
         navigationItem.leftBarButtonItem = cancelBarButton
         let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
         navigationItem.rightBarButtonItem = addBarButton
+        navigationOptions = .Disabled
     }
     
     @IBAction func cancel(_ sender: AnyObject) {

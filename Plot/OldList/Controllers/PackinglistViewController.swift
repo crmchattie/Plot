@@ -100,6 +100,7 @@ class PackinglistViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationItem.title = "Packing List"
+        navigationOptions = .Disabled
     }
     
     func setupRightBarButton() {
@@ -310,11 +311,7 @@ class PackinglistViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if packinglist.admin == nil || packinglist.admin == Auth.auth().currentUser?.uid {
-                    row.value = String(self.selectedFalconUsers.count + 1)
-                } else {
-                    row.value = String(self.selectedFalconUsers.count)
-                }
+                row.value = String(selectedFalconUsers.count + 1)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
@@ -385,11 +382,7 @@ extension PackinglistViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if packinglist.admin == nil || packinglist.admin == Auth.auth().currentUser?.uid {
-                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                inviteesRow.value = String(self.selectedFalconUsers.count)
-            }
+            inviteesRow.value = String(selectedFalconUsers.count + 1)
             inviteesRow.updateCell()
             
 //            if active {

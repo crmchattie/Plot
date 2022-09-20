@@ -90,6 +90,7 @@ class FinanceAccountViewController: FormViewController {
                 navigationItem.leftBarButtonItem?.action = #selector(cancel)
             }
         }
+        navigationOptions = .Disabled
     }
     
     func setupVariables() {
@@ -431,11 +432,7 @@ class FinanceAccountViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
-                    row.value = String(self.selectedFalconUsers.count + 1)
-                } else {
-                    row.value = String(self.selectedFalconUsers.count)
-                }
+                row.value = String(selectedFalconUsers.count + 1)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
@@ -559,11 +556,7 @@ extension FinanceAccountViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if account.admin == nil || account.admin == Auth.auth().currentUser?.uid {
-                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                inviteesRow.value = String(self.selectedFalconUsers.count)
-            }
+            inviteesRow.value = String(selectedFalconUsers.count + 1)
             inviteesRow.updateCell()
             
             if active {

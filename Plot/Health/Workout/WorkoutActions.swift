@@ -68,11 +68,7 @@ class WorkoutActions: NSObject {
         let membersIDs = fetchMembersIDs()
         workout.participantsIDs = membersIDs.0
         workout.lastModifiedDate = Date()
-        
-        if workout.hkSampleID == nil {
-            createHealthKit(memberIDs: membersIDs.0)
-        }
-                
+                        
         let groupWorkoutReference = Database.database().reference().child(workoutsEntity).child(ID)
 
         do {
@@ -80,6 +76,14 @@ class WorkoutActions: NSObject {
             groupWorkoutReference.setValue(value)
         } catch let error {
             print(error)
+        }
+        
+        if workout.hkSampleID == nil {
+            createHealthKit()
+        }
+        
+        if workout.containerID == nil {
+            createActivity()
         }
         
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
@@ -98,22 +102,19 @@ class WorkoutActions: NSObject {
         }
     }
     
-    func createHealthKit(memberIDs: [String]) {
+    func createHealthKit() {
         if let _ = HealthKitSampleBuilder.createHKWorkout(from: workout) {
-            if workout.containerID == nil {
-                self.createActivity(memberIDs: memberIDs)
-            }
+        
         }
     }
     
-    func createActivity(memberIDs: [String]) {
-        if let activity = ActivityBuilder.createActivity(from: self.workout), let activityID = activity.activityID {
+    func createActivity() {
+        if let activity = ActivityBuilder.createActivity(from: workout), let activityID = activity.activityID {
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
             activityActions.createNewActivity()
-            
             //will update activity.containerID and workout.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.id], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: memberIDs)
+            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.id], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: workout.participantsIDs)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
         }
     }

@@ -97,6 +97,7 @@ class MealViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
+        navigationOptions = .Disabled
     }
     
     func setupRightBarButton() {
@@ -250,6 +251,7 @@ class MealViewController: FormViewController {
                 $0.title = $0.tag
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
+                $0.minuteInterval = 5
                 if self.active {
                     $0.value = self.meal!.startDateTime
                 } else {
@@ -293,6 +295,7 @@ class MealViewController: FormViewController {
                 $0.title = $0.tag
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
+                $0.minuteInterval = 5
                 if self.active {
                     $0.value = self.meal!.endDateTime
                 } else {
@@ -338,11 +341,7 @@ class MealViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if meal.admin == nil || meal.admin == Auth.auth().currentUser?.uid {
-                    row.value = String(self.selectedFalconUsers.count + 1)
-                } else {
-                    row.value = String(self.selectedFalconUsers.count)
-                }
+                row.value = String(selectedFalconUsers.count + 1)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
@@ -659,11 +658,7 @@ extension MealViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if meal.admin == nil || meal.admin == Auth.auth().currentUser?.uid {
-                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-            } else {
-                inviteesRow.value = String(self.selectedFalconUsers.count)
-            }
+            inviteesRow.value = String(selectedFalconUsers.count + 1)
             inviteesRow.updateCell()
             
             if active {

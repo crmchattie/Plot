@@ -120,6 +120,7 @@ class ScheduleViewController: FormViewController {
             }
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
+        navigationOptions = .Disabled
         
     }
     
@@ -988,13 +989,8 @@ extension ScheduleViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            if !selectedFalconUsers.isEmpty {
-                inviteesRow.value = String(self.selectedFalconUsers.count + 1)
-                inviteesRow.updateCell()
-            } else {
-                inviteesRow.value = String(1)
-                inviteesRow.updateCell()
-            }
+            inviteesRow.value = String(self.selectedFalconUsers.count + 1)
+            inviteesRow.updateCell()
         }
     }
 }

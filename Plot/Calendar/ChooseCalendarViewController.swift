@@ -81,7 +81,7 @@ class ChooseCalendarViewController: FormViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView.separatorStyle = .none
         definesPresentationContext = true
-        
+        navigationOptions = .Disabled
 //        let barButton = UIBarButtonItem(title: "New Calendar", style: .plain, target: self, action: #selector(newCategory))
 //        navigationItem.rightBarButtonItem = barButton
     }

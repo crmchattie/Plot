@@ -14,6 +14,7 @@ extension NSNotification.Name {
     static let healthUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthUpdated")
     static let workoutsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".workoutsUpdated")
     static let mindfulnessUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".mindfulnessUpdated")
+    static let healthKitUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthKitUpdated")
 }
 
 class HealthService {
@@ -71,6 +72,7 @@ class HealthService {
     var isRunning: Bool = true
     
     func grabHealth(_ completion: @escaping () -> Void) {
+        print("grabHealth")
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.askedforAuthorization = askedforAuthorization
@@ -78,11 +80,12 @@ class HealthService {
                 HealthKitService.authorized = true
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
-                self?.observeWorkoutsForCurrentUser {}
-                self?.observeMindfulnesssForCurrentUser {}
                 if self?.isRunning ?? true {
-                    completion()
+                    self?.observeWorkoutsForCurrentUser {}
+                    self?.observeMindfulnesssForCurrentUser {}
+                    self?.addObservers()
                     self?.isRunning = false
+                    completion()
                 }
             }
         }
@@ -171,33 +174,19 @@ class HealthService {
             }
         })
     }
-}
-
-extension HealthService {
-    func observeHealthForCurrentUser() {
-        guard let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        //this code is inefficient
-        userHealthDatabaseRef = Database.database().reference().child(userHealthEntity).child(currentUserID)
-        userHealthDatabaseRef.child(healthkitWorkoutsKey).observeSingleEvent(of: .value) { dataSnapshot in
-            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
-                self.userHealthDatabaseRef.child(healthkitWorkoutsKey).observe(.childAdded, with: { snapshot in
-                    if dataSnapshotValue[snapshot.key] == nil {
-                        self.grabHealth {}
-                    }
-                })
-            }
-        }
-        userHealthDatabaseRef.child(healthkitMindfulnessKey).observeSingleEvent(of: .value) { dataSnapshot in
-            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {
-                self.userHealthDatabaseRef.child(healthkitMindfulnessKey).observe(.childAdded, with: { snapshot in
-                    if dataSnapshotValue[snapshot.key] == nil {
-                        self.grabHealth {}
-                    }
-                })
-            }
-        }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        print("addObserviers")
+        NotificationCenter.default.addObserver(self, selector: #selector(healthKitUpdated), name: .healthKitUpdated, object: nil)
+    }
+    
+    @objc func healthKitUpdated() {
+        print("healthKitUpdated")
+        grabHealth {}
     }
 }
 
