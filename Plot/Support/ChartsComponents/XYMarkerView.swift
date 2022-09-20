@@ -22,7 +22,7 @@ public class XYMarkerView: BalloonMarker {
         self.xAxisValueFormatter = xAxisValueFormatter
         self.units = units
         yFormatter.minimumFractionDigits = 0
-        yFormatter.maximumFractionDigits = 0
+        yFormatter.maximumFractionDigits = 1
         super.init(color: color, font: font, textColor: textColor, insets: insets)
     }
     

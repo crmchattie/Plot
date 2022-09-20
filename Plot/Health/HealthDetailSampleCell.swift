@@ -186,7 +186,7 @@ class HealthDetailSampleCell: UITableViewCell {
             }
         }
         else if case .activeEnergy = healthMetric.type, let quantitySample = sample as? HKQuantitySample, let unit = healthMetric.unit {
-            let count = String(format: "%.2f", quantitySample.quantity.doubleValue(for: unit))
+            let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: unit))
             let string = "\(count) \(healthMetric.unitName)"
             titleLabel.text = string
             

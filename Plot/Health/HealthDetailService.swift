@@ -351,7 +351,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             for sample in samples {
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
                 let hours = TimeInterval(timeSum).totalHours
-                let stat = Statistic(date: sample.startDate, value: hours)
+                let stat = Statistic(date: sample.endDate, value: hours)
                 customStats.append(stat)
             }
         }
@@ -367,7 +367,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
                 
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
-                map[startDay, default: 0] += timeSum
+                map[interval.endDate, default: 0] += timeSum
                 sum += timeSum
             }
             
