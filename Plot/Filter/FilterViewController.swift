@@ -89,20 +89,7 @@ class FilterViewController: FormViewController {
     }
     
     func initializeForm() {
-        
-        form +++ Section()
-            <<< ButtonRow("Restore Default Filters") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textLabel?.textAlignment = .center
-                row.cell.textLabel?.textColor = FalconPalette.defaultBlue
-                row.cell.accessoryType = .none
-                row.title = row.tag
-                }.onCellSelection({ _,_ in
-                    self.filterDictionary = [String: [String]]()
-                    self.form.removeAll()
-                    self.initializeForm()
-                })
-        
+                
         for filter in filters {
             if filter.typeOfSection == "single" {
                 form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .singleSelection(enableDeselection: true))
@@ -306,6 +293,19 @@ class FilterViewController: FormViewController {
                     }
             }
         }
+        
+        form +++ Section()
+            <<< ButtonRow("Restore Default Filters") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textAlignment = .center
+                row.cell.textLabel?.textColor = FalconPalette.defaultBlue
+                row.cell.accessoryType = .none
+                row.title = row.tag
+                }.onCellSelection({ _,_ in
+                    self.filterDictionary = [String: [String]]()
+                    self.form.removeAll()
+                    self.initializeForm()
+                })
     }
     
     func fetchData() {

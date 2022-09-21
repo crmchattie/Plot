@@ -49,6 +49,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     
     var participants: [String: [User]] = [:]
     
+    var showCompletedTasks: Bool = true
     var filters: [filter] = [.search, .showCompletedTasks, .taskCategory]
     var filterDictionary = [String: [String]]()
     
@@ -56,10 +57,13 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
         
+        showCompletedTasks = getShowCompletedTasksBool()
+        
         setupMainView()
         setupTableView()
         sortandreload()
         addObservers()
+        
         
     }
     
@@ -218,9 +222,14 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             lists[.myLists, default: []].append(contentsOf: listOfLists.sorted(by: {$0.name ?? "" < $1.name ?? "" }))
         }
         
-        if !tasks.isEmpty {
-            sections.append(.tasks)
+        if !showCompletedTasks {
+            filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+        } else {
             filteredTasks = tasks
+        }
+        
+        if !filteredTasks.isEmpty {
+            sections.append(.tasks)
         }
                 
         filteredLists = lists
@@ -263,6 +272,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func filter() {
+        filterDictionary["showCompletedTasks"] = showCompletedTasks ? ["Yes"] : ["No"]
         let destination = FilterViewController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
@@ -281,6 +291,18 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     
     func hideActivityIndicator() {
         
+    }
+    
+    func saveShowCompletedTasks() {
+        UserDefaults.standard.setValue(showCompletedTasks, forKey: kShowCompletedTasks)
+    }
+    
+    func getShowCompletedTasksBool() -> Bool {
+        if let value = UserDefaults.standard.value(forKey: kShowCompletedTasks) as? Bool {
+            return value
+        } else {
+            return true
+        }
     }
     
 }
@@ -361,12 +383,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let section = sections[indexPath.section]
-        if let filteredLists = filteredLists[section], filteredLists.indices.contains(indexPath.row) {
-            return 65
-        } else {
-            return UITableView.automaticDimension
-        }
+        return UITableView.automaticDimension
     }
 
 }
@@ -392,6 +409,18 @@ extension ListsViewController: UpdateFilter {
             })
             dispatchGroup.leave()
         }
+        if let value = filterDictionary["showCompletedTasks"] {
+            dispatchGroup.enter()
+            let bool = value[0].lowercased()
+            if bool == "yes" {
+                filteredTasks = tasks
+                self.showCompletedTasks = true
+            } else {
+                filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+                self.showCompletedTasks = false
+            }
+            dispatchGroup.leave()
+        }
         if let categories = filterDictionary["taskCategory"] {
             dispatchGroup.enter()
             filteredTasks = tasks.filter({ (task) -> Bool in
@@ -402,6 +431,7 @@ extension ListsViewController: UpdateFilter {
             })
             dispatchGroup.leave()
         }
+        
         if filterDictionary.isEmpty {
             sortandreload()
         }
@@ -409,6 +439,7 @@ extension ListsViewController: UpdateFilter {
         dispatchGroup.notify(queue: .main) {
             self.tableView.reloadData()
             self.tableView.layoutIfNeeded()
+            self.saveShowCompletedTasks()
         }
     }
 }

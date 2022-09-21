@@ -63,10 +63,8 @@ class AccountSettingsController: UITableViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if let headerView = tableView.tableHeaderView {
-            
             let height = tableHeaderHeight()
             var headerFrame = headerView.frame
-            
             if height != headerFrame.size.height {
                 headerFrame.size.height = height
                 headerView.frame = headerFrame
@@ -97,20 +95,20 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.name.addTarget(self, action: #selector(nameDidBeginEditing), for: .editingDidBegin)
         userProfileContainerView.name.addTarget(self, action: #selector(nameEditingChanged), for: .editingChanged)
         userProfileContainerView.phone.addTarget(self, action: #selector(changePhoneNumber), for: .editingDidBegin)
-        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
+//        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
         userProfileContainerView.bio.delegate = self
-        userProfileContainerView.email.delegate = self
+//        userProfileContainerView.email.delegate = self
         userProfileContainerView.name.delegate = self
         userProfileContainerView.phone.delegate = self
         userProfileContainerView.backgroundColor = .systemGroupedBackground
         userProfileContainerView.bio.backgroundColor = .secondarySystemGroupedBackground
         userProfileContainerView.userData.backgroundColor = .secondarySystemGroupedBackground
-        userProfileContainerView.email.backgroundColor = .secondarySystemGroupedBackground
+//        userProfileContainerView.email.backgroundColor = .secondarySystemGroupedBackground
         userProfileContainerView.name.textColor = .label
         userProfileContainerView.phone.textColor = .label
         userProfileContainerView.bio.textColor = .label
-        userProfileContainerView.email.textColor = .label
+//        userProfileContainerView.email.textColor = .label
         userProfileContainerView.bio.keyboardAppearance = .default
         userProfileContainerView.name.keyboardAppearance = .default
     }
@@ -129,7 +127,7 @@ class AccountSettingsController: UITableViewController {
     @objc private func emailVerified(_ notification: Notification) {
         guard let email = notification.object as? String, email.isValidEmail else { return }
 
-        userProfileContainerView.email.text = email
+//        userProfileContainerView.email.text = email
 
         let userNameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
         userNameReference.updateChildValues(["email": email])
@@ -192,7 +190,7 @@ class AccountSettingsController: UITableViewController {
                     self.userProfileContainerView.bioPlaceholderLabel.isHidden = !self.userProfileContainerView.bio.text.isEmpty
                     self.currentBio = bio
                 }
-                self.userProfileContainerView.email.text = userInfo["email"] as? String
+//                self.userProfileContainerView.email.text = userInfo["email"] as? String
                 
                 if let phoneNumber = userInfo["phoneNumber"] as? String {
                     do {
@@ -330,7 +328,7 @@ extension AccountSettingsController {
     }
     
     override  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+        return UITableView.automaticDimension
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

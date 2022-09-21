@@ -97,8 +97,6 @@
 		105F34B52885EF7A007531EB /* RecurrenceFrequency+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A12885EF79007531EB /* RecurrenceFrequency+Sequence.swift */; };
 		105F34B62885EF7A007531EB /* MonthOrDaySelectorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 105F34A22885EF79007531EB /* MonthOrDaySelectorCell.xib */; };
 		105F34B82885EF7A007531EB /* EKWeekday+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F34A42885EF79007531EB /* EKWeekday+Sequence.swift */; };
-		105F34B92885F29A007531EB /* RRuleSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; };
-		105F34BA2885F29A007531EB /* RRuleSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		105F66E924149DC600F6EDB6 /* EventDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66E824149DC600F6EDB6 /* EventDetailCell.swift */; };
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
 		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
@@ -300,6 +298,8 @@
 		10F3032E24EC6FE500C04B8F /* MXMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3032D24EC6FE500C04B8F /* MXMember.swift */; };
 		10F3033024EC6FF800C04B8F /* MXAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3032F24EC6FF800C04B8F /* MXAccount.swift */; };
 		10F3033224EC700C00C04B8F /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F3033124EC700C00C04B8F /* Transaction.swift */; };
+		10F413F628DB3ECE008391BC /* RRuleSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; };
+		10F413F728DB3ECE008391BC /* RRuleSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 105F34522885D649007531EB /* RRuleSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		10F5CFF625CB7E3B0078C821 /* GFetchCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFF525CB7E3B0078C821 /* GFetchCalendarEventsOp.swift */; };
 		10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */; };
 		10F5CFFE25CB7E5A0078C821 /* GCalendarEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFFD25CB7E5A0078C821 /* GCalendarEventOp.swift */; };
@@ -564,13 +564,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		105F34BB2885F29A007531EB /* Embed Frameworks */ = {
+		10F413F828DB3ECE008391BC /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				105F34BA2885F29A007531EB /* RRuleSwift.xcframework in Embed Frameworks */,
+				10F413F728DB3ECE008391BC /* RRuleSwift.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1160,7 +1160,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				105F34B92885F29A007531EB /* RRuleSwift.xcframework in Frameworks */,
+				10F413F628DB3ECE008391BC /* RRuleSwift.xcframework in Frameworks */,
 				2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */,
 				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
 				A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */,
@@ -2060,7 +2060,7 @@
 				105F345A2885EB2F007531EB /* Repeat */,
 				10B3E52628B6AEB900E1713D /* Tags */,
 				1092E28328BD28470018FCAA /* Filter */,
-				4BAEE48821272C5E0045AB10 /* ContactsControllers */,
+				4BAEE48821272C5E0045AB10 /* Contacts */,
 				1051AC99244F8C470066761C /* OldList */,
 				4BAEE4A421272D880045AB10 /* Chats */,
 				4BAEE4AB21272D880045AB10 /* ChatLog */,
@@ -2245,14 +2245,14 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
-		4BAEE48821272C5E0045AB10 /* ContactsControllers */ = {
+		4BAEE48821272C5E0045AB10 /* Contacts */ = {
 			isa = PBXGroup;
 			children = (
 				4BAEE48D21272C5E0045AB10 /* Support */,
 				4BAEE49021272C5E0045AB10 /* Controllers */,
 				4BAEE48921272C5E0045AB10 /* Cells */,
 			);
-			path = ContactsControllers;
+			path = Contacts;
 			sourceTree = "<group>";
 		};
 		4BAEE48921272C5E0045AB10 /* Cells */ = {
@@ -2994,7 +2994,7 @@
 				4B4F45281F32230C00A6FF96 /* Frameworks */,
 				4B4F45291F32230C00A6FF96 /* Resources */,
 				F12AFB3F9F7ACA543353B20B /* [CP] Copy Pods Resources */,
-				105F34BB2885F29A007531EB /* Embed Frameworks */,
+				10F413F828DB3ECE008391BC /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -3761,7 +3761,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3772,7 +3772,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.2.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
@@ -3794,7 +3794,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3804,7 +3804,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.2.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3951,7 +3951,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3967,7 +3967,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.2.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3991,7 +3991,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4007,7 +4007,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.2.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -27,7 +27,7 @@ extension AccountSettingsController: UITextViewDelegate {
     }
     
     func tableHeaderHeight() -> CGFloat {
-        return 240 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
+        return 180 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -92,7 +92,7 @@ extension AccountSettingsController { /* user name editing */
         userProfileContainerView.name.resignFirstResponder()
         userProfileContainerView.bio.resignFirstResponder()
         userProfileContainerView.phone.resignFirstResponder()
-        userProfileContainerView.email.resignFirstResponder()
+//        userProfileContainerView.email.resignFirstResponder()
         navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = doneBarButton
         view.setNeedsLayout()

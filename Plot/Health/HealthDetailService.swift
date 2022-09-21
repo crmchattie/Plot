@@ -409,11 +409,12 @@ class HealthDetailService: HealthDetailServiceInterface {
                 let hours = TimeInterval(timeSum).totalHours
                 let stat = Statistic(date: sample.startDate, value: hours)
                 customStats.append(stat)
+                
+                let customSample = HKCategorySample(type: sample.categoryType, value: typeOfSleep.rawValue, start: sample.startDate, end: sample.endDate)
+                customSamples.append(customSample)
 
             }
             
-            let customSample = HKCategorySample(type: samples.first!.categoryType, value: typeOfSleep.rawValue, start: samples.first!.startDate, end: samples.last!.endDate)
-            customSamples.append(customSample)
         }
         else {
             var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)

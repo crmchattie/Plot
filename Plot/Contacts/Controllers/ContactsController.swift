@@ -142,7 +142,7 @@ class ContactsController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 65
+        return UITableView.automaticDimension
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -176,6 +176,7 @@ class ContactsController: UITableViewController {
         let headerSection = 0
         if indexPath.section == headerSection {
             let cell = tableView.dequeueReusableCell(withIdentifier: newGroupCellID) ?? UITableViewCell(style: .default, reuseIdentifier: newGroupCellID)
+            cell.heightAnchor.constraint(greaterThanOrEqualToConstant: 65).isActive = true
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.imageView?.image = UIImage(named: "groupChat")
             cell.imageView?.contentMode = .scaleAspectFit

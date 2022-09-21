@@ -49,6 +49,8 @@ class NewTaskCell: UITableViewCell {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
         contentView.backgroundColor = .systemGroupedBackground
+        
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 73).isActive = true
 
         contentView.addSubview(activityImageView)
         contentView.addSubview(nameLabel)

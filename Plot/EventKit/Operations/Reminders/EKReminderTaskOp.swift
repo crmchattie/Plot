@@ -101,7 +101,6 @@ class EKReminderTaskOp: AsyncOperation {
     }
     
     private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
-        print(reminder.title)
         activity.isTask = true
         activity.name = reminder.title
         if let notes = reminder.notes {

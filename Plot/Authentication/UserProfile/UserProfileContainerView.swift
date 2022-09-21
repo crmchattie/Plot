@@ -84,22 +84,22 @@ class UserProfileContainerView: UIView {
         return phone
     }()
     
-    let email: PasteRestrictedTextField = {
-        let textField = PasteRestrictedTextField()
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.textAlignment = .center
-        textField.keyboardType = .emailAddress
-        textField.attributedPlaceholder = NSAttributedString(string: "Email",
-                                     attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
-        textField.borderStyle = .none
-        textField.layer.cornerRadius = 10
-        textField.autocorrectionType = .no
-        textField.backgroundColor = .secondarySystemGroupedBackground
-        textField.textColor = .label
-        textField.keyboardAppearance = .default
-        return textField
-    }()
+//    let email: PasteRestrictedTextField = {
+//        let textField = PasteRestrictedTextField()
+//        textField.font = UIFont.preferredFont(forTextStyle: .body)
+//        textField.translatesAutoresizingMaskIntoConstraints = false
+//        textField.textAlignment = .center
+//        textField.keyboardType = .emailAddress
+//        textField.attributedPlaceholder = NSAttributedString(string: "Email",
+//                                     attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
+//        textField.borderStyle = .none
+//        textField.layer.cornerRadius = 10
+//        textField.autocorrectionType = .no
+//        textField.backgroundColor = .secondarySystemGroupedBackground
+//        textField.textColor = .label
+//        textField.keyboardAppearance = .default
+//        return textField
+//    }()
     
     let userData: UIView = {
         let userData = UIView()
@@ -163,7 +163,7 @@ class UserProfileContainerView: UIView {
         addSubview(addPhotoLabel)
         addSubview(userData)
         addSubview(bio)
-        addSubview(email)
+//        addSubview(email)
         addSubview(countLabel)
         userData.addSubview(name)
         userData.addSubview(phone)
@@ -193,10 +193,10 @@ class UserProfileContainerView: UIView {
             phone.rightAnchor.constraint(equalTo: userData.rightAnchor, constant: 0),
             phone.heightAnchor.constraint(equalToConstant: 50),
             
-            email.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
-            email.heightAnchor.constraint(equalToConstant: 50),
+//            email.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+//            email.heightAnchor.constraint(equalToConstant: 50),
             
-            bio.topAnchor.constraint(equalTo: email.bottomAnchor, constant: 10),
+            bio.topAnchor.constraint(equalTo: phone.bottomAnchor, constant: 10),
                         
             countLabel.widthAnchor.constraint(equalToConstant: 30),
             countLabel.heightAnchor.constraint(equalToConstant: 30),
@@ -221,8 +221,8 @@ class UserProfileContainerView: UIView {
                 profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 bio.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 bio.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
-                email.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
-                email.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
+//                email.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
+//                email.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
             ])
         } else {
@@ -230,8 +230,8 @@ class UserProfileContainerView: UIView {
                 profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 bio.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 bio.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
-                email.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
-                email.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+//                email.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+//                email.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
             ])
         }

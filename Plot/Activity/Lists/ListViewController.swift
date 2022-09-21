@@ -304,11 +304,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if filteredTasks.indices.contains(indexPath.row) {
-            return UITableView.automaticDimension
-        } else {
-            return 72.66
-        }
+        return UITableView.automaticDimension
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -321,30 +317,64 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             viewPlaceholder.remove(from: tableView, priority: .medium)
         }
-        return filteredTasks.count + 1
+        if filteredTasks.count > 9 {
+            return filteredTasks.count + 2
+        } else {
+            return filteredTasks.count + 1
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if filteredTasks.indices.contains(indexPath.row) {
-            let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-            let task = filteredTasks[indexPath.row]
-            if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                task.listColor = color
+        if filteredTasks.count > 9 {
+            if indexPath.row == 0 {
+                let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
+                return cell
             }
-            cell.configureCell(for: indexPath, task: task)
-            return cell
+            if filteredTasks.indices.contains(indexPath.row - 1) {
+                let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+                let task = filteredTasks[indexPath.row - 1]
+                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    task.listColor = color
+                }
+                cell.configureCell(for: indexPath, task: task)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
+                return cell
+            }
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
-            return cell
+            if filteredTasks.indices.contains(indexPath.row) {
+                let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+                let task = filteredTasks[indexPath.row]
+                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    task.listColor = color
+                }
+                cell.configureCell(for: indexPath, task: task)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
+                return cell
+            }
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if filteredTasks.indices.contains(indexPath.row) {
-            let task = filteredTasks[indexPath.row]
-            showTaskDetailPush(task: task)
+        if filteredTasks.count > 9 {
+            if indexPath.row == 0 {
+                newItem()
+            } else if filteredTasks.indices.contains(indexPath.row - 1) {
+                let task = filteredTasks[indexPath.row - 1]
+                showTaskDetailPush(task: task)
+            } else {
+                newItem()
+            }
         } else {
-            newItem()
+            if filteredTasks.indices.contains(indexPath.row) {
+                let task = filteredTasks[indexPath.row]
+                showTaskDetailPush(task: task)
+            } else {
+                newItem()
+            }
         }
     }
 }

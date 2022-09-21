@@ -42,7 +42,7 @@ class UserProfileController: UIViewController {
         userProfileContainerView.bioPlaceholderLabel.isHidden = !userProfileContainerView.bio.text.isEmpty
         userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image == nil)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
-        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
+//        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.name.delegate = self
     }
@@ -115,12 +115,12 @@ extension UserProfileController {
             }
         })
         
-        let emailReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("email")
-        emailReference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                self.userProfileContainerView.email.text = snapshot.value as? String
-            }
-        })
+//        let emailReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("email")
+//        emailReference.observeSingleEvent(of: .value, with: { (snapshot) in
+//            if snapshot.exists() {
+//                self.userProfileContainerView.email.text = snapshot.value as? String
+//            }
+//        })
                 
         let photoReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("photoURL")
         photoReference.observeSingleEvent(of: .value, with: { (snapshot) in

@@ -77,7 +77,7 @@ extension SelectCountryCodeController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 55
+        return UITableView.automaticDimension
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -85,6 +85,7 @@ extension SelectCountryCodeController {
         let identifier = "cell"
         
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
+        cell.heightAnchor.constraint(greaterThanOrEqualToConstant: 55).isActive = true
         cell.backgroundColor = .secondarySystemGroupedBackground
         //    cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: .body)

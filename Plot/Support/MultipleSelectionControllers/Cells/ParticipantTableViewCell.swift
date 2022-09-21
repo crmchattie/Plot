@@ -56,7 +56,9 @@ class ParticipantTableViewCell: UITableViewCell {
     }()    
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)        
+        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 65).isActive = true
+        
         gestureReconizer = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
         addGestureRecognizer(gestureReconizer)
         

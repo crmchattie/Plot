@@ -213,7 +213,9 @@ class HealthDetailSampleCell: UITableViewCell {
             }
         }
         else if case .sleep = healthMetric.type, let categorySample = sample as? HKCategorySample, let sleepValue = HKCategoryValueSleepAnalysis(rawValue: categorySample.value) {
-            dateFormatter.dateFormat = "MMM dd, yyy"
+            if segmentType != .day {
+                dateFormatter.dateFormat = "MMM dd, yyy"
+            }
             titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             
             switch sleepValue {

@@ -30,6 +30,8 @@ class AccountSettingsTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        
         setColor()
         contentView.addSubview(icon)
         icon.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0).isActive = true

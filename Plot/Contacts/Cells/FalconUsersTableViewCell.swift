@@ -42,6 +42,8 @@ class FalconUsersTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 65).isActive = true
+        
         contentView.addSubview(icon)
         icon.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0).isActive = true
         icon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true

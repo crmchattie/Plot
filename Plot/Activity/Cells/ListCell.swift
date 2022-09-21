@@ -107,6 +107,8 @@ class ListCell: UITableViewCell {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         selectionStyle = .default
         contentView.backgroundColor = .systemGroupedBackground
+        
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 65).isActive = true
 
         contentView.addSubview(activityImageView)
         activityImageView.addSubview(nameLabel)
