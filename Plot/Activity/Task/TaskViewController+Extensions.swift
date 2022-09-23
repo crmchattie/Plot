@@ -94,11 +94,11 @@ extension TaskViewController: UpdateListDelegate {
 
 extension TaskViewController: UpdateSubtaskListDelegate {
     func updateSubtaskList(subtaskList: [Activity]) {
-        if let row: ButtonRow = form.rowBy(tag: "Sub-Tasks") {
-            if subtaskList.isEmpty {
-                row.cell.textLabel?.textColor = .secondaryLabel
+        if let row: LabelRow = form.rowBy(tag: "Sub-Tasks") {
+            if !subtaskList.isEmpty {
+                row.value = String(subtaskList.count)
             } else {
-                row.cell.textLabel?.textColor = .label
+                row.value = "0"
             }
         }
         self.subtaskList = subtaskList
@@ -308,11 +308,11 @@ extension TaskViewController: UpdateMediaDelegate {
         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         activityReference.updateChildValues(["activityPhotos": imageURLs as AnyObject])
         activityReference.updateChildValues(["activityFiles": fileURLs as AnyObject])
-        if let mediaRow: ButtonRow = form.rowBy(tag: "Media") {
-            if self.task.activityPhotos == nil || self.task.activityPhotos!.isEmpty || self.task.activityFiles == nil || self.task.activityFiles!.isEmpty {
-                mediaRow.cell.textLabel?.textColor = .secondaryLabel
+        if let row: LabelRow = form.rowBy(tag: "Media") {
+            if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
             } else {
-                mediaRow.cell.textLabel?.textColor = .label
+                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
             }
         }
     }
@@ -320,11 +320,11 @@ extension TaskViewController: UpdateMediaDelegate {
 
 extension TaskViewController: UpdateActivityListDelegate {
     func updateActivityList(listList: [ListContainer]) {
-        if let row: ButtonRow = form.rowBy(tag: "Checklist") {
+        if let row: LabelRow = form.rowBy(tag: "Checklist") {
             if listList.isEmpty {
-                row.cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             } else {
-                row.cell.textLabel?.textColor = .label
+                row.value = String(listList.count)
             }
         }
         self.listList = listList

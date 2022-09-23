@@ -113,6 +113,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         return panGesture
     }()
     
+    let refreshControl = UIRefreshControl()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -185,6 +187,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+        
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
+        activityView.tableView.refreshControl = refreshControl
         
         view.backgroundColor = .systemGroupedBackground
         
@@ -309,6 +314,17 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         destination.filters = filters
         destination.filterDictionary = filterDictionary
         self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        networkController.activityService.regrabEvents {
+            DispatchQueue.main.async {
+                self.filteredPinnedActivities = self.pinnedActivities
+                self.filteredActivities = self.activities
+                self.activityView.tableView.reloadData()
+                self.refreshControl.endRefreshing()
+            }
+        }
     }
     
     @objc fileprivate func search() {
@@ -437,6 +453,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             if let activityStartDate = activity.startDate, activityStartDate > startDate, endDate > activityStartDate {
                 return true
             } else if let activityEndDate = activity.endDate, activityEndDate > startDate,  endDate > activityEndDate {
+                if activity.allDay ?? false, let activityStartDate = activity.startDate, Calendar.current.dateComponents([.hour], from: activityStartDate, to: activityEndDate).hour > 22 {
+                    return false
+                }
                 return true
             } else if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate, startDate > activityStartDate, activityEndDate > endDate {
                 return true
@@ -447,6 +466,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             if let activityStartDate = activity.startDate, activityStartDate > startDate, endDate > activityStartDate {
                 return true
             } else if let activityEndDate = activity.endDate, activityEndDate > startDate,  endDate > activityEndDate {
+                if activity.allDay ?? false, let activityStartDate = activity.startDate, Calendar.current.dateComponents([.hour], from: activityStartDate, to: activityEndDate).hour > 22 {
+                    return false
+                }
                 return true
             } else if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate, startDate > activityStartDate, activityEndDate > endDate {
                 return true
@@ -463,12 +485,14 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     func handleReloadTableAfterSearch() {
         let currentDate = Date().localTime
         filteredPinnedActivities.sort { (activity1, activity2) -> Bool in
-            if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) && currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
-                return activity1.startDate ?? Date.distantPast < activity2.startDate ?? Date.distantPast
-            } else if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) {
-                return currentDate < activity2.startDate ?? Date.distantPast
-            } else if currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
-                return activity1.startDate ?? Date.distantPast < currentDate
+            if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+                if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
+                    return startDate1 < startDate2
+                } else if currentDate.isBetween(startDate1, and: endDate1) {
+                    return currentDate < startDate2
+                } else if currentDate.isBetween(startDate2, and: endDate2) {
+                    return startDate1 < currentDate
+                }
             }
             if activity1.finalDate == activity2.finalDate {
                 return activity1.name ?? "" < activity2.name ?? ""
@@ -477,12 +501,14 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
         filteredActivities.sort { (activity1, activity2) -> Bool in
-            if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) && currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
-                return activity1.startDate ?? Date.distantPast < activity2.startDate ?? Date.distantPast
-            } else if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) {
-                return currentDate < activity2.startDate ?? Date.distantPast
-            } else if currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
-                return activity1.startDate ?? Date.distantPast < currentDate
+            if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+                if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
+                    return startDate1 < startDate2
+                } else if currentDate.isBetween(startDate1, and: endDate1) {
+                    return currentDate < startDate2
+                } else if currentDate.isBetween(startDate2, and: endDate2) {
+                    return startDate1 < currentDate
+                }
             }
             if activity1.finalDate == activity2.finalDate {
                 return activity1.name ?? "" < activity2.name ?? ""
@@ -590,10 +616,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         return 0
     }
     
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
@@ -604,6 +626,17 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
 //        let mute = setupMuteAction(at: indexPath)
 //
 //        return [delete, mute]
+//    }
+    
+//    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool
+//    {
+//        return true
+//    }
+//    
+//    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+//        return UISwipeActionsConfiguration(actions: [
+//            makeDeleteContextualAction(forRowAt: indexPath)
+//        ])
 //    }
     
     func numberOfSections(in tableView: UITableView) -> Int {

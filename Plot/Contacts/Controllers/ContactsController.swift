@@ -52,10 +52,7 @@ class ContactsController: UITableViewController {
     fileprivate func configureViewController() {
         navigationItem.title = "New Chat"
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
+        navigationItem.largeTitleDisplayMode = .never
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top

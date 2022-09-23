@@ -91,6 +91,8 @@ class FinanceViewController: UIViewController {
     var filterDictionary = [String: [String]]()
     
     let viewPlaceholder = ViewPlaceholder()
+    
+    let refreshControl = UIRefreshControl()
             
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,6 +147,9 @@ class FinanceViewController: UIViewController {
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+        
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
+        collectionView.refreshControl = refreshControl
         
         financeLevel = getFinanceLevel()
                 
@@ -222,6 +227,15 @@ class FinanceViewController: UIViewController {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
+    }
+    
+    @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        networkController.financeService.regrabFinances {
+            DispatchQueue.main.async {
+                self.updateCollectionView()
+                self.refreshControl.endRefreshing()
+            }
+        }
     }
     
     func openMXConnect(current_member_guid: String?) {
@@ -623,7 +637,7 @@ extension FinanceViewController: EndedWebViewDelegate {
         sections.removeAll(where: { $0 == .financialIssues })
         groups[.financialIssues] = nil
         collectionView.reloadData()
-        networkController.financeService.triggerUpdateMXUser()
+        networkController.financeService.triggerUpdateMXUser {}
     }
 }
 

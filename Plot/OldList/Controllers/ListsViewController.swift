@@ -32,7 +32,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     var taskList = [ListType: [Activity]]()
     var filteredLists = [SectionType: [ListType]]()
     var tasks: [Activity] {
-        return networkController.activityService.tasks
+        return networkController.activityService.tasksNoRepeats
     }
     var filteredTasks = [Activity]()
     
@@ -52,6 +52,8 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     var showCompletedTasks: Bool = true
     var filters: [filter] = [.search, .showCompletedTasks, .taskCategory]
     var filterDictionary = [String: [String]]()
+    
+    let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,12 +79,12 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksNoRepeatsUpdated), name: .tasksNoRepeatsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
 
     }
     
-    @objc fileprivate func tasksUpdated() {
+    @objc fileprivate func tasksNoRepeatsUpdated() {
         sortandreload()
     }
     
@@ -103,6 +105,9 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
+        
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
+        tableView.refreshControl = refreshControl
     }
     
     fileprivate func setupTableView() {
@@ -155,6 +160,15 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             viewPlaceholder.add(for: tableView, title: .emptyLists, subtitle: .emptyLists, priority: .medium, position: .top)
         } else {
             viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasks, priority: .medium, position: .top)
+        }
+    }
+    
+    @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        networkController.activityService.regrabLists {
+            DispatchQueue.main.async {
+                self.sortandreload()
+                self.refreshControl.endRefreshing()
+            }
         }
     }
     

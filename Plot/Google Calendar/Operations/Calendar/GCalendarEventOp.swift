@@ -62,7 +62,6 @@ class GCalendarEventOp: AsyncOperation {
                     self?.finish()
                     return
                 }
-                
                 let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                 reference.updateChildValues(calendarEventActivityValue) { (_, _) in
                     weakSelf.createActivity(for: activityID) { activity in
@@ -139,6 +138,7 @@ class GCalendarEventOp: AsyncOperation {
         } else {
             activity.locationName = nil
             activity.locationAddress = nil
+            completion(activity)
         }
     }
     

@@ -45,6 +45,16 @@ extension MasterActivityContainerController {
         }
     }
     
+    
+    @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        networkController.reloadKeyVariables {
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+                self.refreshControl.endRefreshing()
+            }
+        }
+    }
+    
     func presentOnboardingController() {
         let destination = OnboardingController()
         let newNavigationController = UINavigationController(rootViewController: destination)

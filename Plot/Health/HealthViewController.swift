@@ -61,6 +61,8 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
+    
+    let refreshControl = UIRefreshControl()
             
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -109,6 +111,9 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
         extendedLayoutIncludesOpaqueBars = true
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
+        
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
+        collectionView.refreshControl = refreshControl
         
         if !filters.isEmpty {
             navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
@@ -178,6 +183,15 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
         destination.filters = filters
         destination.filterDictionary = filterDictionary
         self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        networkController.healthService.regrabHealth {
+            DispatchQueue.main.async {
+                self.setupData()
+                self.refreshControl.endRefreshing()
+            }
+        }
     }
     
     func openMetric(metric: AnyHashable) {

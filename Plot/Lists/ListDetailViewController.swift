@@ -82,7 +82,9 @@ class ListDetailViewController: FormViewController {
         if list.source == ListSourceOptions.plot.name {
             if active {
                 let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-                navigationItem.rightBarButtonItem = addBarButton
+                let dotsImage = UIImage(named: "dots")
+                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
                 if navigationItem.leftBarButtonItem != nil {
                     navigationItem.leftBarButtonItem?.action = #selector(cancel)
                 }
@@ -123,6 +125,46 @@ class ListDetailViewController: FormViewController {
         } else {
             self.navigationController?.popViewController(animated: true)
         }
+    }
+    
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Delete List", style: .default, handler: { (_) in
+            self.delete()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        
+    }
+    
+    func delete() {
+        let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
+            self.showActivityIndicator()
+            let delete = ListActions(list: self.list, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            delete.deleteList()
+            self.hideActivityIndicator()
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     fileprivate func initializeForm() {

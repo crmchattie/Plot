@@ -72,7 +72,6 @@ class HealthService {
     var isRunning: Bool = true
     
     func grabHealth(_ completion: @escaping () -> Void) {
-        print("grabHealth")
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.askedforAuthorization = askedforAuthorization
@@ -87,6 +86,19 @@ class HealthService {
                     self?.isRunning = false
                     completion()
                 }
+            }
+        }
+    }
+    
+    func regrabHealth(_ completion: @escaping () -> Void) {
+        healhKitManager.checkHealthAuthorizationStatus {}
+        HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
+            self?.askedforAuthorization = askedforAuthorization
+            self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
+                HealthKitService.authorized = true
+                self?.healthMetricSections = Array(metrics.keys)
+                self?.healthMetrics = metrics
+                completion()
             }
         }
     }
@@ -186,7 +198,7 @@ class HealthService {
     
     @objc func healthKitUpdated() {
         print("healthKitUpdated")
-        grabHealth {}
+        regrabHealth {}
     }
 }
 

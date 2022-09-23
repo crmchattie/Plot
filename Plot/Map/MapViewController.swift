@@ -367,8 +367,16 @@ public func lookupLocation(for address: String, completion: @escaping (CLLocatio
     searchRequest.naturalLanguageQuery = address
     let search = MKLocalSearch(request: searchRequest)
     search.start { (response, error) in
+        guard error == nil else {
+            print("error")
+            print(error ?? "error")
+            completion(nil)
+            return
+        }
         if let res = response {
             completion(res.mapItems[0].placemark.coordinate)
+            return
         }
+        completion(nil)
     }
 }

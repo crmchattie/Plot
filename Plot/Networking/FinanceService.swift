@@ -100,14 +100,14 @@ class FinanceService {
     var isRunning: Bool = true
     
     func grabFinances(_ completion: @escaping () -> Void) {
-        self.triggerUpdateMXUser()
+        self.triggerUpdateMXUser {}
         self.observeAccountsForCurrentUser {
         }
         self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
                 self.grabAccountTransactions()
-//                    self.removePendingTransactions()
+                    self.removePendingTransactions()
 //                    self.grabTransactionAttributes()
                 if self.isRunning {
                     completion()
@@ -121,6 +121,12 @@ class FinanceService {
 
     }
     
+    func regrabFinances(_ completion: @escaping () -> Void) {
+        self.triggerUpdateMXUser {
+            completion()
+        }
+    }
+    
     func setupMembersAccountsDict() {
         memberAccountsDict = [MXMember: [MXAccount]]()
         for member in self.members {
@@ -132,9 +138,10 @@ class FinanceService {
         }
     }
     
-    func triggerUpdateMXUser() {
+    func triggerUpdateMXUser(_ completion: @escaping () -> Void) {
         Service.shared.triggerUpdateMXUser() { [weak self] (json, err) in
             self?.hasLoadedFinancials = true
+            completion()
         }
     }
     

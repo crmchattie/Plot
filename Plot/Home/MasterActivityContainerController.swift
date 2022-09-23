@@ -121,6 +121,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         return plotLogoView
     }()
     
+    let refreshControl = UIRefreshControl()
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .default
     }
@@ -180,8 +182,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         collectionView.delegate = self
         
         view.addSubview(collectionView)
-        collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
-        
+        collectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.register(TaskCollectionCell.self, forCellWithReuseIdentifier: taskCellID)
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
@@ -198,8 +199,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .eventsUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(calendarActivitiesUpdated), name: .calendarActivitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksNoRepeatsUpdated), name: .tasksNoRepeatsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
@@ -253,7 +254,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         }
     }
     
-    @objc fileprivate func tasksUpdated() {
+    @objc fileprivate func tasksNoRepeatsUpdated() {
         scrollToFirstTask({ (tasks) in
             if self.sortedTasks != tasks {
                 self.sortedTasks = tasks
@@ -275,7 +276,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         })
     }
     
-    @objc fileprivate func eventsUpdated() {
+    @objc fileprivate func calendarActivitiesUpdated() {
         scrollToFirstActivityWithDate({ (events) in
             if self.sortedEvents != events {
                 self.sortedEvents = events
@@ -374,6 +375,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                             target: self,
                                                             action: #selector(newItem))
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
+        collectionView.refreshControl = refreshControl
     }
     
     func setApplicationBadge() {
@@ -404,7 +407,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func scrollToFirstTask(_ completion: @escaping ([Activity]) -> Void) {
-        let allTasks = networkController.activityService.tasks
+        let allTasks = networkController.activityService.tasksNoRepeats
         if allTasks.count < 3 {
             completion(allTasks)
             return
@@ -418,7 +421,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func scrollToFirstActivityWithDate(_ completion: @escaping ([Activity]) -> Void) {
-        let allActivities = networkController.activityService.events
+        let allActivities = networkController.activityService.calendarActivities
         let totalNumberOfActivities = allActivities.count
         let numberOfActivities = 3
         if totalNumberOfActivities < numberOfActivities {
@@ -836,7 +839,7 @@ extension MasterActivityContainerController: EndedWebViewDelegate {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
-        networkController.financeService.triggerUpdateMXUser()
+        networkController.financeService.triggerUpdateMXUser {}
     }
 }
 

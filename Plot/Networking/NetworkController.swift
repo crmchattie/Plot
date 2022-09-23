@@ -38,26 +38,19 @@ class NetworkController {
         
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
-        print("start grabActivities")
         activityService.grabActivities {
-            print("done grabActivities")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
-        print("start grabFinances")
         financeService.grabFinances {
-            print("done grabFinances")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
-        print("start grabHealth")
         healthService.grabHealth {
-            print("done grabHealth")
             dispatchGroup.leave()
         }
         
         dispatchGroup.notify(queue: .main) {
-            print("done grabbing stuff")
             self.isRunning = false
             completion()
         }
@@ -65,6 +58,40 @@ class NetworkController {
     
     func setupOtherVariables() {
         userService.grabContacts()
+    }
+    
+    func reloadKeyVariables(_ completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
+        isRunning = true
+        
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        print("regrabActivities")
+        activityService.regrabActivities {
+            print("done regrabActivities")
+            dispatchGroup.leave()
+        }
+        dispatchGroup.enter()
+        print("regrabFinances")
+        financeService.regrabFinances {
+            print("done regrabFinances")
+            dispatchGroup.leave()
+        }
+        dispatchGroup.enter()
+        print("regrabHealth")
+        healthService.regrabHealth {
+            print("done regrabHealth")
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            self.isRunning = false
+            completion()
+        }
     }
     
     func askPermissionToTrack() {

@@ -187,9 +187,12 @@ class ScheduleViewController: FormViewController {
                     cell.placeholderLabel?.textColor = .secondaryLabel
                 })
             
-        <<< ButtonRow("Location") { row in
+        <<< LabelRow("Location") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textAlignment = .left
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
             if self.active, let localName = schedule.locationName, localName != "locationName" {
                 row.cell.textLabel?.textColor = .label
                 row.cell.accessoryType = .detailDisclosureButton
@@ -203,6 +206,7 @@ class ScheduleViewController: FormViewController {
                 self.openLocationFinder()
             }).cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.textLabel?.textAlignment = .left
                 if row.title == "Location" {
                     cell.textLabel?.textColor = .secondaryLabel
@@ -873,7 +877,7 @@ class ScheduleViewController: FormViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard let row: ButtonRow = form.rowBy(tag: "Location"), indexPath == row.indexPath,let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath,let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
             return
         }
         let ceo: CLGeocoder = CLGeocoder()
@@ -909,7 +913,7 @@ class ScheduleViewController: FormViewController {
                 self.openLocationFinder()
             }
             let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
-                if let locationRow: ButtonRow = self.form.rowBy(tag: "Location") {
+                if let locationRow: LabelRow = self.form.rowBy(tag: "Location") {
                     self.locationAddress[self.locationName] = nil
                     self.locationName = "locationName"
                     self.schedule.locationName = "locationName"
@@ -935,7 +939,7 @@ class ScheduleViewController: FormViewController {
 
 extension ScheduleViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
-        if let locationRow: ButtonRow = form.rowBy(tag: "Location") {
+        if let locationRow: LabelRow = form.rowBy(tag: "Location") {
             self.locationAddress[self.locationName] = nil
             if self.schedule.locationAddress != nil {
                 self.schedule.locationAddress![self.locationName] = nil

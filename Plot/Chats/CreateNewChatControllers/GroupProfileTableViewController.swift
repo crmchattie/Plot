@@ -34,10 +34,7 @@ class GroupProfileTableViewController: UITableViewController {
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "New Group"
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true

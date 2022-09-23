@@ -120,7 +120,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         activityIndicatorView.centerInSuperview()
         
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
         
         
         let mapBarButton = UIBarButtonItem(image: UIImage(named: "map"), style: .plain, target: self, action: #selector(goToMap))

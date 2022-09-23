@@ -64,10 +64,7 @@ class SelectNewAdminTableViewController: UITableViewController {
     
     func setupMainView() {
         navigationItem.title = "New admin"
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
+        navigationItem.largeTitleDisplayMode = .never
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = [UIRectEdge.top, UIRectEdge.bottom]

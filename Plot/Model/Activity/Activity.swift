@@ -79,6 +79,8 @@ class Activity: NSObject, NSCopying, Codable {
     var flagged: Bool?
     var tags: [String]?
     var priority: String?
+    var lastModifiedDate: Date?
+    var createdDate: Date?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -127,9 +129,11 @@ class Activity: NSObject, NSCopying, Codable {
         case flagged
         case tags
         case priority
+        case createdDate
+        case lastModifiedDate
     }
     
-    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool) {
+    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool, createdDate: Date) {
         self.activityID = activityID
         self.admin = admin
         self.calendarID = calendarID
@@ -142,9 +146,11 @@ class Activity: NSObject, NSCopying, Codable {
         self.endDateTime = endDateTime
         self.endTimeZone = endTimeZone
         self.isEvent = isEvent
+        self.createdDate = createdDate
+        self.lastModifiedDate = createdDate
     }
     
-    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, isTask: Bool, isCompleted: Bool) {
+    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, isTask: Bool, isCompleted: Bool, createdDate: Date) {
         self.activityID = activityID
         self.admin = admin
         self.isTask = isTask
@@ -153,6 +159,8 @@ class Activity: NSObject, NSCopying, Codable {
         self.listName = listName
         self.listColor = listColor
         self.listSource = listSource
+        self.createdDate = createdDate
+        self.lastModifiedDate = createdDate
     }
     
     init(dictionary: [String: AnyObject]?) {
@@ -224,6 +232,8 @@ class Activity: NSObject, NSCopying, Codable {
         flagged = dictionary?["flagged"] as? Bool
         tags = dictionary?["tags"] as? [String]
         priority = dictionary?["priority"] as? String
+        createdDate = dictionary?["createdDate"] as? Date
+        lastModifiedDate = dictionary?["lastModifiedDate"] as? Date
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -253,21 +263,21 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["admin"] = value
         }
         
-        if let value = self.calendarID as AnyObject? {
-            dictionary["calendarID"] = value
-        }
-        
-        if let value = self.calendarName as AnyObject? {
-            dictionary["calendarName"] = value
-        }
-        
-        if let value = self.calendarColor as AnyObject? {
-            dictionary["calendarColor"] = value
-        }
-        
-        if let value = self.calendarSource as AnyObject? {
-            dictionary["calendarSource"] = value
-        }
+//        if let value = self.calendarID as AnyObject? {
+//            dictionary["calendarID"] = value
+//        }
+//
+//        if let value = self.calendarName as AnyObject? {
+//            dictionary["calendarName"] = value
+//        }
+//
+//        if let value = self.calendarColor as AnyObject? {
+//            dictionary["calendarColor"] = value
+//        }
+//
+//        if let value = self.calendarSource as AnyObject? {
+//            dictionary["calendarSource"] = value
+//        }
         
         if let value = self.activityType as AnyObject? {
             dictionary["activityType"] = value
@@ -447,21 +457,29 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["scheduleIDs"] = NSNull()
         }
         
-        if let value = self.listID as AnyObject? {
-            dictionary["listID"] = value
+        if let value = self.createdDate as AnyObject? {
+            dictionary["createdDate"] = value
         }
         
-        if let value = self.listName as AnyObject? {
-            dictionary["listName"] = value
+        if let value = self.lastModifiedDate as AnyObject? {
+            dictionary["lastModifiedDate"] = value
         }
         
-        if let value = self.listColor as AnyObject? {
-            dictionary["listColor"] = value
-        }
-        
-        if let value = self.listSource as AnyObject? {
-            dictionary["listSource"] = value
-        }
+//        if let value = self.listID as AnyObject? {
+//            dictionary["listID"] = value
+//        }
+//
+//        if let value = self.listName as AnyObject? {
+//            dictionary["listName"] = value
+//        }
+//
+//        if let value = self.listColor as AnyObject? {
+//            dictionary["listColor"] = value
+//        }
+//
+//        if let value = self.listSource as AnyObject? {
+//            dictionary["listSource"] = value
+//        }
         
         if let value = self.subtaskIDs as AnyObject? {
             dictionary["subtaskIDs"] = value
@@ -703,6 +721,25 @@ extension Activity {
         let epochDate = endDateTime
         let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
         return Date(timeIntervalSince1970: timezoneEpochOffset)
+    }
+    
+    var finalDateWTZ: Date? {
+        if let startDateTime = startDateTime?.doubleValue {
+            let timezone = TimeZone(identifier: startTimeZone ?? "UTC")!
+            let timezoneOffset =  timezone.secondsFromGMT()
+            let epochDate = startDateTime
+            let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
+            return Date(timeIntervalSince1970: timezoneEpochOffset)
+        //for tasks where deadline date is more likely to be set than start date
+        }
+        else if let endDateTime = endDateTime?.doubleValue {
+            let timezone = TimeZone(identifier: endTimeZone ?? "UTC")!
+            let timezoneOffset =  timezone.secondsFromGMT()
+            let epochDate = endDateTime
+            let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
+            return Date(timeIntervalSince1970: timezoneEpochOffset)
+        }
+        return nil
     }
 }
 

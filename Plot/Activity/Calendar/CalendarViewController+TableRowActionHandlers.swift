@@ -41,7 +41,15 @@ extension CalendarViewController {
             completion()
         }
     }
-    
+
+    //MARK: - Contextual Actions
+    func makeDeleteContextualAction(forRowAt indexPath: IndexPath) -> UIContextualAction {
+        return UIContextualAction(style: .destructive, title: "Delete") { (action, swipeButtonView, completion) in
+            print("DELETE HERE")
+            completion(true)
+        }
+    }
+        
     func setupMuteAction(at indexPath: IndexPath) -> UITableViewRowAction {
         let mute = UITableViewRowAction(style: .default, title: "Mute") { _, _ in
             if indexPath.section == 0 {
@@ -195,9 +203,9 @@ extension CalendarViewController {
         filteredPinnedActivities.remove(at: indexPath.row)
         pinnedActivities.remove(at: index)
         
-        if let invitation = networkController.activityService.invitations.removeValue(forKey: activityID) {
-            InvitationsFetcher.remove(invitation: invitation)
-        }
+//        if let invitation = networkController.activityService.invitations.removeValue(forKey: activityID) {
+//            InvitationsFetcher.remove(invitation: invitation)
+//        }
         
         activityView.tableView.deleteRows(at: [indexPath], with: .left)
         activityView.tableView.endUpdates()

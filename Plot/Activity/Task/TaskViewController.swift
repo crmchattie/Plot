@@ -110,10 +110,10 @@ class TaskViewController: FormViewController {
                 //create new activityID for auto updating items (schedule, purchases, checklist)
                 activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 if let list = list {
-                    task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false)
+                    task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false, createdDate: Date())
                 } else {
                     list = lists[ListSourceOptions.plot.name]?.first { $0.name == "Default"}
-                    task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false)
+                    task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: Date())
                     task.category = list?.category
 
                 }
@@ -922,96 +922,117 @@ class TaskViewController: FormViewController {
             cell.textLabel?.textColor = .label
         }
         
-        <<< ButtonRow("Sub-Tasks") { row in
+        <<< LabelRow("Sub-Tasks") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .secondaryLabel
-            row.cell.textLabel?.textAlignment = .left
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
             row.title = row.tag
-            row.hidden = "$showExtras == false"
             if let subtaskIDs = self.task.subtaskIDs, !subtaskIDs.isEmpty {
-                row.cell.textLabel?.textColor = .label
+                row.value = String(subtaskIDs.count)
             } else {
-                row.cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
+            row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
             self.openSubtasks()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
+            cell.textLabel?.textColor = .label
             if let subtaskIDs = self.task.subtaskIDs, !subtaskIDs.isEmpty {
-                cell.textLabel?.textColor = .label
+                row.value = String(subtaskIDs.count)
             } else {
-                cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
         }
         
-        <<< ButtonRow("Checklists") { row in
+        <<< LabelRow("Checklists") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textAlignment = .left
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.cell.textLabel?.textColor = .label
             row.title = row.tag
-            row.hidden = "$showExtras == false"
-            if self.task.checklistIDs != nil || self.task.grocerylistID != nil || self.task.activitylistIDs != nil {
-                row.cell.textLabel?.textColor = .label
+            if let checklistIDs = self.task.checklistIDs {
+                row.value = String(checklistIDs.count)
             } else {
-                row.cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
+            row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
             self.openList()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
-            if let _ = self.task.checklistIDs {
-                cell.textLabel?.textColor = .label
+            cell.textLabel?.textColor = .label
+            if let checklistIDs = self.task.checklistIDs {
+                row.value = String(checklistIDs.count)
             } else {
-                cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
         }
         
-        <<< ButtonRow("Media") { row in
+        <<< LabelRow("Media") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textAlignment = .left
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
             row.title = row.tag
             row.hidden = "$showExtras == false"
+            if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
+            }
         }.onCellSelection({ _,_ in
             self.openMedia()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
-            if (self.task.activityPhotos == nil || self.task.activityPhotos!.isEmpty) && (self.task.activityFiles == nil || self.task.activityFiles!.isEmpty) {
-                cell.textLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textColor = .label
+            if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
             } else {
-                cell.textLabel?.textColor = .label
+                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
             }
         }
         
-        <<< LabelRow("Tags") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.selectionStyle = .default
-            row.hidden = "$showExtras == false"
-            row.title = row.tag
-        }.onCellSelection({ _, row in
-            self.openTags()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .label
-            cell.textLabel?.textAlignment = .left
-            if let tags = self.task.tags, !tags.isEmpty {
-                cell.textLabel?.textColor = .label
-            } else {
-                cell.textLabel?.textColor = .secondaryLabel
-            }
-        }
+//        <<< LabelRow("Tags") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.textLabel?.textColor = .label
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.hidden = "$showExtras == false"
+//            row.title = row.tag
+//            if let tags = self.activity.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }.onCellSelection({ _, row in
+//            self.openTags()
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//            cell.textLabel?.textAlignment = .left
+//            cell.textLabel?.textColor = .label
+//            if let tags = self.task.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }
         
         if delegate == nil && (!active || (task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
             form.last!

@@ -443,28 +443,32 @@ class FinanceAccountViewController: FormViewController {
                 cell.textLabel?.textAlignment = .left
             }
             
-            <<< LabelRow("Tags") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textLabel?.textColor = .label
-                row.cell.detailTextLabel?.textColor = .label
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.selectionStyle = .default
-                row.cell.textLabel?.textAlignment = .left
-                row.title = row.tag
-            }.onCellSelection({ _, row in
-                self.openTags()
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .label
-                cell.textLabel?.textAlignment = .left
-                if let tags = self.account.tags, !tags.isEmpty {
-                    cell.textLabel?.textColor = .label
-                } else {
-                    cell.textLabel?.textColor = .secondaryLabel
-                }
-            }
+//        <<< LabelRow("Tags") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.textLabel?.textColor = .label
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.title = row.tag
+//            if let tags = self.account.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }.onCellSelection({ _, row in
+//            self.openTags()
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//            cell.textLabel?.textAlignment = .left
+//            cell.textLabel?.textColor = .label
+//            if let tags = self.account.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }
     }
     
     fileprivate func updateTheDate() {

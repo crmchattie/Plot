@@ -199,7 +199,7 @@ class FinancialAccountsViewController: UITableViewController {
 
 extension FinancialAccountsViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.triggerUpdateMXUser()
+        networkController.financeService.triggerUpdateMXUser {}
     }
 }
 

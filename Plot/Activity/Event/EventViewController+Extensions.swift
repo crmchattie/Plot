@@ -95,7 +95,7 @@ extension EventViewController: UpdateCalendarDelegate {
 
 extension EventViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
-        if let locationRow: ButtonRow = form.rowBy(tag: "Location") {
+        if let locationRow: LabelRow = form.rowBy(tag: "Location") {
             self.locationAddress[self.locationName] = nil
             if self.activity.locationAddress != nil {
                 self.activity.locationAddress![self.locationName] = nil
@@ -148,11 +148,11 @@ extension EventViewController: UpdateTimeZoneDelegate {
 
 extension EventViewController: UpdateScheduleListDelegate {
     func updateScheduleList(scheduleList: [Activity]) {
-        if let row: ButtonRow = form.rowBy(tag: "Sub-Events") {
-            if scheduleList.isEmpty {
-                row.cell.textLabel?.textColor = .secondaryLabel
+        if let row: LabelRow = form.rowBy(tag: "Sub-Events") {
+            if !scheduleList.isEmpty {
+                row.value = String(scheduleList.count)
             } else {
-                row.cell.textLabel?.textColor = .label
+                row.value = "0"
             }
         }
         self.scheduleList = scheduleList
@@ -363,26 +363,26 @@ extension EventViewController: UpdateMediaDelegate {
     func updateMedia(imageURLs: [String], fileURLs: [String]) {
         activity.activityPhotos = imageURLs
         activity.activityFiles = fileURLs
+        if let row: LabelRow = form.rowBy(tag: "Media") {
+            if let photos = self.activity.activityPhotos, let files = self.activity.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
+            }
+        }
         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         activityReference.updateChildValues(["activityPhotos": imageURLs as AnyObject])
         activityReference.updateChildValues(["activityFiles": fileURLs as AnyObject])
-        if let mediaRow: ButtonRow = form.rowBy(tag: "Media") {
-            if self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty || self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty {
-                mediaRow.cell.textLabel?.textColor = .secondaryLabel
-            } else {
-                mediaRow.cell.textLabel?.textColor = .label
-            }
-        }
     }
 }
 
 extension EventViewController: UpdateActivityListDelegate {
     func updateActivityList(listList: [ListContainer]) {
-        if let row: ButtonRow = form.rowBy(tag: "Checklist") {
+        if let row: LabelRow = form.rowBy(tag: "Checklist") {
             if listList.isEmpty {
-                row.cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             } else {
-                row.cell.textLabel?.textColor = .label
+                row.value = String(listList.count)
             }
         }
         self.listList = listList
@@ -411,6 +411,13 @@ extension EventViewController: RecurrencePickerDelegate {
 extension EventViewController: UpdateTagsDelegate {
     func updateTags(tags: [String]?) {
         activity.tags = tags
+        if let row: LabelRow = form.rowBy(tag: "Tags") {
+            if let tags = self.activity.tags, !tags.isEmpty {
+                row.value = String(tags.count)
+            } else {
+                row.value = "0"
+            }
+        }
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(["tags": tags as AnyObject])
     }

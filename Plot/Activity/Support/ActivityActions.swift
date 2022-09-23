@@ -45,12 +45,22 @@ class ActivityActions: NSObject {
             Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).removeValue()
         }
         
-        let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
-        
         guard let currentUserId = Auth.auth().currentUser?.uid else {
             return
         }
+        
+        let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+        activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+            if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
+                var varMemberIDs = membersIDs
+                varMemberIDs[currentUserId] = nil
+                activityDataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
+            }
+        })
+        
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
         
         if activity.isTask ?? false {
             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
@@ -110,6 +120,7 @@ class ActivityActions: NSObject {
                 "activity_name": activity.name ?? "name" as NSObject,
                 "activity_type": activity.activityType ?? "basic" as NSObject
             ])
+            firebaseDictionary["lastModifiedDate"] = Date()
             newActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         }
     }

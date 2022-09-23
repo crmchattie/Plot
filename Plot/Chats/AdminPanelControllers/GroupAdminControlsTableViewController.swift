@@ -156,10 +156,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     }
     
     fileprivate func setupMainView() {
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Group Info"
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true

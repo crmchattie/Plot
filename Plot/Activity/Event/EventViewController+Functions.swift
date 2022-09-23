@@ -116,7 +116,7 @@ extension EventViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard let row: ButtonRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
             return
         }
         
@@ -156,7 +156,7 @@ extension EventViewController {
                 self.openLocationFinder()
             }
             let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
-                if let locationRow: ButtonRow = self.form.rowBy(tag: "Location") {
+                if let locationRow: LabelRow = self.form.rowBy(tag: "Location") {
                     self.locationAddress[self.locationName] = nil
                     if let localAddress = self.activity.locationAddress, localAddress[self.locationName] != nil {
                         self.activity.locationAddress![self.locationName] = nil
@@ -310,7 +310,7 @@ extension EventViewController {
                         dispatchGroup.leave()
                         dispatchGroup.notify(queue: .main) {
                             var section = self.form.allSections[0]
-                            if let locationRow: ButtonRow = self.form.rowBy(tag: "Location"), let index = locationRow.indexPath?.item {
+                            if let locationRow: LabelRow = self.form.rowBy(tag: "Location"), let index = locationRow.indexPath?.item {
                                 section.insert(WeatherRow("Weather") { row in
                                     row.value = weather
                                     row.updateCell()

@@ -12,7 +12,9 @@ import GoogleSignIn
 
 extension NSNotification.Name {
     static let eventsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".eventsUpdated")
+    static let eventsNoRepeatsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".eventsNoRepeatsUpdated")
     static let tasksUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".tasksUpdated")
+    static let tasksNoRepeatsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".tasksNoRepeatsUpdated")
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
     static let calendarsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarsUpdated")
     static let listsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".listsUpdated")
@@ -33,9 +35,13 @@ class ActivityService {
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
-                events = activities.filter { $0.isTask == nil }
-                tasks = activities.filter { $0.isTask ?? false }
-                calendarActivities = activities.filter { $0.finalDate != nil }
+                eventsNoRepeats = activities.filter { $0.isTask == nil }
+                tasksNoRepeats = activities.filter { $0.isTask ?? false }
+                addRepeatingActivities(activities: activities) { activities in
+                    self.events = activities.filter { $0.isTask == nil }
+                    self.tasks = activities.filter { $0.isTask ?? false }
+                    self.calendarActivities = activities.filter { $0.finalDate != nil }
+                }
             }
         }
     }
@@ -59,17 +65,34 @@ class ActivityService {
         }
     }
     //for Apple/Google Calendar functions
-    var eventsNoRepeats = [Activity]()
+    var eventsNoRepeats = [Activity]() {
+        didSet {
+            if oldValue != eventsNoRepeats {
+                let currentDate = Date().localTime
+                eventsNoRepeats.sort { (event1, event2) -> Bool in
+                    if currentDate.isBetween(event1.startDate ?? Date.distantPast, and: event1.endDate ?? Date.distantPast) && currentDate.isBetween(event2.startDate ?? Date.distantPast, and: event2.endDate ?? Date.distantPast) {
+                        return event1.startDate ?? Date.distantPast < event2.startDate ?? Date.distantPast
+                    } else if currentDate.isBetween(event1.startDate ?? Date.distantPast, and: event1.endDate ?? Date.distantPast) {
+                        return currentDate < event2.startDate ?? Date.distantPast
+                    } else if currentDate.isBetween(event2.startDate ?? Date.distantPast, and: event2.endDate ?? Date.distantPast) {
+                        return event1.startDate ?? Date.distantPast < currentDate
+                    }
+                    return event1.startDate ?? Date.distantPast < event2.startDate ?? Date.distantPast
+                }
+                NotificationCenter.default.post(name: .eventsNoRepeatsUpdated, object: nil)
+            }
+        }
+    }
     
     var tasks = [Activity]() {
         didSet {
             if oldValue != tasks {
                 tasks.sort { task1, task2 in
                     if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                        if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
+                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
                             return task1.name ?? "" < task2.name ?? ""
                         }
-                        return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
                     } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
                         if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
                             return task1.name ?? "" < task2.name ?? ""
@@ -83,18 +106,40 @@ class ActivityService {
         }
     }
     //for Apple/Google Task functions
-    var tasksNoRepeats = [Activity]()
+    var tasksNoRepeats = [Activity]() {
+        didSet {
+            if oldValue != tasksNoRepeats {
+                tasksNoRepeats.sort { task1, task2 in
+                    if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                    } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                        if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                    }
+                    return !(task1.isCompleted ?? false)
+                }
+                NotificationCenter.default.post(name: .tasksNoRepeatsUpdated, object: nil)
+            }
+        }
+    }
     
     var calendarActivities = [Activity]() {
         didSet {
             let currentDate = Date().localTime
             calendarActivities.sort { (activity1, activity2) -> Bool in
-                if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) && currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
-                    return activity1.startDate ?? Date.distantPast < activity2.startDate ?? Date.distantPast
-                } else if currentDate.isBetween(activity1.startDate ?? Date.distantPast, and: activity1.endDate ?? Date.distantPast) {
-                    return currentDate < activity2.startDate ?? Date.distantPast
-                } else if currentDate.isBetween(activity2.startDate ?? Date.distantPast, and: activity2.endDate ?? Date.distantPast) {
-                    return activity1.startDate ?? Date.distantPast < currentDate
+                if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+                    if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
+                        return startDate1 < startDate2
+                    } else if currentDate.isBetween(startDate1, and: endDate1) {
+                        return currentDate < startDate2
+                    } else if currentDate.isBetween(startDate2, and: endDate2) {
+                        return startDate1 < currentDate
+                    }
                 }
                 if activity1.finalDate == activity2.finalDate {
                     return activity1.name ?? "" < activity2.name ?? ""
@@ -187,65 +232,103 @@ class ActivityService {
     
     func grabOtherActivities() {
         self.observeInvitationForCurrentUser()
-        self.addRepeatingActivities(activities: self.activities, completion: { newActivities in
-            self.activities = newActivities
-            self.grabPrimaryList({ (list) in
-                if list == ListSourceOptions.apple.name {
-                    self.grabEKReminders {
-                        self.hasLoadedListTaskActivities = true
-                    }
-                } else if list == ListSourceOptions.google.name {
-                    self.grabGTasks {
-                        self.hasLoadedListTaskActivities = true
-                    }
-                } else {
+        self.grabPrimaryList({ (list) in
+            if list == ListSourceOptions.apple.name {
+                self.grabEKReminders {
                     self.hasLoadedListTaskActivities = true
                 }
-                self.grabPlotLists()
-                self.grabLists()
-            })
-            self.grabPrimaryCalendar({ (calendar) in
-                if calendar == CalendarSourceOptions.apple.name {
-                    self.grabEKEvents {
-                        self.hasLoadedCalendarEventActivities = true
-                    }
-                } else if calendar == CalendarSourceOptions.google.name {
-                    self.grabGEvents {
-                        self.hasLoadedCalendarEventActivities = true
-                    }
-                } else {
+            } else if list == ListSourceOptions.google.name {
+                self.grabGTasks {
+                    self.hasLoadedListTaskActivities = true
+                }
+            } else {
+                self.hasLoadedListTaskActivities = true
+            }
+            self.grabPlotLists()
+            self.grabLists()
+        })
+        self.grabPrimaryCalendar({ (calendar) in
+            if calendar == CalendarSourceOptions.apple.name {
+                self.grabEKEvents {
                     self.hasLoadedCalendarEventActivities = true
                 }
-                self.grabPlotCalendars()
-                self.grabCalendars()
-            })
+            } else if calendar == CalendarSourceOptions.google.name {
+                self.grabGEvents {
+                    self.hasLoadedCalendarEventActivities = true
+                }
+            } else {
+                self.hasLoadedCalendarEventActivities = true
+            }
+            self.grabPlotCalendars()
+            self.grabCalendars()
         })
         self.saveDataToSharedContainer(activities: self.activities)
+    }
+    
+    func regrabActivities(_ completion: @escaping () -> Void) {
+        let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
+        regrabLists {
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.enter()
+        regrabEvents {
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            completion()
+        }
+    }
+    
+    func regrabLists(_ completion: @escaping () -> Void) {
+        self.grabLists()
+        if primaryList == ListSourceOptions.apple.name {
+            self.grabEKReminders {
+                self.hasLoadedListTaskActivities = true
+                completion()
+            }
+        } else if primaryList == ListSourceOptions.google.name {
+            self.grabGTasks {
+                self.hasLoadedListTaskActivities = true
+                completion()
+            }
+        } else {
+            self.hasLoadedListTaskActivities = true
+            completion()
+        }
+    }
+    
+    func regrabEvents(_ completion: @escaping () -> Void) {
+        self.grabCalendars()
+        if primaryCalendar == CalendarSourceOptions.apple.name {
+            self.grabEKEvents {
+                self.hasLoadedCalendarEventActivities = true
+                completion()
+            }
+        } else if primaryCalendar == CalendarSourceOptions.google.name {
+            self.grabGEvents {
+                self.hasLoadedCalendarEventActivities = true
+                completion()
+            }
+        } else {
+            self.hasLoadedCalendarEventActivities = true
+            completion()
+        }
     }
     
     func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
             if self?.activities.isEmpty ?? true {
                 self?.activities = activitiesInitialAdd
-                self?.eventsNoRepeats = activitiesInitialAdd.filter { $0.isTask == nil }
-                self?.tasksNoRepeats = activitiesInitialAdd.filter { $0.isTask != nil }
                 completion()
             } else if !activitiesInitialAdd.isEmpty {
                 for activity in activitiesInitialAdd {
-                    if activity.recurrences != nil {
-                        if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                            self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                                self?.activities.append(contentsOf: activities)
-                            })
-                        } else {
-                            self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                                self?.activities.append(contentsOf: activities)
-                            })
-                        }
+                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                        self?.activities[index] = activity
                     } else {
-                        //if recurrence was just made nil, repeating activities could show up so remove and then add back
-                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
                         self?.activities.append(activity)
                     }
                 }
@@ -254,44 +337,24 @@ class ActivityService {
             }
         }, activitiesAdded: { [weak self] activitiesAdded in
             for activity in activitiesAdded {
-                if activity.recurrences != nil {
-                    if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                            self?.activities.append(contentsOf: activities)
-                        })
-                    } else {
-                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                            self?.activities.append(contentsOf: activities)
-                        })
-                    }
+                if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                    self?.activities[index] = activity
                 } else {
-                    //if recurrence was just made nil, repeating activities could show up so remove and then add back
-                    self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
                     self?.activities.append(activity)
                 }
             }
         }, activitiesRemoved: { [weak self] activitiesRemoved in
             for activity in activitiesRemoved {
-                //just filter out activities that match activityID; will capture both recurring and non-recurring
-                self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
+                if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                    self?.activities.remove(at: index)
+
+                }
             }
         }, activitiesChanged: { [weak self] activitiesChanged in
             for activity in activitiesChanged {
-                if activity.recurrences != nil {
-                    if self!.activities.contains(where: {$0.activityID == activity.activityID}) {
-                        self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
-                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                            self?.activities.append(contentsOf: activities)
-                        })
-                    } else {
-                        self?.addRepeatingActivities(activities: [activity], completion: { activities in
-                            self?.activities.append(contentsOf: activities)
-                        })
-                    }
+                if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                    self?.activities[index] = activity
                 } else {
-                    //if recurrence was just made nil, repeating activities could show up so remove and then add back
-                    self?.activities = (self?.activities.filter({$0.activityID != activity.activityID})) ?? []
                     self?.activities.append(activity)
                 }
             }
@@ -598,9 +661,7 @@ class ActivityService {
     func grabCalendarEvents() {
         if let plotCalendars = self.calendars[CalendarSourceOptions.plot.name] {
             activitiesFetcher.grabActivitiesViaCalendar(calendars: plotCalendars) { [weak self]  activities in
-                self?.addRepeatingActivities(activities: activities, completion: { activities in
-                    self?.activities.append(contentsOf: activities)
-                })
+                self?.activities.append(contentsOf: activities)
             }
         }
     }
@@ -608,9 +669,7 @@ class ActivityService {
     func grabListTasks() {
         if let plotLists = self.lists[ListSourceOptions.plot.name] {
             activitiesFetcher.grabActivitiesViaList(lists: plotLists) { [weak self] activities in
-                self?.addRepeatingActivities(activities: activities, completion: { activities in
-                    self?.activities.append(contentsOf: activities)
-                })
+                self?.activities.append(contentsOf: activities)
             }
         }
     }

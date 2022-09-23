@@ -73,11 +73,11 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksNoRepeatsUpdated), name: .tasksNoRepeatsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
     }
     
-    @objc fileprivate func tasksUpdated() {
+    @objc fileprivate func tasksNoRepeatsUpdated() {
         if !showCompletedTasks {
             tasks = networkTasks.filter({ !($0.isCompleted ?? false) })
         } else {
@@ -191,10 +191,10 @@ class ListViewController: UIViewController, ObjectDetailShowing {
         }
         filteredTasks.sort { task1, task2 in
             if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
+                if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
                     return task1.name ?? "" < task2.name ?? ""
                 }
-                return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+                return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
             } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
                 if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
                     return task1.name ?? "" < task2.name ?? ""
@@ -209,10 +209,10 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     func handleReloadTableAfterSearch() {
         filteredTasks.sort { task1, task2 in
             if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                if task1.endDate ?? Date.distantPast == task2.endDate ?? Date.distantPast {
+                if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
                     return task1.name ?? "" < task2.name ?? ""
                 }
-                return task1.endDate ?? Date.distantPast < task2.endDate ?? Date.distantPast
+                return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
             } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
                 if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
                     return task1.name ?? "" < task2.name ?? ""

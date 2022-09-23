@@ -548,28 +548,32 @@ class FinanceTransactionViewController: FormViewController {
         
         form.last!
         
-            <<< LabelRow("Tags") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textLabel?.textColor = .label
-                row.cell.detailTextLabel?.textColor = .label
-                row.cell.accessoryType = .disclosureIndicator
-                row.cell.textLabel?.textAlignment = .left
-                row.cell.selectionStyle = .default
-                row.title = row.tag
-            }.onCellSelection({ _, row in
-                self.openTags()
-            }).cellUpdate { cell, row in
-                cell.accessoryType = .disclosureIndicator
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .label
-                cell.textLabel?.textAlignment = .left
-                if let tags = self.transaction.tags, !tags.isEmpty {
-                    cell.textLabel?.textColor = .label
-                } else {
-                    cell.textLabel?.textColor = .secondaryLabel
-                }
-            }
+//        <<< LabelRow("Tags") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.textLabel?.textColor = .label
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.title = row.tag
+//            if let tags = self.transaction.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }.onCellSelection({ _, row in
+//            self.openTags()
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//            cell.textLabel?.textAlignment = .left
+//            cell.textLabel?.textColor = .label
+//            if let tags = self.transaction.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }
         
         if delegate == nil && status && (!active || (transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
             form.last!

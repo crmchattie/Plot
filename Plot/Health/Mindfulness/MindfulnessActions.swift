@@ -40,9 +40,23 @@ class MindfulnessActions: NSObject {
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
-        Database.database().reference().child(userMindfulnessEntity).child(memberID).child(ID).removeAllObservers()
-        Database.database().reference().child(userMindfulnessEntity).child(memberID).child(ID).removeValue()
+            Database.database().reference().child(userMindfulnessEntity).child(memberID).child(ID).removeAllObservers()
+            Database.database().reference().child(userMindfulnessEntity).child(memberID).child(ID).removeValue()
         }
+        
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let reference = Database.database().reference().child(mindfulnessEntity).child(ID)
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
+            if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
+                var varMemberIDs = membersIDs
+                varMemberIDs[currentUserId] = nil
+                reference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
+            }
+        })
                 
     }
     

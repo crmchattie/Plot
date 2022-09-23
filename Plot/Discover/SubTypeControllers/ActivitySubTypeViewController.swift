@@ -102,7 +102,6 @@ class ActivitySubTypeViewController: UICollectionViewController, UICollectionVie
         super.viewDidLoad()
                         
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = true
         
         
         view.addSubview(activityIndicatorView)

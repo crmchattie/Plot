@@ -136,10 +136,10 @@ class EventViewController: FormViewController {
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     
                     if let calendar = calendar {
-                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: Date())
                     } else {
                         let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.name == "Default" }
-                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true)
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: Date())
 
                     }
                 }
@@ -261,7 +261,7 @@ class EventViewController: FormViewController {
             self.activity.activityDescription = row.value
         }
         
-        <<< ButtonRow("Location") { row in
+        <<< LabelRow("Location") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textAlignment = .left
             if let activity = activity, let localName = activity.locationName, localName != "locationName" {
@@ -704,97 +704,117 @@ class EventViewController: FormViewController {
             cell.textLabel?.textColor = .label
         }
         
-        <<< ButtonRow("Sub-Events") { row in
+        <<< LabelRow("Sub-Events") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .secondaryLabel
-            row.cell.textLabel?.textAlignment = .left
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.cell.textLabel?.textColor = .label
             row.title = row.tag
-            row.hidden = "$showExtras == false"
             if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
-                row.cell.textLabel?.textColor = .label
+                row.value = String(scheduleIDs.count)
             } else {
-                row.cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
+            row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
             self.openSchedule()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
+            cell.textLabel?.textColor = .label
             if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
-                cell.textLabel?.textColor = .label
+                row.value = String(scheduleIDs.count)
             } else {
-                cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
         }
         
-        <<< ButtonRow("Checklists") { row in
+        <<< LabelRow("Checklists") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textAlignment = .left
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.cell.textLabel?.textColor = .label
             row.title = row.tag
-            row.hidden = "$showExtras == false"
-            if self.activity.checklistIDs != nil || self.activity.grocerylistID != nil || self.activity.activitylistIDs != nil {
-                row.cell.textLabel?.textColor = .label
+            if let checklistIDs = self.activity.checklistIDs {
+                row.value = String(checklistIDs.count)
             } else {
-                row.cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
+            row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
             self.openList()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
-            if let _ = self.activity.checklistIDs {
-                cell.textLabel?.textColor = .label
+            cell.textLabel?.textColor = .label
+            if let checklistIDs = self.activity.checklistIDs {
+                row.value = String(checklistIDs.count)
             } else {
-                cell.textLabel?.textColor = .secondaryLabel
+                row.value = "0"
             }
         }
         
-        <<< ButtonRow("Media") { row in
+        <<< LabelRow("Media") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textAlignment = .left
             row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
             row.title = row.tag
             row.hidden = "$showExtras == false"
+            if let photos = self.activity.activityPhotos, let files = self.activity.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
+            }
         }.onCellSelection({ _,_ in
             self.openMedia()
         }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
-            if (self.activity.activityPhotos == nil || self.activity.activityPhotos!.isEmpty) && (self.activity.activityFiles == nil || self.activity.activityFiles!.isEmpty) {
-                cell.textLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textColor = .label
+            if let photos = self.activity.activityPhotos, let files = self.activity.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
             } else {
-                cell.textLabel?.textColor = .label
+                row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
             }
         }
         
-        <<< LabelRow("Tags") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.textLabel?.textAlignment = .left
-            row.cell.selectionStyle = .default
-            row.hidden = "$showExtras == false"
-            row.title = row.tag
-        }.onCellSelection({ _, row in
-            self.openTags()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .label
-            cell.textLabel?.textAlignment = .left
-            if let tags = self.activity.tags, !tags.isEmpty {
-                cell.textLabel?.textColor = .label
-            } else {
-                cell.textLabel?.textColor = .secondaryLabel
-            }
-        }
+//        <<< LabelRow("Tags") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.textLabel?.textColor = .label
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.hidden = "$showExtras == false"
+//            row.title = row.tag
+//            if let tags = self.activity.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }.onCellSelection({ _, row in
+//            self.openTags()
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//            cell.textLabel?.textAlignment = .left
+//            cell.textLabel?.textColor = .label
+//            if let tags = self.activity.tags, !tags.isEmpty {
+//                row.value = String(tags.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }
         
         //            <<< TextAreaRow("Notes") {
         //                $0.cell.backgroundColor = .secondarySystemGroupedBackground

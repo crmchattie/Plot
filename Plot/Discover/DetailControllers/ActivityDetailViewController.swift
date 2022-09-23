@@ -85,7 +85,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        navigationController?.navigationBar.prefersLargeTitles = false
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
