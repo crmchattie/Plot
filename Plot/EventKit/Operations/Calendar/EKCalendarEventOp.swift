@@ -122,6 +122,12 @@ class EKCalendarEventOp: AsyncOperation {
         activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
         activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
         activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
+        if let date = event.creationDate {
+            activity.createdDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
+        if let date = event.lastModifiedDate {
+            activity.lastModifiedDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
         completion(activity)
     }
     

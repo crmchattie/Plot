@@ -209,11 +209,12 @@ class FilterViewController: FormViewController {
                     }
             } else if filter.typeOfSection == "input" {
                 form +++ Section(filter.descriptionText)
-                <<< ButtonRow("\(filter.rawValue)") { row in
+                <<< LabelRow("\(filter.rawValue)") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.textLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
                 row.title = filter.titleText
                 if row.tag == "location", let location = filterDictionary["location"] {
                     row.cell.accessoryType = .detailDisclosureButton
@@ -296,15 +297,18 @@ class FilterViewController: FormViewController {
         
         form +++ Section()
             <<< ButtonRow("Restore Default Filters") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.backgroundColor = .systemBlue
                 row.cell.textLabel?.textAlignment = .center
-                row.cell.textLabel?.textColor = FalconPalette.defaultBlue
+                row.cell.textLabel?.textColor = .white
                 row.cell.accessoryType = .none
                 row.title = row.tag
                 }.onCellSelection({ _,_ in
                     self.filterDictionary = [String: [String]]()
                     self.form.removeAll()
                     self.initializeForm()
+                }).cellUpdate({ (cell, row) in
+                    cell.backgroundColor = .systemBlue
+                    cell.textLabel?.textColor = .white
                 })
     }
     
@@ -601,7 +605,7 @@ class FilterViewController: FormViewController {
             
         let alertController = UIAlertController(title: filterDictionary["location"]![0], message: nil, preferredStyle: .alert)
         let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
-            if let locationRow: ButtonRow = self.form.rowBy(tag: "location") {
+            if let locationRow: LabelRow = self.form.rowBy(tag: "location") {
                 self.filterDictionary["lat"] = nil
                 self.filterDictionary["lon"] = nil
                 self.filterDictionary["zipcode"] = nil
@@ -627,7 +631,7 @@ class FilterViewController: FormViewController {
 
 extension FilterViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
-        if let locationRow: ButtonRow = form.rowBy(tag: "location") {
+        if let locationRow: LabelRow = form.rowBy(tag: "location") {
             if locationName != "" {
                 for (_, value) in locationAddress {
                     filterDictionary["lat"] = [String(value[0])]

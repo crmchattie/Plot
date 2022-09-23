@@ -394,7 +394,7 @@ class ChecklistViewController: FormViewController {
                 if item1.value == item2.value {
                     return item1.key < item2.key
                 }
-                return item1.value && !item2.value
+                return !item1.value && item2.value
             }
             for item in sortedItems {
                 var mvs = (form.sectionBy(tag: "checklistfields") as! MultivaluedSection)

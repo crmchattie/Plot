@@ -37,10 +37,21 @@ class ActivityListViewController: FormViewController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Checklist"
+        title = "Checklists"
         setupMainView()
         initializeForm()
         
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if navigationController?.visibleViewController is ChecklistViewController ||
+            navigationController?.visibleViewController is GrocerylistViewController ||
+            navigationController?.visibleViewController is ActivityListViewController ||
+            navigationController?.visibleViewController is PackinglistViewController {
+            return
+        }
+        delegate?.updateActivityList(listList: listList)
     }
     
     fileprivate func setupMainView() {
@@ -49,11 +60,7 @@ class ActivityListViewController: FormViewController {
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-        
         extendedLayoutIncludesOpaqueBars = true
-                
-        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
-        navigationItem.rightBarButtonItem = plusBarButton
         navigationOptions = .Disabled
     }
     

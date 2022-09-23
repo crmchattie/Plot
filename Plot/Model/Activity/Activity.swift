@@ -79,8 +79,8 @@ class Activity: NSObject, NSCopying, Codable {
     var flagged: Bool?
     var tags: [String]?
     var priority: String?
-    var lastModifiedDate: Date?
-    var createdDate: Date?
+    var lastModifiedDate: NSNumber?
+    var createdDate: NSNumber?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -129,11 +129,9 @@ class Activity: NSObject, NSCopying, Codable {
         case flagged
         case tags
         case priority
-        case createdDate
-        case lastModifiedDate
     }
     
-    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool, createdDate: Date) {
+    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool, createdDate: NSNumber) {
         self.activityID = activityID
         self.admin = admin
         self.calendarID = calendarID
@@ -150,7 +148,7 @@ class Activity: NSObject, NSCopying, Codable {
         self.lastModifiedDate = createdDate
     }
     
-    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, isTask: Bool, isCompleted: Bool, createdDate: Date) {
+    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, isTask: Bool, isCompleted: Bool, createdDate: NSNumber) {
         self.activityID = activityID
         self.admin = admin
         self.isTask = isTask
@@ -232,8 +230,8 @@ class Activity: NSObject, NSCopying, Codable {
         flagged = dictionary?["flagged"] as? Bool
         tags = dictionary?["tags"] as? [String]
         priority = dictionary?["priority"] as? String
-        createdDate = dictionary?["createdDate"] as? Date
-        lastModifiedDate = dictionary?["lastModifiedDate"] as? Date
+        createdDate = dictionary?["createdDate"] as? NSNumber
+        lastModifiedDate = dictionary?["lastModifiedDate"] as? NSNumber
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -263,21 +261,21 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["admin"] = value
         }
         
-//        if let value = self.calendarID as AnyObject? {
-//            dictionary["calendarID"] = value
-//        }
-//
-//        if let value = self.calendarName as AnyObject? {
-//            dictionary["calendarName"] = value
-//        }
-//
-//        if let value = self.calendarColor as AnyObject? {
-//            dictionary["calendarColor"] = value
-//        }
-//
-//        if let value = self.calendarSource as AnyObject? {
-//            dictionary["calendarSource"] = value
-//        }
+        //        if let value = self.calendarID as AnyObject? {
+        //            dictionary["calendarID"] = value
+        //        }
+        //
+        //        if let value = self.calendarName as AnyObject? {
+        //            dictionary["calendarName"] = value
+        //        }
+        //
+        //        if let value = self.calendarColor as AnyObject? {
+        //            dictionary["calendarColor"] = value
+        //        }
+        //
+        //        if let value = self.calendarSource as AnyObject? {
+        //            dictionary["calendarSource"] = value
+        //        }
         
         if let value = self.activityType as AnyObject? {
             dictionary["activityType"] = value
@@ -372,7 +370,7 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = self.recurrences as AnyObject? {
             dictionary["recurrences"] = value
         }
-                
+        
         if let value = self.notes as AnyObject? {
             dictionary["notes"] = value
         } else {
@@ -465,21 +463,21 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["lastModifiedDate"] = value
         }
         
-//        if let value = self.listID as AnyObject? {
-//            dictionary["listID"] = value
-//        }
-//
-//        if let value = self.listName as AnyObject? {
-//            dictionary["listName"] = value
-//        }
-//
-//        if let value = self.listColor as AnyObject? {
-//            dictionary["listColor"] = value
-//        }
-//
-//        if let value = self.listSource as AnyObject? {
-//            dictionary["listSource"] = value
-//        }
+        //        if let value = self.listID as AnyObject? {
+        //            dictionary["listID"] = value
+        //        }
+        //
+        //        if let value = self.listName as AnyObject? {
+        //            dictionary["listName"] = value
+        //        }
+        //
+        //        if let value = self.listColor as AnyObject? {
+        //            dictionary["listColor"] = value
+        //        }
+        //
+        //        if let value = self.listSource as AnyObject? {
+        //            dictionary["listSource"] = value
+        //        }
         
         if let value = self.subtaskIDs as AnyObject? {
             dictionary["subtaskIDs"] = value
@@ -676,7 +674,7 @@ extension Activity {
     var startDate: Date? {
         if let startDateTime = startDateTime?.doubleValue {
             return Date(timeIntervalSince1970: startDateTime)
-        //for tasks where deadline date is more likely to be set than start date
+            //for tasks where deadline date is more likely to be set than start date
         }
         return nil
     }
@@ -691,7 +689,7 @@ extension Activity {
     var finalDate: Date? {
         if let startDateTime = startDateTime?.doubleValue {
             return Date(timeIntervalSince1970: startDateTime)
-        //for tasks where deadline date is more likely to be set than start date
+            //for tasks where deadline date is more likely to be set than start date
         }
         else if let endDateTime = endDateTime?.doubleValue {
             return Date(timeIntervalSince1970: endDateTime)
@@ -730,7 +728,7 @@ extension Activity {
             let epochDate = startDateTime
             let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
             return Date(timeIntervalSince1970: timezoneEpochOffset)
-        //for tasks where deadline date is more likely to be set than start date
+            //for tasks where deadline date is more likely to be set than start date
         }
         else if let endDateTime = endDateTime?.doubleValue {
             let timezone = TimeZone(identifier: endTimeZone ?? "UTC")!
@@ -786,10 +784,30 @@ extension GTLRCalendar_Event {
     }
 }
 
-enum TaskPriority: String, CaseIterable {
+enum TaskPriority: String, CaseIterable, Comparable {
     case None = "None"
-    case Low = "Low"
-    case Medium = "Medium"
     case High = "High"
+    case Medium = "Medium"
+    case Low = "Low"
     
+    private var sortOrder: Int {
+        switch self {
+        case .None:
+            return 0
+        case .Low:
+            return 1
+        case .Medium:
+            return 2
+        case .High:
+            return 3
+        }
+    }
+    
+    static func ==(lhs: TaskPriority, rhs: TaskPriority) -> Bool {
+        return lhs.sortOrder == rhs.sortOrder
+    }
+    
+    static func <(lhs: TaskPriority, rhs: TaskPriority) -> Bool {
+        return lhs.sortOrder < rhs.sortOrder
+    }
 }

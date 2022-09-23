@@ -56,7 +56,6 @@ class ListInfoViewController: UITableViewController {
     }
     
     @objc fileprivate func listsUpdated() {
-        print("listsUpdated")
         sections = Array(lists.keys).sorted { s1, s2 in
             if s1 == ListSourceOptions.plot.name {
                 return true

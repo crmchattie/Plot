@@ -244,7 +244,7 @@ class ActivityService {
             } else {
                 self.hasLoadedListTaskActivities = true
             }
-            self.grabPlotLists()
+            self.observeListsForCurrentUser()
             self.grabLists()
         })
         self.grabPrimaryCalendar({ (calendar) in
@@ -259,7 +259,7 @@ class ActivityService {
             } else {
                 self.hasLoadedCalendarEventActivities = true
             }
-            self.grabPlotCalendars()
+            self.observeCalendarsForCurrentUser()
             self.grabCalendars()
         })
         self.saveDataToSharedContainer(activities: self.activities)
@@ -436,7 +436,7 @@ class ActivityService {
         }
     }
     
-    func grabPlotCalendars() {
+    func observeCalendarsForCurrentUser() {
         self.calendarFetcher.observeCalendarForCurrentUser(calendarInitialAdd: { [weak self] calendarInitialAdd in
             if self?.calendars[CalendarSourceOptions.plot.name] != nil {
                 var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
@@ -549,7 +549,7 @@ class ActivityService {
         }
     }
     
-    func grabPlotLists() {
+    func observeListsForCurrentUser() {
         self.listFetcher.observeListForCurrentUser(listInitialAdd: { [weak self] listInitialAdd in
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]

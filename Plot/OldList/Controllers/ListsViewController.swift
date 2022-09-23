@@ -10,6 +10,9 @@ import UIKit
 import Firebase
 import GoogleSignIn
 
+let kShowCompletedTasks = "showCompletedTasks"
+let kTaskSort = "taskSort"
+
 class ListsViewController: UIViewController, ObjectDetailShowing {
     var networkController: NetworkController
     
@@ -50,7 +53,8 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     var participants: [String: [User]] = [:]
     
     var showCompletedTasks: Bool = true
-    var filters: [filter] = [.search, .showCompletedTasks, .taskCategory]
+    var taskSort: String = "Due Date"
+    var filters: [filter] = [.search, .taskSort, .showCompletedTasks, .taskCategory]
     var filterDictionary = [String: [String]]()
     
     let refreshControl = UIRefreshControl()
@@ -59,19 +63,17 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
         
-        showCompletedTasks = getShowCompletedTasksBool()
-        
         setupMainView()
         setupTableView()
-        sortandreload()
         addObservers()
-        
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
+        showCompletedTasks = getShowCompletedTasksBool()
+        taskSort = getSortTasks()
+        sortandreload()
     }
     
     deinit {
@@ -241,6 +243,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         } else {
             filteredTasks = tasks
         }
+        sortTasks()
         
         if !filteredTasks.isEmpty {
             sections.append(.tasks)
@@ -253,7 +256,6 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     func openList(list: ListType) {
         let destination = ListViewController(networkController: self.networkController)
         destination.list = list
-        destination.tasks = taskList[list] ?? []
         navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -287,6 +289,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func filter() {
         filterDictionary["showCompletedTasks"] = showCompletedTasks ? ["Yes"] : ["No"]
+        filterDictionary["taskSort"] = [taskSort]
         let destination = FilterViewController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
@@ -307,7 +310,9 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         
     }
     
-    func saveShowCompletedTasks() {
+    
+    func saveUserDefaults() {
+        UserDefaults.standard.setValue(taskSort, forKey: kTaskSort)
         UserDefaults.standard.setValue(showCompletedTasks, forKey: kShowCompletedTasks)
     }
     
@@ -319,6 +324,70 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         }
     }
     
+    func getSortTasks() -> String {
+        if let value = UserDefaults.standard.value(forKey: kTaskSort) as? String {
+            return value
+        } else {
+            return "Due Date"
+        }
+    }
+    
+    func sortTasks() {
+        if taskSort == "Due Date" {
+            filteredTasks.sort { task1, task2 in
+                if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                    if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                        if task1.priority == task2.priority {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return TaskPriority(rawValue: task1.priority ?? "None")! > TaskPriority(rawValue: task2.priority ?? "None")!
+                    }
+                    return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                    if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                        return task1.name ?? "" < task2.name ?? ""
+                    }
+                    return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                }
+                return !(task1.isCompleted ?? false)
+            }
+        } else if taskSort == "Priority" {
+            filteredTasks.sort { task1, task2 in
+                if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                    if task1.priority == task2.priority {
+                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                    }
+                    return TaskPriority(rawValue: task1.priority ?? "None")! > TaskPriority(rawValue: task2.priority ?? "None")!
+                } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                    if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                        return task1.name ?? "" < task2.name ?? ""
+                    }
+                    return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                }
+                return !(task1.isCompleted ?? false)
+            }
+        } else if taskSort == "Title" {
+            filteredTasks.sort { task1, task2 in
+                if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                    if task1.name ?? "" == task2.name ?? "" {
+                        if task1.priority == task2.priority {
+                            return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                        }
+                    }
+                    return task1.name ?? "" < task2.name ?? ""
+                } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                    if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                        return task1.name ?? "" < task2.name ?? ""
+                    }
+                    return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                }
+                return !(task1.isCompleted ?? false)
+            }
+        }
+    }
 }
 
 extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
@@ -412,17 +481,6 @@ extension ListsViewController: UpdateFilter {
         sections = [.tasks]
         filteredLists = [:]
         let dispatchGroup = DispatchGroup()
-        if let value = filterDictionary["search"] {
-            dispatchGroup.enter()
-            let searchText = value[0]
-            filteredTasks = tasks.filter({ (task) -> Bool in
-                if let name = task.name {
-                    return name.lowercased().contains(searchText.lowercased())
-                }
-                return ("").lowercased().contains(searchText.lowercased())
-            })
-            dispatchGroup.leave()
-        }
         if let value = filterDictionary["showCompletedTasks"] {
             dispatchGroup.enter()
             let bool = value[0].lowercased()
@@ -435,9 +493,20 @@ extension ListsViewController: UpdateFilter {
             }
             dispatchGroup.leave()
         }
+        if let value = filterDictionary["search"] {
+            dispatchGroup.enter()
+            let searchText = value[0]
+            filteredTasks = filteredTasks.filter({ (task) -> Bool in
+                if let name = task.name {
+                    return name.lowercased().contains(searchText.lowercased())
+                }
+                return ("").lowercased().contains(searchText.lowercased())
+            })
+            dispatchGroup.leave()
+        }
         if let categories = filterDictionary["taskCategory"] {
             dispatchGroup.enter()
-            filteredTasks = tasks.filter({ (task) -> Bool in
+            filteredTasks = filteredTasks.filter({ (task) -> Bool in
                 if let category = task.category {
                     return categories.contains(category)
                 }
@@ -445,15 +514,16 @@ extension ListsViewController: UpdateFilter {
             })
             dispatchGroup.leave()
         }
-        
-        if filterDictionary.isEmpty {
-            sortandreload()
+        if let value = filterDictionary["taskSort"] {
+            let sort = value[0]
+            self.taskSort = sort
         }
         
         dispatchGroup.notify(queue: .main) {
+            self.sortTasks()
             self.tableView.reloadData()
             self.tableView.layoutIfNeeded()
-            self.saveShowCompletedTasks()
+            self.saveUserDefaults()
         }
     }
 }

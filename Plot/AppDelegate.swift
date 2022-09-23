@@ -297,9 +297,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let value = userInfo as! [String : Any]
         if let object = try? DictionaryDecoder().decode(PLNotification.self, from: value) {
             notifications.insert(object, at: 0)
-            if notifications.count > 20 {
-                notifications.removeLast()
-            }
+//            if notifications.count > 20 {
+//                notifications.removeLast()
+//            }
         }
         
         _ = NSKeyedArchiver.archiveRootObject(notifications, toFile: notificationsArchivePath)

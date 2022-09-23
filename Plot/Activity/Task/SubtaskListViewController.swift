@@ -48,6 +48,14 @@ class SubtaskListViewController: FormViewController {
         
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if navigationController?.visibleViewController is SubtaskViewController ||
+            navigationController?.visibleViewController is ChooseTaskTableViewController { return
+        }
+        delegate?.updateSubtaskList(subtaskList: subtaskList)
+    }
+    
     fileprivate func setupMainView() {
         view.backgroundColor = .systemGroupedBackground
         tableView.indicatorStyle = .default
@@ -57,8 +65,8 @@ class SubtaskListViewController: FormViewController {
         
         extendedLayoutIncludesOpaqueBars = true
                 
-        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
-        navigationItem.rightBarButtonItem = plusBarButton
+//        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
+//        navigationItem.rightBarButtonItem = plusBarButton
         
         navigationOptions = .Disabled
                 
@@ -102,11 +110,6 @@ class SubtaskListViewController: FormViewController {
             }, at: mvs.count - 1)
             
         }
-    }
-    
-    @objc fileprivate func rightBarButtonTapped() {
-        delegate?.updateSubtaskList(subtaskList: subtaskList)
-        self.navigationController?.popViewController(animated: true)
     }
     
     func openSubtask() {

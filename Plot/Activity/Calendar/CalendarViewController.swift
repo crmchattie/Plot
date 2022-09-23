@@ -632,7 +632,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
 //    {
 //        return true
 //    }
-//    
+//
 //    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 //        return UISwipeActionsConfiguration(actions: [
 //            makeDeleteContextualAction(forRowAt: indexPath)

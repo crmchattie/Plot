@@ -49,6 +49,14 @@ class ScheduleListViewController: FormViewController {
         
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if navigationController?.visibleViewController is ScheduleViewController ||
+            navigationController?.visibleViewController is ChooseEventTableViewController { return
+        }
+        delegate?.updateScheduleList(scheduleList: scheduleList)
+    }
+    
     fileprivate func setupMainView() {
         view.backgroundColor = .systemGroupedBackground
         tableView.indicatorStyle = .default
@@ -58,8 +66,8 @@ class ScheduleListViewController: FormViewController {
         
         extendedLayoutIncludesOpaqueBars = true
                 
-        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
-        navigationItem.rightBarButtonItem = plusBarButton
+//        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
+//        navigationItem.rightBarButtonItem = plusBarButton
         navigationOptions = .Disabled
                 
     }
@@ -101,11 +109,6 @@ class ScheduleListViewController: FormViewController {
             }, at: mvs.count - 1)
             
         }
-    }
-    
-    @objc fileprivate func rightBarButtonTapped() {
-        delegate?.updateScheduleList(scheduleList: scheduleList)
-        self.navigationController?.popViewController(animated: true)
     }
     
     func openSchedule() {

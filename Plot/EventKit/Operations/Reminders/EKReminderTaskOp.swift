@@ -138,6 +138,12 @@ class EKReminderTaskOp: AsyncOperation {
         } else {
             activity.completedDate = nil
         }
+        if let date = reminder.creationDate {
+            activity.createdDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
+        if let date = reminder.lastModifiedDate {
+            activity.lastModifiedDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
         completion(activity)
     }
     

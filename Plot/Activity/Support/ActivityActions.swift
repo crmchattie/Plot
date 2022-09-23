@@ -105,7 +105,7 @@ class ActivityActions: NSObject {
         
         storeReminder()
     
-        let firebaseDictionary = activity.toAnyObject()
+        var firebaseDictionary = activity.toAnyObject()
         
         incrementBadgeForReciever(activityID: activityID, participantsIDs: membersIDs.0)
         
@@ -114,13 +114,13 @@ class ActivityActions: NSObject {
                 "activity_name": activity.name ?? "name" as NSObject,
                 "activity_type": activity.activityType ?? "basic" as NSObject
             ])
+            firebaseDictionary["lastModifiedDate"] = NSNumber(value: Int((Date()).timeIntervalSince1970)) as AnyObject
             updateActivity(firebaseDictionary: firebaseDictionary)
         } else {
             Analytics.logEvent("new_activity", parameters: [
                 "activity_name": activity.name ?? "name" as NSObject,
                 "activity_type": activity.activityType ?? "basic" as NSObject
             ])
-            firebaseDictionary["lastModifiedDate"] = Date()
             newActivity(firebaseDictionary: firebaseDictionary, membersIDs: membersIDs)
         }
     }
@@ -282,7 +282,7 @@ class ActivityActions: NSObject {
     }
     
     func updateCompletion(isComplete: Bool) {
-        guard let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
+        guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
@@ -293,11 +293,30 @@ class ActivityActions: NSObject {
             let completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
             let values:[String : Any] = ["isCompleted": isComplete, "completedDate": completedDate as Any]
             groupActivityReference.updateChildValues(values)
+            activity.completedDate = completedDate
+            
         } else {
             let values:[String : Any] = ["isCompleted": isComplete]
             groupActivityReference.updateChildValues(values)
             groupActivityReference.child("completedDate").removeValue()
+            activity.completedDate = nil
         }
+        activity.isCompleted = isComplete
+        
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists(), let value = snapshot.value as? String {
+                if value == ListSourceOptions.apple.name {
+                    self.eventKitService.updateReminder(for: activity)
+                } else if value == ListSourceOptions.google.name {
+                    self.googleCalService.updateTask(for: activity)
+                }
+            }
+        })
         
     }
     

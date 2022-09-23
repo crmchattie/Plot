@@ -243,6 +243,8 @@
 		10D0CB802464C45C00B2CC03 /* GrocerylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */; };
 		10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */; };
 		10D420AD24787AD500CBAFA7 /* ChecklistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */; };
+		10D6276F28DDFE0C009D2BD0 /* FeedbackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D6276E28DDFE0B009D2BD0 /* FeedbackViewController.swift */; };
+		10D6277128DE0B20009D2BD0 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D6277028DE0B20009D2BD0 /* Feedback.swift */; };
 		10DA3A222465C74500E6B491 /* IngredientDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */; };
 		10DC5C4025AF35C600D52722 /* FinancialMemberFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DC5C3F25AF35C600D52722 /* FinancialMemberFetcher.swift */; };
 		10DE97352475737500D4A7E8 /* ListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DE97342475737500D4A7E8 /* ListCell.swift */; };
@@ -824,6 +826,8 @@
 		10D0CB7F2464C45C00B2CC03 /* GrocerylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistViewController.swift; sourceTree = "<group>"; };
 		10D420AA2478739100CBAFA7 /* GrocerylistFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrocerylistFetcher.swift; sourceTree = "<group>"; };
 		10D420AC24787AD500CBAFA7 /* ChecklistActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistActions.swift; sourceTree = "<group>"; };
+		10D6276E28DDFE0B009D2BD0 /* FeedbackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackViewController.swift; sourceTree = "<group>"; };
+		10D6277028DE0B20009D2BD0 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		10DA3A212465C74500E6B491 /* IngredientDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientDetailViewController.swift; sourceTree = "<group>"; };
 		10DC5C3F25AF35C600D52722 /* FinancialMemberFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialMemberFetcher.swift; sourceTree = "<group>"; };
 		10DE97342475737500D4A7E8 /* ListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCell.swift; sourceTree = "<group>"; };
@@ -1759,6 +1763,14 @@
 			path = Event;
 			sourceTree = "<group>";
 		};
+		10D6276D28DDFDF6009D2BD0 /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				10D6276E28DDFE0B009D2BD0 /* FeedbackViewController.swift */,
+			);
+			path = Feedback;
+			sourceTree = "<group>";
+		};
 		10DFC3B0255A142000565DAD /* Workout */ = {
 			isa = PBXGroup;
 			children = (
@@ -2139,6 +2151,7 @@
 		4BAEE45021272B380045AB10 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				10D6276D28DDFDF6009D2BD0 /* Feedback */,
 				1092E26F28B7E3950018FCAA /* Time */,
 				10F3032824EC69C200C04B8F /* Financial */,
 				10F3032324EB744500C04B8F /* Accounts */,
@@ -2563,6 +2576,7 @@
 				1017D32C24F2B879001D7CBE /* MXMerchant.swift */,
 				1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */,
 				10F3033124EC700C00C04B8F /* Transaction.swift */,
+				10D6277028DE0B20009D2BD0 /* Feedback.swift */,
 				4BAEE549212735880045AB10 /* Conversation.swift */,
 				4BAEE54A212735880045AB10 /* Message.swift */,
 				4BAEE54B212735880045AB10 /* User.swift */,
@@ -3386,6 +3400,7 @@
 				1067753E25E1AE01002F78E7 /* ChangeEmailView.swift in Sources */,
 				10E8E50325923C070076BE42 /* BaseContainerCell.swift in Sources */,
 				4BAEE54E212735880045AB10 /* Message.swift in Sources */,
+				10D6276F28DDFE0C009D2BD0 /* FeedbackViewController.swift in Sources */,
 				10B3E50828B146DC00E1713D /* ChooseListViewController.swift in Sources */,
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
 				109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */,
@@ -3436,6 +3451,7 @@
 				4BAEE4EB21272D890045AB10 /* OutgoingTextMessageCell.swift in Sources */,
 				26036766256CC88900FE9142 /* EventKitService.swift in Sources */,
 				2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */,
+				10D6277128DE0B20009D2BD0 /* Feedback.swift in Sources */,
 				4B6521F8219B3A0A00FF655E /* ChatLogController+GroupMembersDelegate.swift in Sources */,
 				10B3E51B28B5558D00E1713D /* ListViewController.swift in Sources */,
 				10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */,

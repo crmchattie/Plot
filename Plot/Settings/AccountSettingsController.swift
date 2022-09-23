@@ -26,7 +26,8 @@ class AccountSettingsController: UITableViewController {
 //                        ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
                         ( icon: UIImage(named: "DataStorage") , title: "Data and Storage")]
     
-    var secondSection = [( icon: UIImage(named: "Logout") , title: "Log Out")]
+    var secondSection = [( icon: UIImage(named: "Feedback") , title: "Feedback")]
+    var thirdSection = [( icon: UIImage(named: "Logout") , title: "Log Out")]
     
     let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonPressed))
     let updateBarButton = UIBarButtonItem(title: "Update", style: .done, target: self, action:  #selector(updateBarButtonPressed))
@@ -284,6 +285,11 @@ extension AccountSettingsController {
         if indexPath.section == 1 {
             cell.icon.image = secondSection[indexPath.row].icon
             cell.title.text = secondSection[indexPath.row].title
+        }
+        
+        if indexPath.section == 2 {
+            cell.icon.image = thirdSection[indexPath.row].icon
+            cell.title.text = thirdSection[indexPath.row].title
             cell.accessoryType = .none
         }
         return cell
@@ -319,12 +325,19 @@ extension AccountSettingsController {
         }
         
         if indexPath.section == 1 {
+            let destination = FeedbackViewController()
+            destination.hidesBottomBarWhenPushed = true
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+            self.tableView.deselectRow(at: indexPath, animated: true)
+        }
+        if indexPath.section == 2 {
             logoutButtonTapped()
-        }        
+        }
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
     
     override  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -335,9 +348,10 @@ extension AccountSettingsController {
         
         if section == 0 {
             return firstSection.count
-        }
-        if section == 1 {
+        } else if section == 1 {
             return secondSection.count
+        } else if section == 2 {
+            return thirdSection.count
         } else {
             return 0
         }

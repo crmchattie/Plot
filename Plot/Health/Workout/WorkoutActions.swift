@@ -84,7 +84,6 @@ class WorkoutActions: NSObject {
         workout.lastModifiedDate = Date()
                         
         let groupWorkoutReference = Database.database().reference().child(workoutsEntity).child(ID)
-
         do {
             let value = try FirebaseEncoder().encode(workout)
             groupWorkoutReference.setValue(value)

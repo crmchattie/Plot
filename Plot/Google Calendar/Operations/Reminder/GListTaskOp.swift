@@ -121,6 +121,9 @@ class GListTaskOp: AsyncOperation {
             activity.completedDate = nil
             activity.isCompleted = false
         }
+        if let updated = task.updated, let date = isodateFormatter.date(from: updated) {
+            activity.lastModifiedDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
         completion(activity)
     }
     

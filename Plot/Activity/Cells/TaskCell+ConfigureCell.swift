@@ -133,7 +133,7 @@ extension TaskCollectionCell {
         if let color = task.listColor {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
-
+        
         let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         

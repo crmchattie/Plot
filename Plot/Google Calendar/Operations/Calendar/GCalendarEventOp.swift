@@ -123,6 +123,12 @@ class GCalendarEventOp: AsyncOperation {
             activity.endDateTime = NSNumber(value: end.date.timeIntervalSince1970)
             activity.endTimeZone = event.end?.timeZone
         }
+        if let date = event.created?.date {
+            activity.createdDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
+        if let date = event.updated?.date {
+            activity.lastModifiedDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
         if let location = event.location {
             lookupLocation(for: location) { coordinates in
                 if let coordinates = coordinates {

@@ -30,7 +30,8 @@ class ActivityBuilder {
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
         activity.participantsIDs = workout.participantsIDs
-        
+        activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
     }
     
@@ -54,6 +55,8 @@ class ActivityBuilder {
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
         activity.participantsIDs = mindfulness.participantsIDs
+        activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
     }
     
@@ -77,6 +80,8 @@ class ActivityBuilder {
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
         activity.participantsIDs = meal.participantsIDs
+        activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
     }
     
@@ -106,6 +111,8 @@ class ActivityBuilder {
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
         activity.participantsIDs = transaction.participantsIDs
+        activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
     }
 }
