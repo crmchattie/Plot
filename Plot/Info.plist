@@ -50,6 +50,14 @@
 				<string>com.googleusercontent.apps.433321796976-dqv6nmdn0deg0k45kiesobp6bpmi6agp</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>plotliving</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
@@ -57,6 +65,8 @@
 	<string>429511021628192</string>
 	<key>FacebookDisplayName</key>
 	<string>Plot</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>

@@ -217,8 +217,9 @@ class SchedulerViewController: FormViewController {
                             row.cell.backgroundColor = .secondarySystemGroupedBackground
                             row.cell.tintColor = .secondarySystemGroupedBackground
                             cell.datePicker.datePickerMode = .time
-                            if #available(iOS 13.4, *) {
-                                cell.datePicker.preferredDatePickerStyle = .wheels
+                            if #available(iOS 14.0, *) {
+                                cell.datePicker.preferredDatePickerStyle = .inline
+                                cell.datePicker.tintColor = .systemBlue
                             }
                         }
                         let color = cell.detailTextLabel?.textColor
@@ -249,8 +250,9 @@ class SchedulerViewController: FormViewController {
                             row.cell.backgroundColor = .secondarySystemGroupedBackground
                             row.cell.tintColor = .secondarySystemGroupedBackground
                             cell.datePicker.datePickerMode = .time
-                            if #available(iOS 13.4, *) {
-                                cell.datePicker.preferredDatePickerStyle = .wheels
+                            if #available(iOS 14.0, *) {
+                                cell.datePicker.preferredDatePickerStyle = .inline
+                                cell.datePicker.tintColor = .systemBlue
                             }
                         }
                         let color = cell.detailTextLabel?.textColor
@@ -313,8 +315,9 @@ class SchedulerViewController: FormViewController {
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
                         cell.datePicker.datePickerMode = .time
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        if #available(iOS 14.0, *) {
+                            cell.datePicker.preferredDatePickerStyle = .inline
+                            cell.datePicker.tintColor = .systemBlue
                         }
                     }
                     let color = cell.detailTextLabel?.textColor
@@ -345,8 +348,9 @@ class SchedulerViewController: FormViewController {
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
                         cell.datePicker.datePickerMode = .time
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        if #available(iOS 14.0, *) {
+                            cell.datePicker.preferredDatePickerStyle = .inline
+                            cell.datePicker.tintColor = .systemBlue
                         }
                     }
                     let color = cell.detailTextLabel?.textColor

@@ -41,11 +41,7 @@ class GListTaskOp: AsyncOperation {
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            let values: [String : Any] = ["listExport": true,
-                                                          "listID": self?.list.identifier as Any,
-                                                          "listName": self?.list.title as Any,
-                                                          "listSource": ListSourceOptions.google.name as Any,
-                                                          "listColor": CIColor(color: UIColor("#007AFF")).stringRepresentation as Any,
+                            let values: [String : Any] = ["calendarExport": true,
                                                           "externalActivityID": self?.task.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
@@ -69,11 +65,7 @@ class GListTaskOp: AsyncOperation {
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["isGroupActivity": false,
                                                           "badge": 0,
-                                                          "listExport": true,
-                                                          "listID": self?.list.identifier as Any,
-                                                          "listName": self?.list.title as Any,
-                                                          "listSource": ListSourceOptions.google.name as Any,
-                                                          "listColor": CIColor(color: UIColor("#007AFF")).stringRepresentation as Any,
+                                                          "calendarExport": true,
                                                           "externalActivityID": self?.task.identifier as Any,
                                                           "showExtras": activity.showExtras as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
@@ -124,6 +116,10 @@ class GListTaskOp: AsyncOperation {
         if let updated = task.updated, let date = isodateFormatter.date(from: updated) {
             activity.lastModifiedDate = NSNumber(value: Int(date.timeIntervalSince1970))
         }
+        activity.listID = list.identifier
+        activity.listName = list.title
+        activity.listSource = ListSourceOptions.google.name
+        activity.listColor = CIColor(color: UIColor("#007AFF")).stringRepresentation        
         completion(activity)
     }
     

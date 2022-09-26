@@ -273,8 +273,9 @@ class MealViewController: FormViewController {
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
                         cell.datePicker.datePickerMode = .dateAndTime
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        if #available(iOS 14.0, *) {
+                            cell.datePicker.preferredDatePickerStyle = .inline
+                            cell.datePicker.tintColor = .systemBlue
                         }
                     }
                     let color = cell.detailTextLabel?.textColor
@@ -317,8 +318,9 @@ class MealViewController: FormViewController {
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
                             cell.datePicker.datePickerMode = .dateAndTime
-                            if #available(iOS 13.4, *) {
-                                cell.datePicker.preferredDatePickerStyle = .wheels
+                            if #available(iOS 14.0, *) {
+                                cell.datePicker.preferredDatePickerStyle = .inline
+                                cell.datePicker.tintColor = .systemBlue
                             }
                     }
                     let color = cell.detailTextLabel?.textColor

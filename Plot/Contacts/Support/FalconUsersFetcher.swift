@@ -223,7 +223,7 @@ class FalconUsersFetcher: NSObject {
                 
             }
         }, withCancel: { (error) in
-            print("error")
+            print("error falcon")
             //search error
         })
     }

@@ -1075,7 +1075,8 @@ class Service {
         
         var parameters = ["widget_type": "connect_widget",
                           "is_mobile_webview":"\(true)",
-                          "ui_message_version": "\(4)"]
+                          "ui_message_version": "\(4)",
+                          "ui_message_webview_url_scheme": "plotliving"]
         if UITraitCollection.current.userInterfaceStyle == .light {
             parameters["color_scheme"] = "light"
         } else {

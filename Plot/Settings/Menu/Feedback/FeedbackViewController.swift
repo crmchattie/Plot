@@ -78,7 +78,7 @@ class FeedbackViewController: FormViewController {
             $0.cell.textLabel?.textColor = .label
             $0.cell.textLabel?.textAlignment = .center
             $0.cell.textLabel?.numberOfLines = 0
-            $0.title = "Share your feedback with us via the form below. Tell us about new features and/or what you like/dislike about Plot so we can make your experience even better!"
+            $0.title = "Share your feedback with us via the form below. Tell us about what you like/dislike about Plot and/or new features you are looking for so we can make your experience even better!"
         }.cellUpdate { cell, row in
             cell.backgroundColor = .systemGroupedBackground
             cell.textLabel?.textColor = .label

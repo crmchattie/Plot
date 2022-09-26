@@ -135,8 +135,9 @@ class CalendarDetailCell: UICollectionViewCell {
     
     let startDatePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
-        if #available(iOS 13.4, *) {
-            datePicker.preferredDatePickerStyle = .wheels
+        if #available(iOS 14.0, *) {
+            datePicker.preferredDatePickerStyle = .inline
+            datePicker.tintColor = .systemBlue
             datePicker.sizeToFit()
         }
         datePicker.backgroundColor = .clear
@@ -176,8 +177,9 @@ class CalendarDetailCell: UICollectionViewCell {
     let endDatePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.backgroundColor = .clear
-        if #available(iOS 13.4, *) {
-            datePicker.preferredDatePickerStyle = .wheels
+        if #available(iOS 14.0, *) {
+            datePicker.preferredDatePickerStyle = .inline
+            datePicker.tintColor = .systemBlue
             datePicker.sizeToFit()
         }
         datePicker.tintColor = .clear

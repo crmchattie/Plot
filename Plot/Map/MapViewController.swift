@@ -368,7 +368,7 @@ public func lookupLocation(for address: String, completion: @escaping (CLLocatio
     let search = MKLocalSearch(request: searchRequest)
     search.start { (response, error) in
         guard error == nil else {
-            print("error")
+            print("error map")
             print(error ?? "error")
             completion(nil)
             return

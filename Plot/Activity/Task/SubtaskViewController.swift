@@ -264,8 +264,9 @@ class SubtaskViewController: FormViewController {
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.tintColor = .secondarySystemGroupedBackground
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    if #available(iOS 14.0, *) {
+                        cell.datePicker.preferredDatePickerStyle = .inline
+                        cell.datePicker.tintColor = .systemBlue
                     }
                     else {
                         cell.datePicker.datePickerMode = .dateAndTime
@@ -343,8 +344,9 @@ class SubtaskViewController: FormViewController {
 //                    $0.cell.tintColor = .secondarySystemGroupedBackground
 //                    $0.hidden = true
 //                    $0.minuteInterval = 5
-//                    if #available(iOS 13.4, *) {
-//                        $0.cell.datePicker.preferredDatePickerStyle = .wheels
+//                    if #available(iOS 14.0, *) {
+//                        $0.cell.datePicker.preferredDatePickerStyle = .inline
+//                        $0.cell.datePicker.tintColor = .systemBlue
 //                    }
 //                    else {
 //                        $0.cell.datePicker.datePickerMode = .date
@@ -524,8 +526,9 @@ class SubtaskViewController: FormViewController {
                     $0.cell.tintColor = .secondarySystemGroupedBackground
                     $0.hidden = true
                     $0.minuteInterval = 5
-                    if #available(iOS 13.4, *) {
-                        $0.cell.datePicker.preferredDatePickerStyle = .wheels
+                    if #available(iOS 14.0, *) {
+                        $0.cell.datePicker.preferredDatePickerStyle = .inline
+                        $0.cell.datePicker.tintColor = .systemBlue
                     }
                     else {
                         $0.cell.datePicker.datePickerMode = .date

@@ -319,8 +319,9 @@ class ScheduleViewController: FormViewController {
                     inlineRow.cellUpdate { (cell, row) in
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        if #available(iOS 14.0, *) {
+                            cell.datePicker.preferredDatePickerStyle = .inline
+                            cell.datePicker.tintColor = .systemBlue
                         }
                         let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                         if allRow.value ?? false {
@@ -416,8 +417,9 @@ class ScheduleViewController: FormViewController {
                     if let endTimeZone = self?.schedule.endTimeZone {
                         cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
                     }
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    if #available(iOS 14.0, *) {
+                        cell.datePicker.preferredDatePickerStyle = .inline
+                        cell.datePicker.tintColor = .systemBlue
                     }
                     let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                     if allRow.value ?? false {

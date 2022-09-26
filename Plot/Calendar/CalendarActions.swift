@@ -48,7 +48,7 @@ class CalendarActions: NSObject {
             return
         }
         
-        let reference = Database.database().reference().child(calendarEntity).child(ID)
+        let reference = Database.database().reference().child(calendarEntity).child(ID.removeCharacters())
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
@@ -82,7 +82,7 @@ class CalendarActions: NSObject {
         calendar.participantsIDs = membersIDs.0
         calendar.lastModifiedDate = Date()
         
-        let groupCalendarReference = Database.database().reference().child(calendarEntity).child(ID)
+        let groupCalendarReference = Database.database().reference().child(calendarEntity).child(ID.removeCharacters())
 
         do {
             let value = try FirebaseEncoder().encode(calendar)
@@ -108,7 +108,7 @@ class CalendarActions: NSObject {
         }
         let membersIDs = fetchMembersIDs()
         if Set(calendar.participantsIDs!) != Set(membersIDs.0) {
-            let groupCalendarReference = Database.database().reference().child(calendarEntity).child(ID)
+            let groupCalendarReference = Database.database().reference().child(calendarEntity).child(ID.removeCharacters())
             updateParticipants(membersIDs: membersIDs)
             groupCalendarReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
             let date = Date().timeIntervalSinceReferenceDate

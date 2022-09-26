@@ -23,9 +23,9 @@ class ChangeEmailController: UIViewController {
     func configureChangeEmailView() {
         view.addSubview(changeEmailView)
         changeEmailView.frame = view.bounds
+        changeEmailView.email.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         changeEmailView.nextView.addTarget(self, action: #selector(didTapSendSignInLink), for: .touchUpInside)
         changeEmailView.nextView.isEnabled = false
-        
         changeEmailView.instructions.text = "Please enter your email."
         let attributes = [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel]
         changeEmailView.email.attributedPlaceholder = NSAttributedString(string: "New Email", attributes: attributes)
@@ -42,7 +42,7 @@ class ChangeEmailController: UIViewController {
     }
     
     func setRightBarButtonStatus() {
-        let emailForVerification = changeEmailView.email.text!
+        let emailForVerification = changeEmailView.email.text ?? ""
         if !emailForVerification.isValidEmail {
             changeEmailView.nextView.isEnabled = false
         } else {

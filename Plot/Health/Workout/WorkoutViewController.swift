@@ -102,6 +102,10 @@ class WorkoutViewController: FormViewController {
                     row.baseCell.isUserInteractionEnabled = true
                 }
             }
+        } else {
+            if delegate == nil, let section = form.first {
+                section.footer?.title = "An associated event will be created along with this workout"
+            }
         }
     }
     
@@ -392,8 +396,9 @@ class WorkoutViewController: FormViewController {
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.tintColor = .secondarySystemGroupedBackground
                 cell.datePicker.datePickerMode = .dateAndTime
-                if #available(iOS 13.4, *) {
-                    cell.datePicker.preferredDatePickerStyle = .wheels
+                if #available(iOS 14.0, *) {
+                    cell.datePicker.preferredDatePickerStyle = .inline
+                    cell.datePicker.tintColor = .systemBlue
                 }
             }
             let color = cell.detailTextLabel?.textColor
@@ -438,8 +443,9 @@ class WorkoutViewController: FormViewController {
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.tintColor = .secondarySystemGroupedBackground
                 cell.datePicker.datePickerMode = .dateAndTime
-                if #available(iOS 13.4, *) {
-                    cell.datePicker.preferredDatePickerStyle = .wheels
+                if #available(iOS 14.0, *) {
+                    cell.datePicker.preferredDatePickerStyle = .inline
+                    cell.datePicker.tintColor = .systemBlue
                 }
             }
             let color = cell.detailTextLabel?.textColor

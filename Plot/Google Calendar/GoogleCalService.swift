@@ -131,11 +131,17 @@ class GoogleCalService {
             return
         }
         
+        print("calendarID")
+        print(calendarID)
+        print("eventID")
+        print(eventID)
+        
         let eventQuery = GTLRCalendarQuery_EventsGet.query(withCalendarId: calendarID, eventId: eventID)
         
         service.executeQuery(eventQuery, completionHandler: { (ticket, result, error) in
             guard error == nil, let event = result as? GTLRCalendar_Event else {
-                print("failed to grab events \(String(describing: error))")
+                print(ticket)
+                print("failed to grab event \(String(describing: error))")
                 return
             }
             
@@ -143,8 +149,8 @@ class GoogleCalService {
             event.start = start
             event.end = end
             event.recurrence = activity.recurrences
-            
-            let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: calendarID)
+                        
+            let query = GTLRCalendarQuery_EventsUpdate.query(withObject: event, calendarId: calendarID, eventId: eventID)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
                 if error != nil {
                     print("Failed to save google calendar event with error : \(String(describing: error))")
@@ -328,7 +334,7 @@ class GoogleCalService {
                 task.completed = date
             }
             
-            let query = GTLRTasksQuery_TasksInsert.query(withObject: task, tasklist: listID)
+            let query = GTLRTasksQuery_TasksUpdate.query(withObject: task, tasklist: listID, task: taskID)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
                 if error != nil {
                     print("Failed to save google calendar event with error : \(String(describing: error))")

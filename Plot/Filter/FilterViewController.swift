@@ -249,6 +249,7 @@ class FilterViewController: FormViewController {
                     $0.cell.textLabel?.textColor = .label
                     $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = filter.titleText
+                    $0.minuteInterval = 5
                     $0.dateFormatter?.dateStyle = .long
                     if filterDictionary["\(filter.rawValue)"] != nil, let value = filterDictionary["\(filter.rawValue)"], let date = value[0].toDate() {
                         $0.value = date
@@ -261,8 +262,9 @@ class FilterViewController: FormViewController {
                     inlineRow.cellUpdate { (cell, row) in
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        if #available(iOS 14.0, *) {
+                            cell.datePicker.preferredDatePickerStyle = .inline
+                            cell.datePicker.tintColor = .systemBlue
                         }
                         else {
                             cell.datePicker.datePickerMode = .dateAndTime

@@ -48,7 +48,7 @@ class ListActions: NSObject {
             return
         }
         
-        let reference = Database.database().reference().child(listEntity).child(ID)
+        let reference = Database.database().reference().child(listEntity).child(ID.removeCharacters())
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
@@ -82,7 +82,7 @@ class ListActions: NSObject {
         list.participantsIDs = membersIDs.0
         list.lastModifiedDate = Date()
         
-        let groupListReference = Database.database().reference().child(listEntity).child(ID)
+        let groupListReference = Database.database().reference().child(listEntity).child(ID.removeCharacters())
 
         do {
             let value = try FirebaseEncoder().encode(list)
@@ -108,7 +108,7 @@ class ListActions: NSObject {
         }
         let membersIDs = fetchMembersIDs()
         if Set(list.participantsIDs!) != Set(membersIDs.0) {
-            let groupListReference = Database.database().reference().child(listEntity).child(ID)
+            let groupListReference = Database.database().reference().child(listEntity).child(ID.removeCharacters())
             updateParticipants(membersIDs: membersIDs)
             groupListReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
             let date = Date().timeIntervalSinceReferenceDate

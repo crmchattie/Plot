@@ -261,21 +261,22 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["admin"] = value
         }
         
-        //        if let value = self.calendarID as AnyObject? {
-        //            dictionary["calendarID"] = value
-        //        }
-        //
-        //        if let value = self.calendarName as AnyObject? {
-        //            dictionary["calendarName"] = value
-        //        }
-        //
-        //        if let value = self.calendarColor as AnyObject? {
-        //            dictionary["calendarColor"] = value
-        //        }
-        //
-        //        if let value = self.calendarSource as AnyObject? {
-        //            dictionary["calendarSource"] = value
-        //        }
+//calendar is user attribute vs. activity attribute unlike list
+//        if let value = self.calendarID as AnyObject? {
+//            dictionary["calendarID"] = value
+//        }
+//
+//        if let value = self.calendarName as AnyObject? {
+//            dictionary["calendarName"] = value
+//        }
+//
+//        if let value = self.calendarColor as AnyObject? {
+//            dictionary["calendarColor"] = value
+//        }
+//
+//        if let value = self.calendarSource as AnyObject? {
+//            dictionary["calendarSource"] = value
+//        }
         
         if let value = self.activityType as AnyObject? {
             dictionary["activityType"] = value
@@ -463,21 +464,23 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["lastModifiedDate"] = value
         }
         
-        //        if let value = self.listID as AnyObject? {
-        //            dictionary["listID"] = value
-        //        }
-        //
-        //        if let value = self.listName as AnyObject? {
-        //            dictionary["listName"] = value
-        //        }
-        //
-        //        if let value = self.listColor as AnyObject? {
-        //            dictionary["listColor"] = value
-        //        }
-        //
-        //        if let value = self.listSource as AnyObject? {
-        //            dictionary["listSource"] = value
-        //        }
+        
+        //list is activity attribute vs. user attribute unlike calendar
+        if let value = self.listID as AnyObject? {
+            dictionary["listID"] = value
+        }
+
+        if let value = self.listName as AnyObject? {
+            dictionary["listName"] = value
+        }
+
+        if let value = self.listColor as AnyObject? {
+            dictionary["listColor"] = value
+        }
+
+        if let value = self.listSource as AnyObject? {
+            dictionary["listSource"] = value
+        }
         
         if let value = self.subtaskIDs as AnyObject? {
             dictionary["subtaskIDs"] = value

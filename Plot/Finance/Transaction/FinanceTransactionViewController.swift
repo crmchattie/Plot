@@ -230,6 +230,7 @@ class FinanceTransactionViewController: FormViewController {
                 $0.cell.textLabel?.textColor = .secondaryLabel
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
+                $0.minuteInterval = 5
                 $0.title = $0.tag
                 if let date = isodateFormatter.date(from: transaction.transacted_at) {
                     $0.value = date
@@ -239,8 +240,9 @@ class FinanceTransactionViewController: FormViewController {
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.tintColor = .secondarySystemGroupedBackground
                     cell.datePicker.datePickerMode = .dateAndTime
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    if #available(iOS 14.0, *) {
+                        cell.datePicker.preferredDatePickerStyle = .inline
+                        cell.datePicker.tintColor = .systemBlue
                     }
                 }
                 let color = cell.detailTextLabel?.textColor
@@ -259,6 +261,7 @@ class FinanceTransactionViewController: FormViewController {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.textLabel?.textColor = .secondaryLabel
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.minuteInterval = 5
                 $0.title = $0.tag
                 $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
                 if let reportDate = transaction.date_for_reports, reportDate != "", let date = isodateFormatter.date(from: reportDate) {
@@ -271,8 +274,9 @@ class FinanceTransactionViewController: FormViewController {
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.tintColor = .secondarySystemGroupedBackground
                     cell.datePicker.datePickerMode = .dateAndTime
-                    if #available(iOS 13.4, *) {
-                        cell.datePicker.preferredDatePickerStyle = .wheels
+                    if #available(iOS 14.0, *) {
+                        cell.datePicker.preferredDatePickerStyle = .inline
+                        cell.datePicker.tintColor = .systemBlue
                     }
                 }
                 let color = cell.detailTextLabel?.textColor

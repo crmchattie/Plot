@@ -43,7 +43,6 @@ class ChangeEmailView: UIView {
         email.autocorrectionType = .no
         email.keyboardAppearance = .default
         email.textColor = .label
-        email.addTarget(ChangeEmailView.self, action: #selector(EnterPhoneNumberController.textFieldDidChange(_:)), for: .editingChanged)
         return email
     }()
     

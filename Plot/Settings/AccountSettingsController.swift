@@ -96,10 +96,10 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.name.addTarget(self, action: #selector(nameDidBeginEditing), for: .editingDidBegin)
         userProfileContainerView.name.addTarget(self, action: #selector(nameEditingChanged), for: .editingChanged)
         userProfileContainerView.phone.addTarget(self, action: #selector(changePhoneNumber), for: .editingDidBegin)
-//        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
+        userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
         userProfileContainerView.bio.delegate = self
-//        userProfileContainerView.email.delegate = self
+        userProfileContainerView.email.delegate = self
         userProfileContainerView.name.delegate = self
         userProfileContainerView.phone.delegate = self
         userProfileContainerView.backgroundColor = .systemGroupedBackground
@@ -109,7 +109,7 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.name.textColor = .label
         userProfileContainerView.phone.textColor = .label
         userProfileContainerView.bio.textColor = .label
-//        userProfileContainerView.email.textColor = .label
+        userProfileContainerView.email.textColor = .label
         userProfileContainerView.bio.keyboardAppearance = .default
         userProfileContainerView.name.keyboardAppearance = .default
     }
@@ -128,7 +128,7 @@ class AccountSettingsController: UITableViewController {
     @objc private func emailVerified(_ notification: Notification) {
         guard let email = notification.object as? String, email.isValidEmail else { return }
 
-//        userProfileContainerView.email.text = email
+        userProfileContainerView.email.text = email
 
         let userNameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
         userNameReference.updateChildValues(["email": email])
@@ -191,7 +191,7 @@ class AccountSettingsController: UITableViewController {
                     self.userProfileContainerView.bioPlaceholderLabel.isHidden = !self.userProfileContainerView.bio.text.isEmpty
                     self.currentBio = bio
                 }
-//                self.userProfileContainerView.email.text = userInfo["email"] as? String
+                self.userProfileContainerView.email.text = userInfo["email"] as? String
                 
                 if let phoneNumber = userInfo["phoneNumber"] as? String {
                     do {

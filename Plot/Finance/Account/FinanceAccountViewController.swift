@@ -376,6 +376,7 @@ class FinanceAccountViewController: FormViewController {
                     $0.cell.textLabel?.textColor = .secondaryLabel
                     $0.cell.detailTextLabel?.textColor = .secondaryLabel
                     $0.title = $0.tag
+                    $0.minuteInterval = 5
                     $0.dateFormatter?.dateFormat = dateFormatterPrint.dateFormat
                     if let paymentDueDate = account.payment_due_at, let date = isodateFormatter.date(from: paymentDueDate) {
                         $0.value = date
@@ -385,8 +386,9 @@ class FinanceAccountViewController: FormViewController {
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
                         cell.datePicker.datePickerMode = .dateAndTime
-                        if #available(iOS 13.4, *) {
-                            cell.datePicker.preferredDatePickerStyle = .wheels
+                        if #available(iOS 14.0, *) {
+                            cell.datePicker.preferredDatePickerStyle = .inline
+                            cell.datePicker.tintColor = .systemBlue
                         }
                     }
                     let color = cell.detailTextLabel?.textColor

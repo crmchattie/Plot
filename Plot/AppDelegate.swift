@@ -264,6 +264,50 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             annotation: options[UIApplication.OpenURLOptionsKey.annotation]
         )
         
+        let incomingURL = url
+
+        // appscheme://oauth_complete?status=success&member_guid=MBR-1
+        // appscheme://oauth_complete?status=error&member_guid=MBR-1
+        if (incomingURL.scheme == "plotliving") {
+            print("Received a redirect of: ", incomingURL)
+            // This is an OAuth redirect back to the app from MX
+            var status = "",
+                memberGuid = "",
+                errorReason = ""
+
+            let urlc = URLComponents(string: incomingURL.absoluteString)
+
+            for item in urlc?.queryItems ?? [] {
+                switch item.name {
+                case "status":
+                    status = item.value!
+                case "amp;member_guid":
+                    memberGuid = item.value!
+                case "amp;error_reason":
+                    errorReason = item.value!
+                case "member_guid":
+                    memberGuid = item.value!
+                case "error_reason":
+                    errorReason = item.value!
+                default:
+                    print("Unexpected item in oauth query string", item.name)
+                }
+            }
+
+            print("Received a status: \(status), member: \(memberGuid), errorReason: \(errorReason)")
+            
+            if errorReason != "", let error = MXClientRedirectStatus(rawValue: errorReason) {
+                let alert = UIAlertController(title: error.description, message: nil, preferredStyle: UIAlertController.Style.alert)
+                if let rvc = self.window?.rootViewController, let vc = UIApplication.getCurrentViewController(rvc) as? WebViewController {
+                    vc.present(alert, animated: true, completion: nil)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
+                        alert.dismiss(animated: true, completion: nil)
+                        vc.close()
+                    })
+                }
+            }
+        }
+        
         return GIDSignIn.sharedInstance().handle(url)
     }
 

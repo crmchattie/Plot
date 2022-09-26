@@ -25,7 +25,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     
     var current_member_guid: String?
     
-    let appScheme = "appscheme://"
+    let appScheme = "plotliving://"
     let mxScheme = "mx://"
     let atriumScheme = "atrium://"
     
@@ -57,7 +57,7 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
-
+        
         if let url = urlString, let myURL = URL(string: url) {
             let myRequest = URLRequest(url: myURL)
             webView.load(myRequest)
@@ -83,6 +83,10 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     }
     
     @IBAction func done(_ sender: AnyObject) {
+        close()
+    }
+    
+    func close() {
         self.delegate?.updateMXMembers()
         self.dismiss(animated: true, completion: nil)
     }
@@ -109,7 +113,10 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
         let isPostMessageFromMX = url?.hasPrefix(appScheme) == true
                                   || url?.hasPrefix(atriumScheme) == true
                                   || url?.hasPrefix(mxScheme) == true
-
+        
+        print("url")
+        print(url)
+        
         if (isPostMessageFromMX) {
             let urlc = URLComponents(string: url ?? "")
             let path = urlc?.path ?? ""
@@ -175,6 +182,9 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
      */
     func handleOauthRedirect(payload: URLQueryItem?) {
         let metadataString = payload?.value ?? ""
+        
+        print("metadataString")
+        print(metadataString)
 
         do {
             if let json = try JSONSerialization.jsonObject(with: Data(metadataString.utf8), options: []) as? [String: Any] {

@@ -39,14 +39,8 @@ class EKReminderTaskOp: AsyncOperation {
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            var values: [String : Any] = ["listExport": true,
-                                                          "listID": self?.reminder.calendar.calendarIdentifier as Any,
-                                                          "listName": self?.reminder.calendar.title as Any,
-                                                          "listSource": ListSourceOptions.apple.name as Any,
-                                                          "externalActivityID": self?.reminder.calendarItemIdentifier as Any]
-                            if let CGColor = self?.reminder.calendar.cgColor {
-                                values["listColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
-                            }
+                            var values: [String : Any] = ["calendarExport": true,
+                                                          "externalActivityID": self?.reminder.calendarItemIdentifier as Any, "showExtras": activity.showExtras as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })
@@ -68,9 +62,6 @@ class EKReminderTaskOp: AsyncOperation {
                             var values: [String : Any] = ["isGroupActivity": false,
                                                           "badge": 0,
                                                           "calendarExport": true,
-                                                          "listID": self?.reminder.calendar.calendarIdentifier as Any,
-                                                          "listName": self?.reminder.calendar.title as Any,
-                                                          "listSource": ListSourceOptions.apple.name as Any,
                                                           "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
                                                           "showExtras": activity.showExtras as Any]
                             if let CGColor = self?.reminder.calendar.cgColor {
@@ -143,6 +134,12 @@ class EKReminderTaskOp: AsyncOperation {
         }
         if let date = reminder.lastModifiedDate {
             activity.lastModifiedDate = NSNumber(value: Int(date.timeIntervalSince1970))
+        }
+        activity.listID = reminder.calendar.calendarIdentifier
+        activity.listName = reminder.calendar.title
+        activity.listSource = ListSourceOptions.apple.name
+        if let CGColor = reminder.calendar.cgColor {
+            activity.listColor = CIColor(cgColor: CGColor).stringRepresentation
         }
         completion(activity)
     }

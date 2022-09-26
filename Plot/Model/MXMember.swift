@@ -62,3 +62,29 @@ enum ConnectionStatus: String, CaseIterable, Codable {
     case impaired = "IMPAIRED"
     case pending = "PENDING"
 }
+
+enum MXClientRedirectStatus: String, CaseIterable, Codable {
+    case cancelled = "CANCELLED"
+    case denied = "DENIED"
+    case impeded = "IMPEDED"
+    case provider = "PROVIDER_ERROR"
+    case server = "SERVER_ERROR"
+    case session = "SESSION_ERROR"
+    
+    var description: String {
+        switch self {
+        case .cancelled:
+            return "Authentication process was cancelled. Please try again"
+        case .denied:
+            return "Authentication was denied. Please try again"
+        case .impeded:
+            return "Authentication requires user action. Please complete action on provider's website"
+        case .provider:
+            return "An unknown error occurred at the provider. Please try again"
+        case .server:
+            return "An unknown error occurred. Please try again"
+        case .session:
+            return "Authentication was unsuccessful. Please try again"
+        }
+    }
+}

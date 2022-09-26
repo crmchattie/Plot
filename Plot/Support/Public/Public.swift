@@ -97,6 +97,24 @@ extension UIApplication {
         }
         return controller
     }
+    
+    class func getCurrentViewController(_ vc: UIViewController) -> UIViewController? {
+        if let pvc = vc.presentedViewController {
+            return getCurrentViewController(pvc)
+        }
+        else if let svc = vc as? UISplitViewController, svc.viewControllers.count > 0 {
+            return getCurrentViewController(svc.viewControllers.last!)
+        }
+        else if let nc = vc as? UINavigationController, nc.viewControllers.count > 0 {
+            return getCurrentViewController(nc.topViewController!)
+        }
+        else if let tbc = vc as? UITabBarController {
+            if let svc = tbc.selectedViewController {
+                return getCurrentViewController(svc)
+            }
+        }
+        return vc
+    }
 }
 
 struct AppUtility {
@@ -607,7 +625,7 @@ func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, has
     var endString: String
     let now = Date()
     if let startDate = startDate {
-        let startEarliest = now < startDate ? now : startDate
+//        let startEarliest = now < startDate ? now : startDate
         if let hasStartTime = hasStartTime, hasStartTime, hasDeadlineTime {
             if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
                 //start date is next week
