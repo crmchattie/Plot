@@ -98,6 +98,10 @@ class MindfulnessViewController: FormViewController {
                     row.baseCell.isUserInteractionEnabled = false
                 }
             }
+        }  else {
+            if delegate == nil, let section = form.first {
+                section.footer?.title = "An associated event will be created along with this mindfulness session"
+            }
         }
     }
     
@@ -223,7 +227,7 @@ class MindfulnessViewController: FormViewController {
     
     func initializeForm() {
         form +++
-            Section()
+            Section(footer: "")
             
             <<< TextRow("Name") {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground

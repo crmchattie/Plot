@@ -11,42 +11,45 @@ import UIKit
 
 let userActivityCategoriesEntity = "user-activities-categories"
 
-private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
-                           "To-do": ["meeting", "assignment", "project", "standup", "work", "groceries", "to-dos", "tasks"],
-                           "Social": ["party", "birthday"],
-                           "Family": ["family"],
-                           "Personal": ["appointment", "consultation", "therapy", "haircut", "dr", "doctor"],
-                           "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation"],
-                           "Leisure": ["trip", "vacation"]
+private let keywordsMap = ["Health": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise", "mindfulness", "meditation", "dr", "doctor", "therapy", "appointment"],
+                           "To-do": ["groceries", "to-dos", "tasks", "errand", "chore"],
+                           "Work": ["meeting", "assignment", "project", "standup", "work"],
+                           "School": ["class", "homework", "test"],
+                           "Social": ["party", "birthday", "wedding", "drinks", "date"],
+                           "Family": ["family", "kids"],
+                           "Personal": ["consultation", "haircut", "read", "journal"],
+                           "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation", "brunch"],
+                           "Leisure": ["vacation", "shopping", "concert", "sporting event", "museum", "movies"],
+                           "Finances": ["vacation", "shopping"]
 ]
 
-enum ActivityCategory: String, CaseIterable {
-    case sleep = "Sleep"
+enum ActivityCategory: String, Codable, CaseIterable {
+    case health = "Health"
     case meal = "Meal"
     case work = "Work"
+    case school = "School"
     case social = "Social"
     case leisure = "Leisure"
-    case workout = "Workout"
     case family = "Family"
     case personal = "Personal"
-    case uncategorized = "Uncategorized"
     case todo = "To-do"
-    case mindfulness = "Mindfulness"
+    case finances = "Finances"
+    case uncategorized = "Uncategorized"
     /// Same as uncategorized by not included in the analytics
     
     var icon: UIImage {
         switch self {
-        case .sleep: return UIImage(named: "sleep")!
+        case .health: return UIImage(named: "heart-filled")!
         case .meal: return UIImage(named: "food")!
         case .work: return UIImage(named: "work")!
+        case .school: return UIImage(named: "school")!
         case .social: return UIImage(named: "nightlife")!
         case .leisure: return UIImage(named: "leisure")!
-        case .workout: return UIImage(named: "workout")!
         case .family: return UIImage(named: "family")!
         case .personal: return UIImage(named: "personal")!
         case .todo: return UIImage(named: "todo")!
+        case .finances: return UIImage(named: "money")!
         case .uncategorized: return UIImage(named: "event")!
-        case .mindfulness: return UIImage(named: "mindfulness")!
         }
     }
     

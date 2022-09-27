@@ -204,8 +204,8 @@ enum TransactionType: String, Codable, CaseIterable {
     
     var name: String {
         switch self {
-        case .credit: return "Income"
-        case .debit: return "Expense"
+        case .credit: return "Inflow"
+        case .debit: return "Outflow"
         }
     }
 }

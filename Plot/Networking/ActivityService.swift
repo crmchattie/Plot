@@ -140,6 +140,16 @@ class ActivityService {
                     } else if currentDate.isBetween(startDate2, and: endDate2) {
                         return startDate1 < currentDate
                     }
+                } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let finalDate2 = activity2.finalDate {
+                    if currentDate.isBetween(startDate1, and: endDate1) {
+                        return currentDate < finalDate2
+                    }
+                    return startDate1 < finalDate2
+                } else if let finalDate1 = activity1.finalDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+                    if currentDate.isBetween(startDate2, and: endDate2) {
+                        return finalDate1 < currentDate
+                    }
+                    return finalDate1 < startDate2
                 }
                 if activity1.finalDate == activity2.finalDate {
                     return activity1.name ?? "" < activity2.name ?? ""
@@ -284,6 +294,7 @@ class ActivityService {
     }
     
     func regrabLists(_ completion: @escaping () -> Void) {
+        hasLoadedListTaskActivities = false
         self.grabLists()
         if primaryList == ListSourceOptions.apple.name {
             self.grabEKReminders {
@@ -302,6 +313,7 @@ class ActivityService {
     }
     
     func regrabEvents(_ completion: @escaping () -> Void) {
+        hasLoadedCalendarEventActivities = false
         self.grabCalendars()
         if primaryCalendar == CalendarSourceOptions.apple.name {
             self.grabEKEvents {

@@ -74,6 +74,7 @@ class EventViewController: FormViewController {
     var transaction: Transaction!
     var workout: Workout!
     var mindfulness: Mindfulness!
+    var task: Activity!
         
     var active = false
     var sectionChanged: Bool = false
@@ -125,6 +126,9 @@ class EventViewController: FormViewController {
                     self.activity = activity
                     self.activityID = activityID
                 } else if let mindfulness = mindfulness, let activity = ActivityBuilder.createActivity(from: mindfulness), let activityID = activity.activityID {
+                    self.activity = activity
+                    self.activityID = activityID
+                } else if let task = task, let activity = ActivityBuilder.createActivity(from: task), let activityID = activity.activityID {
                     self.activity = activity
                     self.activityID = activityID
                 } else {
@@ -263,7 +267,9 @@ class EventViewController: FormViewController {
         
         <<< LabelRow("Location") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textAlignment = .left
+            row.cell.textLabel?.textColor = .label
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
             if let activity = activity, let localName = activity.locationName, localName != "locationName" {
                 row.cell.textLabel?.textColor = .label
                 row.cell.accessoryType = .detailDisclosureButton

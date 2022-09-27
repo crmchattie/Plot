@@ -247,7 +247,7 @@ class WorkoutViewController: FormViewController {
     func initializeForm() {
         print("initializing form")
         form +++
-        Section()
+        Section(footer: "")
         //"Calories burned is based on estimates and subject to error as a result"
         
         <<< TextRow("Name") {

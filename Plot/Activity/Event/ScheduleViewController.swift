@@ -190,7 +190,6 @@ class ScheduleViewController: FormViewController {
         <<< LabelRow("Location") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             if self.active, let localName = schedule.locationName, localName != "locationName" {

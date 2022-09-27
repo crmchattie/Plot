@@ -15,6 +15,7 @@ extension NSNotification.Name {
     static let workoutsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".workoutsUpdated")
     static let mindfulnessUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".mindfulnessUpdated")
     static let healthKitUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthKitUpdated")
+    static let hasLoadedHealth = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedHealth")
 }
 
 class HealthService {
@@ -66,6 +67,11 @@ class HealthService {
             }
         }
     }
+    var hasLoadedHealth = false {
+        didSet {
+            NotificationCenter.default.post(name: .hasLoadedHealth, object: nil)
+        }
+    }
     
     var askedforAuthorization: Bool = false
     
@@ -84,6 +90,7 @@ class HealthService {
                     self?.observeMindfulnesssForCurrentUser {}
                     self?.addObservers()
                     self?.isRunning = false
+                    self?.hasLoadedHealth = true
                     completion()
                 }
             }
@@ -91,6 +98,7 @@ class HealthService {
     }
     
     func regrabHealth(_ completion: @escaping () -> Void) {
+        hasLoadedHealth = false
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.askedforAuthorization = askedforAuthorization
@@ -98,6 +106,7 @@ class HealthService {
                 HealthKitService.authorized = true
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
+                self?.hasLoadedHealth = true
                 completion()
             }
         }
@@ -192,12 +201,10 @@ class HealthService {
     }
     
     fileprivate func addObservers() {
-        print("addObserviers")
         NotificationCenter.default.addObserver(self, selector: #selector(healthKitUpdated), name: .healthKitUpdated, object: nil)
     }
     
     @objc func healthKitUpdated() {
-        print("healthKitUpdated")
         regrabHealth {}
     }
 }

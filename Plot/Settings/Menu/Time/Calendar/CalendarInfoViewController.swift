@@ -76,17 +76,9 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     @objc fileprivate func newItem() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Plot Calendar", style: .default, handler: { (_) in
-            let destination = CalendarDetailViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }))
-        
         if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
             alert.addAction(UIAlertAction(title: "External Calendar", style: .default, handler: { (_) in
                 let destination = SignInAppleGoogleViewController()
                 destination.networkController = self.networkController
@@ -94,15 +86,29 @@ class CalendarInfoViewController: UITableViewController {
                 destination.delegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
             }))
+            
+            alert.addAction(UIAlertAction(title: "Plot Calendar", style: .default, handler: { (_) in
+                let destination = CalendarDetailViewController(networkController: self.networkController)
+                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                destination.navigationItem.leftBarButtonItem = cancelBarButton
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+        } else {
+            let destination = CalendarDetailViewController(networkController: self.networkController)
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
         }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

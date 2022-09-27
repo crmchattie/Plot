@@ -103,14 +103,6 @@ class LocationFinderTableViewController: UIViewController {
     
 }
 
-
-extension LocationFinderTableViewController: UISearchBarDelegate {
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchCompleter.queryFragment = searchText
-    }
-}
-
 extension LocationFinderTableViewController: MKLocalSearchCompleterDelegate {
     
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
@@ -191,6 +183,13 @@ extension LocationFinderTableViewController: UITableViewDelegate {
             }
         }
 
+    }
+}
+
+extension LocationFinderTableViewController: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchCompleter.queryFragment = searchText
     }
 }
 

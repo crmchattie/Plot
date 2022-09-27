@@ -28,6 +28,7 @@ class Activity: NSObject, NSCopying, Codable {
     var listSource: String?
     var activityType: String?
     var category: String?
+    var subcategory: String?
     var activityDescription: String?
     var locationName: String?
     var locationAddress: [String : [Double]]?
@@ -92,6 +93,7 @@ class Activity: NSObject, NSCopying, Codable {
         case calendarSource
         case activityType
         case category
+        case subcategory
         case allDay
         case startTimeZone
         case endTimeZone
@@ -173,6 +175,7 @@ class Activity: NSObject, NSCopying, Codable {
         calendarSource = dictionary?["calendarSource"] as? String
         activityType = dictionary?["activityType"] as? String
         category = dictionary?["category"] as? String
+        subcategory = dictionary?["subcategory"] as? String
         activityDescription = dictionary?["activityDescription"] as? String
         locationName = dictionary?["locationName"] as? String
         locationAddress = dictionary?["locationAddress"] as? [String : [Double]]
@@ -286,6 +289,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.category as AnyObject? {
             dictionary["category"] = value
+        }
+        
+        if let value = self.subcategory as AnyObject? {
+            dictionary["subcategory"] = value
         }
         
         if let value = self.activityDescription as AnyObject? {

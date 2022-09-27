@@ -208,6 +208,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedCalendarEventActivities), name: .hasLoadedCalendarEventActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedHealth), name: .hasLoadedHealth, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadVariables), name: .oldUserLoggedIn, object: nil)
     }
@@ -305,7 +306,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func healthUpdated() {
-        self.updatingHealth = false
         DispatchQueue.main.async {
             self.setupData()
         }
@@ -344,6 +344,13 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func hasLoadedListTaskActivities() {
         self.updatingTasks = false
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    @objc fileprivate func hasLoadedHealth() {
+        self.updatingHealth = false
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -602,7 +609,7 @@ extension MasterActivityContainerController {
     }
     
     @objc fileprivate func newItem() {
-        let discoverController = DiscoverViewController()
+        let discoverController = LibraryViewController()
         discoverController.networkController = networkController
         present(UINavigationController(rootViewController: discoverController), animated: true)
     }

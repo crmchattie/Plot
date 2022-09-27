@@ -7,20 +7,12 @@
 //
 
 import UIKit
-import MapKit
 import Firebase
 import CodableFirebase
 import GoogleSignIn
 
-protocol UpdateDiscover: AnyObject {
-    func itemCreated()
-}
-
 class DiscoverViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
-    
-        
-    fileprivate var reference: DatabaseReference!
-    
+            
     private let kCompositionalHeader = "CompositionalHeader"
     private let kActivityHeaderCell = "ActivityHeaderCell"
     
@@ -71,7 +63,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = .systemGroupedBackground
         
-        collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(ActivityHeaderCell.self, forCellWithReuseIdentifier: kActivityHeaderCell)
         
 //        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
@@ -221,28 +212,18 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }
     }
     
-    private func fetchData() {        
+    private func fetchData() {
         var snapshot = self.diffableDataSource.snapshot()
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)
-                        
-        let dispatchGroup = DispatchGroup()
-        
+                                
         for section in sections {
             if let object = groups[section] {
                 snapshot.appendSections([section])
                 snapshot.appendItems(object, toSection: section)
                 self.diffableDataSource.apply(snapshot)
-                continue
             }
-            
-            dispatchGroup.notify(queue: .main) {
-                if let object = self.groups[section] {
-                    snapshot.appendSections([section])
-                    snapshot.appendItems(object, toSection: section)
-                    self.diffableDataSource.apply(snapshot)
-                }
-            }
+        
         }
     }
     
@@ -307,21 +288,6 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
         }
     }
     
-}
-
-extension DiscoverViewController: CompositionalHeaderDelegate {
-    func viewTapped(labelText: String) {
-        switch labelText {
-        case "Event":
-            let destination = ActivityTypeViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.users = networkController.userService.users
-            destination.filteredUsers = networkController.userService.users
-            navigationController?.pushViewController(destination, animated: true)
-        default:
-            print("Default")
-        }
-    }
 }
 
 extension DiscoverViewController: EndedWebViewDelegate {

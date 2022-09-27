@@ -1,0 +1,292 @@
+//
+//  SubLibraryViewController.swift
+//  Plot
+//
+//  Created by Cory McHattie on 9/27/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
+//
+
+import UIKit
+import Firebase
+import CodableFirebase
+import GoogleSignIn
+
+class SubLibraryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+        
+    private let kCompositionalHeader = "CompositionalHeader"
+    private let kSubLibraryCell = "SubLibraryCell"
+    
+    var favAct = [String: [String]]()
+    
+    var sections: [SectionType] = []
+    var groups = [SectionType: [AnyHashable]]()
+    var intColor: Int = 0
+    
+    var umbrellaActivity: Activity!
+    
+    var activityType: String!
+    
+    var networkController = NetworkController()
+    
+    let navigationItemActivityIndicator = NavigationItemActivityIndicator()
+    
+    var searchBar: UISearchBar?
+    var searchController: UISearchController?
+    
+    init() {
+        
+        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            
+            let heightDimension = NSCollectionLayoutDimension.estimated(500)
+            
+            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
+            
+            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
+            group.contentInsets.trailing = 16
+            
+            let section = NSCollectionLayoutSection(group: group)
+            section.orthogonalScrollingBehavior = .none
+            section.contentInsets.leading = 16
+            return section
+        }
+        
+        super.init(collectionViewLayout: layout)
+    }
+    
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        navigationController?.navigationBar.layoutIfNeeded()
+        navigationItem.largeTitleDisplayMode = .always
+                
+        tabBarController?.tabBar.barTintColor = .systemGroupedBackground
+        tabBarController?.tabBar.barStyle = .default
+        
+        extendedLayoutIncludesOpaqueBars = true
+        definesPresentationContext = false
+        edgesForExtendedLayout = UIRectEdge.top
+        view.backgroundColor = .systemGroupedBackground
+        
+        collectionView.indicatorStyle = .default
+        collectionView.backgroundColor = .systemGroupedBackground
+        
+        collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
+        
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+        navigationItem.rightBarButtonItem = doneBarButton
+        
+        setupData()
+        setupSearchController()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchFavAct()
+    }
+    
+    fileprivate func setupSearchController() {
+        searchBar = UISearchBar()
+        searchBar?.delegate = self
+        searchBar?.searchBarStyle = .minimal
+        searchBar?.placeholder = "Search"
+        searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+        searchBar?.becomeFirstResponder()
+        
+    }
+    
+    @IBAction func done(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+        if let object = object as? Template {
+            let totalSections = self.groups.count - 1
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
+            cell.intColor = (indexPath.item % 5)
+            if indexPath.item == 0 {
+                cell.firstPosition = true
+            }
+            if indexPath.item == totalSections {
+                cell.lastPosition = true
+            }
+            cell.template = object
+            return cell
+        }
+        return nil
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let object = diffableDataSource.itemIdentifier(for: indexPath)
+        if let template = object as? Template {
+            switch template.object {
+            case .event:
+                print("event")
+            case .task:
+                print("task")
+            case .subtask:
+                print("subtask")
+            case .workout:
+                print("workout")
+            case .schedule:
+                print("schedule")
+            }
+        }
+        else {
+            print("library else")
+        }
+    }
+    
+    private func setupData() {
+        var snapshot = self.diffableDataSource.snapshot()
+        snapshot.deleteAllItems()
+        self.diffableDataSource.apply(snapshot)
+                                
+        for section in sections {
+            if let object = groups[section] as? [Template] {
+                let sortedObject = object.sorted(by: { $0.name < $1.name })
+                snapshot.appendSections([section])
+                snapshot.appendItems(sortedObject, toSection: section)
+                self.diffableDataSource.apply(snapshot)
+            }
+        
+        }
+    }
+    
+
+    @objc func newAccount() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Connect To Account", style: .default, handler: { (_) in
+            self.openMXConnect(current_member_guid: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
+            let destination = FinanceAccountViewController(networkController: self.networkController)
+            destination.updateDiscoverDelegate = self
+            self.navigationController?.pushViewController(destination, animated: true)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+    }
+    
+    func openMXConnect(current_member_guid: String?) {
+        let destination = WebViewController()
+        destination.current_member_guid = current_member_guid
+        destination.controllerTitle = ""
+        destination.delegate = self
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        navigationViewController.modalPresentationStyle = .fullScreen
+        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    func fetchFavAct() {
+        
+    }
+    
+    func showActivityIndicator() {
+        if let navController = self.navigationController {
+            self.showSpinner(onView: navController.view)
+        } else {
+            self.showSpinner(onView: self.view)
+        }
+        self.navigationController?.view.isUserInteractionEnabled = false
+    }
+    
+    func hideActivityIndicator() {
+        self.navigationController?.view.isUserInteractionEnabled = true
+        self.removeSpinner()
+    }
+    
+}
+
+extension SubLibraryViewController: CompositionalHeaderDelegate {
+    func viewTapped(labelText: String) {
+        
+    }
+}
+
+extension SubLibraryViewController: EndedWebViewDelegate {
+    func updateMXMembers() {
+        networkController.financeService.triggerUpdateMXUser {}
+    }
+}
+
+extension SubLibraryViewController: GIDSignInDelegate {
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if (error == nil) {
+            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+            self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+        } else {
+          print("\(error.localizedDescription)")
+        }
+    }
+}
+
+extension SubLibraryViewController: UpdateDiscover {
+    func itemCreated() {
+        self.dismiss(animated: true)
+    }
+}
+
+extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {}
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = nil
+        searchBar.resignFirstResponder()
+        setupData()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        filteredTasks = searchText.isEmpty ? tasks :
+//            tasks.filter({ (task) -> Bool in
+//                if let name = task.name {
+//                    return name.lowercased().contains(searchText.lowercased())
+//                }
+//                return ("").lowercased().contains(searchText.lowercased())
+//            })
+        
+        setupData()
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.keyboardAppearance = .default
+        return true
+    }
+}
+
+extension SubLibraryViewController { /* hiding keyboard */
+    
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if #available(iOS 11.0, *) {
+            searchController?.searchBar.endEditing(true)
+        } else {
+            self.searchBar?.endEditing(true)
+        }
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        setNeedsStatusBarAppearanceUpdate()
+        if #available(iOS 11.0, *) {
+            searchController?.searchBar.endEditing(true)
+        } else {
+            self.searchBar?.endEditing(true)
+        }
+    }
+}

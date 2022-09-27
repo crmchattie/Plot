@@ -122,6 +122,7 @@ class FinanceService {
     }
     
     func regrabFinances(_ completion: @escaping () -> Void) {
+        hasLoadedFinancials = false
         self.triggerUpdateMXUser {
             completion()
         }

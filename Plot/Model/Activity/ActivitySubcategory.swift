@@ -12,7 +12,7 @@ import UIKit
 let userActivitySubcategoriesEntity = "user-activities-subcategories"
 
 private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
-                           "To-do": ["meeting", "assignment", "project", "standup", "work", "groceries", "to-dos", "tasks"],
+                           "Mindfulness": ["mindfulness", "meditation"],
                            "Social": ["party", "birthday"],
                            "Family": ["family"],
                            "Personal": ["appointment", "consultation", "therapy", "haircut", "dr", "doctor"],
@@ -21,44 +21,42 @@ private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", 
 ]
 
 enum ActivitySubcategory: String, CaseIterable {
-    case sleep = "Sleep"
-    case meal = "Meal"
-    case work = "Work"
-    case social = "Social"
+    case bills = "Bills"
+    case car = "Car"
+    case chores = "Chores"
+    case doctor = "Doctor"
+    case entertainment = "Entertainment"
+    case errand = "Errand"
+    case home = "Home"
+    case hygiene = "Hygiene"
+    case kids = "Kids"
     case leisure = "Leisure"
-    case workout = "Workout"
-    case family = "Family"
+    case meal = "Meal"
+    case mindfulness = "Mindfulness"
+    case moving = "Moving"
     case personal = "Personal"
+    case pets = "Pets"
+    case savings = "Savings"
+    case shopping = "Shopping"
+    case skill = "Skill"
+    case sleep = "Sleep"
+    case social = "Social"
+    case travel = "Travel"
+    case wedding = "Wedding"
+    case work = "Work"
+    case workout = "Workout"
     case uncategorized = "Uncategorized"
-    case todo = "To-do"
-    /// Same as uncategorized by not included in the analytics
+    /// Same as uncategorized but not included in the analytics
     case notApplicable = "Not Applicable"
-    
-    var icon: UIImage {
-        switch self {
-        case .sleep: return UIImage(named: "sleep")!
-        case .meal: return UIImage(named: "food")!
-        case .work: return UIImage(named: "work")!
-        case .social: return UIImage(named: "nightlife")!
-        case .leisure: return UIImage(named: "leisure")!
-        case .workout: return UIImage(named: "workout")!
-        case .family: return UIImage(named: "family")!
-        case .personal: return UIImage(named: "personal")!
-        case .todo: return UIImage(named: "todo")!
-        case .uncategorized,
-             .notApplicable:
-            return UIImage(named: "activity")!
-        }
-    }
-    
+        
     // MARK: - Utility
-    static func categorize(_ activity: Activity) -> ActivityCategory {
+    static func categorize(_ activity: Activity) -> ActivitySubcategory {
         let text = "\(activity.name?.lowercased() ?? "") \(activity.notes?.lowercased() ?? "")"
         let elements = text.split(separator: " ")
         
         for (category, keywords) in keywordsMap {
             if elements.contains(where: { keywords.contains(String($0)) }),
-               let cat = ActivityCategory(rawValue: category) {
+               let cat = ActivitySubcategory(rawValue: category) {
                 return cat
             }
         }

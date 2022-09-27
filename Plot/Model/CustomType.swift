@@ -9,13 +9,13 @@
 import Foundation
 
 enum CustomType: String, Equatable, Hashable {
-    case event, task, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances
+    case event, task, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate
     
     var name: String {
         switch self {
         case .event: return "Event"
         case .task: return "Task"
-        case .lists: return "Task List"
+        case .lists: return "List"
         case .meal: return "Meal"
         case .workout: return "Workout"
         case .flight: return "Flight"
@@ -35,6 +35,16 @@ enum CustomType: String, Equatable, Hashable {
         case .time: return "Time"
         case .health: return "Health"
         case .finances: return "Finances"
+        case .healthTemplate: return "Health"
+        case .mealTemplate: return "Meal"
+        case .workTemplate: return "Work"
+        case .schoolTemplate: return "School"
+        case .socialTemplate: return "Social"
+        case .leisureTemplate: return "Leisure"
+        case .familyTemplate: return "Family"
+        case .personalTemplate: return "Personal"
+        case .todoTemplate: return "To-do"
+        case .financesTemplate: return "Finance"
         }
     }
     
@@ -62,6 +72,16 @@ enum CustomType: String, Equatable, Hashable {
         case .time: return "Set Up Tasks and Calendar"
         case .health: return "Set Up Health"
         case .finances: return "Set Up Finances"
+        case .healthTemplate: return "Health"
+        case .mealTemplate: return "Meal"
+        case .workTemplate: return "Work"
+        case .schoolTemplate: return "School"
+        case .socialTemplate: return "Social"
+        case .leisureTemplate: return "Leisure"
+        case .familyTemplate: return "Family"
+        case .personalTemplate: return "Personal"
+        case .todoTemplate: return "To-do"
+        case .financesTemplate: return "Finance"
         }
     }
     
@@ -79,6 +99,16 @@ enum CustomType: String, Equatable, Hashable {
         case .time: return "Set up Time by connecting your Apple or Gmail Account"
         case .health: return "Set up Health by connecting to the Apple Health App"
         case .finances: return "Set up Finances by connecting your existing financial accounts"
+        case .healthTemplate: return "Health"
+        case .mealTemplate: return "Meal"
+        case .workTemplate: return "Work"
+        case .schoolTemplate: return "School"
+        case .socialTemplate: return "Social"
+        case .leisureTemplate: return "Leisure"
+        case .familyTemplate: return "Family"
+        case .personalTemplate: return "Personal"
+        case .todoTemplate: return "To-do"
+        case .financesTemplate: return "Finance"
         }
     }
     
@@ -103,6 +133,16 @@ enum CustomType: String, Equatable, Hashable {
         case .time: return "calendar"
         case .health: return "heart"
         case .finances: return "money"
+        case .healthTemplate: return "heart-filled"
+        case .mealTemplate: return "food"
+        case .workTemplate: return "work"
+        case .schoolTemplate: return "school"
+        case .socialTemplate: return "nightlife"
+        case .leisureTemplate: return "leisure"
+        case .familyTemplate: return "family"
+        case .personalTemplate: return "personal"
+        case .todoTemplate: return "todo"
+        case .financesTemplate: return "money"
         }
     }
 }

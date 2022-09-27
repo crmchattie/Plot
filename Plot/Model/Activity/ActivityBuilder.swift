@@ -21,8 +21,8 @@ class ActivityBuilder {
         }
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        activity.activityType = "Workout"
-        activity.category = "Workout"
+        activity.category = "Health"
+        activity.subcategory = "Workout"
         activity.name = workout.name
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
@@ -46,8 +46,8 @@ class ActivityBuilder {
         }
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        activity.activityType = "Mindfulness"
-        activity.category = "Mindfulness"
+        activity.category = "Health"
+        activity.subcategory = "Mindfulness"
         activity.name = mindfulness.name
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
@@ -71,8 +71,8 @@ class ActivityBuilder {
         }
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        activity.activityType = "Meal"
         activity.category = "Meal"
+        activity.subcategory = "Meal"
         activity.name = meal.name
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
@@ -93,8 +93,6 @@ class ActivityBuilder {
         if let date = isodateFormatter.date(from: transaction.transacted_at) {
             start = date.UTCTime
             end = date.UTCTime
-        } else {
-            return nil
         }
         
         var activityID = UUID().uuidString
@@ -103,7 +101,6 @@ class ActivityBuilder {
         }
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        activity.activityType = "Transaction"
         activity.name = transaction.description
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
@@ -111,6 +108,31 @@ class ActivityBuilder {
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.allDay = false
         activity.participantsIDs = transaction.participantsIDs
+        activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        return activity
+    }
+    
+    class func createActivity(from task: Activity) -> Activity? {
+        let original = Date()
+        let rounded = Date(timeIntervalSinceReferenceDate:
+                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+        
+        var activityID = UUID().uuidString
+        if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
+            activityID = newId
+        }
+
+        let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
+        activity.name = task.name
+        activity.category = task.category
+        activity.subcategory = task.subcategory
+        activity.startTimeZone = TimeZone.current.identifier
+        activity.endTimeZone = TimeZone.current.identifier
+        activity.startDateTime = NSNumber(value: rounded.timeIntervalSince1970)
+        activity.endDateTime = NSNumber(value: rounded.timeIntervalSince1970)
+        activity.allDay = false
+        activity.participantsIDs = task.participantsIDs
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity

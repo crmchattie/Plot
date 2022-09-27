@@ -306,6 +306,11 @@
 		10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */; };
 		10F5CFFE25CB7E5A0078C821 /* GCalendarEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5CFFD25CB7E5A0078C821 /* GCalendarEventOp.swift */; };
 		10F5D00225CB7E670078C821 /* GPlotEventOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D00125CB7E670078C821 /* GPlotEventOp.swift */; };
+		10F7241228E3598E003C13A0 /* Template.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241128E3598D003C13A0 /* Template.swift */; };
+		10F7241428E374DC003C13A0 /* LibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241328E374DC003C13A0 /* LibraryViewController.swift */; };
+		10F7241628E37E4F003C13A0 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241528E37E4F003C13A0 /* LibraryCell.swift */; };
+		10F7241828E39C7A003C13A0 /* SubLibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241728E39C7A003C13A0 /* SubLibraryViewController.swift */; };
+		10F7241A28E39D2C003C13A0 /* SubLibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241928E39D2C003C13A0 /* SubLibraryCell.swift */; };
 		10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */; };
 		10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */; };
 		10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */; };
@@ -886,6 +891,11 @@
 		10F5CFF925CB7E490078C821 /* GSyncCalendarEventsOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSyncCalendarEventsOp.swift; sourceTree = "<group>"; };
 		10F5CFFD25CB7E5A0078C821 /* GCalendarEventOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCalendarEventOp.swift; sourceTree = "<group>"; };
 		10F5D00125CB7E670078C821 /* GPlotEventOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPlotEventOp.swift; sourceTree = "<group>"; };
+		10F7241128E3598D003C13A0 /* Template.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Template.swift; sourceTree = "<group>"; };
+		10F7241328E374DC003C13A0 /* LibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewController.swift; sourceTree = "<group>"; };
+		10F7241528E37E4F003C13A0 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
+		10F7241728E39C7A003C13A0 /* SubLibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubLibraryViewController.swift; sourceTree = "<group>"; };
+		10F7241928E39D2C003C13A0 /* SubLibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubLibraryCell.swift; sourceTree = "<group>"; };
 		10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientSearchViewController.swift; sourceTree = "<group>"; };
 		10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDetailCell.swift; sourceTree = "<group>"; };
 		10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
@@ -1205,7 +1215,8 @@
 		1024ABA523C1255900A5875D /* Discover */ = {
 			isa = PBXGroup;
 			children = (
-				1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */,
+				10F7241328E374DC003C13A0 /* LibraryViewController.swift */,
+				10F7241728E39C7A003C13A0 /* SubLibraryViewController.swift */,
 				1027D09F23EEF7100005D2A7 /* SubTypeControllers */,
 				1082B66523EF25D300A27046 /* DetailControllers */,
 				100A53ED23E0DE3D004AA952 /* ActivityHeaderHorizontalController.swift */,
@@ -1219,6 +1230,7 @@
 		1027D09F23EEF7100005D2A7 /* SubTypeControllers */ = {
 			isa = PBXGroup;
 			children = (
+				1075ED20256C175A00AB2B0A /* DiscoverViewController.swift */,
 				26E3179A2379FB72007D1F21 /* ActivityTypeViewController.swift */,
 				109F848D23D60113002C0044 /* ActivitySubTypeViewController.swift */,
 			);
@@ -1417,6 +1429,8 @@
 			isa = PBXGroup;
 			children = (
 				10B656CB24AF761F006686FA /* CompositionalHeader.swift */,
+				10F7241528E37E4F003C13A0 /* LibraryCell.swift */,
+				10F7241928E39D2C003C13A0 /* SubLibraryCell.swift */,
 				26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */,
 				1082B66323EF1B7500A27046 /* ActivityDetailCell.swift */,
 				100E0DAF24D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift */,
@@ -2576,6 +2590,7 @@
 				1017D32C24F2B879001D7CBE /* MXMerchant.swift */,
 				1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */,
 				10F3033124EC700C00C04B8F /* Transaction.swift */,
+				10F7241128E3598D003C13A0 /* Template.swift */,
 				10D6277028DE0B20009D2BD0 /* Feedback.swift */,
 				4BAEE549212735880045AB10 /* Conversation.swift */,
 				4BAEE54A212735880045AB10 /* Message.swift */,
@@ -3348,10 +3363,12 @@
 				10B541E225479D3100CC9023 /* MealViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
 				100FE70C28931D2100D3124C /* CalendarActions.swift in Sources */,
+				10F7241828E39C7A003C13A0 /* SubLibraryViewController.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4EA21272D890045AB10 /* InformationMessageSender.swift in Sources */,
 				4BAEE5F3212735E50045AB10 /* SwiftSiriWaveformView.swift in Sources */,
 				4BAEE4FF21272D890045AB10 /* VoiceRecordingContainerView.swift in Sources */,
+				10F7241A28E39D2C003C13A0 /* SubLibraryCell.swift in Sources */,
 				10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */,
 				10DFC3F9255CC64000565DAD /* MealFetcher.swift in Sources */,
 				10B3E51528B3F56000E1713D /* TaskCell.swift in Sources */,
@@ -3603,6 +3620,7 @@
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
 				10E0D7B525959C0800B0F83C /* UserService.swift in Sources */,
 				4BAEE51321272D890045AB10 /* ChatLogController+PhotoEditorDelegate.swift in Sources */,
+				10F7241228E3598E003C13A0 /* Template.swift in Sources */,
 				105CB18E2512A3830000D3D8 /* FinanceLineChartDetailViewController.swift in Sources */,
 				109F849923D6860D002C0044 /* FilterViewController.swift in Sources */,
 				4BAEE4EF21272D890045AB10 /* IncomingPhotoMessageCell.swift in Sources */,
@@ -3654,6 +3672,7 @@
 				1017D32F24F2B8E5001D7CBE /* MXMerchantLocation.swift in Sources */,
 				F99E45B0262F22B600F59D0E /* iCalUtility.swift in Sources */,
 				1024035E2586E92E00A54703 /* FinanceBarChartDetailViewController.swift in Sources */,
+				10F7241628E37E4F003C13A0 /* LibraryCell.swift in Sources */,
 				10F3033024EC6FF800C04B8F /* MXAccount.swift in Sources */,
 				269105ED253E8DD700A02C5F /* BalloonMarker.swift in Sources */,
 				10E0D7BB25959C9000B0F83C /* ActivityService.swift in Sources */,
@@ -3734,6 +3753,7 @@
 				4BA1E77F2152518700391BCB /* ChatLogController+MessageSenderDelegate.swift in Sources */,
 				10E0D7C125959D6200B0F83C /* ConversationService.swift in Sources */,
 				269105F6253E8E2E00A02C5F /* DayAxisValueFormatter.swift in Sources */,
+				10F7241428E374DC003C13A0 /* LibraryViewController.swift in Sources */,
 				1092E26528B7AE1A0018FCAA /* GFetchListTasksOp.swift in Sources */,
 				108C37FB28A14F6E00DC4998 /* Container.swift in Sources */,
 				4BB46C6A2136E6F8005405BB /* ChatLogHistoryFetcher.swift in Sources */,

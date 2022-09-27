@@ -171,8 +171,8 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         return appDelegate.notifications
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return UIView()
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        ""
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

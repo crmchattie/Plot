@@ -115,7 +115,6 @@ class TaskViewController: FormViewController {
                     list = lists[ListSourceOptions.plot.name]?.first { $0.name == "Default"}
                     task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                     task.category = list?.category
-
                 }
                 if let container = container {
                     task.containerID = container.id
