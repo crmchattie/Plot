@@ -69,7 +69,7 @@ class MindfulnessOperation: AsyncOperation {
                                                                                 
                         var mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
                         
-                        if let activity = ActivityBuilder.createActivity(from: mindfulnessFB), let activityID = activity.activityID {
+                        if let activity = EventBuilder.createActivity(from: mindfulnessFB), let activityID = activity.activityID {
                             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
 
                             mindfulnessFB.containerID = containerID

@@ -326,7 +326,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.numberOfLines = 0
         label.textAlignment = .left
         label.adjustsFontForContentSizeCategory = true
@@ -336,7 +336,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     let categoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.textAlignment = .right
         label.adjustsFontForContentSizeCategory = true
@@ -346,7 +346,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     let subcategoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = .secondaryLabel
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.textAlignment = .right
         label.adjustsFontForContentSizeCategory = true
@@ -356,7 +356,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     let middleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
         return label
@@ -365,7 +365,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
     let bottomLabel: UILabel = {
         let label = UILabel()
         label.textColor = .secondaryLabel
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
         return label
@@ -437,11 +437,11 @@ class FinanceCollectionViewCell: UICollectionViewCell {
         middleLabel.textColor = .label
         bottomLabel.textColor = .secondaryLabel
         
-        nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
+        categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         subcategoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        middleLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        bottomLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        middleLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        bottomLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         
         categoryLabel.isHidden = false
         subcategoryLabel.isHidden = false

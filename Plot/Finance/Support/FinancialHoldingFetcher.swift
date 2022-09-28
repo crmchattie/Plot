@@ -128,9 +128,7 @@ class FinancialHoldingFetcher: NSObject {
             if let completion = self.holdingsChanged {
                 FinancialHoldingFetcher.getDataFromSnapshot(ID: snapshot.key) { holdingsList in
                     for holding in holdingsList {
-                        if let userHolding = try? FirebaseDecoder().decode(UserHolding.self, from: holding) {
-                            userHoldings[holding.guid] = userHolding
-                        }
+                        userHoldings[holding.guid] = UserHolding(holding: holding)
                     }
                     completion(holdingsList)
                 }

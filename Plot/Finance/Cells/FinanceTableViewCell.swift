@@ -81,7 +81,7 @@ class FinanceTableViewCell: UITableViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.numberOfLines = 0
         label.textAlignment = .left
         label.adjustsFontForContentSizeCategory = true
@@ -91,7 +91,7 @@ class FinanceTableViewCell: UITableViewCell {
     let categoryLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.textAlignment = .right
         label.adjustsFontForContentSizeCategory = true
@@ -101,7 +101,7 @@ class FinanceTableViewCell: UITableViewCell {
     let middleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.textAlignment = .left
         label.adjustsFontForContentSizeCategory = true
@@ -111,7 +111,7 @@ class FinanceTableViewCell: UITableViewCell {
     let bottomLabel: UILabel = {
         let label = UILabel()
         label.textColor = .secondaryLabel
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.textAlignment = .left
         label.adjustsFontForContentSizeCategory = true

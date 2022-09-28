@@ -35,12 +35,9 @@ class WorkoutViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     
-    fileprivate var productIndex: Int = 0
-    
     let numberFormatter = NumberFormatter()
     
-    var timer: Timer?
-    var workoutActions: WorkoutActions?
+    var template: Template!
     
     //added for WorkoutViewController
     var movingBackwards: Bool = false
@@ -81,10 +78,15 @@ class WorkoutViewController: FormViewController {
             title = "New Workout"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 let ID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
-                workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, user_created: true)
-                //need to fix; sloppy code that is used to stop an event from being created
-                if let container = container {
-                    workout.containerID = container.id
+                if let template = template {
+                    workout = Workout(fromTemplate: template)
+                    workout.id = ID
+                } else {
+                    workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, user_created: true)
+                    //need to fix; sloppy code that is used to stop an event from being created
+                    if let container = container {
+                        workout.containerID = container.id
+                    }
                 }
             }
         }
@@ -255,7 +257,7 @@ class WorkoutViewController: FormViewController {
             $0.cell.textField?.textColor = .label
             $0.placeholderColor = .secondaryLabel
             $0.placeholder = $0.tag
-            if active, let workout = workout {
+            if let workout = workout {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
                 $0.value = workout.name
             } else {
@@ -350,7 +352,7 @@ class WorkoutViewController: FormViewController {
             $0.cell.textField?.textColor = .secondaryLabel
             $0.title = $0.tag
             $0.formatter = numberFormatter
-            if let calories = workout.totalEnergyBurned {
+            if let workout = workout, let calories = workout.totalEnergyBurned {
                 $0.value = calories
             }
         }.cellUpdate { cell, row in
@@ -374,8 +376,8 @@ class WorkoutViewController: FormViewController {
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
             $0.minuteInterval = 5
-            if self.active {
-                $0.value = self.workout!.startDateTime
+            if let workout = workout, let startDateTime = workout.startDateTime {
+                $0.value = startDateTime
             } else {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:
@@ -421,8 +423,8 @@ class WorkoutViewController: FormViewController {
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
             $0.minuteInterval = 5
-            if self.active {
-                $0.value = self.workout!.endDateTime
+            if let workout = workout, let endDateTime = workout.endDateTime {
+                $0.value = endDateTime
             } else {
                 let original = Date()
                 let rounded = Date(timeIntervalSinceReferenceDate:

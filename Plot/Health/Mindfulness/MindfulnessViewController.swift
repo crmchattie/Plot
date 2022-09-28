@@ -234,7 +234,7 @@ class MindfulnessViewController: FormViewController {
                 $0.cell.textField?.textColor = .label
                 $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
-                if active, let mindfulness = mindfulness {
+                if let mindfulness = mindfulness {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                     $0.value = mindfulness.name
                 } else {
@@ -264,8 +264,8 @@ class MindfulnessViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 $0.minuteInterval = 5
-                if self.active {
-                    $0.value = self.mindfulness!.startDateTime
+                if let mindfulness = mindfulness {
+                    $0.value = mindfulness.startDateTime
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
@@ -311,8 +311,8 @@ class MindfulnessViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 $0.minuteInterval = 5
-                if self.active {
-                    $0.value = self.mindfulness!.endDateTime
+                if let mindfulness = mindfulness {
+                    $0.value = mindfulness.endDateTime
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:

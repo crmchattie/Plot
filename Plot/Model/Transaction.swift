@@ -178,6 +178,19 @@ struct UserTransaction: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    
+    init(transaction: Transaction) {
+        self.description = transaction.description
+        self.category = transaction.category
+        self.top_level_category = transaction.top_level_category
+        self.group = transaction.group
+        self.tags = transaction.tags
+        self.should_link = transaction.should_link
+        self.date_for_reports = transaction.date_for_reports
+        self.badge = transaction.badge
+        self.pinned = transaction.pinned
+        self.muted = transaction.muted
+    }
 }
 
 enum TransactionCatLevel: String, Codable {

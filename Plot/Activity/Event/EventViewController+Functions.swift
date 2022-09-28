@@ -232,7 +232,7 @@ extension EventViewController {
                 mvs.insert(SubtaskRow() {
                     if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                         task.listColor = color
-                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
                         task.listColor = color
                     }
                     $0.value = task
@@ -500,7 +500,7 @@ extension EventViewController {
     func openCalendar() {
         let destination = ChooseCalendarViewController(networkController: networkController)
         destination.delegate = self
-        destination.calendarID = self.activity.calendarID ?? self.calendars[CalendarSourceOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
+        destination.calendarID = self.activity.calendarID ?? self.calendars[CalendarSourceOptions.plot.name]?.first(where: {$0.defaultCalendar  ?? false })?.id
         if let source = self.activity.calendarSource, let calendars = self.calendars[source] {
             destination.calendars = [source: calendars]
         } else {
@@ -633,7 +633,6 @@ extension EventViewController {
 
             }
         } else {
-            print("else")
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }

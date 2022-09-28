@@ -71,7 +71,7 @@ class WorkoutOperation: AsyncOperation {
                                                                                                 
                                 var workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
                                 
-                                if let activity = ActivityBuilder.createActivity(from: workoutFB), let activityID = activity.activityID {
+                                if let activity = EventBuilder.createActivity(from: workoutFB), let activityID = activity.activityID {
                                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
 
                                     workoutFB.containerID = containerID

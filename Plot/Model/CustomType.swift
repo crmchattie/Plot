@@ -44,7 +44,7 @@ enum CustomType: String, Equatable, Hashable {
         case .familyTemplate: return "Family"
         case .personalTemplate: return "Personal"
         case .todoTemplate: return "To-do"
-        case .financesTemplate: return "Finance"
+        case .financesTemplate: return "Finances"
         }
     }
     

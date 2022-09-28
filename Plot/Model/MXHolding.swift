@@ -70,6 +70,15 @@ struct UserHolding: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    
+    init(holding: MXHolding) {
+        self.description = holding.description
+        self.tags = holding.tags
+        self.should_link = holding.should_link
+        self.badge = holding.badge
+        self.pinned = holding.pinned
+        self.muted = holding.muted
+    }
 }
 
 struct HoldingDetails: Codable, Equatable, Hashable {

@@ -63,10 +63,6 @@ class ActivitiesFetcher: NSObject {
                                 activity.calendarName = userActivity.calendarName
                                 activity.calendarColor = userActivity.calendarColor
                                 activity.calendarSource = userActivity.calendarSource
-//                                activity.listID = userActivity.listID
-//                                activity.listName = userActivity.listName
-//                                activity.listColor = userActivity.listColor
-//                                activity.listSource = userActivity.listSource
                                 activity.calendarExport = userActivity.calendarExport
                                 activity.externalActivityID = userActivity.externalActivityID
                                 activity.userIsCompleted = userActivity.userIsCompleted
@@ -115,10 +111,6 @@ class ActivitiesFetcher: NSObject {
                                     activity.calendarName = userActivity.calendarName
                                     activity.calendarColor = userActivity.calendarColor
                                     activity.calendarSource = userActivity.calendarSource
-//                                    activity.listID = userActivity.listID
-//                                    activity.listName = userActivity.listName
-//                                    activity.listColor = userActivity.listColor
-//                                    activity.listSource = userActivity.listSource
                                     activity.calendarExport = userActivity.calendarExport
                                     activity.externalActivityID = userActivity.externalActivityID
                                     activity.userIsCompleted = userActivity.userIsCompleted
@@ -174,10 +166,6 @@ class ActivitiesFetcher: NSObject {
                         activity.calendarName = userActivity.calendarName
                         activity.calendarColor = userActivity.calendarColor
                         activity.calendarSource = userActivity.calendarSource
-//                        activity.listID = userActivity.listID
-//                        activity.listName = userActivity.listName
-//                        activity.listColor = userActivity.listColor
-//                        activity.listSource = userActivity.listSource
                         activity.calendarExport = userActivity.calendarExport
                         activity.externalActivityID = userActivity.externalActivityID
                         activity.userIsCompleted = userActivity.userIsCompleted
@@ -270,10 +258,6 @@ class ActivitiesFetcher: NSObject {
                         activity.calendarName = calendar.name
                         activity.calendarColor = calendar.color
                         activity.calendarSource = calendar.source
-//                        activity.listID = userActivity.listID
-//                        activity.listName = userActivity.listName
-//                        activity.listColor = userActivity.listColor
-//                        activity.listSource = userActivity.listSource
                         activity.userIsCompleted = userActivity.userIsCompleted
                         activity.userCompletedDate = userActivity.userCompletedDate
                         activity.calendarExport = true
@@ -347,10 +331,6 @@ class ActivitiesFetcher: NSObject {
                         activity.calendarName = userActivity.calendarName
                         activity.calendarColor = userActivity.calendarColor
                         activity.calendarSource = userActivity.calendarSource
-//                        activity.listID = list.id
-//                        activity.listName = list.name
-//                        activity.listColor = list.color
-//                        activity.listSource = list.source
                         activity.userIsCompleted = userActivity.userIsCompleted
                         activity.userCompletedDate = userActivity.userCompletedDate
                         activity.calendarExport = true

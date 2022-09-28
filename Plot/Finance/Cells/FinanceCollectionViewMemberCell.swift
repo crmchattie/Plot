@@ -33,7 +33,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
         return label
@@ -42,7 +42,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
     let infoLabel: UILabel = {
         let label = UILabel()
         label.textColor = .secondaryLabel
-        label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 1
         label.adjustsFontForContentSizeCategory = true
         return label

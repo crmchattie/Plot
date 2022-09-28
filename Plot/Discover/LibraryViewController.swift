@@ -205,101 +205,18 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                 let destination = FinanceTransactionRuleViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
                 self.navigationController?.pushViewController(destination, animated: true)
-            case .healthTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.sections = [.templates]
-                destination.title = ActivityCategory.health.rawValue
-                if let templates = templates[.health] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .mealTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.meal.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.meal] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .workTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.work.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.work] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .schoolTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.school.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.school] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .socialTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.social.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.social] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .leisureTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.leisure.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.leisure] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .familyTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.family.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.family] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .personalTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.personal.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.personal] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .todoTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.todo.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.todo] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
-            case .financesTemplate:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.title = ActivityCategory.finances.rawValue
-                destination.sections = [.templates]
-                if let templates = templates[.finances] {
-                    destination.groups = [.templates: templates]
-                }
-                self.navigationController?.pushViewController(destination, animated: true)
             default:
-                print("default")
+                let destination = SubLibraryViewController()
+                destination.networkController = networkController
+                destination.sections = [.templates]
+                if let cat = ActivityCategory(rawValue: customType.name), let templates = templates[cat] {
+                    destination.title = cat.rawValue
+                    destination.templates = templates
+                    destination.groups = [.templates: templates]
+                    destination.updateDiscoverDelegate = self
+                    self.navigationController?.pushViewController(destination, animated: true)
+                }
             }
-        } else {
-            print("library else")
         }
     }
     

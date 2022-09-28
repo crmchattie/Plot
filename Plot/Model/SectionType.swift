@@ -252,7 +252,7 @@ enum SectionType: Hashable, CaseIterable {
         case .myLists: return "My Lists"
         case .presetLists: return "Preset Lists"
         case .generalHealth: return "General"
-        case .templates: return "Templates"
+        case .templates: return "Templates Categories"
         }
     }
     

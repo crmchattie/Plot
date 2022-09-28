@@ -75,6 +75,7 @@ class EventViewController: FormViewController {
     var workout: Workout!
     var mindfulness: Mindfulness!
     var task: Activity!
+    var template: Template!
         
     var active = false
     var sectionChanged: Bool = false
@@ -119,20 +120,26 @@ class EventViewController: FormViewController {
         } else {
             title = "New Event"
             if let currentUserID = Auth.auth().currentUser?.uid {
-                if let transaction = transaction, let activity = ActivityBuilder.createActivity(from: transaction), let activityID = activity.activityID {
+                if let transaction = transaction, let activity = EventBuilder.createActivity(from: transaction), let activityID = activity.activityID {
                     self.activity = activity
                     self.activityID = activityID
-                } else if let workout = workout, let activity = ActivityBuilder.createActivity(from: workout), let activityID = activity.activityID {
+                } else if let workout = workout, let activity = EventBuilder.createActivity(from: workout), let activityID = activity.activityID {
                     self.activity = activity
                     self.activityID = activityID
-                } else if let mindfulness = mindfulness, let activity = ActivityBuilder.createActivity(from: mindfulness), let activityID = activity.activityID {
+                } else if let mindfulness = mindfulness, let activity = EventBuilder.createActivity(from: mindfulness), let activityID = activity.activityID {
                     self.activity = activity
                     self.activityID = activityID
-                } else if let task = task, let activity = ActivityBuilder.createActivity(from: task), let activityID = activity.activityID {
+                } else if let task = task, let activity = EventBuilder.createActivity(task: task), let activityID = activity.activityID {
+                    self.activity = activity
+                    self.activityID = activityID
+                } else if let template = template, let activityList = EventBuilder.createActivity(template: template), let activity = activityList.0, let activityID = activity.activityID {
+                    scheduleList = activityList.1 ?? []
+                    if !scheduleList.isEmpty {
+//                        updateLists(type: "schedule")
+                    }
                     self.activity = activity
                     self.activityID = activityID
                 } else {
-                    //create new activityID for auto updating items (schedule, purchases, checklist)
                     activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                     print(activityID)
                     let original = Date()
@@ -142,14 +149,13 @@ class EventViewController: FormViewController {
                     if let calendar = calendar {
                         activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
                     } else {
-                        let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.name == "Default" }
+                        let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.defaultCalendar ?? false }
                         activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
 
                     }
                 }
-                
+
                 if let container = container {
-                    print(container.id)
                     activity.containerID = container.id
                 }
             }
@@ -178,7 +184,7 @@ class EventViewController: FormViewController {
             }
         }
         
-        if let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = activity?.participantsIDs, !participantsIDs.contains(currentUser) {
+        if active, let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = activity?.participantsIDs, !participantsIDs.contains(currentUser) {
             navigationItem.rightBarButtonItems = []
             for row in form.rows {
                 row.baseCell.isUserInteractionEnabled = false
@@ -626,7 +632,8 @@ class EventViewController: FormViewController {
             if let activity = activity, let calendarName = activity.calendarName {
                 row.value = calendarName
             } else {
-                row.value = "Default"
+                calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.defaultCalendar ?? false }
+                row.value = calendar?.name ?? "Default"
             }
         }.onCellSelection({ _, row in
             self.openCalendar()
@@ -690,7 +697,7 @@ class EventViewController: FormViewController {
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
             row.title = "Show Extras"
-            if let showExtras = activity.showExtras {
+            if let activity = activity, let showExtras = activity.showExtras {
                 row.value = showExtras
             } else {
                 row.value = true
@@ -719,10 +726,10 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.cell.textLabel?.textColor = .label
             row.title = row.tag
-            if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
-                row.value = String(scheduleIDs.count)
-            } else {
+            if let activity = activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty, scheduleList.isEmpty {
                 row.value = "0"
+            } else {
+                row.value = String((self.activity.scheduleIDs?.count ?? 0) + scheduleList.count)
             }
             row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
@@ -733,10 +740,10 @@ class EventViewController: FormViewController {
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
             cell.textLabel?.textColor = .label
-            if let scheduleIDs = self.activity.scheduleIDs, !scheduleIDs.isEmpty {
-                row.value = String(scheduleIDs.count)
-            } else {
+            if let activity = self.activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty, self.scheduleList.isEmpty {
                 row.value = "0"
+            } else {
+                row.value = String((self.activity.scheduleIDs?.count ?? 0) + self.scheduleList.count)
             }
         }
         
@@ -747,7 +754,7 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.cell.textLabel?.textColor = .label
             row.title = row.tag
-            if let checklistIDs = self.activity.checklistIDs {
+            if let activity = activity, let checklistIDs = activity.checklistIDs {
                 row.value = String(checklistIDs.count)
             } else {
                 row.value = "0"
@@ -776,7 +783,7 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = row.tag
             row.hidden = "$showExtras == false"
-            if let photos = self.activity.activityPhotos, let files = self.activity.activityFiles, photos.isEmpty, files.isEmpty {
+            if let activity = activity, let photos = activity.activityPhotos, let files = activity.activityFiles, photos.isEmpty, files.isEmpty {
                 row.value = "0"
             } else {
                 row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))

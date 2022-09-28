@@ -132,9 +132,7 @@ class FinancialAccountFetcher: NSObject {
             if let completion = self.accountsChanged {
                 FinancialAccountFetcher.getDataFromSnapshot(ID: snapshot.key) { accountsList in
                     for account in accountsList {
-                        if let userAccount = try? FirebaseDecoder().decode(UserAccount.self, from: account) {
-                            userAccounts[account.guid] = userAccount
-                        }
+                        userAccounts[account.guid] = UserAccount(account: account)
                     }
                     completion(accountsList)
                 }

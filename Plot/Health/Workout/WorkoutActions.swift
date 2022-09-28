@@ -122,7 +122,7 @@ class WorkoutActions: NSObject {
     }
     
     func createActivity() {
-        if let activity = ActivityBuilder.createActivity(from: workout), let activityID = activity.activityID {
+        if let activity = EventBuilder.createActivity(from: workout), let activityID = activity.activityID {
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
             activityActions.createNewActivity()
             //will update activity.containerID and workout.containerID

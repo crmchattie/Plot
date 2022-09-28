@@ -14,7 +14,7 @@ struct Template: Codable, Equatable, Hashable {
     var name: String
     var object: ObjectType
     var category: ActivityCategory
-    var subcategory: String
+    var subcategory: ActivitySubcategory
     var type: String
     var frequency: String?
     var occurrence: String?

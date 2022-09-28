@@ -123,7 +123,7 @@ extension TaskViewController: UpdateActivityDelegate {
                 mvs.insert(ScheduleRow() {
                     if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
                         activity.calendarColor = color
-                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
                         activity.calendarColor = color
                     }
                     $0.value = activity
@@ -156,7 +156,7 @@ extension TaskViewController: ChooseActivityDelegate {
             mvs.insert(ScheduleRow() {
                 if let calendarID = mergeActivity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
                     mergeActivity.calendarColor = color
-                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
                     mergeActivity.calendarColor = color
                 }
                 $0.value = mergeActivity

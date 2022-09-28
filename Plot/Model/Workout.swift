@@ -56,6 +56,12 @@ struct Workout: Codable, Equatable, Hashable {
         self.endDateTime = hkWorkout.endDate
         self.length = hkWorkout.duration
     }
+    
+    init(fromTemplate template: Template) {
+        self.id = UUID().uuidString
+        self.name = template.name
+        self.type = template.name
+    }
 }
 
 func ==(lhs: Workout, rhs: Workout) -> Bool {

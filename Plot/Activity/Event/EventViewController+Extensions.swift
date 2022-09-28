@@ -178,7 +178,7 @@ extension EventViewController: UpdateTaskDelegate {
                 mvs.insert(SubtaskRow() {
                     if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                         task.listColor = color
-                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
                         task.listColor = color
                     }
                     $0.value = task
@@ -210,7 +210,7 @@ extension EventViewController: ChooseTaskDelegate {
             mvs.insert(SubtaskRow() {
                 if let listID = mergeTask.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     mergeTask.listColor = color
-                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = list.color {
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
                     mergeTask.listColor = color
                 }
                 $0.value = mergeTask

@@ -106,6 +106,7 @@ class FinanceAccountViewController: FormViewController {
             account = MXAccount(name: "Account Name", balance: 0.0, created_at: date, guid: ID, user_guid: currentUser, type: .any, subtype: .any, user_created: true, admin: currentUser)
             numberFormatter.currencyCode = "USD"
         }
+        print(account.guid)
         
         if account.type == .investment {
             self.holdings = networkController.financeService.holdings.filter({$0.account_guid == self.account.guid})
@@ -479,7 +480,6 @@ class FinanceAccountViewController: FormViewController {
             row.value = date
             row.updateCell()
             self.account.updated_at = date
-//            Database.database().reference().child(financialAccountsEntity).child(self.account.guid).child("updated_at").setValue(date)
         }
     }
     

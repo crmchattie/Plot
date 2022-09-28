@@ -105,7 +105,7 @@ class CalendarDetailViewController: FormViewController {
         } else if let currentUser = Auth.auth().currentUser?.uid {
             title = "New Calendar"
             let ID = Database.database().reference().child(userCalendarEntity).child(currentUser).childByAutoId().key ?? ""
-            calendar = CalendarType(id: ID, name: nil, color: nil, source: CalendarSourceOptions.plot.name, admin: currentUser)
+            calendar = CalendarType(id: ID, name: nil, color: nil, source: CalendarSourceOptions.plot.name, admin: currentUser, defaultCalendar: false)
         }
     }
     

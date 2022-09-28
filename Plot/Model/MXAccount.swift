@@ -115,6 +115,15 @@ struct UserAccount: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+
+    init(account: MXAccount) {
+        self.name = account.name
+        self.tags = account.tags
+        self.should_link = account.should_link
+        self.badge = account.badge
+        self.pinned = account.pinned
+        self.muted = account.muted
+    }
 }
 
 struct AccountDetails: Codable, Equatable, Hashable {

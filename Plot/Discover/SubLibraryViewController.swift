@@ -20,6 +20,8 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
     
     var sections: [SectionType] = []
     var groups = [SectionType: [AnyHashable]]()
+    var templates = [Template]()
+    var filteredTemplates = [Template]()
     var intColor: Int = 0
     
     var umbrellaActivity: Activity!
@@ -30,8 +32,21 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
-    var searchBar: UISearchBar?
+    var timer: Timer?
+    
+    lazy var searchBar : UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.delegate = self
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.searchBarStyle = .minimal
+        searchBar.placeholder = "Search"
+        searchBar.barStyle = .default
+        searchBar.sizeToFit()
+        return searchBar
+    }()
     var searchController: UISearchController?
+    
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
     init() {
         
@@ -47,6 +62,7 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
             let section = NSCollectionLayoutSection(group: group)
             section.orthogonalScrollingBehavior = .none
             section.contentInsets.leading = 16
+            
             return section
         }
         
@@ -74,29 +90,29 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = .systemGroupedBackground
-        
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton
         
+        filteredTemplates = templates
         setupData()
         setupSearchController()
+    }
+    
+    fileprivate func setupSearchController() {
+        searchController = UISearchController(searchResultsController: nil)
+        searchController?.searchResultsUpdater = self
+        searchController?.obscuresBackgroundDuringPresentation = false
+        searchController?.searchBar.delegate = self
+        searchController?.definesPresentationContext = true
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchFavAct()
-    }
-    
-    fileprivate func setupSearchController() {
-        searchBar = UISearchBar()
-        searchBar?.delegate = self
-        searchBar?.searchBarStyle = .minimal
-        searchBar?.placeholder = "Search"
-        searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
-        searchBar?.becomeFirstResponder()
-        
     }
     
     @IBAction func done(_ sender: AnyObject) {
@@ -108,14 +124,16 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
     }
     
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
-        if let object = object as? Template {
-            let totalSections = self.groups.count - 1
+        let snapshot = self.diffableDataSource.snapshot()
+        if let object = object as? Template, let section = snapshot.sectionIdentifier(containingItem: object) {
+            let totalItems = (self.groups[section]?.count ?? 1) - 1
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
             cell.intColor = (indexPath.item % 5)
             if indexPath.item == 0 {
                 cell.firstPosition = true
             }
-            if indexPath.item == totalSections {
+            if indexPath.item == totalItems {
+                print(totalItems)
                 cell.lastPosition = true
             }
             cell.template = object
@@ -129,19 +147,25 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         if let template = object as? Template {
             switch template.object {
             case .event:
-                print("event")
+                let destination = EventViewController(networkController: networkController)
+                destination.updateDiscoverDelegate = self
+                destination.template = template
+                self.navigationController?.pushViewController(destination, animated: true)
             case .task:
-                print("task")
+                let destination = TaskViewController(networkController: networkController)
+                destination.updateDiscoverDelegate = self
+                destination.template = template
+                self.navigationController?.pushViewController(destination, animated: true)
+            case .workout:
+                let destination = WorkoutViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
+                destination.template = template
+                self.navigationController?.pushViewController(destination, animated: true)
             case .subtask:
                 print("subtask")
-            case .workout:
-                print("workout")
             case .schedule:
                 print("schedule")
             }
-        }
-        else {
-            print("library else")
         }
     }
     
@@ -151,13 +175,10 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         self.diffableDataSource.apply(snapshot)
                                 
         for section in sections {
-            if let object = groups[section] as? [Template] {
-                let sortedObject = object.sorted(by: { $0.name < $1.name })
-                snapshot.appendSections([section])
-                snapshot.appendItems(sortedObject, toSection: section)
-                self.diffableDataSource.apply(snapshot)
-            }
-        
+            filteredTemplates = filteredTemplates.sorted(by: { $0.name < $1.name })
+            snapshot.appendSections([section])
+            snapshot.appendItems(filteredTemplates, toSection: section)
+            self.diffableDataSource.apply(snapshot)
         }
     }
     
@@ -240,6 +261,7 @@ extension SubLibraryViewController: GIDSignInDelegate {
 extension SubLibraryViewController: UpdateDiscover {
     func itemCreated() {
         self.dismiss(animated: true)
+        self.updateDiscoverDelegate?.itemCreated()
     }
 }
 
@@ -250,25 +272,32 @@ extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDeleg
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
         searchBar.resignFirstResponder()
+        timer?.invalidate()
+        filteredTemplates = templates
         setupData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        filteredTasks = searchText.isEmpty ? tasks :
-//            tasks.filter({ (task) -> Bool in
-//                if let name = task.name {
-//                    return name.lowercased().contains(searchText.lowercased())
-//                }
-//                return ("").lowercased().contains(searchText.lowercased())
-//            })
+        filteredTemplates = searchText.isEmpty ? templates :
+            templates.filter({ (template) -> Bool in
+                if template.name.lowercased().contains(searchText.lowercased()) || template.object.rawValue.lowercased().contains(searchText.lowercased()) {
+                    return true
+                }
+                return false
+        })
         
-        setupData()
+        timer?.invalidate()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+            self.setupData()
+        })
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
         searchBar.keyboardAppearance = .default
         return true
     }
+    
 }
 
 extension SubLibraryViewController { /* hiding keyboard */
@@ -277,16 +306,30 @@ extension SubLibraryViewController { /* hiding keyboard */
         if #available(iOS 11.0, *) {
             searchController?.searchBar.endEditing(true)
         } else {
-            self.searchBar?.endEditing(true)
+            self.searchBar.endEditing(true)
         }
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         setNeedsStatusBarAppearanceUpdate()
+        if let searchText = searchBar.searchTextField.text {
+            filteredTemplates = searchText.isEmpty ? templates :
+                templates.filter({ (template) -> Bool in
+                    if template.name.lowercased().contains(searchText.lowercased()) || template.object.rawValue.lowercased().contains(searchText.lowercased()) {
+                        return true
+                    }
+                    return false
+            })
+        } else {
+            filteredTemplates = templates
+        }
+        timer?.invalidate()
+        setupData()
+        
         if #available(iOS 11.0, *) {
             searchController?.searchBar.endEditing(true)
         } else {
-            self.searchBar?.endEditing(true)
+            self.searchBar.endEditing(true)
         }
     }
 }

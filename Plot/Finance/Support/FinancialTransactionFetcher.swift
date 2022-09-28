@@ -156,9 +156,7 @@ class FinancialTransactionFetcher: NSObject {
             if let completion = self.transactionsChanged {
                 FinancialTransactionFetcher.getDataFromSnapshot(ID: snapshot.key) { transactionsList in
                     for transaction in transactionsList {
-                        if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: transaction) {
-                            self.userTransactions[transaction.guid] = userTransaction
-                        }
+                        self.userTransactions[transaction.guid] = UserTransaction(transaction: transaction)
                     }
                     completion(transactionsList)
                 }

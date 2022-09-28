@@ -166,7 +166,7 @@ extension TaskViewController {
                 mvs.insert(ScheduleRow() {
                     if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
                         activity.calendarColor = color
-                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.name == "Default"}), let color = calendar.color {
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false}), let color = calendar.color {
                         activity.calendarColor = color
                     }
                     $0.value = activity
@@ -370,7 +370,7 @@ extension TaskViewController {
     func openTaskList() {
         let destination = ChooseListViewController(networkController: networkController)
         destination.delegate = self
-        destination.listID = self.task.listID ?? self.lists[ListSourceOptions.plot.name]?.first(where: {$0.name == "Default"})?.id
+        destination.listID = self.task.listID ?? self.lists[ListSourceOptions.plot.name]?.first(where: {$0.defaultList ?? false})?.id
         if let source = self.task.listSource, let lists = self.lists[source] {
             destination.lists = [source: lists]
         } else {
@@ -463,7 +463,6 @@ extension TaskViewController {
         destination.selectedFalconUsers = selectedFalconUsers
         destination.tasks = tasks
         destination.task = task
-        
         self.navigationController?.pushViewController(destination, animated: true)
     
     }

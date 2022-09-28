@@ -24,16 +24,16 @@ private let keywordsMap = ["Health": ["fitness", "workout", "run", "training", "
 ]
 
 enum ActivityCategory: String, Codable, CaseIterable {
+    case family = "Family"
+    case finances = "Finances"
     case health = "Health"
+    case leisure = "Leisure"
     case meal = "Meal"
-    case work = "Work"
+    case personal = "Personal"
     case school = "School"
     case social = "Social"
-    case leisure = "Leisure"
-    case family = "Family"
-    case personal = "Personal"
     case todo = "To-do"
-    case finances = "Finances"
+    case work = "Work"
     case uncategorized = "Uncategorized"
     /// Same as uncategorized by not included in the analytics
     

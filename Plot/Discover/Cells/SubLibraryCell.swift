@@ -16,13 +16,13 @@ class SubLibraryCell: UICollectionViewCell {
     var template: Template! {
         didSet {
             if let template = template {
-                nameLabel.textColor = .label
                 nameLabel.text = template.name
-                imageView.image = template.category.icon.withRenderingMode(.alwaysTemplate)
+                subLabel.text = template.object.rawValue
+                imageView.image = template.subcategory.icon.withRenderingMode(.alwaysTemplate)
                 imageView.tintColor = colors[intColor].withAlphaComponent(1)
                 imageView.contentMode = .scaleAspectFit
                 imageView.backgroundColor = .clear
-                containerImageView.backgroundColor = colors[intColor].withAlphaComponent(0.2)
+                containerImageView.backgroundColor = colors[intColor].withAlphaComponent(0.3)
                 setupViews()
             }
         }
@@ -31,9 +31,18 @@ class SubLibraryCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.body.with(weight: .bold)
+        label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
+        return label
+    }()
+    
+    let subLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .label
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
         return label
     }()
     
@@ -84,7 +93,7 @@ class SubLibraryCell: UICollectionViewCell {
         } else if lastPosition {
             backgroundView?.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
         }
-        
+                
         containerImageView.constrainWidth(45)
         containerImageView.constrainHeight(45)
         
@@ -106,7 +115,7 @@ class SubLibraryCell: UICollectionViewCell {
         let arrowStackView = UIStackView(arrangedSubviews: [arrowView])
         arrowStackView.layoutMargins = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
         arrowStackView.isLayoutMarginsRelativeArrangement = true
-        let nameLabelStackView = UIStackView(arrangedSubviews: [nameLabel])
+        let nameLabelStackView = VerticalStackView(arrangedSubviews: [nameLabel, subLabel])
         nameLabelStackView.layoutMargins = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
         nameLabelStackView.isLayoutMarginsRelativeArrangement = true
         let stackView = UIStackView(arrangedSubviews: [containerImageView, nameLabelStackView, arrowStackView])
@@ -116,6 +125,7 @@ class SubLibraryCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        setupViews()
         
     }
     
@@ -125,10 +135,23 @@ class SubLibraryCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.textColor = .label
         firstPosition = false
         lastPosition = false
         
+        nameLabel.textColor = .label
+        subLabel.textColor = .label
+        
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if firstPosition && lastPosition {
+            backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
+        } else if firstPosition {
+            backgroundView?.roundCorners(corners: [.topLeft, .topRight], radius: 10)
+        } else if lastPosition {
+            backgroundView?.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
+        }
     }
     
 }

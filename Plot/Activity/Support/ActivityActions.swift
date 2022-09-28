@@ -378,7 +378,7 @@ class ActivityActions: NSObject {
                     })
                 } else {
                     CalendarFetcher.fetchCalendarsForUser(id: memberID) { calendars in
-                        if let calendar = calendars.first(where: { $0.name == "Default"}) {
+                        if let calendar = calendars.first(where: { $0.defaultCalendar ?? false }) {
                             let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["isGroupActivity": true,
                                                           "badge": 0,

@@ -68,6 +68,12 @@ class TaskViewController: FormViewController {
     let informationMessageSender = InformationMessageSender()
     // Participants with accepted invites
     var weather: [DailyWeatherElement]!
+    
+    var transaction: Transaction!
+    var workout: Workout!
+    var mindfulness: Mindfulness!
+    var event: Activity!
+    var template: Template!
         
     var active = false
     var sectionChanged: Bool = false
@@ -107,17 +113,29 @@ class TaskViewController: FormViewController {
         } else {
             title = "New Task"
             if let currentUserID = Auth.auth().currentUser?.uid {
-                //create new activityID for auto updating items (schedule, purchases, checklist)
-                activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                if let list = list {
-                    task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+                if let event = event, let task = TaskBuilder.createActivity(event: event), let activityID = task.activityID {
+                    self.task = task
+                    self.activityID = activityID
+                } else if let template = template, let taskList = TaskBuilder.createActivity(template: template), let task = taskList.0, let activityID = task.activityID {
+                    subtaskList = taskList.1 ?? []
+                    if !subtaskList.isEmpty {
+//                        updateLists(type: "subtasks")
+                    }
+                    self.task = task
+                    self.activityID = activityID
                 } else {
-                    list = lists[ListSourceOptions.plot.name]?.first { $0.name == "Default"}
-                    task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
-                    task.category = list?.category
-                }
-                if let container = container {
-                    task.containerID = container.id
+                    //create new activityID for auto updating items (schedule, purchases, checklist)
+                    activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                    if let list = list {
+                        task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+                    } else {
+                        list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false}
+                        task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+                        task.category = list?.category
+                    }
+                    if let container = container {
+                        task.containerID = container.id
+                    }
                 }
             }
         }
@@ -145,7 +163,7 @@ class TaskViewController: FormViewController {
             }
         }
         
-        if let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = task?.participantsIDs, !participantsIDs.contains(currentUser) {
+        if active, let currentUser = Auth.auth().currentUser?.uid, let participantsIDs = task?.participantsIDs, !participantsIDs.contains(currentUser) {
             navigationItem.rightBarButtonItems = []
             for row in form.rows {
                 row.baseCell.isUserInteractionEnabled = false
@@ -196,8 +214,8 @@ class TaskViewController: FormViewController {
             $0.cell.textField?.textColor = .label
             $0.placeholderColor = .secondaryLabel
             $0.placeholder = $0.tag
-            if self.active {
-                $0.value = self.task.name
+            if let task = task, let name = task.name {
+                $0.value = name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 $0.cell.textField.becomeFirstResponder()
@@ -221,7 +239,7 @@ class TaskViewController: FormViewController {
             $0.cell.textView?.textColor = .label
             $0.cell.placeholderLabel?.textColor = .secondaryLabel
             $0.placeholder = $0.tag
-            if self.active && self.task.activityDescription != "nothing" && self.task.activityDescription != nil {
+            if let task = task, task.activityDescription != "nothing" {
                 $0.value = self.task.activityDescription
             }
         }.cellUpdate({ (cell, row) in
@@ -286,7 +304,7 @@ class TaskViewController: FormViewController {
             $0.minuteInterval = 5
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
-            if self.active, task.isCompleted ?? false, let date = task.completedDate {
+            if let task = task, task.isCompleted ?? false, let date = task.completedDate {
                 $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
                 $0.updateCell()
             } else {
@@ -322,7 +340,7 @@ class TaskViewController: FormViewController {
 //            $0.cell.textLabel?.textColor = .label
 //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
 //            $0.title = $0.tag
-//            if self.active, let task = task, let startDate = task.startDate {
+//            if let task = task, let startDate = task.startDate {
 //                $0.value = true
 //                $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
 //            } else {
@@ -388,7 +406,7 @@ class TaskViewController: FormViewController {
 //            else {
 //                $0.cell.datePicker.datePickerMode = .date
 //            }
-//            if self.active, let task = task, let startDate = task.startDate {
+//            if let task = task, let startDate = task.startDate {
 //                $0.value = startDate
 //                $0.updateCell()
 //            }
@@ -407,7 +425,7 @@ class TaskViewController: FormViewController {
 //            $0.cell.textLabel?.textColor = .label
 //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
 //            $0.title = $0.tag
-//            if self.active, let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
+//            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
 //                $0.value = true
 //                $0.cell.detailTextLabel?.text = startDate.getTimeString()
 //            } else {
@@ -481,7 +499,7 @@ class TaskViewController: FormViewController {
 //            else {
 //                $0.cell.datePicker.datePickerMode = .time
 //            }
-//            if self.active, let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
+//            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
 //                $0.value = startDate
 //                $0.updateCell()
 //            }
@@ -502,7 +520,7 @@ class TaskViewController: FormViewController {
             $0.cell.textLabel?.textColor = .label
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Deadline Date"
-            if self.active, let task = task, let endDate = task.endDate {
+            if let task = task, let endDate = task.endDate {
                 $0.value = true
                 $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
             } else {
@@ -570,7 +588,7 @@ class TaskViewController: FormViewController {
             else {
                 $0.cell.datePicker.datePickerMode = .date
             }
-            if self.active, let task = task, let endDate = task.endDate {
+            if let task = task, let endDate = task.endDate {
                 $0.value = endDate
                 $0.updateCell()
             }
@@ -589,7 +607,7 @@ class TaskViewController: FormViewController {
             $0.cell.textLabel?.textColor = .label
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Deadline Time"
-            if self.active, let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+            if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
                 $0.value = true
                 $0.cell.detailTextLabel?.text = endDate.getTimeString()
             } else {
@@ -666,7 +684,7 @@ class TaskViewController: FormViewController {
             else {
                 $0.cell.datePicker.datePickerMode = .time
             }
-            if self.active, let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+            if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
                 $0.value = endDate
                 $0.updateCell()
             }
@@ -703,7 +721,7 @@ class TaskViewController: FormViewController {
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
-            if self.active, let value = self.task.priority {
+            if let task = task, let value = task.priority {
                 row.value = TaskPriority(rawValue: value)
             } else {
                 row.value = TaskPriority.None
@@ -744,7 +762,7 @@ class TaskViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
-            if self.active, let recurrences = self.task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let endDate = self.task.endDate {
+            if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let endDate = self.task.endDate {
                 row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
             } else {
                 row.value = "Never"
@@ -757,7 +775,7 @@ class TaskViewController: FormViewController {
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
-            if self.active, let recurrences = self.task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let endDate = self.task.endDate {
+            if let recurrences = self.task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let endDate = self.task.endDate {
                 row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
             } else {
                 row.value = "Never"
@@ -770,7 +788,7 @@ class TaskViewController: FormViewController {
             row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
-            if self.active, let value = self.task.reminder {
+            if let task = task, let value = task.reminder {
                 row.value = EventAlert(rawValue: value)
             } else {
                 row.value = EventAlert.None
@@ -834,10 +852,11 @@ class TaskViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if self.active && self.task.listName != nil {
+            if let task = task, task.listName != nil {
                 row.value = self.task.listName
             } else {
-                row.value = "Default"
+                list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
+                row.value = list?.name ?? "Default"
             }
         }.onCellSelection({ _, row in
             self.openTaskList()
@@ -856,7 +875,7 @@ class TaskViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if self.active && self.task.category != nil {
+            if let task = task, task.category != nil {
                 row.value = self.task.category
             } else {
                 row.value = "Uncategorized"
@@ -880,7 +899,7 @@ class TaskViewController: FormViewController {
         //                row.cell.accessoryType = .disclosureIndicator
         //                row.cell.selectionStyle = .default
         //                row.title = row.tag
-        //                if self.active && self.task.activityType != "nothing" && self.task.activityType != nil {
+        //                if let task = task, task.activityType != "nothing" && self.task.activityType != nil {
         //                    row.value = self.task.activityType!
         //                } else {
         //                    row.value = "Uncategorized"
@@ -931,10 +950,10 @@ class TaskViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if let subtaskIDs = self.task.subtaskIDs, !subtaskIDs.isEmpty {
-                row.value = String(subtaskIDs.count)
-            } else {
+            if let task = task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty, subtaskList.isEmpty {
                 row.value = "0"
+            } else {
+                row.value = String((self.task.subtaskIDs?.count ?? 0) + subtaskList.count)
             }
             row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
@@ -945,10 +964,10 @@ class TaskViewController: FormViewController {
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
             cell.textLabel?.textColor = .label
-            if let subtaskIDs = self.task.subtaskIDs, !subtaskIDs.isEmpty {
-                row.value = String(subtaskIDs.count)
-            } else {
+            if let task = self.task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty, self.subtaskList.isEmpty {
                 row.value = "0"
+            } else {
+                row.value = String((self.task.subtaskIDs?.count ?? 0) + self.subtaskList.count)
             }
         }
         
@@ -959,7 +978,7 @@ class TaskViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.cell.textLabel?.textColor = .label
             row.title = row.tag
-            if let checklistIDs = self.task.checklistIDs {
+            if let task = task, let checklistIDs = task.checklistIDs {
                 row.value = String(checklistIDs.count)
             } else {
                 row.value = "0"
@@ -988,7 +1007,7 @@ class TaskViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = row.tag
             row.hidden = "$showExtras == false"
-            if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
+            if let task = task, let photos = task.activityPhotos, let files = task.activityFiles, photos.isEmpty, files.isEmpty {
                 row.value = "0"
             } else {
                 row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
