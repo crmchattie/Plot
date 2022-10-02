@@ -37,6 +37,7 @@ final class ColorPushSelectorCell<T: Equatable> : Cell<T>, CellType {
         contentView.addSubview(colorButton)
         colorButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0).isActive = true
         colorButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5).isActive = true
+        colorButton.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5).isActive = true
         colorButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         colorButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
                 

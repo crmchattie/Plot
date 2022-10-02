@@ -200,7 +200,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(calendarActivitiesUpdated), name: .calendarActivitiesUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksNoRepeatsUpdated), name: .tasksNoRepeatsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
@@ -255,7 +255,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         }
     }
     
-    @objc fileprivate func tasksNoRepeatsUpdated() {
+    @objc fileprivate func tasksUpdated() {
         scrollToFirstTask({ (tasks) in
             if self.sortedTasks != tasks {
                 self.sortedTasks = tasks
@@ -414,14 +414,23 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func scrollToFirstTask(_ completion: @escaping ([Activity]) -> Void) {
-        let allTasks = networkController.activityService.tasksNoRepeats
-        if allTasks.count < 3 {
+        let allTasks = networkController.activityService.tasks
+        let numberOfActivities = 3
+        if allTasks.count < numberOfActivities {
             completion(allTasks)
             return
         } else {
+            var index = 0
             var tasks = [Activity]()
-            for index in 0...2 {
-                tasks.append(allTasks[index])
+            for task in allTasks {
+                if index < numberOfActivities {
+                    if !tasks.contains(where: {$0.activityID == task.activityID}) && !(task.isCompleted ?? false) {
+                        tasks.append(task)
+                    }
+                } else {
+                    break
+                }
+                index += 1
             }
             completion(tasks)
         }

@@ -234,7 +234,7 @@ class MindfulnessViewController: FormViewController {
                 $0.cell.textField?.textColor = .label
                 $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
-                if let mindfulness = mindfulness {
+                if let mindfulness = mindfulness, mindfulness.name != "Name" {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                     $0.value = mindfulness.name
                 } else {
@@ -264,8 +264,8 @@ class MindfulnessViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 $0.minuteInterval = 5
-                if let mindfulness = mindfulness {
-                    $0.value = mindfulness.startDateTime
+                if let mindfulness = mindfulness, let startDateTime = mindfulness.startDateTime {
+                    $0.value = startDateTime
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
@@ -311,8 +311,8 @@ class MindfulnessViewController: FormViewController {
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 $0.minuteInterval = 5
-                if let mindfulness = mindfulness {
-                    $0.value = mindfulness.endDateTime
+                if let mindfulness = mindfulness, let endDateTime = mindfulness.endDateTime {
+                    $0.value = endDateTime
                 } else {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
@@ -526,18 +526,25 @@ class MindfulnessViewController: FormViewController {
                 if self!.eventList.indices.contains(rowNumber) {
                     self!.eventList.remove(at: rowNumber)
                     self!.updateLists()
+                    let item = self!.eventList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .activity, ID: item.activityID ?? "")
                 }
             }
             else if row is PurchaseRow {
                 if self!.purchaseList.indices.contains(rowNumber) {
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists()
+//                    self!.purchaseBreakdown()
+                    let item = self!.purchaseList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .transaction, ID: item.guid)
                 }
             }
             else if row is SubtaskRow {
                 if self!.taskList.indices.contains(rowNumber) {
                     self!.taskList.remove(at: rowNumber)
                     self!.updateLists()
+                    let item = self!.taskList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .task, ID: item.activityID ?? "")
                 }
             }
         }

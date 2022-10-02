@@ -790,18 +790,24 @@ class FinanceTransactionViewController: FormViewController {
                 if self!.eventList.indices.contains(rowNumber) {
                     self!.eventList.remove(at: rowNumber)
                     self!.updateLists()
+                    let item = self!.eventList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .activity, ID: item.activityID ?? "")
                 }
             }
             else if row is HealthRow {
-                if self!.healthList.indices.contains(rowNumber) {
+                if self!.healthList.indices.contains(rowNumber)  {
                     self!.healthList.remove(at: rowNumber)
                     self!.updateLists()
+                    let item = self!.healthList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: item.type, ID: item.ID)
                 }
             }
             else if row is SubtaskRow {
                 if self!.taskList.indices.contains(rowNumber) {
                     self!.taskList.remove(at: rowNumber)
                     self!.updateLists()
+                    let item = self!.taskList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .task, ID: item.activityID ?? "")
                 }
             }
         }

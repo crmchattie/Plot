@@ -23,8 +23,8 @@ struct Container: Codable, Equatable, Hashable {
     var taskIDs: [String]?
     var workoutIDs: [String]?
     var mindfulnessIDs: [String]?
-    var mealIDs: [String]?
     var transactionIDs: [String]?
+    var mealIDs: [String]?
     var participantsIDs: [String]?
     
     init(id: String, activityIDs: [String]?, taskIDs: [String]?, workoutIDs: [String]?, mindfulnessIDs: [String]?, mealIDs: [String]?, transactionIDs: [String]?, participantsIDs: [String]?) {
@@ -196,4 +196,32 @@ class ContainerFunctions {
             completion(container, activities, tasks, healths, transactions)
         }
     }
+    
+    class func deleteStuffInside(type: ContainerType, ID: String) {
+        guard let _ = Auth.auth().currentUser?.uid else {return}
+        let reference = Database.database().reference()
+        switch type {
+        case .activity:
+            reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).removeValue()
+        case .task:
+            reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).removeValue()
+        case .transaction:
+            reference.child(financialTransactionsEntity).child(ID).child(containerIDEntity).removeValue()
+        case .workout:
+            reference.child(workoutsEntity).child(ID).child(containerIDEntity).removeValue()
+        case .mindfulness:
+            reference.child(mindfulnessEntity).child(ID).child(containerIDEntity).removeValue()
+        case .meal:
+            print("meal")
+        }
+    }
+}
+
+enum ContainerType {
+    case activity
+    case task
+    case transaction
+    case workout
+    case mindfulness
+    case meal
 }

@@ -66,15 +66,13 @@ struct HealthContainer: Codable, Equatable {
         return meal?.pinned ?? workout?.pinned ?? mindfulness?.pinned ?? false
     }
     
-    var type: String {
+    var type: ContainerType {
         if meal != nil {
-            return "meal"
+            return .meal
         } else if workout != nil {
-            return "workout"
-        } else if mindfulness != nil {
-            return "mindfulness"
-        }else {
-            return "none"
+            return .workout
+        } else {
+            return .mindfulness
         }
     }
 

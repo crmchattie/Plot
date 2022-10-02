@@ -34,9 +34,10 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     var lists = [SectionType: [ListType]]()
     var taskList = [ListType: [Activity]]()
     var filteredLists = [SectionType: [ListType]]()
-    var tasks: [Activity] {
-        return networkController.activityService.tasksNoRepeats
+    var networkTasks: [Activity] {
+        return networkController.activityService.tasks
     }
+    var tasks = [Activity]()
     var filteredTasks = [Activity]()
     
     lazy var users: [User] = networkController.userService.users
@@ -179,6 +180,12 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         sections = []
         lists = [:]
         taskList = [:]
+        
+        for task in networkTasks {
+            if !tasks.contains(where: {$0.activityID == task.activityID}) {
+                tasks.append(task)
+            }
+        }
         
         var listOfLists = [ListType]()
         

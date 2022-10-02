@@ -472,6 +472,9 @@ extension Date {
     func dayNumberOfWeek() -> Int {
         return Calendar.current.dateComponents([.weekday], from: self).weekday!
     }
+    func secondNumber() -> Int {
+        return Calendar.current.dateComponents([.second], from: self).second!
+    }
     func minuteNumber() -> Int {
         return Calendar.current.dateComponents([.minute], from: self).minute!
     }
@@ -620,76 +623,77 @@ func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZon
     
 }
 
-func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, hasStartTime: Bool?) -> (String, String) {
-    var startString: String
-    var endString: String
+func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, hasStartTime: Bool?) -> (Int, String, String) {
+    var numberOfLines = 1
+    var endString: String = "Due: "
     let now = Date()
     if let startDate = startDate {
+        numberOfLines = 2
+        var startString: String = "Starts: "
 //        let startEarliest = now < startDate ? now : startDate
         if let hasStartTime = hasStartTime, hasStartTime, hasDeadlineTime {
             if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
                 //start date is next week
                 if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
-                    startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
-                    endString = " - " + endDate.getTimeStringForActivity()
+                    startString += startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
+                    endString += endDate.getTimeStringForActivity()
                 } else {
-                    startString = startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
-                    endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                    startString += startDate.getShortDateStringForActivity() + " " + startDate.getTimeStringForActivity()
+                    endString += endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
                 }
             } else { // start day is today
                 if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
-                    startString = "Today @ " + startDate.getTimeStringForActivity()
-                    endString = " - " + endDate.getTimeStringForActivity()
+                    startString += "Today @ " + startDate.getTimeStringForActivity()
+                    endString += endDate.getTimeStringForActivity()
                 } else {
-                    startString = "Today @ " + startDate.getTimeStringForActivity()
-                    endString = " - " + endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+                    startString += "Today @ " + startDate.getTimeStringForActivity()
+                    endString += endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
                 }
             }
         } else {
             if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
                 if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
-                    startString = startDate.getShortDateStringForActivity()
+                    startString = "Starts & Due: "
+                    startString += startDate.getShortDateStringForActivity()
                     endString = ""
                 } else {
-                    startString = startDate.getShortDateStringForActivity()
-                    endString = " - " + endDate.getShortDateStringForActivity()
+                    startString += startDate.getShortDateStringForActivity()
+                    endString += endDate.getShortDateStringForActivity()
                 }
             } else { // start day is today
                 if startDate.getShortDateStringForActivity() == endDate.getShortDateStringForActivity() {
-                    startString = "Today @ " + startDate.getTimeStringForActivity()
+                    startString = "Starts & Due: "
+                    startString += "Today"
                     endString = ""
                 } else {
-                    startString = "Today @ " + startDate.getTimeStringForActivity()
-                    endString = " - " + endDate.getShortDateStringForActivity()
+                    startString += "Today"
+                    endString += endDate.getShortDateStringForActivity()
                 }
             }
         }
-        
-        return (startString, endString)
+        return (numberOfLines, startString, endString)
     } else {
         if hasDeadlineTime {
-            if now.getShortDateStringForActivity() != endDate.getShortDateStringForActivity() {  endString = endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
+            if now.getShortDateStringForActivity() != endDate.getShortDateStringForActivity() {  endString += endDate.getShortDateStringForActivity() + " " + endDate.getTimeStringForActivity()
             } else { // start day is today
-                endString = "Today @ " + endDate.getTimeStringForActivity()
+                endString += "Today @ " + endDate.getTimeStringForActivity()
             }
         } else {
             if now.getShortDateStringForActivity() != endDate.getShortDateStringForActivity() {  // not today
-                endString = endDate.getShortDateStringForActivity()
+                endString += endDate.getShortDateStringForActivity()
             } else { // start day is today
-                endString = "Today"
+                endString += "Today"
             }
         }
-        return (endString, "")
+        return (numberOfLines, "", endString)
     }
 }
 
 func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
     var value = ""
     var numberOfLines = 1
-    if let startDate = activity.startDateTime as? TimeInterval, let endDate = activity.endDateTime as? TimeInterval {
+    if let startDate = activity.startDate, let endDate = activity.endDate {
         let allDay = activity.allDay ?? false
-        let startDate = Date(timeIntervalSince1970: startDate)
-        let endDate = Date(timeIntervalSince1970: endDate)
         let startDateFormatter = DateFormatter()
         let endDateFormatter = DateFormatter()
         startDateFormatter.dateFormat = "d"
@@ -755,10 +759,82 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
     return (numberOfLines, value)
 }
 
-func dateTimeValue(forTask task: Activity) -> String {
+func dateTimeValue(forTask task: Activity) -> (Int, String) {
     var value = ""
-    if let endDate = task.endDate {
-        let allDay = !(task.hasDeadlineTime ?? false)
+    var numberOfLines = 1
+    if let startDate = task.startDate, let endDate = task.endDate {
+        value += "Starts: "
+        numberOfLines = 2
+        let startAllDay = !(task.hasStartTime ?? false)
+        let startDateFormatter = DateFormatter()
+        startDateFormatter.dateFormat = "d"
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var startDay = ""
+        var day = startDateFormatter.string(from: startDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            startDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        startDateFormatter.dateFormat = "EEEE, MMM"
+        value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
+        
+        if !startAllDay {
+            startDateFormatter.dateFormat = "h:mm a"
+            value += " \(startDateFormatter.string(from: startDate))"
+        }
+        
+        value += "\n"
+        value += "Due: "
+        
+        let endAllDay = !(task.hasDeadlineTime ?? false)
+        let endDateFormatter = DateFormatter()
+        endDateFormatter.dateFormat = "d"
+        
+        var endDay = ""
+        day = endDateFormatter.string(from: endDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            endDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        endDateFormatter.dateFormat = "EEEE, MMM"
+        value += "\(endDateFormatter.string(from: endDate)) \(endDay)"
+        
+        if !endAllDay {
+            endDateFormatter.dateFormat = "h:mm a"
+            value += " \(endDateFormatter.string(from: endDate))"
+        }
+        
+    } else if let startDate = task.startDate {
+        value += "Starts: "
+        let startAllDay = !(task.hasStartTime ?? false)
+        let startDateFormatter = DateFormatter()
+        startDateFormatter.dateFormat = "d"
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var startDay = ""
+        let day = startDateFormatter.string(from: startDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            startDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        startDateFormatter.dateFormat = "EEEE, MMM"
+        value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
+        
+        if !startAllDay {
+            startDateFormatter.dateFormat = "h:mm a"
+            value += " \(startDateFormatter.string(from: startDate))"
+        }
+    } else if let endDate = task.endDate {
+        value += "Due: "
+        let endAllDay = !(task.hasDeadlineTime ?? false)
         let endDateFormatter = DateFormatter()
         endDateFormatter.dateFormat = "d"
         
@@ -775,14 +851,14 @@ func dateTimeValue(forTask task: Activity) -> String {
         endDateFormatter.dateFormat = "EEEE, MMM"
         value += "\(endDateFormatter.string(from: endDate)) \(endDay)"
         
-        if !allDay {
+        if !endAllDay {
             endDateFormatter.dateFormat = "h:mm a"
             value += " \(endDateFormatter.string(from: endDate))"
         }
         
     }
     
-    return value
+    return (numberOfLines, value)
 }
 
 func timestampOfChatLogMessage(_ date: Date) -> String {

@@ -142,6 +142,8 @@ extension TaskViewController {
             })
         }
         if let containerID = task.containerID {
+            print("containerID")
+            print(containerID)
             dispatchGroup.enter()
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, _, health, transactions in
                 self.container = container
@@ -204,7 +206,21 @@ extension TaskViewController {
     
     func sortSubtasks() {
         subtaskList.sort { (task1, task2) -> Bool in
-            return task1.name ?? "" < task2.name ?? ""
+            if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                    if task1.priority == task2.priority {
+                        return task1.name ?? "" < task2.name ?? ""
+                    }
+                    return TaskPriority(rawValue: task1.priority ?? "None")! > TaskPriority(rawValue: task2.priority ?? "None")!
+                }
+                return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+            } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                    return task1.name ?? "" < task2.name ?? ""
+                }
+                return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+            }
+            return !(task1.isCompleted ?? false)
         }
         if let mvs = self.form.sectionBy(tag: "Sub-Tasks") as? MultivaluedSection {
             if mvs.count == 1 {
@@ -219,7 +235,6 @@ extension TaskViewController {
     }
     
     func updateLists(type: String) {
-        print("updateLists")
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "subtasks" {
             var subtaskIDs = [String]()
@@ -340,9 +355,9 @@ extension TaskViewController {
         let content = UNMutableNotificationContent()
         content.title = "\(String(describing: task.name!)) Reminder"
         content.sound = UNNotificationSound.default
-        var formattedDate: (String, String) = ("", "")
+        var formattedDate: (Int, String, String) = (1, "", "")
         formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: task.hasDeadlineTime ?? false, startDate: task.startDate, hasStartTime: task.hasStartTime)
-        content.subtitle = formattedDate.0
+        content.subtitle = formattedDate.2
         if let reminder = EventAlert(rawValue: activityReminder) {
             let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)
             let calendar = Calendar.current
@@ -481,7 +496,7 @@ extension TaskViewController {
             self.navigationController?.pushViewController(destination, animated: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
@@ -499,7 +514,7 @@ extension TaskViewController {
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             }))
-            alert.addAction(UIAlertAction(title: "Existing Activity", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
@@ -801,10 +816,9 @@ extension TaskViewController {
     }
     
     func updateStartDate() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "Start Date"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "Start Time"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "StartTime") {
-            if dateSwitchRowValue && timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "startTimeSwitch"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "StartTime") {
+            if dateSwitchRowValue, timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
                 var dateComponents = DateComponents()
-                print(dateRowValue.yearNumber())
                 dateComponents.year = dateRowValue.yearNumber()
                 dateComponents.month = dateRowValue.monthNumber()
                 dateComponents.day = dateRowValue.dayNumber()
@@ -814,7 +828,6 @@ extension TaskViewController {
                 self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
                 self.task.hasStartTime = true
             } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                print(dateRowValue.yearNumber())
                 var dateComponents = DateComponents()
                 dateComponents.year = dateRowValue.yearNumber()
                 dateComponents.month = dateRowValue.monthNumber()
@@ -825,10 +838,6 @@ extension TaskViewController {
             } else {
                 self.task.startDateTime = nil
                 self.task.hasStartTime = false
-//                if let currentUserID = Auth.auth().currentUser?.uid, active {
-//                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("startDateTime")
-//                    userReference.removeValue()
-//                }
             }
             self.updateRepeatReminder()
         }
@@ -857,10 +866,6 @@ extension TaskViewController {
             } else {
                 self.task.endDateTime = nil
                 self.task.hasDeadlineTime = false
-//                if let currentUserID = Auth.auth().currentUser?.uid, active {
-//                    let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder).child("endDateTime")
-//                    userReference.removeValue()
-//                }
             }
             self.updateRepeatReminder()
         }

@@ -257,7 +257,7 @@ class WorkoutViewController: FormViewController {
             $0.cell.textField?.textColor = .label
             $0.placeholderColor = .secondaryLabel
             $0.placeholder = $0.tag
-            if let workout = workout {
+            if let workout = workout, workout.name != "Name" {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
                 $0.value = workout.name
             } else {
@@ -648,18 +648,25 @@ class WorkoutViewController: FormViewController {
                 if self!.eventList.indices.contains(rowNumber) {
                     self!.eventList.remove(at: rowNumber)
                     self!.updateLists()
+                    let item = self!.eventList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .activity, ID: item.activityID ?? "")
                 }
             }
             else if row is PurchaseRow {
                 if self!.purchaseList.indices.contains(rowNumber) {
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists()
+//                    self!.purchaseBreakdown()
+                    let item = self!.purchaseList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .transaction, ID: item.guid)
                 }
             }
             else if row is SubtaskRow {
                 if self!.taskList.indices.contains(rowNumber) {
                     self!.taskList.remove(at: rowNumber)
                     self!.updateLists()
+                    let item = self!.taskList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .task, ID: item.activityID ?? "")
                 }
             }
         }

@@ -260,8 +260,6 @@ class FinanceService {
                 completion()
             } else if !accountsInitialAdd.isEmpty {
                 for account in accountsInitialAdd {
-                    print("accountsInitialAdd")
-                    print(account.name)
                     if let index = self?.accounts.firstIndex(where: {$0.guid == account.guid}) {
                         self?.accounts[index] = account
                     } else {

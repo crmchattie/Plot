@@ -280,7 +280,7 @@ class GoogleCalService {
         }
         
         if activity.isCompleted ?? false, let completedDate = activity.completedDate {
-            let date = isodateFormatter.string(from: Date(timeIntervalSince1970: completedDate as! TimeInterval))
+            let date = isodateFormatter.string(from: Date(timeIntervalSince1970: completedDate.doubleValue))
             task.completed = date
         }
         
@@ -330,7 +330,7 @@ class GoogleCalService {
             }
             
             if activity.isCompleted ?? false, let completedDate = activity.completedDate {
-                let date = isodateFormatter.string(from: Date(timeIntervalSince1970: completedDate as! TimeInterval))
+                let date = isodateFormatter.string(from: Date(timeIntervalSince1970: completedDate.doubleValue))
                 task.completed = date
             }
             

@@ -26,10 +26,12 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     let newTaskCellID = "newTaskCellID"
     
     var list: ListType!
-    var filteredTasks = [Activity]()
-    var tasks: [Activity] {
-        return networkController.activityService.tasksNoRepeats
+    var networkTasks: [Activity] {
+        return networkController.activityService.tasks
     }
+    var tasks = [Activity]()
+    var filteredTasks = [Activity]()
+
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
     lazy var conversations: [Conversation] = networkController.conversationService.conversations
@@ -75,6 +77,12 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     func sortandreload() {
+        for task in networkTasks {
+            if !tasks.contains(where: {$0.activityID == task.activityID}) {
+                tasks.append(task)
+            }
+        }
+        
         switch ListOptions(rawValue: list.name ?? "") {
         case .allList:
             break

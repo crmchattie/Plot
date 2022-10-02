@@ -33,11 +33,14 @@ class GPlotEventOp: AsyncOperation {
         for activity in activities {
             if let activityID = activity.activityID {
                 dispatchGroup.enter()
-                if let event = googleCalService.storeEvent(for: activity), let id = event.identifier {
+                if let _ = activity.externalActivityID {
+                    googleCalService.updateEvent(for: activity)
+                    dispatchGroup.leave()
+                } else if let event = googleCalService.storeEvent(for: activity), let id = event.identifier {
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                     reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": id as Any]
+                        let values:[String : Any] = ["externalActivityID": id as Any]
                         userReference.updateChildValues(values)
                         dispatchGroup.leave()
                     }

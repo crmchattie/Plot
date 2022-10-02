@@ -42,7 +42,6 @@ final class PurchaseCell: Cell<Transaction>, CellType {
     
     
     override func setup() {
-        height = { 60 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
         textLabel?.textColor = .clear
@@ -51,6 +50,8 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         contentView.addSubview(nameLabel)
         contentView.addSubview(participantsLabal)
         contentView.addSubview(costLabel)
+        
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
         
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true

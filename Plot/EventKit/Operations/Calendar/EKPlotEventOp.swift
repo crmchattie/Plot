@@ -34,11 +34,14 @@ class EKPlotEventOp: AsyncOperation {
         for activity in activities {
             if let activityID = activity.activityID {
                 dispatchGroup.enter()
-                if let event = eventKitService.storeEvent(for: activity) {
+                if let _ = activity.externalActivityID {
+                    eventKitService.updateEvent(for: activity)
+                    dispatchGroup.leave()
+                } else if let event = eventKitService.storeEvent(for: activity) {
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                     reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.calendarItemIdentifier as Any]
+                        let values:[String : Any] = ["externalActivityID": event.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
                         dispatchGroup.leave()
                     }

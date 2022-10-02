@@ -60,6 +60,7 @@ class Activity: NSObject, NSCopying, Codable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    //instance or recurring variable
     var containerID: String?
     var conversationID: String?
     var calendarExport: Bool?
@@ -67,7 +68,10 @@ class Activity: NSObject, NSCopying, Codable {
     var isEvent: Bool?
     //task will key off of isTask and isCompleted
     var isTask: Bool?
+    
+    //instance variable
     var isCompleted: Bool?
+    //instance variable
     var completedDate: NSNumber?
     var userIsCompleted: Bool?
     var userCompletedDate: NSNumber?
@@ -82,6 +86,11 @@ class Activity: NSObject, NSCopying, Codable {
     var priority: String?
     var lastModifiedDate: NSNumber?
     var createdDate: NSNumber?
+    //instance variable
+    var recurringEventID: String?
+    var instanceOriginalStartDateTime: NSNumber?
+    var instanceIDs: [String]?
+    var instanceID: String?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -131,6 +140,9 @@ class Activity: NSObject, NSCopying, Codable {
         case flagged
         case tags
         case priority
+        case recurringEventID
+        case instanceIDs
+        case instanceID
     }
     
     init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool, createdDate: NSNumber) {
@@ -235,6 +247,10 @@ class Activity: NSObject, NSCopying, Codable {
         priority = dictionary?["priority"] as? String
         createdDate = dictionary?["createdDate"] as? NSNumber
         lastModifiedDate = dictionary?["lastModifiedDate"] as? NSNumber
+        recurringEventID = dictionary?["recurringEventID"] as? String
+        instanceOriginalStartDateTime = dictionary?["instanceOriginalStartDateTime"] as? NSNumber
+        instanceIDs = dictionary?["instanceIDs"] as? [String]
+        instanceID = dictionary?["instanceID"] as? String
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -263,23 +279,6 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = self.admin as AnyObject? {
             dictionary["admin"] = value
         }
-        
-//calendar is user attribute vs. activity attribute unlike list
-//        if let value = self.calendarID as AnyObject? {
-//            dictionary["calendarID"] = value
-//        }
-//
-//        if let value = self.calendarName as AnyObject? {
-//            dictionary["calendarName"] = value
-//        }
-//
-//        if let value = self.calendarColor as AnyObject? {
-//            dictionary["calendarColor"] = value
-//        }
-//
-//        if let value = self.calendarSource as AnyObject? {
-//            dictionary["calendarSource"] = value
-//        }
         
         if let value = self.activityType as AnyObject? {
             dictionary["activityType"] = value
@@ -521,6 +520,10 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["priority"] = value
         }
         
+        if let value = self.instanceIDs as AnyObject? {
+            dictionary["instanceIDs"] = value
+        }
+        
         return dictionary
     }
     
@@ -706,6 +709,14 @@ extension Activity {
         }
         return nil
     }
+    var instanceOriginalStartDate: Date? {
+        if let instanceOriginalStartDateTime = instanceOriginalStartDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: instanceOriginalStartDateTime)
+            //for tasks where deadline date is more likely to be set than start date
+        }
+        return nil
+    }
+    
 }
 
 extension Activity {

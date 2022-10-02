@@ -63,7 +63,6 @@ class ScheduleListViewController: FormViewController {
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-        
         extendedLayoutIncludesOpaqueBars = true
                 
 //        let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))

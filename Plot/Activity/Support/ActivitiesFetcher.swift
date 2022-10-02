@@ -193,6 +193,28 @@ class ActivitiesFetcher: NSObject {
         }
     }
     
+    class func grabInstanceActivities(IDs: [String], completion: @escaping ([Date: Activity])->()) {
+        let ref = Database.database().reference()
+        var activities: [Date: Activity] = [:]
+        let group = DispatchGroup()
+        for ID in IDs {
+            group.enter()
+            ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+                if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
+                    let activity = Activity(dictionary: activitySnapshotValue)
+                    if let instanceOriginalStartDate = activity.instanceOriginalStartDate {
+                        activities[instanceOriginalStartDate] = activity
+                    }
+                }
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion(activities)
+        }
+    }
+    
     func getUserDataFromSnapshot(ID: String, completion: @escaping ([Activity])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return

@@ -62,6 +62,7 @@ class SubtaskListViewController: FormViewController {
         tableView.sectionIndexBackgroundColor = view.backgroundColor
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        tableView.rowHeight = UITableView.automaticDimension
         
         extendedLayoutIncludesOpaqueBars = true
                 
@@ -189,8 +190,22 @@ class SubtaskListViewController: FormViewController {
     }
     
     func sortSubtask() {
-        subtaskList.sort { (subtask1, subtask2) -> Bool in
-            return subtask1.startDateTime?.int64Value ?? 0 < subtask2.startDateTime?.int64Value ?? 0
+        subtaskList.sort { (task1, task2) -> Bool in
+            if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                    if task1.priority == task2.priority {
+                        return task1.name ?? "" < task2.name ?? ""
+                    }
+                    return TaskPriority(rawValue: task1.priority ?? "None")! > TaskPriority(rawValue: task2.priority ?? "None")!
+                }
+                return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+            } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                    return task1.name ?? "" < task2.name ?? ""
+                }
+                return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+            }
+            return !(task1.isCompleted ?? false)
         }
         if let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
             if mvs.count < 3 {

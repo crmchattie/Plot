@@ -276,13 +276,10 @@ class EventKitService {
     }
     
     func storeReminder(for activity: Activity) -> EKReminder? {
-        print("storeReminder")
         guard let name = activity.name else {
             return nil
         }
         
-        print(name)
-
         let reminder = EKReminder(eventStore: eventStore)
         reminder.title = name
         if let startDate = activity.startDate {
@@ -307,7 +304,7 @@ class EventKitService {
         }
         reminder.isCompleted = activity.isCompleted ?? false
         if let completedDate = activity.completedDate {
-            reminder.completionDate = Date(timeIntervalSince1970: completedDate as! TimeInterval)
+            reminder.completionDate = Date(timeIntervalSince1970: completedDate.doubleValue)
         }
         reminder.notes = activity.activityDescription ?? ""
 
@@ -397,7 +394,7 @@ class EventKitService {
             }
             reminder.isCompleted = activity.isCompleted ?? false
             if let completedDate = activity.completedDate {
-                reminder.completionDate = Date(timeIntervalSince1970: completedDate as! TimeInterval)
+                reminder.completionDate = Date(timeIntervalSince1970: completedDate.doubleValue)
             }
             reminder.notes = activity.activityDescription ?? ""
 

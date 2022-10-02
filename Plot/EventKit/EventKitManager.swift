@@ -103,7 +103,7 @@ class EventKitManager {
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
-        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && !($0.calendarExport ?? false) && $0.isTask == nil && $0.calendarSource == CalendarSourceOptions.plot.name }
+        let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && $0.isTask == nil && $0.calendarSource == CalendarSourceOptions.plot.name }
                 
         let activitiesOp = EKPlotEventOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue
@@ -176,8 +176,14 @@ class EventKitManager {
         
         isRunningTasks = true
         
+        let calendar = Calendar.current
+        // Create the start date components
+        var timeAgoComponents = DateComponents()
+        timeAgoComponents.month = -3
+        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
+        
         //filter old activities out
-        let filterActivities = activities.filter { !($0.calendarExport ?? false) && $0.isTask ?? false && $0.listSource == ListSourceOptions.plot.name }
+        let filterActivities = activities.filter { Date(timeIntervalSince1970: $0.lastModifiedDate?.doubleValue ?? 0) > timeAgo && $0.isTask ?? false && $0.listSource == ListSourceOptions.plot.name }
                         
         let activitiesOp = EKPlotTaskOp(eventKitService: eventKitService, activities: filterActivities)
         // Setup queue

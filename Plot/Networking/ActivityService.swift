@@ -739,18 +739,45 @@ extension ActivityService {
     func addRepeatingActivities(activities: [Activity], completion: @escaping ([Activity])->()) {
         let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
         var newActivities = [Activity]()
+        let group = DispatchGroup()
         for activity in activities {
+            group.enter()
             // Handles recurring events.
             if let rules = activity.recurrences, !rules.isEmpty {
                 if activity.isTask ?? false {
-                    let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
-                    let dates = iCalUtility()
-                        .recurringDates(forRules: rules, ruleStartDate: activity.endDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
-                    for date in dates {
-                        let newActivity = activity.copy() as! Activity
-                        newActivity.recurrenceStartDate = activity.endDate
-                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
-                        newActivities.append(newActivity)
+                    if let instanceIDs = activity.instanceIDs {
+                        ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                            let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                            let dates = iCalUtility()
+                                .recurringDates(forRules: rules, ruleStartDate: activity.endDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                            for date in dates {
+                                if let instanceActivity = activities[date] {
+                                    let newActivity = activity.copy() as! Activity
+                                    newActivity.isCompleted = instanceActivity.isCompleted
+                                    newActivity.completedDate = instanceActivity.completedDate
+                                    newActivity.recurrenceStartDate = activity.endDate
+                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                    newActivities.append(newActivity)
+                                } else {
+                                    let newActivity = activity.copy() as! Activity
+                                    newActivity.recurrenceStartDate = activity.endDate
+                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                    newActivities.append(newActivity)
+                                }
+                            }
+                            group.leave()
+                        }
+                    } else {
+                        let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                        let dates = iCalUtility()
+                            .recurringDates(forRules: rules, ruleStartDate: activity.endDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                        for date in dates {
+                            let newActivity = activity.copy() as! Activity
+                            newActivity.recurrenceStartDate = activity.endDate
+                            newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                            newActivities.append(newActivity)
+                        }
+                        group.leave()
                     }
                 } else {
                     let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
@@ -764,11 +791,16 @@ extension ActivityService {
                         newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
                         newActivities.append(newActivity)
                     }
+                    group.leave()
                 }
             } else {
                 newActivities.append(activity)
+                group.leave()
             }
         }
-        completion(newActivities)
+        
+        group.notify(queue: .main) {
+            completion(newActivities)
+        }
     }
 }

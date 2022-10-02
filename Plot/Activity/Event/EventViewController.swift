@@ -133,12 +133,13 @@ class EventViewController: FormViewController {
                     self.activity = activity
                     self.activityID = activityID
                 } else if let template = template, let activityList = EventBuilder.createActivity(template: template), let activity = activityList.0, let activityID = activity.activityID {
+                    self.activityID = activityID
+                    self.activity = activity
                     scheduleList = activityList.1 ?? []
                     if !scheduleList.isEmpty {
-//                        updateLists(type: "schedule")
+                        sortSchedule()
+                        updateLists(type: "schedule")
                     }
-                    self.activity = activity
-                    self.activityID = activityID
                 } else {
                     activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                     print(activityID)
@@ -726,10 +727,10 @@ class EventViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.cell.textLabel?.textColor = .label
             row.title = row.tag
-            if let activity = activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty, scheduleList.isEmpty {
+            if let activity = activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty {
                 row.value = "0"
             } else {
-                row.value = String((self.activity.scheduleIDs?.count ?? 0) + scheduleList.count)
+                row.value = String(self.activity.scheduleIDs?.count ?? 0)
             }
             row.hidden = "$showExtras == false"
         }.onCellSelection({ _,_ in
@@ -740,10 +741,10 @@ class EventViewController: FormViewController {
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.textLabel?.textAlignment = .left
             cell.textLabel?.textColor = .label
-            if let activity = self.activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty, self.scheduleList.isEmpty {
+            if let activity = self.activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty {
                 row.value = "0"
             } else {
-                row.value = String((self.activity.scheduleIDs?.count ?? 0) + self.scheduleList.count)
+                row.value = String(self.activity.scheduleIDs?.count ?? 0)
             }
         }
         
@@ -982,19 +983,25 @@ class EventViewController: FormViewController {
                 if self!.purchaseList.indices.contains(rowNumber) {
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
-                    //                    self!.purchaseBreakdown()
+//                    self!.purchaseBreakdown()
+                    let item = self!.purchaseList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .transaction, ID: item.guid)
                 }
             }
             else if row is HealthRow {
-                if self!.healthList.indices.contains(rowNumber) {
+                if self!.healthList.indices.contains(rowNumber)  {
                     self!.healthList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
+                    let item = self!.healthList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: item.type, ID: item.ID)
                 }
             }
             else if row is SubtaskRow {
                 if self!.taskList.indices.contains(rowNumber) {
                     self!.taskList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
+                    let item = self!.taskList[rowNumber]
+                    ContainerFunctions.deleteStuffInside(type: .task, ID: item.activityID ?? "")
                 }
             }
         }

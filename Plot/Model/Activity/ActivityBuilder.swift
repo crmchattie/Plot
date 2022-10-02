@@ -8,6 +8,7 @@
 
 import Foundation
 import Firebase
+import RRuleSwift
 
 class EventBuilder {
     class func createActivity(from workout: Workout) -> Activity? {
@@ -153,9 +154,6 @@ class EventBuilder {
         if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
             activityID = newId
         }
-        let original = Date()
-        let rounded = Date(timeIntervalSinceReferenceDate:
-                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = template.name
@@ -163,10 +161,22 @@ class EventBuilder {
         activity.category = template.category.rawValue
         activity.subcategory = template.subcategory.rawValue
         activity.activityDescription = template.description
+        
+        if let startDate = template.getStartDate(), let endDate = template.getEndDate() {
+            if let frequency = template.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
+                var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
+                recurrenceRule.startDate = startDate
+                recurrenceRule.interval = template.interval ?? 1
+                activity.recurrences = [recurrenceRule.toRRuleString()]
+            }
+            
+            activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
+            
+        }
+        
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        activity.startDateTime = NSNumber(value: rounded.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: rounded.timeIntervalSince1970)
         activity.allDay = false
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -183,10 +193,6 @@ class EventBuilder {
         if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
             activityID = newId
         }
-        let original = Date()
-        let rounded = Date(timeIntervalSinceReferenceDate:
-                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-        
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = subtemplate.name
         activity.isSchedule = true
@@ -195,8 +201,11 @@ class EventBuilder {
         activity.activityDescription = subtemplate.description
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        activity.startDateTime = NSNumber(value: rounded.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: rounded.timeIntervalSince1970)
+        
+        if let startDate = subtemplate.getStartDate(), let endDate = subtemplate.getEndDate() {
+            activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
+        }
         activity.allDay = false
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -338,6 +347,23 @@ class TaskBuilder {
         activity.category = template.category.rawValue
         activity.subcategory = template.subcategory.rawValue
         activity.activityDescription = template.description
+        
+        if let endDate = template.getEndDate() {
+            if let frequency = template.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
+                print(recurrenceFrequency)
+                var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
+                recurrenceRule.startDate = endDate
+                recurrenceRule.interval = template.interval ?? 1
+                print(recurrenceRule.toRRuleString())
+                activity.recurrences = [recurrenceRule.toRRuleString()]
+            }
+            
+            if let startDate = template.getStartDate() {
+                activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
+            }
+            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
+        }
+        
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         var subtasks = [Activity]()
@@ -359,6 +385,12 @@ class TaskBuilder {
         activity.category = subtemplate.category.rawValue
         activity.subcategory = subtemplate.subcategory.rawValue
         activity.activityDescription = subtemplate.description
+        if let startDate = subtemplate.getStartDate() {
+            activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
+        }
+        if let endDate = subtemplate.getEndDate() {
+            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
+        }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.isSubtask = true

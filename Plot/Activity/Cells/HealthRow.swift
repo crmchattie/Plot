@@ -52,6 +52,8 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         contentView.addSubview(subLabel)
         contentView.addSubview(activityTypeButton)
         
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
+        
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
@@ -68,7 +70,6 @@ final class HealthCell: Cell<HealthContainer>, CellType {
     }
     
     override func update() {
-        height = { 60 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 

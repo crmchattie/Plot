@@ -21,8 +21,9 @@ extension TaskCell {
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
-        let dateTimeValue = dateTimeValue(forTask: task)
-        endLabel.text = dateTimeValue
+        let dateTimeValueArray = dateTimeValue(forTask: task)
+        endLabel.numberOfLines = dateTimeValueArray.0
+        endLabel.text = dateTimeValueArray.1
         
         if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
@@ -115,8 +116,9 @@ extension TaskCollectionCell {
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
-        let dateTimeValue = dateTimeValue(forTask: task)
-        endLabel.text = dateTimeValue
+        let dateTimeValueArray = dateTimeValue(forTask: task)
+        endLabel.numberOfLines = dateTimeValueArray.0
+        endLabel.text = dateTimeValueArray.1
         
         if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)

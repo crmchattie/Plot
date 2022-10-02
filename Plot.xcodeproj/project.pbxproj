@@ -1753,9 +1753,9 @@
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
 				109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */,
+				10B3E50228B10FC100E1713D /* SubtaskRow.swift */,
 				103E968922C2B309007D6668 /* PurchaseRow.swift */,
 				10DFAFCB2877775800D38016 /* HealthRow.swift */,
-				10B3E50228B10FC100E1713D /* SubtaskRow.swift */,
 				1092E28628BE53D00018FCAA /* ColorRow.swift */,
 				101B90962458DA2D00EDDB90 /* WeatherRow.swift */,
 			);

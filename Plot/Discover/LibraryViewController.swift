@@ -251,8 +251,10 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     }
     
     func fetchTemplates() {
+        var refHandle = DatabaseHandle()
         let reference = Database.database().reference().child(templateEntity)
-        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+        reference.keepSynced(true)
+        refHandle = reference.observe(.value, with: { (snapshot) in
             if snapshot.exists(), let snapshotValue = snapshot.value as? NSArray {
                 for value in snapshotValue {
                     if let template = try? FirebaseDecoder().decode(Template.self, from: value) {
@@ -260,6 +262,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                     }
                 }
             }
+            reference.removeObserver(withHandle: refHandle)
         })
     }
     

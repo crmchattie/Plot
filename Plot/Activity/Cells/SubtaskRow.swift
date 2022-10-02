@@ -14,6 +14,8 @@ protocol UpdateTaskCellDelegate: AnyObject {
 
 final class SubtaskCell: Cell<Activity>, CellType {
     weak var delegate: UpdateTaskCellDelegate?
+    
+    var formattedDate: (Int, String, String) = (1, "", "")
         
     lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -84,6 +86,8 @@ final class SubtaskCell: Cell<Activity>, CellType {
         contentView.addSubview(checkView)
         checkView.addSubview(checkImage)
         
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
+        
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.leftAnchor, constant: -5).isActive = true
@@ -110,24 +114,34 @@ final class SubtaskCell: Cell<Activity>, CellType {
     }
     
     override func update() {
-        height = { 60 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 
         guard let subtask = row.value else { return }
                 
         nameLabel.text = subtask.name
-
-        if let _ = subtask.endDate {
-            let dateTimeValue = dateTimeValue(forTask: subtask)
-            dateTimeLabel.text = dateTimeValue
+        
+        if let endDate = subtask.endDate {
+            dateTimeLabel.isHidden = false
+            formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
+            dateTimeLabel.numberOfLines = formattedDate.0
+            if formattedDate.0 == 2 {
+                dateTimeLabel.text = formattedDate.1 + "\n" + formattedDate.2
+            } else {
+                dateTimeLabel.text = formattedDate.1 + formattedDate.2
+            }
         } else {
-            dateTimeLabel.text = ""
+            dateTimeLabel.text = nil
+            dateTimeLabel.isHidden = true
         }
         
         // set the texts to the labels
-        if subtask.locationName != "locationName" {
+        if let locationName = subtask.locationName, locationName != "locationName" {
             locationNameLabel.text = subtask.locationName
+            dateTimeLabel.isHidden = false
+        } else {
+            locationNameLabel.text = nil
+            dateTimeLabel.isHidden = true
         }
         
         let image = subtask.isCompleted ?? false ? "checkmark.circle" : "circle"

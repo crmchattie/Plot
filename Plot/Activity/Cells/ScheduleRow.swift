@@ -66,6 +66,8 @@ final class ScheduleCell: Cell<Activity>, CellType {
         contentView.addSubview(locationNameLabel)
         contentView.addSubview(activityTypeButton)
         
+        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
+        
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
@@ -87,7 +89,6 @@ final class ScheduleCell: Cell<Activity>, CellType {
     }
     
     override func update() {
-        height = { 60 }
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 
@@ -102,8 +103,12 @@ final class ScheduleCell: Cell<Activity>, CellType {
         }
         // set the texts to the labels
         dateTimeLabel.text = formattedDate.0 + formattedDate.1
-        if schedule.locationName != "locationName" {
+        if let locationName = schedule.locationName, locationName != "locationName" {
             locationNameLabel.text = schedule.locationName
+            dateTimeLabel.isHidden = false
+        } else {
+            locationNameLabel.text = nil
+            dateTimeLabel.isHidden = true
         }
         
         

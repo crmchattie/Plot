@@ -28,17 +28,19 @@ class EKPlotTaskOp: AsyncOperation {
             self.finish()
             return
         }
-        // @FIX-ME remove in four months from 2/6/21 since we can check for calendar export property on activities
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
             if let activityID = activity.activityID {
                 dispatchGroup.enter()
-                if let reminder = eventKitService.storeReminder(for: activity) {
+                if let _ = activity.externalActivityID {
+                    eventKitService.updateReminder(for: activity)
+                    dispatchGroup.leave()
+                } else if let reminder = eventKitService.storeReminder(for: activity) {
                     let reminderTaskActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                     reference.child(reminder.calendarItemIdentifier).updateChildValues(reminderTaskActivityValue) { (_, _) in
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": reminder.calendarItemIdentifier as Any]
+                        let values:[String : Any] = ["externalActivityID": reminder.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
                         dispatchGroup.leave()
                     }
