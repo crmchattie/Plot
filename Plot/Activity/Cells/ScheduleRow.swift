@@ -105,12 +105,8 @@ final class ScheduleCell: Cell<Activity>, CellType {
         dateTimeLabel.text = formattedDate.0 + formattedDate.1
         if let locationName = schedule.locationName, locationName != "locationName" {
             locationNameLabel.text = schedule.locationName
-            dateTimeLabel.isHidden = false
-        } else {
-            locationNameLabel.text = nil
-            dateTimeLabel.isHidden = true
+            locationNameLabel.isHidden = false
         }
-        
         
         if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)

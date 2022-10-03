@@ -95,11 +95,7 @@ final class SubtaskCell: Cell<Activity>, CellType {
         dateTimeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         dateTimeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         dateTimeLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.leftAnchor, constant: -5).isActive = true
-                        
-        locationNameLabel.topAnchor.constraint(equalTo: dateTimeLabel.bottomAnchor, constant: 2).isActive = true
-        locationNameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
-        locationNameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
-        locationNameLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.leftAnchor, constant: -5).isActive = true
+        dateTimeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         
         checkView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
         checkView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0).isActive = true
@@ -130,18 +126,6 @@ final class SubtaskCell: Cell<Activity>, CellType {
             } else {
                 dateTimeLabel.text = formattedDate.1 + formattedDate.2
             }
-        } else {
-            dateTimeLabel.text = nil
-            dateTimeLabel.isHidden = true
-        }
-        
-        // set the texts to the labels
-        if let locationName = subtask.locationName, locationName != "locationName" {
-            locationNameLabel.text = subtask.locationName
-            dateTimeLabel.isHidden = false
-        } else {
-            locationNameLabel.text = nil
-            dateTimeLabel.isHidden = true
         }
         
         let image = subtask.isCompleted ?? false ? "checkmark.circle" : "circle"

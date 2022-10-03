@@ -163,16 +163,14 @@ class EventBuilder {
         activity.activityDescription = template.description
         
         if let startDate = template.getStartDate(), let endDate = template.getEndDate() {
+            activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
             if let frequency = template.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
                 var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
                 recurrenceRule.startDate = startDate
                 recurrenceRule.interval = template.interval ?? 1
                 activity.recurrences = [recurrenceRule.toRRuleString()]
             }
-            
-            activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
-            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
-            
         }
         
         activity.startTimeZone = TimeZone.current.identifier
@@ -201,7 +199,6 @@ class EventBuilder {
         activity.activityDescription = subtemplate.description
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        
         if let startDate = subtemplate.getStartDate(), let endDate = subtemplate.getEndDate() {
             activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
             activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
@@ -349,19 +346,13 @@ class TaskBuilder {
         activity.activityDescription = template.description
         
         if let endDate = template.getEndDate() {
+            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
             if let frequency = template.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
-                print(recurrenceFrequency)
                 var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
                 recurrenceRule.startDate = endDate
                 recurrenceRule.interval = template.interval ?? 1
-                print(recurrenceRule.toRRuleString())
                 activity.recurrences = [recurrenceRule.toRRuleString()]
             }
-            
-            if let startDate = template.getStartDate() {
-                activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
-            }
-            activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
         }
         
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -385,9 +376,6 @@ class TaskBuilder {
         activity.category = subtemplate.category.rawValue
         activity.subcategory = subtemplate.subcategory.rawValue
         activity.activityDescription = subtemplate.description
-        if let startDate = subtemplate.getStartDate() {
-            activity.startDateTime = NSNumber(value: Int(startDate.timeIntervalSince1970))
-        }
         if let endDate = subtemplate.getEndDate() {
             activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
         }
