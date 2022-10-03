@@ -232,6 +232,8 @@ class ActivityService {
     
     func grabActivities(_ completion: @escaping () -> Void) {
         self.observeActivitiesForCurrentUser({
+            self.observeCalendarsForCurrentUser()
+            self.observeListsForCurrentUser()
             if self.isRunning {
                 completion()
                 self.grabOtherActivities()
@@ -254,7 +256,6 @@ class ActivityService {
             } else {
                 self.hasLoadedListTaskActivities = true
             }
-            self.observeListsForCurrentUser()
             self.grabLists()
         })
         self.grabPrimaryCalendar({ (calendar) in
@@ -269,7 +270,6 @@ class ActivityService {
             } else {
                 self.hasLoadedCalendarEventActivities = true
             }
-            self.observeCalendarsForCurrentUser()
             self.grabCalendars()
         })
         self.saveDataToSharedContainer(activities: self.activities)

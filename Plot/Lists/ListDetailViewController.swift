@@ -85,16 +85,14 @@ class ListDetailViewController: FormViewController {
                 let dotsImage = UIImage(named: "dots")
                 let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
                 navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
-                if navigationItem.leftBarButtonItem != nil {
-                    navigationItem.leftBarButtonItem?.action = #selector(cancel)
-                }
             } else {
                 let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
                 navigationItem.rightBarButtonItem = addBarButton
-                if navigationItem.leftBarButtonItem != nil {
-                    navigationItem.leftBarButtonItem?.action = #selector(cancel)
-                }
             }
+            if navigationItem.leftBarButtonItem != nil {
+                navigationItem.leftBarButtonItem?.action = #selector(cancel)
+            }
+
         }
     }
     

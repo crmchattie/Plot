@@ -70,8 +70,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     application,
                     didFinishLaunchingWithOptions: launchOptions
                 )
-                
+                        
         return true
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
+            masterController.openNotification()
+        }
     }
     
     func application(
@@ -174,7 +180,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func getNotificationSettings() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            print("Notification settings: \(settings)")
             guard settings.authorizationStatus == .authorized else { return }
             DispatchQueue.main.async {
                 UIApplication.shared.registerForRemoteNotifications()
@@ -329,6 +334,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 notifications.append(contentsOf: items)
             }
         }
+//        do {
+//            let data = try Data(contentsOf: URL.init(fileURLWithPath: notificationsArchivePath))
+//            let items = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSObject.self], from: data) as! [PLNotification]
+//            if notifications.count == 0 {
+//                notifications = items
+//            } else {
+//                notifications.append(contentsOf: items)
+//            }
+//        }
+//        catch let error {
+//            print("unarchiveObject(withFile:) \(error.localizedDescription)")
+//            
+//        }
     }
 }
 
@@ -341,12 +359,21 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let value = userInfo as! [String : Any]
         if let object = try? DictionaryDecoder().decode(PLNotification.self, from: value) {
             notifications.insert(object, at: 0)
-            if notifications.count > 20 {
-                notifications.removeLast()
-            }
+//            if notifications.count > 20 {
+//                notifications.removeLast()
+//            }
         }
         
         _ = NSKeyedArchiver.archiveRootObject(notifications, toFile: notificationsArchivePath)
+
+        
+//        do {
+//            let dataToBeArchived = try NSKeyedArchiver.archivedData(withRootObject: notifications, requiringSecureCoding: true)
+//            try dataToBeArchived.write(to: URL.init(fileURLWithPath: notificationsArchivePath))
+//        }
+//        catch let error {
+//            print("archiveObject(toFile:) \(error.localizedDescription)")
+//        }
         
         NotificationCenter.default.post(name: .userNotification, object: nil)
     }
@@ -362,7 +389,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         saveUserNotification(notification: response.notification)
         
         // 2
-        if let _ = userInfo["aps"] as? [String: AnyObject] {
+        if let notification = try? DictionaryDecoder().decode(PLNotification.self, from: userInfo) {
             switch response.actionIdentifier {
 //            case Identifiers.viewChatsAction:
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
@@ -371,147 +398,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //            case Identifiers.viewListsAction:
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
-                if let ID = userInfo["objectID"] as? String, let aps = userInfo["aps"] as? [String: AnyObject], let category = aps["category"] as? String {
-                    if category == Identifiers.eventCategory {
-                        ActivitiesFetcher.getDataFromSnapshot(ID: ID) { activities in
-                            if let activity = activities.first {
-                                ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-                                    ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                                        if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                            let destination = EventViewController(networkController: masterController.networkController)
-                                            destination.acceptedParticipant = acceptedParticipant
-                                            destination.selectedFalconUsers = participants
-                                            destination.activity = activity
-                                            destination.hidesBottomBarWhenPushed = true
-                                            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                            destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                            let navigationViewController = UINavigationController(rootViewController: destination)
-                                            masterController.present(navigationViewController, animated: true)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if category == Identifiers.taskCategory {
-                        ActivitiesFetcher.getDataFromSnapshot(ID: ID) { activities in
-                            if let activity = activities.first {
-                                ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-                                    if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                        let destination = TaskViewController(networkController: masterController.networkController)
-                                        destination.selectedFalconUsers = participants
-                                        destination.task = activity
-                                        destination.hidesBottomBarWhenPushed = true
-                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                        let navigationViewController = UINavigationController(rootViewController: destination)
-                                        masterController.present(navigationViewController, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    } else if category == Identifiers.workoutCategory {
-                        WorkoutFetcher.getDataFromSnapshot(ID: ID) { workouts in
-                            if let workout = workouts.first {
-                                ParticipantsFetcher.getParticipants(forWorkout: workout) { (participants) in
-                                    if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                        let destination = WorkoutViewController(networkController: masterController.networkController)
-                                        destination.selectedFalconUsers = participants
-                                        destination.workout = workout
-                                        destination.hidesBottomBarWhenPushed = true
-                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                        let navigationViewController = UINavigationController(rootViewController: destination)
-                                        masterController.present(navigationViewController, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    } else if category == Identifiers.mindfulnessCategory {
-                        MindfulnessFetcher.getDataFromSnapshot(ID: ID) { mindfulnesses in
-                            if let mindfulness = mindfulnesses.first {
-                                ParticipantsFetcher.getParticipants(forMindfulness: mindfulness) { (participants) in
-                                    if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                        let destination = MindfulnessViewController(networkController: masterController.networkController)
-                                        destination.selectedFalconUsers = participants
-                                        destination.mindfulness = mindfulness
-                                        destination.hidesBottomBarWhenPushed = true
-                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                        let navigationViewController = UINavigationController(rootViewController: destination)
-                                        masterController.present(navigationViewController, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    } else if category == Identifiers.transactionCategory {
-                        FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { transactions in
-                            if let transaction = transactions.first {
-                                ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
-                                    if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                        let destination = FinanceTransactionViewController(networkController: masterController.networkController)
-                                        destination.selectedFalconUsers = participants
-                                        destination.transaction = transaction
-                                        destination.hidesBottomBarWhenPushed = true
-                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                        let navigationViewController = UINavigationController(rootViewController: destination)
-                                        masterController.present(navigationViewController, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    } else if category == Identifiers.accountCategory {
-                        FinancialAccountFetcher.getDataFromSnapshot(ID: ID) { accounts in
-                            if let account = accounts.first {
-                                ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
-                                    if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                        let destination = FinanceAccountViewController(networkController: masterController.networkController)
-                                        destination.selectedFalconUsers = participants
-                                        destination.account = account
-                                        destination.hidesBottomBarWhenPushed = true
-                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                        let navigationViewController = UINavigationController(rootViewController: destination)
-                                        masterController.present(navigationViewController, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    } else if category == Identifiers.listCategory {
-                        ListFetcher.getDataFromSnapshot(ID: ID) { lists in
-                            if let list = lists.first {
-                                ParticipantsFetcher.getParticipants(forList: list) { (participants) in
-                                    if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                        let destination = ListDetailViewController(networkController: masterController.networkController)
-                                        destination.selectedFalconUsers = participants
-                                        destination.list = list
-                                        destination.hidesBottomBarWhenPushed = true
-                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                        let navigationViewController = UINavigationController(rootViewController: destination)
-                                        masterController.present(navigationViewController, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    } else if category == Identifiers.calendarCategory {
-                        CalendarFetcher.getDataFromSnapshot(ID: ID) { calendars in
-                            if let calendar = calendars.first {
-                                ParticipantsFetcher.getParticipants(forCalendar: calendar) { (participants) in
-                                    if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                                        let destination = CalendarDetailViewController(networkController: masterController.networkController)
-                                        destination.selectedFalconUsers = participants
-                                        destination.calendar = calendar
-                                        destination.hidesBottomBarWhenPushed = true
-                                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                                        let navigationViewController = UINavigationController(rootViewController: destination)
-                                        masterController.present(navigationViewController, animated: true)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
+                    masterController.notification = notification
                 }
             }
         }

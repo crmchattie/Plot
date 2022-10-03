@@ -190,9 +190,6 @@ class TaskViewController: FormViewController {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = false
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
         } else if delegate != nil {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
@@ -204,6 +201,10 @@ class TaskViewController: FormViewController {
             navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
+
     }
     
     fileprivate func initializeForm() {

@@ -105,9 +105,6 @@ class ScheduleViewController: FormViewController {
         if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
             navigationItem.rightBarButtonItem = plusBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
         } else {
             if let localName = schedule.locationName, localName != "locationName" {
                 let dotsImage = UIImage(named: "dots")
@@ -120,6 +117,10 @@ class ScheduleViewController: FormViewController {
             }
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
+
         navigationOptions = .Disabled
         
     }
@@ -863,7 +864,7 @@ class ScheduleViewController: FormViewController {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
         
         membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
         membersIDs.append(currentUserID)
@@ -874,7 +875,7 @@ class ScheduleViewController: FormViewController {
             membersIDs.append(id)
         }
         
-        return (membersIDs, membersIDsDictionary)
+        return (membersIDs.sorted(), membersIDsDictionary)
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {

@@ -99,13 +99,13 @@ class SubtaskViewController: FormViewController {
         if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonTapped))
             navigationItem.rightBarButtonItem = plusBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
         } else {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightBarButtonTapped))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = true
+        }
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
         navigationOptions = .Disabled
     }
@@ -1074,7 +1074,7 @@ class SubtaskViewController: FormViewController {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
         
         membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
         membersIDs.append(currentUserID)
@@ -1085,7 +1085,7 @@ class SubtaskViewController: FormViewController {
             membersIDs.append(id)
         }
         
-        return (membersIDs, membersIDsDictionary)
+        return (membersIDs.sorted(), membersIDsDictionary)
     }
 
 }

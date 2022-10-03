@@ -115,10 +115,10 @@ class ChecklistActions: NSObject {
         var membersIDsDictionary = [String:AnyObject]()
         
         guard let _ = checklist, let selectedFalconUsers = selectedFalconUsers else {
-            return (membersIDs, membersIDsDictionary)
+            return (membersIDs.sorted(), membersIDsDictionary)
         }
         
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
         
         membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
         membersIDs.append(currentUserID)
@@ -129,7 +129,7 @@ class ChecklistActions: NSObject {
             membersIDs.append(id)
         }
         
-        return (membersIDs, membersIDsDictionary)
+        return (membersIDs.sorted(), membersIDsDictionary)
     }
     
     func connectMembersToGroupChecklist(memberIDs: [String], ID: String) {

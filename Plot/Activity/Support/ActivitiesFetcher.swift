@@ -69,6 +69,7 @@ class ActivitiesFetcher: NSObject {
                                 activity.userCompletedDate = userActivity.userCompletedDate
                                 activity.reminder = userActivity.reminder
                                 activity.badge = userActivity.badge
+                                activity.badgeDate = userActivity.badgeDate
                                 activity.muted = userActivity.muted
                                 activity.pinned = userActivity.pinned
                                 if counter > 0 {
@@ -117,6 +118,7 @@ class ActivitiesFetcher: NSObject {
                                     activity.userCompletedDate = userActivity.userCompletedDate
                                     activity.reminder = userActivity.reminder
                                     activity.badge = userActivity.badge
+                                    activity.badgeDate = userActivity.badgeDate
                                     activity.muted = userActivity.muted
                                     activity.pinned = userActivity.pinned
                                     completion([activity])
@@ -151,6 +153,7 @@ class ActivitiesFetcher: NSObject {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
+        
         let ref = Database.database().reference()
         var activities: [Activity] = []
         let group = DispatchGroup()
@@ -172,6 +175,7 @@ class ActivitiesFetcher: NSObject {
                         activity.userCompletedDate = userActivity.userCompletedDate
                         activity.reminder = userActivity.reminder
                         activity.badge = userActivity.badge
+                        activity.badgeDate = userActivity.badgeDate
                         activity.muted = userActivity.muted
                         activity.pinned = userActivity.pinned
                         activities.append(activity)

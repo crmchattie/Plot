@@ -131,14 +131,15 @@ class MindfulnessViewController: FormViewController {
         if !active {
             let plusBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = plusBarButton
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
         } else {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = plusBarButton
             navigationItem.rightBarButtonItem?.isEnabled = true
         }
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
+
     }
     
     @IBAction func cancel(_ sender: AnyObject) {

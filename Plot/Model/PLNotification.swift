@@ -157,11 +157,13 @@ class Aps: NSObject, Codable, NSCoding {
     let alert: Alert
     let badge: Int?
     let category: String
+    let date: Int?
     
     enum CodingKeys: String, CodingKey {
         case alert
         case badge
         case category
+        case date
     }
     
     required convenience init?(coder decoder: NSCoder) {
@@ -171,24 +173,28 @@ class Aps: NSObject, Codable, NSCoding {
         }
         
         let badge = decoder.decodeObject(forKey: CodingKeys.badge.rawValue) as? Int
+        let date = decoder.decodeObject(forKey: CodingKeys.date.rawValue) as? Int
         
         self.init(
             alert: alert,
             badge: badge,
-            category: category
+            category: category,
+            date: date
         )
     }
     
-    init(alert: Alert, badge: Int?, category: String) {
+    init(alert: Alert, badge: Int?, category: String, date: Int?) {
         self.alert = alert
         self.badge = badge
         self.category = category
+        self.date = date
     }
     
     func encode(with coder: NSCoder) {
         coder.encode(self.alert, forKey: CodingKeys.alert.rawValue)
         coder.encode(self.badge, forKey: CodingKeys.badge.rawValue)
         coder.encode(self.category, forKey: CodingKeys.category.rawValue)
+        coder.encode(self.date, forKey: CodingKeys.date.rawValue)
     }
 }
 

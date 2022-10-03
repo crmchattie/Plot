@@ -351,7 +351,7 @@ class ActivityActions: NSObject {
         var membersIDsDictionary = [String:AnyObject]()
         
         guard let _ = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
-            return (membersIDs, membersIDsDictionary)
+            return (membersIDs.sorted(), membersIDsDictionary)
         }
                         
         membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
@@ -363,7 +363,7 @@ class ActivityActions: NSObject {
             membersIDs.append(id)
         }
         
-        return (membersIDs, membersIDsDictionary)
+        return (membersIDs.sorted(), membersIDsDictionary)
     }
     
     func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
@@ -509,21 +509,31 @@ class ActivityActions: NSObject {
     }
 
     func runActivityBadgeUpdate(firstChild: String, secondChild: String) {
+        guard let activity = activity else {
+            return
+        }
         var ref = Database.database().reference().child(userActivitiesEntity).child(firstChild).child(secondChild)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
-            
-            guard snapshot.hasChild(messageMetaDataFirebaseFolder) else {
-                ref = ref.child(messageMetaDataFirebaseFolder)
-                ref.updateChildValues(["badge": 1])
-                return
+            if activity.recurrences != nil {
+                ref = ref.child(messageMetaDataFirebaseFolder).child("badgeDate")
+                ref.runTransactionBlock({ (mutableData) -> TransactionResult in
+                    var value = mutableData.value as? [NSNumber: Int]
+                    if value == nil, let finalDateTime = activity.finalDateTime {
+                        value = [finalDateTime: 1]
+                    } else if let finalDateTime = activity.finalDateTime {
+                        value![finalDateTime] = 1
+                    }
+                    mutableData.value = value
+                    return TransactionResult.success(withValue: mutableData)
+                })
+            } else {
+                ref = ref.child(messageMetaDataFirebaseFolder).child("badge")
+                ref.runTransactionBlock({ (mutableData) -> TransactionResult in
+                    let value = mutableData.value as? Int
+                    mutableData.value = value ?? 0 + 1
+                    return TransactionResult.success(withValue: mutableData)
+                })
             }
-            ref = ref.child(messageMetaDataFirebaseFolder).child("badge")
-            ref.runTransactionBlock({ (mutableData) -> TransactionResult in
-                var value = mutableData.value as? Int
-                if value == nil { value = 0 }
-                mutableData.value = value! + 1
-                return TransactionResult.success(withValue: mutableData)
-            })
         })
     }
 }

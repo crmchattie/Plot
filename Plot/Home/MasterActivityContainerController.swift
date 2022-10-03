@@ -89,6 +89,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var transactionsDictionary = [TransactionDetails: [Transaction]]()
     var accountsDictionary = [AccountDetails: [MXAccount]]()
     
+    var notification: PLNotification?
+    
     var participants: [String: [User]] = [:]
     
     var isNewUser: Bool = true
@@ -153,7 +155,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         }
         onceToken = 1
         managePresense()
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -163,7 +164,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             self.networkController.userService.grabContacts()
         }
     }
-
+    
     func setupViews() {
         navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
         navigationController?.navigationBar.layoutIfNeeded()
@@ -592,7 +593,7 @@ extension MasterActivityContainerController {
     }
     
     @objc func goToNotifications() {
-        let destination = NotificationsViewController()
+        let destination = NotificationsViewController(networkController: networkController)
 //        destination.notificationActivities = networkController.activityService.events
 //        destination.invitedActivities = networkController.activityService.invitedActivities
 //        destination.invitations = networkController.activityService.invitations

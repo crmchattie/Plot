@@ -152,10 +152,10 @@ class MindfulnessActions: NSObject {
         var membersIDsDictionary = [String:AnyObject]()
         
         guard let _ = mindfulness, let selectedFalconUsers = selectedFalconUsers else {
-            return (membersIDs, membersIDsDictionary)
+            return (membersIDs.sorted(), membersIDsDictionary)
         }
         
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs, membersIDsDictionary) }
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
         
         membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
         membersIDs.append(currentUserID)
@@ -166,7 +166,7 @@ class MindfulnessActions: NSObject {
             membersIDs.append(id)
         }
         
-        return (membersIDs, membersIDsDictionary)
+        return (membersIDs.sorted(), membersIDsDictionary)
     }
     
     func connectMembersToGroupMindfulness(memberIDs: [String], ID: String) {

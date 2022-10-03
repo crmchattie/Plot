@@ -73,7 +73,6 @@ class ContainerFunctions {
     
     class func updateParticipants(containerID: String, selectedFalconUsers: [User]) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {return}
-        
         let dataReference = Database.database().reference().child(containerEntity).child(containerID)
         dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let snapshotValue = snapshot.value, let container = try? FirebaseDecoder().decode(Container.self, from: snapshotValue) {
@@ -81,11 +80,10 @@ class ContainerFunctions {
                 membersIDs.append(currentUserID)
                 for selectedUser in selectedFalconUsers {
                     guard let id = selectedUser.id else { continue }
-                    print(id)
                     membersIDs.append(id)
                 }
                 let reference = Database.database().reference()
-                reference.child(containerEntity).child(container.id).updateChildValues(["participantsIDs": membersIDs as AnyObject])
+                reference.child(containerEntity).child(container.id).updateChildValues(["participantsIDs": membersIDs.sorted() as AnyObject])
                 
                 for activityID in container.activityIDs ?? [] {
                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in
