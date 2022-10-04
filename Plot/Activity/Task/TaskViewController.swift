@@ -104,6 +104,8 @@ class TaskViewController: FormViewController {
             if task.activityID != nil {
                 activityID = task.activityID!
                 print(activityID)
+                print(task.instanceID)
+                print(task.instanceIDs)
             }
             if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 task.admin = currentUserID

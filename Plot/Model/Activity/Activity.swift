@@ -472,7 +472,6 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["lastModifiedDate"] = value
         }
         
-        
         //list is activity attribute vs. user attribute unlike calendar
         if let value = self.listID as AnyObject? {
             dictionary["listID"] = value

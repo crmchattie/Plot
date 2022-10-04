@@ -201,16 +201,34 @@ class ActivitiesFetcher: NSObject {
         let ref = Database.database().reference()
         var activities: [Date: Activity] = [:]
         let group = DispatchGroup()
+        var counter = 0
         for ID in IDs {
+            var handle = UInt.max
             group.enter()
-            ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
+            counter += 1
+            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value, with: { activitySnapshot in
+                ref.removeObserver(withHandle: handle)
                 if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
                     let activity = Activity(dictionary: activitySnapshotValue)
-                    if let instanceOriginalStartDate = activity.instanceOriginalStartDate {
-                        activities[instanceOriginalStartDate] = activity
+                    if counter > 0 {
+                        if let instanceOriginalStartDate = activity.instanceOriginalStartDate {
+                            activities[instanceOriginalStartDate] = activity
+                        }
+                        group.leave()
+                        counter -= 1
+                    } else {
+                        if let instanceOriginalStartDate = activity.instanceOriginalStartDate {
+                            activities = [:]
+                            activities[instanceOriginalStartDate] = activity
+                            completion(activities)
+                        }
+                    }
+                } else {
+                    if counter > 0 {
+                        group.leave()
+                        counter -= 1
                     }
                 }
-                group.leave()
             })
         }
         

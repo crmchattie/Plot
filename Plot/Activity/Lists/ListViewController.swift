@@ -44,6 +44,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     var participants: [String: [User]] = [:]
     
     var showCompletedTasks: Bool = true
+    var showRecurringTasks: Bool = true
     var taskSort: String = "Due Date"
     var filters: [filter] = [.search, .taskSort, .showCompletedTasks, .taskCategory]
     var filterDictionary = [String: [String]]()
@@ -53,6 +54,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
                 
         view.backgroundColor = .systemBackground
         
+        showRecurringTasks = getShowRecurringTasksBool()
         showCompletedTasks = getShowCompletedTasksBool()
         taskSort = getSortTasks()
         
@@ -68,18 +70,23 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksNoRepeatsUpdated), name: .tasksNoRepeatsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
     }
     
-    @objc fileprivate func tasksNoRepeatsUpdated() {
+    @objc fileprivate func tasksUpdated() {
         sortandreload()
     }
     
     func sortandreload() {
-        for task in networkTasks {
-            if !tasks.contains(where: {$0.activityID == task.activityID}) {
-                tasks.append(task)
+        if showRecurringTasks {
+            tasks = networkTasks
+        } else {
+            tasks = []
+            for task in networkTasks {
+                if !tasks.contains(where: {$0.activityID == task.activityID}) {
+                    tasks.append(task)
+                }
             }
         }
         
@@ -242,6 +249,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     func saveUserDefaults() {
         UserDefaults.standard.setValue(taskSort, forKey: kTaskSort)
         UserDefaults.standard.setValue(showCompletedTasks, forKey: kShowCompletedTasks)
+        UserDefaults.standard.setValue(showRecurringTasks, forKey: kShowRecurringTasks)
     }
     
     func getShowCompletedTasksBool() -> Bool {
@@ -249,6 +257,14 @@ class ListViewController: UIViewController, ObjectDetailShowing {
             return value
         } else {
             return true
+        }
+    }
+    
+    func getShowRecurringTasksBool() -> Bool {
+        if let value = UserDefaults.standard.value(forKey: kShowRecurringTasks) as? Bool {
+            return value
+        } else {
+            return false
         }
     }
     
@@ -432,50 +448,71 @@ extension ListViewController: UpdateFilter {
     }
     
     func updateTableViewWFilters() {
-        let dispatchGroup = DispatchGroup()
-        if let value = filterDictionary["showCompletedTasks"] {
-            dispatchGroup.enter()
-            let bool = value[0].lowercased()
-            if bool == "yes" {
-                filteredTasks = tasks
-                self.showCompletedTasks = true
-            } else {
-                filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
-                self.showCompletedTasks = false
+        if filterDictionary.isEmpty {
+            sortandreload()
+        } else {
+            let dispatchGroup = DispatchGroup()
+            if let value = filterDictionary["showRecurringTasks"] {
+                dispatchGroup.enter()
+                let bool = value[0].lowercased()
+                if bool == "yes" {
+                    tasks = networkTasks
+                    self.showRecurringTasks = true
+                } else {
+                    tasks = []
+                    for task in networkTasks {
+                        if !tasks.contains(where: {$0.activityID == task.activityID}) {
+                            tasks.append(task)
+                        }
+                    }
+                    self.showRecurringTasks = false
+                }
+                dispatchGroup.leave()
             }
-            dispatchGroup.leave()
-        }
-        if let value = filterDictionary["search"] {
-            dispatchGroup.enter()
-            let searchText = value[0]
-            filteredTasks = filteredTasks.filter({ (task) -> Bool in
-                if let name = task.name {
-                    return name.lowercased().contains(searchText.lowercased())
+            if let value = filterDictionary["showCompletedTasks"] {
+                dispatchGroup.enter()
+                let bool = value[0].lowercased()
+                if bool == "yes" {
+                    filteredTasks = tasks
+                    self.showCompletedTasks = true
+                } else {
+                    filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+                    self.showCompletedTasks = false
                 }
-                return ("").lowercased().contains(searchText.lowercased())
-            })
-            dispatchGroup.leave()
-        }
-        if let categories = filterDictionary["taskCategory"] {
-            dispatchGroup.enter()
-            filteredTasks = filteredTasks.filter({ (task) -> Bool in
-                if let category = task.category {
-                    return categories.contains(category)
-                }
-                return false
-            })
-            dispatchGroup.leave()
-        }
-        if let value = filterDictionary["taskSort"] {
-            let sort = value[0]
-            self.taskSort = sort
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            self.sortTasks()
-            self.tableView.reloadData()
-            self.tableView.layoutIfNeeded()
-            self.saveUserDefaults()
+                dispatchGroup.leave()
+            }
+            if let value = filterDictionary["search"] {
+                dispatchGroup.enter()
+                let searchText = value[0]
+                filteredTasks = filteredTasks.filter({ (task) -> Bool in
+                    if let name = task.name {
+                        return name.lowercased().contains(searchText.lowercased())
+                    }
+                    return ("").lowercased().contains(searchText.lowercased())
+                })
+                dispatchGroup.leave()
+            }
+            if let categories = filterDictionary["taskCategory"] {
+                dispatchGroup.enter()
+                filteredTasks = filteredTasks.filter({ (task) -> Bool in
+                    if let category = task.category {
+                        return categories.contains(category)
+                    }
+                    return false
+                })
+                dispatchGroup.leave()
+            }
+            if let value = filterDictionary["taskSort"] {
+                let sort = value[0]
+                self.taskSort = sort
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                self.sortTasks()
+                self.tableView.reloadData()
+                self.tableView.layoutIfNeeded()
+                self.saveUserDefaults()
+            }
         }
     }
 }

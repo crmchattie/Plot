@@ -140,9 +140,11 @@ extension TaskCollectionCell {
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         if let badge = task.badge, badge > 0 {
+            print(task.badgeDate)
             badgeLabel.text = String(badge)
             badgeLabel.isHidden = false
         } else if let badgeDate = task.badgeDate, let finalDateTime = task.finalDateTime, let badge = badgeDate[String(describing: finalDateTime)] {
+            print(task.badge)
             badgeLabel.text = String(badge)
             badgeLabel.isHidden = false
         } else {

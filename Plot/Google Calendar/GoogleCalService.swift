@@ -102,14 +102,6 @@ class GoogleCalService {
                     print("Failed to save google calendar event with error : \(String(describing: error))")
                 }
             })
-        } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
-            UserDefaults.standard.set(value, forKey: "PlotGoogleCalendar")
-            let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: value)
-            service.executeQuery(query, completionHandler: { (ticket, result, error) in
-                if error != nil {
-                    print("Failed to save google calendar event with error : \(String(describing: error))")
-                }
-            })
         } else {
             createPlotCalendar { (identifier) in
                 if let value = identifier {

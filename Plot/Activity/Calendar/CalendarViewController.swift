@@ -413,8 +413,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let date = selectedDate
         var index = 0
         var activityFound = false
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         for activity in self.filteredActivities {
             if let endDate = activity.endDateWTZ {
                 if date < endDate {

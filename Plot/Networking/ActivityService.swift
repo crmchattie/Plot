@@ -38,11 +38,17 @@ class ActivityService {
                 eventsNoRepeats = activities.filter { $0.isTask == nil }
                 tasksNoRepeats = activities.filter { $0.isTask ?? false }
                 addRepeatingActivities(activities: activities) { activities in
-                    self.events = activities.filter { $0.isTask == nil }
-                    self.tasks = activities.filter { $0.isTask ?? false }
-                    self.calendarActivities = activities.filter { $0.finalDate != nil }
+                    self.activitiesWithRepeats = activities
                 }
             }
+        }
+    }
+    
+    var activitiesWithRepeats = [Activity]() {
+        didSet {
+            self.events = activitiesWithRepeats.filter { $0.isTask == nil }
+            self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
+            self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil }
         }
     }
     
@@ -740,13 +746,27 @@ extension ActivityService {
         let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
         var newActivities = [Activity]()
         let group = DispatchGroup()
+        var counter = 0
         for activity in activities {
             group.enter()
+            counter += 1
             // Handles recurring events.
             if let rules = activity.recurrences, !rules.isEmpty {
                 if activity.isTask ?? false {
                     if let instanceIDs = activity.instanceIDs {
                         ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                            guard counter > 0 else {
+                                for (_, instanceActivity) in activities {
+                                    if let index = self.activitiesWithRepeats.firstIndex(where: {$0.instanceID == activity.instanceID}) {
+                                        let newActivity = self.activitiesWithRepeats[index]
+                                        newActivity.isCompleted = instanceActivity.isCompleted
+                                        newActivity.completedDate = instanceActivity.completedDate
+                                        newActivity.instanceID = instanceActivity.instanceID
+                                        self.activitiesWithRepeats[index] = newActivity
+                                    }
+                                }
+                                return
+                            }
                             let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
                             let dates = iCalUtility()
                                 .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
@@ -767,6 +787,7 @@ extension ActivityService {
                                 }
                             }
                             group.leave()
+                            counter -= 1
                         }
                     } else {
                         let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
@@ -779,10 +800,23 @@ extension ActivityService {
                             newActivities.append(newActivity)
                         }
                         group.leave()
+                        counter -= 1
                     }
                 } else {
                     if let instanceIDs = activity.instanceIDs {
                         ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                            guard counter > 0 else {
+                                for (_, instanceActivity) in activities {
+                                    if let index = self.activitiesWithRepeats.firstIndex(where: {$0.instanceID == activity.instanceID}) {
+                                        let newActivity = self.activitiesWithRepeats[index]
+                                        newActivity.isCompleted = instanceActivity.isCompleted
+                                        newActivity.completedDate = instanceActivity.completedDate
+                                        newActivity.instanceID = instanceActivity.instanceID
+                                        self.activitiesWithRepeats[index] = newActivity
+                                    }
+                                }
+                                return
+                            }
                             let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
                             let dates = iCalUtility()
                                 .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
@@ -807,6 +841,7 @@ extension ActivityService {
                                 }
                             }
                             group.leave()
+                            counter -= 1
                         }
                     } else {
                         let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
@@ -821,15 +856,18 @@ extension ActivityService {
                             newActivities.append(newActivity)
                         }
                         group.leave()
+                        counter -= 1
                     }
                 }
             } else {
                 newActivities.append(activity)
                 group.leave()
+                counter -= 1
             }
         }
         
         group.notify(queue: .main) {
+            print("completion")
             completion(newActivities)
         }
     }

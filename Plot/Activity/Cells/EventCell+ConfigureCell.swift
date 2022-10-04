@@ -58,8 +58,6 @@ extension EventCell {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
         
-        print(activity.badge)
-        print(activity.badgeDate)
         if let badge = activity.badge, badge > 0 {
             badgeLabel.text = String(badge)
             badgeLabel.isHidden = false

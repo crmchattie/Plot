@@ -341,6 +341,9 @@ class ActivityActions: NSObject {
             return
         }
         
+        print("instanceIDDD")
+        print(activity.instanceID)
+        
         var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
         var instanceIDs = activity.instanceIDs ?? []
         if let instance = activity.instanceID {
@@ -362,11 +365,11 @@ class ActivityActions: NSObject {
         updateInstanceValues["participantsIDs"] = activity.participantsIDs?.sorted()
         
         let groupInstanceActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)
-        groupInstanceActivityReference.updateChildValues(updateInstanceValues)
-        
-        let groupRecurringActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-        let recurringValues: [String : Any] = ["instanceIDs": instanceIDs as Any]
-        groupRecurringActivityReference.updateChildValues(recurringValues)
+        groupInstanceActivityReference.updateChildValues(updateInstanceValues) { _,_ in
+            let groupRecurringActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+            let recurringValues: [String : Any] = ["instanceIDs": instanceIDs as Any]
+            groupRecurringActivityReference.updateChildValues(recurringValues)
+        }
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {

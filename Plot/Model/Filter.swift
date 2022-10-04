@@ -26,7 +26,7 @@ enum filter: String {
     //finance
     case financeAccount, financeLevel
     //task
-    case taskCategory, showCompletedTasks, taskSort
+    case taskCategory, showCompletedTasks, showRecurringTasks, taskSort
     
     var activity: String {
         switch self {
@@ -61,6 +61,7 @@ enum filter: String {
         case .financeLevel: return "Finance"
         case .taskCategory: return "Tasks"
         case .showCompletedTasks: return "Tasks"
+        case .showRecurringTasks: return "Tasks"
         case .taskSort: return "Tasks"
         }
     }
@@ -98,6 +99,7 @@ enum filter: String {
         case .financeLevel: return "single"
         case .taskCategory: return "multiple"
         case .showCompletedTasks: return "single"
+        case .showRecurringTasks: return "single"
         case .taskSort: return "single"
         }
     }
@@ -131,6 +133,7 @@ enum filter: String {
         case .financeLevel: return "Level"
         case .taskCategory: return "Categories"
         case .showCompletedTasks: return "Show"
+        case .showRecurringTasks: return "Show"
         case .taskSort: return "Sort"
         }
     }
@@ -163,7 +166,8 @@ enum filter: String {
         case .financeAccount: return "Filter based on account(s) included"
         case .financeLevel: return "Filter cash flow/balances sections based on level of detail shown"
         case .taskCategory: return "Filter based on categories"
-        case .showCompletedTasks: return "Show Completed Tasks"
+        case .showCompletedTasks: return "Show Completed Tasks or Not"
+        case .showRecurringTasks: return "Show Recurring Tasks or Not"
         case .taskSort: return "Sort Tasks"
         }
     }
@@ -204,6 +208,7 @@ enum filter: String {
             }
         case .taskCategory: return []
         case .showCompletedTasks: return ["Yes", "No"]
+        case .showRecurringTasks: return ["Yes", "No"]
         case .financeAccount: return []
         case .financeLevel: return ["All", "Top"]
         case .taskSort: return ["Due Date", "Priority", "Title"]
