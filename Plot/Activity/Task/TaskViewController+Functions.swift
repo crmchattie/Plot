@@ -669,15 +669,19 @@ extension TaskViewController {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                //update task's recurrence to skip repeat on this date
-                var oldActivityRule = oldRecurrenceRule
-                //duplicate updated task w/ new ID and no recurrence rule
-                self.duplicateActivity(recurrenceRule: nil)
-                //update existing task with exlusion date that fall's on this date
-                //FIX-ME: need to make sure oldActivityRule dates correspond to self.task.endDate
-                oldActivityRule.exdate = ExclusionDate(dates: [endDate], granularity: .day)
-                self.taskOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
-                self.updateRecurrences(recurrences: self.taskOld.recurrences!)
+                
+                let newActivity = self.task.getDifferenceBetweenActivities(otherActivity: self.taskOld)
+                let instanceValues = newActivity.toAnyObject()
+                print(instanceValues)
+                let createActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createActivity.updateInstance(instanceValues: instanceValues)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.delegate?.updateTask(task: self.task)
+                    self.navigationController?.popViewController(animated: true)
+                }
+                
             }))
             
             alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
@@ -988,11 +992,11 @@ extension TaskViewController {
         if self.task.recurrences != nil {
             let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badgeDate")
             badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
-                var value = mutableData.value as? [String: Int]
+                var value = mutableData.value as? [String: AnyObject]
                 if value == nil, let finalDateTime = self.task.finalDateTime {
-                    value = [String(describing: finalDateTime): 0]
+                    value = [String(describing: finalDateTime): NSNull()]
                 } else if let finalDateTime = self.task.finalDateTime {
-                    value![String(describing: finalDateTime)] = 0
+                    value![String(describing: finalDateTime)] = NSNull()
                 }
                 mutableData.value = value
                 return TransactionResult.success(withValue: mutableData)

@@ -842,14 +842,18 @@ extension EventViewController {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                //update activity's recurrence to skip repeat on this date
-                var oldActivityRule = oldRecurrenceRule
-                //duplicate updated activity w/ new ID and no recurrence rule
-                self.duplicateActivity(recurrenceRule: nil)
-                //update existing activity with exlusion date that fall's on this date
-                oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
-                self.activityOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
-                self.updateRecurrences(recurrences: self.activityOld.recurrences!)
+                
+                let newActivity = self.activity.getDifferenceBetweenActivities(otherActivity: self.activityOld)
+                let instanceValues = newActivity.toAnyObject()
+                let createActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createActivity.updateInstance(instanceValues: instanceValues)
+
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.delegate?.updateActivity(activity: self.activity)
+                    self.navigationController?.popViewController(animated: true)
+                }
             }))
             
             alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
@@ -1115,11 +1119,11 @@ extension EventViewController {
         if self.activity.recurrences != nil {
             let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badgeDate")
             badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
-                var value = mutableData.value as? [String: Int]
+                var value = mutableData.value as? [String: AnyObject]
                 if value == nil, let finalDateTime = self.activity.finalDateTime {
-                    value = [String(describing: finalDateTime): 0]
+                    value = [String(describing: finalDateTime): NSNull()]
                 } else if let finalDateTime = self.activity.finalDateTime {
-                    value![String(describing: finalDateTime)] = 0
+                    value![String(describing: finalDateTime)] = NSNull()
                 }
                 mutableData.value = value
                 return TransactionResult.success(withValue: mutableData)

@@ -472,7 +472,6 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["lastModifiedDate"] = value
         }
         
-        //list is activity attribute vs. user attribute unlike calendar
         if let value = self.listID as AnyObject? {
             dictionary["listID"] = value
         }
@@ -487,6 +486,22 @@ class Activity: NSObject, NSCopying, Codable {
 
         if let value = self.listSource as AnyObject? {
             dictionary["listSource"] = value
+        }
+        
+        if let value = self.calendarID as AnyObject? {
+            dictionary["calendarID"] = value
+        }
+
+        if let value = self.calendarName as AnyObject? {
+            dictionary["calendarName"] = value
+        }
+
+        if let value = self.calendarColor as AnyObject? {
+            dictionary["calendarColor"] = value
+        }
+
+        if let value = self.calendarSource as AnyObject? {
+            dictionary["calendarSource"] = value
         }
         
         if let value = self.subtaskIDs as AnyObject? {
@@ -525,7 +540,476 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["instanceIDs"] = value
         }
         
+        if let value = self.badge as AnyObject? {
+            dictionary["badge"] = value
+        }
+        
+        if let value = self.badgeDate as AnyObject? {
+            dictionary["badgeDate"] = value
+        }
+        
+        if let value = self.muted as AnyObject? {
+            dictionary["muted"] = value
+        }
+        
         return dictionary
+    }
+    
+    func updateActivityWActivity(updatingActivity: Activity) -> Activity {
+        let newActivity = self.copy() as! Activity
+        
+        if let value = updatingActivity.activityID {
+            newActivity.activityID = value
+        }
+        
+        if let value = updatingActivity.externalActivityID {
+            newActivity.externalActivityID = value
+        }
+        
+        if let value = updatingActivity.calendarExport {
+            newActivity.calendarExport = value
+        }
+        
+        if let value = updatingActivity.name {
+            newActivity.name = value
+        }
+        
+        if let value = updatingActivity.admin {
+            newActivity.admin = value
+        }
+        
+        if let value = updatingActivity.activityType {
+            newActivity.activityType = value
+        }
+        
+        if let value = updatingActivity.category {
+            newActivity.category = value
+        }
+        
+        if let value = updatingActivity.subcategory {
+            newActivity.subcategory = value
+        }
+        
+        if let value = updatingActivity.activityDescription {
+            newActivity.activityDescription = value
+        }
+        
+        if let value = updatingActivity.locationName {
+            newActivity.locationName = value
+        }
+        
+        if let value = updatingActivity.locationAddress {
+            newActivity.locationAddress = value
+        }
+        
+        if let value = updatingActivity.participantsIDs {
+            newActivity.participantsIDs = value
+        }
+        
+        if let value = updatingActivity.transportation {
+            newActivity.transportation = value
+        }
+        
+        if let value = updatingActivity.activityOriginalPhotoURL {
+            newActivity.activityOriginalPhotoURL = value
+        }
+        
+        if let value = updatingActivity.activityThumbnailPhotoURL {
+            newActivity.activityThumbnailPhotoURL = value
+        }
+        
+        if let value = updatingActivity.activityPhotos {
+            newActivity.activityPhotos = value
+        }
+        
+        if let value = updatingActivity.activityFiles {
+            newActivity.activityFiles = value
+        }
+        
+        if let value = updatingActivity.allDay {
+            newActivity.allDay = value
+        }
+        
+        if let value = updatingActivity.startDateTime {
+            newActivity.startDateTime = value
+        }
+        
+        if let value = updatingActivity.startTimeZone {
+            newActivity.startTimeZone = value
+        }
+        
+        if let value = updatingActivity.endDateTime {
+            newActivity.endDateTime = value
+        }
+        
+        if let value = updatingActivity.endTimeZone {
+            newActivity.endTimeZone = value
+        }
+        
+        if let value = updatingActivity.recurrences {
+            newActivity.recurrences = value
+        }
+        
+        if let value = updatingActivity.notes {
+            newActivity.notes = value
+        }
+        
+        if let value = updatingActivity.conversationID {
+            newActivity.conversationID = value
+        }
+        
+        if let value = updatingActivity.grocerylistID {
+            newActivity.grocerylistID = value
+        }
+        
+        if let value = updatingActivity.checklistIDs {
+            newActivity.checklistIDs = value
+        }
+        
+        if let value = updatingActivity.activitylistIDs {
+            newActivity.activitylistIDs = value
+        }
+        
+        if let value = updatingActivity.packinglistIDs {
+            newActivity.packinglistIDs = value
+        }
+        
+        if let value = updatingActivity.containerID {
+            newActivity.containerID = value
+        }
+        
+        if let value = updatingActivity.showExtras {
+            newActivity.showExtras = value
+        }
+        
+        if let value = updatingActivity.isCompleted {
+            newActivity.isCompleted = value
+        }
+        
+        if let value = updatingActivity.completedDate {
+            newActivity.completedDate = value
+        }
+        
+        if let value = updatingActivity.userIsCompleted {
+            newActivity.userIsCompleted = value
+        }
+        
+        if let value = updatingActivity.userCompletedDate {
+            newActivity.userCompletedDate = value
+        }
+        
+        if let value = updatingActivity.isTask {
+            newActivity.isTask = value
+        }
+        
+        if let value = updatingActivity.isEvent {
+            newActivity.isEvent = value
+        }
+        
+        if let value = updatingActivity.isSchedule {
+            newActivity.isSchedule = value
+        }
+        
+        if let value = updatingActivity.scheduleIDs {
+            newActivity.scheduleIDs = value
+        }
+        
+        if let value = updatingActivity.createdDate {
+            newActivity.createdDate = value
+        }
+        
+        if let value = updatingActivity.lastModifiedDate {
+            newActivity.lastModifiedDate = value
+        }
+        
+        //list is activity attribute vs. user attribute unlike calendar
+        if let value = updatingActivity.listID {
+            newActivity.listID = value
+        }
+
+        if let value = updatingActivity.listName {
+            newActivity.listName = value
+        }
+
+        if let value = updatingActivity.listColor {
+            newActivity.listColor = value
+        }
+
+        if let value = updatingActivity.listSource {
+            newActivity.listSource = value
+        }
+        
+        if let value = updatingActivity.subtaskIDs {
+            newActivity.subtaskIDs = value
+        }
+        
+        if let value = updatingActivity.isSubtask {
+            newActivity.isSubtask = value
+        }
+        
+        if let value = updatingActivity.hasStartTime {
+            newActivity.hasStartTime = value
+        }
+        
+        if let value = updatingActivity.hasDeadlineTime {
+            newActivity.hasDeadlineTime = value
+        }
+        
+        if let value = updatingActivity.flagged {
+            newActivity.flagged = value
+        }
+        
+        if let value = updatingActivity.tags {
+            newActivity.tags = value
+        }
+        
+        if let value = updatingActivity.priority {
+            newActivity.priority = value
+        }
+        
+        if let value = updatingActivity.instanceIDs {
+            newActivity.instanceIDs = value
+        }
+        
+        if let value = updatingActivity.instanceID {
+            newActivity.instanceID = value
+        }
+        
+        if let value = updatingActivity.recurringEventID {
+            newActivity.recurringEventID = value
+        }
+        
+        if let value = updatingActivity.instanceOriginalStartDateTime {
+            newActivity.instanceOriginalStartDateTime = value
+        }
+        
+        return newActivity
+    }
+    
+    func getDifferenceBetweenActivities(otherActivity: Activity) -> Activity {
+        let newActivity = Activity(dictionary: ["activityID": self.activityID as AnyObject])
+        if self.externalActivityID != otherActivity.externalActivityID {
+            newActivity.externalActivityID = self.externalActivityID
+        }
+        
+        if self.calendarExport != otherActivity.calendarExport {
+            newActivity.calendarExport = self.calendarExport
+        }
+        
+        if self.name != otherActivity.name {
+            newActivity.name = self.name
+        }
+        
+        if self.admin != otherActivity.admin {
+            newActivity.admin = self.admin
+        }
+        
+        if self.activityType != otherActivity.activityType {
+            newActivity.activityType = self.activityType
+        }
+        
+        if self.category != otherActivity.category {
+            newActivity.category = self.category
+        }
+        
+        if self.subcategory != otherActivity.subcategory {
+            newActivity.subcategory = self.subcategory
+        }
+        
+        if self.activityDescription != otherActivity.activityDescription {
+            newActivity.activityDescription = self.activityDescription
+        }
+        
+        if self.locationName != otherActivity.locationName {
+            newActivity.locationName = self.locationName
+        }
+        
+        if self.locationAddress != otherActivity.locationAddress {
+            newActivity.locationAddress = self.locationAddress
+        }
+        
+        if self.participantsIDs != otherActivity.participantsIDs {
+            newActivity.participantsIDs = self.participantsIDs
+        }
+        
+        if self.transportation != otherActivity.transportation {
+            newActivity.transportation = self.transportation
+        }
+        
+        if self.activityOriginalPhotoURL != otherActivity.activityOriginalPhotoURL {
+            newActivity.activityOriginalPhotoURL = self.activityOriginalPhotoURL
+        }
+        
+        if self.activityThumbnailPhotoURL != otherActivity.activityThumbnailPhotoURL {
+            newActivity.activityThumbnailPhotoURL = self.activityThumbnailPhotoURL
+        }
+        
+        if self.activityPhotos != otherActivity.activityPhotos {
+            newActivity.activityPhotos = self.activityPhotos
+        }
+        
+        if self.activityFiles != otherActivity.activityFiles {
+            newActivity.activityFiles = self.activityFiles
+        }
+        
+        if self.allDay != otherActivity.allDay {
+            newActivity.allDay = self.allDay
+        }
+        
+        if self.startDateTime != otherActivity.startDateTime {
+            newActivity.startDateTime = self.startDateTime
+        }
+        
+        if self.startTimeZone != otherActivity.startTimeZone {
+            newActivity.startTimeZone = self.startTimeZone
+        }
+        
+        if self.endDateTime != otherActivity.endDateTime {
+            newActivity.endDateTime = self.endDateTime
+        }
+        
+        if self.endTimeZone != otherActivity.endTimeZone {
+            newActivity.endTimeZone = self.endTimeZone
+        }
+        
+        if self.recurrences != otherActivity.recurrences {
+            newActivity.recurrences = self.recurrences
+        }
+        
+        if self.notes != otherActivity.notes {
+            newActivity.notes = self.notes
+        }
+        
+        if self.conversationID != otherActivity.conversationID {
+            newActivity.conversationID = self.conversationID
+        }
+        
+        if self.grocerylistID != otherActivity.grocerylistID {
+            newActivity.grocerylistID = self.grocerylistID
+        }
+        
+        if self.checklistIDs != otherActivity.checklistIDs {
+            newActivity.checklistIDs = self.checklistIDs
+        }
+        
+        if self.activitylistIDs != otherActivity.activitylistIDs {
+            newActivity.activitylistIDs = self.activitylistIDs
+        }
+        
+        if self.packinglistIDs != otherActivity.packinglistIDs {
+            newActivity.packinglistIDs = self.packinglistIDs
+        }
+        
+        if self.containerID != otherActivity.containerID {
+            newActivity.containerID = self.containerID
+        }
+        
+        if self.showExtras != otherActivity.showExtras {
+            newActivity.showExtras = self.showExtras
+        }
+        
+        if self.isCompleted != otherActivity.isCompleted {
+            newActivity.isCompleted = self.isCompleted
+        }
+        
+        if self.completedDate != otherActivity.completedDate {
+            newActivity.completedDate = self.completedDate
+        }
+        
+        if self.userIsCompleted != otherActivity.userIsCompleted {
+            newActivity.userIsCompleted = self.userIsCompleted
+        }
+        
+        if self.userCompletedDate != otherActivity.userCompletedDate {
+            newActivity.userCompletedDate = self.userCompletedDate
+        }
+        
+        if self.isTask != otherActivity.isTask {
+            newActivity.isTask = self.isTask
+        }
+        
+        if self.isEvent != otherActivity.isEvent {
+            newActivity.isEvent = self.isEvent
+        }
+        
+        if self.isSchedule != otherActivity.isSchedule {
+            newActivity.isSchedule = self.isSchedule
+        }
+        
+        if self.scheduleIDs != otherActivity.scheduleIDs {
+            newActivity.scheduleIDs = self.scheduleIDs
+        }
+        
+        if self.createdDate != otherActivity.createdDate {
+            newActivity.createdDate = self.createdDate
+        }
+        
+        if self.lastModifiedDate != otherActivity.lastModifiedDate {
+            newActivity.lastModifiedDate = self.lastModifiedDate
+        }
+        
+        //list is activity attribute vs. user attribute unlike calendar
+        if self.listID != otherActivity.listID {
+            newActivity.listID = self.listID
+        }
+
+        if self.listName != otherActivity.listName {
+            newActivity.listName = self.listName
+        }
+
+        if self.listColor != otherActivity.listColor {
+            newActivity.listColor = self.listColor
+        }
+
+        if self.listSource != otherActivity.listSource {
+            newActivity.listSource = self.listSource
+        }
+        
+        if self.subtaskIDs != otherActivity.subtaskIDs {
+            newActivity.subtaskIDs = self.subtaskIDs
+        }
+        
+        if self.isSubtask != otherActivity.isSubtask {
+            newActivity.isSubtask = self.isSubtask
+        }
+        
+        if self.hasStartTime != otherActivity.hasStartTime {
+            newActivity.hasStartTime = self.hasStartTime
+        }
+        
+        if self.hasDeadlineTime != otherActivity.hasDeadlineTime {
+            newActivity.hasDeadlineTime = self.hasDeadlineTime
+        }
+        
+        if self.flagged != otherActivity.flagged {
+            newActivity.flagged = self.flagged
+        }
+        
+        if self.tags != otherActivity.tags {
+            newActivity.tags = self.tags
+        }
+        
+        if self.priority != otherActivity.priority {
+            newActivity.priority = self.priority
+        }
+        
+        if self.instanceIDs != otherActivity.instanceIDs {
+            newActivity.instanceIDs = self.instanceIDs
+        }
+        
+        if self.instanceID != otherActivity.instanceID {
+            newActivity.instanceID = self.instanceID
+        }
+        
+        if self.recurringEventID != otherActivity.recurringEventID {
+            newActivity.recurringEventID = self.recurringEventID
+        }
+        
+        if self.instanceOriginalStartDateTime != otherActivity.instanceOriginalStartDateTime {
+            newActivity.instanceOriginalStartDateTime = self.instanceOriginalStartDateTime
+        }
+        
+        return newActivity
     }
     
     static func == (lhs: Activity, rhs: Activity) -> Bool {

@@ -319,11 +319,10 @@ class ActivityActions: NSObject {
                 activity.completedDate = nil
             }
             activity.isCompleted = isComplete
-            
+            incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
+
         }
-        
-        incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
-        
+                
         let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? String {
@@ -340,9 +339,6 @@ class ActivityActions: NSObject {
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        
-        print("instanceIDDD")
-        print(activity.instanceID)
         
         var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
         var instanceIDs = activity.instanceIDs ?? []
@@ -363,12 +359,16 @@ class ActivityActions: NSObject {
         updateInstanceValues["name"] = activity.name
         updateInstanceValues["recurringEventID"] = activityID
         updateInstanceValues["participantsIDs"] = activity.participantsIDs?.sorted()
-        
+        updateInstanceValues["lastModifiedDate"] = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                
         let groupInstanceActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)
         groupInstanceActivityReference.updateChildValues(updateInstanceValues) { _,_ in
             let groupRecurringActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             let recurringValues: [String : Any] = ["instanceIDs": instanceIDs as Any]
             groupRecurringActivityReference.updateChildValues(recurringValues)
+            
+            self.incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
+
         }
     }
     
@@ -547,7 +547,12 @@ class ActivityActions: NSObject {
                     if value == nil, let finalDateTime = activity.finalDateTime {
                         value = [String(describing: finalDateTime): 1]
                     } else if let finalDateTime = activity.finalDateTime {
-                        value![String(describing: finalDateTime)] = 1
+                        let stringFinalDateTime = String(describing: finalDateTime)
+                        if let badge = value![stringFinalDateTime] {
+                            value![stringFinalDateTime] = badge + 1
+                        } else {
+                            value![stringFinalDateTime] = 1
+                        }
                     }
                     mutableData.value = value
                     return TransactionResult.success(withValue: mutableData)
@@ -556,7 +561,7 @@ class ActivityActions: NSObject {
                 ref = ref.child(messageMetaDataFirebaseFolder).child("badge")
                 ref.runTransactionBlock({ (mutableData) -> TransactionResult in
                     let value = mutableData.value as? Int
-                    mutableData.value = value ?? 0 + 1
+                    mutableData.value = (value ?? 0) + 1
                     return TransactionResult.success(withValue: mutableData)
                 })
             }

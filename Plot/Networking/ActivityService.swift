@@ -35,6 +35,7 @@ class ActivityService {
     var activities = [Activity]() {
         didSet {
             if oldValue != activities {
+                print("oldValue != activities")
                 eventsNoRepeats = activities.filter { $0.isTask == nil }
                 tasksNoRepeats = activities.filter { $0.isTask ?? false }
                 addRepeatingActivities(activities: activities) { activities in
@@ -46,6 +47,7 @@ class ActivityService {
     
     var activitiesWithRepeats = [Activity]() {
         didSet {
+            print("activitiesWithRepeats didSet")
             self.events = activitiesWithRepeats.filter { $0.isTask == nil }
             self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
             self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil }
@@ -743,6 +745,7 @@ extension ActivityService {
     }
     
     func addRepeatingActivities(activities: [Activity], completion: @escaping ([Activity])->()) {
+        print("addRepeatingActivities")
         let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
         var newActivities = [Activity]()
         let group = DispatchGroup()
@@ -757,12 +760,8 @@ extension ActivityService {
                         ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
                             guard counter > 0 else {
                                 for (_, instanceActivity) in activities {
-                                    if let index = self.activitiesWithRepeats.firstIndex(where: {$0.instanceID == activity.instanceID}) {
-                                        let newActivity = self.activitiesWithRepeats[index]
-                                        newActivity.isCompleted = instanceActivity.isCompleted
-                                        newActivity.completedDate = instanceActivity.completedDate
-                                        newActivity.instanceID = instanceActivity.instanceID
-                                        self.activitiesWithRepeats[index] = newActivity
+                                    if let index = self.activitiesWithRepeats.firstIndex(where: {$0.instanceID == instanceActivity.instanceID}) {
+                                        self.activitiesWithRepeats[index] = self.activitiesWithRepeats[index].updateActivityWActivity(updatingActivity: instanceActivity)
                                     }
                                 }
                                 return
@@ -772,10 +771,7 @@ extension ActivityService {
                                 .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                             for date in dates {
                                 if let instanceActivity = activities[date] {
-                                    let newActivity = activity.copy() as! Activity
-                                    newActivity.isCompleted = instanceActivity.isCompleted
-                                    newActivity.completedDate = instanceActivity.completedDate
-                                    newActivity.instanceID = instanceActivity.instanceID
+                                    let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
                                     newActivity.recurrenceStartDate = activity.finalDate
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivities.append(newActivity)
@@ -807,12 +803,8 @@ extension ActivityService {
                         ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
                             guard counter > 0 else {
                                 for (_, instanceActivity) in activities {
-                                    if let index = self.activitiesWithRepeats.firstIndex(where: {$0.instanceID == activity.instanceID}) {
-                                        let newActivity = self.activitiesWithRepeats[index]
-                                        newActivity.isCompleted = instanceActivity.isCompleted
-                                        newActivity.completedDate = instanceActivity.completedDate
-                                        newActivity.instanceID = instanceActivity.instanceID
-                                        self.activitiesWithRepeats[index] = newActivity
+                                    if let index = self.activitiesWithRepeats.firstIndex(where: {$0.instanceID == instanceActivity.instanceID}) {
+                                        self.activitiesWithRepeats[index] = self.activitiesWithRepeats[index].updateActivityWActivity(updatingActivity: instanceActivity)
                                     }
                                 }
                                 return
@@ -823,11 +815,8 @@ extension ActivityService {
                             let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
                             for date in dates {
                                 if let instanceActivity = activities[date] {
-                                    let newActivity = activity.copy() as! Activity
                                     //just left so something is there
-                                    newActivity.isCompleted = instanceActivity.isCompleted
-                                    newActivity.completedDate = instanceActivity.completedDate
-                                    newActivity.instanceID = instanceActivity.instanceID
+                                    let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
                                     newActivity.recurrenceStartDate = activity.finalDate
                                     newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
@@ -867,7 +856,6 @@ extension ActivityService {
         }
         
         group.notify(queue: .main) {
-            print("completion")
             completion(newActivities)
         }
     }
