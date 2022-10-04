@@ -985,13 +985,27 @@ extension TaskViewController {
     
     func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
-        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
-            var value = mutableData.value as? Int
-            value = 0
-            mutableData.value = value!
-            return TransactionResult.success(withValue: mutableData)
-        })
+        if self.task.recurrences != nil {
+            let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badgeDate")
+            badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+                var value = mutableData.value as? [String: Int]
+                if value == nil, let finalDateTime = self.task.finalDateTime {
+                    value = [String(describing: finalDateTime): 0]
+                } else if let finalDateTime = self.task.finalDateTime {
+                    value![String(describing: finalDateTime)] = 0
+                }
+                mutableData.value = value
+                return TransactionResult.success(withValue: mutableData)
+            })
+        } else {
+            let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
+            badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+                var value = mutableData.value as? Int
+                value = 0
+                mutableData.value = value!
+                return TransactionResult.success(withValue: mutableData)
+            })
+        }
     }
     
     func incrementBadgeForReciever(activityID: String?, participantsIDs: [String]) {

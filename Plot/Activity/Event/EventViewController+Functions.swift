@@ -847,7 +847,6 @@ extension EventViewController {
                 //duplicate updated activity w/ new ID and no recurrence rule
                 self.duplicateActivity(recurrenceRule: nil)
                 //update existing activity with exlusion date that fall's on this date
-                //FIX-ME: need to make sure oldActivityRule dates correspond to self.activity.startDate
                 oldActivityRule.exdate = ExclusionDate(dates: [startDate], granularity: .day)
                 self.activityOld.recurrences?.append(oldActivityRule.exdate!.toExDateString()!)
                 self.updateRecurrences(recurrences: self.activityOld.recurrences!)
@@ -1113,12 +1112,26 @@ extension EventViewController {
     
     func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
-        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
-            var value = mutableData.value as? Int
-            value = 0
-            mutableData.value = value!
-            return TransactionResult.success(withValue: mutableData)
-        })
+        if self.activity.recurrences != nil {
+            let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badgeDate")
+            badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+                var value = mutableData.value as? [String: Int]
+                if value == nil, let finalDateTime = self.activity.finalDateTime {
+                    value = [String(describing: finalDateTime): 0]
+                } else if let finalDateTime = self.activity.finalDateTime {
+                    value![String(describing: finalDateTime)] = 0
+                }
+                mutableData.value = value
+                return TransactionResult.success(withValue: mutableData)
+            })
+        } else {
+            let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
+            badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+                var value = mutableData.value as? Int
+                value = 0
+                mutableData.value = value!
+                return TransactionResult.success(withValue: mutableData)
+            })
+        }
     }
 }

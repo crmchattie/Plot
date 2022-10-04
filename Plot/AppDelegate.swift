@@ -73,10 +73,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         
         return true
     }
-    
+        
     func applicationDidBecomeActive(_ application: UIApplication) {
         if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-            masterController.openNotification()
+            if masterController.isAppLoaded {
+                masterController.openNotification()
+            }
         }
     }
     
@@ -399,6 +401,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
                 if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
+                    print("adding notification")
                     masterController.notification = notification
                 }
             }

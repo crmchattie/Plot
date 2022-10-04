@@ -138,9 +138,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         setupViews()
         setNavBar()
         addObservers()
-        manageAppearanceHome(didFinishLoadingWith: true)
         setApplicationBadge()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -427,11 +425,11 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 if index < numberOfActivities {
                     if !tasks.contains(where: {$0.activityID == task.activityID}) && !(task.isCompleted ?? false) {
                         tasks.append(task)
+                        index += 1
                     }
                 } else {
                     break
                 }
-                index += 1
             }
             completion(tasks)
         }

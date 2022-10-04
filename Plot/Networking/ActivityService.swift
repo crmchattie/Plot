@@ -749,18 +749,19 @@ extension ActivityService {
                         ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
                             let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
                             let dates = iCalUtility()
-                                .recurringDates(forRules: rules, ruleStartDate: activity.endDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                                .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                             for date in dates {
                                 if let instanceActivity = activities[date] {
                                     let newActivity = activity.copy() as! Activity
                                     newActivity.isCompleted = instanceActivity.isCompleted
                                     newActivity.completedDate = instanceActivity.completedDate
-                                    newActivity.recurrenceStartDate = activity.endDate
+                                    newActivity.instanceID = instanceActivity.instanceID
+                                    newActivity.recurrenceStartDate = activity.finalDate
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivities.append(newActivity)
                                 } else {
                                     let newActivity = activity.copy() as! Activity
-                                    newActivity.recurrenceStartDate = activity.endDate
+                                    newActivity.recurrenceStartDate = activity.finalDate
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivities.append(newActivity)
                                 }
@@ -770,28 +771,57 @@ extension ActivityService {
                     } else {
                         let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
                         let dates = iCalUtility()
-                            .recurringDates(forRules: rules, ruleStartDate: activity.endDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                         for date in dates {
                             let newActivity = activity.copy() as! Activity
-                            newActivity.recurrenceStartDate = activity.endDate
+                            newActivity.recurrenceStartDate = activity.finalDate
                             newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
                             newActivities.append(newActivity)
                         }
                         group.leave()
                     }
                 } else {
-                    let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
-                    let dates = iCalUtility()
-                        .recurringDates(forRules: rules, ruleStartDate: activity.startDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
-                    let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
-                    for date in dates {
-                        let newActivity = activity.copy() as! Activity
-                        newActivity.recurrenceStartDate = activity.startDate
-                        newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
-                        newActivities.append(newActivity)
+                    if let instanceIDs = activity.instanceIDs {
+                        ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                            let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                            let dates = iCalUtility()
+                                .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                            let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
+                            for date in dates {
+                                if let instanceActivity = activities[date] {
+                                    let newActivity = activity.copy() as! Activity
+                                    //just left so something is there
+                                    newActivity.isCompleted = instanceActivity.isCompleted
+                                    newActivity.completedDate = instanceActivity.completedDate
+                                    newActivity.instanceID = instanceActivity.instanceID
+                                    newActivity.recurrenceStartDate = activity.finalDate
+                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                    newActivities.append(newActivity)
+                                } else {
+                                    let newActivity = activity.copy() as! Activity
+                                    newActivity.recurrenceStartDate = activity.finalDate
+                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                    newActivities.append(newActivity)
+                                }
+                            }
+                            group.leave()
+                        }
+                    } else {
+                        let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
+                        let dates = iCalUtility()
+                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                        let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
+                        for date in dates {
+                            let newActivity = activity.copy() as! Activity
+                            newActivity.recurrenceStartDate = activity.finalDate
+                            newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                            newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                            newActivities.append(newActivity)
+                        }
+                        group.leave()
                     }
-                    group.leave()
                 }
             } else {
                 newActivities.append(activity)

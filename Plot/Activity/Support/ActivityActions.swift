@@ -285,35 +285,23 @@ class ActivityActions: NSObject {
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        
-        if activity.recurrences != nil, let endDate = activity.endDate {
-            var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-            if let instance = activity.instanceID {
-                instanceID = instance
-            }
-            let groupActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)
-            let instanceOriginalStartDateTime = NSNumber(value: Int((endDate).timeIntervalSince1970))
+
+        if activity.recurrences != nil {
+            var values:[String : Any] = [:]
             if isComplete {
                 let original = Date()
                 let updateDate = Date(timeIntervalSinceReferenceDate:
                                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
-                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": completedDate as Any, "recurringEventID": activityID as Any, "instanceOriginalStartDateTime": instanceOriginalStartDateTime as Any, "instanceID": instanceID as Any]
-                groupActivityReference.updateChildValues(values)
+                values = ["isCompleted": isComplete, "completedDate": completedDate as Any]
+                updateInstance(instanceValues: values)
                 activity.completedDate = completedDate
             } else {
-                let values:[String : Any] = ["isCompleted": isComplete, "recurringEventID": activityID as Any, "instanceOriginalStartDateTime": instanceOriginalStartDateTime as Any, "instanceID": instanceID as Any]
-                groupActivityReference.updateChildValues(values)
-                groupActivityReference.child("completedDate").removeValue()
+                values = ["isCompleted": isComplete]
+                updateInstance(instanceValues: values)
                 activity.completedDate = nil
             }
             activity.isCompleted = isComplete
-            
-            var instanceIDs = activity.instanceIDs ?? []
-            instanceIDs.append(instanceID)
-            let groupRecurringActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["instanceIDs": instanceIDs as Any]
-            groupRecurringActivityReference.updateChildValues(values)
         } else {
             let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             if isComplete {
@@ -334,6 +322,8 @@ class ActivityActions: NSObject {
             
         }
         
+        incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
+        
         let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? String {
@@ -344,6 +334,39 @@ class ActivityActions: NSObject {
                 }
             }
         })
+    }
+    
+    func updateInstance(instanceValues: [String : Any]) {
+        guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+        var instanceIDs = activity.instanceIDs ?? []
+        if let instance = activity.instanceID {
+            instanceID = instance
+        } else {
+            instanceIDs.append(instanceID)
+        }
+        
+        var updateInstanceValues = instanceValues
+        updateInstanceValues["instanceID"] = instanceID
+        if activity.isTask ?? false {
+            updateInstanceValues["isTask"] = true
+        } else {
+            updateInstanceValues["isEvent"] = true
+        }
+        updateInstanceValues["instanceOriginalStartDateTime"] = activity.finalDateTime
+        updateInstanceValues["name"] = activity.name
+        updateInstanceValues["recurringEventID"] = activityID
+        updateInstanceValues["participantsIDs"] = activity.participantsIDs?.sorted()
+        
+        let groupInstanceActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)
+        groupInstanceActivityReference.updateChildValues(updateInstanceValues)
+        
+        let groupRecurringActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+        let recurringValues: [String : Any] = ["instanceIDs": instanceIDs as Any]
+        groupRecurringActivityReference.updateChildValues(recurringValues)
     }
     
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
@@ -517,11 +540,11 @@ class ActivityActions: NSObject {
             if activity.recurrences != nil {
                 ref = ref.child(messageMetaDataFirebaseFolder).child("badgeDate")
                 ref.runTransactionBlock({ (mutableData) -> TransactionResult in
-                    var value = mutableData.value as? [NSNumber: Int]
+                    var value = mutableData.value as? [String: Int]
                     if value == nil, let finalDateTime = activity.finalDateTime {
-                        value = [finalDateTime: 1]
+                        value = [String(describing: finalDateTime): 1]
                     } else if let finalDateTime = activity.finalDateTime {
-                        value![finalDateTime] = 1
+                        value![String(describing: finalDateTime)] = 1
                     }
                     mutableData.value = value
                     return TransactionResult.success(withValue: mutableData)

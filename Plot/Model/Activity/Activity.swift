@@ -58,7 +58,7 @@ class Activity: NSObject, NSCopying, Codable {
     var isGroupActivity: Bool?
     var admin: String?
     var badge: Int?
-    var badgeDate: [NSNumber: Int]?
+    var badgeDate: [String: Int]?
     var pinned: Bool?
     var muted: Bool?
     //instance or recurring variable
@@ -217,7 +217,7 @@ class Activity: NSObject, NSCopying, Codable {
         isGroupActivity = dictionary?["isGroupActivity"] as? Bool
         admin = dictionary?["admin"] as? String
         badge = dictionary?["badge"] as? Int
-        badgeDate = dictionary?["badgeDate"] as? [NSNumber: Int]
+        badgeDate = dictionary?["badgeDate"] as? [String: Int]
         pinned = dictionary?["pinned"] as? Bool
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String

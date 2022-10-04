@@ -26,12 +26,14 @@ extension MasterActivityContainerController {
         self.setupData()
         if !isNewUser {
             networkController.setupKeyVariables {
+                self.manageAppearanceHome(didFinishLoadingWith: true)
                 self.collectionView.reloadData()
                 self.removeLaunchScreenView()
                 self.networkController.setupOtherVariables()
                 self.openNotification()
             }
         } else {
+            self.manageAppearanceHome(didFinishLoadingWith: true)
             self.removeLaunchScreenView()
             self.presentOnboardingController()
         }
@@ -95,13 +97,14 @@ extension MasterActivityContainerController {
     }
     
     func openNotification() {
+        print("openNotification")
         if let notification = notification {
             let aps = notification.aps
             if let ID = notification.objectID {
                 self.notification = nil
                 let category = aps.category
                 if category == Identifiers.eventCategory {
-                    if let date = aps.date, let activity = networkController.activityService.events.first(where: {$0.activityID == ID && Int(truncating: $0.startDateTime ?? 0) == date }) {
+                    if let date = aps.date, let activity = networkController.activityService.events.first(where: {$0.instanceID == ID && Int(truncating: $0.startDateTime ?? 0) == date }) {
                         ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
                             ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 let destination = EventViewController(networkController: self.networkController)
@@ -131,8 +134,7 @@ extension MasterActivityContainerController {
                         }
                     }
                 } else if category == Identifiers.taskCategory {
-                    if let date = aps.date, let activity = networkController.activityService.tasks.first(where: {$0.activityID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
-                        print(date)
+                    if let date = aps.date, let activity = networkController.activityService.tasks.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
                         ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
                             let destination = TaskViewController(networkController: self.networkController)
                             destination.selectedFalconUsers = participants
