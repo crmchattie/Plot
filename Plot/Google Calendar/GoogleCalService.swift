@@ -17,6 +17,26 @@ class GoogleCalService {
         return GoogleCalSetupAssistant.taskService
     }
     
+    var plotGoogleCalendar: String? {
+        if let value = UserDefaults.standard.string(forKey: "PlotGoogleCalendar") {
+            return value
+        } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
+            UserDefaults.standard.set(value, forKey: "PlotGoogleCalendar")
+            return value
+        }
+        return nil
+    }
+    
+    var plotGoogleList: String? {
+        if let value = UserDefaults.standard.string(forKey: "PlotGoogleList") {
+            return value
+        } else if let value = UserDefaults.standard.string(forKey: "PlotList") {
+            UserDefaults.standard.set(value, forKey: "PlotGoogleList")
+            return value
+        }
+        return nil
+    }
+    
     func authorizeGEvents(completion: @escaping (Bool) -> Swift.Void) {
         GoogleCalSetupAssistant.authorizeGEvents { bool in
             completion(bool)
@@ -54,7 +74,7 @@ class GoogleCalService {
         let query = GTLRCalendarQuery_CalendarListList.query()
         service.executeQuery(query) { (ticket, result, error) in
             if error == nil, let calendars = (result as? GTLRCalendar_CalendarList)?.items {
-                let filteredCalendars = calendars.filter{ $0.summary != "Plot" }
+                let filteredCalendars = calendars.filter{ $0.identifier != self.plotGoogleCalendar }
                 for calendar in filteredCalendars {
                     if let id = calendar.identifier {
                         dispatchGroup.enter()
@@ -95,11 +115,12 @@ class GoogleCalService {
         event.start = start
         event.end = end
         event.recurrence = activity.recurrences
-        
-        if let value = UserDefaults.standard.string(forKey: "PlotGoogleCalendar") {
+                        
+        if let value = plotGoogleCalendar {
             let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: value)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
                 if error != nil {
+                    print(name)
                     print("Failed to save google calendar event with error : \(String(describing: error))")
                 }
             })
@@ -156,7 +177,22 @@ class GoogleCalService {
         
         service.executeQuery(eventQuery, completionHandler: { (_, _, error) in
             guard error == nil else {
-                print("failed to grab events \(String(describing: error))")
+                print("failed to delete events \(String(describing: error))")
+                return
+            }
+        })
+    }
+    
+    func deleteCalendar(for calendarID: String) {
+        guard let service = self.calendarService else {
+            return
+        }
+        
+        let eventQuery = GTLRCalendarQuery_CalendarsDelete.query(withCalendarId: calendarID)
+        
+        service.executeQuery(eventQuery, completionHandler: { (_, _, error) in
+            guard error == nil else {
+                print("failed to delete calendar \(String(describing: error))")
                 return
             }
         })
@@ -177,7 +213,7 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            
+            UserDefaults.standard.set(createdCalendar.identifier, forKey: "PlotGoogleCalendar")
             completion(createdCalendar.identifier)
         })
     }
@@ -195,7 +231,7 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            let calendars = items.filter { $0.summary != "Plot" }
+            let calendars = items.filter { $0.identifier != self.plotGoogleCalendar }
             completion(self.convertCalendarsToPlot(calendars: calendars))
         }
     }
@@ -222,7 +258,7 @@ class GoogleCalService {
         query.maxResults = 100
         service.executeQuery(query) { (ticket, result, error) in
             if error == nil, let lists = (result as? GTLRTasks_TaskLists)?.items {
-                let filteredLists = lists.filter{ $0.title != "Plot" }
+                let filteredLists = lists.filter{ $0.identifier != self.plotGoogleList }
                 for list in filteredLists {
                     if let id = list.identifier {
                         dispatchGroup.enter()
@@ -272,7 +308,7 @@ class GoogleCalService {
             task.completed = date
         }
         
-        if let value = UserDefaults.standard.string(forKey: "PlotGoogleList") {
+        if let value = plotGoogleList {
             let query = GTLRTasksQuery_TasksInsert.query(withObject: task, tasklist: value)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
                 if error != nil {
@@ -361,6 +397,7 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
+            UserDefaults.standard.set(createdList.identifier, forKey: "PlotGoogleList")
             completion(createdList.identifier)
         })
     }
@@ -378,7 +415,7 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            let lists = items.filter { $0.title != "Plot" }
+            let lists = items.filter { $0.identifier != self.plotGoogleList }
             completion(self.convertListsToPlot(lists: lists))
         }
     }

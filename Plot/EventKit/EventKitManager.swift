@@ -22,6 +22,26 @@ class EventKitManager {
     var isAuthorizedEvents: Bool
     var isAuthorizedReminders: Bool
     
+    var plotAppleCalendar: String? {
+        if let value = UserDefaults.standard.string(forKey: "PlotAppleCalendar") {
+            return value
+        } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
+            UserDefaults.standard.set(value, forKey: "PlotAppleCalendar")
+            return value
+        }
+        return nil
+    }
+    
+    var plotAppleList: String? {
+        if let value = UserDefaults.standard.string(forKey: "PlotAppleList") {
+            return value
+        } else if let value = UserDefaults.standard.string(forKey: "PlotList") {
+            UserDefaults.standard.set(value, forKey: "PlotAppleList")
+            return value
+        }
+        return nil
+    }
+    
     init(eventKitService: EventKitService) {
         self.eventKitService = eventKitService
         self.isRunningEvents = false
@@ -124,7 +144,8 @@ class EventKitManager {
         guard isAuthorizedEvents else {
             return nil
         }
-        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.title != "Plot" }
+        
+        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.calendarIdentifier != self.plotAppleCalendar }
         return convertCalendarsToPlot(calendars: calendars)
     }
     
@@ -204,7 +225,8 @@ class EventKitManager {
         guard isAuthorizedReminders else {
             return nil
         }
-        let calendars = eventKitService.eventStore.calendars(for: .reminder).filter { $0.title != "Plot" }
+            
+        let calendars = eventKitService.eventStore.calendars(for: .reminder).filter { $0.calendarIdentifier != self.plotAppleList }
         return convertListsToPlot(lists: calendars)
     }
     

@@ -89,6 +89,9 @@ extension UserProfileController {
         if userProfileContainerView.name.text?.count == 0 ||
             userProfileContainerView.name.text!.trimmingCharacters(in: .whitespaces).isEmpty {
             userProfileContainerView.name.shake()
+        } else if userProfileContainerView.phone.text?.count == 0 ||
+            userProfileContainerView.phone.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+            userProfileContainerView.phone.shake()
         } else {
             if currentReachabilityStatus == .notReachable {
                 basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)

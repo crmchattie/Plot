@@ -15,6 +15,26 @@ class EventKitService {
         return EventKitSetupAssistant.eventStore
     }
     
+    var plotAppleCalendar: String? {
+        if let value = UserDefaults.standard.string(forKey: "PlotAppleCalendar") {
+            return value
+        } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
+            UserDefaults.standard.set(value, forKey: "PlotAppleCalendar")
+            return value
+        }
+        return nil
+    }
+    
+    var plotAppleList: String? {
+        if let value = UserDefaults.standard.string(forKey: "PlotAppleList") {
+            return value
+        } else if let value = UserDefaults.standard.string(forKey: "PlotList") {
+            UserDefaults.standard.set(value, forKey: "PlotAppleList")
+            return value
+        }
+        return nil
+    }
+    
     func authorizeEventKitEvents(completion: @escaping (Bool, Error?) -> Swift.Void) {
         EventKitSetupAssistant.authorizeEventKitEvents(completion: completion)
     }
@@ -74,7 +94,7 @@ class EventKitService {
         // Create the predicate from the event store's instance method.
         var predicate: NSPredicate? = nil
         if let timeAgo = timeAgo, let timeFromNow = timeFromNow {
-            let calendars = eventStore.calendars(for: .event).filter { $0.title != "Plot" }
+            let calendars = eventStore.calendars(for: .event).filter { $0.calendarIdentifier != self.plotAppleCalendar }
             predicate = eventStore.predicateForEvents(withStart: timeAgo, end: timeFromNow, calendars: calendars)
         }
         
@@ -259,7 +279,7 @@ class EventKitService {
     }
     
     func fetchReminders(completion: @escaping ([EKReminder]) -> Swift.Void) {
-        let calendars = eventStore.calendars(for: .reminder).filter { $0.title != "Plot" }
+        let calendars = eventStore.calendars(for: .reminder).filter { $0.calendarIdentifier != self.plotAppleList }
         let predicate: NSPredicate? = eventStore.predicateForReminders(in: calendars)
         if let aPredicate = predicate {
             eventStore.fetchReminders(matching: aPredicate, completion: {(_ reminders: [Any]?) -> Void in

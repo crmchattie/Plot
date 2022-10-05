@@ -270,7 +270,9 @@ class FinanceLineChartDetailViewController: UIViewController {
             weakSelf.tableView.isHidden = false
             
             weakSelf.chartView.data = lineChartData
-            weakSelf.chartView.rightAxis.axisMinimum = minValue < 0 ? minValue : 0
+            if minValue > 0 {
+                weakSelf.chartView.rightAxis.axisMinimum = 0
+            }
 //            weakSelf.chartView.rightAxis.axisMaximum = maxValue * 1.1
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()

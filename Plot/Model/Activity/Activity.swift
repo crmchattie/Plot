@@ -1260,7 +1260,7 @@ func dateToGLTRDate(date: Date, allDay: Bool, timeZone: TimeZone?) -> GTLRCalend
     }
     let gDate = GTLRCalendar_EventDateTime()
     if allDay {
-        gDate.date = GTLRDateTime(date: date)
+        gDate.date = GTLRDateTime(forAllDayWith: date)
         gDate.timeZone = timeZone.identifier
     } else {
         gDate.dateTime = GTLRDateTime(date: date)

@@ -66,8 +66,8 @@ class FalconUsersFetcher: NSObject {
         reference = Database.database().reference()
         
         //add 'Plot' user and user to 'Plot'
-        reference.child("relationships").child(self.userID!).child("acdmpzhmDWaBdcEo17DRMt8gwCh1").setValue("true")
-        reference.child("relationships").child("acdmpzhmDWaBdcEo17DRMt8gwCh1").child(self.userID!).setValue("true")
+        reference.child("relationships").child(self.userID!).child("acdmpzhmDWaBdcEo17DRMt8gwCh1").setValue(true)
+        reference.child("relationships").child("acdmpzhmDWaBdcEo17DRMt8gwCh1").child(self.userID!).setValue(true)
 
         //create check if user exists in relationship table and return relationships
         reference.child("relationships").child(userID!).observeSingleEvent(of: .value, with: { snapshot in
@@ -190,7 +190,7 @@ class FalconUsersFetcher: NSObject {
                 guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                 if snapshot.key == self.userID { return }
                 
-                self.reference.child("relationships").child(self.userID!).child(snapshot.key).setValue("true")
+                self.reference.child("relationships").child(self.userID!).child(snapshot.key).setValue(true)
                 
                 dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
                 if let thumbnailURLString = User(dictionary: dictionary).thumbnailPhotoURL, let thumbnailURL = URL(string: thumbnailURLString) {
