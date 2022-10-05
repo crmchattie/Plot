@@ -141,7 +141,7 @@ class GoogleCalService {
             let query = GTLRCalendarQuery_EventsUpdate.query(withObject: event, calendarId: calendarID, eventId: eventID)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
                 if error != nil {
-                    print("Failed to save google calendar event with error : \(String(describing: error))")
+                    print("Failed to update google calendar event with error : \(String(describing: error))")
                 }
             })
         })
@@ -276,7 +276,7 @@ class GoogleCalService {
             let query = GTLRTasksQuery_TasksInsert.query(withObject: task, tasklist: value)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
                 if error != nil {
-                    print("Failed to save google calendar event with error : \(String(describing: error))")
+                    print("Failed to save google task with error : \(String(describing: error))")
                 }
             })
         } else {
@@ -285,7 +285,7 @@ class GoogleCalService {
                     let query = GTLRTasksQuery_TasksInsert.query(withObject: task, tasklist: value)
                     service.executeQuery(query, completionHandler: { (ticket, result, error) in
                         if error != nil {
-                            print("Failed to save google calendar event with error : \(String(describing: error))")
+                            print("Failed to save google task with error : \(String(describing: error))")
                         }
                     })
                 }
@@ -325,7 +325,7 @@ class GoogleCalService {
             let query = GTLRTasksQuery_TasksUpdate.query(withObject: task, tasklist: listID, task: taskID)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
                 if error != nil {
-                    print("Failed to save google calendar event with error : \(String(describing: error))")
+                    print("Failed to update google task with error : \(String(describing: error))")
                 }
             })
         })

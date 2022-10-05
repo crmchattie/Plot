@@ -197,7 +197,6 @@ class ListDetailViewController: FormViewController {
             row.cell.textLabel?.textColor = .label
             row.title = row.tag
             row.cell.detailTextLabel?.text = nil
-//            row.cell.accessoryType = .disclosureIndicator
             if self.active, let color = self.list.color {
                 row.value = UIColor(ciColor: CIColor(string: color))
             }

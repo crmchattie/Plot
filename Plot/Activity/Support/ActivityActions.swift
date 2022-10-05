@@ -424,8 +424,10 @@ class ActivityActions: NSObject {
                                                   "calendarColor": activity.calendarColor as Any,
                                                   "showExtras": activity.showExtras as Any]
                     userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                        let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
-                        calendarReference.child(activityID).setValue(true)
+                        if let source = activity.calendarSource, source == CalendarSourceOptions.plot.name {
+                            let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
+                            calendarReference.child(activityID).setValue(true)
+                        }
                         connectingMembersGroup.leave()
                     })
                 } else {
@@ -440,8 +442,10 @@ class ActivityActions: NSObject {
                                                           "calendarColor": calendar.color as Any,
                                                           "showExtras": activity.showExtras as Any]
                             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                                let calendarReference = Database.database().reference().child(calendarEntity).child(calendar.id ?? "").child(calendarEventsEntity)
-                                calendarReference.child(activityID).setValue(true)
+                                if let source = calendar.source, source == CalendarSourceOptions.plot.name {
+                                    let calendarReference = Database.database().reference().child(calendarEntity).child(calendar.id ?? "").child(calendarEventsEntity)
+                                    calendarReference.child(activityID).setValue(true)
+                                }
                                 connectingMembersGroup.leave()
                             })
                         }

@@ -266,7 +266,8 @@ class ActivitiesFetcher: NSObject {
         let group = DispatchGroup()
         let filteredCalendars = calendars.filter({ $0.admin != currentUserID })
         for calendar in filteredCalendars {
-            if let eventIDs = calendar.eventIDs?.keys {
+            if let events = calendar.eventIDs {
+                let eventIDs = events.keys
                 for ID in eventIDs {
                     if self.userActivities[ID] == nil, let admin = calendar.admin {
                         group.enter()
@@ -338,7 +339,8 @@ class ActivitiesFetcher: NSObject {
         let group = DispatchGroup()
         let filteredLists = lists.filter({ $0.admin != currentUserID })
         for list in filteredLists {
-            if let taskIDs = list.taskIDs?.keys {
+            if let tasks = list.taskIDs {
+                let taskIDs = tasks.keys
                 for ID in taskIDs {
                     if self.userActivities[ID] == nil, let admin = list.admin {
                         group.enter()

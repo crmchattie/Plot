@@ -85,9 +85,10 @@ extension EventViewController: UpdateCalendarDelegate {
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["calendarID": calendarID as Any, "calendarName": calendar.name as Any, "calendarColor": calendar.color as Any, "calendarSource": calendar.source as Any]
             userReference.updateChildValues(values)
-            let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
-            calendarReference.child(self.activityID).setValue(true)
-            
+            if let source = calendar.source, source == CalendarSourceOptions.plot.name {
+                let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
+                calendarReference.child(self.activityID).setValue(true)
+            }
         }
     }
 }

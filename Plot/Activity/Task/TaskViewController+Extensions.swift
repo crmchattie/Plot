@@ -76,7 +76,7 @@ extension TaskViewController: UpdateListDelegate {
     func update(list: ListType) {
         if let row: LabelRow = form.rowBy(tag: "List"), let listID = list.id {
             //remove old list if updated
-            if let oldListID = task.listID, listID != oldListID {
+            if let oldListID = task.listID, let source = task.listSource, listID != oldListID, source == ListSourceOptions.plot.name {
                 let listReference = Database.database().reference().child(listEntity).child(oldListID).child(listTasksEntity)
                 listReference.child(self.activityID).setValue(nil)
             }
@@ -89,8 +89,10 @@ extension TaskViewController: UpdateListDelegate {
             task.listColor = list.color
             task.listSource = list.source
             
-            let listReference = Database.database().reference().child(listEntity).child(listID).child(listTasksEntity)
-            listReference.child(self.activityID).setValue(true)
+            if let source = list.source, source == ListSourceOptions.plot.name {
+                let listReference = Database.database().reference().child(listEntity).child(listID).child(listTasksEntity)
+                listReference.child(self.activityID).setValue(true)
+            }
         }
     }
 }
