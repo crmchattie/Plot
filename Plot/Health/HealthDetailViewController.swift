@@ -188,12 +188,10 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         chartView.xAxis.valueFormatter = dayAxisValueFormatter
         chartView.xAxis.granularity = 1
         chartView.xAxis.labelCount = 5
+        chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         
         chartView.leftAxis.enabled = false
         
-        let xAxis = chartView.xAxis
-        xAxis.labelFont = UIFont.caption1.with(weight: .regular)
-                                
         let rightAxisFormatter = NumberFormatter()
         rightAxisFormatter.numberStyle = .decimal
         let rightAxis = chartView.rightAxis
@@ -243,7 +241,7 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
             weakSelf.tableView.isHidden = false
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMinimum = 0
-            weakSelf.chartView.rightAxis.axisMaximum = maxValue
+//            weakSelf.chartView.rightAxis.axisMaximum = maxValue * 1.1
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.notifyDataSetChanged()

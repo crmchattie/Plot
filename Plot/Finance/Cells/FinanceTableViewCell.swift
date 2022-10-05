@@ -144,10 +144,10 @@ class FinanceTableViewCell: UITableViewCell {
         middleLabel.textColor = .label
         bottomLabel.textColor = .secondaryLabel
         
-        nameLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        middleLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        bottomLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
+        categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        middleLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        bottomLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         IV.isHidden = false
     }
 }

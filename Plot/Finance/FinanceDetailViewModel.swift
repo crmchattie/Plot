@@ -15,9 +15,9 @@ protocol FinanceDetailViewModelInterface {
     var accounts: [MXAccount]? { get set }
     var transactions: [Transaction]? { get set }
     
-    func fetchLineChartData(segmentType: TimeSegmentType, useAll: Bool,completion: @escaping (LineChartData?, Double) -> ())
+    func fetchLineChartData(segmentType: TimeSegmentType, useAll: Bool,completion: @escaping (LineChartData?, Double, Double) -> ())
     
-    func fetchBarChartData(segmentType: TimeSegmentType, useAll: Bool, completion: @escaping (BarChartData?, Double) -> ())
+    func fetchBarChartData(segmentType: TimeSegmentType, useAll: Bool, completion: @escaping (BarChartData?, Double, Double) -> ())
 }
 
 class FinanceDetailViewModel: FinanceDetailViewModelInterface {
@@ -42,23 +42,24 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
         self.filterAccounts = filterAccounts
     }
     
-    func fetchLineChartData(segmentType: TimeSegmentType, useAll: Bool, completion: @escaping (LineChartData?, Double) -> ()) {
+    func fetchLineChartData(segmentType: TimeSegmentType, useAll: Bool, completion: @escaping (LineChartData?, Double, Double) -> ()) {
         if useAll {
             financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions, filterAccounts: filterAccounts) { [weak self] (stats, accounts, transactions, err) in
                 
                 var lineChartData: LineChartData?
                 var maxValue: Double = 0
+                var minValue: Double = 0
                 if let stats = stats, stats.count > 0 {
                     var i = 0
                     var entries: [ChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
+                        minValue = min(maxValue, stat.value)
                         let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
                     }
-                    maxValue *= 1.2
-                    
+                                        
                     let dataSet = LineChartDataSet(entries: entries, label: nil)
                     dataSet.fillColor = .systemBlue
                     dataSet.fillAlpha = 0.5
@@ -72,7 +73,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
-                    completion(lineChartData, maxValue)
+                    completion(lineChartData, maxValue, minValue)
                 }
             }
         } else {
@@ -80,17 +81,18 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 
                 var lineChartData: LineChartData?
                 var maxValue: Double = 0
+                var minValue: Double = 0
                 if let stats = stats, stats.count > 0 {
                     var i = 0
                     var entries: [ChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
+                        minValue = min(maxValue, stat.value)
                         let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
                     }
-                    maxValue *= 1.2
-                    
+                                        
                     let dataSet = LineChartDataSet(entries: entries, label: nil)
                     dataSet.fillColor = .systemBlue
                     dataSet.fillAlpha = 0.5
@@ -104,28 +106,29 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
-                    completion(lineChartData, maxValue)
+                    completion(lineChartData, maxValue, minValue)
                 }
             }
         }
     }
     
-    func fetchBarChartData(segmentType: TimeSegmentType, useAll: Bool, completion: @escaping (BarChartData?, Double) -> ()) {
+    func fetchBarChartData(segmentType: TimeSegmentType, useAll: Bool, completion: @escaping (BarChartData?, Double, Double) -> ()) {
         if useAll {
             financeDetailService.getSamples(accountDetails: accountDetails, transactionDetails: transactionDetails, segmentType: segmentType, accounts: allAccounts, transactions: allTransactions, filterAccounts: filterAccounts) { [weak self] (stats, accounts, transactions, err) in
                 
                 var barChartData: BarChartData?
                 var maxValue: Double = 0
+                var minValue: Double = 0
                 if let stats = stats, stats.count > 0 {
                     var i = 0
                     var entries: [BarChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
+                        minValue = min(maxValue, stat.value)
                         let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
                     }
-                    maxValue *= 1.2
                     
                     let dataSet = BarChartDataSet(entries: entries, label: "")
                     dataSet.setColor(ChartColors.palette()[0])
@@ -139,7 +142,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
-                    completion(barChartData, maxValue)
+                    completion(barChartData, maxValue, minValue)
                 }
             }
         } else {
@@ -147,16 +150,17 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 
                 var barChartData: BarChartData?
                 var maxValue: Double = 0
+                var minValue: Double = 0
                 if let stats = stats, stats.count > 0 {
                     var i = 0
                     var entries: [BarChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
+                        minValue = min(maxValue, stat.value)
                         let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
                     }
-                    maxValue *= 1.2
                     
                     let dataSet = BarChartDataSet(entries: entries, label: "")
                     dataSet.setColor(ChartColors.palette()[0])
@@ -170,7 +174,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
-                    completion(barChartData, maxValue)
+                    completion(barChartData, maxValue, minValue)
                 }
             }
         }

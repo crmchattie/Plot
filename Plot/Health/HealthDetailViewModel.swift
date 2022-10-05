@@ -41,7 +41,6 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
                     entries.append(entry)
                     i += 1
                 }
-                maxValue *= 1.2
                 
                 let dataSet = BarChartDataSet(entries: entries, label: "")
                 dataSet.setColor(ChartColors.palette()[0])

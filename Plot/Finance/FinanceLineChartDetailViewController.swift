@@ -213,10 +213,11 @@ class FinanceLineChartDetailViewController: UIViewController {
 
         chartView.leftAxis.enabled = false
         
-        let xAxis = chartView.xAxis
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
-        xAxis.valueFormatter = dayAxisValueFormatter
-        xAxis.labelFont = UIFont.caption1.with(weight: .regular)
+        chartView.xAxis.valueFormatter = dayAxisValueFormatter
+        chartView.xAxis.granularity = 1
+        chartView.xAxis.labelCount = 5
+        chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         
         let rightAxisFormatter = NumberFormatter()
         rightAxisFormatter.numberStyle = .currency
@@ -263,13 +264,14 @@ class FinanceLineChartDetailViewController: UIViewController {
         
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchLineChartData(segmentType: segmentType, useAll: useAll) { [weak self] (lineChartData, maxValue) in
+        viewModel.fetchLineChartData(segmentType: segmentType, useAll: useAll) { [weak self] (lineChartData, maxValue, minValue) in
             guard let weakSelf = self else { return }
             weakSelf.backgroundChartView.isHidden = false
             weakSelf.tableView.isHidden = false
             
             weakSelf.chartView.data = lineChartData
-            weakSelf.chartView.rightAxis.axisMaximum = maxValue
+            weakSelf.chartView.rightAxis.axisMinimum = minValue < 0 ? minValue : 0
+//            weakSelf.chartView.rightAxis.axisMaximum = maxValue * 1.1
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.notifyDataSetChanged()

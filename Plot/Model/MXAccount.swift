@@ -831,8 +831,16 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
                 } else if let balanceDate = sortedBalances.first(where: { isodateFormatter.date(from: $0)! < date }) {
                     currentBalance = balances[balanceDate] ?? 0
                 } else {
+                    print("not continuing")
+                    print(nextDate)
+                    print(account.name)
+                    print(currentBalance)
                     continue
                 }
+                print("continuing")
+                print(nextDate)
+                print(account.name)
+                print(currentBalance)
                 if accountDetail.name == "Net Worth" {
                     if account.bs_type == .Asset {
                         if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
@@ -929,5 +937,10 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
             }
         }
     }
+//    for statistic in statistics {
+//        print(statistic.date)
+//        print(statistic.value)
+//    }
+    
     completion(statistics, accountList)
 }
