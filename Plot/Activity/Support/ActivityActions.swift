@@ -414,7 +414,7 @@ class ActivityActions: NSObject {
                     connectingMembersGroup.leave()
                 })
             } else {
-                if memberID == currentUserID, let calendarID = activity.calendarID {
+                if memberID == currentUserID, let calendarID = activity.calendarID, !calendarID.isEmpty {
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                     let values: [String : Any] = ["isGroupActivity": true,
                                                   "badge": 0,
@@ -424,7 +424,7 @@ class ActivityActions: NSObject {
                                                   "calendarColor": activity.calendarColor as Any,
                                                   "showExtras": activity.showExtras as Any]
                     userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
-                        let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID.removeCharacters()).child(calendarEventsEntity)
+                        let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
                         calendarReference.child(activityID).setValue(true)
                         connectingMembersGroup.leave()
                     })

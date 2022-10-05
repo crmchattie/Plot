@@ -35,6 +35,7 @@ class GoogleCalService {
             completion(events)
             return
         }
+        
         let dispatchGroup = DispatchGroup()
         // Get the appropriate calendar.
         let calendar = Calendar.current
@@ -123,11 +124,6 @@ class GoogleCalService {
             return
         }
         
-        print("calendarID")
-        print(calendarID)
-        print("eventID")
-        print(eventID)
-        
         let eventQuery = GTLRCalendarQuery_EventsGet.query(withCalendarId: calendarID, eventId: eventID)
         
         service.executeQuery(eventQuery, completionHandler: { (ticket, result, error) in
@@ -173,7 +169,7 @@ class GoogleCalService {
         }
         let calendar = GTLRCalendar_Calendar()
         calendar.summary = "Plot"
-        
+                
         let query = GTLRCalendarQuery_CalendarsInsert.query(withObject: calendar)
         service.executeQuery(query, completionHandler: { (ticket, result, error) in
             guard error == nil, let createdCalendar = result as? GTLRCalendar_Calendar else {
@@ -181,7 +177,7 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            UserDefaults.standard.set(calendar.identifier, forKey: "PlotGoogleCalendar")
+            
             completion(createdCalendar.identifier)
         })
     }
@@ -365,7 +361,6 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            UserDefaults.standard.set(list.identifier, forKey: "PlotGoogleList")
             completion(createdList.identifier)
         })
     }

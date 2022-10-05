@@ -98,7 +98,7 @@ class EventViewController: FormViewController {
         super.viewDidLoad()
                 
         setupMainView()
-        
+                
         if activity != nil {
             title = "Event"
             active = true

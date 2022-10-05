@@ -131,7 +131,7 @@ class TaskViewController: FormViewController {
                     if let list = list {
                         task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                     } else {
-                        list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false}
+                        list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
                         task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                         task.category = list?.category
                     }

@@ -49,7 +49,7 @@ class GoogleCalManager {
             completion()
             return
         }
-        
+                
         events = []
         isRunningEvents = true
         
