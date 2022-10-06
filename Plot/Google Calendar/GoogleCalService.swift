@@ -105,9 +105,10 @@ class GoogleCalService {
         }
     }
     
-    func storeEvent(for activity: Activity) -> GTLRCalendar_Event? {
+    func storeEvent(for activity: Activity, completion: @escaping (GTLRCalendar_Event?) -> Swift.Void) {
         guard let service = self.calendarService, let startDate = activity.startDate, let endDate = activity.endDate, let start = dateToGLTRDate(date: startDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")), let end = dateToGLTRDate(date: endDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.endTimeZone ?? "UTC")), let name = activity.name else {
-            return nil
+            completion(nil)
+            return
         }
         
         let event = GTLRCalendar_Event()
@@ -119,25 +120,28 @@ class GoogleCalService {
         if let value = plotGoogleCalendar {
             let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: value)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
-                if error != nil {
-                    print(name)
-                    print("Failed to save google calendar event with error : \(String(describing: error))")
+                if let event = result as? GTLRCalendar_Event {
+                    completion(event)
+                    return
                 }
+                print("Failed to save google calendar event with error : \(String(describing: error))")
+                completion(nil)
             })
         } else {
             createPlotCalendar { (identifier) in
                 if let value = identifier {
                     let query = GTLRCalendarQuery_EventsInsert.query(withObject: event, calendarId: value)
                     service.executeQuery(query, completionHandler: { (ticket, result, error) in
-                        if error != nil {
-                            print("Failed to save google calendar event with error : \(String(describing: error))")
+                        if let event = result as? GTLRCalendar_Event {
+                            completion(event)
+                            return
                         }
+                        print("Failed to save google calendar event with error : \(String(describing: error))")
+                        completion(nil)
                     })
                 }
             }
         }
-        
-        return event
     }
     
     func updateEvent(for activity: Activity) {
@@ -149,7 +153,6 @@ class GoogleCalService {
         
         service.executeQuery(eventQuery, completionHandler: { (ticket, result, error) in
             guard error == nil, let event = result as? GTLRCalendar_Event else {
-                print(ticket)
                 print("failed to grab event \(String(describing: error))")
                 return
             }
@@ -288,9 +291,10 @@ class GoogleCalService {
         }
     }
     
-    func storeTask(for activity: Activity) -> GTLRTasks_Task? {
+    func storeTask(for activity: Activity, completion: @escaping (GTLRTasks_Task?) -> Swift.Void) {
         guard let service = self.taskService, let name = activity.name else {
-            return nil
+            completion(nil)
+            return
         }
         
         let task = GTLRTasks_Task()
@@ -311,24 +315,28 @@ class GoogleCalService {
         if let value = plotGoogleList {
             let query = GTLRTasksQuery_TasksInsert.query(withObject: task, tasklist: value)
             service.executeQuery(query, completionHandler: { (ticket, result, error) in
-                if error != nil {
-                    print("Failed to save google task with error : \(String(describing: error))")
+                if let event = result as? GTLRTasks_Task {
+                    completion(event)
+                    return
                 }
+                print("Failed to save google calendar event with error : \(String(describing: error))")
+                completion(nil)
             })
         } else {
             createPlotList { (identifier) in
                 if let value = identifier {
                     let query = GTLRTasksQuery_TasksInsert.query(withObject: task, tasklist: value)
                     service.executeQuery(query, completionHandler: { (ticket, result, error) in
-                        if error != nil {
-                            print("Failed to save google task with error : \(String(describing: error))")
+                        if let event = result as? GTLRTasks_Task {
+                            completion(event)
+                            return
                         }
+                        print("Failed to save google calendar event with error : \(String(describing: error))")
+                        completion(nil)
                     })
                 }
             }
         }
-        
-        return task
     }
     
     func updateTask(for activity: Activity) {

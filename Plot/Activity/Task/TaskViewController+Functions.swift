@@ -664,15 +664,13 @@ extension TaskViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc func createNewActivity() {
+    @objc func createNewActivity() {              
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                
                 let newActivity = self.task.getDifferenceBetweenActivities(otherActivity: self.taskOld)
                 let instanceValues = newActivity.toAnyObject()
-                print(instanceValues)
                 let createActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createActivity.updateInstance(instanceValues: instanceValues)
                 if self.navigationItem.leftBarButtonItem != nil {

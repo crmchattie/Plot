@@ -1642,20 +1642,18 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
     }
     
     case None = "None"
-    case At_time_of_event = "At time of activity"
+    case At_time_of_event = "At time of event or task"
     case Five_Minutes = "5 minutes before"
     case Fifteen_Minutes = "15 minutes before"
     case Half_Hour = "30 minutes before"
     case One_Hour = "1 hour before"
+    case Two_Hour = "2 hours before"
     case One_Day = "1 day before"
+    case Two_Day = "2 days before"
     case One_Week = "1 week before"
-    case One_Month = "1 month before"
-    case One_Year = "1 year before"
     
     var description : String { return rawValue }
-    
-    //    static let allValues = [None, At_time_of_event, Fifteen_Minutes, Half_Hour, One_Hour, One_Day, One_Week, One_Month]
-    
+        
     var timeInterval: Double {
         switch self {
         case .None:
@@ -1668,14 +1666,14 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             return -1800
         case .One_Hour:
             return -3600
+        case .Two_Hour:
+            return -7200
         case .One_Day:
             return -86400
+        case .Two_Day:
+            return -172800
         case .One_Week:
             return -604800
-        case .One_Month:
-            return -2419200
-        case .One_Year:
-            return -31536000
         default:
             return 0
         }
@@ -1691,14 +1689,14 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             return .Half_Hour
         case 3600:
             return .One_Hour
+        case 7200:
+            return .Two_Hour
         case 86400:
             return .One_Day
+        case 172800:
+            return .Two_Day
         case 604800:
             return .One_Week
-        case 2419200:
-            return .One_Month
-        case 31536000:
-            return .One_Year
         default:
             return .None
         }

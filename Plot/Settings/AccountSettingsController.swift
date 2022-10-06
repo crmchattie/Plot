@@ -207,7 +207,6 @@ class AccountSettingsController: UITableViewController {
     
     @objc func changePhoneNumber() {
         cancelBarButtonPressed()
-        AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
         let controller = ChangePhoneNumberController()
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
@@ -219,7 +218,6 @@ class AccountSettingsController: UITableViewController {
     
     @objc func changeEmail() {
         cancelBarButtonPressed()
-        AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
         let controller = ChangeEmailController()
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
@@ -250,7 +248,6 @@ class AccountSettingsController: UITableViewController {
             return
         }
 
-        AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
         UIApplication.shared.applicationIconBadgeNumber = 0
 
         let destination = OnboardingController()

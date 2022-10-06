@@ -81,7 +81,6 @@ class CalendarFetcher: NSObject {
         var userCalendars: [String: CalendarType] = [:]
         
         userCalendarDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            print(snapshot.exists())
             guard snapshot.exists() else {
                 self.uploadInitialPlotCalendars()
                 calendarInitialAdd(prebuiltCalendars)

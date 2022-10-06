@@ -25,6 +25,15 @@ class EnterVerificationCodeController: UIViewController {
         enterVerificationContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
         enterVerificationContainerView.enterVerificationCodeController = self
         
+        if let text = enterVerificationContainerView.titleNumber.text {
+            do {
+                let phoneNumber = try self.phoneNumberKit.parse(text)
+                enterVerificationContainerView.titleNumber.text = self.phoneNumberKit.format(phoneNumber, toType: .international)
+            } catch {
+                return
+            }
+        }
+        
     }
     
     fileprivate func configureNavigationBar () {
@@ -50,10 +59,15 @@ class EnterVerificationCodeController: UIViewController {
         var phoneNumberForVerification = String()
         
         do {
+            print("do")
             let phoneNumber = try self.phoneNumberKit.parse(enterVerificationContainerView.titleNumber.text!)
+            print(phoneNumber)
             phoneNumberForVerification = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+            print(phoneNumberForVerification)
         } catch {
+            print("catch")
             phoneNumberForVerification = enterVerificationContainerView.titleNumber.text!
+            print(phoneNumberForVerification)
         }
         
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
@@ -127,9 +141,7 @@ class EnterVerificationCodeController: UIViewController {
                 }
                 
                 self.removeSpinner()
-                self.dismiss(animated: true) {
-                    AppUtility.lockOrientation(.allButUpsideDown)
-                }
+                self.dismiss(animated: true)
             }
         })
     }
@@ -172,7 +184,6 @@ class EnterVerificationCodeController: UIViewController {
             }
             
             let destination = UserProfileController()
-            AppUtility.lockOrientation(.portrait)
             do {
                 let phoneNumber = try self.phoneNumberKit.parse(self.enterVerificationContainerView.titleNumber.text ?? "")
                 destination.userProfileContainerView.phone.text = self.phoneNumberKit.format(phoneNumber, toType: .international)

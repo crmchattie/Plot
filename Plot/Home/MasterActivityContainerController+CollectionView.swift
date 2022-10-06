@@ -105,7 +105,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                             cell.spinnerView.stopAnimating()
                             cell.subTitleLabel.isHidden = true
                         } else {
-                            if updatingTasks || updatingEvents {
+                            if updatingTasks && updatingEvents {
                                 cell.spinnerView.startAnimating()
                             } else {
                                 cell.spinnerView.stopAnimating()
@@ -141,15 +141,15 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kHeaderCell, for: indexPath) as! InterSectionHeader
                 cell.backgroundColor = .systemGroupedBackground
                 cell.titleLabel.text = item.name
-                if item == .tasks {
-                    if updatingTasks && activities[.calendar] != nil {
+                if item == .tasks && activities[.tasks] != nil {
+                    if updatingTasks {
                         cell.spinnerView.startAnimating()
                     } else {
                         cell.spinnerView.stopAnimating()
                     }
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
-                } else if item == .calendar && activities[.tasks] != nil {
+                } else if item == .calendar && activities[.calendar] != nil {
                     if updatingEvents {
                         cell.spinnerView.startAnimating()
                     } else {
@@ -331,11 +331,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             if section == .time {
                 newCalendar()
             } else if section == .health {
-                networkController.healthService.grabHealth {
-                    DispatchQueue.main.async {
-                        self.collectionView.reloadData()
-                    }
-                }
+                networkController.healthService.regrabHealth {}
             } else {
                 self.openMXConnect(current_member_guid: nil)
             }

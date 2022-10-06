@@ -78,6 +78,7 @@ class HealthService {
     var isRunning: Bool = true
     
     func grabHealth(_ completion: @escaping () -> Void) {
+        print("grabHealth")
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.askedforAuthorization = askedforAuthorization
@@ -95,6 +96,12 @@ class HealthService {
                 }
             }
         }
+    }
+    
+    func setupFirebase() {
+        self.observeWorkoutsForCurrentUser {}
+        self.observeMindfulnesssForCurrentUser {}
+        self.hasLoadedHealth = true
     }
     
     func regrabHealth(_ completion: @escaping () -> Void) {

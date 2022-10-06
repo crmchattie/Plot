@@ -7,8 +7,11 @@
 //
 
 import UIKit
+import PhoneNumberKit
 
 class EnterVerificationContainerView: UIView {
+    
+    let phoneNumberKit = PhoneNumberKit()
     
     let leftBarButton = UIBarButtonItem(title: "Resend", style: .done, target: EnterVerificationContainerView.self, action: nil)
     

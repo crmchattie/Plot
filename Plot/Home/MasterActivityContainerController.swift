@@ -69,10 +69,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var healthMetrics: [HealthMetricCategory: [HealthMetric]] {
         var metrics = networkController.healthService.healthMetrics
         if let generalMetrics = metrics[.general] {
-            metrics[.general] = generalMetrics.filter({ $0.type == .steps || $0.type == .sleep || $0.type == .flightsClimbed })
-            if metrics[.general] == [] {
-                metrics[.general] = nil
-            }
+            metrics[.general] = generalMetrics.filter({ $0.type == .steps || $0.type == .sleep || $0.type == .flightsClimbed || $0.type == .mindfulness })
         }
         if let workoutMetrics = metrics[.workouts] {
             metrics[.general]?.append(contentsOf: workoutMetrics.filter({ $0.type == .activeEnergy || $0.type == .workoutMinutes}))
@@ -81,6 +78,9 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         if let nutritionMetrics = metrics[.nutrition] {
             metrics[.general]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name }))
             metrics[.nutrition] = nil
+        }
+        if metrics[.general] == [] {
+            metrics[.general] = nil
         }
         return metrics
     }
@@ -158,8 +158,10 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if isNewUser {
-            isNewUser = false
+            self.networkController.setupFirebase()
             self.networkController.userService.grabContacts()
+            //change to stop from running
+            isNewUser = false
         }
     }
     
@@ -335,28 +337,28 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func hasLoadedCalendarEventActivities() {
-        self.updatingEvents = false
+        self.updatingEvents = !self.networkController.activityService.hasLoadedCalendarEventActivities
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func hasLoadedListTaskActivities() {
-        self.updatingTasks = false
+        self.updatingTasks = !self.networkController.activityService.hasLoadedListTaskActivities
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func hasLoadedHealth() {
-        self.updatingHealth = false
+        self.updatingHealth = !self.networkController.healthService.hasLoadedHealth
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func hasLoadedFinancials() {
-        self.updatingFinances = false
+        self.updatingFinances = !self.networkController.financeService.hasLoadedFinancials
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -381,8 +383,10 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                             target: self,
                                                             action: #selector(newItem))
-        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
-        collectionView.refreshControl = refreshControl
+        if !isNewUser {
+            refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
+            collectionView.refreshControl = refreshControl
+        }
     }
     
     func setApplicationBadge() {
@@ -707,36 +711,33 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     }
     
     func newCalendar() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: CalendarSourceOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
-                self.collectionView.reloadData()
-            }))
-        }
-        
-        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
-            alert.addAction(UIAlertAction(title: CalendarSourceOptions.google.name, style: .default, handler: { (_) in
-                GIDSignIn.sharedInstance().delegate = self
-                GIDSignIn.sharedInstance()?.presentingViewController = self
-                GIDSignIn.sharedInstance()?.signIn()
-            }))
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
+        let destination = SignInAppleGoogleViewController(networkController: networkController)
+        destination.title = "Providers"
+        destination.delegate = self
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+        destination.navigationItem.leftBarButtonItem = cancelBarButton
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: destination, action: nil)
+        destination.navigationItem.rightBarButtonItem = doneBarButton
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
-            self.collectionView.reloadData()
+            let grantedScopes = user?.grantedScopes as? [String]
+            if let grantedScopes = grantedScopes {
+                if grantedScopes.contains(googleEmailScope) && grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                    self.collectionView.reloadData()
+                } else if grantedScopes.contains(googleEmailScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                    self.collectionView.reloadData()
+                } else if grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                    self.collectionView.reloadData()
+                }
+            }
         } else {
           print("\(error.localizedDescription)")
         }
@@ -891,6 +892,12 @@ extension MasterActivityContainerController: DeleteAndExitDelegate {
 //        }) else { return nil }
 //        return index
         return nil
+    }
+}
+
+extension MasterActivityContainerController: UpdateWithGoogleAppleSignInDelegate {
+    func UpdateWithGoogleAppleSignIn() {
+        self.collectionView.reloadData()
     }
 }
 

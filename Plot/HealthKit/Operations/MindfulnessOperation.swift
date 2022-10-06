@@ -39,7 +39,6 @@ class MindfulnessOperation: AsyncOperation {
                     existingMindfulnessKeys = dataSnapshotValue
                 }
                                 
-                var containers: [Container] = []
                 var startDay = startDate.dayBefore
                 var interval = NSDateInterval(start: startDay, duration: 86400)
                 var map: [Date: Double] = [:]
@@ -67,27 +66,9 @@ class MindfulnessOperation: AsyncOperation {
                         
                         ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulnessID).child(hkSampleIDKey).setValue(sample.uuid.uuidString)
                                                                                 
-                        var mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
-                        
-                        if let activity = EventBuilder.createActivity(from: mindfulnessFB), let activityID = activity.activityID {
-                            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-
-                            mindfulnessFB.containerID = containerID
-                            
-                            let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
-                            mindfulnessActions.createNewMindfulness()
-                            
-                            activity.containerID = containerID
-                            
-                            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                            activityActions.createNewActivity()
-                            
-                            let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulnessID], mealIDs: nil, transactionIDs: nil, participantsIDs: [currentUserID])
-                            containers.append(container)
-                        } else {
-                            let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
-                            mindfulnessActions.createNewMindfulness()
-                        }
+                        let mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
+                        let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
+                        mindfulnessActions.createNewMindfulness()
                     }
                 }
                 
@@ -98,7 +79,7 @@ class MindfulnessOperation: AsyncOperation {
                     var metric = HealthMetric(type: .mindfulness, total: val, date: last, unitName: "hrs", rank: HealthMetricType.mindfulness.rank)
                     metric.hkSample = samples.last
                     metric.average = average
-                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general, containers)
+                    _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
                     
                 }
                 

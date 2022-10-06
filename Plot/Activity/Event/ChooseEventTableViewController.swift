@@ -112,22 +112,24 @@ class ChooseEventTableViewController: UITableViewController {
         return .default
     }
     
-    fileprivate func configureTableView() {        
-        tableView = UITableView(frame: .zero, style: .insetGrouped)
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 105
-        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
-        tableView.allowsMultipleSelectionDuringEditing = false
+    fileprivate func configureTableView() {
         view.backgroundColor = .systemGroupedBackground
-        tableView.indicatorStyle = .default
-        tableView.backgroundColor = view.backgroundColor
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
-        tableView.separatorStyle = .none
         definesPresentationContext = true
+        
+        tableView = UITableView(frame: .zero, style: .insetGrouped)
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 105
+        tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
+        tableView.allowsMultipleSelectionDuringEditing = false
+        tableView.indicatorStyle = .default
+        tableView.backgroundColor = view.backgroundColor
+        tableView.separatorStyle = .none
+        
     }
     
     @objc fileprivate func cancel() {

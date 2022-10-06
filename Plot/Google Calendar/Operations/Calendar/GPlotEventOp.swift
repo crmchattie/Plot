@@ -36,17 +36,22 @@ class GPlotEventOp: AsyncOperation {
                 if let _ = activity.externalActivityID {
                     googleCalService.updateEvent(for: activity)
                     dispatchGroup.leave()
-                } else if let event = googleCalService.storeEvent(for: activity), let id = event.identifier {
-                    let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                    reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
-                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["externalActivityID": id as Any]
-                        userReference.updateChildValues(values)
-                        dispatchGroup.leave()
-                    }
                 } else {
-                    dispatchGroup.leave()
+                    googleCalService.storeEvent(for: activity) { event in
+                        if let event = event, let id = event.identifier {
+                            let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                            reference.child(id).updateChildValues(calendarEventActivityValue) { (_, _) in
+                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let values:[String : Any] = ["externalActivityID": id as Any]
+                                userReference.updateChildValues(values)
+                                dispatchGroup.leave()
+                            }
+                        } else {
+                            dispatchGroup.leave()
+                        }
+                    }
                 }
+
             }
         }
         dispatchGroup.notify(queue: .global()) {

@@ -98,7 +98,7 @@ class GoogleCalManager {
 
         //filter old activities out
         let filterActivities = activities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && $0.isTask == nil && $0.calendarSource == CalendarSourceOptions.plot.name }
-                
+                        
         let eventsOp = GPlotEventOp(googleCalService: googleCalService, activities: filterActivities)
         // Setup queue
         queue.addOperations([eventsOp], waitUntilFinished: false)

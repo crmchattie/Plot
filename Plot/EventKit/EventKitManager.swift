@@ -21,6 +21,8 @@ class EventKitManager {
     
     var isAuthorizedEvents: Bool
     var isAuthorizedReminders: Bool
+    var eventAuthorizationStatus: String
+    var reminderAuthorizationStatus: String
     
     var plotAppleCalendar: String? {
         if let value = UserDefaults.standard.string(forKey: "PlotAppleCalendar") {
@@ -48,6 +50,8 @@ class EventKitManager {
         self.isRunningTasks = false
         self.isAuthorizedEvents = false
         self.isAuthorizedReminders = false
+        self.eventAuthorizationStatus = "notDetermined"
+        self.reminderAuthorizationStatus = "notDetermined"
         self.events = []
         self.tasks = []
         self.queue = OperationQueue()
@@ -68,7 +72,17 @@ class EventKitManager {
     }
     
     func checkEventAuthorizationStatus(_ completion: @escaping () -> Void) {
-        eventKitService.checkEventAuthorizationStatus()
+        eventKitService.checkEventAuthorizationStatus { [weak self] status in
+            self?.eventAuthorizationStatus = status
+            completion()
+        }
+    }
+    
+    func checkReminderAuthorizationStatus(_ completion: @escaping () -> Void) {
+        eventKitService.checkReminderAuthorizationStatus { [weak self] status in
+            self?.reminderAuthorizationStatus = status
+            completion()
+        }
     }
     
     func syncEventKitActivities(existingActivities: [Activity], completion: @escaping () -> Void) {

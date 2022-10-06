@@ -59,8 +59,6 @@ extension MasterActivityContainerController {
     func presentOnboardingController() {
         let destination = OnboardingController()
         let newNavigationController = UINavigationController(rootViewController: destination)
-        newNavigationController.navigationBar.shadowImage = UIImage()
-        newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
         newNavigationController.modalTransitionStyle = .crossDissolve
         newNavigationController.modalPresentationStyle = .fullScreen
         self.removeLaunchScreenView()

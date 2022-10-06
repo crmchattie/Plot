@@ -170,6 +170,7 @@ class EventBuilder {
                 recurrenceRule.startDate = startDate
                 recurrenceRule.interval = template.interval ?? 1
                 activity.recurrences = [recurrenceRule.toRRuleString()]
+                print(recurrenceRule.toRRuleString())
             }
         }
         
@@ -352,6 +353,7 @@ class TaskBuilder {
                 recurrenceRule.startDate = endDate
                 recurrenceRule.interval = template.interval ?? 1
                 activity.recurrences = [recurrenceRule.toRRuleString()]
+                print(recurrenceRule.toRRuleString())
             }
         }
         

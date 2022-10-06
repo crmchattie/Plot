@@ -38,15 +38,21 @@ class NetworkController {
         
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
+        print("grabActivities")
         activityService.grabActivities {
+            print("done grabActivities")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
+        print("grabFinances")
         financeService.grabFinances {
+            print("done grabFinances")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
+        print("grabHealth")
         healthService.grabHealth {
+            print("done grabHealth")
             dispatchGroup.leave()
         }
         
@@ -54,6 +60,12 @@ class NetworkController {
             self.isRunning = false
             completion()
         }
+    }
+    
+    func setupFirebase() {
+        activityService.setupFirebase()
+        financeService.setupFirebase()
+        healthService.setupFirebase()
     }
     
     func setupOtherVariables() {

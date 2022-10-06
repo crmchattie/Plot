@@ -50,23 +50,18 @@ class ContainerFunctions {
             print(error)
         }
         for ID in container.activityIDs ?? [] {
-            print(ID)
             reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.taskIDs ?? [] {
-            print(ID)
             reference.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.transactionIDs ?? [] {
-            print(ID)
             reference.child(financialTransactionsEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.workoutIDs ?? [] {
-            print(ID)
             reference.child(workoutsEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
         for ID in container.mindfulnessIDs ?? [] {
-            print(ID)
             reference.child(mindfulnessEntity).child(ID).child(containerIDEntity).setValue(container.id)
         }
     }

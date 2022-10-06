@@ -43,37 +43,37 @@ class EventKitService {
         EventKitSetupAssistant.authorizeEventKitReminders(completion: completion)
     }
     
-    func checkEventAuthorizationStatus() {
+    func checkEventAuthorizationStatus(completion: @escaping (String) -> Swift.Void) {
         let status = EKEventStore.authorizationStatus(for: .event)
         switch (status) {
         case EKAuthorizationStatus.notDetermined:
             // This happens on first-run
-            print("notDetermined")
+            completion("notDetermined")
         case EKAuthorizationStatus.authorized:
             // Things are in line with being able to show the calendars in the table view
-            print("authorized")
+            completion("authorized")
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
-            print("restricted")
+            completion("restricted")
         default:
-            print("default")
+            completion("default")
         }
     }
     
-    func checkReminderAuthorizationStatus() {
+    func checkReminderAuthorizationStatus(completion: @escaping (String) -> Swift.Void) {
         let status = EKEventStore.authorizationStatus(for: .reminder)
         switch (status) {
         case EKAuthorizationStatus.notDetermined:
             // This happens on first-run
-            print("notDetermined")
+            completion("notDetermined")
         case EKAuthorizationStatus.authorized:
             // Things are in line with being able to show the calendars in the table view
-            print("authorized")
+            completion("authorized")
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
-            print("restricted")
+            completion("restricted")
         default:
-            print("default")
+            completion("default")
         }
     }
     

@@ -18,7 +18,16 @@ protocol UpdateWithGoogleAppleSignInDelegate: AnyObject {
 class SignInAppleGoogleViewController: UITableViewController {
     weak var delegate : UpdateWithGoogleAppleSignInDelegate?
     
-    var networkController = NetworkController()
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     let signInAppleGoogleCellId = "signInAppleGoogleCellId"
     
@@ -60,6 +69,13 @@ class SignInAppleGoogleViewController: UITableViewController {
         tableView.register(SignInAppleGoogleTableViewCell.self, forCellReuseIdentifier: signInAppleGoogleCellId)
         extendedLayoutIncludesOpaqueBars = true
         createDataSource()
+        
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
+        if navigationItem.rightBarButtonItem != nil {
+            navigationItem.rightBarButtonItem?.action = #selector(done)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -67,8 +83,16 @@ class SignInAppleGoogleViewController: UITableViewController {
         delegate?.UpdateWithGoogleAppleSignIn()
     }
     
+    @IBAction func done(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func cancel(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     fileprivate func createDataSource() {
-        if title == "Tasks" {
+        if title == "Lists" {
             if !lists.keys.contains(ListSourceOptions.apple.name) && !lists.keys.contains(ListSourceOptions.google.name) {
                 firstSection.append(apple)
                 secondSection.append(google)
@@ -86,6 +110,9 @@ class SignInAppleGoogleViewController: UITableViewController {
             } else if !calendars.keys.contains(CalendarSourceOptions.google.name) {
                 firstSection.append(google)
             }
+        } else if title == "Providers" {
+            firstSection.append(apple)
+            secondSection.append(google)
         }
     }
     
@@ -104,7 +131,7 @@ class SignInAppleGoogleViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: signInAppleGoogleCellId,
                                                  for: indexPath) as? SignInAppleGoogleTableViewCell ?? SignInAppleGoogleTableViewCell()
-        cell.selectionStyle = .none
+        cell.selectionStyle = .default
         if indexPath.section == 0 {
             cell.icon.image = firstSection[indexPath.row].icon
             cell.title.text = firstSection[indexPath.row].title
@@ -140,10 +167,16 @@ class SignInAppleGoogleViewController: UITableViewController {
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
             } else {
-                if title == "Tasks" {
+                if title == "Lists" {
                     self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
-                } else {
+                } else if title == "Calendars" {
                     self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
+                } else if title == "Providers" {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
+                }
+                if navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
                 }
             }
         } else {
@@ -152,26 +185,41 @@ class SignInAppleGoogleViewController: UITableViewController {
                 GIDSignIn.sharedInstance()?.presentingViewController = self
                 GIDSignIn.sharedInstance()?.signIn()
             } else {
-                if title == "Tasks" {
+                if title == "Lists" {
                     self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
-                } else {
+                } else if title == "Calendars" {
                     self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
+                } else if title == "Providers" {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
+                }
+                if navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
                 }
             }
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
 
 extension SignInAppleGoogleViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        print("signed in")
-        self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
-        self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
-        
         if (error == nil) {
-            print("updatePrimaryCalendar")
-            self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+            let grantedScopes = user?.grantedScopes as? [String]
+            print(grantedScopes)
+            if let grantedScopes = grantedScopes {
+                if grantedScopes.contains(googleEmailScope) && grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                } else if grantedScopes.contains(googleEmailScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                } else if grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                }
+            }
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            }
         }
         else {
           print("\(error.localizedDescription)")

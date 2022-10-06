@@ -389,7 +389,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             viewPlaceholder.remove(from: activityView.tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: activityView.tableView, title: .emptyEvents, subtitle: .emptyEvents, priority: .medium, position: .top)
+        viewPlaceholder.add(for: activityView.tableView, title: .emptyEvents, subtitle: .emptyTasksEvents, priority: .medium, position: .top)
     }
     
     func handleReloadTable() {
@@ -819,7 +819,17 @@ extension CalendarViewController: UpdateInvitationDelegate {
 extension CalendarViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+            let grantedScopes = user?.grantedScopes as? [String]
+            if let grantedScopes = grantedScopes {
+                if grantedScopes.contains(googleEmailScope) && grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                } else if grantedScopes.contains(googleEmailScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                } else if grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                }
+            }
         } else {
             print("\(error.localizedDescription)")
         }

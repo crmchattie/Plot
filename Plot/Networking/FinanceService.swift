@@ -101,8 +101,7 @@ class FinanceService {
     
     func grabFinances(_ completion: @escaping () -> Void) {
         self.triggerUpdateMXUser {}
-        self.observeAccountsForCurrentUser {
-        }
+        self.observeAccountsForCurrentUser {}
         self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
@@ -119,6 +118,18 @@ class FinanceService {
         self.observeHoldingsForCurrentUser()
         self.observeMembersForCurrentUser {}
 
+    }
+    
+    func setupFirebase() {
+        self.observeAccountsForCurrentUser {}
+        self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
+            self.transactionRules = transactionRules
+            self.observeTransactionsForCurrentUser {}
+            self.hasLoadedFinancials = true
+        })
+        self.observeTransactionRulesForCurrentUser {}
+        self.observeHoldingsForCurrentUser()
+        self.observeMembersForCurrentUser {}
     }
     
     func regrabFinances(_ completion: @escaping () -> Void) {

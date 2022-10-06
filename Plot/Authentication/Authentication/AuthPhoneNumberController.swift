@@ -20,12 +20,7 @@ class AuthPhoneNumberController: EnterPhoneNumberController {
     override func rightBarButtonDidTap() {
         super.rightBarButtonDidTap()
         let destination = AuthVerificationController()
-        do {
-            let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.phoneNumber.text!)
-            destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + String(phoneNumber.nationalNumber)
-        } catch {
-            destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
-        }
+        destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
         navigationController?.pushViewController(destination, animated: true)
     }
 }

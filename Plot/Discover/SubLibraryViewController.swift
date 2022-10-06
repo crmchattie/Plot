@@ -250,8 +250,17 @@ extension SubLibraryViewController: EndedWebViewDelegate {
 extension SubLibraryViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
-            self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+            let grantedScopes = user?.grantedScopes as? [String]
+            if let grantedScopes = grantedScopes {
+                if grantedScopes.contains(googleEmailScope) && grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                } else if grantedScopes.contains(googleEmailScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                } else if grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                }
+            }
         } else {
           print("\(error.localizedDescription)")
         }

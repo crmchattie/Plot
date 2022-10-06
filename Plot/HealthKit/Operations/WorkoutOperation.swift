@@ -48,7 +48,6 @@ class WorkoutOperation: AsyncOperation {
                     var metricCalories = HealthMetric(type: HealthMetricType.workout, total: workoutTotalCalories, date: workout.endDate, unitName: "calories", rank: _self.rank)
                     metricCalories.hkSample = workout
                                         
-                    var containers: [Container] = []
                     var averageEnergyBurned: Double = 0
                     
                         workouts.forEach { workout in
@@ -69,27 +68,9 @@ class WorkoutOperation: AsyncOperation {
                                 ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(hkSampleIDKey).setValue(workout.uuid.uuidString)
                                 ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child("totalEnergyBurned").setValue(totalEnergyBurned)
                                                                                                 
-                                var workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
-                                
-                                if let activity = EventBuilder.createActivity(from: workoutFB), let activityID = activity.activityID {
-                                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-
-                                    workoutFB.containerID = containerID
-                                    
-                                    let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
-                                    workoutActions.createNewWorkout()
-                                    
-                                    activity.containerID = containerID
-                                    
-                                    let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                                    activityActions.createNewActivity()
-                                    
-                                    let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workoutID], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: [currentUserID])
-                                    containers.append(container)
-                                } else {
-                                    let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
-                                    workoutActions.createNewWorkout()
-                                }
+                                let workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
+                                let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
+                                workoutActions.createNewWorkout()
                             }
                         }
                     
@@ -98,7 +79,7 @@ class WorkoutOperation: AsyncOperation {
                         metricCalories.average = averageEnergyBurned
                     }
                     
-                    _self.delegate?.insertMetric(_self, metricCalories, HealthMetricCategory.workouts, containers)
+                    _self.delegate?.insertMetric(_self, metricCalories, HealthMetricCategory.workouts)
                 }
                 
                 self?.finish()

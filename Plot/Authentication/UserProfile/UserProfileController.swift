@@ -15,6 +15,7 @@ class UserProfileController: UIViewController {
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
+    var newUser = true
     
     // typealias allows you to rename a data type
     typealias CompletionHandler = (_ success: Bool) -> Void
@@ -45,6 +46,7 @@ class UserProfileController: UIViewController {
         userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.name.delegate = self
+        userProfileContainerView.phone.isUserInteractionEnabled = false
     }
     
     fileprivate func configureColorsAccordingToTheme() {
@@ -107,6 +109,7 @@ extension UserProfileController {
         nameReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists() {
                 self.userProfileContainerView.name.text = snapshot.value as? String
+                self.newUser = false
                 NotificationCenter.default.post(name: .oldUserLoggedIn, object: nil)
             }
         })
@@ -152,7 +155,7 @@ extension UserProfileController {
                 AnalyticsParameterMethod: self.method
             ])
             self.dismiss(animated: true) {
-                AppUtility.lockOrientation(.allButUpsideDown)
+                AppUtility.lockOrientation(.portrait)
             }
         }
     }

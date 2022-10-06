@@ -14,47 +14,53 @@ protocol CountryPickerDelegate: AnyObject {
 }
 
 public var countryCode = NSLocale.current.regionCode
-fileprivate var savedContentOffset = CGPoint(x: 0, y: -50)
 fileprivate var savedCountryCode = String()
 
 class SelectCountryCodeController: UITableViewController {
     
     let countries = Country().countries
     var filteredCountries = [[String:String]]()
+    
     var searchBar = UISearchBar()
+    var searchController = UISearchController()
     
     weak var delegate: CountryPickerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        extendedLayoutIncludesOpaqueBars = true
         configureView()
         configureSearchBar()
         configureTableView()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        tableView.setContentOffset(savedContentOffset, animated: false)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        savedContentOffset = tableView.contentOffset
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
     }
     
     fileprivate func configureView() {
         title = "Select your country"
         view.backgroundColor = .systemGroupedBackground
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = UIRectEdge.top
     }
     
     fileprivate func configureSearchBar() {
-        searchBar.delegate = self
-        searchBar.searchBarStyle = .minimal
-        searchBar.placeholder = "Search"
-        searchBar.backgroundColor = .systemGroupedBackground
-        searchBar.keyboardAppearance = .default
-        searchBar.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+        if #available(iOS 11.0, *) {
+            searchController = UISearchController(searchResultsController: nil)
+            searchController.searchResultsUpdater = self
+            searchController.obscuresBackgroundDuringPresentation = false
+            searchController.searchBar.delegate = self
+            searchController.definesPresentationContext = true
+            navigationItem.searchController = searchController
+            navigationItem.hidesSearchBarWhenScrolling = false
+        } else {
+            searchBar = UISearchBar()
+            searchBar.delegate = self
+            searchBar.placeholder = "Search"
+            searchBar.searchBarStyle = .minimal
+            searchBar.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
+            tableView.tableHeaderView = searchBar
+        }
     }
     
     fileprivate func configureTableView() {
@@ -62,12 +68,30 @@ class SelectCountryCodeController: UITableViewController {
         tableView.backgroundColor = .systemGroupedBackground
         tableView.indicatorStyle = .default
         tableView.separatorStyle = .none
-        tableView.tableHeaderView = searchBar
         filteredCountries = countries
     }
 }
 
 extension SelectCountryCodeController {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return ""
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.tintColor = .systemGroupedBackground
+        return view
+        
+    }
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -136,10 +160,11 @@ extension SelectCountryCodeController {
     }
 }
 
-extension SelectCountryCodeController: UISearchBarDelegate {
+extension SelectCountryCodeController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {}
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
         filteredCountries = searchText.isEmpty ? countries : countries.filter({ (data: [String : String]) -> Bool in
             return data["name"]!.lowercased().contains(searchText.lowercased()) || data["dial_code"]!.lowercased().contains(searchText.lowercased())
         })
@@ -147,15 +172,35 @@ extension SelectCountryCodeController: UISearchBarDelegate {
         tableView.reloadData()
     }
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        self.searchBar.endEditing(true)
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = nil
+        searchBar.resignFirstResponder()
+        filteredCountries = countries
+        tableView.reloadData()
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.keyboardAppearance = .default
+        return true
     }
 }
 
 extension SelectCountryCodeController {
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView.isDecelerating {
-            searchBar.endEditing(true)
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        
+        if #available(iOS 11.0, *) {
+            searchController.searchBar.endEditing(true)
+        } else {
+            self.searchBar.endEditing(true)
+        }
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        setNeedsStatusBarAppearanceUpdate()
+        if #available(iOS 11.0, *) {
+            searchController.searchBar.endEditing(true)
+        } else {
+            self.searchBar.endEditing(true)
         }
     }
 }

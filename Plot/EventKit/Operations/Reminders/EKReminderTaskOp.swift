@@ -100,17 +100,17 @@ class EKReminderTaskOp: AsyncOperation {
         activity.startTimeZone = reminder.timeZone?.identifier
         activity.endTimeZone = reminder.timeZone?.identifier
         activity.recurrences = reminder.recurrenceRules?.map { $0.iCalRuleString() }
-        if let startDate = reminder.startDateComponents?.date {
-            activity.startDateTime = NSNumber(value: startDate.timeIntervalSince1970)
-            if reminder.startDateComponents?.hour != nil {
-                activity.hasStartTime = true
-            } else {
-                activity.hasStartTime = false
-            }
-        } else {
-            activity.startDateTime = nil
-            activity.hasStartTime = false
-        }
+//        if let startDate = reminder.startDateComponents?.date {
+//            activity.startDateTime = NSNumber(value: startDate.timeIntervalSince1970)
+//            if reminder.startDateComponents?.hour != nil {
+//                activity.hasStartTime = true
+//            } else {
+//                activity.hasStartTime = false
+//            }
+//        } else {
+//            activity.startDateTime = nil
+//            activity.hasStartTime = false
+//        }
         if let endDate = reminder.dueDateComponents?.date {
             activity.endDateTime = NSNumber(value: endDate.timeIntervalSince1970)
             if reminder.dueDateComponents?.hour != nil {

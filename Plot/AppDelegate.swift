@@ -257,8 +257,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var orientationLock = UIInterfaceOrientationMask.portrait
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        guard Auth.auth().currentUser != nil else { return .portrait }
-        return self.orientationLock
+        return .portrait
     }
     
     func application(_ app: UIApplication,

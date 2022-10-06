@@ -34,6 +34,7 @@ class ActivityService {
     
     var activities = [Activity]() {
         didSet {
+            print("activities didSet")
             if oldValue != activities {
                 print("oldValue != activities")
                 eventsNoRepeats = activities.filter { $0.isTask == nil }
@@ -48,9 +49,12 @@ class ActivityService {
     var activitiesWithRepeats = [Activity]() {
         didSet {
             print("activitiesWithRepeats didSet")
-            self.events = activitiesWithRepeats.filter { $0.isTask == nil }
-            self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
-            self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil }
+            if oldValue != activitiesWithRepeats {
+                print("oldValue != activitiesWithRepeats")
+                self.events = activitiesWithRepeats.filter { $0.isTask == nil }
+                self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
+                self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil }
+            }
         }
     }
     
@@ -252,20 +256,6 @@ class ActivityService {
     
     func grabOtherActivities() {
         self.observeInvitationForCurrentUser()
-        self.grabPrimaryList({ (list) in
-            if list == ListSourceOptions.apple.name {
-                self.grabEKReminders {
-                    self.hasLoadedListTaskActivities = true
-                }
-            } else if list == ListSourceOptions.google.name {
-                self.grabGTasks {
-                    self.hasLoadedListTaskActivities = true
-                }
-            } else {
-                self.hasLoadedListTaskActivities = true
-            }
-            self.grabLists()
-        })
         self.grabPrimaryCalendar({ (calendar) in
             if calendar == CalendarSourceOptions.apple.name {
                 self.grabEKEvents {
@@ -280,7 +270,31 @@ class ActivityService {
             }
             self.grabCalendars()
         })
+        self.grabPrimaryList({ (list) in
+            if list == ListSourceOptions.apple.name {
+                self.grabEKReminders {
+                    self.hasLoadedListTaskActivities = true
+                }
+            } else if list == ListSourceOptions.google.name {
+                self.grabGTasks {
+                    self.hasLoadedListTaskActivities = true
+                }
+            } else {
+                self.hasLoadedListTaskActivities = true
+            }
+            self.grabLists()
+        })
         self.saveDataToSharedContainer(activities: self.activities)
+    }
+    
+    func setupFirebase() {
+        self.observeActivitiesForCurrentUser({
+            self.observeCalendarsForCurrentUser()
+            self.observeListsForCurrentUser()
+            self.observeInvitationForCurrentUser()
+            self.hasLoadedCalendarEventActivities = true
+            self.hasLoadedListTaskActivities = true
+        })
     }
     
     func regrabActivities(_ completion: @escaping () -> Void) {
@@ -385,30 +399,36 @@ class ActivityService {
         guard Auth.auth().currentUser != nil else {
             return completion()
         }
-        self.eventKitManager.checkEventAuthorizationStatus {}
-        self.eventKitManager.authorizeEventKitEvents({ askedforAuthorization in
-            self.askedforCalendarAuthorization = askedforAuthorization
-            self.eventKitManager.syncEventKitActivities(existingActivities: self.eventsNoRepeats, completion: {
-                self.eventKitManager.syncActivitiesToEventKit(activities: self.eventsNoRepeats, completion: {
-                    completion()
+        self.eventKitManager.checkEventAuthorizationStatus {
+            if self.eventKitManager.eventAuthorizationStatus != "restricted" {
+                self.eventKitManager.authorizeEventKitEvents({ askedforAuthorization in
+                    self.askedforCalendarAuthorization = askedforAuthorization
+                    self.eventKitManager.syncEventKitActivities(existingActivities: self.eventsNoRepeats, completion: {
+                        self.eventKitManager.syncActivitiesToEventKit(activities: self.eventsNoRepeats, completion: {
+                            completion()
+                        })
+                    })
                 })
-            })
-        })
+            }
+        }
     }
     
     func grabEKReminders(_ completion: @escaping () -> Void) {
         guard Auth.auth().currentUser != nil else {
             return completion()
         }
-        self.eventKitManager.checkEventAuthorizationStatus {}
-        self.eventKitManager.authorizeEventKitReminders({ askedforAuthorization in
-            self.askedforReminderAuthorization = askedforAuthorization
-            self.eventKitManager.syncEventKitReminders(existingActivities: self.tasksNoRepeats, completion: {
-                self.eventKitManager.syncTasksToEventKit(activities: self.tasksNoRepeats, completion: {
-                    completion()
+        self.eventKitManager.checkReminderAuthorizationStatus {
+            if self.eventKitManager.reminderAuthorizationStatus != "restricted" {
+                self.eventKitManager.authorizeEventKitReminders({ askedforAuthorization in
+                    self.askedforReminderAuthorization = askedforAuthorization
+                    self.eventKitManager.syncEventKitReminders(existingActivities: self.tasksNoRepeats, completion: {
+                        self.eventKitManager.syncTasksToEventKit(activities: self.tasksNoRepeats, completion: {
+                            completion()
+                        })
+                    })
                 })
-            })
-        })
+            }
+        }
     }
     
     func grabGEvents(_ completion: @escaping () -> Void) {
@@ -429,8 +449,8 @@ class ActivityService {
         guard Auth.auth().currentUser != nil else {
             return completion()
         }
-        self.googleCalManager.authorizeGReminders { askedforCalendarAuthorization in
-            self.askedforReminderAuthorization = askedforCalendarAuthorization
+        self.googleCalManager.authorizeGReminders { askedforReminderAuthorization in
+            self.askedforReminderAuthorization = askedforReminderAuthorization
             self.googleCalManager.syncGoogleCalTasks(existingActivities: self.tasksNoRepeats, completion: {
                 self.googleCalManager.syncTasksToGoogleTasks(activities: self.tasksNoRepeats, completion: {
                     completion()
@@ -441,9 +461,13 @@ class ActivityService {
     
     func grabCalendars() {
         if let _ = Auth.auth().currentUser {
-            self.eventKitManager.authorizeEventKitEvents { _ in
-                if let calendars = self.eventKitManager.grabCalendars() {
-                    self.calendars[CalendarSourceOptions.apple.name] = calendars
+            self.eventKitManager.checkEventAuthorizationStatus {
+                if self.eventKitManager.eventAuthorizationStatus == "authorized" {
+                    self.eventKitManager.authorizeEventKitEvents { _ in
+                        if let calendars = self.eventKitManager.grabCalendars() {
+                            self.calendars[CalendarSourceOptions.apple.name] = calendars
+                        }
+                    }
                 }
             }
             self.googleCalManager.authorizeGEvents { _ in
@@ -532,14 +556,25 @@ class ActivityService {
     
     func runCalendarFunctions(value: String) {
         if !askedforCalendarAuthorization {
-            grabActivities {}
+            regrabEvents {}
         } else {
             if value == primaryCalendar && value == CalendarSourceOptions.apple.name {
-                grabEKEvents {}
+                grabEKEvents {
+                    self.grabCalendars()
+                }
             } else if value == primaryCalendar && value == CalendarSourceOptions.google.name {
-                grabGEvents {}
+                grabGEvents {
+                    self.grabCalendars()
+                }
+            } else if value != primaryCalendar && value == CalendarSourceOptions.apple.name {
+                grabEKEvents {
+                    self.grabCalendars()
+                }
+            } else if value != primaryCalendar && value == CalendarSourceOptions.google.name {
+                grabGEvents {
+                    self.grabCalendars()
+                }
             }
-            grabCalendars()
         }
     }
     
@@ -554,9 +589,13 @@ class ActivityService {
     
     func grabLists() {
         if let _ = Auth.auth().currentUser {
-            self.eventKitManager.authorizeEventKitReminders { _ in
-                if let lists = self.eventKitManager.grabLists() {
-                    self.lists[ListSourceOptions.apple.name] = lists
+            self.eventKitManager.checkReminderAuthorizationStatus {
+                if self.eventKitManager.reminderAuthorizationStatus == "authorized" {
+                    self.eventKitManager.authorizeEventKitReminders { _ in
+                        if let lists = self.eventKitManager.grabLists() {
+                            self.lists[ListSourceOptions.apple.name] = lists
+                        }
+                    }
                 }
             }
             self.googleCalManager.authorizeGReminders { _ in
@@ -645,14 +684,25 @@ class ActivityService {
     
     func runListFunctions(value: String) {
         if !askedforReminderAuthorization {
-            grabActivities {}
+            regrabLists {}
         } else {
             if value == primaryList && value == ListSourceOptions.apple.name {
-                grabEKReminders {}
+                grabEKReminders {
+                    self.grabLists()
+                }
             } else if value == primaryList && value == ListSourceOptions.google.name {
-                grabGTasks {}
+                grabGTasks {
+                    self.grabLists()
+                }
+            } else if value != primaryList && value == ListSourceOptions.apple.name {
+                grabEKReminders {
+                    self.grabLists()
+                }
+            } else if value != primaryList && value == ListSourceOptions.google.name {
+                grabGTasks {
+                    self.grabLists()
+                }
             }
-            grabLists()
         }
     }
     
@@ -745,7 +795,6 @@ extension ActivityService {
     }
     
     func addRepeatingActivities(activities: [Activity], completion: @escaping ([Activity])->()) {
-        print("addRepeatingActivities")
         let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
         var newActivities = [Activity]()
         let group = DispatchGroup()
@@ -772,12 +821,12 @@ extension ActivityService {
                             for date in dates {
                                 if let instanceActivity = activities[date] {
                                     let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
-                                    newActivity.recurrenceStartDate = activity.finalDate
+                                    newActivity.recurrenceStartDateTime = activity.finalDateTime
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivities.append(newActivity)
                                 } else {
                                     let newActivity = activity.copy() as! Activity
-                                    newActivity.recurrenceStartDate = activity.finalDate
+                                    newActivity.recurrenceStartDateTime = activity.finalDateTime
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivities.append(newActivity)
                                 }
@@ -791,7 +840,7 @@ extension ActivityService {
                             .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                         for date in dates {
                             let newActivity = activity.copy() as! Activity
-                            newActivity.recurrenceStartDate = activity.finalDate
+                            newActivity.recurrenceStartDateTime = activity.finalDateTime
                             newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
                             newActivities.append(newActivity)
                         }
@@ -817,13 +866,13 @@ extension ActivityService {
                                 if let instanceActivity = activities[date] {
                                     //just left so something is there
                                     let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
-                                    newActivity.recurrenceStartDate = activity.finalDate
+                                    newActivity.recurrenceStartDateTime = activity.finalDateTime
                                     newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
                                     newActivities.append(newActivity)
                                 } else {
                                     let newActivity = activity.copy() as! Activity
-                                    newActivity.recurrenceStartDate = activity.finalDate
+                                    newActivity.recurrenceStartDateTime = activity.finalDateTime
                                     newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
                                     newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
                                     newActivities.append(newActivity)
@@ -839,7 +888,7 @@ extension ActivityService {
                         let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
                         for date in dates {
                             let newActivity = activity.copy() as! Activity
-                            newActivity.recurrenceStartDate = activity.finalDate
+                            newActivity.recurrenceStartDateTime = activity.finalDateTime
                             newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
                             newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
                             newActivities.append(newActivity)

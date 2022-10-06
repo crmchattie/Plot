@@ -136,6 +136,7 @@ class ActivityActions: NSObject {
     }
     
     func updateActivityParticipants() {
+        print("updateActivityParticipants")
         guard let _ = active, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
@@ -145,9 +146,7 @@ class ActivityActions: NSObject {
             updateParticipants(membersIDs: membersIDs)
             groupActivityReference.updateChildValues(["participantsIDs": membersIDs.0 as AnyObject])
             if !(activity.isTask ?? false) {
-                InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
-                    
-                }
+                InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {}
             }
         }
     }
@@ -200,7 +199,6 @@ class ActivityActions: NSObject {
         self.dispatchGroup.enter()
         self.dispatchGroup.enter()
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
-        
         if let containerID = activity.containerID {
             ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
             self.dispatchGroup.leave()
@@ -231,13 +229,17 @@ class ActivityActions: NSObject {
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
                         let values:[String : Any] = ["calendarExport": true, "externalActivityID": reminder.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
-                    } else if value == ListSourceOptions.google.name, let task = self.googleCalService.storeTask(for: activity), let id = task.identifier {
-                        reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
-                        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                        reference.updateChildValues(calendarEventActivityValue)
-                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": task.identifier as Any]
-                        userReference.updateChildValues(values)
+                    } else if value == ListSourceOptions.google.name {
+                        self.googleCalService.storeTask(for: activity) { task in
+                            if let task = task, let id = task.identifier {
+                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
+                                let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                                reference.updateChildValues(calendarEventActivityValue)
+                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let values:[String : Any] = ["calendarExport": true, "externalActivityID": task.identifier as Any]
+                                userReference.updateChildValues(values)
+                            }
+                        }
                     }
                 }
             })
@@ -252,13 +254,17 @@ class ActivityActions: NSObject {
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
                         let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
-                    } else if value == CalendarSourceOptions.google.name, let event = self.googleCalService.storeEvent(for: activity), let id = event.identifier {
-                        reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
-                        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                        reference.updateChildValues(calendarEventActivityValue)
-                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.identifier as Any]
-                        userReference.updateChildValues(values)
+                    } else if value == CalendarSourceOptions.google.name {
+                        self.googleCalService.storeEvent(for: activity) { event in
+                            if let event = event, let id = event.identifier {
+                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
+                                let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                                reference.updateChildValues(calendarEventActivityValue)
+                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.identifier as Any]
+                                userReference.updateChildValues(values)
+                            }
+                        }
                     }
                 }
             })
@@ -379,7 +385,7 @@ class ActivityActions: NSObject {
         guard let _ = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return (membersIDs.sorted(), membersIDsDictionary)
         }
-                        
+                
         membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
         membersIDs.append(currentUserID)
         
@@ -393,6 +399,7 @@ class ActivityActions: NSObject {
     }
     
     func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
+        print("connectMembersToGroupActivity")
         guard let activity = activity, let currentUserID = Auth.auth().currentUser?.uid else {
             self.dispatchGroup.leave()
             return
@@ -405,6 +412,8 @@ class ActivityActions: NSObject {
             self.dispatchGroup.leave()
         })
         for memberID in memberIDs {
+            print("memberID")
+            print(memberID)
             if activity.isTask ?? false {
                 let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                 let values: [String : Any] = ["isGroupActivity": true,
@@ -415,6 +424,7 @@ class ActivityActions: NSObject {
                 })
             } else {
                 if memberID == currentUserID, let calendarID = activity.calendarID, !calendarID.isEmpty {
+                    print("found calendar")
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                     let values: [String : Any] = ["isGroupActivity": true,
                                                   "badge": 0,
@@ -432,7 +442,9 @@ class ActivityActions: NSObject {
                     })
                 } else {
                     CalendarFetcher.fetchCalendarsForUser(id: memberID) { calendars in
+                        print("looking for calendar")
                         if let calendar = calendars.first(where: { $0.defaultCalendar ?? false }) {
+                            print("found second calendar")
                             let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["isGroupActivity": true,
                                                           "badge": 0,
@@ -467,6 +479,7 @@ class ActivityActions: NSObject {
     }
     
     func updateParticipants(membersIDs: ([String], [String:AnyObject])) {
+        print("updateParticipants activities")
         guard let activity = activity, let activityID = activityID else {
             return
         }

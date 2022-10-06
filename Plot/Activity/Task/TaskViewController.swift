@@ -735,7 +735,6 @@ class TaskViewController: FormViewController {
             } else {
                 row.value = TaskPriority.None
                 if let priority = row.value?.rawValue {
-                    print(priority)
                     self.task.priority = priority
                 }
             }

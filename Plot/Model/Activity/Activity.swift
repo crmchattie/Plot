@@ -48,7 +48,7 @@ class Activity: NSObject, NSCopying, Codable {
     //
     // Both Google and iCloud events are transfomed into this expression.
     var recurrences: [String]?
-    var recurrenceStartDate: Date?
+    var recurrenceStartDateTime: NSNumber?
     var reminder: String?
     var notes: String?
     var checklistIDs: [String]?
@@ -212,6 +212,7 @@ class Activity: NSObject, NSCopying, Codable {
         endDateTime = dictionary?["endDateTime"] as? NSNumber
         endTimeZone = dictionary?["endTimeZone"] as? String
         recurrences = dictionary?["recurrences"] as? [String]
+        recurrenceStartDateTime = dictionary?["recurrenceStartDateTime"] as? NSNumber
         reminder = dictionary?["reminder"] as? String
         notes = dictionary?["notes"] as? String
         isGroupActivity = dictionary?["isGroupActivity"] as? Bool
@@ -378,6 +379,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.recurrences as AnyObject? {
             dictionary["recurrences"] = value
+        }
+        
+        if let value = self.recurrenceStartDateTime as AnyObject? {
+            dictionary["recurrenceStartDateTime"] = value
         }
         
         if let value = self.notes as AnyObject? {
@@ -648,6 +653,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.recurrences {
             newActivity.recurrences = value
+        }
+        
+        if let value = updatingActivity.recurrenceStartDateTime {
+            newActivity.recurrenceStartDateTime = value
         }
         
         if let value = updatingActivity.notes {
@@ -1204,7 +1213,12 @@ extension Activity {
     var instanceOriginalStartDate: Date? {
         if let instanceOriginalStartDateTime = instanceOriginalStartDateTime?.doubleValue {
             return Date(timeIntervalSince1970: instanceOriginalStartDateTime)
-            //for tasks where deadline date is more likely to be set than start date
+        }
+        return nil
+    }
+    var recurrenceStartDate: Date? {
+        if let recurrenceStartDateTime = recurrenceStartDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: recurrenceStartDateTime)
         }
         return nil
     }

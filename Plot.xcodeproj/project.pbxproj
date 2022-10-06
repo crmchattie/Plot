@@ -311,6 +311,7 @@
 		10F7241628E37E4F003C13A0 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241528E37E4F003C13A0 /* LibraryCell.swift */; };
 		10F7241828E39C7A003C13A0 /* SubLibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241728E39C7A003C13A0 /* SubLibraryViewController.swift */; };
 		10F7241A28E39D2C003C13A0 /* SubLibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241928E39D2C003C13A0 /* SubLibraryCell.swift */; };
+		10F7241D28EE23E6003C13A0 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F7241C28EE23E6003C13A0 /* TutorialViewController.swift */; };
 		10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */; };
 		10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */; };
 		10F8C1922440C4CA0085ECB0 /* ActivityDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */; };
@@ -896,6 +897,7 @@
 		10F7241528E37E4F003C13A0 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
 		10F7241728E39C7A003C13A0 /* SubLibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubLibraryViewController.swift; sourceTree = "<group>"; };
 		10F7241928E39D2C003C13A0 /* SubLibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubLibraryCell.swift; sourceTree = "<group>"; };
+		10F7241C28EE23E6003C13A0 /* TutorialViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		10F819FC2470945800BFE5C9 /* IngredientSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientSearchViewController.swift; sourceTree = "<group>"; };
 		10F8C18F24401FA80085ECB0 /* CalendarDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDetailCell.swift; sourceTree = "<group>"; };
 		10F8C1912440C4CA0085ECB0 /* ActivityDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailViewController.swift; sourceTree = "<group>"; };
@@ -1886,6 +1888,14 @@
 			path = Operations;
 			sourceTree = "<group>";
 		};
+		10F7241B28EE2398003C13A0 /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				10F7241C28EE23E6003C13A0 /* TutorialViewController.swift */,
+			);
+			path = Tutorial;
+			sourceTree = "<group>";
+		};
 		26036760256CC4A600FE9142 /* EventKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -2238,6 +2248,7 @@
 				4BAEE47C21272C4F0045AB10 /* Onboarding */,
 				4BAEE47921272C4F0045AB10 /* Authentication */,
 				4BAEE47321272C4F0045AB10 /* UserProfile */,
+				10F7241B28EE2398003C13A0 /* Tutorial */,
 			);
 			path = Authentication;
 			sourceTree = "<group>";
@@ -3640,6 +3651,7 @@
 				4BAEE4EE21272D890045AB10 /* ChatInputContainer+AttachedImagesCollectionConfig.swift in Sources */,
 				10196F0624411B5600B6AFDF /* EventViewController+UpdateInvitees.swift in Sources */,
 				10DE973B2475E4E600D4A7E8 /* ChecklistFetcher.swift in Sources */,
+				10F7241D28EE23E6003C13A0 /* TutorialViewController.swift in Sources */,
 				10196F0D24411C2800B6AFDF /* ChooseEventTableViewController.swift in Sources */,
 				4BAEE47021272B380045AB10 /* AccountSettingsController+nameEditing.swift in Sources */,
 				4BAEE5DA212735E50045AB10 /* CameraCell.swift in Sources */,
@@ -3797,7 +3809,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 57;
+				CURRENT_PROJECT_VERSION = 58;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3830,7 +3842,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 57;
+				CURRENT_PROJECT_VERSION = 58;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3987,7 +3999,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 57;
+				CURRENT_PROJECT_VERSION = 58;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4027,7 +4039,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 57;
+				CURRENT_PROJECT_VERSION = 58;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

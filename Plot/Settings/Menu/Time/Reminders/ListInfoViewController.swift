@@ -80,7 +80,7 @@ class ListInfoViewController: UITableViewController {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "External List", style: .default, handler: { (_) in
-                let destination = SignInAppleGoogleViewController()
+                let destination = SignInAppleGoogleViewController(networkController: self.networkController)
                 destination.networkController = self.networkController
                 destination.title = "Lists"
                 destination.delegate = self

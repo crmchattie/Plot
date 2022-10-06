@@ -375,7 +375,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if filteredTasks.count == 0 {
-            viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasks, priority: .medium, position: .fill)
+            viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasksEvents, priority: .medium, position: .fill)
         } else {
             viewPlaceholder.remove(from: tableView, priority: .medium)
         }

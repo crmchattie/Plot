@@ -18,7 +18,7 @@ class HealthKitManager {
     private var metrics: [HealthMetricCategory: [HealthMetric]]
     private var containers: [Container]
     private var isRunning: Bool
-    private var saveContainersDispatchGroup: DispatchGroup!
+    private var dispatchGroup: DispatchGroup!
     
     init() {
         self.isRunning = false
@@ -154,9 +154,9 @@ class HealthKitManager {
                 
                 // if we properly fetched the items then save
                 if _self.containers.count > 0 {
-                    _self.saveContainersOnFirebase(_self.containers, completion: {
+                    _self.saveFirebase{
                         completion(_self.metrics, true)
-                    })
+                    }
                 }
                 else {
                     completion(_self.metrics, false)
@@ -188,25 +188,20 @@ class HealthKitManager {
         })
     }
     
-    func saveContainersOnFirebase(_ containers: [Container], completion: @escaping () -> Void) {
-        guard containers.count > 0, let currentUserId = Auth.auth().currentUser?.uid else {
+    func saveFirebase(completion: @escaping () -> Void) {
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
             completion()
             return
         }
         
-        saveContainersDispatchGroup = DispatchGroup()
+        dispatchGroup = DispatchGroup()
         
-        saveContainersDispatchGroup.notify(queue: DispatchQueue.global(), execute: {
+        dispatchGroup.notify(queue: DispatchQueue.global(), execute: {
             completion()
         })
-        
-        for container in containers {
-            ContainerFunctions.updateContainerAndStuffInside(container: container)
-        }
-        
 
         let reference = Database.database().reference().child(userHealthEntity).child(currentUserId)
-        saveContainersDispatchGroup.enter()
+        dispatchGroup.enter()
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists() {
                 let values = [lastSyncDateKey: Date().timeIntervalSince1970]
@@ -218,7 +213,7 @@ class HealthKitManager {
                 reference.setValue(values)
             }
             
-            self?.saveContainersDispatchGroup.leave()
+            self?.dispatchGroup.leave()
         })
     }
     

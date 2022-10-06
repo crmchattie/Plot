@@ -161,7 +161,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             viewPlaceholder.remove(from: tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasks, priority: .medium, position: .top)
+        viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasksEvents, priority: .medium, position: .top)
     }
     
     @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
@@ -244,7 +244,11 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         }
         
         if !listOfLists.isEmpty {
-            sections.insert(.myLists, at: 1)
+            if sections.count > 0 {
+                sections.insert(.myLists, at: 1)
+            } else {
+                sections.append(.myLists)
+            }
             lists[.myLists, default: []].append(contentsOf: listOfLists.sorted(by: {$0.name ?? "" < $1.name ?? "" }))
         }
         
@@ -571,8 +575,17 @@ extension ListsViewController: UpdateFilter {
 extension ListsViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
-            self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
-            self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+            let grantedScopes = user?.grantedScopes as? [String]
+            if let grantedScopes = grantedScopes {
+                if grantedScopes.contains(googleEmailScope) && grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                } else if grantedScopes.contains(googleEmailScope) {
+                    self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)
+                } else if grantedScopes.contains(googleTaskScope) {
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.google.name)
+                }
+            }
         } else {
           print("\(error.localizedDescription)")
         }
