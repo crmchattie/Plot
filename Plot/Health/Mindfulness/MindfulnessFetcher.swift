@@ -70,6 +70,7 @@ class MindfulnessFetcher: NSObject {
                                     } else {
                                         mindfulnesses = [_mindfulness]
                                         completion(mindfulnesses)
+                                        return
                                     }
                                 }
                             } else {

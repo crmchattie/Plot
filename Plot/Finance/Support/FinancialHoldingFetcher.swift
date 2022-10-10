@@ -75,6 +75,7 @@ class FinancialHoldingFetcher: NSObject {
                                     } else {
                                         holdings = [_holding]
                                         completion(holdings)
+                                        return
                                     }
                                 }
                             } else {

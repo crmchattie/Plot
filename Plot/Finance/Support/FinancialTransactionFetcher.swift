@@ -88,6 +88,7 @@ class FinancialTransactionFetcher: NSObject {
                                     } else {
                                         transactions = [_transaction]
                                         completion(transactions)
+                                        return
                                     }
                                 }
                             } else {

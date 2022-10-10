@@ -107,6 +107,7 @@ class InvitationsFetcher: NSObject {
                                         } else {
                                             activitiesForInvitations = [activity]
                                             completion(invitations, activities)
+                                            return
                                         }
                                     } else {
                                         if counter > 0 {

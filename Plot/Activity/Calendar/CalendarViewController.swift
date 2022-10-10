@@ -578,14 +578,14 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.selectedDate = date
+        self.selectedDate = date.startOfDay
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        self.selectedDate = calendar.currentPage
+        self.selectedDate = calendar.currentPage.startOfDay
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)

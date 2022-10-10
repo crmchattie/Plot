@@ -91,15 +91,15 @@ class ChecklistViewController: FormViewController {
     }
 
     fileprivate func configureTableView() {
-        tableView.allowsMultipleSelectionDuringEditing = false
-        view.backgroundColor = .systemGroupedBackground
-        tableView.indicatorStyle = .default
-        tableView.backgroundColor = view.backgroundColor
+        navigationItem.title = "Checklist"
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
-        tableView.separatorStyle = .none
         definesPresentationContext = true
-        navigationItem.title = "Checklist"
+        view.backgroundColor = .systemGroupedBackground
+        tableView.allowsMultipleSelectionDuringEditing = false
+        tableView.indicatorStyle = .default
+        tableView.backgroundColor = view.backgroundColor
+        tableView.separatorStyle = .none
         navigationOptions = .Disabled
     }
     
@@ -346,7 +346,6 @@ class ChecklistViewController: FormViewController {
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = .secondarySystemGroupedBackground
                         cell.textLabel?.textAlignment = .left
-                        
                 }
             }
             $0.multivaluedRowToInsertAt = { index in
@@ -359,10 +358,12 @@ class ChecklistViewController: FormViewController {
                         $0.placeholder = "Item"
                         }.cellUpdate { cell, row in
                             cell.backgroundColor = .secondarySystemGroupedBackground
-                            cell.textField?.textColor = .label
                             row.placeholderColor = .secondaryLabel
+                            cell.textField?.textColor = .label
+//                            cell.height = {
+//                                self.estimateFrameForText(width: Int(row.cell.frame.width), text: row.value ?? "").height
+//                            }
                     }
-                    
                     $0.rowRight = CheckRow() {
                         $0.cell.backgroundColor = .secondarySystemGroupedBackground
                         $0.cell.tintColor = FalconPalette.defaultBlue
@@ -381,7 +382,13 @@ class ChecklistViewController: FormViewController {
                     }
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = .secondarySystemGroupedBackground
-                    }.onChange() { _ in
+//                        cell.height = {
+//                            self.estimateFrameForText(width: Int(row.cell.frame.width * 0.75), text: row.rowLeft?.value ?? "").height
+//                        }
+                    }.onChange() { row in
+//                        row.cell.height = {
+//                            self.estimateFrameForText(width: Int(row.cell.frame.width * 0.75), text: row.rowLeft?.value ?? "").height
+//                        }
                         self.updateLists()
                 }
                 
@@ -407,8 +414,11 @@ class ChecklistViewController: FormViewController {
                         $0.value = item.key
                         }.cellUpdate { cell, row in
                             cell.backgroundColor = .secondarySystemGroupedBackground
-                            cell.textField?.textColor = .label
                             row.placeholderColor = .secondaryLabel
+                            cell.textField?.textColor = .label
+//                            cell.height = {
+//                                self.estimateFrameForText(width: Int(row.cell.frame.width), text: row.value ?? "").height
+//                            }
                     }
                     $0.rowRight = CheckRow() {
                         $0.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -428,7 +438,13 @@ class ChecklistViewController: FormViewController {
                     }
                     }.cellUpdate { cell, row in
                         cell.backgroundColor = .secondarySystemGroupedBackground
-                    }.onChange() { _ in
+//                        cell.height = {
+//                            self.estimateFrameForText(width: Int(row.cell.frame.width * 0.75), text: row.rowLeft?.value ?? "").height
+//                        }
+                    }.onChange() { row in
+//                        row.cell.height = {
+//                            self.estimateFrameForText(width: Int(row.cell.frame.width * 0.75), text: row.rowLeft?.value ?? "").height
+//                        }
                         self.updateLists()
                 } , at: mvs.count - 1)
             }
@@ -527,6 +543,13 @@ class ChecklistViewController: FormViewController {
             mutableData.value = value!
             return TransactionResult.success(withValue: mutableData)
         })
+    }
+    
+    func estimateFrameForText(width: Int, text: String) -> CGRect {
+        let size = CGSize(width: width, height: 10000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        let attributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)]
+        return text.boundingRect(with: size, options: options, attributes: attributes, context: nil).integral
     }
 }
 

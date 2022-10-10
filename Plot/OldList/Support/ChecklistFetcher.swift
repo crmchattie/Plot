@@ -17,7 +17,6 @@ class ChecklistFetcher: NSObject {
     fileprivate var currentUserChecklistsChangeHandle = DatabaseHandle()
     fileprivate var currentUserChecklistsRemoveHandle = DatabaseHandle()
     
-    
     var checklistsAdded: (([Checklist])->())?
     var checklistsRemoved: (([Checklist])->())?
     var checklistsChanged: (([Checklist])->())?

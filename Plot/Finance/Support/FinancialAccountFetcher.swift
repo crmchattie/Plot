@@ -76,6 +76,7 @@ class FinancialAccountFetcher: NSObject {
                                     } else {
                                         accounts = [_account]
                                         completion(accounts)
+                                        return
                                     }
                                 }
                             } else {

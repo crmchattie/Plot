@@ -60,6 +60,7 @@ class FinancialMemberFetcher: NSObject {
                                 } else {
                                     members = [member]
                                     completion(members)
+                                    return
                                 }
                             } else {
                                 if counter > 0 {

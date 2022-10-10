@@ -71,6 +71,7 @@ class MealFetcher: NSObject {
                                     } else {
                                         meals = [_meal]
                                         completion(meals)
+                                        return
                                     }
                                 }
                             } else {

@@ -21,9 +21,15 @@ class ActivitiesFetcher: NSObject {
     var activitiesAdded: (([Activity])->())?
     var activitiesRemoved: (([Activity])->())?
     var activitiesChanged: (([Activity])->())?
+    var activitiesWithRepeatsInitialAdd: (([Activity])->())?
+    var activitiesWithRepeatsAdded: (([Activity])->())?
+    var activitiesWithRepeatsChanged: (([Activity])->())?
+    //activityID:Activity
     var userActivities: [String: Activity] = [:]
+    //instanceOriginalStartDate:Activity
+    var instanceActivities: [String: Activity] = [:]
             
-    func observeActivityForCurrentUser(activitiesInitialAdd: @escaping ([Activity])->(), activitiesAdded: @escaping ([Activity])->(), activitiesRemoved: @escaping ([Activity])->(), activitiesChanged: @escaping ([Activity])->()) {
+    func observeActivityForCurrentUser(activitiesInitialAdd: @escaping ([Activity])->(), activitiesWithRepeatsInitialAdd: @escaping ([Activity])->(), activitiesAdded: @escaping ([Activity])->(), activitiesWithRepeatsAdded: @escaping ([Activity])->(), activitiesRemoved: @escaping ([Activity])->(), activitiesChanged: @escaping ([Activity])->(), activitiesWithRepeatsChanged: @escaping ([Activity])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -35,6 +41,9 @@ class ActivitiesFetcher: NSObject {
         self.activitiesAdded = activitiesAdded
         self.activitiesRemoved = activitiesRemoved
         self.activitiesChanged = activitiesChanged
+        self.activitiesWithRepeatsInitialAdd = activitiesWithRepeatsInitialAdd
+        self.activitiesWithRepeatsAdded = activitiesWithRepeatsAdded
+        self.activitiesWithRepeatsChanged = activitiesWithRepeatsChanged
                                 
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
@@ -42,8 +51,9 @@ class ActivitiesFetcher: NSObject {
                 return
             }
             
-            if let completion = self.activitiesInitialAdd {
+            if let completion = self.activitiesInitialAdd, let completionRepeats = self.activitiesWithRepeatsInitialAdd {
                 var activities: [Activity] = []
+                var activitiesWithRepeats: [Activity] = []
                 let group = DispatchGroup()
                 var counter = 0
                 let activityIDs = snapshot.value as? [String: AnyObject] ?? [:]
@@ -72,13 +82,36 @@ class ActivitiesFetcher: NSObject {
                                 activity.badgeDate = userActivity.badgeDate
                                 activity.muted = userActivity.muted
                                 activity.pinned = userActivity.pinned
-                                if counter > 0 {
-                                    activities.append(activity)
-                                    group.leave()
-                                    counter -= 1
+                                if let rules = activity.recurrences, !rules.isEmpty {
+                                    if counter == 0 {
+                                        activities = [activity]
+                                        completion(activities)
+                                    }
+                                    self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
+                                        if counter > 0 {
+                                            activities.append(activity)
+                                            activitiesWithRepeats.append(contentsOf: newActivitiesWithRepeats)
+                                            group.leave()
+                                            counter -= 1
+                                        } else {
+                                            activitiesWithRepeats = newActivitiesWithRepeats
+                                            completionRepeats(activitiesWithRepeats)
+                                            return
+                                        }
+                                    }
                                 } else {
-                                    activities = [activity]
-                                    completion(activities)
+                                    if counter > 0 {
+                                        activities.append(activity)
+                                        activitiesWithRepeats.append(activity)
+                                        group.leave()
+                                        counter -= 1
+                                    } else {
+                                        activities = [activity]
+                                        completion(activities)
+                                        activitiesWithRepeats = [activity]
+                                        completionRepeats(activitiesWithRepeats)
+                                        return
+                                    }
                                 }
                             } else {
                                 if counter > 0 {
@@ -91,13 +124,14 @@ class ActivitiesFetcher: NSObject {
                 }
                 group.notify(queue: .main) {
                     completion(activities)
+                    completionRepeats(activitiesWithRepeats)
                 }
             }
         })
         
         currentUserActivitiesAddHandle = userActivitiesDatabaseRef.observe(.childAdded, with: { snapshot in
             if self.userActivities[snapshot.key] == nil {
-                if let completion = self.activitiesAdded {
+                if let completion = self.activitiesAdded, let completionRepeats = self.activitiesWithRepeatsAdded {
                     var handle = UInt.max
                     let ID = snapshot.key
                     self.getUserDataFromSnapshot(ID: ID) { activityList in
@@ -121,7 +155,15 @@ class ActivitiesFetcher: NSObject {
                                     activity.badgeDate = userActivity.badgeDate
                                     activity.muted = userActivity.muted
                                     activity.pinned = userActivity.pinned
-                                    completion([activity])
+                                    if let rules = activity.recurrences, !rules.isEmpty {
+                                        completion([activity])
+                                        self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
+                                            completionRepeats(newActivitiesWithRepeats)
+                                        }
+                                    } else {
+                                        completion([activity])
+                                        completionRepeats([activity])
+                                    }
                                 }
                             }
                         }
@@ -138,12 +180,20 @@ class ActivitiesFetcher: NSObject {
         })
         
         currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
-            if let completion = self.activitiesChanged {
+            if let completion = self.activitiesChanged, let completionRepeats = self.activitiesWithRepeatsAdded {
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key) { activityList in
                     for activity in activityList {
                         self.userActivities[activity.activityID ?? ""] = activity
+                        if let rules = activity.recurrences, !rules.isEmpty {
+                            completion([activity])
+                            self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
+                                completionRepeats(newActivitiesWithRepeats)
+                            }
+                        } else {
+                            completion([activity])
+                            completionRepeats([activity])
+                        }
                     }
-                    completion(activityList)
                 }
             }
         })
@@ -194,6 +244,110 @@ class ActivitiesFetcher: NSObject {
         })
         group.notify(queue: .main) {
             completion(activities)
+        }
+    }
+    
+    func addRepeatingActivities(activity: Activity, completion: @escaping ([Activity])->()) {
+        let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
+        var newActivities = [Activity]()
+        let group = DispatchGroup()
+        var counter = 0
+        if let rules = activity.recurrences, !rules.isEmpty {
+            group.enter()
+            counter += 1
+            if activity.isTask ?? false {
+                if let instanceIDs = activity.instanceIDs {
+                    ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                        guard counter > 0 else {
+                            for (_, instanceActivity) in activities {
+                                completion([instanceActivity])
+                            }
+                            return
+                        }
+                        let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                        let dates = iCalUtility()
+                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                        for date in dates {
+                            if let instanceActivity = activities[date] {
+                                let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
+                                newActivity.recurrenceStartDateTime = activity.finalDateTime
+                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                newActivities.append(newActivity)
+                            } else {
+                                let newActivity = activity.copy() as! Activity
+                                newActivity.recurrenceStartDateTime = activity.finalDateTime
+                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                newActivities.append(newActivity)
+                            }
+                        }
+                        group.leave()
+                        counter -= 1
+                    }
+                } else {
+                    let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                    let dates = iCalUtility()
+                        .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                    for date in dates {
+                        let newActivity = activity.copy() as! Activity
+                        newActivity.recurrenceStartDateTime = activity.finalDateTime
+                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                        newActivities.append(newActivity)
+                    }
+                    group.leave()
+                    counter -= 1
+                }
+            } else {
+                if let instanceIDs = activity.instanceIDs {
+                    ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                        guard counter > 0 else {
+                            for (_, instanceActivity) in activities {
+                                completion([instanceActivity])
+
+                            }
+                            return
+                        }
+                        let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                        let dates = iCalUtility()
+                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                        let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
+                        for date in dates {
+                            if let instanceActivity = activities[date] {
+                                //just left so something is there
+                                let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
+                                newActivity.recurrenceStartDateTime = activity.finalDateTime
+                                newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                newActivities.append(newActivity)
+                            } else {
+                                let newActivity = activity.copy() as! Activity
+                                newActivity.recurrenceStartDateTime = activity.finalDateTime
+                                newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                newActivities.append(newActivity)
+                            }
+                        }
+                        group.leave()
+                        counter -= 1
+                    }
+                } else {
+                    let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
+                    let dates = iCalUtility()
+                        .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                    let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
+                    for date in dates {
+                        let newActivity = activity.copy() as! Activity
+                        newActivity.recurrenceStartDateTime = activity.finalDateTime
+                        newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                        newActivities.append(newActivity)
+                    }
+                    group.leave()
+                    counter -= 1
+                }
+            }
+        }
+        group.notify(queue: .main) {
+            completion(newActivities)
         }
     }
     

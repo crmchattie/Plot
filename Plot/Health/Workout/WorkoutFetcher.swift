@@ -71,6 +71,7 @@ class WorkoutFetcher: NSObject {
                                     } else {
                                         workouts = [_workout]
                                         completion(workouts)
+                                        return
                                     }
                                 }
                             } else {

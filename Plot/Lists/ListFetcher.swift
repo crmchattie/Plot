@@ -115,6 +115,7 @@ class ListFetcher: NSObject {
                                     } else {
                                         lists = [_list]
                                         completion(lists)
+                                        return
                                     }
                                 }
                             } else {

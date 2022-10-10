@@ -67,7 +67,7 @@ class ActivityListViewController: FormViewController {
     fileprivate func initializeForm() {
         
         form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
+            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
                                header: "Checklists",
                                footer: "Add a checklist") {
                                 $0.tag = "listsfields"

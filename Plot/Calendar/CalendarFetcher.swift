@@ -114,6 +114,7 @@ class CalendarFetcher: NSObject {
                                     } else {
                                         calendars = [_calendar]
                                         completion(calendars)
+                                        return
                                     }
                                 }
                             } else {
