@@ -227,6 +227,7 @@ struct TransactionDetails: Codable, Equatable, Hashable {
     var uuid = UUID().uuidString
     var name: String
     var amount: Double
+    var lastPeriodAmount: Double?
     var level: TransactionCatLevel
     var category: String?
     var topLevelCategory: String?
@@ -540,6 +541,18 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
         }
     }
     completion(sortedTransactionsList, transactionsDict)
+}
+
+func addPriorTransactionDetails(currentDetailsList: [TransactionDetails], currentDetailsDict: [TransactionDetails: [Transaction]], priorDetailsList: [TransactionDetails], completion: @escaping ([TransactionDetails], [TransactionDetails: [Transaction]]) -> ()) {
+    var finalDetailsList = currentDetailsList
+    var finalDetailsDict = [TransactionDetails: [Transaction]]()
+    for index in 0...finalDetailsList.count - 1 {
+        if let priorDetail = priorDetailsList.first(where: {$0.name == finalDetailsList[index].name && $0.level == finalDetailsList[index].level}) {
+            finalDetailsList[index].lastPeriodAmount = priorDetail.amount
+        }
+        finalDetailsDict[finalDetailsList[index]] = currentDetailsDict[currentDetailsList[index]] ?? []
+    }
+    completion(finalDetailsList, finalDetailsDict)
 }
 
 func transactionDetailsOverTimeChartData(transactions: [Transaction], transactionDetails: [TransactionDetails], start: Date, end: Date, segmentType: TimeSegmentType, accounts: [String]?, completion: @escaping ([TransactionDetails: [Statistic]], [TransactionDetails: [Transaction]]) -> ()) {

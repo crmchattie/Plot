@@ -20,6 +20,7 @@ let healthMetricCellID = "HealthMetricCellID"
 let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 let kHeaderCell = "HeaderCell"
 let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
+let kFinanceCollectionViewComparisonCell = "FinanceCollectionViewComparisonCell"
 let kFinanceCollectionViewMemberCell = "FinanceCollectionViewMemberCell"
 let setupCell = "SetupCell"
 let headerContainerCell = "HeaderCellDelegate"
@@ -188,7 +189,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
-        collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
+        collectionView.register(FinanceCollectionViewComparisonCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewComparisonCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         collectionView.register(InterSectionHeader.self, forCellWithReuseIdentifier: kHeaderCell)
         collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
@@ -453,7 +454,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         var calendar = Calendar.current
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         for activity in allActivities {
-            if let endDate = activity.endDateWTZ {
+            if let endDate = activity.endDate?.localTime {
                 if currentDate < endDate {
                     if index < totalNumberOfActivities - (numberOfActivities - 1) {
                         if events.count < numberOfActivities {
@@ -483,7 +484,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         accountLevel = .bs_type
         transactionLevel = .group
         
-        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .investments, .transactions]
+        let setSections: [SectionType] = [.financialIssues, .cashFlow, .balancesFinances, .investments, .transactions]
         
         let members = networkController.financeService.members
         let accounts = networkController.financeService.accounts
@@ -506,8 +507,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     groups[section] = challengedMembers
                 }
             } else if section.type == "Accounts" {
-                if section.subType == "Balance Sheet" {
-                    categorizeAccounts(accounts: accounts, level: accountLevel) { (accountsList, accountsDict) in
+                if section.subType == "Balances" {
+                    categorizeAccounts(accounts: accounts, timeSegment: .month, level: accountLevel, date: nil) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
                             sections.append(section)
                             groups[section] = accountsList
@@ -516,12 +517,22 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     }
                 }
             } else if section.type == "Transactions" {
-                if section.subType == "Income Statement" {
+                if section.subType == "Cash Flow" {
                     categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.endOfMonth, level: transactionLevel, accounts: nil) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
-                            sections.append(section)
-                            groups[section] = transactionsList
-                            self.transactionsDictionary = transactionsDict
+                            categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.endOfMonth.monthBefore, level: .group, accounts: nil) { (transactionsListPrior, _) in
+                                if !transactionsListPrior.isEmpty {
+                                    addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
+                                        sections.append(section)
+                                        groups[section] = finalTransactionList
+                                        self.transactionsDictionary = finalTransactionsDict
+                                    }
+                                } else {
+                                    sections.append(section)
+                                    groups[section] = transactionsList
+                                    self.transactionsDictionary = transactionsDict
+                                }
+                            }
                         }
                     }
                 } else if section.subType == "Transactions" {

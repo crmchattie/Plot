@@ -50,42 +50,15 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             cell.member = item
             return cell
         } else if let item = object as? TransactionDetails {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.mode = .small
-            let index = financeGroups[.incomeStatement]?.firstIndex(where: {$0 == object})
-            let totalItems = financeGroups[.incomeStatement]?.count ?? 0
-            if index == 0 {
-                cell.firstPosition = true
-            }
-            if index == totalItems - 1 {
-                cell.lastPosition = true
-            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
             cell.transactionDetails = item
             return cell
         } else if let item = object as? AccountDetails {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.mode = .small
-            let index = financeGroups[.balanceSheet]?.firstIndex(where: {$0 == object})
-            let totalItems = financeGroups[.balanceSheet]?.count ?? 0
-            if index == 0 {
-                cell.firstPosition = true
-            }
-            if index == totalItems - 1 {
-                cell.lastPosition = true
-            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
             cell.accountDetails = item
             return cell
         } else if let item = object as? MXHolding {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
-            cell.mode = .small
-            let index = financeGroups[.investments]?.firstIndex(where: {$0 == object})
-            let totalItems = financeGroups[.investments]?.count ?? 0
-            if index == 0 {
-                cell.firstPosition = true
-            }
-            if index == totalItems - 1 {
-                cell.lastPosition = true
-            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
             cell.holding = item
             return cell
         } else if let item = object as? Transaction {
@@ -218,46 +191,19 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
             height = estimatedSize.height
         } else if let item = object as? TransactionDetails {
-            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-            dummyCell.mode = .small
-            let index = financeGroups[.incomeStatement]?.firstIndex(where: {$0 == object})
-            let totalItems = financeGroups[.incomeStatement]?.count ?? 0 - 1
-            if index == 0 {
-                dummyCell.firstPosition = true
-            }
-            if index == totalItems - 1 {
-                dummyCell.lastPosition = true
-            }
+            let dummyCell = FinanceCollectionViewComparisonCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.transactionDetails = item
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
             height = estimatedSize.height
         } else if let item = object as? AccountDetails {
-            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-            dummyCell.mode = .small
-            let index = financeGroups[.balanceSheet]?.firstIndex(where: {$0 == object})
-            let totalItems = financeGroups[.balanceSheet]?.count ?? 0
-            if index == 0 {
-                dummyCell.firstPosition = true
-            }
-            if index == totalItems - 1 {
-                dummyCell.lastPosition = true
-            }
+            let dummyCell = FinanceCollectionViewComparisonCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.accountDetails = item
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
             height = estimatedSize.height
         } else if let item = object as? MXHolding {
-            let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-            dummyCell.mode = .small
-            let index = financeGroups[.investments]?.firstIndex(where: {$0 == object})
-            let totalItems = financeGroups[.investments]?.count ?? 0
-            if index == 0 {
-                dummyCell.firstPosition = true
-            }
-            if index == totalItems - 1 {
-                dummyCell.lastPosition = true
-            }
+            let dummyCell = FinanceCollectionViewComparisonCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.holding = item
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
@@ -309,11 +255,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else if let _ = object as? MXMember {
             return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? TransactionDetails {
-            return .init(top: 0, left: 0, bottom: 0, right: 0)
+            return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? AccountDetails {
-            return .init(top: 0, left: 0, bottom: 0, right: 0)
+            return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? MXHolding {
-            return .init(top: 0, left: 0, bottom: 0, right: 0)
+            return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? Transaction {
             return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let item = object as? SectionType {

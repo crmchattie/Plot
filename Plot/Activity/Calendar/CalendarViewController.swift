@@ -414,7 +414,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
-            if let endDate = activity.endDateWTZ {
+            if let endDate = activity.endDate?.localTime {
                 if date < endDate {
                     activityFound = true
                     break
@@ -578,14 +578,14 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.selectedDate = date.startOfDay
+        self.selectedDate = date
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        self.selectedDate = calendar.currentPage.startOfDay
+        self.selectedDate = calendar.currentPage
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)

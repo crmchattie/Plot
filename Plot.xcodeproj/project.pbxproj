@@ -142,6 +142,7 @@
 		1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082C89624F0A91500CF6491 /* HealthViewController.swift */; };
 		10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10868D6C246314C700D6BB4F /* Grocerylist.swift */; };
 		108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108841D1257004F10064C5F8 /* SummaryViewController.swift */; };
+		108BDBC028F5933200A2285B /* FinanceCollectionViewComparisonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDBBF28F5933200A2285B /* FinanceCollectionViewComparisonCell.swift */; };
 		108C37EE2899708B00DC4998 /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37ED2899708B00DC4998 /* TaskViewController.swift */; };
 		108C37F328997CBF00DC4998 /* ActivityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F228997CBF00DC4998 /* ActivityListViewController.swift */; };
 		108C37F5289C085D00DC4998 /* HKWorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */; };
@@ -731,6 +732,7 @@
 		1082C89624F0A91500CF6491 /* HealthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewController.swift; sourceTree = "<group>"; };
 		10868D6C246314C700D6BB4F /* Grocerylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grocerylist.swift; sourceTree = "<group>"; };
 		108841D1257004F10064C5F8 /* SummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewController.swift; sourceTree = "<group>"; };
+		108BDBBF28F5933200A2285B /* FinanceCollectionViewComparisonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewComparisonCell.swift; sourceTree = "<group>"; };
 		108C37ED2899708B00DC4998 /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
 		108C37F228997CBF00DC4998 /* ActivityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListViewController.swift; sourceTree = "<group>"; };
 		108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HKWorkoutViewController.swift; sourceTree = "<group>"; };
@@ -1820,6 +1822,7 @@
 			isa = PBXGroup;
 			children = (
 				10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */,
+				108BDBBF28F5933200A2285B /* FinanceCollectionViewComparisonCell.swift */,
 				10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */,
 				10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */,
 				10E4DB0925217C3200898D6E /* HeaderCell.swift */,
@@ -3591,6 +3594,7 @@
 				4BAEE50D21272D890045AB10 /* ChatsTableViewController+TableRowActionHandlers.swift in Sources */,
 				100458952517D50D00065872 /* FinancialTransactionFetcher.swift in Sources */,
 				10DFC3B2255A148F00565DAD /* WorkoutViewController.swift in Sources */,
+				108BDBC028F5933200A2285B /* FinanceCollectionViewComparisonCell.swift in Sources */,
 				1069B2D4243115950048244C /* ActivityObject.swift in Sources */,
 				1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */,
 				10B3E50E28B168E600E1713D /* ListActions.swift in Sources */,

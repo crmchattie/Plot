@@ -106,6 +106,23 @@ struct MXAccount: Codable, Equatable, Hashable {
         self.subtype = subtype
         self.user_created = user_created
     }
+    
+    func balanceGivenDate(date: Date) -> Double? {
+        print(self.name)
+        print(date)
+        let isodateFormatter = ISO8601DateFormatter()
+        if let balances = self.balances {
+            let sortedBalances = Array(balances.keys.sorted {$0.localizedStandardCompare($1) == .orderedDescending})
+            let firstBalanceDate = isodateFormatter.date(from: sortedBalances.last!)!
+            if date >= firstBalanceDate {
+                if let balanceDate = sortedBalances.first(where: { isodateFormatter.date(from: $0)! < date }) {
+                    return balances[balanceDate] ?? 0
+                }
+            }
+        }
+            
+        return nil
+    }
 }
 
 struct UserAccount: Codable, Equatable, Hashable {
@@ -129,6 +146,7 @@ struct UserAccount: Codable, Equatable, Hashable {
 struct AccountDetails: Codable, Equatable, Hashable {
     var name: String
     var balance: Double
+    var lastPeriodBalance: Double?
     var level: AccountCatLevel
     var subtype: MXAccountSubType?
     var type: MXAccountType?
@@ -550,16 +568,27 @@ enum MXAccountSubType: String, CaseIterable, Codable {
     }
 }
 
-func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completion: @escaping ([AccountDetails], [AccountDetails: [MXAccount]]) -> ()) {
+func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, level: AccountCatLevel?, date: Date?, completion: @escaping ([AccountDetails], [AccountDetails: [MXAccount]]) -> ()) {
     var accountsList = [AccountDetails]()
     var accountsDict = [AccountDetails: [MXAccount]]()
     for account in accounts {
+        var finalDate = Date()
+        var balance = 0.0
         guard account.should_link ?? true else { continue }
+        if let date = date {
+            finalDate = date
+            if let balanceGivenDate = account.balanceGivenDate(date: finalDate) {
+                balance = balanceGivenDate
+            } else {
+                continue
+            }
+        } else {
+            balance = account.finalBalance
+        }
         switch level {
         case .account:
-            let accountDetail = AccountDetails(name: account.name, balance: account.finalBalance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+            let accountDetail = AccountDetails(name: account.name, balance: balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
             accountsDict[accountDetail] = [account]
-            
         case .subtype:
             if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype?.name ?? MXAccountSubType.none.name && $0.level == .subtype && $0.subtype == account.subtype ?? MXAccountSubType.none && $0.type == account.type && $0.bs_type == account.bs_type}) {
                 var accountDetail = accountsDict.keys[index]
@@ -567,12 +596,12 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = nil
                 
-                accountDetail.balance += account.finalBalance
+                accountDetail.balance += balance
                 accounts!.append(account)
                 
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: account.finalBalance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
                 accountsDict[accountDetail] = [account]
             }
         case .type:
@@ -582,12 +611,12 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = nil
                 
-                accountDetail.balance += account.finalBalance
+                accountDetail.balance += balance
                 accounts!.append(account)
                 
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.type.name, balance: account.finalBalance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                let accountDetail = AccountDetails(name: account.type.name, balance: balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
                 accountsDict[accountDetail] = [account]
             }
         case .bs_type:
@@ -596,17 +625,77 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 var accounts = accountsDict[accountDetail]
                 
                 accountsDict[accountDetail] = nil
+
+                accountDetail.balance += balance
                 
-                accountDetail.balance += account.finalBalance
+                switch timeSegment {
+                case .day:
+                    let oldDate = finalDate.dayBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                case .week:
+                    let oldDate = finalDate.weekBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                case .month:
+                    let oldDate = finalDate.monthBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                case .year:
+                    let oldDate = finalDate.lastYear
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                }
                 accounts!.append(account)
-                
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.finalBalance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                var accountDetail = AccountDetails(name: account.bs_type.name, balance: balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                switch timeSegment {
+                case .day:
+                    let oldDate = finalDate.dayBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .week:
+                    let oldDate = finalDate.weekBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .month:
+                    let oldDate = finalDate.monthBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .year:
+                    let oldDate = finalDate.lastYear
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                }
                 accountsDict[accountDetail] = [account]
             }
         case .none:
-            let accountDetail = AccountDetails(name: account.name, balance: account.finalBalance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+            let accountDetail = AccountDetails(name: account.name, balance: balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
             accountsDict[accountDetail] = [account]
             
             if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype?.name ?? MXAccountSubType.none.name && $0.level == .subtype && $0.subtype == account.subtype ?? MXAccountSubType.none && $0.type == account.type && $0.bs_type == account.bs_type}) {
@@ -615,12 +704,12 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = nil
                 
-                accountDetail.balance += account.finalBalance
+                accountDetail.balance += balance
                 accounts!.append(account)
                 
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: account.finalBalance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
                 accountsDict[accountDetail] = [account]
             }
             
@@ -630,12 +719,12 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = nil
                 
-                accountDetail.balance += account.finalBalance
+                accountDetail.balance += balance
                 accounts!.append(account)
                 
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.type.name, balance: account.finalBalance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                let accountDetail = AccountDetails(name: account.type.name, balance: balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
                 accountsDict[accountDetail] = [account]
             }
             
@@ -645,12 +734,72 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
                 
                 accountsDict[accountDetail] = nil
                 
-                accountDetail.balance += account.finalBalance
+                accountDetail.balance += balance
+                switch timeSegment {
+                case .day:
+                    let oldDate = finalDate.dayBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                case .week:
+                    let oldDate = finalDate.weekBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                case .month:
+                    let oldDate = finalDate.monthBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                case .year:
+                    let oldDate = finalDate.lastYear
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        if accountDetail.lastPeriodBalance != nil {
+                            accountDetail.lastPeriodBalance! += oldBalance
+                        } else {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                }
                 accounts!.append(account)
                 
                 accountsDict[accountDetail] = accounts
             } else {
-                let accountDetail = AccountDetails(name: account.bs_type.name, balance: account.finalBalance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                var accountDetail = AccountDetails(name: account.bs_type.name, balance: balance, level: .bs_type, subtype: nil, type: nil, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                switch timeSegment {
+                case .day:
+                    let oldDate = finalDate.dayBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .week:
+                    let oldDate = finalDate.weekBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .month:
+                    let oldDate = finalDate.monthBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .year:
+                    let oldDate = finalDate.lastYear
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                }
                 accountsDict[accountDetail] = [account]
             }
         }
@@ -664,7 +813,11 @@ func categorizeAccounts(accounts: [MXAccount], level: AccountCatLevel?, completi
             let liabilityAccounts = accountsDict[liabilityAccountDetail] ?? []
             let accounts = assetAccounts + liabilityAccounts
             let balance = assetAccountDetail.balance - liabilityAccountDetail.balance
-            let accountDetail = AccountDetails(name: "Net Worth", balance: balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth, currencyCode: "USD")
+            let lastPeriodBalance = (assetAccountDetail.lastPeriodBalance ?? 0) - (liabilityAccountDetail.lastPeriodBalance ?? 0)
+            var accountDetail = AccountDetails(name: "Net Worth", balance: balance, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth, currencyCode: "USD")
+            if lastPeriodBalance > 0 {
+                accountDetail.lastPeriodBalance = lastPeriodBalance
+            }
             sortedAccountsList.insert(accountDetail, at: 0)
             accountsDict[accountDetail] = accounts
         }
@@ -823,6 +976,7 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
         if let balances = account.balances {
             let sortedBalances = Array(balances.keys.sorted {$0.localizedStandardCompare($1) == .orderedDescending})
             let firstBalanceDate = isodateFormatter.date(from: sortedBalances.last!)!
+            //need to include for future dates
             let lastBalanceDate = Date().addingTimeInterval(86400)
             if date >= firstBalanceDate, nextDate >= firstBalanceDate, date <= lastBalanceDate, nextDate <= lastBalanceDate {
                 var currentBalance = 0.0
@@ -831,16 +985,8 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
                 } else if let balanceDate = sortedBalances.first(where: { isodateFormatter.date(from: $0)! < date }) {
                     currentBalance = balances[balanceDate] ?? 0
                 } else {
-                    print("not continuing")
-                    print(nextDate)
-                    print(account.name)
-                    print(currentBalance)
                     continue
                 }
-                print("continuing")
-                print(nextDate)
-                print(account.name)
-                print(currentBalance)
                 if accountDetail.name == "Net Worth" {
                     if account.bs_type == .Asset {
                         if let index = statistics.firstIndex(where: {$0.date == nextDate}) {
@@ -937,10 +1083,6 @@ func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, star
             }
         }
     }
-//    for statistic in statistics {
-//        print(statistic.date)
-//        print(statistic.value)
-//    }
     
     completion(statistics, accountList)
 }

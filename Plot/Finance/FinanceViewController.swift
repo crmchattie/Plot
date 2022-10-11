@@ -71,7 +71,7 @@ class FinanceViewController: UIViewController {
     
     var transactionsDictionary = [TransactionDetails: [Transaction]]()
     var accountsDictionary = [AccountDetails: [MXAccount]]()
-            
+    
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
@@ -93,7 +93,7 @@ class FinanceViewController: UIViewController {
     let viewPlaceholder = ViewPlaceholder()
     
     let refreshControl = UIRefreshControl()
-            
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -105,6 +105,7 @@ class FinanceViewController: UIViewController {
         
         collectionView.register(HeaderCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kHeaderCell)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
+        collectionView.register(FinanceCollectionViewComparisonCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewComparisonCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         
         setupMainView()
@@ -119,7 +120,7 @@ class FinanceViewController: UIViewController {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
-
+        
     }
     
     @objc fileprivate func financeUpdated() {
@@ -137,10 +138,10 @@ class FinanceViewController: UIViewController {
         
         customSegmented.backgroundColor = .systemGroupedBackground
         customSegmented.constrainHeight(30)
-                        
+        
         view.addSubview(customSegmented)
         view.addSubview(collectionView)
-
+        
         customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
@@ -152,13 +153,12 @@ class FinanceViewController: UIViewController {
         collectionView.refreshControl = refreshControl
         
         financeLevel = getFinanceLevel()
-                
-
+        
     }
     
     @objc fileprivate func newItem() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
+        
         alert.addAction(UIAlertAction(title: "Transaction", style: .default, handler: { (_) in
             let destination = FinanceTransactionViewController(networkController: self.networkController)
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
@@ -277,7 +277,7 @@ class FinanceViewController: UIViewController {
         self.saveFinanceLevel()
         
         let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
-                
+        
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
         
@@ -287,7 +287,7 @@ class FinanceViewController: UIViewController {
             filteredAccounts = filteredAccounts.filter({ accountsString.contains($0.guid) })
             filteredAccountsString = accountsString
         }
-                                
+        
         for section in setSections {
             if section.type == "Issues" && filterDictionary["search"] == nil {
                 var challengedMembers = [MXMember]()
@@ -297,7 +297,7 @@ class FinanceViewController: UIViewController {
                             challengedMembers.append(member)
                         }
                     } else if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending {
-                            challengedMembers.append(member)
+                        challengedMembers.append(member)
                     }
                 }
                 if !challengedMembers.isEmpty {
@@ -306,8 +306,12 @@ class FinanceViewController: UIViewController {
                 }
             } else if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" && filterDictionary["search"] == nil {
-                    categorizeAccounts(accounts: filteredAccounts, level: accountLevel) { (accountsList, accountsDict) in
+                    categorizeAccounts(accounts: filteredAccounts, timeSegment: TimeSegmentType(rawValue: selectedIndex) ?? .month, level: accountLevel, date: nil) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
+                            if accountsList.first?.lastPeriodBalance != nil {
+                                self.sections.append(.balancesFinances)
+                                self.groups[.balancesFinances] = accountsList.filter {$0.level == .bs_type}
+                            }
                             self.sections.append(section)
                             self.groups[section] = accountsList
                             self.accountsDictionary = accountsDict
@@ -329,9 +333,75 @@ class FinanceViewController: UIViewController {
                 if section.subType == "Income Statement" && filterDictionary["search"] == nil {
                     categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: filteredAccountsString) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
-                            self.sections.append(section)
-                            self.groups[section] = transactionsList
-                            self.transactionsDictionary = transactionsDict
+                            if self.selectedIndex == 0 {
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.dayBefore, end: self.endDate.dayBefore, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                    if !transactionsListPrior.isEmpty {
+                                        addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
+                                            self.sections.append(.cashFlow)
+                                            self.groups[.cashFlow] = finalTransactionList.filter {$0.level == .group}
+                                            
+                                            self.sections.append(section)
+                                            self.groups[section] = finalTransactionList
+                                            self.transactionsDictionary = finalTransactionsDict
+                                        }
+                                    } else {
+                                        self.sections.append(section)
+                                        self.groups[section] = transactionsList
+                                        self.transactionsDictionary = transactionsDict
+                                    }
+                                }
+                            } else if self.selectedIndex == 1 {
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.weekBefore, end: self.endDate.weekBefore, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                    if !transactionsListPrior.isEmpty {
+                                        addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
+                                            self.sections.append(.cashFlow)
+                                            self.groups[.cashFlow] = finalTransactionList.filter {$0.level == .group}
+                                            
+                                            self.sections.append(section)
+                                            self.groups[section] = finalTransactionList
+                                            self.transactionsDictionary = finalTransactionsDict
+                                        }
+                                    } else {
+                                        self.sections.append(section)
+                                        self.groups[section] = transactionsList
+                                        self.transactionsDictionary = transactionsDict
+                                    }
+                                }
+                            } else if self.selectedIndex == 2 {
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.monthBefore, end: self.endDate.monthBefore, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                    if !transactionsListPrior.isEmpty {
+                                        addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
+                                            self.sections.append(.cashFlow)
+                                            self.groups[.cashFlow] = finalTransactionList.filter {$0.level == .group}
+                                            
+                                            self.sections.append(section)
+                                            self.groups[section] = finalTransactionList
+                                            self.transactionsDictionary = finalTransactionsDict
+                                        }
+                                    } else {
+                                        self.sections.append(section)
+                                        self.groups[section] = transactionsList
+                                        self.transactionsDictionary = transactionsDict
+                                    }
+                                }
+                            } else {
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.lastYear, end: self.endDate.lastYear, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                    if !transactionsListPrior.isEmpty {
+                                        addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
+                                            self.sections.append(.cashFlow)
+                                            self.groups[.cashFlow] = finalTransactionList.filter {$0.level == .group}
+                                            
+                                            self.sections.append(section)
+                                            self.groups[section] = finalTransactionList
+                                            self.transactionsDictionary = finalTransactionsDict
+                                        }
+                                    } else {
+                                        self.sections.append(section)
+                                        self.groups[section] = transactionsList
+                                        self.transactionsDictionary = transactionsDict
+                                    }
+                                }
+                            }
                         }
                     }
                 } else if section.subType == "Transactions" {
@@ -395,7 +465,6 @@ class FinanceViewController: UIViewController {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: filterDictionary["financeAccount"],  financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex
-//        financeDetailViewController.delegate = self
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -404,7 +473,6 @@ class FinanceViewController: UIViewController {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex
-//        financeDetailViewController.delegate = self
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -435,7 +503,21 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         let section = sections[indexPath.section]
         let object = groups[section]
         let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
-        if section != .financialIssues {
+        if section == .cashFlow, let object = object as? [TransactionDetails] {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
+            cell.selectedIndex = TimeSegmentType(rawValue: selectedIndex) ?? .month
+            cell.transactionDetails = object[indexPath.item]
+            return cell
+        } else if section == .balancesFinances, let object = object as? [AccountDetails] {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
+            cell.selectedIndex = TimeSegmentType(rawValue: selectedIndex) ?? .month
+            cell.accountDetails = object[indexPath.item]
+            return cell
+        } else if section == .financialIssues, let object = object as? [MXMember] {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
+            cell.member = object[indexPath.item]
+            return cell
+        } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewCell, for: indexPath) as! FinanceCollectionViewCell
             if indexPath.item == 0 {
                 cell.firstPosition = true
@@ -472,12 +554,6 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
                 cell.account = object[indexPath.item]
             }
             return cell
-        } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
-            if let object = object as? [MXMember] {
-                cell.member = object[indexPath.item]
-            }
-            return cell
         }
     }
     
@@ -485,8 +561,26 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         var height: CGFloat = 328
         let section = sections[indexPath.section]
         let object = groups[section]
-        let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
-        if section != .financialIssues {
+        if section == .cashFlow, let object = object as? [TransactionDetails] {
+            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
+            dummyCell.transactionDetails = object[indexPath.item]
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+            height = estimatedSize.height
+        } else if section == .balancesFinances, let object = object as? [AccountDetails] {
+            let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
+            dummyCell.accountDetails = object[indexPath.item]
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+            height = estimatedSize.height
+        } else if section == .financialIssues, let object = object as? [MXMember] {
+            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            dummyCell.member = object[indexPath.item]
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+            height = estimatedSize.height
+        } else {
+            let totalItems = collectionView.numberOfItems(inSection: indexPath.section) - 1
             let dummyCell = FinanceCollectionViewCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width - 30, height: 1000))
             if indexPath.item == 0 {
                 dummyCell.firstPosition = true
@@ -525,14 +619,6 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             dummyCell.layoutIfNeeded()
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
             height = estimatedSize.height
-        } else {
-            let dummyCell = FinanceCollectionViewMemberCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-            if let object = object as? [MXMember] {
-                dummyCell.member = object[indexPath.item]
-            }
-            dummyCell.layoutIfNeeded()
-            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
-            height = estimatedSize.height
         }
         return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
         
@@ -543,7 +629,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+                        viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let section = sections[indexPath.section]
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: kHeaderCell, for: indexPath) as! HeaderCell
         header.backgroundColor = .systemGroupedBackground
@@ -562,12 +648,12 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         let section = sections[section]
-        if section == .transactions || section == .financialAccounts || section == .financialIssues || section == .investments {
+        if section == .transactions || section == .financialAccounts || section == .financialIssues || section == .investments || section == .cashFlow || section == .balancesFinances {
             return 10
         }
         return 0
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
@@ -580,44 +666,32 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
         let section = sections[indexPath.section]
         let object = groups[section]
         if let object = object as? [TransactionDetails] {
-            if section.subType == "Income Statement" {
-                openTransactionDetails(transactionDetails: object[indexPath.item])
-            }
+            openTransactionDetails(transactionDetails: object[indexPath.item])
         } else if let object = object as? [AccountDetails] {
-            if section.subType == "Balance Sheet" {
-                openAccountDetails(accountDetails: object[indexPath.item])
-            }
+            openAccountDetails(accountDetails: object[indexPath.item])
         } else if let object = object as? [Transaction] {
-            if section.subType == "Transactions" {
-                let destination = FinanceTransactionViewController(networkController: self.networkController)
-                destination.transaction = object[indexPath.item]
-                ParticipantsFetcher.getParticipants(forTransaction: object[indexPath.item]) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+            let destination = FinanceTransactionViewController(networkController: self.networkController)
+            destination.transaction = object[indexPath.item]
+            ParticipantsFetcher.getParticipants(forTransaction: object[indexPath.item]) { (participants) in
+                destination.selectedFalconUsers = participants
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         } else if let object = object as? [MXAccount] {
-            if section.subType == "Accounts" {
-                let destination = FinanceAccountViewController(networkController: self.networkController)
-                destination.account = object[indexPath.item]
-                ParticipantsFetcher.getParticipants(forAccount: object[indexPath.item]) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+            let destination = FinanceAccountViewController(networkController: self.networkController)
+            destination.account = object[indexPath.item]
+            ParticipantsFetcher.getParticipants(forAccount: object[indexPath.item]) { (participants) in
+                destination.selectedFalconUsers = participants
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         } else if let object = object as? [MXHolding] {
-            if section.subType == "Investments" {
-                let destination = FinanceHoldingViewController(networkController: self.networkController)
-                destination.holding = object[indexPath.item]
-                ParticipantsFetcher.getParticipants(forHolding: object[indexPath.item]) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+            let destination = FinanceHoldingViewController(networkController: self.networkController)
+            destination.holding = object[indexPath.item]
+            ParticipantsFetcher.getParticipants(forHolding: object[indexPath.item]) { (participants) in
+                destination.selectedFalconUsers = participants
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         } else if let object = object as? [MXMember] {
-            if section.type == "Issues" {
-                self.openMXConnect(current_member_guid: object[indexPath.item].guid)
-            }
+            self.openMXConnect(current_member_guid: object[indexPath.item].guid)
         }
         collectionView.deselectItem(at: indexPath, animated: true)
     }
@@ -656,8 +730,8 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
             startDate = Date().localTime.startOfYear
             endDate = Date().localTime.endOfYear
         }
-        updateCollectionView()
         selectedIndex = index
+        updateCollectionView()
     }
 }
 

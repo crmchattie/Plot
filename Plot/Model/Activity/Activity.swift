@@ -1181,7 +1181,6 @@ extension Activity {
     var startDate: Date? {
         if let startDateTime = startDateTime?.doubleValue {
             return Date(timeIntervalSince1970: startDateTime)
-            //for tasks where deadline date is more likely to be set than start date
         }
         return nil
     }

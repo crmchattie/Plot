@@ -170,11 +170,9 @@ class ChooseEventTableViewController: UITableViewController {
         let date = Date().localTime
         var index = 0
         var eventFound = false
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         for event in self.filteredEvents {
-            if let endDate = event.endDateWTZ {
-                if (date < endDate) || (event.allDay ?? false && calendar.compare(date, to: endDate, toGranularity: .day) != .orderedDescending) {
+            if let endDate = event.endDate?.localTime {
+                if date < endDate {
                     eventFound = true
                     break
                 }
