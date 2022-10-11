@@ -143,6 +143,7 @@
 		10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10868D6C246314C700D6BB4F /* Grocerylist.swift */; };
 		108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108841D1257004F10064C5F8 /* SummaryViewController.swift */; };
 		108BDBC028F5933200A2285B /* FinanceCollectionViewComparisonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDBBF28F5933200A2285B /* FinanceCollectionViewComparisonCell.swift */; };
+		108BDBC228F5F53300A2285B /* OnboardingCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDBC128F5F53300A2285B /* OnboardingCollectionViewCell.swift */; };
 		108C37EE2899708B00DC4998 /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37ED2899708B00DC4998 /* TaskViewController.swift */; };
 		108C37F328997CBF00DC4998 /* ActivityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F228997CBF00DC4998 /* ActivityListViewController.swift */; };
 		108C37F5289C085D00DC4998 /* HKWorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */; };
@@ -733,6 +734,7 @@
 		10868D6C246314C700D6BB4F /* Grocerylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grocerylist.swift; sourceTree = "<group>"; };
 		108841D1257004F10064C5F8 /* SummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewController.swift; sourceTree = "<group>"; };
 		108BDBBF28F5933200A2285B /* FinanceCollectionViewComparisonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewComparisonCell.swift; sourceTree = "<group>"; };
+		108BDBC128F5F53300A2285B /* OnboardingCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCollectionViewCell.swift; sourceTree = "<group>"; };
 		108C37ED2899708B00DC4998 /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
 		108C37F228997CBF00DC4998 /* ActivityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityListViewController.swift; sourceTree = "<group>"; };
 		108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HKWorkoutViewController.swift; sourceTree = "<group>"; };
@@ -2280,8 +2282,9 @@
 		4BAEE47C21272C4F0045AB10 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				4BAEE47D21272C4F0045AB10 /* OnboardingController.swift */,
 				4BAEE47E21272C4F0045AB10 /* OnboardingContainerView.swift */,
+				4BAEE47D21272C4F0045AB10 /* OnboardingController.swift */,
+				108BDBC128F5F53300A2285B /* OnboardingCollectionViewCell.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -3457,6 +3460,7 @@
 				4BAEE48621272C4F0045AB10 /* OnboardingController.swift in Sources */,
 				105F34B02885EF7A007531EB /* GridSelectorLayout.swift in Sources */,
 				260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */,
+				108BDBC228F5F53300A2285B /* OnboardingCollectionViewCell.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
 				10F5D00225CB7E670078C821 /* GPlotEventOp.swift in Sources */,

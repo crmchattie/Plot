@@ -10,62 +10,58 @@ import UIKit
 
 class OnboardingContainerView: UIView {
     
-    //set-up logo image
-    let logoImageView: UIImageView = {
-        let logoImageView = UIImageView()
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        logoImageView.image = UIImage(named: "plotLogo")
-        logoImageView.contentMode = .scaleAspectFit
-        return logoImageView
+    let collectionView: UICollectionView = {
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .systemGroupedBackground
+        return collectionView
     }()
     
-    //set-up welcome label
-    let welcomeTitle: UILabel = {
-        let welcomeTitle = UILabel()
-        welcomeTitle.translatesAutoresizingMaskIntoConstraints = false
-        welcomeTitle.text = "Welcome to Plot"
-        welcomeTitle.font = UIFont.title2.with(weight: .semibold)
-        welcomeTitle.adjustsFontForContentSizeCategory = true
-        welcomeTitle.textAlignment = .center
-        welcomeTitle.textColor = .label
-        return welcomeTitle
+    let pageControl: UIPageControl = {
+        let pageControl = UIPageControl()
+        pageControl.translatesAutoresizingMaskIntoConstraints = false
+        pageControl.currentPageIndicatorTintColor = .systemBlue
+        pageControl.pageIndicatorTintColor = .secondaryLabel
+        pageControl.isUserInteractionEnabled = false
+        return pageControl
     }()
     
-    //set-up startMessaging button
-    let startMessaging: UIButton = {
-        let startMessaging = UIButton()
-        startMessaging.translatesAutoresizingMaskIntoConstraints = false
-        startMessaging.setTitle("Start Plotting", for: .normal)
-        startMessaging.setTitleColor(FalconPalette.defaultBlue, for: .normal)
-        startMessaging.titleLabel?.backgroundColor = .clear
-        startMessaging.titleLabel?.font = UIFont.title2.with(weight: .semibold)
-        startMessaging.titleLabel?.adjustsFontForContentSizeCategory = true
-        return startMessaging
+    //set-up startPlotting button
+    let startPlotting: UIButton = {
+        let startPlotting = UIButton()
+        startPlotting.translatesAutoresizingMaskIntoConstraints = false
+        startPlotting.setTitle("Start Plotting", for: .normal)
+        startPlotting.setTitleColor(.white, for: .normal)
+        startPlotting.titleLabel?.backgroundColor = .clear
+        startPlotting.titleLabel?.font = UIFont.title2.with(weight: .semibold)
+        startPlotting.backgroundColor = .systemBlue
+        startPlotting.layer.cornerRadius = 10
+        return startPlotting
     }()
     
     //add View background color, Subviews and Constraints
     override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        addSubview(logoImageView)
-        addSubview(welcomeTitle)
-        addSubview(startMessaging)
+        super.init(frame: frame)        
+        addSubview(collectionView)
+        addSubview(pageControl)
+        addSubview(startPlotting)
         
         NSLayoutConstraint.activate([
-            logoImageView.topAnchor.constraint(equalTo: topAnchor, constant: 200),
-            logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 50),
-            logoImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -50),
-            logoImageView.heightAnchor.constraint(equalTo: logoImageView.widthAnchor),
+            collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 100),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
+            collectionView.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -20),
+
+            pageControl.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
+            pageControl.bottomAnchor.constraint(equalTo: startPlotting.topAnchor, constant: -20),
+            pageControl.heightAnchor.constraint(equalToConstant: 50),
             
-            welcomeTitle.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
-            welcomeTitle.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
-            welcomeTitle.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 50),
-            welcomeTitle.heightAnchor.constraint(equalToConstant: 50),
-            
-            startMessaging.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
-            startMessaging.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
-            startMessaging.topAnchor.constraint(equalTo: welcomeTitle.bottomAnchor, constant: 10),
-            startMessaging.heightAnchor.constraint(equalToConstant: 50)
+            startPlotting.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            startPlotting.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            startPlotting.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200),
+            startPlotting.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
