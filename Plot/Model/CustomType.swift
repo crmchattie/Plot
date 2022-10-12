@@ -9,7 +9,7 @@
 import Foundation
 
 enum CustomType: String, Equatable, Hashable {
-    case event, task, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate
+    case event, task, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour
     
     var name: String {
         switch self {
@@ -45,6 +45,10 @@ enum CustomType: String, Equatable, Hashable {
         case .personalTemplate: return "Personal"
         case .todoTemplate: return "To-do"
         case .financesTemplate: return "Finances"
+        case .tutorialOne: return "Tutorial One"
+        case .tutorialTwo: return "Tutorial Two"
+        case .tutorialThree: return "Tutorial Three"
+        case .tutorialFour: return "Tutorial Four"
         }
     }
     
@@ -82,6 +86,10 @@ enum CustomType: String, Equatable, Hashable {
         case .personalTemplate: return "Personal"
         case .todoTemplate: return "To-do"
         case .financesTemplate: return "Finance"
+        case .tutorialOne: return "Welcome to Your New Personal Assistant"
+        case .tutorialTwo: return "Better Manage Your Time and Tasks"
+        case .tutorialThree: return "Take Control of Your Health"
+        case .tutorialFour: return "See Your Complete Financial Picture"
         }
     }
     
@@ -109,6 +117,10 @@ enum CustomType: String, Equatable, Hashable {
         case .personalTemplate: return "Personal"
         case .todoTemplate: return "To-do"
         case .financesTemplate: return "Finance"
+        case .tutorialOne: return "Simplify your life by integrating your calendar, health data and finances"
+        case .tutorialTwo: return "Set reminders, plan events and create your ideal routine"
+        case .tutorialThree: return "Improve your health by tracking your workouts, sleep, steps and more"
+        case .tutorialFour: return "Understand your spending and achieve your financial goals"
         }
     }
     
@@ -143,6 +155,11 @@ enum CustomType: String, Equatable, Hashable {
         case .personalTemplate: return "personal"
         case .todoTemplate: return "todo"
         case .financesTemplate: return "money"
+        case .tutorialOne: return "plotLogo"
+        case .tutorialTwo: return "plotLogo"
+        case .tutorialThree: return "plotLogo"
+        case .tutorialFour: return "plotLogo"
+            
         }
     }
 }

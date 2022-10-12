@@ -19,7 +19,7 @@ class EnterPhoneNumberContainerView: UIView {
         title.textAlignment = .center
         title.text = "Phone number"
         title.textColor = .label
-        title.font = .preferredFont(forTextStyle: .title1)
+        title.font = UIFont.title1.with(weight: .bold)
         return title
     }()
     
@@ -29,7 +29,7 @@ class EnterPhoneNumberContainerView: UIView {
         instructions.textAlignment = .center
         instructions.numberOfLines = 2
         instructions.textColor = .label
-        instructions.font = .preferredFont(forTextStyle: .title3)
+        instructions.font = UIFont.title3.with(weight: .medium)
         return instructions
     }()
     
@@ -44,7 +44,7 @@ class EnterPhoneNumberContainerView: UIView {
         selectCountry.backgroundColor = .secondarySystemGroupedBackground
         selectCountry.layer.cornerRadius = 10
         selectCountry.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
-        selectCountry.titleLabel?.font = .preferredFont(forTextStyle: .title3)
+        selectCountry.titleLabel?.font = UIFont.title3.with(weight: .medium)
         selectCountry.titleLabel?.adjustsFontForContentSizeCategory = true
         return selectCountry
     }()
@@ -55,14 +55,14 @@ class EnterPhoneNumberContainerView: UIView {
         countryCode.text = "+1"
         countryCode.textAlignment = .center
         countryCode.textColor = .label
-        countryCode.font = UIFont.preferredFont(forTextStyle: .title3)
+        countryCode.font = UIFont.title3.with(weight: .medium)
         countryCode.adjustsFontForContentSizeCategory = true
         return countryCode
     }()
     
     let phoneNumber: UITextField = {
         let phoneNumber = UITextField()
-        phoneNumber.font = UIFont.preferredFont(forTextStyle: .title3)
+        phoneNumber.font = UIFont.title3.with(weight: .medium)
         phoneNumber.adjustsFontForContentSizeCategory = true
         phoneNumber.translatesAutoresizingMaskIntoConstraints = false
         phoneNumber.textAlignment = .center
@@ -89,7 +89,7 @@ class EnterPhoneNumberContainerView: UIView {
         next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
         next.setTitleColor(.secondaryLabel, for: .highlighted)
         next.setTitleColor(.secondaryLabel, for: .disabled)
-        next.titleLabel?.font = UIFont.preferredFont(forTextStyle: .title3)
+        next.titleLabel?.font = UIFont.title3.with(weight: .medium)
         return next
     }()
     

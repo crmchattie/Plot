@@ -35,7 +35,7 @@ class OnboardingContainerView: UIView {
         startPlotting.setTitle("Start Plotting", for: .normal)
         startPlotting.setTitleColor(.white, for: .normal)
         startPlotting.titleLabel?.backgroundColor = .clear
-        startPlotting.titleLabel?.font = UIFont.title2.with(weight: .semibold)
+        startPlotting.titleLabel?.font = UIFont.title3.with(weight: .semibold)
         startPlotting.backgroundColor = .systemBlue
         startPlotting.layer.cornerRadius = 10
         return startPlotting
@@ -49,7 +49,7 @@ class OnboardingContainerView: UIView {
         addSubview(startPlotting)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 100),
+            collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 75),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
             collectionView.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -20),
@@ -60,7 +60,7 @@ class OnboardingContainerView: UIView {
             
             startPlotting.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             startPlotting.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            startPlotting.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200),
+            startPlotting.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -75),
             startPlotting.heightAnchor.constraint(equalToConstant: 50)
         ])
     }

@@ -896,7 +896,7 @@ extension TaskViewController {
         if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
-            alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Delete This Task Only", style: .default, handler: { (_) in
                 print("Save for this event only")
                 
                 //update activity's recurrence to skip repeat on this date
@@ -907,7 +907,7 @@ extension TaskViewController {
                 self.updateRecurrences(recurrences: self.task.recurrences!)
             }))
             
-            alert.addAction(UIAlertAction(title: "Delete All Future Events", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Delete All Future Tasks", style: .default, handler: { (_) in
                 //update activity's recurrence to stop repeating at this event
                 var oldActivityRule = oldRecurrenceRule
                 let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())

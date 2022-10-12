@@ -371,18 +371,16 @@ class ActivityService {
                 self?.activitiesWithRepeats = activitiesWithRepeatsInitialAdd
                 completion()
             } else if !activitiesWithRepeatsInitialAdd.isEmpty {
+                self?.activitiesWithRepeats = self?.activitiesWithRepeats.filter({ $0.activityID != activitiesWithRepeatsInitialAdd.first?.activityID }) ?? []
                 for activity in activitiesWithRepeatsInitialAdd {
-                    if let index = self?.activitiesWithRepeats.firstIndex(where: {$0.activityID == activity.activityID && $0.finalDateTime == activity.finalDateTime}) {
-                        self?.activitiesWithRepeats[index] = activity
-                    } else {
-                        self?.activitiesWithRepeats.append(activity)
-                    }
+                    self?.activitiesWithRepeats.append(activity)
                 }
             } else {
                 completion()
             }
         }, activitiesAdded: { [weak self] activitiesAdded in
             for activity in activitiesAdded {
+                //remove activities from repeatActivities in case recurrences is updated
                 if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
                     self?.activities[index] = activity
                 } else {
@@ -390,19 +388,14 @@ class ActivityService {
                 }
             }
         }, activitiesWithRepeatsAdded: { [weak self] activitiesWithRepeatsAdded in
+            self?.activitiesWithRepeats = self?.activitiesWithRepeats.filter({ $0.activityID != activitiesWithRepeatsAdded.first?.activityID }) ?? []
             for activity in activitiesWithRepeatsAdded {
-                if let index = self?.activitiesWithRepeats.firstIndex(where: {$0.activityID == activity.activityID && $0.finalDateTime == activity.finalDateTime}) {
-                    self?.activitiesWithRepeats[index] = activity
-                } else {
-                    self?.activitiesWithRepeats.append(activity)
-                }
+                self?.activitiesWithRepeats.append(activity)
             }
         }, activitiesRemoved: { [weak self] activitiesRemoved in
             for activity in activitiesRemoved {
-                if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                    self?.activities.remove(at: index)
-
-                }
+                self?.activities = self?.activities.filter({ $0.activityID != activity.activityID }) ?? []
+                self?.activitiesWithRepeats = self?.activitiesWithRepeats.filter({ $0.activityID != activity.activityID }) ?? []
             }
         }, activitiesChanged: { [weak self] activitiesChanged in
             for activity in activitiesChanged {
@@ -413,12 +406,9 @@ class ActivityService {
                 }
             }
         }, activitiesWithRepeatsChanged: { [weak self] activitiesWithRepeatsChanged in
+            self?.activitiesWithRepeats = self?.activitiesWithRepeats.filter({ $0.activityID != activitiesWithRepeatsChanged.first?.activityID }) ?? []
             for activity in activitiesWithRepeatsChanged {
-                if let index = self?.activitiesWithRepeats.firstIndex(where: {$0.activityID == activity.activityID && $0.finalDateTime == activity.finalDateTime}) {
-                    self?.activitiesWithRepeats[index] = activity
-                } else {
-                    self?.activitiesWithRepeats.append(activity)
-                }
+                self?.activitiesWithRepeats.append(activity)
             }
         })
     }

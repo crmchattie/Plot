@@ -20,14 +20,14 @@ class EnterVerificationContainerView: UIView {
         titleNumber.translatesAutoresizingMaskIntoConstraints = false
         titleNumber.textAlignment = .center
         titleNumber.textColor = .label
-        titleNumber.font = .preferredFont(forTextStyle: .title1)
+        titleNumber.font = UIFont.title1.with(weight: .bold)
         return titleNumber
     }()
     
     let subtitleText: UILabel = {
         let subtitleText = UILabel()
         subtitleText.translatesAutoresizingMaskIntoConstraints = false
-        subtitleText.font = UIFont.preferredFont(forTextStyle: .title3)
+        subtitleText.font = UIFont.title3.with(weight: .medium)
         subtitleText.adjustsFontForContentSizeCategory = true
         subtitleText.textAlignment = .center
         subtitleText.textColor = .label
@@ -38,7 +38,7 @@ class EnterVerificationContainerView: UIView {
     
     let verificationCode: UITextField = {
         let verificationCode = UITextField()
-        verificationCode.font = UIFont.preferredFont(forTextStyle: .title3)
+        verificationCode.font = UIFont.title3.with(weight: .medium)
         verificationCode.adjustsFontForContentSizeCategory = true
         verificationCode.translatesAutoresizingMaskIntoConstraints = false
         verificationCode.textAlignment = .center
@@ -62,7 +62,7 @@ class EnterVerificationContainerView: UIView {
         resend.setTitleColor(FalconPalette.defaultBlue, for: .normal)
         resend.setTitleColor(.secondaryLabel, for: .highlighted)
         resend.setTitleColor(.secondaryLabel, for: .disabled)
-        resend.titleLabel?.font = UIFont.preferredFont(forTextStyle: .title3)
+        resend.titleLabel?.font = UIFont.title3.with(weight: .medium)
         return resend
     }()
     
@@ -75,7 +75,7 @@ class EnterVerificationContainerView: UIView {
         next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
         next.setTitleColor(.secondaryLabel, for: .highlighted)
         next.setTitleColor(.secondaryLabel, for: .disabled)
-        next.titleLabel?.font = UIFont.preferredFont(forTextStyle: .title3)
+        next.titleLabel?.font = UIFont.title3.with(weight: .medium)
         return next
     }()
     

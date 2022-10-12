@@ -87,7 +87,7 @@ class FinanceViewController: UIViewController {
     
     var financeLevel: FinanceLevel = .all
     
-    var filters: [filter] = [.search, .financeLevel, .financeAccount]
+    var filters: [filter] = [.search, .financeAccount]
     var filterDictionary = [String: [String]]()
     
     let viewPlaceholder = ViewPlaceholder()

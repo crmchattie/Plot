@@ -126,6 +126,8 @@ final class SubtaskCell: Cell<Activity>, CellType {
             } else {
                 dateTimeLabel.text = formattedDate.1 + formattedDate.2
             }
+        } else {
+            dateTimeLabel.isHidden = true
         }
         
         let image = subtask.isCompleted ?? false ? "checkmark.circle" : "circle"
