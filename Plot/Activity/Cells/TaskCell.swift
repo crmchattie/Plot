@@ -456,6 +456,5 @@ class TaskCollectionCell: UICollectionViewCell {
         
         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
         updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false))
-        
     }
 }

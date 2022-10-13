@@ -244,6 +244,12 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
         label.adjustsFontForContentSizeCategory = true
         return label
     }()
+    
+    override var isHighlighted: Bool {
+        didSet {
+            self.backgroundView?.backgroundColor = .secondarySystemGroupedBackground.withAlphaComponent(isHighlighted ? 0.7 : 1)
+        }
+    }
             
     func setupViews() {
         backgroundColor = .clear

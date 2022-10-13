@@ -283,15 +283,21 @@ class ActivityActions: NSObject {
         guard let _ = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
-        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).child("recurrences")
-        groupActivityReference.removeValue()
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+        groupActivityReference.child("recurrences").removeValue()
+        groupActivityReference.child("instanceIDs").removeValue()
+        
+        let membersIDs = fetchMembersIDs()
+        
+        for memberID in membersIDs.0 {
+            Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).child("badgeDate").removeValue()
+        }
     }
     
     func updateCompletion(isComplete: Bool) {
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-
         if activity.recurrences != nil {
             var values:[String : Any] = [:]
             if isComplete {
@@ -479,7 +485,6 @@ class ActivityActions: NSObject {
     }
     
     func updateParticipants(membersIDs: ([String], [String:AnyObject])) {
-        print("updateParticipants activities")
         guard let activity = activity, let activityID = activityID else {
             return
         }
@@ -562,9 +567,9 @@ class ActivityActions: NSObject {
                 ref.runTransactionBlock({ (mutableData) -> TransactionResult in
                     var value = mutableData.value as? [String: Int]
                     if value == nil, let finalDateTime = activity.finalDateTime {
-                        value = [String(describing: finalDateTime): 1]
+                        value = [String(describing: Int(truncating: finalDateTime)): 1]
                     } else if let finalDateTime = activity.finalDateTime {
-                        let stringFinalDateTime = String(describing: finalDateTime)
+                        let stringFinalDateTime = String(describing: Int(truncating: finalDateTime))
                         if let badge = value![stringFinalDateTime] {
                             value![stringFinalDateTime] = badge + 1
                         } else {

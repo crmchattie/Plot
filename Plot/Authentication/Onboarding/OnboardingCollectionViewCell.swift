@@ -169,12 +169,10 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
             let item = activities[indexPath.item]
             if item.isTask ?? false {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: taskCellID, for: indexPath) as? TaskCollectionCell ?? TaskCollectionCell()
-                cell.isUserInteractionEnabled = false
                 cell.configureCell(for: indexPath, task: item)
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: eventCellID, for: indexPath) as? EventCollectionCell ?? EventCollectionCell()
-                cell.isUserInteractionEnabled = false
                 cell.configureCell(for: indexPath, activity: item, withInvitation: nil)
                 return cell
             }
@@ -185,7 +183,6 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewComparisonCell, for: indexPath) as! FinanceCollectionViewComparisonCell
-            cell.isUserInteractionEnabled = false
             if let finances = finances {
                 if let item = finances[indexPath.item] as? TransactionDetails {
                     cell.transactionDetails = item

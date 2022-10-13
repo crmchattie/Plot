@@ -45,7 +45,7 @@ extension TaskCell {
         let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
-        if let badgeDate = task.badgeDate, let finalDateTime = task.finalDateTime, let badge = badgeDate[String(describing: finalDateTime)], badge > 0 {
+        if let badgeDate = task.badgeDate, let finalDateTime = task.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))], badge > 0 {
             badgeLabel.text = String(badge)
             badgeLabel.isHidden = false
         } else if let badge = task.badge, badge > 0 {
@@ -145,7 +145,7 @@ extension TaskCollectionCell {
         let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
-        if let badgeDate = task.badgeDate, let finalDateTime = task.finalDateTime, let badge = badgeDate[String(describing: finalDateTime)], badge > 0 {
+        if let badgeDate = task.badgeDate, let finalDateTime = task.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))], badge > 0 {
             badgeLabel.text = String(badge)
             badgeLabel.isHidden = false
         } else if let badge = task.badge, badge > 0 {

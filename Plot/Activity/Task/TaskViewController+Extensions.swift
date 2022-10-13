@@ -349,7 +349,7 @@ extension TaskViewController: RecurrencePickerDelegate {
             } else {
                 row.value = "Never"
                 row.updateCell()
-                task.recurrences = nil
+                self.deleteRecurrences()
             }
         }
     }

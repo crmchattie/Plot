@@ -108,8 +108,6 @@ struct MXAccount: Codable, Equatable, Hashable {
     }
     
     func balanceGivenDate(date: Date) -> Double? {
-        print(self.name)
-        print(date)
         let isodateFormatter = ISO8601DateFormatter()
         if let balances = self.balances {
             let sortedBalances = Array(balances.keys.sorted {$0.localizedStandardCompare($1) == .orderedDescending})

@@ -402,7 +402,7 @@ extension EventViewController: RecurrencePickerDelegate {
             } else {
                 row.value = "Never"
                 row.updateCell()
-                activity.recurrences = nil
+                self.deleteRecurrences()
             }
         }
     }

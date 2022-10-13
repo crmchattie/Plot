@@ -129,6 +129,8 @@ extension TaskViewController {
                 dispatchGroup.leave()
             })
         }
+        print("task.checklistIDs")
+        print(task.checklistIDs)
         for checklistID in task.checklistIDs ?? [] {
             dispatchGroup.enter()
             let checklistDataReference = Database.database().reference().child(checklistsEntity).child(checklistID)
@@ -987,24 +989,24 @@ extension TaskViewController {
     
     func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        if self.task.recurrences != nil {
+        let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
+        badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
+            var value = mutableData.value as? Int
+            value = 0
+            mutableData.value = value!
+            return TransactionResult.success(withValue: mutableData)
+        })
+        if let task = task, task.badgeDate != nil {
             let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badgeDate")
             badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
                 var value = mutableData.value as? [String: AnyObject]
                 if value == nil, let finalDateTime = self.task.finalDateTime {
-                    value = [String(describing: finalDateTime): NSNull()]
+                    value = [String(describing: Int(truncating: finalDateTime)): 0 as AnyObject]
                 } else if let finalDateTime = self.task.finalDateTime {
-                    value![String(describing: finalDateTime)] = NSNull()
+                    print(finalDateTime)
+                    value![String(describing: Int(truncating: finalDateTime))] = 0 as AnyObject
                 }
                 mutableData.value = value
-                return TransactionResult.success(withValue: mutableData)
-            })
-        } else {
-            let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")
-            badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in
-                var value = mutableData.value as? Int
-                value = 0
-                mutableData.value = value!
                 return TransactionResult.success(withValue: mutableData)
             })
         }
