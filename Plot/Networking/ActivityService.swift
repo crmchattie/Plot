@@ -344,6 +344,12 @@ class ActivityService {
                 self.hasLoadedCalendarEventActivities = true
                 completion()
             }
+        } else if primaryCalendar == "iCloud" {
+            self.grabEKEvents {
+                self.hasLoadedCalendarEventActivities = true
+                self.updatePrimaryCalendarFB(value: CalendarSourceOptions.apple.name)
+                completion()
+            }
         } else {
             self.hasLoadedCalendarEventActivities = true
             completion()
@@ -354,7 +360,6 @@ class ActivityService {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
             if self?.activities.isEmpty ?? true {
                 self?.activities = activitiesInitialAdd
-                completion()
             } else if !activitiesInitialAdd.isEmpty {
                 for activity in activitiesInitialAdd {
                     if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
@@ -363,8 +368,6 @@ class ActivityService {
                         self?.activities.append(activity)
                     }
                 }
-            } else {
-                completion()
             }
         }, activitiesWithRepeatsInitialAdd: { [weak self] activitiesWithRepeatsInitialAdd in
             if self?.activitiesWithRepeats.isEmpty ?? true {
@@ -410,6 +413,7 @@ class ActivityService {
             return completion()
         }
         self.eventKitManager.checkEventAuthorizationStatus {
+            print(self.eventKitManager.eventAuthorizationStatus)
             if self.eventKitManager.eventAuthorizationStatus != "restricted" {
                 self.eventKitManager.authorizeEventKitEvents({ askedforAuthorization in
                     self.askedforCalendarAuthorization = askedforAuthorization

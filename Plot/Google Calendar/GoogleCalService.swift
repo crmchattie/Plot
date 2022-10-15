@@ -9,6 +9,9 @@
 import Foundation
 import GoogleSignIn
 
+let kPlotGoogleCalendar = "PlotGoogleCalendar"
+let kPlotGoogleList = "PlotGoogleList"
+
 class GoogleCalService {
     var calendarService: GTLRCalendarService? {
         return GoogleCalSetupAssistant.calendarService
@@ -18,20 +21,22 @@ class GoogleCalService {
     }
     
     var plotGoogleCalendar: String? {
-        if let value = UserDefaults.standard.string(forKey: "PlotGoogleCalendar") {
+        if let value = UserDefaults.standard.string(forKey: kPlotGoogleCalendar) {
             return value
-        } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
-            UserDefaults.standard.set(value, forKey: "PlotGoogleCalendar")
+        } else if let value = UserDefaults.standard.string(forKey: kPlotCalendar) {
+            UserDefaults.standard.set(value, forKey: kPlotGoogleCalendar)
+            setFirebaseUserDefaults(child: kPlotGoogleCalendar, childValue: value)
             return value
         }
         return nil
     }
     
     var plotGoogleList: String? {
-        if let value = UserDefaults.standard.string(forKey: "PlotGoogleList") {
+        if let value = UserDefaults.standard.string(forKey: kPlotGoogleList) {
             return value
-        } else if let value = UserDefaults.standard.string(forKey: "PlotList") {
-            UserDefaults.standard.set(value, forKey: "PlotGoogleList")
+        } else if let value = UserDefaults.standard.string(forKey: kPlotList) {
+            UserDefaults.standard.set(value, forKey: kPlotGoogleList)
+            setFirebaseUserDefaults(child: kPlotGoogleList, childValue: value)
             return value
         }
         return nil
@@ -216,7 +221,10 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            UserDefaults.standard.set(createdCalendar.identifier, forKey: "PlotGoogleCalendar")
+            UserDefaults.standard.set(createdCalendar.identifier, forKey: kPlotGoogleCalendar)
+            if let id = createdCalendar.identifier {
+                setFirebaseUserDefaults(child: kPlotGoogleCalendar, childValue: id)
+            }
             completion(createdCalendar.identifier)
         })
     }
@@ -405,7 +413,10 @@ class GoogleCalService {
                 completion(nil)
                 return
             }
-            UserDefaults.standard.set(createdList.identifier, forKey: "PlotGoogleList")
+            UserDefaults.standard.set(createdList.identifier, forKey: kPlotGoogleList)
+            if let id = createdList.identifier {
+                setFirebaseUserDefaults(child: kPlotGoogleList, childValue: id)
+            }
             completion(createdList.identifier)
         })
     }

@@ -342,6 +342,7 @@ class TaskBuilder {
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = template.name
+        activity.isTask = true
         activity.category = template.category.rawValue
         activity.subcategory = template.subcategory.rawValue
         activity.activityDescription = template.description

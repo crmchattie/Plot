@@ -141,7 +141,7 @@ class SignInAppleGoogleViewController: UITableViewController {
                 cell.title.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: customFont)
             } else {
                 cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.title.font = UIFont.body.with(weight: .bold)
+                cell.title.font = UIFont.body.with(weight: .semibold)
             }
             return cell
         } else {
@@ -153,7 +153,7 @@ class SignInAppleGoogleViewController: UITableViewController {
                 cell.title.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: customFont)
             } else {
                 cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.title.font = UIFont.body.with(weight: .bold)
+                cell.title.font = UIFont.body.with(weight: .semibold)
             }
             return cell
         }
@@ -206,7 +206,6 @@ extension SignInAppleGoogleViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
             let grantedScopes = user?.grantedScopes as? [String]
-            print(grantedScopes)
             if let grantedScopes = grantedScopes {
                 if grantedScopes.contains(googleEmailScope) && grantedScopes.contains(googleTaskScope) {
                     self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.google.name)

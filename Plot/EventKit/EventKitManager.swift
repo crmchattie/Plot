@@ -11,6 +11,11 @@ import EventKit
 import CoreImage
 import UIKit
 
+let kPlotAppleCalendar = "PlotAppleCalendar"
+let kPlotCalendar = "PlotCalendar"
+let kPlotAppleList = "PlotAppleList"
+let kPlotList = "PlotList"
+
 class EventKitManager {
     private let eventKitService: EventKitService
     private var isRunningEvents: Bool
@@ -23,26 +28,6 @@ class EventKitManager {
     var isAuthorizedReminders: Bool
     var eventAuthorizationStatus: String
     var reminderAuthorizationStatus: String
-    
-    var plotAppleCalendar: String? {
-        if let value = UserDefaults.standard.string(forKey: "PlotAppleCalendar") {
-            return value
-        } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
-            UserDefaults.standard.set(value, forKey: "PlotAppleCalendar")
-            return value
-        }
-        return nil
-    }
-    
-    var plotAppleList: String? {
-        if let value = UserDefaults.standard.string(forKey: "PlotAppleList") {
-            return value
-        } else if let value = UserDefaults.standard.string(forKey: "PlotList") {
-            UserDefaults.standard.set(value, forKey: "PlotAppleList")
-            return value
-        }
-        return nil
-    }
     
     init(eventKitService: EventKitService) {
         self.eventKitService = eventKitService
@@ -159,7 +144,7 @@ class EventKitManager {
             return nil
         }
         
-        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.calendarIdentifier != self.plotAppleCalendar }
+        let calendars = eventKitService.eventStore.calendars(for: .event).filter { $0.calendarIdentifier != eventKitService.plotAppleCalendar }
         return convertCalendarsToPlot(calendars: calendars)
     }
     
@@ -240,7 +225,7 @@ class EventKitManager {
             return nil
         }
             
-        let calendars = eventKitService.eventStore.calendars(for: .reminder).filter { $0.calendarIdentifier != self.plotAppleList }
+        let calendars = eventKitService.eventStore.calendars(for: .reminder).filter { $0.calendarIdentifier != eventKitService.plotAppleList }
         return convertListsToPlot(lists: calendars)
     }
     

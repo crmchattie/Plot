@@ -1036,7 +1036,6 @@ public let userMessagesFirebaseFolder = "userMessages"
 public let messageMetaDataFirebaseFolder = "metaData"
 
 func setOnlineStatus()  {
-    
     if Auth.auth().currentUser != nil {
         let onlineStatusReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("OnlineStatus")
         let connectedRef = Database.database().reference(withPath: ".info/connected")
@@ -1044,9 +1043,30 @@ func setOnlineStatus()  {
         connectedRef.observe(.value, with: { (snapshot) in
             guard let connected = snapshot.value as? Bool, connected else { return }
             onlineStatusReference.setValue(statusOnline)
-            
             onlineStatusReference.onDisconnectSetValue(ServerValue.timestamp())
         })
+    }
+}
+
+func grabFirebaseUserDefaults(child: String, completion: @escaping (String?) -> Void) {
+    if Auth.auth().currentUser != nil {
+        let reference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child(child)
+        reference.observeSingleEvent(of: .value, with: { (snapshot) in
+            guard snapshot.exists(), let value = snapshot.value as? String else {
+                completion(nil)
+                return
+            }
+            completion(value)
+            return
+        })
+    }
+    completion(nil)
+}
+
+func setFirebaseUserDefaults(child: String, childValue: String)  {
+    if Auth.auth().currentUser != nil {
+        let reference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child(child)
+        reference.setValue(childValue)
     }
 }
 

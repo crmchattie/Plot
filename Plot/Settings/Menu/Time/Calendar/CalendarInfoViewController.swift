@@ -48,10 +48,12 @@ class CalendarInfoViewController: UITableViewController {
     }
     
     fileprivate func addObservers() {
+        print("addObservers")
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
     }
     
     deinit {
+        print("deinit")
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -84,7 +86,12 @@ class CalendarInfoViewController: UITableViewController {
                 destination.networkController = self.networkController
                 destination.title = "Calendars"
                 destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
+                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                destination.navigationItem.leftBarButtonItem = cancelBarButton
+                let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: destination, action: nil)
+                destination.navigationItem.rightBarButtonItem = doneBarButton
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             }))
             
             alert.addAction(UIAlertAction(title: "Plot Calendar", style: .default, handler: { (_) in
@@ -195,14 +202,6 @@ class CalendarInfoViewController: UITableViewController {
 
 extension CalendarInfoViewController: UpdateWithGoogleAppleSignInDelegate {
     func UpdateWithGoogleAppleSignIn() {
-        sections = Array(calendars.keys).sorted { s1, s2 in
-            if s1 == ListSourceOptions.plot.name {
-                return true
-            } else if s2 == ListSourceOptions.plot.name {
-                return false
-            }
-            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
-        }
-        self.tableView.reloadData()
+        calendarsUpdated()
     }
 }

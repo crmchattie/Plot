@@ -95,7 +95,7 @@ extension MasterActivityContainerController {
     }
     
     func openNotification() {
-        print("openNotification")
+        //remove to open notifications
         if let notification = notification {
             let aps = notification.aps
             if let ID = notification.objectID {

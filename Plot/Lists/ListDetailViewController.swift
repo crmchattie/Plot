@@ -89,10 +89,9 @@ class ListDetailViewController: FormViewController {
                 let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
                 navigationItem.rightBarButtonItem = addBarButton
             }
-            if navigationItem.leftBarButtonItem != nil {
-                navigationItem.leftBarButtonItem?.action = #selector(cancel)
-            }
-
+        }
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
         }
     }
     

@@ -223,7 +223,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     transactionRule.group = transaction.group
                 }
             }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
+                self.openLevel(level: row.tag!, value: row.value!, otherValue: nil)
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = .secondarySystemGroupedBackground
@@ -247,7 +247,11 @@ class FinanceTransactionRuleViewController: FormViewController {
                     transactionRule.top_level_category = transaction.top_level_category
                 }
             }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
+                if let string = self.transactionRule.category {
+                    self.openLevel(level: row.tag!, value: row.value!, otherValue: string)
+                } else if let transaction = self.transaction {
+                    self.openLevel(level: row.tag!, value: row.value!, otherValue: transaction.category)
+                }
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = .secondarySystemGroupedBackground
@@ -264,14 +268,18 @@ class FinanceTransactionRuleViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if let string = transactionRule.top_level_category {
+                if let string = transactionRule.category {
                     row.value = string
                 } else if let transaction = transaction {
-                    row.value = transaction.top_level_category
+                    row.value = transaction.category
                     transactionRule.category = transaction.category
                 }
             }.onCellSelection({ _, row in
-                self.openLevel(level: row.tag!, value: row.value!)
+                if let string = self.transactionRule.top_level_category {
+                    self.openLevel(level: row.tag!, value: row.value!, otherValue: string)
+                } else if let transaction = self.transaction {
+                    self.openLevel(level: row.tag!, value: row.value!, otherValue: transaction.top_level_category)
+                }
             }).cellUpdate { cell, row in
                 cell.accessoryType = .disclosureIndicator
                 cell.backgroundColor = .secondarySystemGroupedBackground
@@ -281,11 +289,12 @@ class FinanceTransactionRuleViewController: FormViewController {
             }
     }
     
-    @objc fileprivate func openLevel(level: String, value: String) {
+    @objc fileprivate func openLevel(level: String, value: String, otherValue: String?) {
         let destination = FinanceTransactionLevelViewController(networkController: networkController)
         destination.delegate = self
         destination.level = level
         destination.value = value
+        destination.otherValue = otherValue
         self.navigationController?.pushViewController(destination, animated: true)
     }
     

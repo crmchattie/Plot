@@ -16,20 +16,22 @@ class EventKitService {
     }
     
     var plotAppleCalendar: String? {
-        if let value = UserDefaults.standard.string(forKey: "PlotAppleCalendar") {
+        if let value = UserDefaults.standard.string(forKey: kPlotAppleCalendar) {
             return value
-        } else if let value = UserDefaults.standard.string(forKey: "PlotCalendar") {
-            UserDefaults.standard.set(value, forKey: "PlotAppleCalendar")
+        } else if let value = UserDefaults.standard.string(forKey: kPlotCalendar) {
+            UserDefaults.standard.set(value, forKey: kPlotAppleCalendar)
+            setFirebaseUserDefaults(child: kPlotAppleCalendar, childValue: value)
             return value
         }
         return nil
     }
     
     var plotAppleList: String? {
-        if let value = UserDefaults.standard.string(forKey: "PlotAppleList") {
+        if let value = UserDefaults.standard.string(forKey: kPlotAppleList) {
             return value
-        } else if let value = UserDefaults.standard.string(forKey: "PlotList") {
-            UserDefaults.standard.set(value, forKey: "PlotAppleList")
+        } else if let value = UserDefaults.standard.string(forKey: kPlotList) {
+            UserDefaults.standard.set(value, forKey: kPlotAppleList)
+            setFirebaseUserDefaults(child: kPlotAppleList, childValue: value)
             return value
         }
         return nil
@@ -160,7 +162,7 @@ class EventKitService {
             event.recurrenceRules = [EKRecurrenceRule(recurrenceWith: frequency, interval: recurrenceRule.interval, daysOfTheWeek: daysOfTheWeek, daysOfTheMonth: daysOfTheMonth, monthsOfTheYear: monthsOfTheYear, weeksOfTheYear: weeksOfTheYear, daysOfTheYear: daysOfTheYear, setPositions: setPositions, end: recurrenceRule.recurrenceEnd)]
         }
         
-        if let value = UserDefaults.standard.string(forKey: "PlotAppleCalendar"), let calendar = eventStore.calendar(withIdentifier: value) {
+        if let value = UserDefaults.standard.string(forKey: kPlotAppleCalendar), let calendar = eventStore.calendar(withIdentifier: value) {
             event.calendar = calendar
             do {
                 try eventStore.save(event, span: .thisEvent)
@@ -263,7 +265,8 @@ class EventKitService {
         calendar.source = source
         do {
             try eventStore.saveCalendar(calendar, commit: true)
-            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: "PlotAppleCalendar")
+            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: kPlotAppleCalendar)
+            setFirebaseUserDefaults(child: kPlotAppleCalendar, childValue: calendar.calendarIdentifier)
         } catch let error as NSError {
             print("Failed to save iOS calendar with error : \(error)")
         }
@@ -363,7 +366,7 @@ class EventKitService {
 
         }
         
-        if let value = UserDefaults.standard.string(forKey: "PlotAppleList"), let calendar = eventStore.calendar(withIdentifier: value) {
+        if let value = UserDefaults.standard.string(forKey: kPlotAppleList), let calendar = eventStore.calendar(withIdentifier: value) {
             reminder.calendar = calendar
             do {
                 try eventStore.save(reminder, commit: true)
@@ -487,7 +490,8 @@ class EventKitService {
         calendar.source = source
         do {
             try eventStore.saveCalendar(calendar, commit: true)
-            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: "PlotAppleList")
+            UserDefaults.standard.set(calendar.calendarIdentifier, forKey: kPlotAppleList)
+            setFirebaseUserDefaults(child: kPlotAppleList, childValue: calendar.calendarIdentifier)
         } catch let error as NSError {
             print("Failed to save iOS calendar with error : \(error)")
         }

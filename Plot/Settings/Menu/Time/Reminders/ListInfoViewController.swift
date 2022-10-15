@@ -84,7 +84,12 @@ class ListInfoViewController: UITableViewController {
                 destination.networkController = self.networkController
                 destination.title = "Lists"
                 destination.delegate = self
-                self.navigationController?.pushViewController(destination, animated: true)
+                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+                destination.navigationItem.leftBarButtonItem = cancelBarButton
+                let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: destination, action: nil)
+                destination.navigationItem.rightBarButtonItem = doneBarButton
+                let navigationViewController = UINavigationController(rootViewController: destination)
+                self.present(navigationViewController, animated: true, completion: nil)
             }))
                         
             alert.addAction(UIAlertAction(title: "Plot List", style: .default, handler: { (_) in
@@ -196,17 +201,6 @@ class ListInfoViewController: UITableViewController {
 
 extension ListInfoViewController: UpdateWithGoogleAppleSignInDelegate {
     func UpdateWithGoogleAppleSignIn() {
-        for (key, _) in lists {
-            print(key)
-        }
-        sections = Array(lists.keys).sorted { s1, s2 in
-            if s1 == ListSourceOptions.plot.name {
-                return true
-            } else if s2 == ListSourceOptions.plot.name {
-                return false
-            }
-            return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
-        }
-        self.tableView.reloadData()
+        listsUpdated()
     }
 }

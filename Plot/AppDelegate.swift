@@ -88,6 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         fetchCompletionHandler completionHandler:
             @escaping (UIBackgroundFetchResult) -> Void
     ) {
+        print("didReceiveRemoteNotification")
         guard let aps = userInfo["aps"] as? [String: AnyObject] else {
             completionHandler(.failed)
             return
@@ -233,6 +234,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // listen for user notifications
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        print("userNotificationCenter listen")
         
         saveUserNotification(notification: notification)
         
@@ -356,6 +358,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: UNUserNotificationCenterDelegate {
     
     func saveUserNotification(notification: UNNotification) {
+        print("saveUserNotification")
         let userInfo = notification.request.content.userInfo
         let value = userInfo as! [String : Any]
         if let object = try? DictionaryDecoder().decode(PLNotification.self, from: value) {
@@ -365,7 +368,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //            }
         }
         
-        _ = NSKeyedArchiver.archiveRootObject(notifications, toFile: notificationsArchivePath)
+        let bool = NSKeyedArchiver.archiveRootObject(notifications, toFile: notificationsArchivePath)
+        print("saveUserNotification bool \(bool)")
 
         
 //        do {
@@ -383,6 +387,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void) {
+            print("UNUserNotificationCenter didReceive")
         
         // 1
         let userInfo = response.notification.request.content.userInfo
@@ -400,7 +405,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
             default:
                 if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                    print("adding notification")
                     masterController.notification = notification
                 }
             }

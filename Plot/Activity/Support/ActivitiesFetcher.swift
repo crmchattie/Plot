@@ -306,40 +306,44 @@ class ActivitiesFetcher: NSObject {
                             }
                             return
                         }
-                        let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
-                        let dates = iCalUtility()
-                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
-                        let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
-                        for date in dates {
-                            if let instanceActivity = activities[date] {
-                                //just left so something is there
-                                let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
-                                newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
-                                newActivities.append(newActivity)
-                            } else {
-                                let newActivity = activity.copy() as! Activity
-                                newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
-                                newActivities.append(newActivity)
+                        if let endDate = activity.endDate, let startDate = activity.startDate {
+                            let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
+                            let dates = iCalUtility()
+                                .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                            let duration = endDate.timeIntervalSince(startDate)
+                            for date in dates {
+                                if let instanceActivity = activities[date] {
+                                    //just left so something is there
+                                    let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
+                                    newActivity.recurrenceStartDateTime = activity.finalDateTime
+                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                    newActivities.append(newActivity)
+                                } else {
+                                    let newActivity = activity.copy() as! Activity
+                                    newActivity.recurrenceStartDateTime = activity.finalDateTime
+                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                    newActivities.append(newActivity)
+                                }
                             }
                         }
                         group.leave()
                         counter -= 1
                     }
                 } else {
-                    let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
-                    let dates = iCalUtility()
-                        .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
-                    let duration = activity.endDate!.timeIntervalSince(activity.startDate!)
-                    for date in dates {
-                        let newActivity = activity.copy() as! Activity
-                        newActivity.recurrenceStartDateTime = activity.finalDateTime
-                        newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
-                        newActivities.append(newActivity)
+                    if let endDate = activity.endDate, let startDate = activity.startDate {
+                        let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
+                        let dates = iCalUtility()
+                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                        let duration = endDate.timeIntervalSince(startDate)
+                        for date in dates {
+                            let newActivity = activity.copy() as! Activity
+                            newActivity.recurrenceStartDateTime = activity.finalDateTime
+                            newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
+                            newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                            newActivities.append(newActivity)
+                        }
                     }
                     group.leave()
                     counter -= 1
