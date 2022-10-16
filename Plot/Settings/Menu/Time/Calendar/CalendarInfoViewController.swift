@@ -45,15 +45,14 @@ class CalendarInfoViewController: UITableViewController {
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
+        addObservers()
     }
     
     fileprivate func addObservers() {
-        print("addObservers")
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
     }
     
     deinit {
-        print("deinit")
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -85,7 +84,6 @@ class CalendarInfoViewController: UITableViewController {
                 let destination = SignInAppleGoogleViewController(networkController: self.networkController)
                 destination.networkController = self.networkController
                 destination.title = "Calendars"
-                destination.delegate = self
                 let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
                 destination.navigationItem.leftBarButtonItem = cancelBarButton
                 let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: destination, action: nil)
@@ -197,11 +195,5 @@ class CalendarInfoViewController: UITableViewController {
         let section = sender.item
         networkController.activityService.updatePrimaryCalendarFB(value: sections[section])
         tableView.reloadData()
-    }
-}
-
-extension CalendarInfoViewController: UpdateWithGoogleAppleSignInDelegate {
-    func UpdateWithGoogleAppleSignIn() {
-        calendarsUpdated()
     }
 }

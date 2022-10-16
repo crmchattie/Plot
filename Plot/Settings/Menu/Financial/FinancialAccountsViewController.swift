@@ -199,21 +199,6 @@ class FinancialAccountsViewController: UITableViewController {
 
 extension FinancialAccountsViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.triggerUpdateMXUser {}
+        networkController.financeService.regrabFinances {}
     }
 }
-
-//extension FinancialAccountsViewController: UpdateAccountDelegate {
-//    func updateAccount(account: MXAccount) {
-//        for (member, accounts) in memberAccountsDict {
-//            for index in 0...accounts.count - 1 {
-//                if accounts[index] == account {
-//                    var accs = accounts
-//                    accs[index] = account
-//                    memberAccountsDict[member] = accs
-//                    tableView.reloadData()
-//                }
-//            }
-//        }
-//    }
-//}

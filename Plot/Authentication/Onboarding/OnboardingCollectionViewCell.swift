@@ -150,15 +150,19 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let activities = activities {
+            print("activities")
             imageView.isHidden = true
             return activities.count
         } else if let healthMetrics = healthMetrics {
+            print("healthMetrics")
             imageView.isHidden = true
             return healthMetrics.count
         } else if let finances = finances {
+            print("finances")
             imageView.isHidden = true
             return finances.count
         } else {
+            print("else")
             imageView.isHidden = false
             return 0
         }

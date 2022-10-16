@@ -45,6 +45,7 @@ class ListInfoViewController: UITableViewController {
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
+        addObservers()
     }
     
     fileprivate func addObservers() {
@@ -83,7 +84,6 @@ class ListInfoViewController: UITableViewController {
                 let destination = SignInAppleGoogleViewController(networkController: self.networkController)
                 destination.networkController = self.networkController
                 destination.title = "Lists"
-                destination.delegate = self
                 let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
                 destination.navigationItem.leftBarButtonItem = cancelBarButton
                 let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: destination, action: nil)
@@ -196,11 +196,5 @@ class ListInfoViewController: UITableViewController {
         let section = sender.item
         networkController.activityService.updatePrimaryListFB(value: sections[section])
         tableView.reloadData()
-    }
-}
-
-extension ListInfoViewController: UpdateWithGoogleAppleSignInDelegate {
-    func UpdateWithGoogleAppleSignIn() {
-        listsUpdated()
     }
 }

@@ -292,7 +292,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
 
 extension DiscoverViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.triggerUpdateMXUser {}
+        networkController.financeService.regrabFinances {}
     }
 }
 

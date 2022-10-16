@@ -55,7 +55,6 @@ class FalconUsersFetcher: NSObject {
     }
     
     func fetchFalconUsers(asynchronously: Bool) {
-        
         //check is user exists
         if userID == nil {
             return
@@ -160,17 +159,15 @@ class FalconUsersFetcher: NSObject {
     fileprivate func fetchAsynchronously() {
         //add Plot user
         
-        var preparedNumber = String()
         for number in localPhones {
             do {
                 //possibly useless; just adds a plus sign and takes up memory
                 let countryCode = try phoneNumberKit.parse(number).countryCode
                 let nationalNumber = try phoneNumberKit.parse(number).nationalNumber
                 //update number format
-                preparedNumber = "+" + String(countryCode) + String(nationalNumber)
+                let preparedNumber = "+" + String(countryCode) + String(nationalNumber)
+                fetchAndObserveFalconUser(for: preparedNumber, asynchronously: true)
             } catch {}
-            
-            fetchAndObserveFalconUser(for: preparedNumber, asynchronously: true)
         }
     }
     
@@ -179,7 +176,6 @@ class FalconUsersFetcher: NSObject {
         if userID == nil {
             return
         }
-//        print("Prepared Number: \(preparedNumber)")
         //create reference to database + reference + child("users"); just a url
         reference = Database.database().reference()
         //create query that grabs a user's phone number
@@ -191,13 +187,14 @@ class FalconUsersFetcher: NSObject {
                 if snapshot.key == self.userID { return }
                 
                 self.reference.child("relationships").child(self.userID!).child(snapshot.key).setValue(true)
+                self.reference.child("relationships").child(snapshot.key).child(self.userID!).setValue(true)
                 
                 dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
                 if let thumbnailURLString = User(dictionary: dictionary).thumbnailPhotoURL, let thumbnailURL = URL(string: thumbnailURLString) {
                     SDWebImagePrefetcher.shared.prefetchURLs([thumbnailURL])
                 }
                                 
-                //add user to self.users unless user already was added, then update user's dictionary - will continuously add current user since current user is removed below
+                //add user to self.users unless user already was added, then update user's dictionary
                 if let index = self.users.firstIndex(where: { (user) -> Bool in
                     return user.id == User(dictionary: dictionary).id
                 }) {
@@ -207,14 +204,6 @@ class FalconUsersFetcher: NSObject {
                 }
                 
                 self.users = self.sortUsers(users: self.users)
-                //self.users = self.rearrangeUsers(users: self.users)
-                
-                //remove current user from users array
-                if let index = self.users.firstIndex(where: { (user) -> Bool in
-                    return user.id == self.userID!
-                }) {
-                    self.users.remove(at: index)
-                }
                 
                 if asynchronously {
                     self.delegate?.falconUsers(shouldBeUpdatedTo: self.users)

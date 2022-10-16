@@ -82,7 +82,7 @@ class CalendarFetcher: NSObject {
         
         userCalendarDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
-                self.uploadInitialPlotCalendars()
+                CalendarFetcher.uploadInitialPlotCalendars()
                 calendarInitialAdd(prebuiltCalendars)
                 return
             }
@@ -242,7 +242,7 @@ class CalendarFetcher: NSObject {
         }
     }
     
-    func uploadInitialPlotCalendars() {
+    class func uploadInitialPlotCalendars() {
         guard let _ = Auth.auth().currentUser?.uid else {
             return
         }
@@ -284,7 +284,8 @@ class CalendarFetcher: NSObject {
                     completion(calendars)
                 }
             } else {
-                completion([])
+                CalendarFetcher.uploadInitialPlotCalendars()
+                completion(prebuiltCalendars)
             }
         })
     }

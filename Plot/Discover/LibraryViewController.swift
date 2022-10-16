@@ -326,7 +326,7 @@ extension LibraryViewController: CompositionalHeaderDelegate {
 
 extension LibraryViewController: EndedWebViewDelegate {
     func updateMXMembers() {
-        networkController.financeService.triggerUpdateMXUser {}
+        networkController.financeService.regrabFinances {}
     }
 }
 

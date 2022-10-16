@@ -711,7 +711,7 @@ extension FinanceViewController: EndedWebViewDelegate {
         sections.removeAll(where: { $0 == .financialIssues })
         groups[.financialIssues] = nil
         collectionView.reloadData()
-        networkController.financeService.triggerUpdateMXUser {}
+        networkController.financeService.regrabFinances {}
     }
 }
 

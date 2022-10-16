@@ -81,9 +81,8 @@ class ListFetcher: NSObject {
         var userLists: [String: ListType] = [:]
         
         userListDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
-            print(snapshot.exists())
             guard snapshot.exists() else {
-                self.uploadInitialPlotLists()
+                ListFetcher.uploadInitialPlotLists()
                 listInitialAdd(prebuiltLists)
                 return
             }
@@ -243,7 +242,7 @@ class ListFetcher: NSObject {
         }
     }
     
-    func uploadInitialPlotLists() {
+    class func uploadInitialPlotLists() {
         guard let _ = Auth.auth().currentUser?.uid else {
             return
         }
@@ -285,7 +284,8 @@ class ListFetcher: NSObject {
                     completion(lists)
                 }
             } else {
-                completion([])
+                ListFetcher.uploadInitialPlotLists()
+                completion(prebuiltLists)
             }
         })
     }

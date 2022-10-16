@@ -405,7 +405,6 @@ class ActivityActions: NSObject {
     }
     
     func connectMembersToGroupActivity(memberIDs: [String], activityID: String) {
-        print("connectMembersToGroupActivity")
         guard let activity = activity, let currentUserID = Auth.auth().currentUser?.uid else {
             self.dispatchGroup.leave()
             return
@@ -418,8 +417,6 @@ class ActivityActions: NSObject {
             self.dispatchGroup.leave()
         })
         for memberID in memberIDs {
-            print("memberID")
-            print(memberID)
             if activity.isTask ?? false {
                 let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                 let values: [String : Any] = ["isGroupActivity": true,
@@ -430,7 +427,6 @@ class ActivityActions: NSObject {
                 })
             } else {
                 if memberID == currentUserID, let calendarID = activity.calendarID, !calendarID.isEmpty {
-                    print("found calendar")
                     let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                     let values: [String : Any] = ["isGroupActivity": true,
                                                   "badge": 0,
@@ -448,9 +444,7 @@ class ActivityActions: NSObject {
                     })
                 } else {
                     CalendarFetcher.fetchCalendarsForUser(id: memberID) { calendars in
-                        print("looking for calendar")
                         if let calendar = calendars.first(where: { $0.defaultCalendar ?? false }) {
-                            print("found second calendar")
                             let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["isGroupActivity": true,
                                                           "badge": 0,
@@ -466,6 +460,8 @@ class ActivityActions: NSObject {
                                 }
                                 connectingMembersGroup.leave()
                             })
+                        } else {
+                            connectingMembersGroup.leave()
                         }
                     }
                 }

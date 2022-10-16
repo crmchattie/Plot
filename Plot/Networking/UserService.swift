@@ -22,12 +22,14 @@ class UserService {
     }
     
     func grabContacts() {
+        print("grabContacts")
         DispatchQueue.global(qos: .default).async { [unowned self] in
             self.contactsFetcher.fetchContacts()
         }
     }
     
     func grabUsers() {
+        print("grabUsers")
         DispatchQueue.global(qos: .default).async { [unowned self] in
             self.falconUsersFetcher.fetchFalconUsers(asynchronously: true)
         }

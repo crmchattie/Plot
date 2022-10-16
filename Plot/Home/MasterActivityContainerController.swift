@@ -160,7 +160,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         super.viewDidAppear(animated)
         if isNewUser {
             self.networkController.setupFirebase()
-            self.networkController.userService.grabContacts()
+            self.networkController.setupOtherVariables()
             //change to stop from running
             isNewUser = false
         }
@@ -359,6 +359,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func hasLoadedFinancials() {
+        print("hasLoadedFinancials")
         self.updatingFinances = !self.networkController.financeService.hasLoadedFinancials
         DispatchQueue.main.async {
             self.collectionView.reloadData()
@@ -724,7 +725,6 @@ extension MasterActivityContainerController: GIDSignInDelegate {
     func newCalendar() {
         let destination = SignInAppleGoogleViewController(networkController: networkController)
         destination.title = "Providers"
-        destination.delegate = self
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: destination, action: nil)
@@ -802,7 +802,6 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openTransactionDetails(transactionDetails: TransactionDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-//        financeDetailViewController.delegate = self
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -810,7 +809,6 @@ extension MasterActivityContainerController: FinanceControllerCellDelegate {
     func openAccountDetails(accountDetails: AccountDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: networkController.financeService.accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-//        financeDetailViewController.delegate = self
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
@@ -866,7 +864,7 @@ extension MasterActivityContainerController: EndedWebViewDelegate {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
-        networkController.financeService.triggerUpdateMXUser {}
+        networkController.financeService.regrabFinances {}
     }
 }
 
@@ -905,10 +903,3 @@ extension MasterActivityContainerController: DeleteAndExitDelegate {
         return nil
     }
 }
-
-extension MasterActivityContainerController: UpdateWithGoogleAppleSignInDelegate {
-    func UpdateWithGoogleAppleSignIn() {
-        self.collectionView.reloadData()
-    }
-}
-

@@ -180,6 +180,7 @@ class ActivityService {
     
     var calendars = [String: [CalendarType]]() {
         didSet {
+            print("calendars didSet")
             if oldValue != calendars {
                 for (_, calendarList) in calendars {
                     for calendar in calendarList {
@@ -194,6 +195,7 @@ class ActivityService {
     }
     var lists = [String: [ListType]]() {
         didSet {
+            print("lists didSet")
             if oldValue != lists {
                 for (_, listList) in lists {
                     for list in listList {
@@ -314,18 +316,20 @@ class ActivityService {
     
     func regrabLists(_ completion: @escaping () -> Void) {
         hasLoadedListTaskActivities = false
-        self.grabLists()
         if primaryList == ListSourceOptions.apple.name {
             self.grabEKReminders {
+                self.grabLists()
                 self.hasLoadedListTaskActivities = true
                 completion()
             }
         } else if primaryList == ListSourceOptions.google.name {
             self.grabGTasks {
+                self.grabLists()
                 self.hasLoadedListTaskActivities = true
                 completion()
             }
         } else {
+            self.grabLists()
             self.hasLoadedListTaskActivities = true
             completion()
         }
@@ -333,24 +337,20 @@ class ActivityService {
     
     func regrabEvents(_ completion: @escaping () -> Void) {
         hasLoadedCalendarEventActivities = false
-        self.grabCalendars()
         if primaryCalendar == CalendarSourceOptions.apple.name {
             self.grabEKEvents {
+                self.grabCalendars()
                 self.hasLoadedCalendarEventActivities = true
                 completion()
             }
         } else if primaryCalendar == CalendarSourceOptions.google.name {
             self.grabGEvents {
+                self.grabCalendars()
                 self.hasLoadedCalendarEventActivities = true
-                completion()
-            }
-        } else if primaryCalendar == "iCloud" {
-            self.grabEKEvents {
-                self.hasLoadedCalendarEventActivities = true
-                self.updatePrimaryCalendarFB(value: CalendarSourceOptions.apple.name)
                 completion()
             }
         } else {
+            self.grabCalendars()
             self.hasLoadedCalendarEventActivities = true
             completion()
         }
