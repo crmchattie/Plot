@@ -158,7 +158,6 @@ class FalconUsersFetcher: NSObject {
     
     fileprivate func fetchAsynchronously() {
         //add Plot user
-        
         for number in localPhones {
             do {
                 //possibly useless; just adds a plus sign and takes up memory
@@ -185,7 +184,6 @@ class FalconUsersFetcher: NSObject {
             if snapshot.exists() {
                 guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
                 if snapshot.key == self.userID { return }
-                
                 self.reference.child("relationships").child(self.userID!).child(snapshot.key).setValue(true)
                 self.reference.child("relationships").child(snapshot.key).child(self.userID!).setValue(true)
                 
@@ -207,7 +205,6 @@ class FalconUsersFetcher: NSObject {
                 
                 if asynchronously {
                     self.delegate?.falconUsers(shouldBeUpdatedTo: self.users)
-                    //                                print("Updated delegate")
                 }
                 
             }

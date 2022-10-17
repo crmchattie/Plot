@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import PhoneNumberKit
 
 class UserProfileController: UIViewController {
     
@@ -16,6 +17,7 @@ class UserProfileController: UIViewController {
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
     var newUser = true
+    let phoneNumberKit = PhoneNumberKit()
     
     // typealias allows you to rename a data type
     typealias CompletionHandler = (_ success: Bool) -> Void
@@ -148,8 +150,18 @@ extension UserProfileController {
     
     func updateUserData() {
         let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
+        
+        var phoneNumberForFB = String()
+        
+        do {
+            let phoneNumber = try self.phoneNumberKit.parse(userProfileContainerView.phone.text!)
+            phoneNumberForFB = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+        } catch {
+            phoneNumberForFB = userProfileContainerView.phone.text!
+        }
+        
         userReference.updateChildValues(["name": userProfileContainerView.name.text!,
-                                         "phoneNumber": userProfileContainerView.phone.text!,
+                                         "phoneNumber": phoneNumberForFB,
                                          "bio": userProfileContainerView.bio.text!]) { (_, _) in
             Analytics.logEvent(AnalyticsEventSignUp, parameters: [
                 AnalyticsParameterMethod: self.method

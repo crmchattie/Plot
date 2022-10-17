@@ -59,15 +59,10 @@ class EnterVerificationCodeController: UIViewController {
         var phoneNumberForVerification = String()
         
         do {
-            print("do")
             let phoneNumber = try self.phoneNumberKit.parse(enterVerificationContainerView.titleNumber.text!)
-            print(phoneNumber)
             phoneNumberForVerification = self.phoneNumberKit.format(phoneNumber, toType: .e164)
-            print(phoneNumberForVerification)
         } catch {
-            print("catch")
             phoneNumberForVerification = enterVerificationContainerView.titleNumber.text!
-            print(phoneNumberForVerification)
         }
         
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
@@ -128,8 +123,12 @@ class EnterVerificationCodeController: UIViewController {
             do {
                 let phoneNumber = try self.phoneNumberKit.parse(self.enterVerificationContainerView.titleNumber.text!)
                 phoneNumberForFB = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+                print("do")
+                print(phoneNumberForFB)
             } catch {
                 phoneNumberForFB = self.enterVerificationContainerView.titleNumber.text!
+                print("catch")
+                print(phoneNumberForFB)
             }
             
             let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
