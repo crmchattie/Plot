@@ -790,25 +790,25 @@ class FinanceTransactionViewController: FormViewController {
         DispatchQueue.main.async { [weak self] in
             if row is ScheduleRow {
                 if self!.eventList.indices.contains(rowNumber) {
+                    let item = self!.eventList[rowNumber]
                     self!.eventList.remove(at: rowNumber)
                     self!.updateLists()
-                    let item = self!.eventList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .activity, ID: item.activityID ?? "")
                 }
             }
             else if row is HealthRow {
                 if self!.healthList.indices.contains(rowNumber)  {
+                    let item = self!.healthList[rowNumber]
                     self!.healthList.remove(at: rowNumber)
                     self!.updateLists()
-                    let item = self!.healthList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: item.type, ID: item.ID)
                 }
             }
             else if row is SubtaskRow {
                 if self!.taskList.indices.contains(rowNumber) {
+                    let item = self!.taskList[rowNumber]
                     self!.taskList.remove(at: rowNumber)
                     self!.updateLists()
-                    let item = self!.taskList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .task, ID: item.activityID ?? "")
                 }
             }

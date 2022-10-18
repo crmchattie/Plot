@@ -6,6 +6,8 @@
 //  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
+import Foundation
+
 let userFinancialTransactionsEntity = "user-financial-transactions"
 let financialTransactionsEntity = "financial-transactions"
 let userFinancialTransactionsCategoriesEntity = "user-financial-transactions-categories"
@@ -23,12 +25,6 @@ var financialTransactionsTopLevelCategoriesDictionaryStatic = ["Auto & Transport
 var financialTransactionsCategoriesStatic = ["Auto Payment", "Auto Insurance", "Gas", "Parking", "Public Transportation", "Service & Parts", "Auto & Transport", "Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills & Utilities", "Advertising", "Legal", "Office Supplies", "Printing", "Shipping", "Business Services", "Book Supplies", "Student Loans", "Tuition", "Education", "Amusement", "Arts", "Movies & DVDs", "Music", "Newspapers & Magazines", "Entertainment", "ATM Fee", "Banking Fee", "Finance Charge", "Late Fee", "Service Fee", "Trade Commissions", "Fees & Charges", "Financial Advisor", "Life Insurance", "Financial", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining", "Charity", "Gift", "Gifts & Donations", "Dentist", "Doctor", "Eyecare", "Gym", "Health Insurance", "Pharmacy", "Sports", "Health & Fitness", "Furnishings", "Home Improvement", "Home Insurance", "Home Services", "Home Supplies", "Lawn & Garden", "Mortgage & Rent", "Home", "Bonus", "Interest Income", "Paycheck", "Reimbursement", "Rental Income", "Income", "Buy", "Deposit", "Dividend & Cap Gains", "Sell", "Withdrawal", "Investments", "Allowance", "Baby Supplies", "Babysitter & Daycare", "Child Support", "Kids Activities", "Toys", "Kids", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Pets", "Books", "Clothing", "Hobbies", "Sporting Goods", "Shopping", "Federal Tax", "Local Tax", "Property Tax", "Sales Tax", "State Tax", "Taxes", "Credit Card Payment", "Transfer for Cash Spending", "Mortgage Payment", "Transfer", "Air Travel", "Hotel", "Rental Car & Taxi", "Vacation", "Travel", "Cash", "Check", "Uncategorized"]
 
 var financialTransactionsCategoriesDictionaryStatic = ["Auto Payment": "Auto & Transport", "Auto Insurance": "Auto & Transport", "Gas": "Auto & Transport", "Parking": "Auto & Transport", "Public Transportation": "Auto & Transport", "Service & Parts": "Auto & Transport", "Auto & Transport": "Auto & Transport", "Domain Names": "Bills & Utilities", "Fraud Protection": "Bills & Utilities", "Home Phone": "Bills & Utilities", "Hosting": "Bills & Utilities", "Internet": "Bills & Utilities", "Mobile Phone": "Bills & Utilities", "Television": "Bills & Utilities", "Utilities": "Bills & Utilities", "Bills & Utilities": "Bills & Utilities", "Advertising": "Business Services", "Legal": "Business Services", "Office Supplies": "Business Services", "Printing": "Business Services", "Shipping": "Business Services", "Business Services": "Business Services", "Book Supplies": "Education", "Student Loans": "Education", "Tuition": "Education", "Education": "Education", "Amusement": "Entertainment", "Arts": "Entertainment", "Movies & DVDs": "Entertainment", "Music": "Entertainment", "Newspapers & Magazines": "Entertainment", "Entertainment": "Entertainment", "ATM Fee": "Fees & Charges", "Banking Fee": "Fees & Charges", "Finance Charge": "Fees & Charges", "Late Fee": "Fees & Charges", "Service Fee": "Fees & Charges", "Trade Commissions": "Fees & Charges", "Fees & Charges": "Fees & Charges", "Financial Advisor": "Financial", "Life Insurance": "Financial", "Financial": "Financial", "Alcohol & Bars": "Food & Dining", "Coffee Shops": "Food & Dining", "Fast Food": "Food & Dining", "Groceries": "Food & Dining", "Restaurants": "Food & Dining", "Food & Dining": "Food & Dining", "Charity": "Gifts & Donations", "Gift": "Gifts & Donations", "Gifts & Donations": "Gifts & Donations", "Dentist": "Health & Fitness", "Doctor": "Health & Fitness", "Eyecare": "Health & Fitness", "Gym": "Health & Fitness", "Health Insurance": "Health & Fitness", "Pharmacy": "Health & Fitness", "Sports": "Health & Fitness", "Health & Fitness": "Health & Fitness", "Furnishings": "Home", "Home Improvement": "Home", "Home Insurance": "Home", "Home Services": "Home", "Home Supplies": "Home", "Lawn & Garden": "Home", "Mortgage & Rent": "Home", "Home": "Home", "Bonus": "Income", "Interest Income": "Income", "Paycheck": "Income", "Reimbursement": "Income", "Rental Income": "Income", "Income": "Income", "Buy": "Investments", "Deposit": "Investments", "Dividend & Cap Gains": "Investments", "Sell": "Investments", "Withdrawal": "Investments", "Investments": "Investments", "Allowance": "Kids", "Baby Supplies": "Kids", "Babysitter & Daycare": "Kids", "Child Support": "Kids", "Kids Activities": "Kids", "Toys": "Kids", "Kids": "Kids", "Hair": "Personal Care", "Laundry": "Personal Care", "Spa & Massage": "Personal Care", "Personal Care": "Personal Care", "Pet Food & Supplies": "Pets", "Pet Grooming": "Pets", "Veterinary": "Pets", "Pets": "Pets", "Books": "Shopping", "Clothing": "Shopping", "Hobbies": "Shopping", "Sporting Goods": "Shopping", "Shopping": "Shopping", "Federal Tax": "Taxes", "Local Tax": "Taxes", "Property Tax": "Taxes", "Sales Tax": "Taxes", "State Tax": "Taxes", "Taxes": "Taxes", "Credit Card Payment": "Transfer", "Transfer for Cash Spending": "Transfer", "Mortgage Payment": "Transfer", "Transfer": "Transfer", "Air Travel": "Travel", "Hotel": "Travel", "Rental Car & Taxi": "Travel", "Vacation": "Travel", "Travel": "Travel", "Cash": "Uncategorized", "Check": "Uncategorized", "Uncategorized": "Uncategorized"]
-
-//transactions that involve doing something with your time e.g. dining out, grabbing drinks, groceries
-var financialTransactionCategoriesAssociatedWithEvents = ["Gas", "Public Transportation", "Amusement", "Arts", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Restaurants", "Food & Dining", "Dentist", "Doctor", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Rental Car & Taxi"]
-
-//recurring transaction(bills)
-var financialTransactionCategoriesAssociatedWithTasks = ["Auto Payment", "Auto Insurance", "Domain Names", "Hosting", "Internet", "Television", "Utilities", "Groceries", "Bills & Utilities", "Student Loans", "Tuition", "Life Insurance", "Health Insurance", "Home Insurance", "Mortgage & Rent", "Paycheck", "Income", "Child Support", "Credit Card Payment", "Mortgage Payment"]
 
 
 func topLevelCategoryColor(_ value: String) -> UIColor {
@@ -173,12 +169,6 @@ struct Transaction: Codable, Equatable, Hashable {
         self.top_level_category = top_level_category
         self.user_created = user_created
         self.admin = admin
-    }
-    
-    // MARK: - Utility
-    static func categorize(_ transaction: Transaction) -> Activity? {
-        
-        return nil
     }
 }
 
@@ -966,5 +956,67 @@ func updateTransactionWRule(transaction: Transaction, transactionRules: [Transac
         }
     }
     completion(_transaction, bool)
+}
+
+//transactions that involve doing something with your time e.g. dining out, grabbing drinks, groceries
+var financialTransactionCategoriesAssociatedWithEvents = ["Gas", "Public Transportation", "Amusement", "Arts", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Restaurants", "Food & Dining", "Dentist", "Doctor", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Rental Car & Taxi", "Groceries"]
+
+//recurring transaction(bills)
+var financialTransactionCategoriesAssociatedWithRecurringCosts = ["Auto Payment", "Auto Insurance", "Domain Names", "Hosting", "Internet", "Television", "Utilities", "Bills & Utilities", "Student Loans", "Tuition", "Life Insurance", "Health Insurance", "Home Insurance", "Mortgage & Rent", "Child Support", "Credit Card Payment", "Mortgage Payment"]
+
+var financialTransactionCategoriesToSkip = ["Cash", "Check", "Uncategorized", "Transfer", "Public Transportation", "Rental Car & Taxi", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining"]
+
+var financialTransactionDescriptionsToSkip = ["aplpay"]
+
+var subscriptionProviders = ["spotify", "netflix", "amazon prime", "disney plus", "hulu", "crunchyroll", "espn plus", "apple music", "hbo", "amazon music", "dashpass", "apple tv plus", "audible"]
+
+func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @escaping ([Transaction: Activity]) -> Void) {
+    let isodateFormatter = ISO8601DateFormatter()
+    for transaction in transactions {
+        if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), transactions.filter({ abs($0.amount) == abs(transaction.amount) }).count == 1, abs(transaction.amount) > 0 {
+            TaskBuilder.createActivityWithList(from: transaction) { task in
+                if let task = task {
+                    task.category = ActivityCategory.finances.rawValue
+                    task.subcategory = ActivitySubcategory.bills.rawValue
+                    completion([transaction:task])
+                }
+            }
+        } else if transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortDayMonthAndYear() }).count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
+            TaskBuilder.createActivityWithList(from: transaction) { task in
+                if let task = task {
+                    task.category = ActivityCategory.finances.rawValue
+                    task.subcategory = ActivitySubcategory.bills.rawValue
+                    completion([transaction:task])
+                }
+            }
+        }
+    }
+}
+
+//        if transaction.status == .pending, financialTransactionCategoriesAssociatedWithEvents.contains(transaction.category), abs(transaction.amount) > 0, let event = EventBuilder.createActivity(from: transaction) {
+//            print("event via financialTransactionCategoriesAssociatedWithEvents")
+//            print(transaction.description)
+//            print(transaction.amount)
+//            print(transaction.group)
+//            print(transaction.top_level_category)
+//            print(transaction.category)
+//            print(event.startDate)
+//        } else
+
+func containsWord(str: String, wordGroups: [String]) -> Bool {
+    // Get all the words from your input string
+    let words = str.split(separator: " ")
+    
+    for group in wordGroups {
+        // Put all the words in the group into set to improve lookup time
+        let set = Set(group.split(separator: " "))
+        for word in words {
+            if set.contains(word) {
+                return true
+            }
+        }
+    }
+    
+    return false
 }
 

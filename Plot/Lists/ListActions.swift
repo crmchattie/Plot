@@ -43,7 +43,7 @@ class ListActions: NSObject {
             Database.database().reference().child(userListEntity).child(memberID).child(ID).removeAllObservers()
             Database.database().reference().child(userListEntity).child(memberID).child(ID).removeValue()
         }
-        
+                
         guard let currentUserId = Auth.auth().currentUser?.uid else {
             return
         }
@@ -149,7 +149,7 @@ class ListActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userListEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["isGroupList": true, "listColor": list.color as Any]
+            let values:[String : Any] = ["isGroupList": true, "color": list.color as Any]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })

@@ -125,7 +125,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
             if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                 activity.listColor = color
             } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                activity.calendarColor = color
+                activity.listColor = color
             }
             cell.configureCell(for: indexPath, task: activity)
             return cell

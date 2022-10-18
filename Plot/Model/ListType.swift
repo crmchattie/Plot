@@ -35,20 +35,26 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     var category: String?
     var taskIDs: [String: Bool]?
     var defaultList: Bool?
+    var financeList: Bool?
+    var healthList: Bool?
     
-    init(id: String, name: String?, color: String?, source: String, admin: String?, defaultList: Bool?) {
+    init(id: String, name: String?, color: String?, source: String, admin: String?, defaultList: Bool?, financeList: Bool?, healthList: Bool?) {
         self.id = id
         self.name = name
         self.color = color
         self.source = source
         self.admin = admin
         self.defaultList = defaultList
+        self.financeList = financeList
+        self.healthList = healthList
     }
 }
 
-let prebuiltLists: [ListType] = [defaultList]
+let prebuiltLists: [ListType] = [defaultList, financeList, healthList]
 
-let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: true)
+let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: true, financeList: false, healthList: false)
+let financeList = ListType(id: UUID().uuidString, name: "Finances", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: true, healthList: false)
+let healthList = ListType(id: UUID().uuidString, name: "Health", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: false, healthList: true)
 
 enum ListSourceOptions: String, CaseIterable {
     case plot = "Plot"

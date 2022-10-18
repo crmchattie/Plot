@@ -150,7 +150,7 @@ class EventViewController: FormViewController {
                     if let calendar = calendar {
                         activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
                     } else {
-                        let calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.defaultCalendar ?? false }
+                        let calendar = calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false })
                         activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
 
                     }
@@ -982,26 +982,26 @@ class EventViewController: FormViewController {
         DispatchQueue.main.async { [weak self] in
             if row is PurchaseRow {
                 if self!.purchaseList.indices.contains(rowNumber) {
+                    let item = self!.purchaseList[rowNumber]
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
 //                    self!.purchaseBreakdown()
-                    let item = self!.purchaseList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .transaction, ID: item.guid)
                 }
             }
             else if row is HealthRow {
                 if self!.healthList.indices.contains(rowNumber)  {
+                    let item = self!.healthList[rowNumber]
                     self!.healthList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
-                    let item = self!.healthList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: item.type, ID: item.ID)
                 }
             }
             else if row is SubtaskRow {
                 if self!.taskList.indices.contains(rowNumber) {
+                    let item = self!.taskList[rowNumber]
                     self!.taskList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
-                    let item = self!.taskList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .task, ID: item.activityID ?? "")
                 }
             }

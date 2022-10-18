@@ -197,6 +197,8 @@ class ChooseTaskTableViewController: UITableViewController {
         let task = filteredTasks[indexPath.row]
         if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
             task.listColor = color
+        } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
+            task.listColor = color
         }
         cell.configureCell(for: indexPath, task: task)
         return cell

@@ -199,7 +199,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             return false
         }
         if !flaggedTasks.isEmpty {
-            let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "", admin: nil, defaultList: false)
+            let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false)
             taskList[flaggedList] = flaggedTasks
             listOfLists.insert(flaggedList, at: 0)
         }
@@ -211,7 +211,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             return false
         }
         if !scheduledTasks.isEmpty {
-            let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "", admin: nil, defaultList: false)
+            let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false)
             taskList[scheduledList] = scheduledTasks
             listOfLists.insert(scheduledList, at: 0)
         }
@@ -223,7 +223,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             return false
         }
         if !dailyTasks.isEmpty {
-            let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "", admin: nil, defaultList: false)
+            let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false)
             taskList[dailyList] = dailyTasks
             listOfLists.insert(dailyList, at: 0)
         }
@@ -467,8 +467,15 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else if !filteredTasks.isEmpty {
             let task = filteredTasks[indexPath.row]
+            print(task.name)
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
             if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                print("task has listID")
+                print(list.name)
+                task.listColor = color
+            } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
+                print("default list")
+                print(list.name)
                 task.listColor = color
             }
             cell.configureCell(for: indexPath, task: task)

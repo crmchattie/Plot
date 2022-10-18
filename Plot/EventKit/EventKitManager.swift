@@ -232,7 +232,7 @@ class EventKitManager {
     func convertListsToPlot(lists: [EKCalendar]) -> [ListType] {
         var listTypes = [ListType]()
         for list in lists {
-            let listType = ListType(id: list.calendarIdentifier, name: list.title, color: CIColor(cgColor: list.cgColor).stringRepresentation, source: ListSourceOptions.apple.name, admin: nil, defaultList: false)
+            let listType = ListType(id: list.calendarIdentifier, name: list.title, color: CIColor(cgColor: list.cgColor).stringRepresentation, source: ListSourceOptions.apple.name, admin: nil, defaultList: false, financeList: false, healthList: false)
             listTypes.append(listType)
         }
         return listTypes

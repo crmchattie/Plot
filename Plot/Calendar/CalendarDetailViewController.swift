@@ -81,9 +81,13 @@ class CalendarDetailViewController: FormViewController {
         if calendar.source == CalendarSourceOptions.plot.name {
             if active {
                 let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-                let dotsImage = UIImage(named: "dots")
-                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-                navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
+                if !(calendar.defaultCalendar ?? false) {
+                    let dotsImage = UIImage(named: "dots")
+                    let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                    navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
+                } else {
+                    navigationItem.rightBarButtonItems = [addBarButton]
+                }
             } else {
                 let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
                 navigationItem.rightBarButtonItem = addBarButton

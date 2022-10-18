@@ -99,6 +99,7 @@ class GCalendarEventOp: AsyncOperation {
             activity.activityType = CustomType.googleCalendarEvent.categoryText
             activity.admin = Auth.auth().currentUser?.uid
             activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
+            activity.showExtras = false
             completion(activity)
         }
     }

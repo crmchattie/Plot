@@ -231,6 +231,10 @@ class TaskBuilder {
         activity.hasDeadlineTime = true
         activity.participantsIDs = workout.participantsIDs
         activity.containerID = workout.containerID
+        if end.timeIntervalSinceNow.sign == .minus {
+            activity.isCompleted = true
+            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
@@ -255,6 +259,10 @@ class TaskBuilder {
         activity.hasDeadlineTime = true
         activity.participantsIDs = mindfulness.participantsIDs
         activity.containerID = mindfulness.containerID
+        if end.timeIntervalSinceNow.sign == .minus {
+            activity.isCompleted = true
+            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
@@ -279,6 +287,10 @@ class TaskBuilder {
         activity.hasDeadlineTime = true
         activity.participantsIDs = meal.participantsIDs
         activity.containerID = meal.containerID
+        if end.timeIntervalSinceNow.sign == .minus {
+            activity.isCompleted = true
+            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
@@ -298,7 +310,7 @@ class TaskBuilder {
         }
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        activity.name = transaction.description
+        activity.name = transaction.description  + " Bill"
         activity.isTask = true
         activity.category = ActivityCategory.finances.rawValue
         activity.subcategory = ActivitySubcategory.bills.rawValue
@@ -306,6 +318,8 @@ class TaskBuilder {
         activity.hasDeadlineTime = false
         activity.participantsIDs = transaction.participantsIDs
         activity.containerID = transaction.containerID
+        activity.isCompleted = true
+        activity.completedDate = NSNumber(value: end.timeIntervalSince1970)
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
@@ -361,6 +375,10 @@ class TaskBuilder {
         }
         activity.participantsIDs = event.participantsIDs
         activity.containerID = event.containerID
+        if let endDate = event.endDate, endDate.timeIntervalSinceNow.sign == .minus {
+            activity.isCompleted = true
+            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
@@ -431,7 +449,7 @@ class TaskBuilder {
             }
             
             ListFetcher.fetchListsForUser(id: currentUserID) { lists in
-                if let list = lists.first(where: { $0.defaultList ?? false }) {
+                if let list = lists.first(where: { $0.healthList ?? false }) {
                     let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
                     activity.listID = list.id
                     activity.listName = list.name
@@ -445,9 +463,15 @@ class TaskBuilder {
                     activity.hasDeadlineTime = true
                     activity.participantsIDs = workout.participantsIDs
                     activity.containerID = workout.containerID
+                    if end.timeIntervalSinceNow.sign == .minus {
+                        activity.isCompleted = true
+                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                    }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     completion(activity)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -464,7 +488,7 @@ class TaskBuilder {
             }
 
             ListFetcher.fetchListsForUser(id: currentUserID) { lists in
-                if let list = lists.first(where: { $0.defaultList ?? false }) {
+                if let list = lists.first(where: { $0.healthList ?? false }) {
                     let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
                     activity.listID = list.id
                     activity.listName = list.name
@@ -478,9 +502,15 @@ class TaskBuilder {
                     activity.hasDeadlineTime = true
                     activity.participantsIDs = mindfulness.participantsIDs
                     activity.containerID = mindfulness.containerID
+                    if end.timeIntervalSinceNow.sign == .minus {
+                        activity.isCompleted = true
+                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                    }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     completion(activity)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -497,7 +527,7 @@ class TaskBuilder {
             }
 
             ListFetcher.fetchListsForUser(id: currentUserID) { lists in
-                if let list = lists.first(where: { $0.defaultList ?? false }) {
+                if let list = lists.first(where: { $0.healthList ?? false }) {
                     let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
                     activity.listID = list.id
                     activity.listName = list.name
@@ -511,9 +541,15 @@ class TaskBuilder {
                     activity.hasDeadlineTime = true
                     activity.participantsIDs = meal.participantsIDs
                     activity.containerID = meal.containerID
+                    if end.timeIntervalSinceNow.sign == .minus {
+                        activity.isCompleted = true
+                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                    }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     completion(activity)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -533,13 +569,13 @@ class TaskBuilder {
             }
 
             ListFetcher.fetchListsForUser(id: currentUserID) { lists in
-                if let list = lists.first(where: { $0.defaultList ?? false }) {
+                if let list = lists.first(where: { $0.financeList ?? false }) {
                     let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
                     activity.listID = list.id
                     activity.listName = list.name
                     activity.listSource = list.source
                     activity.listColor = list.color
-                    activity.name = transaction.description
+                    activity.name = transaction.description + " Bill"
                     activity.isTask = true
                     activity.category = ActivityCategory.finances.rawValue
                     activity.subcategory = ActivitySubcategory.bills.rawValue
@@ -547,9 +583,13 @@ class TaskBuilder {
                     activity.hasDeadlineTime = false
                     activity.participantsIDs = transaction.participantsIDs
                     activity.containerID = transaction.containerID
+                    activity.isCompleted = true
+                    activity.completedDate = NSNumber(value: end.timeIntervalSince1970)
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     completion(activity)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -572,7 +612,7 @@ class TaskBuilder {
             }
 
             ListFetcher.fetchListsForUser(id: currentUserID) { lists in
-                if let list = lists.first(where: { $0.defaultList ?? false }) {
+                if let list = lists.first(where: { $0.financeList ?? false }) {
                     let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
                     activity.listID = list.id
                     activity.listName = list.name
@@ -591,6 +631,8 @@ class TaskBuilder {
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     completion(activity)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -626,9 +668,15 @@ class TaskBuilder {
                     }
                     activity.participantsIDs = event.participantsIDs
                     activity.containerID = event.containerID
+                    if let endDate = event.endDate, endDate.timeIntervalSinceNow.sign == .minus {
+                        activity.isCompleted = true
+                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                    }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     completion(activity)
+                } else {
+                    completion(nil)
                 }
             }
         }
@@ -675,27 +723,9 @@ class TaskBuilder {
                         subtasks.append(subtask)
                     }
                     completion(activity, subtasks)
+                } else {
+                    completion(nil, nil)
                 }
             }
-        }
-        
-        class func createSubTaskWithList(subtemplate: Template) -> Activity {
-            var activityID = UUID().uuidString
-            if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
-                activityID = newId
-            }
-
-            let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-            activity.name = subtemplate.name
-            activity.category = subtemplate.category.rawValue
-            activity.subcategory = subtemplate.subcategory.rawValue
-            activity.activityDescription = subtemplate.description
-            if let endDate = subtemplate.getEndDate() {
-                activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
-            }
-            activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
-            activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
-            activity.isSubtask = true
-            return activity
         }
 }

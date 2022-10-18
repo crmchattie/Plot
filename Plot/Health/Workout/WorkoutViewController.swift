@@ -647,26 +647,26 @@ class WorkoutViewController: FormViewController {
         DispatchQueue.main.async { [weak self] in
             if row is ScheduleRow {
                 if self!.eventList.indices.contains(rowNumber) {
+                    let item = self!.eventList[rowNumber]
                     self!.eventList.remove(at: rowNumber)
                     self!.updateLists()
-                    let item = self!.eventList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .activity, ID: item.activityID ?? "")
                 }
             }
             else if row is PurchaseRow {
                 if self!.purchaseList.indices.contains(rowNumber) {
+                    let item = self!.purchaseList[rowNumber]
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists()
 //                    self!.purchaseBreakdown()
-                    let item = self!.purchaseList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .transaction, ID: item.guid)
                 }
             }
             else if row is SubtaskRow {
                 if self!.taskList.indices.contains(rowNumber) {
+                    let item = self!.taskList[rowNumber]
                     self!.taskList.remove(at: rowNumber)
                     self!.updateLists()
-                    let item = self!.taskList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .task, ID: item.activityID ?? "")
                 }
             }

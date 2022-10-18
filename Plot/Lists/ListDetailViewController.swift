@@ -82,9 +82,13 @@ class ListDetailViewController: FormViewController {
         if list.source == ListSourceOptions.plot.name {
             if active {
                 let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-                let dotsImage = UIImage(named: "dots")
-                let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
-                navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
+                if !(list.defaultList ?? false) && !(list.financeList ?? false) && !(list.healthList ?? false) {
+                    let dotsImage = UIImage(named: "dots")
+                    let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+                    navigationItem.rightBarButtonItems = [addBarButton, dotsBarButton]
+                } else {
+                    navigationItem.rightBarButtonItems = [addBarButton]
+                }
             } else {
                 let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
                 navigationItem.rightBarButtonItem = addBarButton
@@ -99,11 +103,10 @@ class ListDetailViewController: FormViewController {
         if let _ = list {
             title = "List"
             active = true
-            
         } else if let currentUser = Auth.auth().currentUser?.uid {
             title = "New List"
             let ID = Database.database().reference().child(userListEntity).child(currentUser).childByAutoId().key ?? ""
-            list = ListType(id: ID, name: nil, color: nil, source: ListSourceOptions.plot.name, admin: currentUser, defaultList: false)
+            list = ListType(id: ID, name: nil, color: nil, source: ListSourceOptions.plot.name, admin: currentUser, defaultList: false, financeList: false, healthList: false)
         }
     }
     

@@ -39,8 +39,9 @@ class EKReminderTaskOp: AsyncOperation {
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            var values: [String : Any] = ["calendarExport": true,
-                                                          "externalActivityID": self?.reminder.calendarItemIdentifier as Any, "showExtras": activity.showExtras as Any]
+                            let values: [String : Any] = ["calendarExport": true,
+                                                          "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
+                                                          "showExtras": activity.showExtras as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })
@@ -59,14 +60,11 @@ class EKReminderTaskOp: AsyncOperation {
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            var values: [String : Any] = ["isGroupActivity": false,
+                            let values: [String : Any] = ["isGroupActivity": false,
                                                           "badge": 0,
                                                           "calendarExport": true,
                                                           "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
                                                           "showExtras": activity.showExtras as Any]
-                            if let CGColor = self?.reminder.calendar.cgColor {
-                                values["listColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
-                            }
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })
@@ -87,6 +85,7 @@ class EKReminderTaskOp: AsyncOperation {
             activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
             activity.activityType = CustomType.iOSCalendarEvent.categoryText
             activity.category = ActivityCategory.categorize(activity).rawValue
+            activity.showExtras = false
             completion(activity)
         }
     }

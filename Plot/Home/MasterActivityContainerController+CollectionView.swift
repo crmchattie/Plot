@@ -26,7 +26,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 if let listID = item.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     item.listColor = color
                 } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                    item.calendarColor = color
+                    item.listColor = color
                 }
                 cell.configureCell(for: indexPath, task: item)
                 return cell
@@ -160,18 +160,12 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         if let item = object as? Activity {
             if item.isTask ?? false {
                 let dummyCell = TaskCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-                if let listID = item.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    item.listColor = color
-                }
                 dummyCell.configureCell(for: indexPath, task: item)
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
                 height = estimatedSize.height
             } else {
                 let dummyCell = EventCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-                if let calendarID = item.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                    item.calendarColor = color
-                }
                 var invitation: Invitation? = nil
                 if let activityID = item.activityID, let value = invitations[activityID] {
                     invitation = value

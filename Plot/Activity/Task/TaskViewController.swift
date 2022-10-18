@@ -143,7 +143,7 @@ class TaskViewController: FormViewController {
                     if let list = list {
                         task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                     } else {
-                        list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
+                        list = lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false })
                         task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                         task.category = list?.category
                     }
@@ -1207,26 +1207,26 @@ class TaskViewController: FormViewController {
         DispatchQueue.main.async { [weak self] in
             if row is ScheduleRow {
                 if self!.eventList.indices.contains(rowNumber) {
+                    let item = self!.eventList[rowNumber]
                     self!.eventList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
-                    let item = self!.eventList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .activity, ID: item.activityID ?? "")
                 }
             }
             else if row is PurchaseRow {
                 if self!.purchaseList.indices.contains(rowNumber) {
+                    let item = self!.purchaseList[rowNumber]
                     self!.purchaseList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
 //                    self!.purchaseBreakdown()
-                    let item = self!.purchaseList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: .transaction, ID: item.guid)
                 }
             }
             else if row is HealthRow {
                 if self!.healthList.indices.contains(rowNumber)  {
+                    let item = self!.healthList[rowNumber]
                     self!.healthList.remove(at: rowNumber)
                     self!.updateLists(type: "container")
-                    let item = self!.healthList[rowNumber]
                     ContainerFunctions.deleteStuffInside(type: item.type, ID: item.ID)
                 }
             }

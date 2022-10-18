@@ -149,7 +149,7 @@ class CalendarActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userCalendarEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["isGroupCalendar": true, "calendarColor": calendar.color as Any]
+            let values:[String : Any] = ["isGroupCalendar": true, "color": calendar.color as Any]
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })

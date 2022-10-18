@@ -9,6 +9,7 @@
 import Foundation
 import Firebase
 import GoogleSignIn
+import CodableFirebase
 
 extension NSNotification.Name {
     static let eventsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".eventsUpdated")
