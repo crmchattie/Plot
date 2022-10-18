@@ -49,18 +49,18 @@ class OnboardingContainerView: UIView {
         addSubview(startPlotting)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 75),
+            collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 50),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
             collectionView.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -20),
 
             pageControl.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             pageControl.bottomAnchor.constraint(equalTo: startPlotting.topAnchor, constant: -20),
-            pageControl.heightAnchor.constraint(equalToConstant: 50),
+            pageControl.heightAnchor.constraint(equalToConstant: 15),
             
             startPlotting.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             startPlotting.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            startPlotting.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -75),
+            startPlotting.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -50),
             startPlotting.heightAnchor.constraint(equalToConstant: 50)
         ])
     }

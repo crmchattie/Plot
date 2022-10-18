@@ -117,6 +117,12 @@ class TaskViewController: FormViewController {
                 if let event = event, let task = TaskBuilder.createActivity(event: event), let activityID = task.activityID {
                     self.activityID = activityID
                     self.task = task
+                    if let list = lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                        self.task.listID = list.id
+                        self.task.listName = list.name
+                        self.task.listSource = list.source
+                        self.task.listColor = list.color
+                    }
                 } else if let template = template, let taskList = TaskBuilder.createActivity(template: template), let task = taskList.0, let activityID = task.activityID {
                     self.activityID = activityID
                     self.task = task
@@ -124,6 +130,12 @@ class TaskViewController: FormViewController {
                     if !subtaskList.isEmpty {
                         sortSubtasks()
                         updateLists(type: "subtasks")
+                    }
+                    if let list = lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                        self.task.listID = list.id
+                        self.task.listName = list.name
+                        self.task.listSource = list.source
+                        self.task.listColor = list.color
                     }
                 } else {
                     //create new activityID for auto updating items (schedule, purchases, checklist)

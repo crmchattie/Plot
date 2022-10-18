@@ -180,7 +180,6 @@ class ActivityService {
     
     var calendars = [String: [CalendarType]]() {
         didSet {
-            print("calendars didSet")
             if oldValue != calendars {
                 for (_, calendarList) in calendars {
                     for calendar in calendarList {
@@ -195,7 +194,6 @@ class ActivityService {
     }
     var lists = [String: [ListType]]() {
         didSet {
-            print("lists didSet")
             if oldValue != lists {
                 for (_, listList) in lists {
                     for list in listList {
@@ -413,7 +411,6 @@ class ActivityService {
             return completion()
         }
         self.eventKitManager.checkEventAuthorizationStatus {
-            print(self.eventKitManager.eventAuthorizationStatus)
             if self.eventKitManager.eventAuthorizationStatus != "restricted" {
                 self.eventKitManager.authorizeEventKitEvents({ askedforAuthorization in
                     self.askedforCalendarAuthorization = askedforAuthorization

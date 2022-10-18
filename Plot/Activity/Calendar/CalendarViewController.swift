@@ -680,6 +680,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
                 if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     activity.listColor = color
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
+                    activity.calendarColor = color
                 }
                 cell.configureCell(for: indexPath, task: activity)
                 return cell
@@ -688,6 +690,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.updateInvitationDelegate = self
                 var invitation: Invitation? = nil
                 if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    activity.calendarColor = color
+                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
                     activity.calendarColor = color
                 }
                 if let activityID = activity.activityID, let value = invitations[activityID] {
@@ -702,6 +706,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
                 if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     activity.listColor = color
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
+                    activity.calendarColor = color
                 }
                 cell.configureCell(for: indexPath, task: activity)
                 return cell
@@ -710,6 +716,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.updateInvitationDelegate = self
                 var invitation: Invitation? = nil
                 if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    activity.calendarColor = color
+                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
                     activity.calendarColor = color
                 }
                 if let activityID = activity.activityID, let value = invitations[activityID] {

@@ -15,11 +15,13 @@ class EventKitSetupAssistant {
     
     class func authorizeEventKitEvents(completion: @escaping (Bool, Error?) -> Swift.Void) {
         EventKitSetupAssistant.eventStore.requestAccess(to: .event) { granted, error in
+            EventKitSetupAssistant.eventStore.reset()
             completion(granted, error)
         }
     }
     class func authorizeEventKitReminders(completion: @escaping (Bool, Error?) -> Swift.Void) {
         EventKitSetupAssistant.eventStore.requestAccess(to: .reminder) { granted, error in
+            EventKitSetupAssistant.eventStore.reset()
             completion(granted, error)
         }
     }

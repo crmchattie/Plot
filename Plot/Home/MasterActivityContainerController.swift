@@ -95,6 +95,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var participants: [String: [User]] = [:]
     
     var isNewUser: Bool = true
+    var isOldUser: Bool = false
     
     var onceToken = 0
     
@@ -159,10 +160,13 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if isNewUser {
+            //has to be here given currentUserID = nil on app start
             self.networkController.setupFirebase()
             self.networkController.setupOtherVariables()
             //change to stop from running
             isNewUser = false
+        } else if isOldUser {
+            reloadVariables()
         }
     }
     
@@ -212,7 +216,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedHealth), name: .hasLoadedHealth, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadVariables), name: .oldUserLoggedIn, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
     }
     
     func setupData() {
@@ -359,11 +363,15 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func hasLoadedFinancials() {
-        print("hasLoadedFinancials")
         self.updatingFinances = !self.networkController.financeService.hasLoadedFinancials
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
+    }
+    
+    @objc fileprivate func oldUserLoggedIn() {
+        print("oldUserLoggedIn")
+        isOldUser = true
     }
     
     func setNavBar() {

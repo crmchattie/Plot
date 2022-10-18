@@ -108,9 +108,9 @@ class FinanceTransactionRuleViewController: FormViewController {
     
     fileprivate func initializeForm() {
         form +++
-            Section(header: nil, footer: "Set-up a rule to automatically rename, categorize and/or ignore certain transactions based on the name")
+            Section(header: nil, footer: "Set-up a rule to automatically rename, categorize and/or ignore certain transactions based on the name and/or amount")
             
-            <<< TextRow("Transaction name contains") {
+            <<< TextRow("Name contains") {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.textField?.textColor = .secondaryLabel
                 $0.title = $0.tag
@@ -137,7 +137,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 }
             }
             
-            <<< TextRow("Update transaction name to") {
+            <<< TextRow("Update Name to") {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.textField?.textColor = .secondaryLabel
                 $0.title = $0.tag
@@ -151,7 +151,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                 self.transactionRule.description = row.value
             }
             
-            <<< DecimalRow("Transaction amount equals") {
+            <<< DecimalRow("Amount equals") {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.textField?.textColor = .secondaryLabel
                 $0.title = $0.tag

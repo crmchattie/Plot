@@ -694,6 +694,8 @@ class FinanceTransactionViewController: FormViewController {
     func createRule() {
         let destination = FinanceTransactionRuleViewController(networkController: networkController)
         destination.transaction = transaction
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+        destination.navigationItem.leftBarButtonItem = cancelBarButton
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }

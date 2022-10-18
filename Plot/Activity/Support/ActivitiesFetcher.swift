@@ -48,6 +48,7 @@ class ActivitiesFetcher: NSObject {
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 activitiesInitialAdd([])
+                activitiesWithRepeatsInitialAdd([])
                 return
             }
             

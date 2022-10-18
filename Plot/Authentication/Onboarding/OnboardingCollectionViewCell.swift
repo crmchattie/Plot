@@ -72,6 +72,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         label.numberOfLines = 2
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     
@@ -82,6 +83,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         label.numberOfLines = 2
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     
@@ -128,8 +130,8 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         addSubview(containerView)
         
         typeLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 30, bottom: 0, right: 30))
-        descriptionLabel.anchor(top: typeLabel.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 30, left: 30, bottom: 0, right: 30))
-        containerView.anchor(top: descriptionLabel.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 30, left: 0, bottom: 0, right: 0))
+        descriptionLabel.anchor(top: typeLabel.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor, padding: .init(top: 20, left: 30, bottom: 0, right: 30))
+        containerView.anchor(top: descriptionLabel.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 0))
         
         containerView.addSubview(collectionView)
         collectionView.fillSuperview()
@@ -150,19 +152,15 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let activities = activities {
-            print("activities")
             imageView.isHidden = true
             return activities.count
         } else if let healthMetrics = healthMetrics {
-            print("healthMetrics")
             imageView.isHidden = true
             return healthMetrics.count
         } else if let finances = finances {
-            print("finances")
             imageView.isHidden = true
             return finances.count
         } else {
-            print("else")
             imageView.isHidden = false
             return 0
         }

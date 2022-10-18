@@ -65,7 +65,9 @@ class ListInfoViewController: UITableViewController {
             }
             return s1.localizedStandardCompare(s2) == ComparisonResult.orderedAscending
         }
-        tableView.reloadData()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {

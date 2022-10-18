@@ -136,7 +136,6 @@ class ActivityActions: NSObject {
     }
     
     func updateActivityParticipants() {
-        print("updateActivityParticipants")
         guard let _ = active, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
@@ -190,7 +189,7 @@ class ActivityActions: NSObject {
     }
     
     func newActivity(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-        guard let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
+        guard let currentUserId = Auth.auth().currentUser?.uid, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
                                 
@@ -198,6 +197,7 @@ class ActivityActions: NSObject {
                 
         self.dispatchGroup.enter()
         self.dispatchGroup.enter()
+        
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
         if let containerID = activity.containerID {
             ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
@@ -206,18 +206,11 @@ class ActivityActions: NSObject {
             connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
             self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
                 if !(activity.isTask ?? false) {
-                    InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {
-
-                    }
+                    InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {}
                 }
             })
         }
-        
-        // Save to calendar
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
-            return
-        }
-        
+                
         if activity.isTask ?? false {
             var reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in

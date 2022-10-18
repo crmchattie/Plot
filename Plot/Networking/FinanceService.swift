@@ -101,7 +101,9 @@ class FinanceService {
     
     func grabFinances(_ completion: @escaping () -> Void) {
         self.triggerUpdateMXUser {}
-        self.observeAccountsForCurrentUser {}
+        self.observeAccountsForCurrentUser {
+            self.createTasksFromAccounts()
+        }
         self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
@@ -117,7 +119,6 @@ class FinanceService {
         self.observeTransactionRulesForCurrentUser {}
         self.observeHoldingsForCurrentUser()
         self.observeMembersForCurrentUser {}
-
     }
     
     func setupFirebase() {
@@ -470,6 +471,98 @@ class FinanceService {
             ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("category").setValue(transaction.category)
             ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("top_level_category").setValue(transaction.top_level_category)
             ref.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction.guid).child("group").setValue(transaction.group)
+        }
+    }
+    
+    private func createTasksFromAccounts() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let reference = Database.database().reference().child(userFinancialAccountsTasksEntity).child(currentUserID)
+        reference.observeSingleEvent(of: .value) { dataSnapshot in
+            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: [String: String]] {
+                for account in self.accounts {
+                    if let accountTasks = dataSnapshotValue[account.guid], let payment_due_at = account.payment_due_at, accountTasks[payment_due_at] == nil {
+                        TaskBuilder.createActivityWithList(from: account) { activity in
+                            if let activity = activity, let activityID = activity.activityID {
+                                reference.child(account.guid).child(payment_due_at).setValue(activityID)
+                                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                                activityActions.createNewActivity()
+                            }
+                        }
+                    }
+                }
+            } else {
+                for account in self.accounts {
+                    if let payment_due_at = account.payment_due_at {
+                        TaskBuilder.createActivityWithList(from: account) { activity in
+                            if let activity = activity, let activityID = activity.activityID {
+                                reference.child(account.guid).child(payment_due_at).setValue(activityID)
+                                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                                activityActions.createNewActivity()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func createTasksFromTransactions() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let reference = Database.database().reference().child(userFinancialTransactionsTasksEntity).child(currentUserID)
+        reference.observeSingleEvent(of: .value) { dataSnapshot in
+            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: String] {
+                for transaction in self.transactions {
+                    if dataSnapshotValue[transaction.guid] == nil {
+                        TaskBuilder.createActivityWithList(from: transaction) { activity in
+                            if let activity = activity, let activityID = activity.activityID {
+                                reference.child(transaction.guid).child(transaction.guid).setValue(activityID)
+                                let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                                activityActions.createNewActivity()
+                            }
+                        }
+                    }
+                }
+            } else {
+                for transaction in self.transactions {
+                    TaskBuilder.createActivityWithList(from: transaction) { activity in
+                        if let activity = activity, let activityID = activity.activityID {
+                            reference.child(transaction.guid).child(transaction.guid).setValue(activityID)
+                            let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                            activityActions.createNewActivity()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func createEventsFromTransactions() {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let reference = Database.database().reference().child(userFinancialTransactionsEventsEntity).child(currentUserID)
+        reference.observeSingleEvent(of: .value) { dataSnapshot in
+            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: String] {
+                for transaction in self.transactions {
+                    if dataSnapshotValue[transaction.guid] == nil, let activity = EventBuilder.createActivity(from: transaction), let activityID = activity.activityID {
+                        reference.child(transaction.guid).child(transaction.guid).setValue(activityID)
+                        let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                        activityActions.createNewActivity()
+                    }
+                }
+            } else {
+                for transaction in self.transactions {
+                    if let activity = EventBuilder.createActivity(from: transaction), let activityID = activity.activityID {
+                        reference.child(transaction.guid).child(transaction.guid).setValue(activityID)
+                        let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
+                        activityActions.createNewActivity()
+                    }
+                }
+            }
         }
     }
 }

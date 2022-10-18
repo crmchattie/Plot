@@ -40,8 +40,8 @@ class MealActions: NSObject {
         let membersIDs = fetchMembersIDs()
         
         for memberID in membersIDs.0 {
-        Database.database().reference().child(userMealsEntity).child(memberID).child(ID).removeAllObservers()
-        Database.database().reference().child(userMealsEntity).child(memberID).child(ID).removeValue()
+            Database.database().reference().child(userMealsEntity).child(memberID).child(ID).removeAllObservers()
+            Database.database().reference().child(userMealsEntity).child(memberID).child(ID).removeValue()
         }
                 
     }

@@ -58,7 +58,6 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: onboardingCollectionViewCell, for: indexPath) as! OnboardingCollectionViewCell
         cell.intColor = indexPath.item
         cell.customType = items[indexPath.item]
-        print(indexPath.item)
         if indexPath.item == 0 {
             cell.activities = nil
             cell.healthMetrics = nil

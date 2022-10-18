@@ -25,12 +25,16 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: taskCellID, for: indexPath) as? TaskCollectionCell ?? TaskCollectionCell()
                 if let listID = item.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     item.listColor = color
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
+                    item.calendarColor = color
                 }
                 cell.configureCell(for: indexPath, task: item)
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: eventCellID, for: indexPath) as? EventCollectionCell ?? EventCollectionCell()
                 if let calendarID = item.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                    item.calendarColor = color
+                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
                     item.calendarColor = color
                 }
                 var invitation: Invitation? = nil
