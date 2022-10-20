@@ -97,7 +97,7 @@ class WorkoutFetcher: NSObject {
                     self.getUserDataFromSnapshot(ID: ID) { workoutsList in
                         for userWorkout in workoutsList {
                             userWorkouts[ID] = userWorkout
-                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                            handle = ref.child(workoutsEntity).child(ID).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let workout = try? FirebaseDecoder().decode(Workout.self, from: snapshotValue), let userWorkout = userWorkouts[ID] {

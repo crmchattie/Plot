@@ -102,7 +102,7 @@ class FinancialAccountFetcher: NSObject {
                     self.getUserDataFromSnapshot(ID: ID) { accountsList in
                         for userAccount in accountsList {
                             userAccounts[ID] = userAccount
-                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                            handle = ref.child(financialAccountsEntity).child(ID).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let account = try? FirebaseDecoder().decode(MXAccount.self, from: snapshotValue), let userAccount = userAccounts[ID] {

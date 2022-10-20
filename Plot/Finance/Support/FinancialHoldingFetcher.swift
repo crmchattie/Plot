@@ -101,7 +101,7 @@ class FinancialHoldingFetcher: NSObject {
                     self.getUserDataFromSnapshot(ID: ID) { holdingsList in
                         for userHolding in holdingsList {
                             userHoldings[ID] = userHolding
-                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                            handle = ref.child(financialHoldingsEntity).child(ID).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let holding = try? FirebaseDecoder().decode(MXHolding.self, from: snapshotValue), let userHolding = userHoldings[ID] {

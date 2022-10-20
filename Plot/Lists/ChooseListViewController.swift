@@ -59,14 +59,12 @@ class ChooseListViewController: FormViewController {
         }
     }
     
-    fileprivate func grabReminders() {
-        form.removeAll()
-//        activityIndicatorView.startAnimating()
-//        listFetcher.fetchReminder { lists in
-//            DispatchQueue.main.async {
-//              self.initializeForm()
-//            }
-//        }
+    fileprivate func grabLists() {
+        DispatchQueue.main.async {
+            self.form.removeAll()
+            activityIndicatorView.startAnimating()
+            self.initializeForm()
+        }
     }
     
     fileprivate func configureTableView() {
@@ -79,11 +77,14 @@ class ChooseListViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationOptions = .Disabled
-//        let barButton = UIBarButtonItem(title: "New Reminder", style: .plain, target: self, action: #selector(newCategory))
-//        navigationItem.rightBarButtonItem = barButton
+        
+        if lists.keys.contains(ListSourceOptions.plot.name) {
+            let barButton = UIBarButtonItem(title: "New List", style: .plain, target: self, action: #selector(new))
+            navigationItem.rightBarButtonItem = barButton
+        }
     }
     
-    @objc func newCategory(_ item:UIBarButtonItem) {
+    @objc func new(_ item:UIBarButtonItem) {
         let destination = ListDetailViewController(networkController: networkController)
         destination.delegate = self
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
@@ -127,8 +128,9 @@ class ChooseListViewController: FormViewController {
     
 }
 
-extension ChooseListViewController: ListDetailDelegate {
-    func update() {
-        grabReminders()
+extension ChooseListViewController: UpdateListDelegate {
+    func update(list: ListType) {
+        lists[ListSourceOptions.plot.name, default: []].append(list)
+        grabLists()
     }
 }

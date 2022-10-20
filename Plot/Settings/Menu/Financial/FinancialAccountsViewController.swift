@@ -34,6 +34,8 @@ class FinancialAccountsViewController: UITableViewController {
         navigationItem.rightBarButtonItem = barButton
         
         members = networkController.financeService.members.sorted(by: {$0.name < $1.name})
+        
+        addObservers()
                 
     }
     

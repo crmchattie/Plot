@@ -140,7 +140,7 @@ class CalendarFetcher: NSObject {
                     self.getUserDataFromSnapshot(ID: ID) { calendarsList in
                         for userCalendar in calendarsList {
                             userCalendars[ID] = userCalendar
-                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                            handle = ref.child(listEntity).child(ID).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let calendar = try? FirebaseDecoder().decode(CalendarType.self, from: snapshotValue), let userCalendar = userCalendars[ID] {

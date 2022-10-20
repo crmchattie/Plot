@@ -140,7 +140,7 @@ class ListFetcher: NSObject {
                     self.getUserDataFromSnapshot(ID: ID) { listsList in
                         for userList in listsList {
                             userLists[ID] = userList
-                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                            handle = ref.child(listEntity).child(ID).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let list = try? FirebaseDecoder().decode(ListType.self, from: snapshotValue), let userList = userLists[ID] {

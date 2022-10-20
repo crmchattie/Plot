@@ -10,12 +10,8 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol ListDetailDelegate: AnyObject {
-    func update()
-}
-
 class ListDetailViewController: FormViewController {
-    weak var delegate : ListDetailDelegate?
+    weak var delegate : UpdateListDelegate?
     
     var list: ListType!
     
@@ -119,6 +115,7 @@ class ListDetailViewController: FormViewController {
         let createList = ListActions(list: list, active: active, selectedFalconUsers: selectedFalconUsers)
         createList.createNewList()
         self.hideActivityIndicator()
+        self.delegate?.update(list: list)
         self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)

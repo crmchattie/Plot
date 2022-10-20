@@ -96,7 +96,7 @@ class MindfulnessFetcher: NSObject {
                     self.getUserDataFromSnapshot(ID: ID) { mindfulnessList in
                         for userMindfulness in mindfulnessList {
                             userMindfulnesses[ID] = userMindfulness
-                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                            handle = ref.child(mindfulnessEntity).child(ID).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: snapshotValue), let userMindfulness = userMindfulnesses[ID] {

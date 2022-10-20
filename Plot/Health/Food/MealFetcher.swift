@@ -97,7 +97,7 @@ class MealFetcher: NSObject {
                     self.getUserDataFromSnapshot(ID: ID) { mealsList in
                         for userMeal in mealsList {
                             userMeals[ID] = userMeal
-                            handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                            handle = ref.child(mealsEntity).child(ID).observe(.value) { snapshot in
                                 ref.removeObserver(withHandle: handle)
                                 if snapshot.exists(), let snapshotValue = snapshot.value {
                                     if let meal = try? FirebaseDecoder().decode(Meal.self, from: snapshotValue), let userMeal = userMeals[ID] {

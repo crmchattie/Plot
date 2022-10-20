@@ -195,6 +195,7 @@ class ActivityService {
     }
     var lists = [String: [ListType]]() {
         didSet {
+            print("didSet lists")
             if oldValue != lists {
                 for (_, listList) in lists {
                     for list in listList {
@@ -497,8 +498,10 @@ class ActivityService {
             if self?.calendars[CalendarSourceOptions.plot.name] != nil {
                 var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
                 for calendar in calendarInitialAdd {
-                    if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
-                        plotCalendars?[index] = calendar
+                    if let index = plotCalendars!.firstIndex(where: { $0.id == calendar.id}) {
+                        plotCalendars![index] = calendar
+                    } else {
+                        plotCalendars!.append(calendar)
                     }
                 }
                 self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
@@ -510,8 +513,10 @@ class ActivityService {
             if self?.calendars[CalendarSourceOptions.plot.name] != nil {
                 var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
                 for calendar in calendarAdded {
-                    if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
-                        plotCalendars?[index] = calendar
+                    if let index = plotCalendars!.firstIndex(where: { $0.id == calendar.id}) {
+                        plotCalendars![index] = calendar
+                    } else {
+                        plotCalendars!.append(calendar)
                     }
                 }
                 self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
@@ -530,8 +535,10 @@ class ActivityService {
             if self?.calendars[CalendarSourceOptions.plot.name] != nil {
                 var plotCalendars = self?.calendars[CalendarSourceOptions.plot.name]
                 for calendar in calendarChanged {
-                    if let index = plotCalendars?.firstIndex(where: { $0.id == calendar.id}) {
-                        plotCalendars?[index] = calendar
+                    if let index = plotCalendars!.firstIndex(where: { $0.id == calendar.id }) {
+                        plotCalendars![index] = calendar
+                    } else {
+                        plotCalendars!.append(calendar)
                     }
                 }
                 self?.calendars[CalendarSourceOptions.plot.name] = plotCalendars
@@ -622,11 +629,14 @@ class ActivityService {
     
     func observeListsForCurrentUser() {
         self.listFetcher.observeListForCurrentUser(listInitialAdd: { [weak self] listInitialAdd in
+            print("listInitialAdd")
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listInitialAdd {
                     if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
-                        plotLists?[index] = list
+                        plotLists![index] = list
+                    } else {
+                        plotLists!.append(list)
                     }
                 }
                 self?.lists[ListSourceOptions.plot.name] = plotLists
@@ -635,11 +645,14 @@ class ActivityService {
                 self?.grabListTasks()
             }
         }, listAdded: { [weak self] listAdded in
+            print("listAdded")
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listAdded {
-                    if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
-                        plotLists?[index] = list
+                    if let index = plotLists!.firstIndex(where: { $0.id == list.id}) {
+                        plotLists![index] = list
+                    } else {
+                        plotLists!.append(list)
                     }
                 }
                 self?.lists[ListSourceOptions.plot.name] = plotLists
@@ -650,16 +663,19 @@ class ActivityService {
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listRemoved {
-                    plotLists = plotLists?.filter({$0.id != list.id})
+                    plotLists = plotLists!.filter({$0.id != list.id})
                 }
                 self?.lists[ListSourceOptions.plot.name] = plotLists
             }
         }, listChanged: { [weak self] listChanged in
+            print("listChanged")
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listChanged {
-                    if let index = plotLists?.firstIndex(where: { $0.id == list.id}) {
-                        plotLists?[index] = list
+                    if let index = plotLists!.firstIndex(where: { $0.id == list.id}) {
+                        plotLists![index] = list
+                    } else {
+                        plotLists!.append(list)
                     }
                 }
                 self?.lists[ListSourceOptions.plot.name] = plotLists

@@ -10,12 +10,8 @@ import UIKit
 import Eureka
 import Firebase
 
-protocol CalendarDetailDelegate: AnyObject {
-    func update()
-}
-
 class CalendarDetailViewController: FormViewController {
-    weak var delegate : CalendarDetailDelegate?
+    weak var delegate : UpdateCalendarDelegate?
     
     var calendar: CalendarType!
     
@@ -50,9 +46,7 @@ class CalendarDetailViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-                
-        
-        
+
         numberFormatter.numberStyle = .currency
         numberFormatter.maximumFractionDigits = 0
         dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
@@ -119,6 +113,7 @@ class CalendarDetailViewController: FormViewController {
         let createCalendar = CalendarActions(calendar: calendar, active: active, selectedFalconUsers: selectedFalconUsers)
         createCalendar.createNewCalendar()
         self.hideActivityIndicator()
+        self.delegate?.update(calendar: calendar)
         self.updateDiscoverDelegate?.itemCreated()
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)

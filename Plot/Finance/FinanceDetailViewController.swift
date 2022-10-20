@@ -88,8 +88,6 @@ class FinanceDetailViewController: UIViewController {
         addObservers()
         
         if setSections.contains(.transactions) {
-            print(startDate)
-            print(endDate)
             let filteredTransactions = transactions.filter { (transaction) -> Bool in
                 if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
                     if transactionDate > startDate && endDate > transactionDate {

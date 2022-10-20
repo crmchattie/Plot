@@ -63,12 +63,10 @@ class ChooseCalendarViewController: FormViewController {
     }
     
     fileprivate func grabCalendars() {
-        form.removeAll()
-        activityIndicatorView.startAnimating()
-        calendarFetcher.fetchCalendar { calendars in
-            DispatchQueue.main.async {
-              self.initializeForm()
-            }
+        DispatchQueue.main.async {
+            self.form.removeAll()
+            activityIndicatorView.startAnimating()
+            self.initializeForm()
         }
     }
     
@@ -82,11 +80,14 @@ class ChooseCalendarViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         navigationOptions = .Disabled
-//        let barButton = UIBarButtonItem(title: "New Calendar", style: .plain, target: self, action: #selector(newCategory))
-//        navigationItem.rightBarButtonItem = barButton
+        
+        if calendars.keys.contains(CalendarSourceOptions.plot.name) {
+            let barButton = UIBarButtonItem(title: "New Calendar", style: .plain, target: self, action: #selector(new))
+            navigationItem.rightBarButtonItem = barButton
+        }
     }
     
-    @objc func newCategory(_ item:UIBarButtonItem) {
+    @objc func new(_ item:UIBarButtonItem) {
         let destination = CalendarDetailViewController(networkController: networkController)
         destination.delegate = self
         let navigationViewController = UINavigationController(rootViewController: destination)
@@ -128,8 +129,9 @@ class ChooseCalendarViewController: FormViewController {
     
 }
 
-extension ChooseCalendarViewController: CalendarDetailDelegate {
-    func update() {
+extension ChooseCalendarViewController: UpdateCalendarDelegate {
+    func update(calendar: CalendarType) {
+        calendars[CalendarSourceOptions.plot.name, default: []].append(calendar)
         grabCalendars()
     }
 }
