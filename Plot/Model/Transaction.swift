@@ -102,6 +102,8 @@ struct Transaction: Codable, Equatable, Hashable {
     var transactionDescription: String?
     var transactionIDs: [String]?
     var containerID: String?
+    var plot_is_recurring: Bool?
+    var plot_created: Bool?
     var cash_flow_type: String? {
         if type == .credit {
             return "Inflow"
@@ -962,7 +964,7 @@ func updateTransactionWRule(transaction: Transaction, transactionRules: [Transac
 var financialTransactionCategoriesAssociatedWithEvents = ["Gas", "Public Transportation", "Amusement", "Arts", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Restaurants", "Food & Dining", "Dentist", "Doctor", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Rental Car & Taxi", "Groceries"]
 
 //recurring transaction(bills)
-var financialTransactionCategoriesAssociatedWithRecurringCosts = ["Auto Payment", "Auto Insurance", "Domain Names", "Hosting", "Internet", "Television", "Utilities", "Bills & Utilities", "Student Loans", "Tuition", "Life Insurance", "Health Insurance", "Home Insurance", "Mortgage & Rent", "Child Support", "Credit Card Payment", "Mortgage Payment"]
+var financialTransactionCategoriesAssociatedWithRecurringCosts = ["Auto Insurance", "Domain Names", "Hosting", "Internet", "Television", "Utilities", "Bills & Utilities", "Tuition", "Life Insurance", "Health Insurance", "Home Insurance", "Mortgage & Rent", "Child Support", "Paycheck"]
 
 var financialTransactionCategoriesToSkip = ["Cash", "Check", "Uncategorized", "Transfer", "Public Transportation", "Rental Car & Taxi", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining"]
 
@@ -973,25 +975,62 @@ var subscriptionProviders = ["spotify", "netflix", "amazon prime", "disney plus"
 func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @escaping ([Transaction: Activity]) -> Void) {
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
-        if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), transactions.filter({ abs($0.amount) == abs(transaction.amount) }).count == 1, abs(transaction.amount) > 0 {
+        guard !(transaction.plot_is_recurring ?? false) && transaction.status == .posted else { continue }
+        //amount period to period differs
+        //transactions.filter({ abs($0.amount) == abs(transaction.amount) }).count == 1,
+        if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), abs(transaction.amount) > 0 {
+            print(transaction.description)
+            print(transaction.amount)
+            print(transaction.transacted_at)
             TaskBuilder.createActivityWithList(from: transaction) { task in
                 if let task = task {
-                    task.category = ActivityCategory.finances.rawValue
-                    task.subcategory = ActivitySubcategory.bills.rawValue
                     completion([transaction:task])
                 }
             }
-        } else if transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortDayMonthAndYear() }).count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
+        }
+        //amount period to period is the same
+        else if transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortDayMonthAndYear() }).count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
             TaskBuilder.createActivityWithList(from: transaction) { task in
                 if let task = task {
-                    task.category = ActivityCategory.finances.rawValue
-                    task.subcategory = ActivitySubcategory.bills.rawValue
                     completion([transaction:task])
                 }
             }
         }
     }
 }
+
+func getMostFrequentDaysBetweenRecurringTransactions(transactions: [Transaction]) -> Int? {
+    let isodateFormatter = ISO8601DateFormatter()
+    var counts = [Int: Int]()
+    for index in 0...transactions.count - 1 {
+        if transactions.indices.contains(index), transactions.indices.contains(index + 1), let first = isodateFormatter.date(from: transactions[index].transacted_at), let second = isodateFormatter.date(from: transactions[index + 1].transacted_at) {
+            let days = Calendar.current.numberOfDaysBetween(second, and: first)
+            counts[days] = (counts[days] ?? 0) + 1
+        }
+    }
+    
+    if let (value, _) = counts.max(by: {$0.1 < $1.1}) {
+        return value
+    }
+    return nil
+}
+
+//    //paychecks
+//    let paycheckTransactions = transactions.filter({ $0.category == "Paycheck" }).sorted(by: {
+//        return isodateFormatter.date(from: $0.transacted_at) ?? Date() > isodateFormatter.date(from: $1.transacted_at) ?? Date()
+//    })
+//    if paycheckTransactions.count > 1 {
+//        for transaction in getRecurringTransactions(transactions: paycheckTransactions) {
+////            TaskBuilder.createActivityWithList(from: transaction) { task in
+////                if let task = task {
+////                    task.category = ActivityCategory.finances.rawValue
+////                    task.subcategory = ActivitySubcategory.bills.rawValue
+////                    completion([transaction:task])
+////                }
+////            }
+//        }
+//    }
+    
 
 //        if transaction.status == .pending, financialTransactionCategoriesAssociatedWithEvents.contains(transaction.category), abs(transaction.amount) > 0, let event = EventBuilder.createActivity(from: transaction) {
 //            print("event via financialTransactionCategoriesAssociatedWithEvents")

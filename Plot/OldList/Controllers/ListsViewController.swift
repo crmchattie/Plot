@@ -370,7 +370,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
                     if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
                         return task1.name ?? "" < task2.name ?? ""
                     }
-                    return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                    return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
                 }
                 return !(task1.isCompleted ?? false)
             }
@@ -388,7 +388,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
                     if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
                         return task1.name ?? "" < task2.name ?? ""
                     }
-                    return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                    return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
                 }
                 return !(task1.isCompleted ?? false)
             }
@@ -405,7 +405,7 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
                     if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
                         return task1.name ?? "" < task2.name ?? ""
                     }
-                    return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                    return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
                 }
                 return !(task1.isCompleted ?? false)
             }
@@ -467,15 +467,10 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else if !filteredTasks.isEmpty {
             let task = filteredTasks[indexPath.row]
-            print(task.name)
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
             if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                print("task has listID")
-                print(list.name)
                 task.listColor = color
             } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                print("default list")
-                print(list.name)
                 task.listColor = color
             }
             cell.configureCell(for: indexPath, task: task)

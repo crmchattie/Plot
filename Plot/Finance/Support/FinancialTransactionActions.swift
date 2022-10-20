@@ -163,7 +163,12 @@ class TransactionActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userFinancialTransactionsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["description": transaction.description, "should_link": false]
+            var values = [String : Any]()
+            if transaction.plot_created ?? false {
+                values = ["description": transaction.description]
+            } else {
+                values = ["description": transaction.description, "should_link": false]
+            }
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })

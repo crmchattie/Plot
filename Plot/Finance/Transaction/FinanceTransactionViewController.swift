@@ -105,6 +105,7 @@ class FinanceTransactionViewController: FormViewController {
     
     fileprivate func setupVariables() {
         if let _ = transaction {
+            print("transaction.guid")
             print(transaction.guid)
             
             title = "Transaction"
@@ -197,6 +198,7 @@ class FinanceTransactionViewController: FormViewController {
                 row.placeholderColor = .secondaryLabel
             }.onChange { row in
                 if let value = row.value {
+                    self.transaction.description = value
                     if let currentUser = Auth.auth().currentUser?.uid {
                         let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("description")
                         reference.setValue(value)
@@ -287,6 +289,7 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 if let value = row.value {
                     let date = self.isodateFormatter.string(from: value)
+                    self.transaction.date_for_reports = date
                     if let currentUser = Auth.auth().currentUser?.uid {
                         let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("date_for_reports")
                         reference.setValue(date)
@@ -426,6 +429,7 @@ class FinanceTransactionViewController: FormViewController {
             }.onChange { row in
                 row.title = row.value ?? false ? "Included in Financial Profile" : "Not Included in Financial Profile"
                 row.cell.tintAdjustmentMode = row.value ?? false ? .automatic : .dimmed
+                self.transaction.should_link = row.value
                 if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("should_link")
                     reference.setValue(row.value ?? false)
@@ -550,7 +554,7 @@ class FinanceTransactionViewController: FormViewController {
             }
         }
         
-        form.last!
+//        form.last!
         
 //        <<< LabelRow("Tags") { row in
 //            row.cell.backgroundColor = .secondarySystemGroupedBackground

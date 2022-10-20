@@ -325,7 +325,6 @@ class ActivityActions: NSObject {
             }
             activity.isCompleted = isComplete
             incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
-
         }
                 
         let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)

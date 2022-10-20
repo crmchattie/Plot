@@ -54,7 +54,7 @@ class FinanceTransactionRuleViewController: FormViewController {
             active = false
             let ID = Database.database().reference().child(userFinancialTransactionRulesEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
-            transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: nil, category: "Uncategorized", top_level_category: "Uncategorized", group: "Uncategorized", amount: nil, should_link: true)
+            transactionRule = TransactionRule(created_at: date, guid: ID, match_description: "", description: nil, updated_at: date, user_guid: nil, category: nil, top_level_category: nil, group: nil, amount: nil, should_link: true)
         } else {
             title = "Transaction Rule"
         }
@@ -221,6 +221,8 @@ class FinanceTransactionRuleViewController: FormViewController {
                 } else if let transaction = transaction {
                     row.value = transaction.group
                     transactionRule.group = transaction.group
+                } else {
+                    row.value = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 self.openLevel(level: row.tag!, value: row.value!, otherValue: nil)
@@ -245,6 +247,8 @@ class FinanceTransactionRuleViewController: FormViewController {
                 } else if let transaction = transaction {
                     row.value = transaction.top_level_category
                     transactionRule.top_level_category = transaction.top_level_category
+                } else {
+                    row.value = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 if let string = self.transactionRule.category {
@@ -273,6 +277,8 @@ class FinanceTransactionRuleViewController: FormViewController {
                 } else if let transaction = transaction {
                     row.value = transaction.category
                     transactionRule.category = transaction.category
+                } else {
+                    row.value = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 if let string = self.transactionRule.top_level_category {

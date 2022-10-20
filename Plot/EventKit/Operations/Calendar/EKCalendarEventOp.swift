@@ -39,11 +39,13 @@ class EKCalendarEventOp: AsyncOperation {
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            var values: [String : Any] = ["calendarExport": true,
-                                                          "calendarID": self?.event.calendar.calendarIdentifier as Any,
-                                                          "calendarName": self?.event.calendar.title as Any,
-                                                          "calendarSource": CalendarSourceOptions.apple.name as Any,
+                            var values: [String : Any] = ["calendarExport": true,                                            "calendarSource": CalendarSourceOptions.apple.name as Any,
                                                           "externalActivityID": self?.event.calendarItemIdentifier as Any]
+                            if let calendar = self?.event.calendar {
+                                values["calendarID"] = calendar.calendarIdentifier as Any
+                                values["calendarName"] = calendar.title as Any
+                                values["externalActivityID"] = calendar.title as Any
+                            }
                             if let CGColor = self?.event.calendar.cgColor {
                                 values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
                             }
@@ -65,16 +67,15 @@ class EKCalendarEventOp: AsyncOperation {
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
-                            var values: [String : Any] = ["isGroupActivity": false,
-                                                          "badge": 0,
-                                                          "calendarExport": true,
-                                                          "calendarID": self?.event.calendar.calendarIdentifier as Any,
-                                                          "calendarName": self?.event.calendar.title as Any,
-                                                          "calendarSource": CalendarSourceOptions.apple.name as Any,
-                                                          "externalActivityID": self?.event.calendarItemIdentifier as Any,
-                                                          "showExtras": activity.showExtras as Any]
-                            if let CGColor = self?.event.calendar.cgColor {
-                                values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                            var values: [String : Any] = ["calendarExport": true,                                            "calendarSource": CalendarSourceOptions.apple.name as Any,
+                                                          "externalActivityID": self?.event.calendarItemIdentifier as Any]
+                            if let calendar = self?.event.calendar {
+                                values["calendarID"] = calendar.calendarIdentifier as Any
+                                values["calendarName"] = calendar.title as Any
+                                values["externalActivityID"] = calendar.title as Any
+                                if let CGColor = calendar.cgColor {
+                                    values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                                }
                             }
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()

@@ -210,17 +210,14 @@ class EventViewController: FormViewController {
         if !active {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
-            navigationItem.rightBarButtonItem?.isEnabled = false
         } else if delegate != nil {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
             navigationItem.rightBarButtonItem = plusBarButton
-            navigationItem.rightBarButtonItem?.isEnabled = true
         } else {
             let dotsImage = UIImage(named: "dots")
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createNewActivity))
             let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
             navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
-            navigationItem.rightBarButtonItem?.isEnabled = true
         }
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
@@ -242,6 +239,7 @@ class EventViewController: FormViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 $0.cell.textField.becomeFirstResponder()
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         }.onChange() { [unowned self] row in
             self.activity.name = row.value

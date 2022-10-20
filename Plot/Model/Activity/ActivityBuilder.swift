@@ -298,6 +298,11 @@ class TaskBuilder {
     
     class func createActivity(from transaction: Transaction) -> Activity? {
         let isodateFormatter = ISO8601DateFormatter()
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
+        
         var end = Date()
         
         if let date = isodateFormatter.date(from: transaction.transacted_at) {
@@ -310,16 +315,27 @@ class TaskBuilder {
         }
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        activity.name = transaction.description  + " Bill"
+        if transaction.category == "Paycheck" {
+            activity.name = "Paycheck"
+            activity.category = ActivityCategory.finances.rawValue
+            activity.subcategory = ActivitySubcategory.finances.rawValue
+        } else {
+            activity.name = transaction.description + " Bill"
+            activity.category = ActivityCategory.finances.rawValue
+            activity.subcategory = ActivitySubcategory.bills.rawValue
+        }
+        if let amount = numberFormatter.string(from: transaction.amount as NSNumber) {
+            activity.activityDescription = String("Amount: \(amount)")
+        }
         activity.isTask = true
-        activity.category = ActivityCategory.finances.rawValue
-        activity.subcategory = ActivitySubcategory.bills.rawValue
         activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
         activity.hasDeadlineTime = false
         activity.participantsIDs = transaction.participantsIDs
         activity.containerID = transaction.containerID
-        activity.isCompleted = true
-        activity.completedDate = NSNumber(value: end.timeIntervalSince1970)
+        if end.timeIntervalSinceNow.sign == .minus {
+            activity.isCompleted = true
+            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
@@ -561,6 +577,10 @@ class TaskBuilder {
                 return
             }
             
+            let numberFormatter = NumberFormatter()
+            numberFormatter.numberStyle = .currency
+            numberFormatter.maximumFractionDigits = 0
+            
             let end = date.UTCTime
             
             var activityID = UUID().uuidString
@@ -575,16 +595,27 @@ class TaskBuilder {
                     activity.listName = list.name
                     activity.listSource = list.source
                     activity.listColor = list.color
-                    activity.name = transaction.description + " Bill"
+                    if transaction.category == "Paycheck" {
+                        activity.name = "Paycheck"
+                        activity.category = ActivityCategory.finances.rawValue
+                        activity.subcategory = ActivitySubcategory.finances.rawValue
+                    } else {
+                        activity.name = transaction.description + " Bill"
+                        activity.category = ActivityCategory.finances.rawValue
+                        activity.subcategory = ActivitySubcategory.bills.rawValue
+                    }
+                    if let amount = numberFormatter.string(from: transaction.amount as NSNumber) {
+                        activity.activityDescription = String("Amount: \(amount)")
+                    }
                     activity.isTask = true
-                    activity.category = ActivityCategory.finances.rawValue
-                    activity.subcategory = ActivitySubcategory.bills.rawValue
                     activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
                     activity.hasDeadlineTime = false
                     activity.participantsIDs = transaction.participantsIDs
                     activity.containerID = transaction.containerID
-                    activity.isCompleted = true
-                    activity.completedDate = NSNumber(value: end.timeIntervalSince1970)
+                    if end.timeIntervalSinceNow.sign == .minus {
+                        activity.isCompleted = true
+                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                    }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     completion(activity)

@@ -203,7 +203,7 @@ class SubtaskListViewController: FormViewController {
                 if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
                     return task1.name ?? "" < task2.name ?? ""
                 }
-                return Int(truncating: task1.completedDate ?? 0) < Int(truncating: task2.completedDate ?? 0)
+                return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
             }
             return !(task1.isCompleted ?? false)
         }

@@ -289,6 +289,16 @@ extension Date {
     
 }
 
+extension Calendar {
+    func numberOfDaysBetween(_ from: Date, and to: Date) -> Int {
+        let fromDate = startOfDay(for: from) // <1>
+        let toDate = startOfDay(for: to) // <2>
+        let numberOfDays = dateComponents([.day], from: fromDate, to: toDate) // <3>
+        
+        return numberOfDays.day!
+    }
+}
+
 extension Date {
     
     func getShortDateStringForActivityWTZ(timeZone: String?) -> String {
@@ -2035,6 +2045,12 @@ extension Date {
         var components = DateComponents()
         components.year = 1
         return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfYear)!
+    }
+    
+    var nextYear: Date {
+        var components = DateComponents()
+        components.year = 1
+        return Calendar(identifier: .gregorian).date(byAdding: components, to: Date())!
     }
     
     func isMonday() -> Bool {
