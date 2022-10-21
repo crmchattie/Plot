@@ -13,12 +13,9 @@ class GSyncListTasksOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var listTasksDict: [GTLRTasks_TaskList: [GTLRTasks_Task]] = [:]
-    var existingTasks: [GTLRTasks_Task] = []
-    var existingActivities: [Activity] = []
     
-    init(existingActivities: [Activity]) {
+    override init() {
         self.queue = OperationQueue()
-        self.existingActivities = existingActivities
     }
     
     override func main() {

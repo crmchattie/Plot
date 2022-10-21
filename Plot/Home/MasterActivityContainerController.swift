@@ -545,7 +545,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                         }
                     }
                 } else if section.subType == "Transactions" {
-                    let filteredTransactions = transactions.filter({$0.should_link ?? true})
+                    let filteredTransactions = transactions.filter({$0.should_link ?? true && !($0.plot_created ?? false)})
                     if !filteredTransactions.isEmpty {
                         sections.append(section)
                         if filteredTransactions.count < 3 {

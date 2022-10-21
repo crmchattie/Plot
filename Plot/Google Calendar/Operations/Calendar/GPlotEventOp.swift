@@ -34,7 +34,7 @@ class GPlotEventOp: AsyncOperation {
             if let activityID = activity.activityID {
                 dispatchGroup.enter()
                 if let _ = activity.externalActivityID {
-                    googleCalService.updateEvent(for: activity)
+                    googleCalService.updateEvent(for: activity, span: .futureEvents)
                     dispatchGroup.leave()
                 } else {
                     googleCalService.storeEvent(for: activity) { event in

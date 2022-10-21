@@ -45,7 +45,7 @@ class ActivityActions: NSObject {
             Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).removeValue()
         }
         
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         
@@ -54,7 +54,7 @@ class ActivityActions: NSObject {
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
                 var varMemberIDs = membersIDs
-                varMemberIDs[currentUserId] = nil
+                varMemberIDs[currentUserID] = nil
                 activityDataReference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
             }
         })
@@ -63,7 +63,7 @@ class ActivityActions: NSObject {
         center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
         
         if activity.isTask ?? false {
-            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == ListSourceOptions.apple.name {
@@ -74,7 +74,7 @@ class ActivityActions: NSObject {
                 }
             })
         } else {
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == CalendarSourceOptions.apple.name {
@@ -92,12 +92,12 @@ class ActivityActions: NSObject {
             return
         }
         
-        guard let active = active, let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let active = active, let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         
         if !active {
-            activity.admin = currentUserId
+            activity.admin = currentUserID
         }
         
         let membersIDs = fetchMembersIDs()
@@ -158,13 +158,13 @@ class ActivityActions: NSObject {
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(firebaseDictionary)
         
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         
         
         if activity.isTask ?? false {
-            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == ListSourceOptions.apple.name {
@@ -175,13 +175,13 @@ class ActivityActions: NSObject {
                 }
             })
         } else {
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == CalendarSourceOptions.apple.name {
-                        self.eventKitService.updateEvent(for: activity)
+                        self.eventKitService.updateEvent(for: activity, span: .futureEvents)
                     } else if value == CalendarSourceOptions.google.name {
-                        self.googleCalService.updateEvent(for: activity)
+                        self.googleCalService.updateEvent(for: activity, span: .futureEvents)
                     }
                 }
             })
@@ -189,7 +189,7 @@ class ActivityActions: NSObject {
     }
     
     func newActivity(firebaseDictionary: [String: AnyObject], membersIDs: ([String], [String:AnyObject])) {
-        guard let currentUserId = Auth.auth().currentUser?.uid, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
+        guard let currentUserID = Auth.auth().currentUser?.uid, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
                                 
@@ -212,23 +212,23 @@ class ActivityActions: NSObject {
         }
                 
         if activity.isTask ?? false {
-            var reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+            var reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == ListSourceOptions.apple.name, let reminder = self.eventKitService.storeReminder(for: activity) {
-                        reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
+                        reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
                         let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                         reference.updateChildValues(calendarEventActivityValue)
-                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                         let values:[String : Any] = ["calendarExport": true, "externalActivityID": reminder.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
                     } else if value == ListSourceOptions.google.name {
                         self.googleCalService.storeTask(for: activity) { task in
                             if let task = task, let id = task.identifier {
-                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
+                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(reminderTasksKey).child(id)
                                 let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                                 reference.updateChildValues(calendarEventActivityValue)
-                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                                 let values:[String : Any] = ["calendarExport": true, "externalActivityID": task.identifier as Any]
                                 userReference.updateChildValues(values)
                             }
@@ -237,23 +237,23 @@ class ActivityActions: NSObject {
                 }
             })
         } else {
-            var reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            var reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == CalendarSourceOptions.apple.name, let event = self.eventKitService.storeEvent(for: activity) {
-                        reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(event.calendarItemIdentifier)
+                        reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(event.calendarItemIdentifier)
                         let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                         reference.updateChildValues(calendarEventActivityValue)
-                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                         let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
                     } else if value == CalendarSourceOptions.google.name {
                         self.googleCalService.storeEvent(for: activity) { event in
                             if let event = event, let id = event.identifier {
-                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey).child(id)
+                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(id)
                                 let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                                 reference.updateChildValues(calendarEventActivityValue)
-                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                                 let values:[String : Any] = ["calendarExport": true, "externalActivityID": event.identifier as Any]
                                 userReference.updateChildValues(values)
                             }
@@ -288,69 +288,85 @@ class ActivityActions: NSObject {
     }
     
     func updateCompletion(isComplete: Bool) {
-        guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
+        guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
         if activity.recurrences != nil {
             var values:[String : Any] = [:]
+            activity.isCompleted = isComplete
             if isComplete {
                 let original = Date()
                 let updateDate = Date(timeIntervalSinceReferenceDate:
                                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
                 values = ["isCompleted": isComplete, "completedDate": completedDate as Any]
-                updateInstance(instanceValues: values)
+                if activity.instanceOriginalStartDateTime == nil {
+                    activity.instanceOriginalStartDateTime = activity.finalDateTime
+                    activity.instanceOriginalAllDay = activity.allDay ?? false
+                    activity.instanceOriginalStartTimeZone = activity.finalTimeZone
+                    values["instanceOriginalStartDateTime"] = activity.finalDateTime as Any
+                    values["instanceOriginalAllDay"] = activity.instanceOriginalAllDay as Any
+                    values["instanceOriginalStartTimeZone"] = activity.instanceOriginalStartTimeZone as Any
+                }
                 activity.completedDate = completedDate
+                updateInstance(instanceValues: values, updateExternal: true)
             } else {
                 values = ["isCompleted": isComplete]
-                updateInstance(instanceValues: values)
+                if activity.instanceOriginalStartDateTime == nil {
+                    activity.instanceOriginalStartDateTime = activity.finalDateTime
+                    activity.instanceOriginalAllDay = activity.allDay ?? false
+                    activity.instanceOriginalStartTimeZone = activity.finalTimeZone
+                    values["instanceOriginalStartDateTime"] = activity.finalDateTime as Any
+                    values["instanceOriginalAllDay"] = activity.instanceOriginalAllDay as Any
+                    values["instanceOriginalStartTimeZone"] = activity.instanceOriginalStartTimeZone as Any
+                }
                 activity.completedDate = nil
+                updateInstance(instanceValues: values, updateExternal: true)
             }
-            activity.isCompleted = isComplete
-        } else {
+        } else if let currentUserID = Auth.auth().currentUser?.uid {
             let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+            activity.isCompleted = isComplete
             if isComplete {
                 let original = Date()
                 let updateDate = Date(timeIntervalSinceReferenceDate:
                                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                 let completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
                 let values:[String : Any] = ["isCompleted": isComplete, "completedDate": completedDate as Any]
-                groupActivityReference.updateChildValues(values)
                 activity.completedDate = completedDate
+                groupActivityReference.updateChildValues(values)
             } else {
                 let values:[String : Any] = ["isCompleted": isComplete]
                 groupActivityReference.updateChildValues(values)
-                groupActivityReference.child("completedDate").removeValue()
                 activity.completedDate = nil
+                groupActivityReference.child("completedDate").removeValue()
             }
-            activity.isCompleted = isComplete
             incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
-        }
-                
-        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
-        reference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists(), let value = snapshot.value as? String {
-                if value == ListSourceOptions.apple.name {
-                    self.eventKitService.updateReminder(for: activity)
-                } else if value == ListSourceOptions.google.name {
-                    self.googleCalService.updateTask(for: activity)
+            
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
+            reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let value = snapshot.value as? String {
+                    if value == ListSourceOptions.apple.name {
+                        self.eventKitService.updateReminder(for: activity)
+                    } else if value == ListSourceOptions.google.name {
+                        self.googleCalService.updateTask(for: activity)
+                    }
                 }
-            }
-        })
+            })
+        }
     }
     
-    func updateInstance(instanceValues: [String : Any]) {
+    func updateInstance(instanceValues: [String : Any], updateExternal: Bool) {
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         
         var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-        var instanceIDs = activity.instanceIDs ?? []
         if let instance = activity.instanceID {
             instanceID = instance
-        } else {
-            instanceIDs.append(instanceID)
         }
+        
+        var instanceIDs = activity.instanceIDs ?? []
+        instanceIDs.append(instanceID)
         
         var updateInstanceValues = instanceValues
         updateInstanceValues["instanceID"] = instanceID
@@ -359,7 +375,6 @@ class ActivityActions: NSObject {
         } else {
             updateInstanceValues["isEvent"] = true
         }
-        updateInstanceValues["instanceOriginalStartDateTime"] = activity.finalDateTime
         updateInstanceValues["name"] = activity.name
         updateInstanceValues["recurringEventID"] = activityID
         updateInstanceValues["participantsIDs"] = activity.participantsIDs?.sorted()
@@ -370,9 +385,33 @@ class ActivityActions: NSObject {
             let groupRecurringActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             let recurringValues: [String : Any] = ["instanceIDs": instanceIDs as Any]
             groupRecurringActivityReference.updateChildValues(recurringValues)
-            
             self.incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
-
+            
+            if updateExternal {
+                if activity.isTask ?? false {
+                    let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
+                    reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let value = snapshot.value as? String {
+                            if value == ListSourceOptions.apple.name {
+                                self.eventKitService.updateReminder(for: activity)
+                            } else if value == ListSourceOptions.google.name {
+                                self.googleCalService.updateTask(for: activity)
+                            }
+                        }
+                    })
+                } else {
+                    let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
+                    reference.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if snapshot.exists(), let value = snapshot.value as? String {
+                            if value == CalendarSourceOptions.apple.name {
+                                self.eventKitService.updateEvent(for: activity, span: .thisEvent)
+                            } else if value == CalendarSourceOptions.google.name {
+                                self.googleCalService.updateEvent(for: activity, span: .thisEvent)
+                            }
+                        }
+                    })
+                }
+            }
         }
     }
     

@@ -140,7 +140,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func calendarActivitiesUpdated() {
-        updateTableViewWFilters()
+        activityView.tableView.reloadData()
+//        updateTableViewWFilters()
     }
     
     @objc fileprivate func invitationsUpdated() {

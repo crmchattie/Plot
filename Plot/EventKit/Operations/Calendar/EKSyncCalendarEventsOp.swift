@@ -9,16 +9,12 @@
 import EventKit
 
 class EKSyncCalendarEventsOp: AsyncOperation {
-    
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var events: [EKEvent] = []
-    var existingEvents: [EKEvent] = []
-    var existingActivities: [Activity] = []
     
-    init(existingActivities: [Activity]) {
+    override init() {
         self.queue = OperationQueue()
-        self.existingActivities = existingActivities
     }
     
     override func main() {

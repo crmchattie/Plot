@@ -8,6 +8,7 @@
 
 import Foundation
 import GoogleSignIn
+import EventKit
 
 let kPlotGoogleCalendar = "PlotGoogleCalendar"
 let kPlotGoogleList = "PlotGoogleList"
@@ -149,31 +150,56 @@ class GoogleCalService {
         }
     }
     
-    func updateEvent(for activity: Activity) {
+    func updateEvent(for activity: Activity, span: EKSpan) {
         guard let service = self.calendarService, let eventID = activity.externalActivityID, let calendarID = activity.calendarID, let startDate = activity.startDate, let endDate = activity.endDate, let start = dateToGLTRDate(date: startDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")), let end = dateToGLTRDate(date: endDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.endTimeZone ?? "UTC")), let name = activity.name else {
             return
         }
         
-        let eventQuery = GTLRCalendarQuery_EventsGet.query(withCalendarId: calendarID, eventId: eventID)
-        
-        service.executeQuery(eventQuery, completionHandler: { (ticket, result, error) in
-            guard error == nil, let event = result as? GTLRCalendar_Event else {
-                print("failed to grab event \(String(describing: error))")
-                return
-            }
+        if span == .futureEvents {
+            let eventQuery = GTLRCalendarQuery_EventsGet.query(withCalendarId: calendarID, eventId: eventID)
             
-            event.summary = name
-            event.start = start
-            event.end = end
-            event.recurrence = activity.recurrences
-                        
-            let query = GTLRCalendarQuery_EventsUpdate.query(withObject: event, calendarId: calendarID, eventId: eventID)
-            service.executeQuery(query, completionHandler: { (ticket, result, error) in
-                if error != nil {
-                    print("Failed to update google calendar event with error : \(String(describing: error))")
+            service.executeQuery(eventQuery, completionHandler: { (ticket, result, error) in
+                guard error == nil, let event = result as? GTLRCalendar_Event else {
+                    print("failed to grab event \(String(describing: error))")
+                    return
+                }
+                
+                event.summary = name
+                event.start = start
+                event.end = end
+                event.recurrence = activity.recurrences
+                            
+                let query = GTLRCalendarQuery_EventsUpdate.query(withObject: event, calendarId: calendarID, eventId: eventID)
+                service.executeQuery(query, completionHandler: { (ticket, result, error) in
+                    if error != nil {
+                        print("Failed to update google calendar event with error : \(String(describing: error))")
+                    }
+                })
+            })
+        } else if span == .thisEvent, let originalStartDate = activity.instanceOriginalStartDate, let originalStartTime = dateToGLTRDate(date: originalStartDate, allDay: activity.instanceOriginalAllDay ?? false, timeZone: TimeZone(identifier: activity.instanceOriginalStartTimeZone ?? "UTC")) {
+            let instancesQuery = GTLRCalendarQuery_EventsInstances.query(withCalendarId: calendarID, eventId: eventID)
+            service.executeQuery(instancesQuery, completionHandler: { (ticket, result, error) in
+                guard error == nil, let events = result as? GTLRCalendar_Events, let instances = events.items else {
+                    print("failed to grab event \(String(describing: error))")
+                    return
+                }
+                
+                if let event = instances.first(where: {$0.originalStartTime == originalStartTime }) {
+                    event.summary = name
+                    event.start = start
+                    event.end = end
+                    event.recurrence = activity.recurrences
+                                
+                    let query = GTLRCalendarQuery_EventsUpdate.query(withObject: event, calendarId: calendarID, eventId: eventID)
+                    service.executeQuery(query, completionHandler: { (ticket, result, error) in
+                        if error != nil {
+                            print("Failed to update google calendar event with error : \(String(describing: error))")
+                        }
+                    })
                 }
             })
-        })
+            
+        }
     }
     
     func deleteEvent(for activity: Activity) {
@@ -310,7 +336,7 @@ class GoogleCalService {
         
         let isodateFormatter = ISO8601DateFormatter()
         
-        if activity.hasDeadlineTime ?? false, let deadlineDateSwitch = activity.endDate {
+        if let deadlineDateSwitch = activity.endDate {
             let date = isodateFormatter.string(from: deadlineDateSwitch)
             task.due = date
         }
@@ -364,7 +390,7 @@ class GoogleCalService {
             
             let isodateFormatter = ISO8601DateFormatter()
             
-            if activity.hasDeadlineTime ?? false, let deadlineDateSwitch = activity.endDate {
+            if let deadlineDateSwitch = activity.endDate {
                 let date = isodateFormatter.string(from: deadlineDateSwitch)
                 task.due = date
             }

@@ -54,7 +54,7 @@ class GoogleCalManager {
         isRunningEvents = true
         
         let eventsOp = GFetchCalendarEventsOp(googleCalService: googleCalService)
-        let syncEventsOp = GSyncCalendarEventsOp(existingActivities: existingActivities)
+        let syncEventsOp = GSyncCalendarEventsOp()
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
             syncEventsOp.calendarEventsDict = eventsOp.calendarEventsDict
         }
@@ -135,7 +135,7 @@ class GoogleCalManager {
         isRunningTasks = true
 
         let tasksOp = GFetchListTasksOp(googleCalService: googleCalService)
-        let syncTasksOp = GSyncListTasksOp(existingActivities: existingActivities)
+        let syncTasksOp = GSyncListTasksOp()
         let tasksOpAdapter = BlockOperation() { [unowned tasksOp, unowned syncTasksOp] in
             syncTasksOp.listTasksDict = tasksOp.listTasksDict
         }

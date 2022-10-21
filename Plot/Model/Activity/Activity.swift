@@ -87,9 +87,11 @@ class Activity: NSObject, NSCopying, Codable {
     var priority: String?
     var lastModifiedDate: NSNumber?
     var createdDate: NSNumber?
-    //instance variable
+    //instance variables
     var recurringEventID: String?
     var instanceOriginalStartDateTime: NSNumber?
+    var instanceOriginalAllDay: Bool?
+    var instanceOriginalStartTimeZone: String?
     var instanceIDs: [String]?
     var instanceID: String?
     
@@ -252,6 +254,8 @@ class Activity: NSObject, NSCopying, Codable {
         lastModifiedDate = dictionary?["lastModifiedDate"] as? NSNumber
         recurringEventID = dictionary?["recurringEventID"] as? String
         instanceOriginalStartDateTime = dictionary?["instanceOriginalStartDateTime"] as? NSNumber
+        instanceOriginalAllDay = dictionary?["instanceOriginalAllDay"] as? Bool
+        instanceOriginalStartTimeZone = dictionary?["instanceOriginalStartTimeZone"] as? String
         instanceIDs = dictionary?["instanceIDs"] as? [String]
         instanceID = dictionary?["instanceID"] as? String
     }
@@ -792,6 +796,14 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.instanceOriginalStartDateTime = value
         }
         
+        if let value = updatingActivity.instanceOriginalAllDay {
+            newActivity.instanceOriginalAllDay = value
+        }
+        
+        if let value = updatingActivity.instanceOriginalStartTimeZone {
+            newActivity.instanceOriginalStartTimeZone = value
+        }
+        
         return newActivity
     }
     
@@ -1018,6 +1030,14 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.instanceOriginalStartDateTime = self.instanceOriginalStartDateTime
         }
         
+        if self.instanceOriginalAllDay != otherActivity.instanceOriginalAllDay {
+            newActivity.instanceOriginalAllDay = self.instanceOriginalAllDay
+        }
+        
+        if self.instanceOriginalStartTimeZone != otherActivity.instanceOriginalStartTimeZone {
+            newActivity.instanceOriginalStartTimeZone = self.instanceOriginalStartTimeZone
+        }
+        
         return newActivity
     }
     
@@ -1221,7 +1241,13 @@ extension Activity {
         }
         return nil
     }
-    
+    var finalTimeZone: String? {
+        if self.isTask ?? false {
+            return endTimeZone
+        } else {
+            return startTimeZone
+        }
+    }
 }
 
 extension Activity {

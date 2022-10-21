@@ -13,12 +13,9 @@ class EKSyncReminderTasksOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var reminders: [EKReminder] = []
-    var existingReminders: [EKReminder] = []
-    var existingActivities: [Activity] = []
     
-    init(existingActivities: [Activity]) {
+    override init() {
         self.queue = OperationQueue()
-        self.existingActivities = existingActivities
     }
     
     override func main() {

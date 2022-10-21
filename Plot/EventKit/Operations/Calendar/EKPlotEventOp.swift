@@ -35,7 +35,7 @@ class EKPlotEventOp: AsyncOperation {
             if let activityID = activity.activityID {
                 dispatchGroup.enter()
                 if let _ = activity.externalActivityID {
-                    eventKitService.updateEvent(for: activity)
+                    eventKitService.updateEvent(for: activity, span: .futureEvents)
                     dispatchGroup.leave()
                 } else if let event = eventKitService.storeEvent(for: activity) {
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]

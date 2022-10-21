@@ -102,7 +102,7 @@ class GListTaskOp: AsyncOperation {
         let isodateFormatter = ISO8601DateFormatter()
         if let due = task.due, let date = isodateFormatter.date(from: due) {
             activity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
-            activity.hasDeadlineTime = true
+            activity.hasDeadlineTime = false
         } else {
             activity.endDateTime = nil
             activity.hasDeadlineTime = false

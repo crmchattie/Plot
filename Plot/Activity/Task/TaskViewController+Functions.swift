@@ -669,10 +669,16 @@ extension TaskViewController {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
+                if self.task.instanceOriginalStartDateTime == nil {
+                    self.task.instanceOriginalStartDateTime = self.taskOld.finalDateTime
+                    self.task.instanceOriginalAllDay = self.taskOld.allDay
+                    self.task.instanceOriginalStartTimeZone = self.taskOld.startTimeZone
+                }
+                
                 let newActivity = self.task.getDifferenceBetweenActivities(otherActivity: self.taskOld)
                 let instanceValues = newActivity.toAnyObject()
                 let createActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createActivity.updateInstance(instanceValues: instanceValues)
+                createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
                 if self.navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)
                 } else {

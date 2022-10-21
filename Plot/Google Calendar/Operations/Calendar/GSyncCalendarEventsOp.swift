@@ -13,12 +13,9 @@ class GSyncCalendarEventsOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var calendarEventsDict: [GTLRCalendar_CalendarListEntry: [GTLRCalendar_Event]] = [:]
-    var existingEvents: [GTLRCalendar_Event] = []
-    var existingActivities: [Activity] = []
     
-    init(existingActivities: [Activity]) {
+    override init() {
         self.queue = OperationQueue()
-        self.existingActivities = existingActivities
     }
     
     override func main() {

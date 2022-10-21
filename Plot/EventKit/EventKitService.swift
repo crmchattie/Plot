@@ -165,7 +165,7 @@ class EventKitService {
         if let value = UserDefaults.standard.string(forKey: kPlotAppleCalendar), let calendar = eventStore.calendar(withIdentifier: value) {
             event.calendar = calendar
             do {
-                try eventStore.save(event, span: .thisEvent)
+                try eventStore.save(event, span: .futureEvents)
             }
             catch let error as NSError {
                 print("Failed to save iOS calendar event with error : \(error)")
@@ -173,7 +173,7 @@ class EventKitService {
         } else if let calendar = createPlotCalendar() {
             event.calendar = calendar
             do {
-                try eventStore.save(event, span: .thisEvent)
+                try eventStore.save(event, span: .futureEvents)
             }
             catch let error as NSError {
                 print("Failed to save iOS calendar event with error : \(error)")
@@ -183,7 +183,7 @@ class EventKitService {
         return event
     }
     
-    func updateEvent(for activity: Activity) {
+    func updateEvent(for activity: Activity, span: EKSpan) {
         guard let eventID = activity.externalActivityID, let startDate = activity.startDate, let endDate = activity.endDate, let name = activity.name, let allDay = activity.allDay else {
             return
         }
@@ -231,7 +231,7 @@ class EventKitService {
             }
             
             do {
-                try eventStore.save(event, span: .futureEvents)
+                try eventStore.save(event, span: span)
             }
             catch let error as NSError {
                 print("Failed to save iOS calendar event with error : \(error)")
@@ -252,6 +252,14 @@ class EventKitService {
                 print("Failed to save iOS calendar event with error : \(error)")
             }
         }
+    }
+    
+    func fetchItemWithCalendarExternalIdentifier(itemID: String) -> [EKCalendarItem]? {
+        let existingItems = eventStore.calendarItems(withExternalIdentifier: itemID)
+        if !existingItems.isEmpty {
+            return existingItems
+        }
+        return nil
     }
     
     func createPlotCalendar() -> EKCalendar? {

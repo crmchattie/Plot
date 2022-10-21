@@ -28,8 +28,8 @@ class EventBuilder {
         activity.name = workout.name
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.startDateTime = NSNumber(value: Int(start.timeIntervalSince1970))
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.allDay = false
         activity.participantsIDs = workout.participantsIDs
         activity.containerID = workout.containerID
@@ -55,8 +55,8 @@ class EventBuilder {
         activity.name = mindfulness.name
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.startDateTime = NSNumber(value: Int(start.timeIntervalSince1970))
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.allDay = false
         activity.participantsIDs = mindfulness.participantsIDs
         activity.containerID = mindfulness.containerID
@@ -82,8 +82,8 @@ class EventBuilder {
         activity.name = meal.name
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.startDateTime = NSNumber(value: Int(start.timeIntervalSince1970))
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.allDay = false
         activity.participantsIDs = meal.participantsIDs
         activity.containerID = meal.containerID
@@ -112,8 +112,8 @@ class EventBuilder {
         activity.isEvent = true
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        activity.startDateTime = NSNumber(value: start.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.startDateTime = NSNumber(value: Int(start.timeIntervalSince1970))
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.allDay = false
         activity.participantsIDs = transaction.participantsIDs
         activity.containerID = transaction.containerID
@@ -139,8 +139,8 @@ class EventBuilder {
         activity.isEvent = true
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
-        activity.startDateTime = NSNumber(value: rounded.timeIntervalSince1970)
-        activity.endDateTime = NSNumber(value: rounded.timeIntervalSince1970)
+        activity.startDateTime = NSNumber(value: Int(rounded.timeIntervalSince1970))
+        activity.endDateTime = NSNumber(value: Int(rounded.timeIntervalSince1970))
         activity.allDay = false
         activity.participantsIDs = task.participantsIDs
         activity.containerID = task.containerID
@@ -227,7 +227,7 @@ class TaskBuilder {
         activity.subcategory = ActivitySubcategory.workout.rawValue
         activity.isTask = true
         activity.name = workout.name
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.hasDeadlineTime = true
         activity.participantsIDs = workout.participantsIDs
         activity.containerID = workout.containerID
@@ -255,7 +255,7 @@ class TaskBuilder {
         activity.subcategory = ActivitySubcategory.mindfulness.rawValue
         activity.isTask = true
         activity.name = mindfulness.name
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.hasDeadlineTime = true
         activity.participantsIDs = mindfulness.participantsIDs
         activity.containerID = mindfulness.containerID
@@ -283,7 +283,7 @@ class TaskBuilder {
         activity.subcategory = ActivitySubcategory.meal.rawValue
         activity.isTask = true
         activity.name = meal.name
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.hasDeadlineTime = true
         activity.participantsIDs = meal.participantsIDs
         activity.containerID = meal.containerID
@@ -328,7 +328,7 @@ class TaskBuilder {
             activity.activityDescription = String("Amount: \(amount)")
         }
         activity.isTask = true
-        activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+        activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
         activity.hasDeadlineTime = false
         activity.participantsIDs = transaction.participantsIDs
         activity.containerID = transaction.containerID
@@ -475,7 +475,7 @@ class TaskBuilder {
                     activity.subcategory = ActivitySubcategory.workout.rawValue
                     activity.isTask = true
                     activity.name = workout.name
-                    activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+                    activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
                     activity.hasDeadlineTime = true
                     activity.participantsIDs = workout.participantsIDs
                     activity.containerID = workout.containerID
@@ -514,7 +514,7 @@ class TaskBuilder {
                     activity.subcategory = ActivitySubcategory.mindfulness.rawValue
                     activity.isTask = true
                     activity.name = mindfulness.name
-                    activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+                    activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
                     activity.hasDeadlineTime = true
                     activity.participantsIDs = mindfulness.participantsIDs
                     activity.containerID = mindfulness.containerID
@@ -553,7 +553,7 @@ class TaskBuilder {
                     activity.subcategory = ActivitySubcategory.meal.rawValue
                     activity.isTask = true
                     activity.name = meal.name
-                    activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+                    activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
                     activity.hasDeadlineTime = true
                     activity.participantsIDs = meal.participantsIDs
                     activity.containerID = meal.containerID
@@ -608,7 +608,7 @@ class TaskBuilder {
                         activity.activityDescription = String("Amount: \(amount)")
                     }
                     activity.isTask = true
-                    activity.endDateTime = NSNumber(value: end.timeIntervalSince1970)
+                    activity.endDateTime = NSNumber(value: Int(end.timeIntervalSince1970))
                     activity.hasDeadlineTime = false
                     activity.participantsIDs = transaction.participantsIDs
                     activity.containerID = transaction.containerID

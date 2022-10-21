@@ -272,12 +272,12 @@ class ActivitiesFetcher: NSObject {
                             if let instanceActivity = activities[date] {
                                 let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
                                 newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
                                 newActivities.append(newActivity)
                             } else {
                                 let newActivity = activity.copy() as! Activity
                                 newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                                newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
                                 newActivities.append(newActivity)
                             }
                         }
@@ -291,7 +291,7 @@ class ActivitiesFetcher: NSObject {
                     for date in dates {
                         let newActivity = activity.copy() as! Activity
                         newActivity.recurrenceStartDateTime = activity.finalDateTime
-                        newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970)
+                        newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
                         newActivities.append(newActivity)
                     }
                     group.leave()
@@ -317,14 +317,14 @@ class ActivitiesFetcher: NSObject {
                                     //just left so something is there
                                     let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
                                     newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                    newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                                    newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
                                     newActivities.append(newActivity)
                                 } else {
                                     let newActivity = activity.copy() as! Activity
                                     newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                    newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                                    newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                                    newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                                    newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
                                     newActivities.append(newActivity)
                                 }
                             }
@@ -341,8 +341,8 @@ class ActivitiesFetcher: NSObject {
                         for date in dates {
                             let newActivity = activity.copy() as! Activity
                             newActivity.recurrenceStartDateTime = activity.finalDateTime
-                            newActivity.startDateTime = NSNumber(value: date.timeIntervalSince1970)
-                            newActivity.endDateTime = NSNumber(value: date.timeIntervalSince1970 + duration)
+                            newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                            newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
                             newActivities.append(newActivity)
                         }
                     }

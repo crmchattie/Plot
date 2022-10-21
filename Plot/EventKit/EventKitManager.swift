@@ -80,7 +80,7 @@ class EventKitManager {
         isRunningEvents = true
         
         let eventsOp = EKFetchCalendarEventsOp(eventKitService: eventKitService)
-        let syncEventsOp = EKSyncCalendarEventsOp(existingActivities: existingActivities)
+        let syncEventsOp = EKSyncCalendarEventsOp()
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
             syncEventsOp.events = eventsOp.events
         }
@@ -167,7 +167,7 @@ class EventKitManager {
         isRunningTasks = true
         
         let remindersOp = EKFetchReminderTasksOp(eventKitService: eventKitService)
-        let syncRemindersOp = EKSyncReminderTasksOp(existingActivities: existingActivities)
+        let syncRemindersOp = EKSyncReminderTasksOp()
         let remindersOpAdapter = BlockOperation() { [unowned remindersOp, unowned syncRemindersOp] in
             syncRemindersOp.reminders = remindersOp.reminders
         }
