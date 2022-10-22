@@ -24,11 +24,11 @@ class GListTaskOp: AsyncOperation {
     }
     
     private func startRequest() {
-        guard let currentUserId = Auth.auth().currentUser?.uid, let id = list.identifier else {
+        guard let currentUserID = Auth.auth().currentUser?.uid, let id = task.identifier else {
             self.finish()
             return
         }
-        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(id)
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(reminderTasksKey).child(id)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] {
                 let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID)
@@ -40,9 +40,9 @@ class GListTaskOp: AsyncOperation {
                     self?.update(activity: activity, completion: { activity in
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["calendarExport": true,
-                                                          "externalActivityID": self?.task.identifier as Any,
+                                                          "externalActivityID": id as Any,
                                                           "showExtras": activity.showExtras as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
@@ -52,7 +52,7 @@ class GListTaskOp: AsyncOperation {
                 })
             }
             else if !snapshot.exists() {
-                guard let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserId).childByAutoId().key, let weakSelf = self else {
+                guard let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key, let weakSelf = self else {
                     self?.finish()
                     return
                 }
@@ -62,11 +62,11 @@ class GListTaskOp: AsyncOperation {
                     weakSelf.createActivity(for: activityID) { activity in
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["isGroupActivity": false,
                                                           "badge": 0,
                                                           "calendarExport": true,
-                                                          "externalActivityID": self?.task.identifier as Any,
+                                                          "externalActivityID": id as Any,
                                                           "showExtras": activity.showExtras as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
@@ -125,12 +125,12 @@ class GListTaskOp: AsyncOperation {
     }
     
     private func deleteActivity() {
-        guard let currentUserId = Auth.auth().currentUser?.uid, let id = task.identifier else {
+        guard let currentUserID = Auth.auth().currentUser?.uid, let id = task.identifier else {
             self.finish()
             return
         }
         
-        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(id)
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(reminderTasksKey).child(id)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             guard snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] else {
                 self?.finish()
@@ -138,7 +138,7 @@ class GListTaskOp: AsyncOperation {
             }
             
             let activityReference = Database.database().reference().child(activitiesEntity).child(activityID)
-            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID)
+            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID)
             activityReference.removeValue { (_, _) in
                 userActivityReference.removeValue { (_, _) in
                     reference.removeValue { (_, _) in

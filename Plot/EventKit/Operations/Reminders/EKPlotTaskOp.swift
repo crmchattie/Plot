@@ -24,11 +24,11 @@ class EKPlotTaskOp: AsyncOperation {
     }
     
     private func startRequest() {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             self.finish()
             return
         }
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
             if let activityID = activity.activityID {
@@ -39,7 +39,7 @@ class EKPlotTaskOp: AsyncOperation {
                 } else if let reminder = eventKitService.storeReminder(for: activity) {
                     let reminderTaskActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                     reference.child(reminder.calendarItemIdentifier).updateChildValues(reminderTaskActivityValue) { (_, _) in
-                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                         let values:[String : Any] = ["externalActivityID": reminder.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
                         dispatchGroup.leave()

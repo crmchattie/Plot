@@ -156,6 +156,8 @@
 		108C380328AC483E00DC4998 /* TaskViewController+UpdateInvitees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380228AC483900DC4998 /* TaskViewController+UpdateInvitees.swift */; };
 		108C380528AC485300DC4998 /* TaskViewController+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380428AC485300DC4998 /* TaskViewController+Functions.swift */; };
 		108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */; };
+		10920EAD290455DA0069F027 /* EKDeletePlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10920EAC290455DA0069F027 /* EKDeletePlotActivityOp.swift */; };
+		10920EAF290463160069F027 /* GDeletedPlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10920EAE290463160069F027 /* GDeletedPlotActivityOp.swift */; };
 		1092E25A28B6F2B50018FCAA /* EKFetchReminderTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25928B6F2B50018FCAA /* EKFetchReminderTasksOp.swift */; };
 		1092E25C28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */; };
 		1092E25E28B6F2EA0018FCAA /* EKReminderTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */; };
@@ -746,6 +748,8 @@
 		108C380228AC483900DC4998 /* TaskViewController+UpdateInvitees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+UpdateInvitees.swift"; sourceTree = "<group>"; };
 		108C380428AC485300DC4998 /* TaskViewController+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+Functions.swift"; sourceTree = "<group>"; };
 		108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+Extensions.swift"; sourceTree = "<group>"; };
+		10920EAC290455DA0069F027 /* EKDeletePlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKDeletePlotActivityOp.swift; sourceTree = "<group>"; };
+		10920EAE290463160069F027 /* GDeletedPlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDeletedPlotActivityOp.swift; sourceTree = "<group>"; };
 		1092E25928B6F2B50018FCAA /* EKFetchReminderTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKFetchReminderTasksOp.swift; sourceTree = "<group>"; };
 		1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKSyncReminderTasksOp.swift; sourceTree = "<group>"; };
 		1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKReminderTaskOp.swift; sourceTree = "<group>"; };
@@ -1885,6 +1889,7 @@
 		10F5CFF025CB7D100078C821 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
+				10920EAE290463160069F027 /* GDeletedPlotActivityOp.swift */,
 				1092E26228B70DCC0018FCAA /* Calendar */,
 				1092E26328B70DD30018FCAA /* Reminder */,
 			);
@@ -1906,6 +1911,7 @@
 		26036771256DB68600FE9142 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
+				10920EAC290455DA0069F027 /* EKDeletePlotActivityOp.swift */,
 				1092E25828B6F2900018FCAA /* Calendar */,
 				1092E26128B705540018FCAA /* Reminders */,
 			);
@@ -3337,11 +3343,13 @@
 				26336E172593FA1A001A3071 /* HealthKitSampleBuilder.swift in Sources */,
 				4BAEE49721272C5E0045AB10 /* FalconUsersFetcher.swift in Sources */,
 				105F34A72885EF7A007531EB /* RecurrenceRule+Generator.swift in Sources */,
+				10920EAD290455DA0069F027 /* EKDeletePlotActivityOp.swift in Sources */,
 				4BAEE48521272C4F0045AB10 /* AuthVerificationController.swift in Sources */,
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
 				103F492C286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift in Sources */,
 				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
 				260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */,
+				10920EAF290463160069F027 /* GDeletedPlotActivityOp.swift in Sources */,
 				26958553255A7355008FEE9B /* NutritionOperation.swift in Sources */,
 				4BAEE5E5212735E50045AB10 /* EnterVerificationCodeController.swift in Sources */,
 				4BAEE49B21272C5E0045AB10 /* ContactsDetailController.swift in Sources */,

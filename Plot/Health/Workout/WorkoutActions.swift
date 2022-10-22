@@ -44,7 +44,7 @@ class WorkoutActions: NSObject {
             Database.database().reference().child(userWorkoutsEntity).child(memberID).child(ID).removeValue()
         }
         
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
         
@@ -53,7 +53,7 @@ class WorkoutActions: NSObject {
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
                 var varMemberIDs = membersIDs
-                varMemberIDs[currentUserId] = nil
+                varMemberIDs[currentUserID] = nil
                 reference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
             }
         })

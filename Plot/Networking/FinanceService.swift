@@ -181,10 +181,10 @@ class FinanceService {
     }
     
     func deleteTransaction(transaction_guid: String) {
-        if let currentUserId = Auth.auth().currentUser?.uid, let index = self.transactions.firstIndex(where: {$0.guid == transaction_guid}) {
+        if let currentUserID = Auth.auth().currentUser?.uid, let index = self.transactions.firstIndex(where: {$0.guid == transaction_guid}) {
             self.transactions.remove(at: index)
             let reference = Database.database().reference()
-            reference.child(userFinancialTransactionsEntity).child(currentUserId).child(transaction_guid).removeValue()
+            reference.child(userFinancialTransactionsEntity).child(currentUserID).child(transaction_guid).removeValue()
             reference.child(financialTransactionsEntity).child(transaction_guid).removeValue()
         }
     }
@@ -197,10 +197,10 @@ class FinanceService {
     
     func deleteMXMemberFB(member: MXMember) {
         let current_member_guid = member.guid
-        if let currentUserId = Auth.auth().currentUser?.uid, let index = self.members.firstIndex(where: {$0.guid == current_member_guid}) {
+        if let currentUserID = Auth.auth().currentUser?.uid, let index = self.members.firstIndex(where: {$0.guid == current_member_guid}) {
             self.members.remove(at: index)
             let reference = Database.database().reference()
-            reference.child(userFinancialMembersEntity).child(currentUserId).child(current_member_guid).removeValue()
+            reference.child(userFinancialMembersEntity).child(currentUserID).child(current_member_guid).removeValue()
             self.memberAccountsDict[member] = nil
             if let accounts = self.memberAccountsDict[member] {
                 deleteMXAccountsFB(accounts: accounts)
@@ -217,13 +217,13 @@ class FinanceService {
     }
     
     func deleteMXAccountsFB(accounts: [MXAccount]) {
-        if let currentUserId = Auth.auth().currentUser?.uid {
+        if let currentUserID = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference()
             for account in accounts {
                 if let index = self.accounts.firstIndex(where: {$0.guid == account.guid}) {
                     self.accounts.remove(at: index)
                 }
-                reference.child(userFinancialAccountsEntity).child(currentUserId).child(account.guid).removeValue()
+                reference.child(userFinancialAccountsEntity).child(currentUserID).child(account.guid).removeValue()
             }
         }
     }
@@ -625,6 +625,7 @@ class FinanceService {
                                 var newTransaction = filteredTransactions[0]
                                 let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
                                 newTransaction.guid = ID
+                                newTransaction.description = newTransaction.description + " (Expected)"
                                 newTransaction.plot_created = true
                                 newTransaction.amount = averageAmount
                                 newTransaction.transacted_at = newDateString
@@ -702,6 +703,7 @@ class FinanceService {
                                 var newTransaction = filteredTransactions[0]
                                 let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
                                 newTransaction.guid = ID
+                                newTransaction.description = newTransaction.description + " (Expected)"
                                 newTransaction.plot_created = true
                                 newTransaction.amount = averageAmount
                                 newTransaction.transacted_at = newDateString

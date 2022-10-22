@@ -19,14 +19,17 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         
     private let kCompositionalHeader = "CompositionalHeader"
     private let kLibraryCell = "LibraryCell"
+    private let kSubLibraryCell = "SubLibraryCell"
     
     var favAct = [String: [String]]()
     
-    var sections: [SectionType] = [.custom, .templates]
+    var sections: [SectionType] = [.custom, .templates, .allTemplates]
     var groups = [SectionType: [AnyHashable]]()
     var customTypes: [CustomType] = [.event, .task, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
-    var templates = [ActivityCategory: [Template]]()
+    var templatesDict = [ActivityCategory: [Template]]()
+    var templates = [Template]()
+    var filteredTemplates = [Template]()
     
     var intColor: Int = 0
     
@@ -38,28 +41,46 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
+    let viewPlaceholder = ViewPlaceholder()
+    
+    var timer: Timer?
+    
+    lazy var searchBar : UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.delegate = self
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.searchBarStyle = .minimal
+        searchBar.placeholder = "Search"
+        searchBar.barStyle = .default
+        searchBar.sizeToFit()
+        return searchBar
+    }()
+    var searchController: UISearchController?
+    
     init() {
         
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
             
             if sectionNumber == 0 {
                 return LibraryViewController.topSection()
+            } else if sectionNumber == 1 {
+                return LibraryViewController.secondSection()
             } else {
                 // second section
-                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1)))
-                item.contentInsets = .init(top: 8, leading: 0, bottom: 8, trailing: 8)
+                let heightDimension = NSCollectionLayoutDimension.estimated(500)
                 
-                let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(130)), subitems: [item])
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
+                
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
+                group.contentInsets.trailing = 16
                 
                 let section = NSCollectionLayoutSection(group: group)
                 section.orthogonalScrollingBehavior = .none
-                section.contentInsets.top = 16
                 section.contentInsets.leading = 16
-                section.contentInsets.trailing = 8
                 
                 let kind = UICollectionView.elementKindSectionHeader
                 section.boundarySupplementaryItems = [
-                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(30)), elementKind: kind, alignment: .topLeading)
+                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
                 ]
                 
                 return section
@@ -90,6 +111,78 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         return section
     }
     
+    static func secondSection() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1)))
+        item.contentInsets = .init(top: 8, leading: 0, bottom: 8, trailing: 8)
+        
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(130)), subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .none
+        section.contentInsets.top = 16
+        section.contentInsets.leading = 16
+        section.contentInsets.trailing = 8
+        
+        let kind = UICollectionView.elementKindSectionHeader
+        section.boundarySupplementaryItems = [
+            .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(25)), elementKind: kind, alignment: .topLeading)
+        ]
+        
+        return section
+    }
+    
+    func updateLayoutToInitial() {
+        collectionView.reloadData()
+        collectionView.collectionViewLayout.invalidateLayout()
+        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            
+            if sectionNumber == 0 {
+                return LibraryViewController.topSection()
+            } else if sectionNumber == 1 {
+                return LibraryViewController.secondSection()
+            } else {
+                // second section
+                let heightDimension = NSCollectionLayoutDimension.estimated(500)
+                
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
+                
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
+                group.contentInsets.trailing = 16
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .none
+                section.contentInsets.leading = 16
+                
+                let kind = UICollectionView.elementKindSectionHeader
+                section.boundarySupplementaryItems = [
+                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
+                ]
+                
+                return section
+            }
+        }
+        collectionView.setCollectionViewLayout(layout, animated: true)
+    }
+    
+    func updateLayoutToSearch() {
+        collectionView.reloadData()
+        collectionView.collectionViewLayout.invalidateLayout()
+        let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            let heightDimension = NSCollectionLayoutDimension.estimated(500)
+            
+            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
+            
+            let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
+            group.contentInsets.trailing = 16
+            
+            let section = NSCollectionLayoutSection(group: group)
+            section.orthogonalScrollingBehavior = .none
+            section.contentInsets.leading = 16
+            
+            return section
+        }
+        collectionView.setCollectionViewLayout(layout, animated: true)
+    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -114,20 +207,30 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
+        collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
         
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton
         
         groups[.custom] = customTypes
-        groups[.templates] = templateTypes
         
-        setupData()
         fetchTemplates()
+        setupSearchController()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchFavAct()
+    }
+    
+    fileprivate func setupSearchController() {
+        searchController = UISearchController(searchResultsController: nil)
+        searchController?.searchResultsUpdater = self
+        searchController?.obscuresBackgroundDuringPresentation = false
+        searchController?.searchBar.delegate = self
+        searchController?.definesPresentationContext = true
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     @IBAction func done(_ sender: AnyObject) {
@@ -138,11 +241,78 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         self.dismiss(animated: true, completion: nil)
     }
     
+    func fetchTemplates() {
+        var refHandle = DatabaseHandle()
+        let reference = Database.database().reference().child(templateEntity)
+        reference.keepSynced(true)
+        refHandle = reference.observe(.value, with: { (snapshot) in
+            reference.removeObserver(withHandle: refHandle)
+            if snapshot.exists(), let snapshotValue = snapshot.value as? NSArray {
+                for value in snapshotValue {
+                    if let template = try? FirebaseDecoder().decode(Template.self, from: value) {
+                        self.templatesDict[template.category, default: []].append(template)
+                        self.templates.append(template)
+                    }
+                }
+            }
+            if !self.templates.isEmpty {
+                self.templates = self.templates.sorted(by: { $0.name < $1.name })
+                self.filteredTemplates = self.templates
+                self.groups[.templates] = self.templateTypes
+                self.groups[.allTemplates] = self.filteredTemplates
+            }
+            self.setupData()
+        })
+    }
+    
+    private func setupData() {
+        guard currentReachabilityStatus != .notReachable else {
+            return
+        }
+        
+        var snapshot = self.diffableDataSource.snapshot()
+        snapshot.deleteAllItems()
+        self.diffableDataSource.apply(snapshot)
+                        
+        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
+            header.delegate = self
+            let snapshot = self.diffableDataSource.snapshot()
+            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
+                header.titleLabel.text = section.name
+                header.subTitleLabel.isHidden = true
+            }
+            
+            return header
+        })
+                                
+        for section in sections {
+            if let object = groups[section] {
+                snapshot.appendSections([section])
+                snapshot.appendItems(object, toSection: section)
+                self.diffableDataSource.apply(snapshot)
+            }
+        }
+    }
+    
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
+        let snapshot = self.diffableDataSource.snapshot()
         if let object = object as? CustomType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kLibraryCell, for: indexPath) as! LibraryCell
             cell.intColor = (indexPath.item % 5)
             cell.customType = object
+            return cell
+        } else if let object = object as? Template, let section = snapshot.sectionIdentifier(containingItem: object) {
+            let totalItems = (self.groups[section]?.count ?? 1) - 1
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
+            cell.intColor = (indexPath.item % 5)
+            if indexPath.item == 0 {
+                cell.firstPosition = true
+            }
+            if indexPath.item == totalItems {
+                cell.lastPosition = true
+            }
+            cell.template = object
             return cell
         }
         return nil
@@ -209,7 +379,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                 let destination = SubLibraryViewController()
                 destination.networkController = networkController
                 destination.sections = [.templates]
-                if let cat = ActivityCategory(rawValue: customType.name), let templates = templates[cat] {
+                if let cat = ActivityCategory(rawValue: customType.name), let templates = templatesDict[cat] {
                     destination.title = cat.rawValue
                     destination.templates = templates
                     destination.groups = [.templates: templates]
@@ -217,53 +387,29 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
-        }
-    }
-    
-    private func setupData() {
-        guard currentReachabilityStatus != .notReachable else {
-            return
-        }
-        
-        var snapshot = self.diffableDataSource.snapshot()
-        snapshot.deleteAllItems()
-        self.diffableDataSource.apply(snapshot)
-                        
-        diffableDataSource.supplementaryViewProvider = .some({ (collectionView, kind, indexPath) -> UICollectionReusableView? in
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: self.kCompositionalHeader, for: indexPath) as! CompositionalHeader
-            header.delegate = self
-            let snapshot = self.diffableDataSource.snapshot()
-            if let object = self.diffableDataSource.itemIdentifier(for: indexPath), let section = snapshot.sectionIdentifier(containingItem: object) {
-                header.titleLabel.text = section.name
-                header.subTitleLabel.isHidden = true
-            }
-            
-            return header
-        })
-                                
-        for section in sections {
-            if let object = groups[section] {
-                snapshot.appendSections([section])
-                snapshot.appendItems(object, toSection: section)
-                self.diffableDataSource.apply(snapshot)
+        } else if let template = object as? Template {
+            switch template.object {
+            case .event:
+                let destination = EventViewController(networkController: networkController)
+                destination.updateDiscoverDelegate = self
+                destination.template = template
+                self.navigationController?.pushViewController(destination, animated: true)
+            case .task:
+                let destination = TaskViewController(networkController: networkController)
+                destination.updateDiscoverDelegate = self
+                destination.template = template
+                self.navigationController?.pushViewController(destination, animated: true)
+            case .workout:
+                let destination = WorkoutViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
+                destination.template = template
+                self.navigationController?.pushViewController(destination, animated: true)
+            case .subtask:
+                print("subtask")
+            case .schedule:
+                print("schedule")
             }
         }
-    }
-    
-    func fetchTemplates() {
-        var refHandle = DatabaseHandle()
-        let reference = Database.database().reference().child(templateEntity)
-        reference.keepSynced(true)
-        refHandle = reference.observe(.value, with: { (snapshot) in
-            if snapshot.exists(), let snapshotValue = snapshot.value as? NSArray {
-                for value in snapshotValue {
-                    if let template = try? FirebaseDecoder().decode(Template.self, from: value) {
-                        self.templates[template.category, default: []].append(template)
-                    }
-                }
-            }
-            reference.removeObserver(withHandle: refHandle)
-        })
     }
     
     @objc func newAccount() {
@@ -353,5 +499,98 @@ extension LibraryViewController: GIDSignInDelegate {
 extension LibraryViewController: UpdateDiscover {
     func itemCreated() {
         self.dismiss(animated: true)
+    }
+}
+
+extension LibraryViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {}
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = nil
+        searchBar.resignFirstResponder()
+        timer?.invalidate()
+        filteredTemplates = templates
+        self.viewPlaceholder.remove(from: self.collectionView, priority: .medium)
+        
+        groups[.allTemplates] = filteredTemplates
+        updateLayoutToInitial()
+        sections = [.custom, .templates, .allTemplates]
+        setupData()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        filteredTemplates = searchText.isEmpty ? templates :
+            templates.filter({ (template) -> Bool in
+                if template.name.lowercased().contains(searchText.lowercased()) || template.object.rawValue.lowercased().contains(searchText.lowercased()) {
+                    return true
+                }
+                return false
+        })
+        
+        timer?.invalidate()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+            if self.filteredTemplates.count == 0 {
+                self.viewPlaceholder.add(for: self.collectionView, title: .emptySearchTemplate, subtitle: .empty, priority: .medium, position: .fill)
+            } else {
+                self.viewPlaceholder.remove(from: self.collectionView, priority: .medium)
+            }
+
+            self.groups[.allTemplates] = self.filteredTemplates
+            self.updateLayoutToSearch()
+            self.sections = [.allTemplates]
+            self.setupData()
+        })
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.keyboardAppearance = .default
+        return true
+    }
+    
+}
+
+extension LibraryViewController { /* hiding keyboard */
+    
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if #available(iOS 11.0, *) {
+            searchController?.searchBar.endEditing(true)
+        } else {
+            self.searchBar.endEditing(true)
+        }
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        setNeedsStatusBarAppearanceUpdate()
+        if let searchText = searchBar.searchTextField.text {
+            filteredTemplates = searchText.isEmpty ? templates :
+                templates.filter({ (template) -> Bool in
+                    if template.name.lowercased().contains(searchText.lowercased()) || template.object.rawValue.lowercased().contains(searchText.lowercased()) {
+                        return true
+                    }
+                    return false
+            })
+        } else {
+            filteredTemplates = templates
+        }
+        timer?.invalidate()
+        
+        if self.filteredTemplates.count == 0 {
+            self.viewPlaceholder.add(for: collectionView, title: .emptySearchTemplate, subtitle: .empty, priority: .medium, position: .fill)
+        } else {
+            self.viewPlaceholder.remove(from: collectionView, priority: .medium)
+        }
+        
+        groups[.allTemplates] = filteredTemplates
+        updateLayoutToSearch()
+        sections = [.allTemplates]
+        setupData()
+        
+        if #available(iOS 11.0, *) {
+            searchController?.searchBar.endEditing(true)
+        } else {
+            self.searchBar.endEditing(true)
+        }
     }
 }

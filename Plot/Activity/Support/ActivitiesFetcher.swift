@@ -26,7 +26,7 @@ class ActivitiesFetcher: NSObject {
     var activitiesWithRepeatsChanged: (([Activity])->())?
     //activityID:Activity
     var userActivities: [String: Activity] = [:]
-    //instanceOriginalStartDate:Activity
+    //instanceID:Activity
     var instanceActivities: [String: Activity] = [:]
             
     func observeActivityForCurrentUser(activitiesInitialAdd: @escaping ([Activity])->(), activitiesWithRepeatsInitialAdd: @escaping ([Activity])->(), activitiesAdded: @escaping ([Activity])->(), activitiesWithRepeatsAdded: @escaping ([Activity])->(), activitiesRemoved: @escaping ([Activity])->(), activitiesChanged: @escaping ([Activity])->(), activitiesWithRepeatsChanged: @escaping ([Activity])->()) {
@@ -261,7 +261,11 @@ class ActivitiesFetcher: NSObject {
                     ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
                         guard counter > 0 else {
                             for (_, instanceActivity) in activities {
-                                completion([instanceActivity])
+                                if let instanceID = instanceActivity.instanceID, let activity = self.instanceActivities[instanceID] {
+                                    activity.updateActivityWActivitySameInstance(updatingActivity: instanceActivity)
+                                    self.instanceActivities[instanceID] = activity
+                                    completion([activity])
+                                }
                             }
                             return
                         }
@@ -269,10 +273,13 @@ class ActivitiesFetcher: NSObject {
                         let dates = iCalUtility()
                             .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                         for date in dates {
-                            if let instanceActivity = activities[date] {
-                                let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
+                            if let instanceActivity = activities[date], let instanceID = instanceActivity.instanceID {
+                                let newActivity = activity.updateActivityWActivityNewInstance(updatingActivity: instanceActivity)
                                 newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                                if newActivity.endDateTime == activity.endDateTime {
+                                    newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                                }
+                                self.instanceActivities[instanceID] = newActivity
                                 newActivities.append(newActivity)
                             } else {
                                 let newActivity = activity.copy() as! Activity
@@ -302,8 +309,11 @@ class ActivitiesFetcher: NSObject {
                     ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
                         guard counter > 0 else {
                             for (_, instanceActivity) in activities {
-                                completion([instanceActivity])
-
+                                if let instanceID = instanceActivity.instanceID, let activity = self.instanceActivities[instanceID] {
+                                    activity.updateActivityWActivitySameInstance(updatingActivity: instanceActivity)
+                                    self.instanceActivities[instanceID] = activity
+                                    completion([activity])
+                                }
                             }
                             return
                         }
@@ -313,12 +323,16 @@ class ActivitiesFetcher: NSObject {
                                 .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                             let duration = endDate.timeIntervalSince(startDate)
                             for date in dates {
-                                if let instanceActivity = activities[date] {
-                                    //just left so something is there
-                                    let newActivity = activity.updateActivityWActivity(updatingActivity: instanceActivity)
+                                if let instanceActivity = activities[date], let instanceID = instanceActivity.instanceID {
+                                    let newActivity = activity.updateActivityWActivityNewInstance(updatingActivity: instanceActivity)
                                     newActivity.recurrenceStartDateTime = activity.finalDateTime
-                                    newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
-                                    newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
+                                    if newActivity.startDateTime == activity.startDateTime {
+                                        newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                                    }
+                                    if newActivity.endDateTime == activity.endDateTime {
+                                        newActivity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
+                                    }
+                                    self.instanceActivities[instanceID] = newActivity
                                     newActivities.append(newActivity)
                                 } else {
                                     let newActivity = activity.copy() as! Activity

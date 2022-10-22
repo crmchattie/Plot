@@ -53,8 +53,23 @@ class GoogleCalManager {
         events = []
         isRunningEvents = true
         
+        let calendar = Calendar.current
+
+        // Create the start date components
+        var timeAgoComponents = DateComponents()
+        timeAgoComponents.day = -1
+        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
+
+        // Create the end date components.
+        var timeFromNowComponents = DateComponents()
+        timeFromNowComponents.month = 6
+        let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
+
+        //filter old activities out
+        let filterActivities = existingActivities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && $0.isTask == nil && $0.calendarSource == CalendarSourceOptions.google.name }
+        
         let eventsOp = GFetchCalendarEventsOp(googleCalService: googleCalService)
-        let syncEventsOp = GSyncCalendarEventsOp()
+        let syncEventsOp = GSyncCalendarEventsOp(existingActivities: filterActivities)
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
             syncEventsOp.calendarEventsDict = eventsOp.calendarEventsDict
         }
@@ -133,9 +148,11 @@ class GoogleCalManager {
 
         tasks = []
         isRunningTasks = true
+        
+        let filterActivities = existingActivities.filter { $0.isTask ?? false && $0.listSource == ListSourceOptions.google.name }
 
         let tasksOp = GFetchListTasksOp(googleCalService: googleCalService)
-        let syncTasksOp = GSyncListTasksOp()
+        let syncTasksOp = GSyncListTasksOp(existingActivities: filterActivities)
         let tasksOpAdapter = BlockOperation() { [unowned tasksOp, unowned syncTasksOp] in
             syncTasksOp.listTasksDict = tasksOp.listTasksDict
         }

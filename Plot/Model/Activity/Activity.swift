@@ -359,26 +359,18 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.startDateTime as AnyObject? {
             dictionary["startDateTime"] = value
-        } else {
-            dictionary["startDateTime"] = NSNull()
         }
         
         if let value = self.startTimeZone as AnyObject? {
             dictionary["startTimeZone"] = value
-        } else {
-            dictionary["startTimeZone"] = NSNull()
         }
         
         if let value = self.endDateTime as AnyObject? {
             dictionary["endDateTime"] = value
-        } else {
-            dictionary["endDateTime"] = NSNull()
         }
         
         if let value = self.endTimeZone as AnyObject? {
             dictionary["endTimeZone"] = value
-        } else {
-            dictionary["endTimeZone"] = NSNull()
         }
         
         if let value = self.recurrences as AnyObject? {
@@ -564,7 +556,7 @@ class Activity: NSObject, NSCopying, Codable {
         return dictionary
     }
     
-    func updateActivityWActivity(updatingActivity: Activity) -> Activity {
+    func updateActivityWActivityNewInstance(updatingActivity: Activity) -> Activity {
         let newActivity = self.copy() as! Activity
         
         if let value = updatingActivity.activityID {
@@ -611,7 +603,7 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.locationAddress = value
         }
         
-        if let value = updatingActivity.participantsIDs {
+        if let value = updatingActivity.participantsIDs, !value.isEmpty {
             newActivity.participantsIDs = value
         }
         
@@ -807,7 +799,246 @@ class Activity: NSObject, NSCopying, Codable {
         return newActivity
     }
     
-    func getDifferenceBetweenActivities(otherActivity: Activity) -> Activity {
+    func updateActivityWActivitySameInstance(updatingActivity: Activity) {
+        if let value = updatingActivity.activityID {
+            self.activityID = value
+        }
+        
+        if let value = updatingActivity.externalActivityID {
+            self.externalActivityID = value
+        }
+        
+        if let value = updatingActivity.calendarExport {
+            self.calendarExport = value
+        }
+        
+        if let value = updatingActivity.name {
+            self.name = value
+        }
+        
+        if let value = updatingActivity.admin {
+            self.admin = value
+        }
+        
+        if let value = updatingActivity.activityType {
+            self.activityType = value
+        }
+        
+        if let value = updatingActivity.category {
+            self.category = value
+        }
+        
+        if let value = updatingActivity.subcategory {
+            self.subcategory = value
+        }
+        
+        if let value = updatingActivity.activityDescription {
+            self.activityDescription = value
+        }
+        
+        if let value = updatingActivity.locationName {
+            self.locationName = value
+        }
+        
+        if let value = updatingActivity.locationAddress {
+            self.locationAddress = value
+        }
+        
+        if let value = updatingActivity.participantsIDs, !value.isEmpty {
+            self.participantsIDs = value
+        }
+        
+        if let value = updatingActivity.transportation {
+            self.transportation = value
+        }
+        
+        if let value = updatingActivity.activityOriginalPhotoURL {
+            self.activityOriginalPhotoURL = value
+        }
+        
+        if let value = updatingActivity.activityThumbnailPhotoURL {
+            self.activityThumbnailPhotoURL = value
+        }
+        
+        if let value = updatingActivity.activityPhotos {
+            self.activityPhotos = value
+        }
+        
+        if let value = updatingActivity.activityFiles {
+            self.activityFiles = value
+        }
+        
+        if let value = updatingActivity.allDay {
+            self.allDay = value
+        }
+        
+        if let value = updatingActivity.startDateTime {
+            self.startDateTime = value
+        }
+        
+        if let value = updatingActivity.startTimeZone {
+            self.startTimeZone = value
+        }
+        
+        if let value = updatingActivity.endDateTime {
+            self.endDateTime = value
+        }
+        
+        if let value = updatingActivity.endTimeZone {
+            self.endTimeZone = value
+        }
+        
+        if let value = updatingActivity.recurrences {
+            self.recurrences = value
+        }
+        
+        if let value = updatingActivity.recurrenceStartDateTime {
+            self.recurrenceStartDateTime = value
+        }
+        
+        if let value = updatingActivity.notes {
+            self.notes = value
+        }
+        
+        if let value = updatingActivity.conversationID {
+            self.conversationID = value
+        }
+        
+        if let value = updatingActivity.grocerylistID {
+            self.grocerylistID = value
+        }
+        
+        if let value = updatingActivity.checklistIDs {
+            self.checklistIDs = value
+        }
+        
+        if let value = updatingActivity.activitylistIDs {
+            self.activitylistIDs = value
+        }
+        
+        if let value = updatingActivity.packinglistIDs {
+            self.packinglistIDs = value
+        }
+        
+        if let value = updatingActivity.containerID {
+            self.containerID = value
+        }
+        
+        if let value = updatingActivity.showExtras {
+            self.showExtras = value
+        }
+        
+        if let value = updatingActivity.isCompleted {
+            self.isCompleted = value
+        }
+        
+        if let value = updatingActivity.completedDate {
+            self.completedDate = value
+        }
+        
+        if let value = updatingActivity.userIsCompleted {
+            self.userIsCompleted = value
+        }
+        
+        if let value = updatingActivity.userCompletedDate {
+            self.userCompletedDate = value
+        }
+        
+        if let value = updatingActivity.isTask {
+            self.isTask = value
+        }
+        
+        if let value = updatingActivity.isEvent {
+            self.isEvent = value
+        }
+        
+        if let value = updatingActivity.isSchedule {
+            self.isSchedule = value
+        }
+        
+        if let value = updatingActivity.scheduleIDs {
+            self.scheduleIDs = value
+        }
+        
+        if let value = updatingActivity.createdDate {
+            self.createdDate = value
+        }
+        
+        if let value = updatingActivity.lastModifiedDate {
+            self.lastModifiedDate = value
+        }
+        
+        //list is activity attribute vs. user attribute unlike calendar
+        if let value = updatingActivity.listID {
+            self.listID = value
+        }
+
+        if let value = updatingActivity.listName {
+            self.listName = value
+        }
+
+        if let value = updatingActivity.listColor {
+            self.listColor = value
+        }
+
+        if let value = updatingActivity.listSource {
+            self.listSource = value
+        }
+        
+        if let value = updatingActivity.subtaskIDs {
+            self.subtaskIDs = value
+        }
+        
+        if let value = updatingActivity.isSubtask {
+            self.isSubtask = value
+        }
+        
+        if let value = updatingActivity.hasStartTime {
+            self.hasStartTime = value
+        }
+        
+        if let value = updatingActivity.hasDeadlineTime {
+            self.hasDeadlineTime = value
+        }
+        
+        if let value = updatingActivity.flagged {
+            self.flagged = value
+        }
+        
+        if let value = updatingActivity.tags {
+            self.tags = value
+        }
+        
+        if let value = updatingActivity.priority {
+            self.priority = value
+        }
+        
+        if let value = updatingActivity.instanceIDs {
+            self.instanceIDs = value
+        }
+        
+        if let value = updatingActivity.instanceID {
+            self.instanceID = value
+        }
+        
+        if let value = updatingActivity.recurringEventID {
+            self.recurringEventID = value
+        }
+        
+        if let value = updatingActivity.instanceOriginalStartDateTime {
+            self.instanceOriginalStartDateTime = value
+        }
+        
+        if let value = updatingActivity.instanceOriginalAllDay {
+            self.instanceOriginalAllDay = value
+        }
+        
+        if let value = updatingActivity.instanceOriginalStartTimeZone {
+            self.instanceOriginalStartTimeZone = value
+        } 
+    }
+    
+    func getDifferenceBetweenActivitiesNewInstance(otherActivity: Activity) -> Activity {
         let newActivity = Activity(dictionary: ["activityID": self.activityID as AnyObject])
         if self.externalActivityID != otherActivity.externalActivityID {
             newActivity.externalActivityID = self.externalActivityID
@@ -1213,15 +1444,14 @@ extension Activity {
     }
     
     var finalDate: Date? {
-        if let startDateTime = startDateTime?.doubleValue {
-            return Date(timeIntervalSince1970: startDateTime)
-            //for tasks where deadline date is more likely to be set than start date
+        if self.isTask ?? false {
+            return endDate
+        } else {
+            return startDate
         }
-        else if let endDateTime = endDateTime?.doubleValue {
-            return Date(timeIntervalSince1970: endDateTime)
-        }
-        return nil
     }
+    
+    //for tasks where deadline date is more likely to be set than start date
     var finalDateTime: NSNumber? {
         if self.isTask ?? false {
             return endDateTime

@@ -675,7 +675,7 @@ extension TaskViewController {
                     self.task.instanceOriginalStartTimeZone = self.taskOld.startTimeZone
                 }
                 
-                let newActivity = self.task.getDifferenceBetweenActivities(otherActivity: self.taskOld)
+                let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
                 let instanceValues = newActivity.toAnyObject()
                 let createActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)

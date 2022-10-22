@@ -140,8 +140,13 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc fileprivate func calendarActivitiesUpdated() {
-        activityView.tableView.reloadData()
-//        updateTableViewWFilters()
+        filteredPinnedActivities = pinnedActivities
+        filteredActivities = activities
+        if filterDictionary["search"] != nil || filterDictionary["calendarCategory"] != nil {
+            updateTableViewWFilters()
+        } else {
+            activityView.tableView.reloadData()
+        }
     }
     
     @objc fileprivate func invitationsUpdated() {

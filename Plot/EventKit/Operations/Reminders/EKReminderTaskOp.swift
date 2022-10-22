@@ -22,11 +22,11 @@ class EKReminderTaskOp: AsyncOperation {
     }
     
     private func startRequest() {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             self.finish()
             return
         }
-        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] {
                 let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
@@ -38,7 +38,7 @@ class EKReminderTaskOp: AsyncOperation {
                     self?.update(activity: activity) { activity in
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["calendarExport": true,
                                                           "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
                                                           "showExtras": activity.showExtras as Any]
@@ -50,7 +50,7 @@ class EKReminderTaskOp: AsyncOperation {
                 })
             }
             else if !snapshot.exists() {
-                guard let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserId).childByAutoId().key, let weakSelf = self else {
+                guard let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key, let weakSelf = self else {
                     self?.finish()
                     return
                 }
@@ -59,7 +59,7 @@ class EKReminderTaskOp: AsyncOperation {
                     weakSelf.createActivity(for: activityID) { activity in
                         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["isGroupActivity": false,
                                                           "badge": 0,
                                                           "calendarExport": true,
@@ -144,12 +144,12 @@ class EKReminderTaskOp: AsyncOperation {
     }
     
     private func deleteActivity() {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             self.finish()
             return
         }
         
-        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
+        let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(reminderTasksKey).child(reminder.calendarItemIdentifier)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             guard snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] else {
                 self?.finish()
@@ -157,7 +157,7 @@ class EKReminderTaskOp: AsyncOperation {
             }
             
             let activityReference = Database.database().reference().child(activitiesEntity).child(activityID)
-            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID)
+            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID)
             activityReference.removeValue { (_, _) in
                 userActivityReference.removeValue { (_, _) in
                     reference.removeValue { (_, _) in

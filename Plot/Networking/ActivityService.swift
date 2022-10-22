@@ -547,8 +547,8 @@ class ActivityService {
     }
     
     func grabPrimaryCalendar(_ completion: @escaping (String) -> Void) {
-        if let currentUserId = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     self.primaryCalendar = value
@@ -561,8 +561,8 @@ class ActivityService {
     }
     
     func updatePrimaryCalendar(value: String) {
-        if let currentUserId = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if !snapshot.exists() {
                     self.updatePrimaryCalendarFB(value: value)
@@ -598,10 +598,10 @@ class ActivityService {
     }
     
     func updatePrimaryCalendarFB(value: String) {
-        if let currentUserId = Auth.auth().currentUser?.uid {
+        if let currentUserID = Auth.auth().currentUser?.uid {
             self.primaryCalendar = value
             self.runCalendarFunctions(value: value)
-            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(primaryCalendarKey)
+            let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.setValue(value)
         }
     }
@@ -684,8 +684,8 @@ class ActivityService {
     }
     
     func grabPrimaryList(_ completion: @escaping (String) -> Void) {
-        if let currentUserId = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     self.primaryList = value
@@ -698,8 +698,8 @@ class ActivityService {
     }
     
     func updatePrimaryList(value: String) {
-        if let currentUserId = Auth.auth().currentUser?.uid {
-            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if !snapshot.exists() {
                     self.updatePrimaryListFB(value: value)
@@ -735,10 +735,10 @@ class ActivityService {
     }
     
     func updatePrimaryListFB(value: String) {
-        if let currentUserId = Auth.auth().currentUser?.uid {
+        if let currentUserID = Auth.auth().currentUser?.uid {
             self.primaryList = value
             self.runListFunctions(value: value)
-            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserId).child(primaryReminderKey)
+            let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.setValue(value)
         }
     }
@@ -784,7 +784,7 @@ extension ActivityService {
     }
     
     func cleanCalendarEventActivities() {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             
             return
         }
@@ -792,12 +792,12 @@ extension ActivityService {
         for activity in self.activities {
             if activity.activityType == "calendarEvent" || activity.activityType == CustomType.iOSCalendarEvent.categoryText || activity.activityType == CustomType.googleCalendarEvent.categoryText, let activityID = activity.activityID {
                 let activityReference = Database.database().reference().child(activitiesEntity).child(activityID)
-                let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID)
+                let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID)
                 activityReference.removeValue()
                 userActivityReference.removeValue()
             }
         }
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey)
         reference.removeValue()
     }
     

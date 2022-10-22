@@ -241,7 +241,7 @@ class ActivityActions: NSObject {
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {
                     if value == CalendarSourceOptions.apple.name, let event = self.eventKitService.storeEvent(for: activity) {
-                        reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(event.calendarItemIdentifier)
+                        reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(event.calendarItemExternalIdentifierClean.removeCharacters())
                         let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                         reference.updateChildValues(calendarEventActivityValue)
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
@@ -249,8 +249,8 @@ class ActivityActions: NSObject {
                         userReference.updateChildValues(values)
                     } else if value == CalendarSourceOptions.google.name {
                         self.googleCalService.storeEvent(for: activity) { event in
-                            if let event = event, let id = event.identifier {
-                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(id)
+                            if let event = event, let iCalUID = event.iCalUID {
+                                reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(iCalUID.removeCharacters())
                                 let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                                 reference.updateChildValues(calendarEventActivityValue)
                                 let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
@@ -361,13 +361,13 @@ class ActivityActions: NSObject {
         }
         
         var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+        var instanceIDs = activity.instanceIDs ?? []
         if let instance = activity.instanceID {
             instanceID = instance
+        } else {
+            instanceIDs.append(instanceID)
         }
-        
-        var instanceIDs = activity.instanceIDs ?? []
-        instanceIDs.append(instanceID)
-        
+                
         var updateInstanceValues = instanceValues
         updateInstanceValues["instanceID"] = instanceID
         if activity.isTask ?? false {
@@ -377,7 +377,6 @@ class ActivityActions: NSObject {
         }
         updateInstanceValues["name"] = activity.name
         updateInstanceValues["recurringEventID"] = activityID
-        updateInstanceValues["participantsIDs"] = activity.participantsIDs?.sorted()
         updateInstanceValues["lastModifiedDate"] = NSNumber(value: Int((Date()).timeIntervalSince1970))
                 
         let groupInstanceActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)

@@ -13,9 +13,11 @@ class GSyncCalendarEventsOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var calendarEventsDict: [GTLRCalendar_CalendarListEntry: [GTLRCalendar_Event]] = [:]
+    var existingActivities: [Activity] = []
     
-    override init() {
+    init(existingActivities: [Activity]) {
         self.queue = OperationQueue()
+        self.existingActivities = existingActivities
     }
     
     override func main() {
@@ -27,6 +29,15 @@ class GSyncCalendarEventsOp: AsyncOperation {
             for event in events {
                 let op = GCalendarEventOp(calendar: calendar, event: event)
                 queue.addOperation(op)
+            }
+        }
+        
+        for (_, events) in calendarEventsDict {
+            for activity in existingActivities {
+                if !events.contains(where: { $0.identifier == activity.externalActivityID }) {
+                    let op = GDeletePlotActivityOp(activity: activity)
+                    queue.addOperation(op)
+                }
             }
         }
         

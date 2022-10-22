@@ -79,8 +79,23 @@ class EventKitManager {
         events = []
         isRunningEvents = true
         
+        let calendar = Calendar.current
+
+        // Create the start date components
+        var timeAgoComponents = DateComponents()
+        timeAgoComponents.day = -1
+        let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
+
+        // Create the end date components.
+        var timeFromNowComponents = DateComponents()
+        timeFromNowComponents.month = 6
+        let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
+
+        //filter old activities out
+        let filterActivities = existingActivities.filter { $0.endDate ?? Date() > timeAgo && $0.endDate ?? Date() < timeFromNow && $0.isTask == nil && $0.calendarSource == CalendarSourceOptions.apple.name }
+        
         let eventsOp = EKFetchCalendarEventsOp(eventKitService: eventKitService)
-        let syncEventsOp = EKSyncCalendarEventsOp()
+        let syncEventsOp = EKSyncCalendarEventsOp(existingActivities: filterActivities)
         let eventsOpAdapter = BlockOperation() { [unowned eventsOp, unowned syncEventsOp] in
             syncEventsOp.events = eventsOp.events
         }
@@ -165,9 +180,11 @@ class EventKitManager {
                         
         tasks = []
         isRunningTasks = true
+
+        let filterActivities = existingActivities.filter { $0.isTask ?? false && $0.listSource == ListSourceOptions.apple.name }
         
         let remindersOp = EKFetchReminderTasksOp(eventKitService: eventKitService)
-        let syncRemindersOp = EKSyncReminderTasksOp()
+        let syncRemindersOp = EKSyncReminderTasksOp(existingActivities: filterActivities)
         let remindersOpAdapter = BlockOperation() { [unowned remindersOp, unowned syncRemindersOp] in
             syncRemindersOp.reminders = remindersOp.reminders
         }

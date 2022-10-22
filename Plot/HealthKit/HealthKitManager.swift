@@ -189,7 +189,7 @@ class HealthKitManager {
     }
     
     func saveFirebase(completion: @escaping () -> Void) {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             completion()
             return
         }
@@ -200,7 +200,7 @@ class HealthKitManager {
             completion()
         })
 
-        let reference = Database.database().reference().child(userHealthEntity).child(currentUserId)
+        let reference = Database.database().reference().child(userHealthEntity).child(currentUserID)
         dispatchGroup.enter()
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists() {

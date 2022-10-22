@@ -32,6 +32,8 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
+    let viewPlaceholder = ViewPlaceholder()
+    
     var timer: Timer?
     
     lazy var searchBar : UISearchBar = {
@@ -283,6 +285,8 @@ extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDeleg
         searchBar.resignFirstResponder()
         timer?.invalidate()
         filteredTemplates = templates
+        self.viewPlaceholder.remove(from: self.collectionView, priority: .medium)
+        
         setupData()
     }
     
@@ -298,6 +302,12 @@ extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDeleg
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+            if self.filteredTemplates.count == 0 {
+                self.viewPlaceholder.add(for: self.collectionView, title: .emptySearchTemplate, subtitle: .empty, priority: .medium, position: .fill)
+            } else {
+                self.viewPlaceholder.remove(from: self.collectionView, priority: .medium)
+            }
+            
             self.setupData()
         })
     }
@@ -333,6 +343,12 @@ extension SubLibraryViewController { /* hiding keyboard */
             filteredTemplates = templates
         }
         timer?.invalidate()
+        if self.filteredTemplates.count == 0 {
+            self.viewPlaceholder.add(for: self.collectionView, title: .emptySearchTemplate, subtitle: .empty, priority: .medium, position: .fill)
+        } else {
+            self.viewPlaceholder.remove(from: self.collectionView, priority: .medium)
+        }
+        
         setupData()
         
         if #available(iOS 11.0, *) {

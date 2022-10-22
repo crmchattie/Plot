@@ -13,9 +13,11 @@ class EKSyncReminderTasksOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var reminders: [EKReminder] = []
+    var existingActivities: [Activity] = []
     
-    override init() {
+    init(existingActivities: [Activity]) {
         self.queue = OperationQueue()
+        self.existingActivities = existingActivities
     }
     
     override func main() {
@@ -26,6 +28,13 @@ class EKSyncReminderTasksOp: AsyncOperation {
         for reminder in reminders {
             let op = EKReminderTaskOp(reminder: reminder)
             queue.addOperation(op)
+        }
+        
+        for activity in existingActivities {
+            if !reminders.contains(where: { $0.calendarItemIdentifier == activity.externalActivityID }) {
+                let op = EKDeletePlotActivityOp(activity: activity)
+                queue.addOperation(op)
+            }
         }
         
         queue.addBarrierBlock { [weak self] in

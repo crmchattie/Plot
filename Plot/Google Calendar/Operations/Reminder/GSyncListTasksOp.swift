@@ -13,9 +13,11 @@ class GSyncListTasksOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var listTasksDict: [GTLRTasks_TaskList: [GTLRTasks_Task]] = [:]
+    var existingActivities: [Activity] = []
     
-    override init() {
+    init(existingActivities: [Activity]) {
         self.queue = OperationQueue()
+        self.existingActivities = existingActivities
     }
     
     override func main() {
@@ -27,6 +29,15 @@ class GSyncListTasksOp: AsyncOperation {
             for task in tasks {
                 let op = GListTaskOp(list: list, task: task)
                 queue.addOperation(op)
+            }
+        }
+        
+        for (_, tasks) in listTasksDict {
+            for activity in existingActivities {
+                if !tasks.contains(where: { $0.identifier == activity.externalActivityID }) {
+                    let op = GDeletePlotActivityOp(activity: activity)
+                    queue.addOperation(op)
+                }
             }
         }
         

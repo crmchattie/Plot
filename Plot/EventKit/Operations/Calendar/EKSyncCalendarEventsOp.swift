@@ -12,9 +12,11 @@ class EKSyncCalendarEventsOp: AsyncOperation {
     private let queue: OperationQueue
     private var operations: [AsyncOperation] = []
     var events: [EKEvent] = []
+    var existingActivities: [Activity] = []
     
-    override init() {
+    init(existingActivities: [Activity]) {
         self.queue = OperationQueue()
+        self.existingActivities = existingActivities
     }
     
     override func main() {
@@ -25,6 +27,13 @@ class EKSyncCalendarEventsOp: AsyncOperation {
         for event in events {
             let op = EKCalendarEventOp(event: event)
             queue.addOperation(op)
+        }
+        
+        for activity in existingActivities {
+            if !events.contains(where: { $0.calendarItemIdentifier == activity.externalActivityID }) {
+                let op = EKDeletePlotActivityOp(activity: activity)
+                queue.addOperation(op)
+            }
         }
         
         queue.addBarrierBlock { [weak self] in

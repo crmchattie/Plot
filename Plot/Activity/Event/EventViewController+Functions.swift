@@ -848,7 +848,7 @@ extension EventViewController {
                     self.activity.instanceOriginalStartTimeZone = self.activityOld.startTimeZone
                 }
                 
-                let newActivity = self.activity.getDifferenceBetweenActivities(otherActivity: self.activityOld)
+                let newActivity = self.activity.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.activityOld)
                 let instanceValues = newActivity.toAnyObject()
                 let createActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)

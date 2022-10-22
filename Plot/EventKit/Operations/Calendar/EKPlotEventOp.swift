@@ -24,12 +24,12 @@ class EKPlotEventOp: AsyncOperation {
     }
     
     private func startRequest() {
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
             self.finish()
             return
         }
         // @FIX-ME remove in four months from 2/6/21 since we can check for calendar export property on activities
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserId).child(calendarEventsKey)
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
             if let activityID = activity.activityID {
@@ -39,8 +39,8 @@ class EKPlotEventOp: AsyncOperation {
                     dispatchGroup.leave()
                 } else if let event = eventKitService.storeEvent(for: activity) {
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                    reference.child(event.calendarItemIdentifier).updateChildValues(calendarEventActivityValue) { (_, _) in
-                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserId).child(activityID).child(messageMetaDataFirebaseFolder)
+                    reference.child(event.calendarItemExternalIdentifierClean.removeCharacters()).updateChildValues(calendarEventActivityValue) { (_, _) in
+                        let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                         let values:[String : Any] = ["externalActivityID": event.calendarItemIdentifier as Any]
                         userReference.updateChildValues(values)
                         dispatchGroup.leave()
