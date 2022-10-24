@@ -20,7 +20,7 @@ private let keywordsMap = ["Health": ["fitness", "workout", "run", "training", "
                            "Personal": ["consultation", "haircut", "read", "journal"],
                            "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation", "brunch"],
                            "Leisure": ["vacation", "shopping", "concert", "sporting event", "museum", "movies"],
-                           "Finances": ["vacation", "shopping"]
+                           "Finances": ["bill", "payment"]
 ]
 
 enum ActivityCategory: String, Codable, CaseIterable {
@@ -63,6 +63,24 @@ enum ActivityCategory: String, Codable, CaseIterable {
                let cat = ActivityCategory(rawValue: category) {
                 return cat
             }
+        }
+        
+        return .uncategorized
+    }
+    
+    static func categorize(_ transaction: Transaction) -> ActivityCategory {
+        if transaction.category == "Amusement" || transaction.category == "Arts" || transaction.category == "Alcohol & Bars" || transaction.category == "Coffee Shops" {
+            return .social
+        } else if transaction.category == "Fast Food" || transaction.category == "Restaurants" || transaction.category == "Food & Dining" {
+            return .meal
+        } else if transaction.category == "Dentist" || transaction.category == "Doctor" {
+            return .health
+        } else if transaction.category == "Hair" || transaction.category == "Spa & Massage" || transaction.category == "Personal Care" {
+            return .personal
+        } else if transaction.category == "Pet Grooming" || transaction.category == "Veterinary" {
+            return .family
+        } else if transaction.category == "Groceries" {
+            return .todo
         }
         
         return .uncategorized

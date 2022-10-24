@@ -961,7 +961,7 @@ func updateTransactionWRule(transaction: Transaction, transactionRules: [Transac
 }
 
 //transactions that involve doing something with your time e.g. dining out, grabbing drinks, groceries
-var financialTransactionCategoriesAssociatedWithEvents = ["Gas", "Public Transportation", "Amusement", "Arts", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Restaurants", "Food & Dining", "Dentist", "Doctor", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Rental Car & Taxi", "Groceries"]
+var financialTransactionCategoriesAssociatedWithEvents = ["Amusement", "Arts", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Restaurants", "Food & Dining", "Dentist", "Doctor", "Hair", "Spa & Massage", "Personal Care", "Pet Grooming", "Veterinary", "Groceries"]
 
 //recurring transaction(bills)
 var financialTransactionCategoriesAssociatedWithRecurringCosts = ["Auto Insurance", "Domain Names", "Hosting", "Internet", "Television", "Utilities", "Bills & Utilities", "Tuition", "Life Insurance", "Health Insurance", "Home Insurance", "Mortgage & Rent", "Child Support", "Paycheck"]
@@ -979,9 +979,6 @@ func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @e
         //amount period to period differs
         //transactions.filter({ abs($0.amount) == abs(transaction.amount) }).count == 1,
         if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), abs(transaction.amount) > 0 {
-            print(transaction.description)
-            print(transaction.amount)
-            print(transaction.transacted_at)
             TaskBuilder.createActivityWithList(from: transaction) { task in
                 if let task = task {
                     completion([transaction:task])
@@ -995,6 +992,15 @@ func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @e
                     completion([transaction:task])
                 }
             }
+        }
+    }
+}
+
+func categorizeTransactionsIntoEvents(transactions: [Transaction], completion: @escaping ([Transaction: Activity]) -> Void) {
+    for transaction in transactions {
+        guard transaction.status == .posted else { continue }
+        if financialTransactionCategoriesAssociatedWithEvents.contains(transaction.category), !transaction.transacted_at.contains("12:00:00"), abs(transaction.amount) > 0, let event = EventBuilder.createActivity(from: transaction) {
+            completion([transaction:event])
         }
     }
 }
@@ -1030,17 +1036,6 @@ func getMostFrequentDaysBetweenRecurringTransactions(transactions: [Transaction]
 ////            }
 //        }
 //    }
-    
-
-//        if transaction.status == .pending, financialTransactionCategoriesAssociatedWithEvents.contains(transaction.category), abs(transaction.amount) > 0, let event = EventBuilder.createActivity(from: transaction) {
-//            print("event via financialTransactionCategoriesAssociatedWithEvents")
-//            print(transaction.description)
-//            print(transaction.amount)
-//            print(transaction.group)
-//            print(transaction.top_level_category)
-//            print(transaction.category)
-//            print(event.startDate)
-//        } else
 
 func containsWord(str: String, wordGroups: [String]) -> Bool {
     // Get all the words from your input string

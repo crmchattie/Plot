@@ -13,11 +13,15 @@ let userActivitySubcategoriesEntity = "user-activities-subcategories"
 
 private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
                            "Mindfulness": ["mindfulness", "meditation"],
+                           "Wedding": ["wedding"],
                            "Social": ["party", "birthday"],
                            "Family": ["family"],
-                           "Personal": ["appointment", "consultation", "therapy", "haircut", "dr", "doctor"],
+                           "Doctor": ["appointment", "therapy", "dr", "doctor"],
+                           "Personal": ["consultation", "haircut", "read", "journal"],
                            "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation"],
-                           "Leisure": ["trip", "vacation"]
+                           "Leisure": ["trip", "vacation"],
+                           "Bills": ["bill", "payment"],
+                           "Kids": ["kids"]
 ]
 
 enum ActivitySubcategory: String, Codable, CaseIterable {
@@ -102,6 +106,23 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
             }
         }
         
+        return .uncategorized
+    }
+    
+    static func categorize(_ transaction: Transaction) -> ActivitySubcategory {
+        if transaction.category == "Amusement" || transaction.category == "Arts" || transaction.category == "Alcohol & Bars" || transaction.category == "Coffee Shops" {
+            return .social
+        } else if transaction.category == "Fast Food" || transaction.category == "Restaurants" || transaction.category == "Food & Dining" {
+            return .meal
+        } else if transaction.category == "Dentist" || transaction.category == "Doctor" {
+            return .doctor
+        } else if transaction.category == "Hair" || transaction.category == "Spa & Massage" || transaction.category == "Personal Care" {
+            return .personal
+        } else if transaction.category == "Pet Grooming" || transaction.category == "Veterinary" {
+            return .pets
+        } else if transaction.category == "Groceries" {
+            return .errand
+        }
         return .uncategorized
     }
 }

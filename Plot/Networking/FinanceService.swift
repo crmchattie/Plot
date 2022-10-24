@@ -324,6 +324,7 @@ class FinanceService {
             } else {
                 completion()
             }
+            self?.createEventsFromTransactions(transactions: transactionsInitialAdd)
             self?.createTasksFromTransactions(transactions: transactionsInitialAdd)
             self?.createFutureTasksFromRecurringTransactions(transactions: transactionsInitialAdd)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
@@ -341,6 +342,7 @@ class FinanceService {
                     }
                 }
             }
+            self?.createEventsFromTransactions(transactions: transactionsAdded)
             self?.createTasksFromTransactions(transactions: transactionsAdded)
             self?.createFutureTasksFromRecurringTransactions(transactions: transactionsAdded)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
@@ -543,13 +545,49 @@ class FinanceService {
         }
     }
     
-    private func updateTransactionCreateTaskContainer(transaction: Transaction, activity: Activity) {
+    private func updateTransactionCreateContainer(transaction: Transaction, activity: Activity) {
         let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
         activityActions.createNewActivity()
         
-        let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-        let container = Container(id: containerID, activityIDs: nil, taskIDs: [activity.activityID ?? ""], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: [transaction.guid], participantsIDs: transaction.participantsIDs)
-        ContainerFunctions.updateContainerAndStuffInside(container: container)
+        if activity.isTask ?? false {
+            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+            let container = Container(id: containerID, activityIDs: nil, taskIDs: [activity.activityID ?? ""], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: [transaction.guid], participantsIDs: transaction.participantsIDs)
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
+        } else {
+            let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+            let container = Container(id: containerID, activityIDs: [activity.activityID ?? ""], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: [transaction.guid], participantsIDs: transaction.participantsIDs)
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
+        }
+    }
+    
+    private func createEventsFromTransactions(transactions: [Transaction]) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let userReference = Database.database().reference().child(userFinancialTransactionsEventsEntity).child(currentUserID)
+        
+        userReference.observeSingleEvent(of: .value) { dataSnapshot in
+            if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: String] {
+                categorizeTransactionsIntoEvents(transactions: transactions) { [self] transactionsActivities in
+                    for (transaction, activity) in transactionsActivities {
+                        if dataSnapshotValue[transaction.guid] == nil, let activityID = activity.activityID {
+                            userReference.child(transaction.guid).setValue(activityID)
+                            self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
+                        }
+                    }
+                }
+            } else {
+                categorizeTransactionsIntoEvents(transactions: transactions) { transactionsActivities in
+                    for (transaction, activity) in transactionsActivities {
+                        if let activityID = activity.activityID {
+                            userReference.child(transaction.guid).setValue(activityID)
+                            self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private func createTasksFromTransactions(transactions: [Transaction]) {
@@ -567,7 +605,7 @@ class FinanceService {
                         if dataSnapshotValue[transaction.guid] == nil, let activityID = activity.activityID {
                             userReference.child(transaction.guid).setValue(activityID)
                             reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
-                            self.updateTransactionCreateTaskContainer(transaction: transaction, activity: activity)
+                            self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                         }
                     }
                 }
@@ -577,7 +615,7 @@ class FinanceService {
                         if let activityID = activity.activityID {
                             userReference.child(transaction.guid).setValue(activityID)
                             reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
-                            self.updateTransactionCreateTaskContainer(transaction: transaction, activity: activity)
+                            self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                         }
                     }
                 }
@@ -636,7 +674,7 @@ class FinanceService {
                                         createTransaction.createNewTransaction()
 
                                         userReference.child(newTransaction.guid).setValue(activityID)
-                                        self.updateTransactionCreateTaskContainer(transaction: newTransaction, activity: task)
+                                        self.updateTransactionCreateContainer(transaction: newTransaction, activity: task)
                                     }
                                 }
                             }
@@ -693,14 +731,14 @@ class FinanceService {
                             var days = 0
                             if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
                                 days = mostFrequentDays
-                            } else if let second = isodateFormatter.date(from: filteredTransactions[1].transacted_at), let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
+                            } else if let second = isodateFormatter.date(from: secondTransaction.transacted_at), let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
                                 days = Calendar.current.numberOfDaysBetween(third, and: second)
                             }
                             let newDate = first.addDays(days)
                             if newDate > Date() {
                                 let averageAmount = filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count)
                                 let newDateString = isodateFormatter.string(from: newDate)
-                                var newTransaction = filteredTransactions[0]
+                                var newTransaction = firstTransaction
                                 let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
                                 newTransaction.guid = ID
                                 newTransaction.description = newTransaction.description + " (Expected)"
@@ -714,7 +752,7 @@ class FinanceService {
                                         createTransaction.createNewTransaction()
 
                                         userReference.child(newTransaction.guid).setValue(activityID)
-                                        self.updateTransactionCreateTaskContainer(transaction: newTransaction, activity: task)
+                                        self.updateTransactionCreateContainer(transaction: newTransaction, activity: task)
                                     }
                                 }
                             }

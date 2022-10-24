@@ -629,7 +629,6 @@ class ActivityService {
     
     func observeListsForCurrentUser() {
         self.listFetcher.observeListForCurrentUser(listInitialAdd: { [weak self] listInitialAdd in
-            print("listInitialAdd")
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listInitialAdd {
@@ -645,7 +644,6 @@ class ActivityService {
                 self?.grabListTasks()
             }
         }, listAdded: { [weak self] listAdded in
-            print("listAdded")
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listAdded {
@@ -668,7 +666,6 @@ class ActivityService {
                 self?.lists[ListSourceOptions.plot.name] = plotLists
             }
         }, listChanged: { [weak self] listChanged in
-            print("listChanged")
             if self?.lists[ListSourceOptions.plot.name] != nil {
                 var plotLists = self?.lists[ListSourceOptions.plot.name]
                 for list in listChanged {

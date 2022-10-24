@@ -85,6 +85,7 @@ class EKReminderTaskOp: AsyncOperation {
             activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
             activity.activityType = CustomType.iOSCalendarEvent.categoryText
             activity.category = ActivityCategory.categorize(activity).rawValue
+            activity.subcategory = ActivitySubcategory.categorize(activity).rawValue
             activity.showExtras = false
             completion(activity)
         }

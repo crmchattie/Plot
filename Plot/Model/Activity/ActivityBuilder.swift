@@ -110,6 +110,8 @@ class EventBuilder {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = transaction.description
         activity.isEvent = true
+        activity.category = ActivityCategory.categorize(transaction).rawValue
+        activity.subcategory = ActivitySubcategory.categorize(transaction).rawValue
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
         activity.startDateTime = NSNumber(value: Int(start.timeIntervalSince1970))
