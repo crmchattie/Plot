@@ -42,7 +42,13 @@ extension EventCell {
             invitationSegmentedControl.isHidden = true
         }
         
-        if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue) {
+        if let subcategoryValue = activity.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue) {
+            activityTypeButton.setImage(subcategory.icon, for: .normal)
+            if subcategory == .uncategorized {
+                activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+            }
+            activityTypeLabel.text = subcategory.rawValue
+        } else if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "event"), for: .normal)

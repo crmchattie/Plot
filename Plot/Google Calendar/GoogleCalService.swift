@@ -151,8 +151,15 @@ class GoogleCalService {
     }
     
     func updateEvent(for activity: Activity, span: EKSpan) {
-        guard let service = self.calendarService, let eventID = activity.externalActivityID, let calendarID = activity.calendarID, let startDate = activity.startDate, let endDate = activity.endDate, let start = dateToGLTRDate(date: startDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")), let end = dateToGLTRDate(date: endDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.endTimeZone ?? "UTC")), let name = activity.name else {
+        guard let service = self.calendarService, let eventID = activity.externalActivityID, let startDate = activity.startDate, let endDate = activity.endDate, let start = dateToGLTRDate(date: startDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")), let end = dateToGLTRDate(date: endDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.endTimeZone ?? "UTC")), let name = activity.name else {
             return
+        }
+        
+        var calendarID = String()
+        if activity.calendarSource == CalendarSourceOptions.plot.name, let calendar = plotGoogleCalendar {
+            calendarID = calendar
+        } else if let calendar = activity.calendarID {
+            calendarID = calendar
         }
         
         if span == .futureEvents {
@@ -160,7 +167,7 @@ class GoogleCalService {
             
             service.executeQuery(eventQuery, completionHandler: { (ticket, result, error) in
                 guard error == nil, let event = result as? GTLRCalendar_Event else {
-                    print("failed to grab event \(String(describing: error))")
+                    print("failed to update/grab FUTURE event \(String(describing: error))")
                     return
                 }
                 
@@ -180,7 +187,7 @@ class GoogleCalService {
             let instancesQuery = GTLRCalendarQuery_EventsInstances.query(withCalendarId: calendarID, eventId: eventID)
             service.executeQuery(instancesQuery, completionHandler: { (ticket, result, error) in
                 guard error == nil, let events = result as? GTLRCalendar_Events, let instances = events.items else {
-                    print("failed to grab event \(String(describing: error))")
+                    print("failed to update/grab THIS event \(String(describing: error))")
                     return
                 }
                 
@@ -203,8 +210,15 @@ class GoogleCalService {
     }
     
     func deleteEvent(for activity: Activity) {
-        guard let service = self.calendarService, let eventID = activity.externalActivityID, let calendarID = activity.calendarID else {
+        guard let service = self.calendarService, let eventID = activity.externalActivityID else {
             return
+        }
+        
+        var calendarID = String()
+        if activity.calendarSource == CalendarSourceOptions.plot.name, let calendar = plotGoogleCalendar {
+            calendarID = calendar
+        } else if let calendar = activity.calendarID {
+            calendarID = calendar
         }
         
         let eventQuery = GTLRCalendarQuery_EventsDelete.query(withCalendarId: calendarID, eventId: eventID)
@@ -374,8 +388,15 @@ class GoogleCalService {
     }
     
     func updateTask(for activity: Activity) {
-        guard let service = self.taskService, let taskID = activity.externalActivityID, let listID = activity.listID, let name = activity.name else {
+        guard let service = self.taskService, let taskID = activity.externalActivityID, let name = activity.name else {
             return
+        }
+        
+        var listID = String()
+        if activity.listSource == ListSourceOptions.plot.name, let list = plotGoogleList {
+            listID = list
+        } else if let list = activity.listID {
+            listID = list
         }
         
         let taskQuery = GTLRTasksQuery_TasksGet.query(withTasklist: listID, task: taskID)
@@ -410,8 +431,15 @@ class GoogleCalService {
     }
     
     func deleteTask(for activity: Activity) {
-        guard let service = self.taskService, let taskID = activity.externalActivityID, let listID = activity.listID else {
+        guard let service = self.taskService, let taskID = activity.externalActivityID else {
             return
+        }
+        
+        var listID = String()
+        if activity.listSource == ListSourceOptions.plot.name, let list = plotGoogleList {
+            listID = list
+        } else if let list = activity.listID {
+            listID = list
         }
         
         let taskQuery = GTLRTasksQuery_TasksDelete.query(withTasklist: listID, task: taskID)

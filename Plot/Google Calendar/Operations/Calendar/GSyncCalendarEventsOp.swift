@@ -32,12 +32,14 @@ class GSyncCalendarEventsOp: AsyncOperation {
             }
         }
         
-        for (_, events) in calendarEventsDict {
-            for activity in existingActivities {
-                if !events.contains(where: { $0.identifier == activity.externalActivityID }) {
-                    let op = GDeletePlotActivityOp(activity: activity)
-                    queue.addOperation(op)
-                }
+        var events = [GTLRCalendar_Event]()
+        for (_, eventList) in calendarEventsDict {
+            events.append(contentsOf: eventList)
+        }
+        for activity in existingActivities {
+            if !events.contains(where: { $0.identifierClean == activity.externalActivityID }) {
+                let op = GDeletePlotActivityOp(activity: activity)
+                queue.addOperation(op)
             }
         }
         

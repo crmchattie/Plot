@@ -132,6 +132,8 @@ class ActivitiesFetcher: NSObject {
         
         currentUserActivitiesAddHandle = userActivitiesDatabaseRef.observe(.childAdded, with: { snapshot in
             if self.userActivities[snapshot.key] == nil {
+                print("childAdded")
+                print(snapshot)
                 if let completion = self.activitiesAdded, let completionRepeats = self.activitiesWithRepeatsAdded {
                     var handle = UInt.max
                     let ID = snapshot.key
@@ -172,8 +174,8 @@ class ActivitiesFetcher: NSObject {
                 }
             }
         })
-        
         currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
+            print(snapshot)
             if let completion = self.activitiesRemoved {
                 self.userActivities[snapshot.key] = nil
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
@@ -181,6 +183,7 @@ class ActivitiesFetcher: NSObject {
         })
         
         currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
+            print(snapshot)
             if let completion = self.activitiesChanged, let completionRepeats = self.activitiesWithRepeatsAdded {
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key) { activityList in
                     for activity in activityList {

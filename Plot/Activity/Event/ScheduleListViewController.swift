@@ -272,7 +272,7 @@ extension ScheduleListViewController: ChooseActivityDelegate {
         if let _ = mergeActivity.name, let currentUserID = Auth.auth().currentUser?.uid {
             ParticipantsFetcher.getParticipants(forActivity: mergeActivity) { (participants) in
                 let deleteActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-                deleteActivity.deleteActivity()
+                deleteActivity.deleteActivity(updateExternal: false)
             }
             
             mergeActivity.participantsIDs = [currentUserID]

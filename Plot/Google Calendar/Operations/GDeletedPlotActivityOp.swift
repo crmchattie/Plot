@@ -28,7 +28,7 @@ class GDeletePlotActivityOp: AsyncOperation {
         
         ParticipantsFetcher.getParticipants(forActivity: activity) { [weak self] users in
             let activityAction = ActivityActions(activity: self!.activity, active: true, selectedFalconUsers: users)
-            activityAction.deleteActivity()
+            activityAction.deleteActivity(updateExternal: false)
             self?.finish()
         }
     }

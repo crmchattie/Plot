@@ -158,6 +158,7 @@
 		108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */; };
 		10920EAD290455DA0069F027 /* EKDeletePlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10920EAC290455DA0069F027 /* EKDeletePlotActivityOp.swift */; };
 		10920EAF290463160069F027 /* GDeletedPlotActivityOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10920EAE290463160069F027 /* GDeletedPlotActivityOp.swift */; };
+		10920EB12906F1F90069F027 /* GoogleCal+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10920EB02906F1F90069F027 /* GoogleCal+Utility.swift */; };
 		1092E25A28B6F2B50018FCAA /* EKFetchReminderTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25928B6F2B50018FCAA /* EKFetchReminderTasksOp.swift */; };
 		1092E25C28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */; };
 		1092E25E28B6F2EA0018FCAA /* EKReminderTaskOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */; };
@@ -750,6 +751,7 @@
 		108C380628AC487400DC4998 /* TaskViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskViewController+Extensions.swift"; sourceTree = "<group>"; };
 		10920EAC290455DA0069F027 /* EKDeletePlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKDeletePlotActivityOp.swift; sourceTree = "<group>"; };
 		10920EAE290463160069F027 /* GDeletedPlotActivityOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDeletedPlotActivityOp.swift; sourceTree = "<group>"; };
+		10920EB02906F1F90069F027 /* GoogleCal+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoogleCal+Utility.swift"; sourceTree = "<group>"; };
 		1092E25928B6F2B50018FCAA /* EKFetchReminderTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKFetchReminderTasksOp.swift; sourceTree = "<group>"; };
 		1092E25B28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKSyncReminderTasksOp.swift; sourceTree = "<group>"; };
 		1092E25D28B6F2EA0018FCAA /* EKReminderTaskOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKReminderTaskOp.swift; sourceTree = "<group>"; };
@@ -1284,6 +1286,7 @@
 				1034A07725C84FCC006D3DB8 /* GoogleCalManager.swift */,
 				1034A07D25C84FF0006D3DB8 /* GoogleCalService.swift */,
 				1034A08125C8507A006D3DB8 /* GoogleCalSetupAssistant.swift */,
+				10920EB02906F1F90069F027 /* GoogleCal+Utility.swift */,
 			);
 			path = "Google Calendar";
 			sourceTree = "<group>";
@@ -3574,6 +3577,7 @@
 				26317C30251DB250007CC315 /* WorkoutOperation.swift in Sources */,
 				10196F0724411B5600B6AFDF /* SelectActivityMembersViewController.swift in Sources */,
 				4BAEE5E4212735E50045AB10 /* EnterVerificationContainerView+timerHandlers.swift in Sources */,
+				10920EB12906F1F90069F027 /* GoogleCal+Utility.swift in Sources */,
 				10DFC3E3255C495800565DAD /* FinancialTransactionRulesViewController.swift in Sources */,
 				10EE27F3245DFA8E00C80AAF /* PackinglistViewController.swift in Sources */,
 				108087272585059E00FB9BB0 /* SleepActions.swift in Sources */,

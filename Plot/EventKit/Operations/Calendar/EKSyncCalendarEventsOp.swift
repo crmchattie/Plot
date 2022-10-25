@@ -30,7 +30,7 @@ class EKSyncCalendarEventsOp: AsyncOperation {
         }
         
         for activity in existingActivities {
-            if !events.contains(where: { $0.calendarItemIdentifier == activity.externalActivityID }) {
+            if !events.contains(where: { $0.calendarItemExternalIdentifierClean.removeCharacters() == activity.externalActivityID }) {
                 let op = EKDeletePlotActivityOp(activity: activity)
                 queue.addOperation(op)
             }

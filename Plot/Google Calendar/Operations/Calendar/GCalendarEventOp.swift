@@ -24,21 +24,21 @@ class GCalendarEventOp: AsyncOperation {
     }
     
     private func startRequest() {
-        guard let currentUserID = Auth.auth().currentUser?.uid, let iCalUID = event.iCalUID, let id = event.identifier else {
+        guard let currentUserID = Auth.auth().currentUser?.uid, let id = event.identifierClean else {
             self.finish()
             return
         }
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(iCalUID.removeCharacters())
+        
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(id)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             if snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] {
-                let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID)
-                activityDataReference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
+                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+                activityReference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
                     guard snapshot.exists(), let activitySnapshotValue = snapshot.value, let activity = try? FirebaseDecoder().decode(Activity.self, from: activitySnapshotValue) else {
                         self?.finish()
                         return
                     }
                     self?.update(activity: activity, completion: { activity in
-                        let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
                         activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                             var values: [String : Any] = ["calendarExport": true,
@@ -57,73 +57,37 @@ class GCalendarEventOp: AsyncOperation {
                     })
                 })
             }
-            else if !snapshot.exists(), let weakSelf = self {
-                let newReference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(iCalUID.removeCharacters())
-                newReference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
-                    if snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"], weakSelf.event.originalStartTime == nil {
-                        
-                        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                        reference.updateChildValues(calendarEventActivityValue)
-                        
-                        let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID)
-                        activityDataReference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
-                            guard snapshot.exists(), let activitySnapshotValue = snapshot.value, let activity = try? FirebaseDecoder().decode(Activity.self, from: activitySnapshotValue) else {
-                                self?.finish()
-                                return
+            else if !snapshot.exists() {
+                guard let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key, let weakSelf = self else {
+                    self?.finish()
+                    return
+                }
+                let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
+                reference.updateChildValues(calendarEventActivityValue) { (_, _) in
+                    weakSelf.createActivity(for: activityID) { activity in
+                        let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+                        activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
+                            let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
+                            var values: [String : Any] = ["isGroupActivity": false,
+                                                          "badge": 0,
+                                                          "calendarExport": true,
+                                                          "calendarID": self?.calendar.identifier as Any,
+                                                          "calendarName": self?.calendar.summary as Any,
+                                                          "calendarSource": CalendarSourceOptions.google.name as Any,
+                                                          "externalActivityID": id as Any,
+                                                          "showExtras": activity.showExtras as Any]
+                            if let value = self?.calendar.backgroundColor {
+                                values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
                             }
-                            self?.update(activity: activity, completion: { activity in
-                                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                                activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                                    let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
-                                    var values: [String : Any] = ["calendarExport": true,
-                                                                  "calendarID": self?.calendar.identifier as Any,
-                                                                  "calendarName": self?.calendar.summary as Any,
-                                                                  "calendarSource": CalendarSourceOptions.google.name as Any,
-                                                                  "externalActivityID": id as Any,
-                                                                  "showExtras": activity.showExtras as Any]
-                                    if let value = self?.calendar.backgroundColor {
-                                        values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
-                                    }
-                                    userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
-                                        self?.finish()
-                                    })
-                                })
+                            userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
+                                self?.finish()
                             })
                         })
                     }
-                    else if !snapshot.exists() {
-                        guard let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key else {
-                            self?.finish()
-                            return
-                        }
-                        let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
-                        reference.updateChildValues(calendarEventActivityValue) { (_, _) in
-                            weakSelf.createActivity(for: activityID) { activity in
-                                let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                                activityReference.updateChildValues(activity.toAnyObject(), withCompletionBlock: { [weak self] (error, reference) in
-                                    let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
-                                    var values: [String : Any] = ["isGroupActivity": false,
-                                                                  "badge": 0,
-                                                                  "calendarExport": true,
-                                                                  "calendarID": self?.calendar.identifier as Any,
-                                                                  "calendarName": self?.calendar.summary as Any,
-                                                                  "calendarSource": CalendarSourceOptions.google.name as Any,
-                                                                  "externalActivityID": self?.event.identifier as Any,
-                                                                  "showExtras": activity.showExtras as Any]
-                                    if let value = self?.calendar.backgroundColor {
-                                        values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
-                                    }
-                                    userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
-                                        self?.finish()
-                                    })
-                                })
-                            }
-                        }
-                    }
-                    else {
-                        self?.finish()
-                    }
-                })
+                }
+            }
+            else {
+                self?.finish()
             }
         })
     }
@@ -142,7 +106,7 @@ class GCalendarEventOp: AsyncOperation {
     }
     
     private func update(activity: Activity, completion: @escaping (Activity) -> Void) {
-        if event.originalStartTime == nil {
+        if event.originalStartTime == nil, !(event.hasIntervalKey) {
             activity.name = event.summary
             activity.isEvent = true
             if let descriptionProperty = event.descriptionProperty {
@@ -241,12 +205,12 @@ class GCalendarEventOp: AsyncOperation {
     }
     
     private func deleteActivity() {
-        guard let currentUserID = Auth.auth().currentUser?.uid, let iCalUID = event.iCalUID else {
+        guard let currentUserID = Auth.auth().currentUser?.uid, let id = event.identifierClean else {
             self.finish()
             return
         }
         
-        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(iCalUID.removeCharacters())
+        let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(id)
         reference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
             guard snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"] else {
                 self?.finish()

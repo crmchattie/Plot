@@ -293,7 +293,7 @@ extension SubtaskListViewController: ChooseTaskDelegate {
         if let _ = mergeTask.name, let currentUserID = Auth.auth().currentUser?.uid {
             ParticipantsFetcher.getParticipants(forActivity: mergeTask) { (participants) in
                 let deleteActivity = ActivityActions(activity: mergeTask, active: true, selectedFalconUsers: participants)
-                deleteActivity.deleteActivity()
+                deleteActivity.deleteActivity(updateExternal: false)
             }
             
             mergeTask.participantsIDs = [currentUserID]

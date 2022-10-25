@@ -1053,7 +1053,7 @@ extension EventViewController {
                     if dateIndex == 0 {
                         self.showActivityIndicator()
                         let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                        deleteActivity.deleteActivity()
+                        deleteActivity.deleteActivity(updateExternal: true)
                         self.hideActivityIndicator()
                         if self.navigationItem.leftBarButtonItem != nil {
                             self.dismiss(animated: true, completion: nil)
@@ -1083,7 +1083,7 @@ extension EventViewController {
                 print("Save for this event only")
                 self.showActivityIndicator()
                 let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                deleteActivity.deleteActivity()
+                deleteActivity.deleteActivity(updateExternal: true)
                 self.hideActivityIndicator()
                 if self.navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)

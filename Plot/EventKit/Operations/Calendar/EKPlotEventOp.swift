@@ -41,7 +41,7 @@ class EKPlotEventOp: AsyncOperation {
                     let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                     reference.child(event.calendarItemExternalIdentifierClean.removeCharacters()).updateChildValues(calendarEventActivityValue) { (_, _) in
                         let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
-                        let values:[String : Any] = ["externalActivityID": event.calendarItemIdentifier as Any]
+                        let values:[String : Any] = ["externalActivityID": event.calendarItemExternalIdentifierClean.removeCharacters() as Any]
                         userReference.updateChildValues(values)
                         dispatchGroup.leave()
                     }

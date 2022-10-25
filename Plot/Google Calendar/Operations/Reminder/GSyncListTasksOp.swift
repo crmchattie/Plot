@@ -32,12 +32,14 @@ class GSyncListTasksOp: AsyncOperation {
             }
         }
         
-        for (_, tasks) in listTasksDict {
-            for activity in existingActivities {
-                if !tasks.contains(where: { $0.identifier == activity.externalActivityID }) {
-                    let op = GDeletePlotActivityOp(activity: activity)
-                    queue.addOperation(op)
-                }
+        var tasks = [GTLRTasks_Task]()
+        for (_, taskList) in listTasksDict {
+            tasks.append(contentsOf: taskList)
+        }
+        for activity in existingActivities {
+            if !tasks.contains(where: { $0.identifier == activity.externalActivityID }) {
+                let op = GDeletePlotActivityOp(activity: activity)
+                queue.addOperation(op)
             }
         }
         

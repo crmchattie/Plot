@@ -692,7 +692,7 @@ class FinanceService {
                                         if let activity = activities.first {
                                             ParticipantsFetcher.getParticipants(forTransaction: transaction) { users in
                                                 let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                activityAction.deleteActivity()
+                                                activityAction.deleteActivity(updateExternal: true)
                                             }
                                         }
                                     }
