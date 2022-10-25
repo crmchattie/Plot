@@ -755,7 +755,7 @@ class ActivityService {
     
     func grabCalendarEvents() {
         if let plotCalendars = self.calendars[CalendarSourceOptions.plot.name] {
-            activitiesFetcher.grabActivitiesViaCalendar(calendars: plotCalendars) { [weak self]  activities in
+            activitiesFetcher.grabActivitiesViaCalendar(calendars: plotCalendars) { [weak self] activities in
                 self?.activities.append(contentsOf: activities)
             }
         }

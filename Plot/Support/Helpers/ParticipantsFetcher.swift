@@ -19,7 +19,7 @@ class ParticipantsFetcher: NSObject {
         var participants: [User] = []
         for id in participantsIDs {
             // Only if the current user is created this activity
-            if id == currentUserID {
+            if id == currentUserID || id.isEmpty {
                 continue
             }
             
@@ -80,7 +80,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -113,7 +113,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -145,7 +145,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -177,7 +177,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -209,7 +209,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -241,7 +241,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -273,7 +273,7 @@ class ParticipantsFetcher: NSObject {
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -304,7 +304,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -328,7 +328,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -352,7 +352,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 
@@ -376,7 +376,7 @@ class ParticipantsFetcher: NSObject {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID {
+                if id == currentUserID || id.isEmpty {
                     continue
                 }
                 

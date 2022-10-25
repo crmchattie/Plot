@@ -256,42 +256,51 @@ class FinancialTransactionFetcher: NSObject {
         let group = DispatchGroup()
         let filteredAccounts = accounts.filter({ $0.admin != currentUserID })
         for account in filteredAccounts {
+            print(account.name)
             group.enter()
             let reference = Database.database().reference()
-            reference.child(financialTransactionsEntity).queryOrdered(byChild: "account_guid").queryEqual(toValue: account.guid).observeSingleEvent(of: .childAdded, with: { (snapshot) in
-                if snapshot.exists(), let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshot), self.userTransactions[transaction.guid] == nil, let admin = transaction.admin {
-                    self.getUserDataFromSnapshotViaUser(ID: transaction.guid, userID: admin) { transactionList in
-                        if let userTransaction = transactionList.first {
-                            var _transaction = transaction
-                            if let value = userTransaction.description {
-                                _transaction.description = value
+            reference.child(financialTransactionsEntity).queryOrdered(byChild: "account_guid").queryEqual(toValue: account.guid).observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
+                    for (ID, transactionValue) in snapshotValue {
+                        if self.userTransactions[ID] == nil, let transaction = try? FirebaseDecoder().decode(Transaction.self, from: transactionValue), let admin = transaction.admin {
+                            group.enter()
+                            self.getUserDataFromSnapshotViaUser(ID: transaction.guid, userID: admin) { transactionList in
+                                if let userTransaction = transactionList.first {
+                                    var _transaction = transaction
+                                    if let value = userTransaction.description {
+                                        _transaction.description = value
+                                    }
+                                    if let value = userTransaction.group {
+                                        _transaction.group = value
+                                    }
+                                    if let value = userTransaction.top_level_category {
+                                        _transaction.top_level_category = value
+                                    }
+                                    if let value = userTransaction.category {
+                                        _transaction.category = value
+                                    }
+                                    if let value = userTransaction.tags {
+                                        _transaction.tags = value
+                                    }
+                                    if let value = userTransaction.should_link {
+                                        _transaction.should_link = value
+                                    }
+                                    if let value = userTransaction.date_for_reports, value != "" {
+                                        _transaction.date_for_reports = value
+                                    }
+                                    transactions.append(_transaction)
+                                }
+                                group.leave()
                             }
-                            if let value = userTransaction.group {
-                                _transaction.group = value
-                            }
-                            if let value = userTransaction.top_level_category {
-                                _transaction.top_level_category = value
-                            }
-                            if let value = userTransaction.category {
-                                _transaction.category = value
-                            }
-                            if let value = userTransaction.tags {
-                                _transaction.tags = value
-                            }
-                            if let value = userTransaction.should_link {
-                                _transaction.should_link = value
-                            }
-                            if let value = userTransaction.date_for_reports, value != "" {
-                                _transaction.date_for_reports = value
-                            }
-                            transactions.append(_transaction)
                         }
                     }
                 }
+                group.leave()
             })
         }
         
         group.notify(queue: .global()) {
+            print("group.notify(queue: .global())")
             completion(transactions)
         }
     }
