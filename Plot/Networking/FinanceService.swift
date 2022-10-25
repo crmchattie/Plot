@@ -664,6 +664,7 @@ class FinanceService {
                                 let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
                                 newTransaction.guid = ID
                                 newTransaction.description = newTransaction.description + " (Expected)"
+                                newTransaction.status = .pending
                                 newTransaction.plot_created = true
                                 newTransaction.amount = averageAmount
                                 newTransaction.transacted_at = newDateString
@@ -742,6 +743,7 @@ class FinanceService {
                                 let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
                                 newTransaction.guid = ID
                                 newTransaction.description = newTransaction.description + " (Expected)"
+                                newTransaction.status = .pending
                                 newTransaction.plot_created = true
                                 newTransaction.amount = averageAmount
                                 newTransaction.transacted_at = newDateString

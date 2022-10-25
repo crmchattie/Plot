@@ -119,6 +119,7 @@ class EventCell: UITableViewCell {
         button.setImage(UIImage(named: "event"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .systemBlue
         return button
     }()
     
@@ -200,6 +201,7 @@ class EventCell: UITableViewCell {
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
         activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+        activityTypeButton.tintColor = .systemBlue
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
@@ -335,6 +337,7 @@ class EventCollectionCell: UICollectionViewCell {
         button.setImage(UIImage(named: "event"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .systemBlue
         return button
     }()
     
@@ -428,6 +431,7 @@ class EventCollectionCell: UICollectionViewCell {
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
         activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+        activityTypeButton.tintColor = .systemBlue
     }
     
     override var isHighlighted: Bool {

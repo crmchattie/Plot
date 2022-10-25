@@ -24,7 +24,7 @@ enum filter: String {
     //health
     case healthCategory, workoutCategory
     //finance
-    case financeAccount, financeLevel
+    case financeAccount, financeLevel, showPendingTransactions
     //task
     case taskCategory, showCompletedTasks, showRecurringTasks, taskSort
     
@@ -59,6 +59,7 @@ enum filter: String {
         case .workoutCategory: return "Health"
         case .financeAccount: return "Finance"
         case .financeLevel: return "Finance"
+        case .showPendingTransactions: return "Finance"
         case .taskCategory: return "Tasks"
         case .showCompletedTasks: return "Tasks"
         case .showRecurringTasks: return "Tasks"
@@ -97,6 +98,7 @@ enum filter: String {
         case .workoutCategory: return "multiple"
         case .financeAccount: return "multiple"
         case .financeLevel: return "single"
+        case .showPendingTransactions: return "single"
         case .taskCategory: return "multiple"
         case .showCompletedTasks: return "single"
         case .showRecurringTasks: return "single"
@@ -131,6 +133,7 @@ enum filter: String {
         case .workoutCategory: return "Categories"
         case .financeAccount: return "Accounts"
         case .financeLevel: return "Level"
+        case .showPendingTransactions: return "Show"
         case .taskCategory: return "Categories"
         case .showCompletedTasks: return "Show"
         case .showRecurringTasks: return "Show"
@@ -165,6 +168,7 @@ enum filter: String {
         case .workoutCategory: return "Filter based on workout categories"
         case .financeAccount: return "Filter based on account(s) included"
         case .financeLevel: return "Filter cash flow/balances sections based on level of detail shown"
+        case .showPendingTransactions: return "Show Pending Transactions or Not"
         case .taskCategory: return "Filter based on categories"
         case .showCompletedTasks: return "Show Completed Tasks or Not"
         case .showRecurringTasks: return "Show Recurring Tasks or Not"
@@ -211,6 +215,7 @@ enum filter: String {
         case .showRecurringTasks: return ["Yes", "No"]
         case .financeAccount: return []
         case .financeLevel: return ["All", "Top"]
+        case .showPendingTransactions: return ["Yes", "No"]
         case .taskSort: return ["Due Date", "Priority", "Title"]
         }
     }

@@ -137,14 +137,7 @@ extension TaskCollectionCell {
             activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
-        
-        activityTypeButton.tintColor = .systemBlue
-        if let color = task.listColor {
-            print(task.listName)
-            print(task.listColor)
-            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-        }
-        
+                
         let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         

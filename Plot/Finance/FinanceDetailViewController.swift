@@ -102,7 +102,7 @@ class FinanceDetailViewController: UIViewController {
             }
             self.sections.append(.transactions)
             self.groups[.transactions] = filteredTransactions
-            filters = [.search, .financeAccount, .startDate, .endDate]
+            filters = [.search, .financeAccount, .showPendingTransactions, .startDate, .endDate]
             
         } else if setSections.contains(.financialAccounts) {
             self.sections.append(.financialAccounts)
@@ -232,6 +232,14 @@ class FinanceDetailViewController: UIViewController {
                     filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
                         accounts.contains(transaction.account_guid ?? "")
                     })
+                }
+                if let value = filterDictionary["showPendingTransactions"] {
+                    let bool = value[0].lowercased()
+                    if bool == "no" {
+                        filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
+                            transaction.status == .posted
+                        })
+                    }
                 }
                 if let filterStartDate = filterDictionary["startDate"], let filterEndDate = filterDictionary["endDate"] {
                     startDate = isodateFormatter.date(from: filterStartDate[0]) ?? Date.distantPast

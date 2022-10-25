@@ -59,7 +59,6 @@ extension EventCell {
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
         
-        activityTypeButton.tintColor = .systemBlue
         if let color = activity.calendarColor {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
@@ -175,7 +174,6 @@ extension EventCollectionCell {
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
         
-        activityTypeButton.tintColor = .systemBlue
         if let color = activity.calendarColor {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }

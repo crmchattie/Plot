@@ -69,6 +69,7 @@ final class SubtaskCell: Cell<Activity>, CellType {
     let checkImage: UIImageView = {
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.tintColor = .systemBlue
         return view
     }()
     

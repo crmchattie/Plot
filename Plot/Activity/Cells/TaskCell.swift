@@ -104,6 +104,7 @@ class TaskCell: UITableViewCell {
         button.setImage(UIImage(named: "task"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .systemBlue
         return button
     }()
     
@@ -207,6 +208,7 @@ class TaskCell: UITableViewCell {
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
         activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
+        activityTypeButton.tintColor = .systemBlue
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
@@ -324,6 +326,7 @@ class TaskCollectionCell: UICollectionViewCell {
         button.setImage(UIImage(named: "task"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .systemBlue
         return button
     }()
     
@@ -438,6 +441,7 @@ class TaskCollectionCell: UICollectionViewCell {
         muteIndicator.isHidden = true
         nameLabel.textColor = .label
         activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
+        activityTypeButton.tintColor = .systemBlue
     }
     
     override var isHighlighted: Bool {

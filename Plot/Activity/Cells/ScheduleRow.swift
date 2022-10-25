@@ -52,6 +52,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         let button = UIButton(type: .system)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .systemBlue
         return button
     }()
     
@@ -117,7 +118,6 @@ final class ScheduleCell: Cell<Activity>, CellType {
             activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
         }
         
-        activityTypeButton.tintColor = .systemBlue
         if let color = schedule.calendarColor {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
