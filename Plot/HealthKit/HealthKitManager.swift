@@ -124,16 +124,16 @@ class HealthKitManager {
             self?.queue.addOperations([workoutMinutesOp, annualAverageStepsOperation, groupOperation, adapter, flightsClimbedOperation, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
             
             if #available(iOS 14.0, *) {
-                for workout in HKWorkoutActivityType.allCases {
-                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
+                for index in 0...HKWorkoutActivityType.allCases.count - 1 {
+                    let op = WorkoutOperation(date: futureDay, workoutActivityType: HKWorkoutActivityType.allCases[index], rank: index + 1)
                     op.delegate = self
                     op.lastSyncDate = lastSyncDate
                     self?.queue.addOperations([op], waitUntilFinished: false)
                 }
             } else {
                 // Fallback on earlier versions
-                for workout in HKWorkoutActivityType.oldAllCases {
-                    let op = WorkoutOperation(date: futureDay, workoutActivityType: workout, rank: Int(workout.rawValue))
+                for index in 0...HKWorkoutActivityType.oldAllCases.count - 1 {
+                    let op = WorkoutOperation(date: futureDay, workoutActivityType: HKWorkoutActivityType.oldAllCases[index], rank: index + 1)
                     op.delegate = self
                     op.lastSyncDate = lastSyncDate
                     self?.queue.addOperations([op], waitUntilFinished: false)

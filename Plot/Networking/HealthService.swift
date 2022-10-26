@@ -78,7 +78,6 @@ class HealthService {
     var isRunning: Bool = true
     
     func grabHealth(_ completion: @escaping () -> Void) {
-        print("grabHealth")
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.askedforAuthorization = askedforAuthorization
