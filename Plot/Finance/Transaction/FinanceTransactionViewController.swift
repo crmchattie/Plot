@@ -388,6 +388,8 @@ class FinanceTransactionViewController: FormViewController {
                 $0.hidden = "$splitNumber == nil || $splitNumber == 0"
                 if let splitNumber = transaction.splitNumber, splitNumber != 0 {
                     $0.value = transaction.amount / Double(splitNumber)
+                } else if let participantsIDs = transaction.participantsIDs, participantsIDs.count > 1 {
+                    $0.value = transaction.amount / Double(participantsIDs.count)
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground

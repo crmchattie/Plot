@@ -535,6 +535,9 @@ class FinanceService {
                                     if let activity = activities.first, !(activity.isCompleted ?? false) {
                                         let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                         activityAction.updateCompletion(isComplete: true)
+                                        let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                                        let container = Container(id: containerID, activityIDs: nil, taskIDs: [activity.activityID ?? ""], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: transactions.map({$0.guid}), participantsIDs: activity.participantsIDs)
+                                        ContainerFunctions.updateContainerAndStuffInside(container: container)
                                     }
                                 }
                             }
@@ -548,7 +551,6 @@ class FinanceService {
     private func updateTransactionCreateContainer(transaction: Transaction, activity: Activity) {
         let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
         activityActions.createNewActivity()
-        
         if activity.isTask ?? false {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             let container = Container(id: containerID, activityIDs: nil, taskIDs: [activity.activityID ?? ""], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: [transaction.guid], participantsIDs: transaction.participantsIDs)

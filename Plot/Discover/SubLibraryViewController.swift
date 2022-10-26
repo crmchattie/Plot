@@ -135,7 +135,6 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
                 cell.firstPosition = true
             }
             if indexPath.item == totalItems {
-                print(totalItems)
                 cell.lastPosition = true
             }
             cell.template = object
@@ -177,10 +176,11 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         self.diffableDataSource.apply(snapshot)
                                 
         for section in sections {
-            filteredTemplates = filteredTemplates.sorted(by: { $0.name < $1.name })
-            snapshot.appendSections([section])
-            snapshot.appendItems(filteredTemplates, toSection: section)
-            self.diffableDataSource.apply(snapshot)
+            if let object = groups[section] {
+                snapshot.appendSections([section])
+                snapshot.appendItems(object, toSection: section)
+                self.diffableDataSource.apply(snapshot)
+            }
         }
     }
     
@@ -271,6 +271,7 @@ extension SubLibraryViewController: GIDSignInDelegate {
 
 extension SubLibraryViewController: UpdateDiscover {
     func itemCreated() {
+        self.navigationItem.searchController?.isActive = false
         self.dismiss(animated: true)
         self.updateDiscoverDelegate?.itemCreated()
     }
@@ -285,8 +286,8 @@ extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDeleg
         searchBar.resignFirstResponder()
         timer?.invalidate()
         filteredTemplates = templates
+        groups[.templates] = filteredTemplates
         self.viewPlaceholder.remove(from: self.collectionView, priority: .medium)
-        
         setupData()
     }
     
@@ -298,7 +299,7 @@ extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDeleg
                 }
                 return false
         })
-        
+        groups[.templates] = filteredTemplates
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
@@ -307,7 +308,6 @@ extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDeleg
             } else {
                 self.viewPlaceholder.remove(from: self.collectionView, priority: .medium)
             }
-            
             self.setupData()
         })
     }
@@ -342,6 +342,8 @@ extension SubLibraryViewController { /* hiding keyboard */
         } else {
             filteredTemplates = templates
         }
+        groups[.templates] = filteredTemplates
+        
         timer?.invalidate()
         if self.filteredTemplates.count == 0 {
             self.viewPlaceholder.add(for: self.collectionView, title: .emptySearchTemplate, subtitle: .empty, priority: .medium, position: .fill)

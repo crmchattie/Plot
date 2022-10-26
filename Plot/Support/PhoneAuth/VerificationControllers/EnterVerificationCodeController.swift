@@ -123,11 +123,9 @@ class EnterVerificationCodeController: UIViewController {
             do {
                 let phoneNumber = try self.phoneNumberKit.parse(self.enterVerificationContainerView.titleNumber.text!)
                 phoneNumberForFB = self.phoneNumberKit.format(phoneNumber, toType: .e164)
-                print("do")
                 print(phoneNumberForFB)
             } catch {
                 phoneNumberForFB = self.enterVerificationContainerView.titleNumber.text!
-                print("catch")
                 print(phoneNumberForFB)
             }
             
