@@ -50,17 +50,16 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         contentView.addSubview(nameLabel)
         contentView.addSubview(participantsLabal)
         contentView.addSubview(costLabel)
-        
-        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
-        
+                
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: costLabel.leftAnchor, constant: -5).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
         
-        costLabel.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor).isActive = true
+        costLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
+        costLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         costLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
         
-        participantsLabal.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
+        participantsLabal.topAnchor.constraint(equalTo: costLabel.bottomAnchor, constant: 2).isActive = true
         participantsLabal.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         participantsLabal.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         participantsLabal.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
@@ -76,7 +75,7 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         
         // set the texts to the labels
         nameLabel.text = transaction.description
-        costLabel.text = String(format: "$%.02f", transaction.amount)
+        costLabel.text = "Amount: " + String(format: "$%.02f", transaction.amount)
 //        if let purchaseRowCount = transaction.splitNumber {
 //            participantsLabal.text = "Purchase split by \(purchaseRowCount)"
 //        } else if let participants = transaction.participantsIDs, participants.count > 1 {

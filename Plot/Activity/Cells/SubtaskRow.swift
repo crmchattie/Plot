@@ -86,16 +86,14 @@ final class SubtaskCell: Cell<Activity>, CellType {
         contentView.addSubview(locationNameLabel)
         contentView.addSubview(checkView)
         checkView.addSubview(checkImage)
-        
-        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
-        
+                
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.leftAnchor, constant: -5).isActive = true
+        nameLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.leftAnchor, constant: -10).isActive = true
         
         dateTimeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         dateTimeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
-        dateTimeLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.leftAnchor, constant: -5).isActive = true
+        dateTimeLabel.rightAnchor.constraint(lessThanOrEqualTo: checkView.leftAnchor, constant: -10).isActive = true
         dateTimeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         
         checkView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true

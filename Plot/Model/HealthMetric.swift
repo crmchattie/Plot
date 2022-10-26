@@ -129,7 +129,6 @@ enum HealthMetricCategory: String {
     case workoutsList
     case mindfulnessList
     
-    
     var rank: Int {
         get {
             switch self {

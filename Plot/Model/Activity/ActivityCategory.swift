@@ -53,6 +53,22 @@ enum ActivityCategory: String, Codable, CaseIterable {
         }
     }
     
+    var iconString: String {
+        switch self {
+        case .health: return "heart-filled"
+        case .meal: return "food"
+        case .work: return "work"
+        case .school: return "school"
+        case .social: return "nightlife"
+        case .leisure: return "leisure"
+        case .family: return "family"
+        case .personal: return "personal"
+        case .todo: return "todo"
+        case .finances: return "money"
+        case .uncategorized: return "event"
+        }
+    }
+    
     // MARK: - Utility
     static func categorize(_ activity: Activity) -> ActivityCategory {
         let text = "\(activity.name?.lowercased() ?? "") \(activity.notes?.lowercased() ?? "") \(activity.activityDescription?.lowercased() ?? "")"

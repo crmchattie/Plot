@@ -66,9 +66,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
         contentView.addSubview(dateTimeLabel)
         contentView.addSubview(locationNameLabel)
         contentView.addSubview(activityTypeButton)
-        
-        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
-        
+                
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true

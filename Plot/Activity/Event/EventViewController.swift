@@ -46,8 +46,6 @@ class EventViewController: FormViewController {
     var purchaseUsers = [User]()
     var userInvitationStatus: [String: Status] = [:]
     let avatarOpener = AvatarOpener()
-    var locationName : String = "locationName"
-    var locationAddress = [String : [Double]]()
     var scheduleList = [Activity]()
     var container: Container!
     var purchaseList = [Transaction]()
@@ -109,11 +107,6 @@ class EventViewController: FormViewController {
             }
             if activity.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 activity.admin = currentUserID
-            }
-            if let localName = activity.locationName, localName != "locationName", let localAddress = activity.locationAddress {
-                locationName = localName
-                locationAddress = localAddress
-                //                self.weatherRow()
             }
             setupLists()
             resetBadgeForSelf()

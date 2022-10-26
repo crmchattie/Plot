@@ -105,6 +105,7 @@ extension TaskViewController: UpdateSubtaskListDelegate {
             } else {
                 row.value = "0"
             }
+            row.updateCell()
         }
         self.subtaskList = subtaskList
         sortSubtasks()
@@ -319,6 +320,7 @@ extension TaskViewController: UpdateMediaDelegate {
             } else {
                 row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
             }
+            row.updateCell()
         }
     }
 }
@@ -331,6 +333,7 @@ extension TaskViewController: UpdateActivityListDelegate {
             } else {
                 row.value = String(listList.count)
             }
+            row.updateCell()
         }
         self.listList = listList
         self.updateLists(type: "lists")

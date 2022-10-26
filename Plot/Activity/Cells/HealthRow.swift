@@ -51,9 +51,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         contentView.addSubview(nameLabel)
         contentView.addSubview(subLabel)
         contentView.addSubview(activityTypeButton)
-        
-        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
-        
+                
         nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
@@ -61,6 +59,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         subLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         subLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15).isActive = true
         subLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15).isActive = true
+        subLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         
         activityTypeButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         activityTypeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true

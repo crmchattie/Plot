@@ -41,7 +41,7 @@ class ParticipantTableViewCell: UITableViewCell {
         subtitle.font = UIFont.preferredFont(forTextStyle: .subheadline)
         subtitle.adjustsFontForContentSizeCategory = true
         subtitle.textColor = .secondaryLabel
-        
+        subtitle.numberOfLines = 0
         return subtitle
     }()
     
@@ -57,8 +57,6 @@ class ParticipantTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-        contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 65).isActive = true
-        
         gestureReconizer = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
         addGestureRecognizer(gestureReconizer)
         
@@ -67,30 +65,23 @@ class ParticipantTableViewCell: UITableViewCell {
         icon.backgroundColor = backgroundColor
         
         contentView.addSubview(icon)
+        contentView.addSubview(title)
+        contentView.addSubview(subtitle)
+
         icon.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0).isActive = true
-        icon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
+        icon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         icon.widthAnchor.constraint(equalToConstant: 46).isActive = true
         icon.heightAnchor.constraint(equalToConstant: 46).isActive = true
         
-        contentView.addSubview(title)
-        title.topAnchor.constraint(equalTo: icon.topAnchor, constant: 0).isActive = true
-        title.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 15).isActive = true
-        title.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15).isActive = true
-        title.heightAnchor.constraint(equalToConstant: 23).isActive = true
+        title.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        title.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10).isActive = true
+        title.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         
-        contentView.addSubview(rightSubtitle)
-        contentView.addSubview(subtitle)
-        
-        subtitle.bottomAnchor.constraint(equalTo: icon.bottomAnchor, constant: 0).isActive = true
-        subtitle.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 15).isActive = true
-
-        subtitle.heightAnchor.constraint(equalToConstant: 23).isActive = true
-        
-        rightSubtitle.bottomAnchor.constraint(equalTo: icon.bottomAnchor, constant: 0).isActive = true
-        rightSubtitle.leadingAnchor.constraint(equalTo: subtitle.trailingAnchor, constant: 10).isActive = true
-        rightSubtitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        rightSubtitle.heightAnchor.constraint(equalToConstant: 23).isActive = true
-        
+        subtitle.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 2).isActive = true
+        subtitle.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10).isActive = true
+        subtitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        subtitle.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+                
     }
     
     required init?(coder aDecoder: NSCoder) {

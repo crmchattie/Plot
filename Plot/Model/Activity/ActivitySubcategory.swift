@@ -93,6 +93,42 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .notApplicable: return UIImage(named: "event")!
         }
     }
+    
+    var iconString: String {
+        switch self {
+        case .health: return "heart-filled"
+        case .meal: return "food"
+        case .work: return "work"
+        case .school: return "school"
+        case .social: return "nightlife"
+        case .leisure: return "leisure"
+        case .family: return "family"
+        case .personal: return "personal"
+        case .todo: return "todo"
+        case .finances: return "money"
+        case .uncategorized: return "event"
+        case .bills: return "transaction"
+        case .car: return "car"
+        case .chores: return "todo"
+        case .doctor: return "doctor"
+        case .entertainment: return "nightlife"
+        case .errand: return "todo"
+        case .home: return "home"
+        case .hygiene: return "hygiene"
+        case .kids: return "kids"
+        case .mindfulness: return "mindfulness"
+        case .moving: return "moving"
+        case .pets: return "pets"
+        case .savings: return "transaction"
+        case .shopping: return "shopping"
+        case .skill: return "school"
+        case .sleep: return "sleep"
+        case .travel: return "plane"
+        case .wedding: return "wedding"
+        case .workout: return "workout"
+        case .notApplicable: return "event"
+        }
+    }
         
     // MARK: - Utility
     static func categorize(_ activity: Activity) -> ActivitySubcategory {

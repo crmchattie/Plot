@@ -1925,7 +1925,6 @@
 			isa = PBXGroup;
 			children = (
 				2647B82D25131EBD0021E3B0 /* Operations */,
-				26C4431B250F0C9200A9533C /* Model */,
 				260C87C924FF5FE900715A64 /* HealthKitManager.swift */,
 				2623AA9124FB67BF0020A316 /* HealthKitService.swift */,
 				2623AA8F24FA2D9B0020A316 /* HealthKitSetupAssistant.swift */,
@@ -2017,14 +2016,6 @@
 				26B975E82364009C003BFBE3 /* InvitationCell.swift */,
 			);
 			path = Invitations;
-			sourceTree = "<group>";
-		};
-		26C4431B250F0C9200A9533C /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				26C4431C250F0CB000A9533C /* HealthMetric.swift */,
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		26E8E3A4238B2C81000F30C8 /* Notfications */ = {
@@ -2611,6 +2602,7 @@
 				4BAEE54A212735880045AB10 /* Message.swift */,
 				4BAEE54B212735880045AB10 /* User.swift */,
 				4BAEE54C212735880045AB10 /* MediaObject.swift */,
+				26C4431C250F0CB000A9533C /* HealthMetric.swift */,
 				109FEB4122A9C3DD00621D2F /* Purchase.swift */,
 				10EE27EE245C5B8000C80AAF /* Checklist.swift */,
 				10FBC8B624BFE58F00D0E6B5 /* Activitylist.swift */,

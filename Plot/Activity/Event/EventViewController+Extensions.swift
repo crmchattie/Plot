@@ -96,25 +96,15 @@ extension EventViewController: UpdateCalendarDelegate {
 extension EventViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         if let locationRow: LabelRow = form.rowBy(tag: "Location") {
-            self.locationAddress[self.locationName] = nil
-            if self.activity.locationAddress != nil {
-                self.activity.locationAddress![self.locationName] = nil
-            }
-            for (key, value) in locationAddress {
+            activity.locationName = nil
+            activity.locationAddress = nil
+            for (key, _) in locationAddress {
                 let newLocationName = key.removeCharacters()
                 locationRow.title = newLocationName
                 locationRow.updateCell()
-
-                self.locationName = newLocationName
-                self.locationAddress[newLocationName] = value
                 
-                self.activity.locationName = newLocationName
-                if activity.locationAddress == nil {
-                    self.activity.locationAddress = self.locationAddress
-                } else {
-                    self.activity.locationAddress![newLocationName] = value
-                }
-//                self.weatherRow()
+                activity.locationName = newLocationName
+                activity.locationAddress = locationAddress
             }
         }
     }
@@ -154,14 +144,10 @@ extension EventViewController: UpdateScheduleListDelegate {
             } else {
                 row.value = "0"
             }
+            row.updateCell()
         }
         self.scheduleList = scheduleList
         sortSchedule()
-        if let localAddress = activity.locationAddress {
-            for (key, value) in localAddress {
-                locationAddress[key] = value
-            }
-        }
         updateLists(type: "schedule")
     }
 }
@@ -369,6 +355,7 @@ extension EventViewController: UpdateMediaDelegate {
             } else {
                 row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
             }
+            row.updateCell()
         }
         let activityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         activityReference.updateChildValues(["activityPhotos": imageURLs as AnyObject])
@@ -384,6 +371,7 @@ extension EventViewController: UpdateActivityListDelegate {
             } else {
                 row.value = String(listList.count)
             }
+            row.updateCell()
         }
         self.listList = listList
         updateLists(type: "lists")

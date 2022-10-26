@@ -30,10 +30,6 @@ extension SelectParticipantsViewController: UITableViewDelegate, UITableViewData
         return sections[section].count
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
-    
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
 //        view.tintColor = .systemGroupedBackground
 //        if let headerTitle = view as? UITableViewHeaderFooterView {

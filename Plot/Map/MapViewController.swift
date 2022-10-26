@@ -306,6 +306,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                             type = "activity"
                         }
                         
+                        if let subcategoryValue = activity.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue) {
+                            type = subcategory.iconString
+                        } else if let categoryValue = activity.category, let category = ActivityCategory(rawValue: categoryValue) {
+                            type = category.iconString
+                        }
+                        
                         let annotation = CustomMapItemAnnotation()
                         let placemark = MKPlacemark(coordinate: .init(latitude: latitude, longitude: longitude))
                         let mapItem = MKMapItem(placemark: placemark)

@@ -28,8 +28,6 @@ class ScheduleViewController: FormViewController {
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
-    var locationName: String = "locationName"
-    var locationAddress = [String : [Double]]()
     var checklist: Checklist!
     var startDateTime: Date?
     var endDateTime: Date?
@@ -65,10 +63,6 @@ class ScheduleViewController: FormViewController {
                         selectedFalconUsers.append(user)
                     }
                 }
-            }
-            if let localName = schedule.locationName, localName != "locationName", let localAddress = schedule.locationAddress  {
-                locationName = localName
-                locationAddress = localAddress
             }
             setupLists()
             schedule.isSchedule = true
@@ -632,9 +626,6 @@ class ScheduleViewController: FormViewController {
             schedule.activityDescription = value
         }
 
-        schedule.locationName = self.locationName
-        schedule.locationAddress = self.locationAddress
-
         if let value = valuesDictionary["Transportation"] as? String {
             schedule.transportation = value
         }
@@ -855,7 +846,7 @@ class ScheduleViewController: FormViewController {
         
         let destination = MapViewController()
         destination.sections = [.event]
-        destination.locations = [.event: schedule]
+        destination.locations = [.event:  [schedule]]
         navigationController?.pushViewController(destination, animated: true)
         
     }
@@ -879,9 +870,11 @@ class ScheduleViewController: FormViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath,let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let locationName = schedule.locationName, let locationAddress = schedule.locationAddress, let longlat = locationAddress[locationName] else {
             return
         }
+        let latitude = longlat[0]
+        let longitude = longlat[1]
         let ceo: CLGeocoder = CLGeocoder()
         let loc: CLLocation = CLLocation(latitude:latitude, longitude: longitude)
         var addressString : String = ""
@@ -906,7 +899,10 @@ class ScheduleViewController: FormViewController {
                 addressString = addressString + place.postalCode!
             }
             
-            let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
+            let alertController = UIAlertController(title: locationName, message: addressString, preferredStyle: .alert)
+            let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
+                self.goToMap()
+            }
             let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
                 let pasteboard = UIPasteboard.general
                 pasteboard.string = addressString
@@ -916,9 +912,8 @@ class ScheduleViewController: FormViewController {
             }
             let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
                 if let locationRow: LabelRow = self.form.rowBy(tag: "Location") {
-                    self.locationAddress[self.locationName] = nil
-                    self.locationName = "locationName"
-                    self.schedule.locationName = "locationName"
+                    self.schedule.locationAddress = nil
+                    self.schedule.locationName = nil
                     locationRow.title = "Location"
                     locationRow.updateCell()
                 }
@@ -927,6 +922,7 @@ class ScheduleViewController: FormViewController {
                 
             }
             
+            alertController.addAction(mapAddress)
             alertController.addAction(copyAddress)
             alertController.addAction(changeAddress)
             alertController.addAction(removeAddress)
@@ -942,24 +938,15 @@ class ScheduleViewController: FormViewController {
 extension ScheduleViewController: UpdateLocationDelegate {
     func updateLocation(locationName: String, locationAddress: [String : [Double]], zipcode: String, city: String, state: String, country: String) {
         if let locationRow: LabelRow = form.rowBy(tag: "Location") {
-            self.locationAddress[self.locationName] = nil
-            if self.schedule.locationAddress != nil {
-                self.schedule.locationAddress![self.locationName] = nil
-            }
-            for (key, value) in locationAddress {
+            schedule.locationName = nil
+            schedule.locationAddress = nil
+            for (key, _) in locationAddress {
                 let newLocationName = key.removeCharacters()
                 locationRow.title = newLocationName
                 locationRow.updateCell()
-
-                self.locationName = newLocationName
-                self.locationAddress[newLocationName] = value
                 
-                self.schedule.locationName = newLocationName
-                if schedule.locationAddress == nil {
-                    self.schedule.locationAddress = self.locationAddress
-                } else {
-                    self.schedule.locationAddress![newLocationName] = value
-                }
+                schedule.locationName = newLocationName
+                schedule.locationAddress = locationAddress
             }
         }
     }

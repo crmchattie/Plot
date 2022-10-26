@@ -280,6 +280,7 @@ class SelectParticipantsViewController: UIViewController {
         tableView.setEditing(true, animated: false)
         tableView.register(ParticipantTableViewCell.self, forCellReuseIdentifier: falconUsersCellID)
         tableView.separatorStyle = .none
+        tableView.estimatedRowHeight = UITableView.automaticDimension
     }
     
     fileprivate func setupSearchController() {

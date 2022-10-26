@@ -97,7 +97,7 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
         navigationItem.rightBarButtonItem = doneBarButton
         
-        filteredTemplates = templates
+        filteredTemplates = templates.sorted(by: { $0.name < $1.name })
         setupData()
         setupSearchController()
     }

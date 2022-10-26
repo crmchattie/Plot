@@ -116,10 +116,11 @@ extension EventViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let latitude = locationAddress[locationName]?[0], let longitude = locationAddress[locationName]?[1] else {
+        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let locationName = activity.locationName, let locationAddress = activity.locationAddress, let longlat = locationAddress[locationName] else {
             return
         }
-        
+        let latitude = longlat[0]
+        let longitude = longlat[1]
         let ceo: CLGeocoder = CLGeocoder()
         let loc: CLLocation = CLLocation(latitude:latitude, longitude: longitude)
         var addressString : String = ""
@@ -144,7 +145,7 @@ extension EventViewController {
                 addressString = addressString + place.postalCode!
             }
             
-            let alertController = UIAlertController(title: self.locationName, message: addressString, preferredStyle: .alert)
+            let alertController = UIAlertController(title: locationName, message: addressString, preferredStyle: .alert)
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
                 self.goToMap()
             }
@@ -157,12 +158,10 @@ extension EventViewController {
             }
             let removeAddress = UIAlertAction(title: "Remove Address", style: .default) { (action:UIAlertAction) in
                 if let locationRow: LabelRow = self.form.rowBy(tag: "Location") {
-                    self.locationAddress[self.locationName] = nil
-                    if let localAddress = self.activity.locationAddress, localAddress[self.locationName] != nil {
-                        self.activity.locationAddress![self.locationName] = nil
+                    if let localAddress = self.activity.locationAddress, localAddress[locationName] != nil {
+                        self.activity.locationAddress![locationName] = nil
                     }
-                    self.activity.locationName = "locationName"
-                    self.locationName = "locationName"
+                    self.activity.locationName = nil
                     locationRow.title = "Location"
                     locationRow.updateCell()
                 }
@@ -270,64 +269,64 @@ extension EventViewController {
         }
     }
     
-    func weatherRow() {
-        if let localName = activity.locationName, localName != "locationName", Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval) > Date(), Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval) < Date().addingTimeInterval(1296000) {
-            var startDate = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
-            var endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
-            if startDate < Date() {
-                startDate = Date().addingTimeInterval(3600)
-            }
-            if endDate > Date().addingTimeInterval(1209600) {
-                endDate = Date().addingTimeInterval(1209600)
-            }
-            let startDateString = startDate.toString(dateFormat: "YYYY-MM-dd") + "T24:00:00Z"
-            let endDateString = endDate.toString(dateFormat: "YYYY-MM-dd") + "T00:00:00Z"
-            if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
-                let dispatchGroup = DispatchGroup()
-                dispatchGroup.enter()
-                Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
-                    if let weather = search {
-                        dispatchGroup.leave()
-                        dispatchGroup.notify(queue: .main) {
-                            weatherRow.value = weather
-                            weatherRow.updateCell()
-                            weatherRow.cell.collectionView.reloadData()
-                            self.weather = weather
-                        }
-                    } else if let index = weatherRow.indexPath?.item {
-                        dispatchGroup.leave()
-                        dispatchGroup.notify(queue: .main) {
-                            let section = self.form.allSections[0]
-                            section.remove(at: index)
-                        }
-                    }
-                }
-            } else if let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
-                let dispatchGroup = DispatchGroup()
-                dispatchGroup.enter()
-                Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
-                    if let weather = search {
-                        dispatchGroup.leave()
-                        dispatchGroup.notify(queue: .main) {
-                            var section = self.form.allSections[0]
-                            if let locationRow: LabelRow = self.form.rowBy(tag: "Location"), let index = locationRow.indexPath?.item {
-                                section.insert(WeatherRow("Weather") { row in
-                                    row.value = weather
-                                    row.updateCell()
-                                    row.cell.collectionView.reloadData()
-                                    self.weather = weather
-                                }, at: index+1)
-                            }
-                        }
-                    }
-                }
-            }
-        } else if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let index = weatherRow.indexPath?.item {
-            let section = self.form.allSections[0]
-            section.remove(at: index)
-            self.weather = [DailyWeatherElement]()
-        }
-    }
+//    func weatherRow() {
+//        if let localName = activity.locationName, localName != "locationName", Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval) > Date(), Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval) < Date().addingTimeInterval(1296000) {
+//            var startDate = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
+//            var endDate = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
+//            if startDate < Date() {
+//                startDate = Date().addingTimeInterval(3600)
+//            }
+//            if endDate > Date().addingTimeInterval(1209600) {
+//                endDate = Date().addingTimeInterval(1209600)
+//            }
+//            let startDateString = startDate.toString(dateFormat: "YYYY-MM-dd") + "T24:00:00Z"
+//            let endDateString = endDate.toString(dateFormat: "YYYY-MM-dd") + "T00:00:00Z"
+//            if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
+//                let dispatchGroup = DispatchGroup()
+//                dispatchGroup.enter()
+//                Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
+//                    if let weather = search {
+//                        dispatchGroup.leave()
+//                        dispatchGroup.notify(queue: .main) {
+//                            weatherRow.value = weather
+//                            weatherRow.updateCell()
+//                            weatherRow.cell.collectionView.reloadData()
+//                            self.weather = weather
+//                        }
+//                    } else if let index = weatherRow.indexPath?.item {
+//                        dispatchGroup.leave()
+//                        dispatchGroup.notify(queue: .main) {
+//                            let section = self.form.allSections[0]
+//                            section.remove(at: index)
+//                        }
+//                    }
+//                }
+//            } else if let localAddress = activity.locationAddress, let latitude = localAddress[locationName]?[0], let longitude = localAddress[locationName]?[1] {
+//                let dispatchGroup = DispatchGroup()
+//                dispatchGroup.enter()
+//                Service.shared.fetchWeatherDaily(startDateTime: startDateString, endDateTime: endDateString, lat: latitude, long: longitude, unit: "us") { (search, err) in
+//                    if let weather = search {
+//                        dispatchGroup.leave()
+//                        dispatchGroup.notify(queue: .main) {
+//                            var section = self.form.allSections[0]
+//                            if let locationRow: LabelRow = self.form.rowBy(tag: "Location"), let index = locationRow.indexPath?.item {
+//                                section.insert(WeatherRow("Weather") { row in
+//                                    row.value = weather
+//                                    row.updateCell()
+//                                    row.cell.collectionView.reloadData()
+//                                    self.weather = weather
+//                                }, at: index+1)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } else if let weatherRow: WeatherRow = self.form.rowBy(tag: "Weather"), let index = weatherRow.indexPath?.item {
+//            let section = self.form.allSections[0]
+//            section.remove(at: index)
+//            self.weather = [DailyWeatherElement]()
+//        }
+//    }
     
     func sortSchedule() {
         scheduleList.sort { (schedule1, schedule2) -> Bool in
@@ -1015,12 +1014,14 @@ extension EventViewController {
         destination.sections = [.event]
         var locations = [activity]
         
-        if locationAddress.count > 1 {
-            locations.append(contentsOf: scheduleList)
-            destination.locations = [.event: locations]
-        } else {
-            destination.locations = [.event: locations]
+        for schedule in scheduleList {
+            if schedule.locationName != nil, schedule.locationName != "locationName" {
+                locations.append(schedule)
+            }
         }
+        
+        destination.locations = [.event: locations]
+        
         navigationController?.pushViewController(destination, animated: true)
     }
     
