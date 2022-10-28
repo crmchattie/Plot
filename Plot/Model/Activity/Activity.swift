@@ -13,6 +13,7 @@ import CodableFirebase
 let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
 let userFavActivitiesEntity = "user-fav-activities"
+let directAssociationObjectIDEntity = "directAssociationObjectID"
 
 class Activity: NSObject, NSCopying, Codable {
     var activityID: String?
@@ -94,6 +95,9 @@ class Activity: NSObject, NSCopying, Codable {
     var instanceOriginalStartTimeZone: String?
     var instanceIDs: [String]?
     var instanceID: String?
+    var directAssociation: Bool?
+    var directAssociationObjectID: String?
+    var directAssociationType: ObjectType?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -146,6 +150,9 @@ class Activity: NSObject, NSCopying, Codable {
         case recurringEventID
         case instanceIDs
         case instanceID
+        case directAssociation
+        case directAssociationObjectID
+        case directAssociationType
     }
     
     init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool, createdDate: NSNumber) {
@@ -258,6 +265,11 @@ class Activity: NSObject, NSCopying, Codable {
         instanceOriginalStartTimeZone = dictionary?["instanceOriginalStartTimeZone"] as? String
         instanceIDs = dictionary?["instanceIDs"] as? [String]
         instanceID = dictionary?["instanceID"] as? String
+        directAssociation = dictionary?["directAssociation"] as? Bool
+        directAssociationObjectID = dictionary?["directAssociationObjectID"] as? String
+        if let value = dictionary?["directAssociationType"] as? String {
+            directAssociationType = ObjectType(rawValue: value)
+        }
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -553,6 +565,18 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["muted"] = value
         }
         
+        if let value = self.directAssociation as AnyObject? {
+            dictionary["directAssociation"] = value
+        }
+        
+        if let value = self.directAssociationObjectID as AnyObject? {
+            dictionary["directAssociationObjectID"] = value
+        }
+        
+        if let directAssociationType = self.directAssociationType, let value = directAssociationType.rawValue as AnyObject? {
+            dictionary["directAssociationType"] = value
+        }
+        
         return dictionary
     }
     
@@ -796,6 +820,18 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.instanceOriginalStartTimeZone = value
         }
         
+        if let value = updatingActivity.directAssociation {
+            newActivity.directAssociation = value
+        }
+        
+        if let value = updatingActivity.directAssociationObjectID {
+            newActivity.directAssociationObjectID = value
+        }
+        
+        if let value = updatingActivity.directAssociationType {
+            newActivity.directAssociationType = value
+        }
+        
         return newActivity
     }
     
@@ -1035,7 +1071,19 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.instanceOriginalStartTimeZone {
             self.instanceOriginalStartTimeZone = value
-        } 
+        }
+        
+        if let value = updatingActivity.directAssociation {
+            self.directAssociation = value
+        }
+        
+        if let value = updatingActivity.directAssociationObjectID {
+            self.directAssociationObjectID = value
+        }
+        
+        if let value = updatingActivity.directAssociationType {
+            self.directAssociationType = value
+        }
     }
     
     func getDifferenceBetweenActivitiesNewInstance(otherActivity: Activity) -> Activity {
@@ -1267,6 +1315,18 @@ class Activity: NSObject, NSCopying, Codable {
         
         if self.instanceOriginalStartTimeZone != otherActivity.instanceOriginalStartTimeZone {
             newActivity.instanceOriginalStartTimeZone = self.instanceOriginalStartTimeZone
+        }
+        
+        if self.directAssociation != otherActivity.directAssociation {
+            newActivity.directAssociation = self.directAssociation
+        }
+        
+        if self.directAssociationObjectID != otherActivity.directAssociationObjectID {
+            newActivity.directAssociationObjectID = self.directAssociationObjectID
+        }
+        
+        if self.directAssociationType != otherActivity.directAssociationType {
+            newActivity.directAssociationType = self.directAssociationType
         }
         
         return newActivity

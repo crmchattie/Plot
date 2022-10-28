@@ -20,10 +20,11 @@ class FinancialTransactionFetcher: NSObject {
     var transactionsInitialAdd: (([Transaction])->())?
     var transactionsAdded: (([Transaction])->())?
     var transactionsChanged: (([Transaction])->())?
+    var transactionsRemoved: (([Transaction])->())?
     
     var userTransactions: [String: UserTransaction] = [:]
         
-    func observeTransactionForCurrentUser(transactionsInitialAdd: @escaping ([Transaction])->(), transactionsAdded: @escaping ([Transaction])->(), transactionsChanged: @escaping ([Transaction])->()) {
+    func observeTransactionForCurrentUser(transactionsInitialAdd: @escaping ([Transaction])->(), transactionsAdded: @escaping ([Transaction])->(), transactionsRemoved: @escaping ([Transaction])->(), transactionsChanged: @escaping ([Transaction])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -34,6 +35,7 @@ class FinancialTransactionFetcher: NSObject {
         self.transactionsInitialAdd = transactionsInitialAdd
         self.transactionsAdded = transactionsAdded
         self.transactionsChanged = transactionsChanged
+        self.transactionsRemoved = transactionsRemoved
                 
         userTransactionsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
@@ -150,6 +152,13 @@ class FinancialTransactionFetcher: NSObject {
                         }
                     }
                 }
+            }
+        })
+        
+        currentUserTransactionsRemoveHandle = userTransactionsDatabaseRef.observe(.childRemoved, with: { snapshot in
+            if let completion = self.transactionsRemoved {
+                self.userTransactions[snapshot.key] = nil
+                FinancialTransactionFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
         

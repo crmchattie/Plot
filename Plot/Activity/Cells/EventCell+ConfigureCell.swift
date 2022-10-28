@@ -42,7 +42,7 @@ extension EventCell {
             invitationSegmentedControl.isHidden = true
         }
         
-        if let subcategoryValue = activity.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue) {
+        if let subcategoryValue = activity.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
             if subcategory == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
@@ -157,7 +157,7 @@ extension EventCollectionCell {
             invitationSegmentedControl.isHidden = true
         }
         
-        if let subcategoryValue = activity.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue) {
+        if let subcategoryValue = activity.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
             if subcategory == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "event"), for: .normal)

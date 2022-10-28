@@ -44,9 +44,9 @@ class EKCalendarEventOp: AsyncOperation {
                             if let calendar = self?.event.calendar {
                                 values["calendarID"] = calendar.calendarIdentifier as Any
                                 values["calendarName"] = calendar.title as Any
-                            }
-                            if let CGColor = self?.event.calendar.cgColor {
-                                values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                                if let CGColor = calendar.cgColor {
+                                    values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                                }
                             }
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
@@ -78,9 +78,9 @@ class EKCalendarEventOp: AsyncOperation {
                                     if let calendar = self?.event.calendar {
                                         values["calendarID"] = calendar.calendarIdentifier as Any
                                         values["calendarName"] = calendar.title as Any
-                                    }
-                                    if let CGColor = self?.event.calendar.cgColor {
-                                        values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                                        if let CGColor = calendar.cgColor {
+                                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                                        }
                                     }
                                     userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                         self?.finish()
@@ -106,9 +106,9 @@ class EKCalendarEventOp: AsyncOperation {
                                     if let calendar = self?.event.calendar {
                                         values["calendarID"] = calendar.calendarIdentifier as Any
                                         values["calendarName"] = calendar.title as Any
-                                    }
-                                    if let CGColor = self?.event.calendar.cgColor {
-                                        values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                                        if let CGColor = calendar.cgColor {
+                                            values["calendarColor"] = CIColor(cgColor: CGColor).stringRepresentation as Any
+                                        }
                                     }
                                     userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                         self?.finish()

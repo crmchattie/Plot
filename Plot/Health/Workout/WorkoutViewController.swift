@@ -82,7 +82,7 @@ class WorkoutViewController: FormViewController {
                     workout = Workout(fromTemplate: template)
                     workout.id = ID
                 } else {
-                    workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, user_created: true)
+                    workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, user_created: true, directAssociation: true, directAssociationType: .event)
                     //need to fix; sloppy code that is used to stop an event from being created
                     if let container = container {
                         workout.containerID = container.id
@@ -96,17 +96,22 @@ class WorkoutViewController: FormViewController {
         updateLength()
         
         if active {
-            for row in form.allRows {
-                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" && row.tag != "Body Weight" && row.tag != "Name" {
-                    row.baseCell.isUserInteractionEnabled = false
+            if !(workout.user_created ?? false) {
+                for row in form.allRows {
+                    if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" && row.tag != "Body Weight" && row.tag != "Name" {
+                        row.baseCell.isUserInteractionEnabled = false
+                    }
+                    if workout.hkSampleID == nil && row.tag == "Calories Burned"  {
+                        row.baseCell.isUserInteractionEnabled = true
+                    }
                 }
-                if workout.hkSampleID == nil && row.tag == "Calories Burned"  {
-                    row.baseCell.isUserInteractionEnabled = true
-                }
+            }
+            if workout.hkSampleID == nil, let section = form.first  {
+                section.footer?.title = "Hit the done button in the upper right corner to add to the health app if connected"
             }
         } else {
             if delegate == nil, let section = form.first {
-                section.footer?.title = "An associated event will be created along with this workout"
+                section.footer?.title = "This workout will be added to the health app if connected and will create an associated event as well"
             }
         }
     }
@@ -133,10 +138,14 @@ class WorkoutViewController: FormViewController {
         if !active {
             let plusBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = plusBarButton
-        } else {
+        } else if delegate != nil {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = plusBarButton
-            navigationItem.rightBarButtonItem?.isEnabled = true
+        } else if workout.user_created ?? false {
+            let dotsImage = UIImage(named: "dots")
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
         }
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
@@ -151,7 +160,7 @@ class WorkoutViewController: FormViewController {
     @objc fileprivate func create() {
         showActivityIndicator()
         let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-        createNewWorkout.createNewWorkout()
+        createNewWorkout.createNewWorkout(updateDirectAssociation: true)
         self.delegate?.updateWorkout(workout: self.workout)
         self.updateDiscoverDelegate?.itemCreated()
         self.hideActivityIndicator()
@@ -171,7 +180,7 @@ class WorkoutViewController: FormViewController {
                 self.showActivityIndicator()
                 self.updateLists()
                 let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createWorkout.createNewWorkout()
+                createWorkout.createNewWorkout(updateDirectAssociation: true)
                 self.hideActivityIndicator()
                 if self.navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)
@@ -193,7 +202,7 @@ class WorkoutViewController: FormViewController {
                     self.showActivityIndicator()
                     self.updateLists()
                     let createWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createWorkout.createNewWorkout()
+                    createWorkout.createNewWorkout(updateDirectAssociation: true)
                     
                     //duplicate workout
                     let newWorkoutID = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -203,7 +212,7 @@ class WorkoutViewController: FormViewController {
                     newWorkout.participantsIDs = nil
                     
                     let createNewWorkout = WorkoutActions(workout: newWorkout, active: false, selectedFalconUsers: [])
-                    createNewWorkout.createNewWorkout()
+                    createNewWorkout.createNewWorkout(updateDirectAssociation: false)
                     self.hideActivityIndicator()
                     
                     if self.navigationItem.leftBarButtonItem != nil {
@@ -229,12 +238,9 @@ class WorkoutViewController: FormViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        
-        
-        //        alert.addAction(UIAlertAction(title: "Share Grocery List", style: .default, handler: { (_) in
-        //            print("User click Edit button")
-        //            self.share()
-        //        }))
+        alert.addAction(UIAlertAction(title: "Delete Workout", style: .default, handler: { (_) in
+            self.delete()
+        }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -245,6 +251,29 @@ class WorkoutViewController: FormViewController {
         })
         print("shareButtonTapped")
         
+    }
+    
+    func delete() {
+        let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
+            self.showActivityIndicator()
+            let workoutAction = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            workoutAction.deleteWorkout(updateDirectAssociation: true)
+            self.hideActivityIndicator()
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func initializeForm() {

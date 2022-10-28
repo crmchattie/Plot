@@ -132,13 +132,18 @@ final class SubtaskCell: Cell<Activity>, CellType {
         let image = subtask.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
-        if let categoryValue = subtask.category, let category = ActivityCategory(rawValue: categoryValue) {
+        if let subcategoryValue = subtask.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
+            activityTypeButton.setImage(subcategory.icon, for: .normal)
+            if subcategory == .uncategorized {
+                activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+            }
+        } else if let categoryValue = subtask.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
-                activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
+                activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
             }
         } else {
-            activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
+            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
         }
         
         checkImage.tintColor = .secondaryLabel

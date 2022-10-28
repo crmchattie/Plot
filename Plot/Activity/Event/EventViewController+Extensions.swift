@@ -282,7 +282,6 @@ extension EventViewController: ChooseTransactionDelegate {
 
 extension EventViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
-        print("updateWorkout")
         var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
         if workout.name != "Name" {
             if healthList.indices.contains(healthIndex) {

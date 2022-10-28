@@ -118,6 +118,7 @@ enum ObjectType: String, Codable, CaseIterable {
     case task = "Task"
     case subtask = "Subtask"
     case workout = "Workout"
+    case mindfulness = "Mindfulness"
     case schedule = "Schedule"
 }
 

@@ -44,6 +44,44 @@ class HealthKitSampleBuilder {
         return hkWorkout
     }
     
+    class func editHKWorkout(from workout: Workout) -> HKWorkout? {
+        guard let hkSampleID = workout.hkSampleID, let uuid = UUID(uuidString: hkSampleID), let start = workout.startDateTime, let end = workout.endDateTime, let currentUserID = Auth.auth().currentUser?.uid else {
+            return nil
+        }
+        
+        let ref = Database.database().reference()
+        
+        ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(hkSampleID).child(identifierKey).removeValue()
+                
+        HealthKitService.deleteSample(sampleType: .workoutType(), uuid: uuid) { _,_ in }
+        
+        var totalEnergyBurned: HKQuantity?
+        if let cals = workout.totalEnergyBurned {
+            totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: cals)
+        }
+                
+        let hkWorkout = HKWorkout(
+            activityType: workout.hkWorkoutActivityType,
+            start: start,
+            end: end,
+            workoutEvents: nil,
+            totalEnergyBurned: totalEnergyBurned,
+            totalDistance: nil,
+            device: nil,
+            metadata: nil
+        )
+                
+        ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(hkWorkout.uuid.uuidString).child(identifierKey).setValue(workout.id)
+        
+        ref.child(userWorkoutsEntity).child(currentUserID).child(workout.id).child(hkSampleIDKey).setValue(hkWorkout.uuid.uuidString)
+        
+        HealthKitService.storeSample(sample: hkWorkout) { (_, _) in
+            NotificationCenter.default.post(name: .healthKitUpdated, object: nil)
+        }
+        
+        return hkWorkout
+    }
+    
     class func createHKMindfulness(from mindfulness: Mindfulness) -> HKCategorySample? {
         guard let start = mindfulness.startDateTime, let end = mindfulness.endDateTime, let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession), let currentUserID = Auth.auth().currentUser?.uid else {
             return nil
@@ -53,6 +91,30 @@ class HealthKitSampleBuilder {
         
         let ref = Database.database().reference()
         
+        ref.child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey).child(hkMindfulness.uuid.uuidString).child(identifierKey).setValue(mindfulness.id)
+        
+        ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulness.id).child(hkSampleIDKey).setValue(hkMindfulness.uuid.uuidString)
+        
+        HealthKitService.storeSample(sample: hkMindfulness) { (_, _) in
+            NotificationCenter.default.post(name: .healthKitUpdated, object: nil)
+        }
+        
+        return hkMindfulness
+    }
+    
+    class func editHKMindfulness(from mindfulness: Mindfulness) -> HKCategorySample? {
+        guard let hkSampleID = mindfulness.hkSampleID, let uuid = UUID(uuidString: hkSampleID), let categoryType = HKCategoryType.categoryType(forIdentifier: .mindfulSession), let start = mindfulness.startDateTime, let end = mindfulness.endDateTime, let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession), let currentUserID = Auth.auth().currentUser?.uid else {
+            return nil
+        }
+        
+        let ref = Database.database().reference()
+        
+        ref.child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey).child(hkSampleID).child(identifierKey).removeValue()
+                
+        HealthKitService.deleteSample(sampleType: categoryType, uuid: uuid) { _,_ in }
+        
+        let hkMindfulness = HKCategorySample(type: mindfulSessionType, value: 0, start: start, end: end)
+                
         ref.child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey).child(hkMindfulness.uuid.uuidString).child(identifierKey).setValue(mindfulness.id)
         
         ref.child(userMindfulnessEntity).child(currentUserID).child(mindfulness.id).child(hkSampleIDKey).setValue(hkMindfulness.uuid.uuidString)

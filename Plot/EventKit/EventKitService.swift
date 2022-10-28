@@ -90,7 +90,7 @@ class EventKitService {
         
         // Create the end date components.
         var timeFromNowComponents = DateComponents()
-        timeFromNowComponents.month = 6
+        timeFromNowComponents.month = 3
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date())
         
         // Create the predicate from the event store's instance method.
@@ -297,7 +297,7 @@ class EventKitService {
                 var filteredReminders = [EKReminder]()
                 //remove redunction reminders due to recurrences
                 for reminder in reminders as? [EKReminder] ?? [] {
-                    if !filteredReminders.contains(where: {$0.calendarItemIdentifier == reminder.calendarItemIdentifier} ) {
+                    if !filteredReminders.contains(where: {$0.calendarItemIdentifier == reminder.calendarItemIdentifier} ) && !reminder.isCompleted {
                         filteredReminders.append(reminder)
                     }
                 }

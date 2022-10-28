@@ -985,8 +985,9 @@ func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @e
                 }
             }
         }
+        
         //amount period to period is the same
-        else if transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortDayMonthAndYear() }).count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
+        else if transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortMonthAndYear() }).count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
             TaskBuilder.createActivityWithList(from: transaction) { task in
                 if let task = task {
                     completion([transaction:task])

@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import CodableFirebase
+import HealthKit
 
 class MindfulnessActions: NSObject {
     
@@ -28,12 +29,12 @@ class MindfulnessActions: NSObject {
     
     }
     
-    func deleteMindfulness() {
+    func deleteMindfulness(updateDirectAssociation: Bool) {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
         
-        guard let _ = active, let _ = mindfulness, let ID = ID, let _ = selectedFalconUsers else {
+        guard let _ = active, let _ = mindfulness, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
                           
@@ -57,10 +58,24 @@ class MindfulnessActions: NSObject {
                 reference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
             }
         })
+        
+        if updateDirectAssociation, mindfulness.directAssociation ?? false, let ID = mindfulness.directAssociationObjectID {
+            ActivitiesFetcher.getDataFromSnapshot(ID: ID) { activities in
+                if let activity = activities.first {
+                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: selectedFalconUsers)
+                    activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
+                }
+            }
+        }
+        
+        if let hkSampleID = mindfulness.hkSampleID, let uuid = UUID(uuidString: hkSampleID), let mindfulSessionType = HKObjectType.categoryType(forIdentifier: .mindfulSession) {
+            Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey).child(hkSampleID).child(identifierKey).removeValue()
+            HealthKitService.deleteSample(sampleType: mindfulSessionType, uuid: uuid) { _,_ in }
+        }
                 
     }
     
-    func createNewMindfulness() {
+    func createNewMindfulness(updateDirectAssociation: Bool) {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -93,10 +108,14 @@ class MindfulnessActions: NSObject {
         
         if mindfulness.hkSampleID == nil {
             createHealthKit()
+        } else if active, mindfulness.user_created ?? false {
+            editHealthKit()
         }
         
         if mindfulness.containerID == nil {
             createActivity()
+        } else if active, updateDirectAssociation {
+            editActivity()
         }
         
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
@@ -111,24 +130,36 @@ class MindfulnessActions: NSObject {
                 connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
             }
         } else {
+            
             Analytics.logEvent("update_mindfulness", parameters: [String: Any]())
         }
     }
     
     func createHealthKit() {
-        if let _ = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {
-            
-        }
+        if let _ = HealthKitSampleBuilder.createHKMindfulness(from: mindfulness) {}
+    }
+    
+    func editHealthKit() {
+        if let _ = HealthKitSampleBuilder.editHKMindfulness(from: mindfulness) {}
     }
     
     func createActivity() {
         if let activity = EventBuilder.createActivity(from: self.mindfulness), let activityID = activity.activityID {
+            Database.database().reference().child(mindfulnessEntity).child(mindfulness.id).child(directAssociationObjectIDEntity).setValue(activityID)
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
-            activityActions.createNewActivity()
+            activityActions.createNewActivity(updateDirectAssociation: false)
             //will update activity.containerID and mindfulness.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: nil, mindfulnessIDs: [mindfulness.id], mealIDs: nil, transactionIDs: nil, participantsIDs: mindfulness.participantsIDs)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
+        }
+    }
+    
+    func editActivity() {
+        if let activity = EventBuilder.createActivity(from: self.mindfulness), let ID = mindfulness.directAssociationObjectID {
+            activity.activityID = ID
+            let activityActions = ActivityActions(activity: activity, active: true, selectedFalconUsers: selectedFalconUsers ?? [])
+            activityActions.createNewActivity(updateDirectAssociation: false)
         }
     }
     

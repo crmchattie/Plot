@@ -94,7 +94,7 @@ class MealActions: NSObject {
             // Create activity
             if let activity = EventBuilder.createActivity(from: meal) {
                 let activityActions = ActivityActions(activity: activity, active: active, selectedFalconUsers: selectedFalconUsers)
-                activityActions.createNewActivity()
+                activityActions.createNewActivity(updateDirectAssociation: false)
             }
         } else {
             Analytics.logEvent("update_meal", parameters: [String: Any]())

@@ -955,7 +955,7 @@ extension EventViewController {
     func createActivity(activity: Activity?) {
         showActivityIndicator()
         let createActivity = ActivityActions(activity: activity ?? self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
-        createActivity.createNewActivity()
+        createActivity.createNewActivity(updateDirectAssociation: true)
         hideActivityIndicator()
         self.delegate?.updateActivity(activity: activity ?? self.activity)
         self.updateDiscoverDelegate?.itemCreated()
@@ -1054,7 +1054,7 @@ extension EventViewController {
                     if dateIndex == 0 {
                         self.showActivityIndicator()
                         let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                        deleteActivity.deleteActivity(updateExternal: true)
+                        deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)
                         self.hideActivityIndicator()
                         if self.navigationItem.leftBarButtonItem != nil {
                             self.dismiss(animated: true, completion: nil)
@@ -1084,7 +1084,7 @@ extension EventViewController {
                 print("Save for this event only")
                 self.showActivityIndicator()
                 let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                deleteActivity.deleteActivity(updateExternal: true)
+                deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)
                 self.hideActivityIndicator()
                 if self.navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)
@@ -1116,7 +1116,7 @@ extension EventViewController {
             }
             
             let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: selectedFalconUsers)
-            createActivity.createNewActivity()
+            createActivity.createNewActivity(updateDirectAssociation: true)
         }
     }
     

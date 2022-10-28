@@ -72,9 +72,9 @@ class HealthKitService {
     }
     
     class func getMostRecentSamples(for sampleType: HKSampleType,
-                                   startDate: Date,
-                                   endDate: Date,
-                                   completion: @escaping ([HKSample]?, Error?) -> Swift.Void) {
+                                    startDate: Date,
+                                    endDate: Date,
+                                    completion: @escaping ([HKSample]?, Error?) -> Swift.Void) {
         
         // Use HKQuery to load the most recent samples.
         let mostRecentPredicate = HKQuery.predicateForSamples(withStart: startDate,
@@ -90,7 +90,7 @@ class HealthKitService {
                                         predicate: mostRecentPredicate,
                                         limit: limit,
                                         sortDescriptors: [sortDescriptor]) { (query, samples, error) in
-                                            completion(samples, error)
+            completion(samples, error)
         }
         
         healthStore.execute(sampleQuery)
@@ -113,19 +113,19 @@ class HealthKitService {
                                         predicate: mostRecentPredicate,
                                         limit: Int(HKObjectQueryNoLimit),
                                         sortDescriptors: [sortDescriptor]) { (query, samples, error) in
-                                            completion(samples, error)
+            completion(samples, error)
         }
         
         healthStore.execute(sampleQuery)
     }
-
+    
     class func getIntervalBasedSamples(for quantityType: HKQuantityType,
                                        statisticsOptions: HKStatisticsOptions,
                                        startDate: Date, endDate: Date,
                                        anchorDate: Date,
                                        interval: DateComponents,
                                        completion: @escaping ([HKStatistics]?, Error?) -> Void) {
-         
+        
         // Create the query
         let query = HKStatisticsCollectionQuery(quantityType: quantityType,
                                                 quantitySamplePredicate: nil,
@@ -135,28 +135,28 @@ class HealthKitService {
         // Set the results handler
         query.initialResultsHandler = {
             query, results, error in
-                guard let statsCollection = results else {
-                    // Perform proper error handling here
-                    print("*** An error occurred while calculating the statistics: \(String(describing: error?.localizedDescription)) ***")
-                    completion(nil, nil)
-                    return
-                }
+            guard let statsCollection = results else {
+                // Perform proper error handling here
+                print("*** An error occurred while calculating the statistics: \(String(describing: error?.localizedDescription)) ***")
+                completion(nil, nil)
+                return
+            }
             
-                var data: [HKStatistics] = []
-                statsCollection.enumerateStatistics(from: startDate, to: endDate) {statistics, stop in
-                    data.append(statistics)
-                }
-                
-                completion(data, nil)
+            var data: [HKStatistics] = []
+            statsCollection.enumerateStatistics(from: startDate, to: endDate) {statistics, stop in
+                data.append(statistics)
+            }
+            
+            completion(data, nil)
         }
-         
+        
         healthStore.execute(query)
     }
     
     class func getCumulativeSumSampleAverageAndRecent(forIdentifier identifier: HKQuantityTypeIdentifier,
-                                      unit: HKUnit,
-                                      date: Date,
-                                      completion: @escaping (Double?, Double?, Date?) -> Void) {
+                                                      unit: HKUnit,
+                                                      date: Date,
+                                                      completion: @escaping (Double?, Double?, Date?) -> Void) {
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: date)
         let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
@@ -165,10 +165,10 @@ class HealthKitService {
     }
     
     class func getCumulativeSumSampleAverageAndRecent(forIdentifier identifier: HKQuantityTypeIdentifier,
-                                      unit: HKUnit,
-                                      startDate: Date,
-                                      endDate: Date,
-                                      completion: @escaping (Double?, Double?, Date?) -> Void) {
+                                                      unit: HKUnit,
+                                                      startDate: Date,
+                                                      endDate: Date,
+                                                      completion: @escaping (Double?, Double?, Date?) -> Void) {
         guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else {
             completion(nil, nil, nil)
             return
@@ -203,13 +203,13 @@ class HealthKitService {
             
             completion(total, recent, recentStatDate)
         }
-
+        
         healthStore.execute(query)
     }
     
     class func getLatestDiscreteDailyAverageSample(forIdentifier identifier: HKQuantityTypeIdentifier,
-                                      unit: HKUnit,
-                                      completion: @escaping (Double?, Date?) -> Void) {
+                                                   unit: HKUnit,
+                                                   completion: @escaping (Double?, Date?) -> Void) {
         let calendar = Calendar.current
         let endDate = Date()
         let startDate = calendar.date(byAdding: .year, value: -1, to: endDate)!
@@ -219,11 +219,11 @@ class HealthKitService {
     }
     
     class func getDiscreteAverageSample(forIdentifier identifier: HKQuantityTypeIdentifier,
-                                      unit: HKUnit,
-                                      startDate: Date,
-                                      endDate: Date,
-                                      interval: DateComponents,
-                                      completion: @escaping (Double?, Date?) -> Void) {
+                                        unit: HKUnit,
+                                        startDate: Date,
+                                        endDate: Date,
+                                        interval: DateComponents,
+                                        completion: @escaping (Double?, Date?) -> Void) {
         guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else {
             completion(nil, nil)
             return
@@ -247,14 +247,14 @@ class HealthKitService {
             let count = mostRecent?.averageQuantity()?.doubleValue(for: unit)
             completion(count, date)
         }
-
+        
         healthStore.execute(query)
     }
     
     class func getWorkouts(forWorkoutActivityType workoutActivityType: HKWorkoutActivityType,
-                              startDate: Date,
-                              endDate: Date,
-                              completion: @escaping ([HKWorkout]?, Error?) -> Void) {
+                           startDate: Date,
+                           endDate: Date,
+                           completion: @escaping ([HKWorkout]?, Error?) -> Void) {
         // Get all workouts with the given workoutActivityType
         let workoutPredicate = HKQuery.predicateForWorkouts(with: workoutActivityType)
         
@@ -262,7 +262,7 @@ class HealthKitService {
         
         // Combine the predicates into a single predicate.
         let compound = NSCompoundPredicate(andPredicateWithSubpredicates:
-            [workoutPredicate, datePredicate])
+                                            [workoutPredicate, datePredicate])
         
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate,
                                               ascending: true)
@@ -282,7 +282,7 @@ class HealthKitService {
                     
                     completion(samples, nil)
                 }
-        }
+            }
         
         healthStore.execute(query)
     }
@@ -303,7 +303,7 @@ class HealthKitService {
                 
                 // Combine the predicates into a single predicate.
                 let compound = NSCompoundPredicate(andPredicateWithSubpredicates:
-                    [workoutPredicate, datePredicate])
+                                                    [workoutPredicate, datePredicate])
                 
                 let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate,
                                                       ascending: true)
@@ -344,7 +344,7 @@ class HealthKitService {
                 
                 // Combine the predicates into a single predicate.
                 let compound = NSCompoundPredicate(andPredicateWithSubpredicates:
-                    [workoutPredicate, datePredicate])
+                                                    [workoutPredicate, datePredicate])
                 
                 let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate,
                                                       ascending: true)
@@ -379,19 +379,19 @@ class HealthKitService {
     }
     
     class func getAllCategoryTypeSamples(forIdentifier identifier: HKCategoryTypeIdentifier,
-                                      startDate: Date,
-                                      endDate: Date,
-                                      completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
-    
+                                         startDate: Date,
+                                         endDate: Date,
+                                         completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
+        
         guard let type = HKObjectType.categoryType(forIdentifier: identifier) else {
             completion(nil, nil)
             return
         }
         
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
-
+        
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
-
+        
         let query = HKSampleQuery(sampleType: type, predicate: predicate, limit: 0, sortDescriptors: [sortDescriptor]) { (query, result, error) in
             guard let result = result, error == nil else {
                 completion(nil, error)
@@ -401,14 +401,14 @@ class HealthKitService {
             let categorySamples = result.compactMap({ $0 as? HKCategorySample })
             completion(categorySamples, nil)
         }
-
+        
         // finally, we execute our query
         healthStore.execute(query)
     }
     
     class func getSummaryActivityData(startDate: Date,
-                              endDate: Date,
-                              completion: @escaping ([HKActivitySummary]?, Error?) -> Void) {
+                                      endDate: Date,
+                                      completion: @escaping ([HKActivitySummary]?, Error?) -> Void) {
         
         let calendar = Calendar.current
         var startComponents = calendar.dateComponents([.day, .month, .year], from: startDate)
@@ -435,16 +435,7 @@ class HealthKitService {
         healthStore.save(samples, withCompletion: completion)
     }
     
-    class func deleteSample(sample: HKSample, completion: @escaping (Bool, Error?) -> Void) {
-        healthStore.delete(sample, withCompletion: completion)
-    }
-    
-    class func deleteSamples(samples: [HKSample], completion: @escaping (Bool, Error?) -> Void) {
-        healthStore.delete(samples, withCompletion: completion)
-    }
-    
     class func grabSpecificWorkoutSample(uuid: UUID, completion: @escaping ([HKWorkout]?, Error?) -> Void) {
-        
         let predicate = HKQuery.predicateForObject(with: uuid)
         let workoutQuery = HKSampleQuery(
             sampleType: .workoutType(),
@@ -490,5 +481,45 @@ class HealthKitService {
             }
         
         healthStore.execute(workoutQuery)
+    }
+    
+    class func fetchHealthKitSample(for healthSampleType: HKSampleType, withPredicate predicate: NSPredicate, completion: @escaping (HKSample?, Error?) -> Swift.Void) {
+        
+        let query = HKSampleQuery(sampleType: healthSampleType, predicate: predicate, limit: 1, sortDescriptors: nil) { (query, samples, error) in
+            
+            if let error = error {
+                // Handler error
+                completion(nil,error)
+            } else {
+                guard let fetchedObject = samples?.first else {
+                    // Handler unexisting object
+                    completion(nil,nil)
+                    return
+                }
+                
+                completion(fetchedObject,nil)
+            }
+        }
+        
+        healthStore.execute(query)
+    }
+    
+    class func deleteSample(sampleType: HKSampleType, uuid: UUID, completion: @escaping (Bool, Error?) -> Void) {
+        let predicate = HKQuery.predicateForObject(with: uuid)
+        HealthKitService.fetchHealthKitSample(for: sampleType, withPredicate: predicate) { (fetchedObject, error) in
+            if let error = error {
+                // Handle error
+                completion(false,error)
+            } else if let unwrappedFetchedObject = fetchedObject {
+                healthStore.delete(unwrappedFetchedObject, withCompletion: { (success, error) in
+                    if let error = error {
+                        // Handle error
+                        completion(false,error)
+                    } else {
+                        completion(success,nil)
+                    }
+                })
+            }
+        }
     }
 }

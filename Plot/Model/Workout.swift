@@ -32,8 +32,11 @@ struct Workout: Codable, Equatable, Hashable {
     var recurrences: [String]?
     var containerID: String?
     var hkSampleID: String?
+    var directAssociation: Bool?
+    var directAssociationObjectID: String?
+    var directAssociationType: ObjectType?
     
-    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?, user_created: Bool?) {
+    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?, user_created: Bool?, directAssociation: Bool?, directAssociationType: ObjectType?) {
         self.id = id
         self.name = name
         self.admin = admin
@@ -45,6 +48,8 @@ struct Workout: Codable, Equatable, Hashable {
         self.length = length
         self.totalEnergyBurned = totalEnergyBurned
         self.user_created = user_created
+        self.directAssociation = directAssociation
+        self.directAssociationType = directAssociationType
     }
     
     init(forInitialSave id: String, hkWorkout: HKWorkout) {
@@ -61,6 +66,8 @@ struct Workout: Codable, Equatable, Hashable {
         self.id = UUID().uuidString
         self.name = template.name
         self.type = template.name
+        self.user_created = true
+        self.directAssociation = true
     }
 }
 

@@ -70,7 +70,7 @@ class WorkoutOperation: AsyncOperation {
                                                                                                 
                                 let workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
                                 let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
-                                workoutActions.createNewWorkout()
+                                workoutActions.createNewWorkout(updateDirectAssociation: false)
                             }
                         }
                     

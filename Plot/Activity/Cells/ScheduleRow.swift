@@ -107,7 +107,12 @@ final class ScheduleCell: Cell<Activity>, CellType {
             locationNameLabel.isHidden = false
         }
         
-        if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
+        if let subcategoryValue = schedule.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
+            activityTypeButton.setImage(subcategory.icon, for: .normal)
+            if subcategory == .uncategorized {
+                activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+            }
+        } else if let categoryValue = schedule.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "event"), for: .normal)

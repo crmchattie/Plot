@@ -30,8 +30,11 @@ struct Mindfulness: Codable, Equatable, Hashable {
     var recurrences: [String]?
     var containerID: String?
     var hkSampleID: String?
+    var directAssociation: Bool?
+    var directAssociationObjectID: String?
+    var directAssociationType: ObjectType?
     
-    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, startDateTime: Date?, endDateTime: Date?, user_created: Bool?) {
+    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, startDateTime: Date?, endDateTime: Date?, user_created: Bool?, directAssociation: Bool?, directAssociationType: ObjectType?) {
         self.id = id
         self.name = name
         self.admin = admin
@@ -40,6 +43,8 @@ struct Mindfulness: Codable, Equatable, Hashable {
         self.startDateTime = startDateTime
         self.endDateTime = endDateTime
         self.user_created = user_created
+        self.directAssociation = directAssociation
+        self.directAssociationType = directAssociationType
     }
     
     init(forInitialSave id: String, mindfuless: HKCategorySample) {
@@ -49,7 +54,14 @@ struct Mindfulness: Codable, Equatable, Hashable {
         self.startDateTime = mindfuless.startDate
         self.endDateTime = mindfuless.endDate
     }
-}
+    
+    init(fromTemplate template: Template) {
+        self.id = UUID().uuidString
+        self.name = template.name
+        self.user_created = true
+        self.directAssociation = true
+    }
+} 
 
 func ==(lhs: Mindfulness, rhs: Mindfulness) -> Bool {
     return lhs.id == rhs.id

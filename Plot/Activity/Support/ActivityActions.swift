@@ -29,12 +29,12 @@ class ActivityActions: NSObject {
         self.selectedFalconUsers = selectedFalconUsers
     }
     
-    func deleteActivity(updateExternal: Bool) {
+    func deleteActivity(updateExternal: Bool, updateDirectAssociation: Bool) {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
         
-        guard let _ = active, let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
+        guard let _ = active, let activity = activity, let activityID = activityID, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
                                   
@@ -43,10 +43,6 @@ class ActivityActions: NSObject {
         for memberID in membersIDs.0 {
             Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).removeAllObservers()
             Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).removeValue()
-        }
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else {
-            return
         }
         
         let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
@@ -62,6 +58,23 @@ class ActivityActions: NSObject {
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
         
+        if updateDirectAssociation, activity.directAssociation ?? false, let ID = activity.directAssociationObjectID {
+            if activity.directAssociationType == .workout {
+                WorkoutFetcher.getDataFromSnapshot(ID: ID) { workouts in
+                    if let workout = workouts.first, workout.user_created ?? false {
+                        let workoutAction = WorkoutActions(workout: workout, active: true, selectedFalconUsers: selectedFalconUsers)
+                        workoutAction.deleteWorkout(updateDirectAssociation: false)
+                    }
+                }
+            } else if activity.directAssociationType == .mindfulness {
+                MindfulnessFetcher.getDataFromSnapshot(ID: ID) { mindfulnesses in
+                    if let mindfulness = mindfulnesses.first, mindfulness.user_created ?? false {
+                        let mindfulnessAction = MindfulnessActions(mindfulness: mindfulness, active: true, selectedFalconUsers: selectedFalconUsers)
+                        mindfulnessAction.deleteMindfulness(updateDirectAssociation: false)
+                    }
+                }
+            }
+        }
         
         if updateExternal {
             if activity.isTask ?? false {
@@ -90,7 +103,7 @@ class ActivityActions: NSObject {
         }
     }
     
-    func createNewActivity() {
+    func createNewActivity(updateDirectAssociation: Bool) {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -119,6 +132,9 @@ class ActivityActions: NSObject {
             ])
             firebaseDictionary["lastModifiedDate"] = NSNumber(value: Int((Date()).timeIntervalSince1970)) as AnyObject
             updateActivity(firebaseDictionary: firebaseDictionary)
+            if updateDirectAssociation, activity.directAssociation ?? false {
+                editObject()
+            }
         } else {
             Analytics.logEvent("new_activity", parameters: [
                 "activity_name": activity.name ?? "name" as NSObject,
@@ -188,6 +204,41 @@ class ActivityActions: NSObject {
                     }
                 }
             })
+        }
+    }
+    
+    func editObject() {
+        print("editObject")
+        guard let _ = active, let activity = activity, let _ = activityID, let selectedFalconUsers = selectedFalconUsers else {
+            return
+        }
+        
+        if let ID = activity.directAssociationObjectID {
+            if activity.directAssociationType == .workout {
+                WorkoutFetcher.getDataFromSnapshot(ID: ID) { workouts in
+                    if let workout = workouts.first, workout.user_created ?? false {
+                        var newWorkout = workout
+                        newWorkout.startDateTime = activity.startDate
+                        newWorkout.endDateTime = activity.endDate
+                        let length = Calendar.current.dateComponents([.second], from: newWorkout.startDateTime ?? Date(), to: newWorkout.endDateTime ?? Date()).second ?? 0
+                        newWorkout.length = Double(length)
+                        let workoutAction = WorkoutActions(workout: workout, active: true, selectedFalconUsers: selectedFalconUsers)
+                        workoutAction.createNewWorkout(updateDirectAssociation: false)
+                    }
+                }
+            } else if activity.directAssociationType == .mindfulness {
+                MindfulnessFetcher.getDataFromSnapshot(ID: ID) { mindfulnesses in
+                    if let mindfulness = mindfulnesses.first, mindfulness.user_created ?? false {
+                        var newMindfulness = mindfulness
+                        newMindfulness.startDateTime = activity.startDate
+                        newMindfulness.endDateTime = activity.endDate
+                        let length = Calendar.current.dateComponents([.second], from: newMindfulness.startDateTime ?? Date(), to: newMindfulness.endDateTime ?? Date()).second ?? 0
+                        newMindfulness.length = Double(length)
+                        let mindfulnessAction = MindfulnessActions(mindfulness: mindfulness, active: true, selectedFalconUsers: selectedFalconUsers)
+                        mindfulnessAction.createNewMindfulness(updateDirectAssociation: false)
+                    }
+                }
+            }
         }
     }
     

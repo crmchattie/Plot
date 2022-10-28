@@ -73,7 +73,7 @@ class GoogleCalService {
         
         // Create the end date components.
         var timeFromNowComponents = DateComponents()
-        timeFromNowComponents.month = 6
+        timeFromNowComponents.month = 3
         let timeFromNow = GTLRDateTime(date: calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date())
         
         dispatchGroup.enter()
@@ -318,11 +318,17 @@ class GoogleCalService {
                         
                         service.executeQuery(tasksListQuery, completionHandler: { (ticket, result, error) in
                             guard error == nil, let items = (result as? GTLRTasks_Tasks)?.items else {
-                                print("failed to grab events \(String(describing: error))")
+                                print("failed to grab reminders \(String(describing: error))")
                                 dispatchGroup.leave()
                                 return
                             }
-                            tasks[list] = items
+                            var filteredTasks = [GTLRTasks_Task]()
+                            for item in items {
+                                if item.completed == nil {
+                                    filteredTasks.append(item)
+                                }
+                            }
+                            tasks[list] = filteredTasks
                             dispatchGroup.leave()
                         })
                     }

@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import CodableFirebase
+import HealthKit
 
 class WorkoutActions: NSObject {
     
@@ -28,12 +29,12 @@ class WorkoutActions: NSObject {
     
     }
     
-    public func deleteWorkout() {
+    public func deleteWorkout(updateDirectAssociation: Bool) {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
         
-        guard let _ = active, let _ = workout, let ID = ID, let _ = selectedFalconUsers else {
+        guard let _ = active, let _ = workout, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
                           
@@ -57,10 +58,23 @@ class WorkoutActions: NSObject {
                 reference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
             }
         })
-                
+        
+        if updateDirectAssociation, workout.directAssociation ?? false, let ID = workout.directAssociationObjectID {
+            ActivitiesFetcher.getDataFromSnapshot(ID: ID) { activities in
+                if let activity = activities.first {
+                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: selectedFalconUsers)
+                    activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
+                }
+            }
+        }
+        
+        if let hkSampleID = workout.hkSampleID, let uuid = UUID(uuidString: hkSampleID) {
+            Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(hkSampleID).child(identifierKey).removeValue()
+            HealthKitService.deleteSample(sampleType: .workoutType(), uuid: uuid) { _,_ in }
+        }
     }
     
-    public func createNewWorkout() {
+    public func createNewWorkout(updateDirectAssociation: Bool) {
         guard currentReachabilityStatus != .notReachable else {
             return
         }
@@ -84,6 +98,7 @@ class WorkoutActions: NSObject {
         workout.lastModifiedDate = Date()
                         
         let groupWorkoutReference = Database.database().reference().child(workoutsEntity).child(ID)
+        
         do {
             let value = try FirebaseEncoder().encode(workout)
             groupWorkoutReference.setValue(value)
@@ -93,10 +108,14 @@ class WorkoutActions: NSObject {
         
         if workout.hkSampleID == nil {
             createHealthKit()
+        } else if active, workout.user_created ?? false {
+            editHealthKit()
         }
         
         if workout.containerID == nil {
             createActivity()
+        } else if active, updateDirectAssociation {
+            editActivity()
         }
         
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
@@ -116,19 +135,30 @@ class WorkoutActions: NSObject {
     }
     
     func createHealthKit() {
-        if let _ = HealthKitSampleBuilder.createHKWorkout(from: workout) {
-        
-        }
+        if let _ = HealthKitSampleBuilder.createHKWorkout(from: workout) {}
+    }
+    
+    func editHealthKit() {
+        if let _ = HealthKitSampleBuilder.editHKWorkout(from: workout) {}
     }
     
     func createActivity() {
         if let activity = EventBuilder.createActivity(from: workout), let activityID = activity.activityID {
+            Database.database().reference().child(workoutsEntity).child(workout.id).child(directAssociationObjectIDEntity).setValue(activityID)
             let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: selectedFalconUsers ?? [])
-            activityActions.createNewActivity()
+            activityActions.createNewActivity(updateDirectAssociation: false)
             //will update activity.containerID and workout.containerID
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             let container = Container(id: containerID, activityIDs: [activityID], taskIDs: nil, workoutIDs: [workout.id], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: workout.participantsIDs)
             ContainerFunctions.updateContainerAndStuffInside(container: container)
+        }
+    }
+    
+    func editActivity() {
+        if let activity = EventBuilder.createActivity(from: self.workout), let ID = workout.directAssociationObjectID {
+            activity.activityID = ID
+            let activityActions = ActivityActions(activity: activity, active: true, selectedFalconUsers: selectedFalconUsers ?? [])
+            activityActions.createNewActivity(updateDirectAssociation: false)
         }
     }
     

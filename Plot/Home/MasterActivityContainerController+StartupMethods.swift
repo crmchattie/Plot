@@ -95,8 +95,10 @@ extension MasterActivityContainerController {
     }
     
     func openNotification() {
+        print("openNotification")
         //remove to open notifications
         if let notification = notification {
+            print(notification)
             let aps = notification.aps
             if let ID = notification.objectID {
                 self.notification = nil
@@ -116,7 +118,7 @@ extension MasterActivityContainerController {
                                 self.present(navigationViewController, animated: true)
                             }
                         }
-                    } else if let activity = networkController.activityService.events.first(where: {$0.activityID == ID }) {
+                    } else if let activity = networkController.activityService.eventsNoRepeats.first(where: {$0.activityID == ID }) {
                         ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
                             ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
                                 let destination = EventViewController(networkController: self.networkController)
@@ -143,7 +145,7 @@ extension MasterActivityContainerController {
                             let navigationViewController = UINavigationController(rootViewController: destination)
                             self.present(navigationViewController, animated: true)
                         }
-                    } else if let activity = networkController.activityService.tasks.first(where: {$0.activityID == ID }) {
+                    } else if let activity = networkController.activityService.tasksNoRepeats.first(where: {$0.activityID == ID }) {
                         ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
                             let destination = TaskViewController(networkController: self.networkController)
                             destination.selectedFalconUsers = participants

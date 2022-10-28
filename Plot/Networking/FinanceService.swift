@@ -346,6 +346,12 @@ class FinanceService {
             self?.createTasksFromTransactions(transactions: transactionsAdded)
             self?.createFutureTasksFromRecurringTransactions(transactions: transactionsAdded)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
+        }, transactionsRemoved: { [weak self] transactionsRemoved in
+            for transaction in transactionsRemoved {
+                if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
+                    self?.transactions.remove(at: index)
+                }
+            }
         }, transactionsChanged: { [weak self] transactionsChanged in
             for transaction in transactionsChanged {
                 if let index = self?.transactions.firstIndex(where: {$0.guid == transaction.guid}) {
@@ -496,7 +502,7 @@ class FinanceService {
                                 if let activity = activity, let activityID = activity.activityID {
                                     reference.child(account.guid).child(payment_due_at).setValue(activityID)
                                     let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                                    activityActions.createNewActivity()
+                                    activityActions.createNewActivity(updateDirectAssociation: false)
                                 }
                             }
                         }
@@ -509,7 +515,7 @@ class FinanceService {
                             if let activity = activity, let activityID = activity.activityID {
                                 reference.child(account.guid).child(payment_due_at).setValue(activityID)
                                 let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-                                activityActions.createNewActivity()
+                                activityActions.createNewActivity(updateDirectAssociation: false)
                             }
                         }
                     }
@@ -550,7 +556,7 @@ class FinanceService {
     
     private func updateTransactionCreateContainer(transaction: Transaction, activity: Activity) {
         let activityActions = ActivityActions(activity: activity, active: false, selectedFalconUsers: [])
-        activityActions.createNewActivity()
+        activityActions.createNewActivity(updateDirectAssociation: false)
         if activity.isTask ?? false {
             let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
             let container = Container(id: containerID, activityIDs: nil, taskIDs: [activity.activityID ?? ""], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: [transaction.guid], participantsIDs: transaction.participantsIDs)
@@ -625,6 +631,32 @@ class FinanceService {
         }
     }
     
+    private func createFutureTransaction(oldTransaction: Transaction, newDateString: String, averageAmount: Double) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let userReference = Database.database().reference().child(userFinancialTransactionsTasksEntity).child(currentUserID)
+        let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
+        var newTransaction = oldTransaction
+        newTransaction.guid = ID
+        newTransaction.status = .pending
+        newTransaction.plot_created = true
+        newTransaction.amount = averageAmount
+        newTransaction.transacted_at = newDateString
+        newTransaction.containerID = nil
+        TaskBuilder.createActivityWithList(from: newTransaction) { task in
+            if let task = task, let activityID = task.activityID {
+                let createTransaction = TransactionActions(transaction: newTransaction, active: false, selectedFalconUsers: [])
+                createTransaction.createNewTransaction()
+
+                userReference.child(newTransaction.guid).setValue(activityID)
+                self.updateTransactionCreateContainer(transaction: newTransaction, activity: task)
+            }
+        }
+        
+    }
+    
     private func createFutureTasksFromRecurringTransactions(transactions: [Transaction]) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -649,7 +681,7 @@ class FinanceService {
                     //if first is plot_created && transacted_date is more than 7 days past, then delete transaction and activity given recurrances may have stopped, otherwise do nothing
                     //if second is plot_created, potentially delete if first is 'real' transaction and reassign existing task to 'real' transaction
                     //make sure new plot_created transaction is in the future
-
+                    print(description)
                     if filteredTransactions.count > 1 {
                         if !(filteredTransactions[0].plot_created ?? false), !(filteredTransactions[1].plot_created ?? false), let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at) {
                             var days = 0
@@ -660,55 +692,79 @@ class FinanceService {
                             }
                             let newDate = first.addDays(days)
                             if newDate > Date() {
-                                let averageAmount = filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count)
-                                let newDateString = isodateFormatter.string(from: newDate)
-                                var newTransaction = filteredTransactions[0]
-                                let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
-                                newTransaction.guid = ID
-                                newTransaction.description = newTransaction.description + " (Expected)"
-                                newTransaction.status = .pending
-                                newTransaction.plot_created = true
-                                newTransaction.amount = averageAmount
-                                newTransaction.transacted_at = newDateString
-                                newTransaction.containerID = nil
-                                TaskBuilder.createActivityWithList(from: newTransaction) { task in
-                                    if let task = task, let activityID = task.activityID {
-                                        let createTransaction = TransactionActions(transaction: newTransaction, active: false, selectedFalconUsers: [])
-                                        createTransaction.createNewTransaction()
-
-                                        userReference.child(newTransaction.guid).setValue(activityID)
-                                        self.updateTransactionCreateContainer(transaction: newTransaction, activity: task)
-                                    }
-                                }
+                                self.createFutureTransaction(oldTransaction: filteredTransactions[0], newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
+                                
                             }
-                        } else if filteredTransactions[0].plot_created ?? false, let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at) {
-                            let transaction = filteredTransactions[0]
-                            let days = Calendar.current.numberOfDaysBetween(first, and: Date())
-                            if days > 7 {
-                                //delete transaction and activity
-                                if let activityID = dataSnapshotValue[transaction.guid] {
-                                    ParticipantsFetcher.getParticipants(forTransaction: transaction) { users in
-                                        let transactionAction = TransactionActions(transaction: transaction, active: true, selectedFalconUsers: users)
+                        } else if filteredTransactions[0].plot_created ?? false, !(filteredTransactions[1].plot_created ?? false), let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at), let second = isodateFormatter.date(from: filteredTransactions[1].transacted_at) {
+                            let deleteTransaction = filteredTransactions[0]
+                            if first.getShortMonthAndYear() == second.getShortMonthAndYear() {
+                                let keepTransaction = filteredTransactions[1]
+                                if let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
+                                    userReference.child(deleteTransaction.guid).setValue(nil)
+                                    ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
+                                        let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
                                         transactionAction.deleteTransaction()
                                     }
+                                    
                                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
-                                        if let activity = activities.first {
-                                            ParticipantsFetcher.getParticipants(forTransaction: transaction) { users in
-                                                let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                activityAction.deleteActivity(updateExternal: true)
+                                        if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                            activityAction.updateCompletion(isComplete: true)
+                                        }
+                                    }
+
+                                    userReference.child(keepTransaction.guid).setValue(activityID)
+                                    ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, _, _, transactions in
+                                        if let transactions = transactions {
+                                            var newTransactions = transactions.filter({ $0.guid != deleteTransaction.guid })
+                                            newTransactions.append(keepTransaction)
+                                            var newContainer = container
+                                            newContainer.transactionIDs = newTransactions.map({ $0.guid })
+                                            ContainerFunctions.updateContainerAndStuffInside(container: newContainer)
+                                        }
+                                    }
+                                }
+                                
+                                var days = 0
+                                if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
+                                    days = mostFrequentDays
+                                } else if let second = isodateFormatter.date(from: deleteTransaction.transacted_at), filteredTransactions.count > 2, let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
+                                    days = Calendar.current.numberOfDaysBetween(third, and: second)
+                                } else {
+                                    days = Calendar.current.numberOfDaysBetween(second, and: first)
+                                }
+                                let newDate = first.addDays(days)
+                                if newDate > Date() {
+                                    self.createFutureTransaction(oldTransaction: keepTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
+                                }
+                            } else {
+                                let days = Calendar.current.numberOfDaysBetween(first, and: Date())
+                                if days > 7 {
+                                    //delete transaction and activity
+                                    if let activityID = dataSnapshotValue[deleteTransaction.guid] {
+                                        ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
+                                            let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
+                                            transactionAction.deleteTransaction()
+                                        }
+                                        ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
+                                            if let activity = activities.first {
+                                                ParticipantsFetcher.getParticipants(forActivity: activity) { users in
+                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
+                                                    activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                        } else if filteredTransactions[1].plot_created ?? false, let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at) {
+                        } else if !(filteredTransactions[0].plot_created ?? false), filteredTransactions[1].plot_created ?? false, let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at) {
                             //delete second transaction, assign first transaction to container, update reference & update task to complete; create next plot_created transaction/activity
-                            let firstTransaction = filteredTransactions[0]
-                            let secondTransaction = filteredTransactions[1]
-                            if let activityID = dataSnapshotValue[secondTransaction.guid], let containerID = secondTransaction.containerID {
-                                userReference.child(secondTransaction.guid).setValue(nil)
-                                ParticipantsFetcher.getParticipants(forTransaction: secondTransaction) { users in
-                                    let transactionAction = TransactionActions(transaction: secondTransaction, active: true, selectedFalconUsers: users)
+                            let keepTransaction = filteredTransactions[0]
+                            let deleteTransaction = filteredTransactions[1]
+                            if let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
+                                userReference.child(deleteTransaction.guid).setValue(nil)
+                                ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
+                                    let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
                                     transactionAction.deleteTransaction()
                                 }
                                 
@@ -719,11 +775,11 @@ class FinanceService {
                                     }
                                 }
 
-                                userReference.child(firstTransaction.guid).setValue(activityID)
+                                userReference.child(keepTransaction.guid).setValue(activityID)
                                 ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, _, _, transactions in
                                     if let transactions = transactions {
-                                        var newTransactions = transactions.filter({ $0.guid != secondTransaction.guid })
-                                        newTransactions.append(firstTransaction)
+                                        var newTransactions = transactions.filter({ $0.guid != deleteTransaction.guid })
+                                        newTransactions.append(keepTransaction)
                                         var newContainer = container
                                         newContainer.transactionIDs = newTransactions.map({ $0.guid })
                                         ContainerFunctions.updateContainerAndStuffInside(container: newContainer)
@@ -734,31 +790,12 @@ class FinanceService {
                             var days = 0
                             if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
                                 days = mostFrequentDays
-                            } else if let second = isodateFormatter.date(from: secondTransaction.transacted_at), let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
+                            } else if let second = isodateFormatter.date(from: deleteTransaction.transacted_at), let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
                                 days = Calendar.current.numberOfDaysBetween(third, and: second)
                             }
                             let newDate = first.addDays(days)
                             if newDate > Date() {
-                                let averageAmount = filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count)
-                                let newDateString = isodateFormatter.string(from: newDate)
-                                var newTransaction = firstTransaction
-                                let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUserID).childByAutoId().key ?? ""
-                                newTransaction.guid = ID
-                                newTransaction.description = newTransaction.description + " (Expected)"
-                                newTransaction.status = .pending
-                                newTransaction.plot_created = true
-                                newTransaction.amount = averageAmount
-                                newTransaction.transacted_at = newDateString
-                                newTransaction.containerID = nil
-                                TaskBuilder.createActivityWithList(from: newTransaction) { task in
-                                    if let task = task, let activityID = task.activityID {
-                                        let createTransaction = TransactionActions(transaction: newTransaction, active: false, selectedFalconUsers: [])
-                                        createTransaction.createNewTransaction()
-
-                                        userReference.child(newTransaction.guid).setValue(activityID)
-                                        self.updateTransactionCreateContainer(transaction: newTransaction, activity: task)
-                                    }
-                                }
+                                self.createFutureTransaction(oldTransaction: keepTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                             }
                         }
                     }

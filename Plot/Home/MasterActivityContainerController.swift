@@ -370,7 +370,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func oldUserLoggedIn() {
-        print("oldUserLoggedIn")
         isOldUser = true
     }
     

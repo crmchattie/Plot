@@ -162,6 +162,11 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
                 destination.updateDiscoverDelegate = self
                 destination.template = template
                 self.navigationController?.pushViewController(destination, animated: true)
+            case .mindfulness:
+                let destination = MindfulnessViewController(networkController: self.networkController)
+                destination.updateDiscoverDelegate = self
+                destination.template = template
+                self.navigationController?.pushViewController(destination, animated: true)
             case .subtask:
                 print("subtask")
             case .schedule:

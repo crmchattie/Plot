@@ -62,7 +62,7 @@ class GoogleCalManager {
 
         // Create the end date components.
         var timeFromNowComponents = DateComponents()
-        timeFromNowComponents.month = 6
+        timeFromNowComponents.month = 3
         let timeFromNow = calendar.date(byAdding: timeFromNowComponents, to: Date()) ?? Date()
 
         //filter old activities out
@@ -103,7 +103,7 @@ class GoogleCalManager {
 
         // Create the start date components
         var timeAgoComponents = DateComponents()
-        timeAgoComponents.day = -7
+        timeAgoComponents.day = -1
         let timeAgo = calendar.date(byAdding: timeAgoComponents, to: Date()) ?? Date()
 
         // Create the end date components.

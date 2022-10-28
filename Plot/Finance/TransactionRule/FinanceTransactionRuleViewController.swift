@@ -223,6 +223,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     transactionRule.group = transaction.group
                 } else {
                     row.value = "Uncategorized"
+                    transactionRule.group = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 self.openLevel(level: row.tag!, value: row.value!, otherValue: nil)
@@ -249,6 +250,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     transactionRule.top_level_category = transaction.top_level_category
                 } else {
                     row.value = "Uncategorized"
+                    transactionRule.top_level_category = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 if let string = self.transactionRule.category {
@@ -279,6 +281,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     transactionRule.category = transaction.category
                 } else {
                     row.value = "Uncategorized"
+                    transactionRule.category = "Uncategorized"
                 }
             }.onCellSelection({ _, row in
                 if let string = self.transactionRule.top_level_category {

@@ -132,8 +132,6 @@ class ActivitiesFetcher: NSObject {
         
         currentUserActivitiesAddHandle = userActivitiesDatabaseRef.observe(.childAdded, with: { snapshot in
             if self.userActivities[snapshot.key] == nil {
-                print("childAdded")
-                print(snapshot)
                 if let completion = self.activitiesAdded, let completionRepeats = self.activitiesWithRepeatsAdded {
                     var handle = UInt.max
                     let ID = snapshot.key
@@ -175,7 +173,6 @@ class ActivitiesFetcher: NSObject {
             }
         })
         currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
-            print(snapshot)
             if let completion = self.activitiesRemoved {
                 self.userActivities[snapshot.key] = nil
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
@@ -183,7 +180,6 @@ class ActivitiesFetcher: NSObject {
         })
         
         currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
-            print(snapshot)
             if let completion = self.activitiesChanged, let completionRepeats = self.activitiesWithRepeatsAdded {
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key) { activityList in
                     for activity in activityList {
@@ -252,7 +248,7 @@ class ActivitiesFetcher: NSObject {
     }
     
     func addRepeatingActivities(activity: Activity, completion: @escaping ([Activity])->()) {
-        let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
+        let futureDate = Calendar.current.date(byAdding: .month, value: 3, to: Date())
         var newActivities = [Activity]()
         let group = DispatchGroup()
         var counter = 0
@@ -274,7 +270,7 @@ class ActivitiesFetcher: NSObject {
                         }
                         let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
                         let dates = iCalUtility()
-                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                         for date in dates {
                             if let instanceActivity = activities[date], let instanceID = instanceActivity.instanceID {
                                 let newActivity = activity.updateActivityWActivityNewInstance(updatingActivity: instanceActivity)
@@ -297,7 +293,7 @@ class ActivitiesFetcher: NSObject {
                 } else {
                     let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
                     let dates = iCalUtility()
-                        .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                        .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                     for date in dates {
                         let newActivity = activity.copy() as! Activity
                         newActivity.recurrenceStartDateTime = activity.finalDateTime
@@ -323,7 +319,7 @@ class ActivitiesFetcher: NSObject {
                         if let endDate = activity.endDate, let startDate = activity.startDate {
                             let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.endDate ?? Date())
                             let dates = iCalUtility()
-                                .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                                .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                             let duration = endDate.timeIntervalSince(startDate)
                             for date in dates {
                                 if let instanceActivity = activities[date], let instanceID = instanceActivity.instanceID {
@@ -353,7 +349,7 @@ class ActivitiesFetcher: NSObject {
                     if let endDate = activity.endDate, let startDate = activity.startDate {
                         let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.startDate ?? Date())
                         let dates = iCalUtility()
-                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                            .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                         let duration = endDate.timeIntervalSince(startDate)
                         for date in dates {
                             let newActivity = activity.copy() as! Activity

@@ -35,6 +35,9 @@ class EventBuilder {
         activity.containerID = workout.containerID
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.directAssociation = true
+        activity.directAssociationObjectID = workout.id
+        activity.directAssociationType = .workout
         return activity
     }
     
@@ -62,6 +65,9 @@ class EventBuilder {
         activity.containerID = mindfulness.containerID
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.directAssociation = true
+        activity.directAssociationObjectID = mindfulness.id
+        activity.directAssociationType = .mindfulness
         return activity
     }
     
@@ -172,7 +178,6 @@ class EventBuilder {
                 recurrenceRule.startDate = startDate
                 recurrenceRule.interval = template.interval ?? 1
                 activity.recurrences = [recurrenceRule.toRRuleString()]
-                print(recurrenceRule.toRRuleString())
             }
         }
         

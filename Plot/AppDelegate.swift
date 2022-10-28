@@ -396,18 +396,18 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         // 2
         if let notification = try? DictionaryDecoder().decode(PLNotification.self, from: userInfo) {
-            switch response.actionIdentifier {
+            if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
+                masterController.notification = notification
+            }
+//            switch response.actionIdentifier {
 //            case Identifiers.viewChatsAction:
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
 //            case Identifiers.viewEventsAction:
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
 //            case Identifiers.viewListsAction:
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
-            default:
-                if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
-                    masterController.notification = notification
-                }
-            }
+//            default:
+//            }
         }
         
         // 4

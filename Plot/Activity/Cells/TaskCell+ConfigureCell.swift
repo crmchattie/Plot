@@ -25,7 +25,7 @@ extension TaskCell {
         endLabel.numberOfLines = dateTimeValueArray.0
         endLabel.text = dateTimeValueArray.1
         
-        if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue) {
+        if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
             if subcategory == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
@@ -121,7 +121,7 @@ extension TaskCollectionCell {
         endLabel.numberOfLines = dateTimeValueArray.0
         endLabel.text = dateTimeValueArray.1
         
-        if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue) {
+        if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
             if subcategory == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "task"), for: .normal)

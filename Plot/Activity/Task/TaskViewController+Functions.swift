@@ -798,7 +798,7 @@ extension TaskViewController {
     func createActivity(activity: Activity?) {
         showActivityIndicator()
         let createActivity = ActivityActions(activity: activity ?? self.task, active: active, selectedFalconUsers: selectedFalconUsers)
-        createActivity.createNewActivity()
+        createActivity.createNewActivity(updateDirectAssociation: true)
         hideActivityIndicator()
         self.delegate?.updateTask(task: activity ?? self.task)
         self.updateDiscoverDelegate?.itemCreated()
@@ -925,7 +925,7 @@ extension TaskViewController {
                     if dateIndex == 0 {
                         self.showActivityIndicator()
                         let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                        deleteActivity.deleteActivity(updateExternal: true)
+                        deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)
                         self.hideActivityIndicator()
                         if self.navigationItem.leftBarButtonItem != nil {
                             self.dismiss(animated: true, completion: nil)
@@ -955,7 +955,7 @@ extension TaskViewController {
                 print("Save for this event only")
                 self.showActivityIndicator()
                 let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                deleteActivity.deleteActivity(updateExternal: true)
+                deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)
                 self.hideActivityIndicator()
                 if self.navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)
@@ -987,7 +987,7 @@ extension TaskViewController {
             }
             
             let createActivity = ActivityActions(activity: newActivity, active: false, selectedFalconUsers: selectedFalconUsers)
-            createActivity.createNewActivity()
+            createActivity.createNewActivity(updateDirectAssociation: false)
         }
     }
     

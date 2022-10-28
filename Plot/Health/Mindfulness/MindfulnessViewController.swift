@@ -47,6 +47,8 @@ class MindfulnessViewController: FormViewController {
     weak var delegate : UpdateMindfulnessDelegate?
     weak var updateDiscoverDelegate : UpdateDiscover?
     
+    var template: Template!
+    
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -66,25 +68,30 @@ class MindfulnessViewController: FormViewController {
         
         numberFormatter.numberStyle = .decimal
         
-        if mindfulness == nil {
-            title = "New Mindfulness"
-            active = false
-            if let currentUserID = Auth.auth().currentUser?.uid {
-                let ID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
-                mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil, user_created: true)
-                
-                //need to fix; sloppy code that is used to stop an event from being created
-                if let container = container {
-                    mindfulness.containerID = container.id
-                }
-            }
-        } else {
+        if mindfulness != nil {
             active = true
             title = "Mindfulness"
             print(mindfulness.id)
             
             setupLists()
             resetBadgeForSelf()
+        } else {
+            title = "New Mindfulness"
+            active = false
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                let ID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
+                if let template = template {
+                    mindfulness = Mindfulness(fromTemplate: template)
+                    mindfulness.id = ID
+                } else {
+                    mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil, user_created: true, directAssociation: true, directAssociationType: .event)
+                    
+                    //need to fix; sloppy code that is used to stop an event from being created
+                    if let container = container {
+                        mindfulness.containerID = container.id
+                    }
+                }
+            }
         }
         
         configureTableView()
@@ -93,14 +100,19 @@ class MindfulnessViewController: FormViewController {
         updateLength()
         
         if active {
-            for row in form.allRows {
-                if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" && row.tag != "Name" {
-                    row.baseCell.isUserInteractionEnabled = false
+            if !(mindfulness.user_created ?? false) {
+                for row in form.allRows {
+                    if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" && row.tag != "Name" {
+                        row.baseCell.isUserInteractionEnabled = false
+                    }
                 }
+            }
+            if mindfulness.hkSampleID == nil, let section = form.first  {
+                section.footer?.title = "Hit the done button in the upper right corner to add to the health app if connected"
             }
         }  else {
             if delegate == nil, let section = form.first {
-                section.footer?.title = "An associated event will be created along with this mindfulness session"
+                section.footer?.title = "This mindfulness session will be added to the health app if connected and will create an associated event as well"
             }
         }
     }
@@ -131,10 +143,14 @@ class MindfulnessViewController: FormViewController {
         if !active {
             let plusBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = plusBarButton
-        } else {
+        } else if delegate != nil {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = plusBarButton
-            navigationItem.rightBarButtonItem?.isEnabled = true
+        } else if mindfulness.user_created ?? false {
+            let dotsImage = UIImage(named: "dots")
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
         }
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
@@ -149,7 +165,7 @@ class MindfulnessViewController: FormViewController {
     @objc fileprivate func create() {
         showActivityIndicator()
         let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-        createMindfulness.createNewMindfulness()
+        createMindfulness.createNewMindfulness(updateDirectAssociation: true)
         self.delegate?.updateMindfulness(mindfulness: self.mindfulness)
         self.updateDiscoverDelegate?.itemCreated()
         self.hideActivityIndicator()
@@ -170,7 +186,7 @@ class MindfulnessViewController: FormViewController {
                 self.showActivityIndicator()
                 self.updateLists()
                 let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createMindfulness.createNewMindfulness()
+                createMindfulness.createNewMindfulness(updateDirectAssociation: true)
                 self.hideActivityIndicator()
                 if self.navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)
@@ -192,7 +208,7 @@ class MindfulnessViewController: FormViewController {
                     self.showActivityIndicator()
                     self.updateLists()
                     let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createMindfulness.createNewMindfulness()
+                    createMindfulness.createNewMindfulness(updateDirectAssociation: true)
                     
                     //duplicate mindfulness
                     let newMindfulnessID = Database.database().reference().child(userMindfulnessEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -202,7 +218,7 @@ class MindfulnessViewController: FormViewController {
                     newMindfulness.participantsIDs = nil
                     
                     let createNewMindfulness = MindfulnessActions(mindfulness: newMindfulness, active: false, selectedFalconUsers: [])
-                    createNewMindfulness.createNewMindfulness()
+                    createNewMindfulness.createNewMindfulness(updateDirectAssociation: true)
                     self.hideActivityIndicator()
                     
                     if self.navigationItem.leftBarButtonItem != nil {
@@ -224,6 +240,47 @@ class MindfulnessViewController: FormViewController {
             })
             
         }
+    }
+    
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Delete Mindfulness Session", style: .default, handler: { (_) in
+            self.delete()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
+        
+    }
+    
+    func delete() {
+        let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
+            self.showActivityIndicator()
+            let mindfulnessAction = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            mindfulnessAction.deleteMindfulness(updateDirectAssociation: true)
+            self.hideActivityIndicator()
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func initializeForm() {
@@ -645,7 +702,7 @@ extension MindfulnessViewController: UpdateInvitees {
                     ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
                 } else {
                     let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createMindfulness.createNewMindfulness()
+                    createMindfulness.updateMindfulnessParticipants()
                 }
                 self.hideActivityIndicator()
             }

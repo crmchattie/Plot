@@ -665,7 +665,7 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
                 
                 self.showActivityIndicator()
                 let createActivity = ActivityActions(activity: self.activity, active: false, selectedFalconUsers: [])
-                createActivity.createNewActivity()
+                createActivity.createNewActivity(updateDirectAssociation: true)
                 self.hideActivityIndicator()
                 
                 self.movingBackwards = false
@@ -876,8 +876,8 @@ extension ActivityTypeViewController: ActivityTypeCellDelegate {
 
 extension ActivityTypeViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
-        if let activity = activity {
-            let dispatchGroup = DispatchGroup()
+//        if let activity = activity {
+//            let dispatchGroup = DispatchGroup()
 //                if mergeActivity.schedule != nil {
 //                    var scheduleList = mergeActivity.schedule!
 //                    scheduleList.append(activity)
@@ -887,22 +887,22 @@ extension ActivityTypeViewController: ChooseActivityDelegate {
 //                    mergeActivity.schedule = scheduleList
 //                }
 //
-            dispatchGroup.enter()
-            self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
-                self.showActivityIndicator()
-                let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
-                createActivity.createNewActivity()
-                self.hideActivityIndicator()
-                dispatchGroup.leave()
-            }
-            
-            dispatchGroup.notify(queue: .main) {
-               self.actAddAlert()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
-                    self.removeActAddAlert()
-                })
-            }
-        }
+//            dispatchGroup.enter()
+//            self.getSelectedFalconUsers(forActivity: mergeActivity) { (participants) in
+//                self.showActivityIndicator()
+//                let createActivity = ActivityActions(activity: mergeActivity, active: true, selectedFalconUsers: participants)
+//                createActivity.createNewActivity(updateDirectAssociation: true)
+//                self.hideActivityIndicator()
+//                dispatchGroup.leave()
+//            }
+//
+//            dispatchGroup.notify(queue: .main) {
+//               self.actAddAlert()
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+//                    self.removeActAddAlert()
+//                })
+//            }
+//        }
     }
 }
 

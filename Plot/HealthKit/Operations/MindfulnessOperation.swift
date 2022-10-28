@@ -68,7 +68,7 @@ class MindfulnessOperation: AsyncOperation {
                                                                                 
                         let mindfulnessFB = Mindfulness(forInitialSave: mindfulnessID, mindfuless: sample)
                         let mindfulnessActions = MindfulnessActions(mindfulness: mindfulnessFB, active: false, selectedFalconUsers: [])
-                        mindfulnessActions.createNewMindfulness()
+                        mindfulnessActions.createNewMindfulness(updateDirectAssociation: false)
                     }
                 }
                 
