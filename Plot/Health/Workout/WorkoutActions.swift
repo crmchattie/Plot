@@ -139,6 +139,7 @@ class WorkoutActions: NSObject {
     }
     
     func editHealthKit() {
+        print("editHealthKit")
         if let _ = HealthKitSampleBuilder.editHKWorkout(from: workout) {}
     }
     

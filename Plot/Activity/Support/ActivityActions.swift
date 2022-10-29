@@ -208,7 +208,6 @@ class ActivityActions: NSObject {
     }
     
     func editObject() {
-        print("editObject")
         guard let _ = active, let activity = activity, let _ = activityID, let selectedFalconUsers = selectedFalconUsers else {
             return
         }
@@ -222,7 +221,7 @@ class ActivityActions: NSObject {
                         newWorkout.endDateTime = activity.endDate
                         let length = Calendar.current.dateComponents([.second], from: newWorkout.startDateTime ?? Date(), to: newWorkout.endDateTime ?? Date()).second ?? 0
                         newWorkout.length = Double(length)
-                        let workoutAction = WorkoutActions(workout: workout, active: true, selectedFalconUsers: selectedFalconUsers)
+                        let workoutAction = WorkoutActions(workout: newWorkout, active: true, selectedFalconUsers: selectedFalconUsers)
                         workoutAction.createNewWorkout(updateDirectAssociation: false)
                     }
                 }
@@ -234,7 +233,7 @@ class ActivityActions: NSObject {
                         newMindfulness.endDateTime = activity.endDate
                         let length = Calendar.current.dateComponents([.second], from: newMindfulness.startDateTime ?? Date(), to: newMindfulness.endDateTime ?? Date()).second ?? 0
                         newMindfulness.length = Double(length)
-                        let mindfulnessAction = MindfulnessActions(mindfulness: mindfulness, active: true, selectedFalconUsers: selectedFalconUsers)
+                        let mindfulnessAction = MindfulnessActions(mindfulness: newMindfulness, active: true, selectedFalconUsers: selectedFalconUsers)
                         mindfulnessAction.createNewMindfulness(updateDirectAssociation: false)
                     }
                 }
