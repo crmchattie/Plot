@@ -542,8 +542,9 @@ class TaskViewController: FormViewController {
                 $0.cell.detailTextLabel?.text = nil
             }
         }.onChange { [weak self] row in
-            if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
-                if value, let endTime = self?.form.rowBy(tag: "DeadlineTime") {
+            if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                if value, let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
+                    row.cell.detailTextLabel?.textColor = .systemBlue
                     if let task = self?.task, let endDate = task.endDate {
                         row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                         endDateRow.value = endDate
@@ -553,12 +554,15 @@ class TaskViewController: FormViewController {
                         row.cell.detailTextLabel?.text = endDateTime.getMonthAndDateAndYear()
 
                     }
+                    endTimeSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                    endTimeSwitchRow.updateCell()
                     endTime.hidden = true
                     endTime.evaluateHidden()
-                } else if let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                } else {
                     row.cell.detailTextLabel?.text = nil
-                    endDateSwitchRow.updateCell()
-                    endDateSwitchRow.cell.detailTextLabel?.text = nil
+                    endTimeSwitchRow.cell.detailTextLabel?.text = nil
+                    endTimeSwitchRow.value = false
+                    endTimeSwitchRow.updateCell()
                 }
                 self!.updateDeadlineDate()
 
@@ -570,12 +574,17 @@ class TaskViewController: FormViewController {
             }
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
-                if let endDate = self?.form.rowBy(tag: "DeadlineDate"), let endTime = self?.form.rowBy(tag: "DeadlineTime") {
+                if let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
                     endDate.hidden = endDate.isHidden ? false : true
                     endDate.evaluateHidden()
                     if !endDate.isHidden {
+                        row.cell.detailTextLabel?.textColor = .systemBlue
+                        endTimeSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                        endTimeSwitchRow.updateCell()
                         endTime.hidden = true
                         endTime.evaluateHidden()
+                    } else {
+                        row.cell.detailTextLabel?.textColor = .secondaryLabel
                     }
                 }
             }
@@ -633,7 +642,8 @@ class TaskViewController: FormViewController {
             }
         }.onChange { [weak self] row in
             if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
-                if value, let endDateDateRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                if value, let endDateDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                    row.cell.detailTextLabel?.textColor = .systemBlue
                     if let task = self?.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
                         row.cell.detailTextLabel?.text = endDate.getTimeString()
                         endTimeRow.value = endDate
@@ -654,6 +664,8 @@ class TaskViewController: FormViewController {
                             endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                         }
                     }
+                    endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                    endDateSwitchRow.updateCell()
                     endDateDateRow.hidden = true
                     endDateDateRow.evaluateHidden()
                 } else {
@@ -669,12 +681,17 @@ class TaskViewController: FormViewController {
             }
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
-                if let endTime = self?.form.rowBy(tag: "DeadlineTime"), let endDate = self?.form.rowBy(tag: "DeadlineDate") {
+                if let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
                     endTime.hidden = endTime.isHidden ? false : true
                     endTime.evaluateHidden()
                     if !endTime.isHidden {
+                        row.cell.detailTextLabel?.textColor = .systemBlue
+                        endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                        endDateSwitchRow.updateCell()
                         endDate.hidden = true
                         endDate.evaluateHidden()
+                    } else {
+                        row.cell.detailTextLabel?.textColor = .secondaryLabel
                     }
                 }
             }
@@ -709,7 +726,6 @@ class TaskViewController: FormViewController {
             }
         }.onChange { [weak self] row in
             if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
-                self?.task.endDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
                 switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
             }            
             self!.updateDeadlineDate()

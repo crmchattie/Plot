@@ -106,11 +106,10 @@ class FinanceService {
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
                 self.grabAccountTransactions()
-                    self.removePendingTransactions()
-//                    self.grabTransactionAttributes()
+                self.removePendingTransactions()
                 if self.isRunning {
-                    completion()
                     self.isRunning = false
+                    completion()
                 }
             }
         })

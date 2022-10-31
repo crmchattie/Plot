@@ -57,7 +57,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
             guard !activities.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
-                newChartViewModel.rangeAverageValue = "0 activities"
+                newChartViewModel.rangeAverageValue = "0 events"
                 self.chartViewModel.send(newChartViewModel)
                 completion?()
                 return
@@ -80,7 +80,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 }
                 categories.sort(by: { $0.value > $1.value })
                 newChartViewModel.categories = Array(categories.prefix(3))
-                newChartViewModel.rangeAverageValue = "\(activityCount) activities"
+                newChartViewModel.rangeAverageValue = "\(activityCount) events"
                 
                 let daysInRange = self.range.daysInRange
                 let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in

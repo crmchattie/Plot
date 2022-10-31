@@ -35,7 +35,16 @@ protocol ManageAppearanceHome: AnyObject {
 }
 
 class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
-    var networkController = NetworkController()
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    let networkController: NetworkController
 
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
@@ -95,79 +104,21 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var participants: [String: [User]] = [:]
     
     var isNewUser: Bool = true
-    var isOldUser: Bool = false
-    
-    var onceToken = 0
-    
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
-    var isAppLoaded = false
         
-    var window: UIWindow?
-    
-    let splashContainer: SplashScreenContainer = {
-        let splashContainer = SplashScreenContainer()
-        splashContainer.translatesAutoresizingMaskIntoConstraints = false
-        return splashContainer
-    }()
-    
-    let launchScreenView: UIView = {
-        let launchScreenView = UIView()
-        launchScreenView.translatesAutoresizingMaskIntoConstraints = false
-        return launchScreenView
-    }()
-    
-    let plotLogoView: UIImageView = {
-        let plotLogoView = UIImageView()
-        plotLogoView.translatesAutoresizingMaskIntoConstraints = false
-        plotLogoView.layer.masksToBounds = true
-        plotLogoView.image = UIImage(named: "plotLogo")
-        return plotLogoView
-    }()
-    
+    var isAppLoaded = false
+            
     let refreshControl = UIRefreshControl()
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .default
-    }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate.loadNotifications()
-        showLaunchScreen()
-        setOnlineStatus()
-        loadVariables()
         setupViews()
         setNavBar()
-        addObservers()
-        setApplicationBadge()
+        delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if onceToken == 0 {
-            splashContainer.backgroundColor = .systemGroupedBackground
-            view.addSubview(splashContainer)
-            splashContainer.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-            splashContainer.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-            splashContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-            splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        }
-        onceToken = 1
         managePresense()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if isNewUser {
-            //has to be here given currentUserID = nil on app start
-            self.networkController.setupFirebase()
-            self.networkController.setupOtherVariables()
-            //change to stop from running
-            isNewUser = false
-        } else if isOldUser {
-            reloadVariables()
-        }
     }
     
     func setupViews() {
@@ -180,7 +131,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = .systemGroupedBackground
         
-        extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         layout.scrollDirection = UICollectionView.ScrollDirection.vertical
         collectionView.setCollectionViewLayout(layout, animated: true)
@@ -188,7 +138,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         collectionView.delegate = self
         
         view.addSubview(collectionView)
-        collectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        collectionView.fillSuperview()
         collectionView.register(TaskCollectionCell.self, forCellWithReuseIdentifier: taskCellID)
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
         collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
@@ -204,7 +154,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.removeObserver(self)
     }
     
-    fileprivate func addObservers() {
+    func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(calendarActivitiesUpdated), name: .calendarActivitiesUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
@@ -216,7 +166,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedHealth), name: .hasLoadedHealth, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
     }
     
     func setupData() {
@@ -342,35 +291,31 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func hasLoadedCalendarEventActivities() {
-        self.updatingEvents = !self.networkController.activityService.hasLoadedCalendarEventActivities
+        self.updatingEvents = !networkController.activityService.hasLoadedCalendarEventActivities
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func hasLoadedListTaskActivities() {
-        self.updatingTasks = !self.networkController.activityService.hasLoadedListTaskActivities
+        self.updatingTasks = !networkController.activityService.hasLoadedListTaskActivities
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func hasLoadedHealth() {
-        self.updatingHealth = !self.networkController.healthService.hasLoadedHealth
+        self.updatingHealth = !networkController.healthService.hasLoadedHealth
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func hasLoadedFinancials() {
-        self.updatingFinances = !self.networkController.financeService.hasLoadedFinancials
+        self.updatingFinances = !networkController.financeService.hasLoadedFinancials
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
-    }
-    
-    @objc fileprivate func oldUserLoggedIn() {
-        isOldUser = true
     }
     
     func setNavBar() {
@@ -380,30 +325,18 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             return dateFormatter.string(from: Date())
         }()
         
-        let settingsBarButton = UIBarButtonItem(image: UIImage(named: "settings"),
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "settings"),
                                                            style: .plain,
                                                            target: self,
                                                            action: #selector(goToSettings))
-        let notificationsBarButton = UIBarButtonItem(image: UIImage(named: "notification-bell"),
-                                                           style: .plain,
-                                                           target: self,
-                                                           action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItems = [settingsBarButton, notificationsBarButton]
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "notification-bell"),
+                                                            style: .plain,
                                                             target: self,
-                                                            action: #selector(newItem))
+                                                            action: #selector(goToNotifications))
+
         if !isNewUser {
             refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
             collectionView.refreshControl = refreshControl
-        }
-    }
-    
-    func setApplicationBadge() {
-        let badge = 0
-        UIApplication.shared.applicationIconBadgeNumber = badge
-        if let uid = Auth.auth().currentUser?.uid {
-            let ref = Database.database().reference().child("users").child(uid)
-            ref.updateChildValues(["badge": badge])
         }
     }
     
@@ -607,42 +540,16 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
 
 extension MasterActivityContainerController {
     @objc func goToSettings() {
-        let destination = AccountSettingsController()
-        destination.networkController = networkController
+        let destination = AccountSettingsController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
-    
+
     @objc func goToNotifications() {
         let destination = NotificationsViewController(networkController: networkController)
-//        destination.notificationActivities = networkController.activityService.events
-//        destination.invitedActivities = networkController.activityService.invitedActivities
-//        destination.invitations = networkController.activityService.invitations
-//        destination.users = networkController.userService.users
-//        destination.filteredUsers = networkController.userService.users
-//        destination.conversations = networkController.conversationService.conversations
-//        destination.listList = networkController.listService.listList
         destination.sortInvitedActivities()
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
-    }
-    
-    @objc func goToChat() {
-        let destination = ChatsTableViewController()
-        destination.conversations = networkController.conversationService.conversations
-        destination.contacts = networkController.userService.contacts
-        destination.filteredContacts = networkController.userService.contacts
-        destination.users = networkController.userService.users
-        destination.filteredUsers = networkController.userService.users
-        destination.conversations = networkController.conversationService.conversations
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
-    }
-    
-    @objc fileprivate func newItem() {
-        let discoverController = LibraryViewController()
-        discoverController.networkController = networkController
-        present(UINavigationController(rootViewController: discoverController), animated: true)
     }
 }
 

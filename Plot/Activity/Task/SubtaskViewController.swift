@@ -646,7 +646,6 @@ class SubtaskViewController: FormViewController {
                 }
             }.onChange { [weak self] row in
                 if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
-                    self?.subtask.endDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
                     switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
                 }
                 self!.updateDeadlineDate()

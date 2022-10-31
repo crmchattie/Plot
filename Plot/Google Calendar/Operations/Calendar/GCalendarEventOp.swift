@@ -178,13 +178,9 @@ class GCalendarEventOp: AsyncOperation {
             }
             
             if let start = originalStartTime.date {
-                values["instanceOriginalAllDay"] = true as Any
                 values["instanceOriginalStartDateTime"] = NSNumber(value: Int(start.date.timeIntervalSince1970)) as Any
-                values["instanceOriginalStartTimeZone"] = event.start?.timeZone as Any
             } else if let start = originalStartTime.dateTime {
-                values["instanceOriginalAllDay"] = false as Any
                 values["instanceOriginalStartDateTime"] = NSNumber(value: Int(start.date.timeIntervalSince1970)) as Any
-                values["instanceOriginalStartTimeZone"] = event.start?.timeZone as Any
             }
             
             if event.summary != activity.name {

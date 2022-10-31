@@ -35,8 +35,8 @@ class AnalyticsViewModel {
     func loadData(completion: @escaping () -> Void) {
         let group = DispatchGroup()
 
-        let activitiesDataSource = ActivityAnalyticsDataSource(range: range, networkController: networkController)
         group.enter()
+        let activitiesDataSource = ActivityAnalyticsDataSource(range: range, networkController: networkController)
         activitiesDataSource.loadData {
             group.leave()
         }

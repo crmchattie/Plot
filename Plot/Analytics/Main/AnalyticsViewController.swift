@@ -102,7 +102,7 @@ extension AnalyticsViewController {
             }
         } else {
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.backgroundColor = .tertiarySystemBackground
+            cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.text = "See detail"
             cell.accessoryType = .disclosureIndicator
             return cell

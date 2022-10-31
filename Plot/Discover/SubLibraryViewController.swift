@@ -93,10 +93,7 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = .systemGroupedBackground
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
-        
-        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
-        navigationItem.rightBarButtonItem = doneBarButton
-        
+                
         filteredTemplates = templates.sorted(by: { $0.name < $1.name })
         setupData()
         setupSearchController()
@@ -151,21 +148,25 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
                 let destination = EventViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .task:
                 let destination = TaskViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mindfulness:
                 let destination = MindfulnessViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .subtask:
                 print("subtask")
@@ -200,6 +201,7 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
             let destination = FinanceAccountViewController(networkController: self.networkController)
             destination.updateDiscoverDelegate = self
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }))
         

@@ -49,15 +49,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         GIDSignIn.sharedInstance().scopes = googleScopes
         GIDSignIn.sharedInstance()?.restorePreviousSignIn()
         //manually create window or default controller, thus ridding of Storyboard
-        let masterController = MasterActivityContainerController()
-        let controller = UINavigationController(rootViewController: masterController)
-        controller.navigationBar.prefersLargeTitles = true
-        controller.navigationItem.largeTitleDisplayMode = .always
-        
+        let tabController = GeneralTabBarController()
         // set-up window
         window = UIWindow(frame: UIScreen.main.bounds)
         //set window = tabBarController
-        window?.rootViewController = controller
+        window?.rootViewController = tabController
         //make window visible
         window?.makeKeyAndVisible()
         

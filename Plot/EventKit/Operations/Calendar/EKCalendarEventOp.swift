@@ -157,8 +157,8 @@ class EKCalendarEventOp: AsyncOperation {
             }
             activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
             activity.allDay = event.isAllDay
-            activity.startDateTime = NSNumber(value: event.startDate.timeIntervalSince1970)
-            activity.endDateTime = NSNumber(value: event.endDate.timeIntervalSince1970)
+            activity.startDateTime = NSNumber(value: Int(event.startDate.timeIntervalSince1970))
+            activity.endDateTime = NSNumber(value: Int(event.endDate.timeIntervalSince1970))
             activity.startTimeZone = event.timeZone?.identifier
             activity.endTimeZone = event.timeZone?.identifier
             if let date = event.creationDate {
@@ -179,15 +179,13 @@ class EKCalendarEventOp: AsyncOperation {
             
             var values:[String : Any] = [:]
             values["allDay"] = event.isAllDay as Any
-            values["startDateTime"] = NSNumber(value: event.startDate.timeIntervalSince1970) as Any
+            values["startDateTime"] = NSNumber(value: Int(event.startDate.timeIntervalSince1970)) as Any
             values["startTimeZone"] = event.timeZone?.identifier as Any
             
-            values["endDateTime"] = NSNumber(value: event.endDate.timeIntervalSince1970) as Any
+            values["endDateTime"] = NSNumber(value: Int(event.endDate.timeIntervalSince1970)) as Any
             values["endTimeZone"] = event.timeZone?.identifier as Any
 
             values["instanceOriginalStartDateTime"] = NSNumber(value: Int(originalOccurrenceDate.timeIntervalSince1970)) as Any
-            values["instanceOriginalAllDay"] = event.isAllDay as Any
-            values["instanceOriginalStartTimeZone"] = event.timeZone?.identifier as Any
                         
             if event.title != activity.name {
                 values["name"] = event.title as Any

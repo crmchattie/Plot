@@ -2070,17 +2070,17 @@
 			isa = PBXGroup;
 			children = (
 				F9C05FA625F7D5F5009E892A /* Constants */,
-				F9B82C8125FAB0B80072BE74 /* Analytics */,
 				26B975E32363F8DE003BFBE3 /* Invitations */,
 				26391FEA235EC3B3002BB4C0 /* Extensions */,
 				4BAEE47221272C4F0045AB10 /* Authentication */,
-				1051AC94244F8AF80066761C /* Home */,
+				F9B82C8125FAB0B80072BE74 /* Analytics */,
 				108841D0257003F70064C5F8 /* Summary */,
+				1051AC94244F8AF80066761C /* Home */,
+				4BAEE44D21272B380045AB10 /* Settings */,
 				1024ABA523C1255900A5875D /* Discover */,
 				10C50F932273818D00111033 /* Activity */,
 				1082C89324F0A8C800CF6491 /* Health */,
 				1082C89224F0A8B000CF6491 /* Finance */,
-				4BAEE44D21272B380045AB10 /* Settings */,
 				26E8E3A4238B2C81000F30C8 /* Notfications */,
 				10E93D5B24BE47A600F6EE18 /* Map */,
 				10B3E50628B1462600E1713D /* Lists */,
@@ -3809,7 +3809,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3842,7 +3842,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3999,7 +3999,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4039,7 +4039,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

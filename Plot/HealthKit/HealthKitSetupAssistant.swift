@@ -31,11 +31,6 @@ class HealthKitSetupAssistant {
             let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate),
             let stepCount = HKObjectType.quantityType(forIdentifier: .stepCount),
             let flightCount = HKObjectType.quantityType(forIdentifier: .flightsClimbed),
-            let dietaryFatTotal = HKObjectType.quantityType(forIdentifier: .dietaryFatTotal),
-            let dietaryCarbohydrates = HKObjectType.quantityType(forIdentifier: .dietaryCarbohydrates),
-            let dietarySugar = HKObjectType.quantityType(forIdentifier: .dietarySugar),
-            let dietaryProtein = HKObjectType.quantityType(forIdentifier: .dietaryProtein),
-            let dietaryEnergyConsumed = HKObjectType.quantityType(forIdentifier: .dietaryEnergyConsumed),
             let distanceWalkingRunning = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
             let distanceCycling = HKObjectType.quantityType(forIdentifier: .distanceCycling),
             let sleepAnalysis = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
@@ -58,22 +53,12 @@ class HealthKitSetupAssistant {
                                                         bodyMassIndex,
                                                         distanceWalkingRunning,
                                                         distanceCycling,
-                                                        dietaryFatTotal,
-                                                        dietaryCarbohydrates,
-                                                        dietarySugar,
-                                                        dietaryProtein,
-                                                        dietaryEnergyConsumed,
                                                         HKObjectType.workoutType()]
         
         let healthKitTypesToWrite: Set<HKSampleType> = [
                                                        distanceWalkingRunning,
                                                        distanceCycling,
                                                        mindfulSession,
-                                                       dietaryFatTotal,
-                                                       dietaryCarbohydrates,
-                                                       dietarySugar,
-                                                       dietaryProtein,
-                                                       dietaryEnergyConsumed,
                                                        HKObjectType.workoutType()]
         // Request Authorization
         healthStore.requestAuthorization(toShare: healthKitTypesToWrite,
@@ -82,3 +67,10 @@ class HealthKitSetupAssistant {
         }
     }
 }
+
+//            let dietaryFatTotal = HKObjectType.quantityType(forIdentifier: .dietaryFatTotal),
+//            let dietaryCarbohydrates = HKObjectType.quantityType(forIdentifier: .dietaryCarbohydrates),
+//            let dietarySugar = HKObjectType.quantityType(forIdentifier: .dietarySugar),
+//            let dietaryProtein = HKObjectType.quantityType(forIdentifier: .dietaryProtein),
+//            let dietaryEnergyConsumed = HKObjectType.quantityType(forIdentifier: .dietaryEnergyConsumed),
+

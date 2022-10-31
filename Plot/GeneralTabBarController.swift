@@ -17,20 +17,29 @@ enum Tabs: Int {
     case settings = 2
 }
 
+extension NSNotification.Name {
+    static let oldUserLoggedIn = NSNotification.Name(Bundle.main.bundleIdentifier! + ".oldUserLoggedIn")
+}
+
 class GeneralTabBarController: UITabBarController {
     
     var onceToken = 0
-    let networkController = NetworkController()
+    static let networkController = NetworkController()
     
     fileprivate let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     fileprivate var isAppLoaded = false
     
     fileprivate var isNewUser = false
+    fileprivate var isOldUser = false
     
-    let homeController = MasterActivityContainerController()
-    let settingsController = AccountSettingsController()
+    let homeController = MasterActivityContainerController(networkController: GeneralTabBarController.networkController)
+    let discoverController = LibraryViewController(networkController: GeneralTabBarController.networkController)
     let analyticsController = AnalyticsViewController()
+    let launchController: UIViewController = {
+        let storyboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
+        return storyboard.instantiateViewController(withIdentifier: "LaunchScreen")
+    }()
     
     let splashContainer: SplashScreenContainer = {
         let splashContainer = SplashScreenContainer()
@@ -55,14 +64,106 @@ class GeneralTabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        appDelegate.loadNotifications()
-        
         homeController.delegate = self
-        setOnlineStatus()
-        loadVariables()
         configureTabBar()
         setTabs()
+        loadVariables()
+        addObservers()
+        appDelegate.loadNotifications()
+        setApplicationBadge()
+        setOnlineStatus()
+        showLaunchScreen()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if onceToken == 0 {
+            splashContainer.backgroundColor = .systemGroupedBackground
+            view.addSubview(splashContainer)
+            splashContainer.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+            splashContainer.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+            splashContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        }
+        onceToken = 1
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if isNewUser {
+            //has to be here given currentUserID = nil on app start
+            GeneralTabBarController.networkController.setupFirebase()
+            GeneralTabBarController.networkController.setupOtherVariables()
+            //change to stop from running
+            isNewUser = false
+        } else if isOldUser {
+            reloadVariables()
+        }
+    }
+    
+    @objc fileprivate func oldUserLoggedIn() {
+        isOldUser = true
+    }
+    
+    fileprivate func loadVariables() {
+        isNewUser = Auth.auth().currentUser == nil
+        homeController.isNewUser = isNewUser
+        homeController.addObservers()
+        GeneralTabBarController.networkController.askPermissionToTrack()
+        let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+//        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+        //if new user, do nothing; if existing user with old version of app, load other variables
+        //if existing user with current version, load everything
+        if !isNewUser {
+            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+            GeneralTabBarController.networkController.setupKeyVariables {
+                self.analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
+                GeneralTabBarController.networkController.setupOtherVariables()
+                self.removeLaunchScreenView()
+                self.homeController.openNotification()
+            }
+        } else {
+            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+            self.presentOnboardingController()
+        }
+    }
+    
+    @objc func reloadVariables() {
+        GeneralTabBarController.networkController.setupKeyVariables {
+            GeneralTabBarController.networkController.setupOtherVariables()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
+    }
+    
+    func setApplicationBadge() {
+        let badge = 0
+        UIApplication.shared.applicationIconBadgeNumber = badge
+        if let uid = Auth.auth().currentUser?.uid {
+            let ref = Database.database().reference().child("users").child(uid)
+            ref.updateChildValues(["badge": badge])
+        }
+    }
+    
+    private func wrapInNavigationController(
+        _ viewController: UIViewController,
+        icon: UIImage,
+        selectedIcon: UIImage? = nil
+    ) -> UINavigationController {
+        let controller = UINavigationController(rootViewController: viewController)
+        controller.navigationBar.prefersLargeTitles = true
+        controller.navigationItem.largeTitleDisplayMode = .always
+        controller.navigationBar.backgroundColor = .systemGroupedBackground
+        let tabBarItem = UITabBarItem(title: nil, image: icon, selectedImage: selectedIcon)
+        tabBarItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
+        controller.tabBarItem = tabBarItem
+        return controller
     }
     
     fileprivate func configureTabBar(){
@@ -85,72 +186,18 @@ class GeneralTabBarController: UITabBarController {
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if onceToken == 0 {
-            splashContainer.backgroundColor = .systemGroupedBackground
-            view.addSubview(splashContainer)
-            splashContainer.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-            splashContainer.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-            splashContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-            splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        }
-        onceToken = 1
-    }
-    
-    fileprivate func loadVariables() {
-        isNewUser = Auth.auth().currentUser == nil
-        homeController.isNewUser = isNewUser
-        
-        networkController.askPermissionToTrack()
-        
-        let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-//        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
-        //if new user, do nothing; if existing user with old version of app, load other variables
-        //if existing user with current version, load everything
-        if !isNewUser {
-            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
-            networkController.setupKeyVariables {
-                self.homeController.networkController = self.networkController
-                self.settingsController.networkController = self.networkController
-                self.analyticsController.viewModel = .init(networkController: self.networkController)
-                self.networkController.setupOtherVariables()
-                self.removeLaunchScreenView()
-            }
-        } else {
-            UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
-            self.removeLaunchScreenView()
-        }
-    }
-    
-    private func wrapInNavigationController(
-        _ viewController: UIViewController,
-        icon: UIImage,
-        selectedIcon: UIImage? = nil
-    ) -> UINavigationController {
-        let controller = UINavigationController(rootViewController: viewController)
-        controller.navigationBar.prefersLargeTitles = true
-        controller.navigationItem.largeTitleDisplayMode = .always
-        controller.navigationBar.backgroundColor = .systemGroupedBackground
-        let tabBarItem = UITabBarItem(title: nil, image: icon, selectedImage: selectedIcon)
-        tabBarItem.imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
-        controller.tabBarItem = tabBarItem
-        return controller
-    }
-    
     fileprivate func setTabs() {
         let tabBarControllers = [
             wrapInNavigationController(analyticsController,
                                        icon: UIImage(named: "chart")!),
             wrapInNavigationController(homeController, icon: UIImage(named: "home")!),
-            wrapInNavigationController(settingsController, icon: UIImage(named: "settings")!)
+            wrapInNavigationController(discoverController, icon: UIImage(named: "discover")!)
         ]
         viewControllers = tabBarControllers
         selectedIndex = Tabs.home.rawValue
     }
     
     func presentOnboardingController() {
-        guard isNewUser else { return }
         let destination = OnboardingController()
         let newNavigationController = UINavigationController(rootViewController: destination)
         newNavigationController.navigationBar.shadowImage = UIImage()
@@ -166,19 +213,26 @@ class GeneralTabBarController: UITabBarController {
     }
     
     func showLaunchScreen() {
-        launchScreenView.backgroundColor = .secondarySystemGroupedBackground
-        view.addSubview(launchScreenView)
-        launchScreenView.fillSuperview()
-        launchScreenView.addSubview(plotLogoView)
-        plotLogoView.heightAnchor.constraint(equalToConstant: 310).isActive = true
-        plotLogoView.widthAnchor.constraint(equalToConstant: 310).isActive = true
-        plotLogoView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        plotLogoView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        print("showLaunchScreen")
+        let navigationViewController = UINavigationController(rootViewController: launchController)
+        navigationViewController.modalPresentationStyle = .fullScreen
+        self.present(navigationViewController, animated: true, completion: nil)
+        
+//        launchScreenView.backgroundColor = .systemGroupedBackground
+//        launchScreenView.layer.zPosition = CGFloat(Float.greatestFiniteMagnitude)
+//        navigationController?.view.addSubview(launchScreenView)
+//        launchScreenView.fillSuperview()
+//        launchScreenView.addSubview(plotLogoView)
+//        plotLogoView.heightAnchor.constraint(equalToConstant: 310).isActive = true
+//        plotLogoView.widthAnchor.constraint(equalToConstant: 310).isActive = true
+//        plotLogoView.centerXAnchor.constraint(equalTo: launchScreenView.centerXAnchor).isActive = true
+//        plotLogoView.centerYAnchor.constraint(equalTo: launchScreenView.centerYAnchor).isActive = true
     }
     
     func removeLaunchScreenView() {
+        print("removeLaunchScreenView")
         DispatchQueue.main.async {
-            self.launchScreenView.removeFromSuperview()
+            self.launchController.dismiss(animated: true)
         }
     }
 }

@@ -97,7 +97,7 @@ class StackedBarChartCell: UITableViewCell {
 
     func initUI() {
         selectionStyle = .none
-        backgroundColor = .tertiarySystemBackground
+        backgroundColor = .secondarySystemGroupedBackground
 
         let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel, chartContainer, categoriesStackView])
         stack.translatesAutoresizingMaskIntoConstraints = false

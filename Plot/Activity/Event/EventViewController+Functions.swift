@@ -841,14 +841,14 @@ extension EventViewController {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
+                let newActivity = self.activity.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.activityOld)
+                var instanceValues = newActivity.toAnyObject()
+                
                 if self.activity.instanceOriginalStartDateTime == nil {
+                    instanceValues["instanceOriginalStartDateTime"] = self.activityOld.finalDateTime
                     self.activity.instanceOriginalStartDateTime = self.activityOld.finalDateTime
-                    self.activity.instanceOriginalAllDay = self.activityOld.allDay
-                    self.activity.instanceOriginalStartTimeZone = self.activityOld.startTimeZone
                 }
                 
-                let newActivity = self.activity.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.activityOld)
-                let instanceValues = newActivity.toAnyObject()
                 let createActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
 

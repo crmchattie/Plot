@@ -1343,8 +1343,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
     var totalValue: Double = end.timeIntervalSince(start)
     // create dateFormatter with UTC time format
     for activity in activities {
-        guard let activityStartDate = activity.startDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }),
-              let activityEndDate = activity.endDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }) else { return }
+        guard let activityStartDate = activity.startDate, let activityEndDate = activity.endDate else { continue }
         
         // Skipping activities that are outside of the interest range.
         if activityStartDate > end || activityEndDate <= start {

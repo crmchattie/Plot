@@ -16,7 +16,8 @@ protocol UpdateDiscover: AnyObject {
 }
 
 class LibraryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
-        
+    let networkController: NetworkController
+    
     private let kCompositionalHeader = "CompositionalHeader"
     private let kLibraryCell = "LibraryCell"
     private let kSubLibraryCell = "SubLibraryCell"
@@ -36,9 +37,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     var umbrellaActivity: Activity!
     
     var activityType: String!
-    
-    var networkController = NetworkController()
-    
+        
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
     let viewPlaceholder = ViewPlaceholder()
@@ -57,7 +56,8 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     }()
     var searchController: UISearchController?
     
-    init() {
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
             
@@ -88,6 +88,10 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         }
         
         super.init(collectionViewLayout: layout)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     static func topSection() -> NSCollectionLayoutSection {
@@ -184,10 +188,6 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.setCollectionViewLayout(layout, animated: true)
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Discover"
@@ -208,10 +208,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
-        
-        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
-        navigationItem.rightBarButtonItem = doneBarButton
-        
+                
         groups[.custom] = customTypes
         
         fetchTemplates()
@@ -325,55 +322,68 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
             case .event:
                 let destination = EventViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .task:
                 let destination = TaskViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .calendar:
                 let destination = CalendarDetailViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .lists:
                 let destination = ListDetailViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .meal:
                 let destination = MealViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mindfulness:
                 let destination = MindfulnessViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mood:
                 let destination = MoodViewController()
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .sleep:
                 let destination = SchedulerViewController()
                 destination.type = customType
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .work:
                 let destination = SchedulerViewController()
                 destination.type = customType
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .transaction:
                 let destination = FinanceTransactionViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .investment:
                 let destination = FinanceHoldingViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .financialAccount:
                 self.newAccount()
             case .transactionRule:
                 let destination = FinanceTransactionRuleViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             default:
                 let destination = SubLibraryViewController()
@@ -384,6 +394,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                     destination.templates = templates
                     destination.groups = [.templates: templates]
                     destination.updateDiscoverDelegate = self
+                    destination.hidesBottomBarWhenPushed = true
                     self.navigationController?.pushViewController(destination, animated: true)
                 }
             }
@@ -393,21 +404,25 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                 let destination = EventViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .task:
                 let destination = TaskViewController(networkController: networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .workout:
                 let destination = WorkoutViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .mindfulness:
                 let destination = MindfulnessViewController(networkController: self.networkController)
                 destination.updateDiscoverDelegate = self
                 destination.template = template
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             case .subtask:
                 print("subtask")
@@ -427,6 +442,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
             let destination = FinanceAccountViewController(networkController: self.networkController)
             destination.updateDiscoverDelegate = self
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }))
         

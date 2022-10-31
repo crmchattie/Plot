@@ -246,9 +246,9 @@ class ActivityService {
             self.observeCalendarsForCurrentUser()
             self.observeListsForCurrentUser()
             if self.isRunning {
-                completion()
                 self.grabOtherActivities()
                 self.isRunning = false
+                completion()
             }
         })
     }

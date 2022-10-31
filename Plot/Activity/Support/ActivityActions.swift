@@ -355,11 +355,7 @@ class ActivityActions: NSObject {
                 values = ["isCompleted": isComplete, "completedDate": completedDate as Any]
                 if activity.instanceOriginalStartDateTime == nil {
                     activity.instanceOriginalStartDateTime = activity.finalDateTime
-                    activity.instanceOriginalAllDay = activity.allDay ?? false
-                    activity.instanceOriginalStartTimeZone = activity.finalTimeZone
                     values["instanceOriginalStartDateTime"] = activity.finalDateTime as Any
-                    values["instanceOriginalAllDay"] = activity.instanceOriginalAllDay as Any
-                    values["instanceOriginalStartTimeZone"] = activity.instanceOriginalStartTimeZone as Any
                 }
                 activity.completedDate = completedDate
                 updateInstance(instanceValues: values, updateExternal: true)
@@ -367,11 +363,7 @@ class ActivityActions: NSObject {
                 values = ["isCompleted": isComplete]
                 if activity.instanceOriginalStartDateTime == nil {
                     activity.instanceOriginalStartDateTime = activity.finalDateTime
-                    activity.instanceOriginalAllDay = activity.allDay ?? false
-                    activity.instanceOriginalStartTimeZone = activity.finalTimeZone
                     values["instanceOriginalStartDateTime"] = activity.finalDateTime as Any
-                    values["instanceOriginalAllDay"] = activity.instanceOriginalAllDay as Any
-                    values["instanceOriginalStartTimeZone"] = activity.instanceOriginalStartTimeZone as Any
                 }
                 activity.completedDate = nil
                 updateInstance(instanceValues: values, updateExternal: true)
@@ -430,6 +422,8 @@ class ActivityActions: NSObject {
         }
         updateInstanceValues["name"] = activity.name
         updateInstanceValues["recurringEventID"] = activityID
+        
+        print(updateInstanceValues)
                 
         let groupInstanceActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)
         groupInstanceActivityReference.updateChildValues(updateInstanceValues) { _,_ in

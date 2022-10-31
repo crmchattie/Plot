@@ -11,7 +11,7 @@ import Firebase
 import PhoneNumberKit
 
 class AccountSettingsController: UITableViewController {
-    var networkController = NetworkController()
+    let networkController: NetworkController
     let phoneNumberKit = PhoneNumberKit()
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
@@ -37,6 +37,15 @@ class AccountSettingsController: UITableViewController {
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let nightMode = UIButton()
     
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Settings"
@@ -48,7 +57,6 @@ class AccountSettingsController: UITableViewController {
         
         configureTableView()
         configureContainerView()
-        configureNavigationBar()
         listenChanges()
         addObservers()
     }
@@ -112,13 +120,6 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.email.textColor = .label
         userProfileContainerView.bio.keyboardAppearance = .default
         userProfileContainerView.name.keyboardAppearance = .default
-    }
-
-    func configureNavigationBar() {
-//        navigationController?.navigationBar.barStyle = .default
-//        navigationController?.navigationBar.barTintColor = .systemGroupedBackground
-        doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
-        navigationItem.rightBarButtonItem = doneBarButton
     }
     
     @objc func doneBarButtonPressed() {
