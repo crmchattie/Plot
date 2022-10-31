@@ -54,6 +54,8 @@ class AccountSettingsController: UITableViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         
+        doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
+        navigationItem.rightBarButtonItem = doneBarButton
         
         configureTableView()
         configureContainerView()

@@ -47,21 +47,6 @@ class GeneralTabBarController: UITabBarController {
         return splashContainer
     }()
     
-    let launchScreenView: UIView = {
-        let launchScreenView = UIView()
-        launchScreenView.translatesAutoresizingMaskIntoConstraints = false
-        launchScreenView.layer.masksToBounds = true
-        return launchScreenView
-    }()
-    
-    let plotLogoView: UIImageView = {
-        let plotLogoView = UIImageView()
-        plotLogoView.translatesAutoresizingMaskIntoConstraints = false
-        plotLogoView.layer.masksToBounds = true
-        plotLogoView.image = UIImage(named: "plotLogo")
-        return plotLogoView
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         homeController.delegate = self
@@ -72,7 +57,6 @@ class GeneralTabBarController: UITabBarController {
         appDelegate.loadNotifications()
         setApplicationBadge()
         setOnlineStatus()
-        showLaunchScreen()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -86,6 +70,7 @@ class GeneralTabBarController: UITabBarController {
             splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
         onceToken = 1
+        showLaunchScreen()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -214,19 +199,8 @@ class GeneralTabBarController: UITabBarController {
     
     func showLaunchScreen() {
         print("showLaunchScreen")
-        let navigationViewController = UINavigationController(rootViewController: launchController)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
-        
-//        launchScreenView.backgroundColor = .systemGroupedBackground
-//        launchScreenView.layer.zPosition = CGFloat(Float.greatestFiniteMagnitude)
-//        navigationController?.view.addSubview(launchScreenView)
-//        launchScreenView.fillSuperview()
-//        launchScreenView.addSubview(plotLogoView)
-//        plotLogoView.heightAnchor.constraint(equalToConstant: 310).isActive = true
-//        plotLogoView.widthAnchor.constraint(equalToConstant: 310).isActive = true
-//        plotLogoView.centerXAnchor.constraint(equalTo: launchScreenView.centerXAnchor).isActive = true
-//        plotLogoView.centerYAnchor.constraint(equalTo: launchScreenView.centerYAnchor).isActive = true
+        launchController.modalPresentationStyle = .fullScreen
+        self.present(launchController, animated: true, completion: nil)
     }
     
     func removeLaunchScreenView() {
@@ -242,6 +216,7 @@ extension GeneralTabBarController: ManageAppearanceHome {
         guard !isAppLoaded else { return }
         isAppLoaded = true
         let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
+        _ = discoverController.view
         guard state else { return }
         if isBiometricalAuthEnabled {
             splashContainer.authenticationWithTouchID()

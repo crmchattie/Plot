@@ -273,19 +273,6 @@ class ActivitiesFetcher: NSObject {
                             .recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                         for date in dates {
                             let updatedDate = NSNumber(value: Int(date.timeIntervalSince1970))
-                            if activity.name == "Weekly Groceries" {
-                                print(updatedDate)
-                                print(activities.count)
-                                for (date, _) in activities {
-                                    print(date)
-                                    print(date == updatedDate)
-                                }
-                                if let _ = activities[updatedDate] {
-                                    print("found activity")
-                                } else {
-                                    print("did find activity")
-                                }
-                            }
                             if let instanceActivity = activities[updatedDate], let instanceID = instanceActivity.instanceID {
                                 let newActivity = activity.updateActivityWActivityNewInstance(updatingActivity: instanceActivity)
                                 newActivity.recurrenceStartDateTime = activity.finalDateTime

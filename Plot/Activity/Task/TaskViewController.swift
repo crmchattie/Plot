@@ -796,8 +796,12 @@ class TaskViewController: FormViewController {
             row.cell.selectionStyle = .default
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
-            if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let endDate = self.task.endDate {
-                row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+            if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
+                if let endDate = self.task.instanceOriginalStartDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                } else if let endDate = self.task.endDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                }
             } else {
                 row.value = "Never"
             }
@@ -809,11 +813,6 @@ class TaskViewController: FormViewController {
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
-            if let recurrences = self.task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let endDate = self.task.endDate {
-                row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
-            } else {
-                row.value = "Never"
-            }
         }
         
         <<< PushRow<EventAlert>("Reminder") { row in
@@ -962,12 +961,13 @@ class TaskViewController: FormViewController {
                 self.task.showExtras = true
             }
         }.onChange { [weak self] row in
-            if !row.value!, let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+            if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
                 self?.segmentRowValue = segmentRow.value ?? "Health"
                 segmentRow.value = "Hidden"
             } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
                 segmentRow.value = self?.segmentRowValue
             }
+            self?.task.showExtras = row.value
             guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["showExtras": row.value ?? false]

@@ -208,7 +208,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
-                
+        
         groups[.custom] = customTypes
         
         fetchTemplates()

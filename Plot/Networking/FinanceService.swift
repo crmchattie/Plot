@@ -680,7 +680,6 @@ class FinanceService {
                     //if first is plot_created && transacted_date is more than 7 days past, then delete transaction and activity given recurrances may have stopped, otherwise do nothing
                     //if second is plot_created, potentially delete if first is 'real' transaction and reassign existing task to 'real' transaction
                     //make sure new plot_created transaction is in the future
-                    print(description)
                     if filteredTransactions.count > 1 {
                         if !(filteredTransactions[0].plot_created ?? false), !(filteredTransactions[1].plot_created ?? false), let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at) {
                             var days = 0

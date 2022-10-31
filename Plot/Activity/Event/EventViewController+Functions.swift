@@ -432,7 +432,7 @@ extension EventViewController {
     }
     
     func updateRepeatReminder() {
-        if let _ = activity.recurrences {
+        if let _ = activity.recurrences, !active {
             scheduleRecurrences()
         }
         if let _ = activity.reminder {
@@ -861,14 +861,13 @@ extension EventViewController {
             }))
             
             alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
-                print("Save for future events")
                 //update activity's recurrence to stop repeating just before this event
                 var oldActivityRule = oldRecurrenceRule
                 //will equal true if first instance of repeating event
-                let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
+                let futureDate = Calendar.current.date(byAdding: .month, value: 3, to: Date())
                 let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: recurrenceStartDate)
                 let dates = iCalUtility()
-                    .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
+                    .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                 
                 if let dateIndex = dates.firstIndex(of: startDate) {
                     if dateIndex == 0 {

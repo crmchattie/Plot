@@ -93,7 +93,7 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = .systemGroupedBackground
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
-                
+                        
         filteredTemplates = templates.sorted(by: { $0.name < $1.name })
         setupData()
         setupSearchController()

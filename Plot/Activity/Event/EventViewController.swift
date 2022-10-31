@@ -537,8 +537,12 @@ class EventViewController: FormViewController {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if let activity = activity, let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]), let startDate = activity.startDate {
-                row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
+            if let activity = activity, let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
+                if let startDate = activity.instanceOriginalStartDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
+                } else if let startDate = activity.startDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
+                }
             } else {
                 row.value = "Never"
             }
@@ -697,12 +701,13 @@ class EventViewController: FormViewController {
                 self.activity.showExtras = true
             }
         }.onChange { [weak self] row in
-            if !row.value!, let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+            if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
                 self?.segmentRowValue = segmentRow.value ?? "Health"
                 segmentRow.value = "Hidden"
             } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
                 segmentRow.value = self?.segmentRowValue
             }
+            self?.activity.showExtras = row.value
             guard let currentUserID = Auth.auth().currentUser?.uid else { return }
             let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
             let values:[String : Any] = ["showExtras": row.value ?? false]

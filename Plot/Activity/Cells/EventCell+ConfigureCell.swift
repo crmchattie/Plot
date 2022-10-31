@@ -63,7 +63,7 @@ extension EventCell {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
         
-        if let badgeDate = activity.badgeDate, let finalDateTime = activity.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))] {
+        if let badgeDate = activity.badgeDate, let finalDateTime = activity.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))], badge > 0 {
             badgeLabel.text = String(badge)
             badgeLabel.isHidden = false
         } else if let badge = activity.badge, badge > 0 {
@@ -178,7 +178,7 @@ extension EventCollectionCell {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
         
-        if let badgeDate = activity.badgeDate, let finalDateTime = activity.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))] {
+        if let badgeDate = activity.badgeDate, let finalDateTime = activity.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))], badge > 0 {
             badgeLabel.text = String(badge)
             badgeLabel.isHidden = false
         } else if let badge = activity.badge, badge > 0 {

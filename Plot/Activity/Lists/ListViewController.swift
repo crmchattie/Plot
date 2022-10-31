@@ -46,7 +46,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     var showCompletedTasks: Bool = true
     var showRecurringTasks: Bool = true
     var taskSort: String = "Due Date"
-    var filters: [filter] = [.search, .taskSort, .showCompletedTasks, .taskCategory]
+    var filters: [filter] = [.search, .taskSort, .showCompletedTasks, .showRecurringTasks, .taskCategory]
     var filterDictionary = [String: [String]]()
     
     override func viewDidLoad() {
@@ -232,6 +232,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func filter() {
+        filterDictionary["showRecurringTasks"] = showRecurringTasks ? ["Yes"] : ["No"]
         filterDictionary["showCompletedTasks"] = showCompletedTasks ? ["Yes"] : ["No"]
         filterDictionary["taskSort"] = [taskSort]
         let destination = FilterViewController(networkController: networkController)
@@ -506,6 +507,37 @@ extension ListViewController: UpdateFilter {
         if let value = filterDictionary["taskSort"] {
             let sort = value[0]
             self.taskSort = sort
+        }
+        
+        switch ListOptions(rawValue: list.name ?? "") {
+        case .allList:
+            break
+        case .flaggedList:
+            let flaggedTasks = filteredTasks.filter {
+                if $0.flagged ?? false {
+                    return true
+                }
+                return false
+            }
+            filteredTasks = flaggedTasks
+        case .scheduledList:
+            let scheduledTasks = filteredTasks.filter {
+                if let _ = $0.endDate {
+                    return true
+                }
+                return false
+            }
+            filteredTasks = scheduledTasks
+        case .todayList:
+            let dailyTasks = filteredTasks.filter {
+                if let endDate = $0.endDate {
+                    return NSCalendar.current.isDateInToday(endDate)
+                }
+                return false
+            }
+            filteredTasks = dailyTasks
+        default:
+            filteredTasks = filteredTasks.filter { $0.listID == list.id }
         }
         
         dispatchGroup.notify(queue: .main) {
