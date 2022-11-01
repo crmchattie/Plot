@@ -50,6 +50,7 @@ final class ScheduleCell: Cell<Activity>, CellType {
     //blue dot on the left of cell
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "event"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tintColor = .systemBlue
@@ -91,7 +92,10 @@ final class ScheduleCell: Cell<Activity>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 
-        guard let schedule = row.value else { return }
+        guard let schedule = row.value else {
+            nameLabel.text = "Connecting Event"
+            return
+        }
 
         nameLabel.text = schedule.name
 

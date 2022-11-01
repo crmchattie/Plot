@@ -121,7 +121,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
     guard let controller = parentController else { return }
     
     if currentReachabilityStatus == .notReachable {
-      basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: controller)
+      basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: controller)
       return
     }
     
@@ -131,7 +131,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
         presentGallery()
         break
       case .denied, .restricted:
-        basicErrorAlertWith(title: basicTitleForAccessError, message: photoLibraryAccessDeniedMessageProfilePicture, controller: controller)
+        basicErrorAlertWithClose(title: basicTitleForAccessError, message: photoLibraryAccessDeniedMessageProfilePicture, controller: controller)
         return
       case .notDetermined:
         PHPhotoLibrary.requestAuthorization() { status in
@@ -140,7 +140,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
               self.presentGallery()
               break
             case .denied, .restricted, .notDetermined:
-              basicErrorAlertWith(title: basicTitleForAccessError, message: photoLibraryAccessDeniedMessageProfilePicture, controller: controller)
+              basicErrorAlertWithClose(title: basicTitleForAccessError, message: photoLibraryAccessDeniedMessageProfilePicture, controller: controller)
               break
           case .limited:
               self.presentGallery()
@@ -161,7 +161,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
     guard let controller = parentController else { return }
   
     if currentReachabilityStatus == .notReachable {
-      basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: controller)
+      basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: controller)
       return
     }
    
@@ -172,7 +172,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
         presentCamera()
         break
       case .denied, .restricted:
-        basicErrorAlertWith(title: basicTitleForAccessError, message: cameraAccessDeniedMessageProfilePicture, controller: controller)
+        basicErrorAlertWithClose(title: basicTitleForAccessError, message: cameraAccessDeniedMessageProfilePicture, controller: controller)
         return
       case .notDetermined:
         AVCaptureDevice.requestAccess(for: AVMediaType.video) { granted in
@@ -181,7 +181,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
               self.presentCamera()
               break
             case false:
-              basicErrorAlertWith(title: basicTitleForAccessError, message: cameraAccessDeniedMessageProfilePicture, controller: controller)
+              basicErrorAlertWithClose(title: basicTitleForAccessError, message: cameraAccessDeniedMessageProfilePicture, controller: controller)
               break
           }
         }
@@ -205,7 +205,7 @@ class AvatarOpener: NSObject, UIImagePickerControllerDelegate, UINavigationContr
   private func presentCamera() {
     guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
       guard let controller = parentController else { return }
-      basicErrorAlertWith(title: basicErrorTitleForAlert, message: cameraNotExistsMessage, controller: controller)
+      basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: cameraNotExistsMessage, controller: controller)
       return
     }
     DispatchQueue.main.async {

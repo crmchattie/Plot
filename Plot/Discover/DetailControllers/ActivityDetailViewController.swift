@@ -172,7 +172,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     func fetchFavAct() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         
@@ -280,7 +280,7 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
     
     @objc func goToMap(activity: Activity) {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = MapViewController()

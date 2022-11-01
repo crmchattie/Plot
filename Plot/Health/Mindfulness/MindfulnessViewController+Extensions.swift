@@ -79,7 +79,7 @@ extension MindfulnessViewController {
     
     func openTask() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if taskList.indices.contains(taskIndex) {
@@ -133,7 +133,7 @@ extension MindfulnessViewController {
     
     func openEvent() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if eventList.indices.contains(eventIndex) {
@@ -187,7 +187,7 @@ extension MindfulnessViewController {
     
     func openPurchases() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if purchaseList.indices.contains(purchaseIndex) {

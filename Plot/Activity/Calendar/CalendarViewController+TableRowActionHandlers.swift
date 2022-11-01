@@ -101,7 +101,7 @@ extension CalendarViewController {
         
         let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
             if self.currentReachabilityStatus == .notReachable {
-                basicErrorAlertWith(title: "Error deleting message", message: noInternetError, controller: self)
+                basicErrorAlertWithClose(title: "Error deleting message", message: noInternetError, controller: self)
                 return
             }
             if indexPath.section == 0 {
@@ -146,7 +146,7 @@ extension CalendarViewController {
 //        let metadataRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
 //        metadataRef.updateChildValues(["pinned": false], withCompletionBlock: { (error, reference) in
 //            if error != nil {
-//                basicErrorAlertWith(title: pinErrorTitle , message: pinErrorMessage, controller: self)
+//                basicErrorAlertWithClose(title: pinErrorTitle , message: pinErrorMessage, controller: self)
 //                return
 //            }
 //        })
@@ -185,7 +185,7 @@ extension CalendarViewController {
 //        let metadataReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
 //        metadataReference.updateChildValues(["pinned": true], withCompletionBlock: { (error, reference) in
 //            if error != nil {
-//                basicErrorAlertWith(title: pinErrorTitle, message: pinErrorMessage, controller: self)
+//                basicErrorAlertWithClose(title: pinErrorTitle, message: pinErrorMessage, controller: self)
 //                return
 //            }
 //        })
@@ -275,7 +275,7 @@ extension CalendarViewController {
         let metadataReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
         metadataReference.updateChildValues(["muted": state], withCompletionBlock: { (error, reference) in
             if error != nil {
-                basicErrorAlertWith(title: muteErrorTitle, message: muteErrorMessage, controller: self)
+                basicErrorAlertWithClose(title: muteErrorTitle, message: muteErrorMessage, controller: self)
             }
         })
     }

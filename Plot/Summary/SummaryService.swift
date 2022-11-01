@@ -76,11 +76,8 @@ class SummaryService: SummaryServiceInterface {
         if let activities = activities {
             var entries = [Entry]()
             dispatchGroup.enter()
-            print("categorizeActivities")
-            categorizeActivities(activities: activities, start: startDate, end: endDate) { (categoryDict, _) in
-                print("activitiesOverTimeChartData")
-                activitiesOverTimeChartData(activities: activities, activityCategories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
-                    print("finished with activitiesOverTimeChartData")
+            categorizeActivities(activities: activities, start: startDate, end: endDate) { (categoryDict, activitiesList) in
+                activitiesOverTimeChartData(activities: activitiesList, activityCategories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
                     if !statsDict.isEmpty {
                         barChartStats[.calendarSummary] = statsDict
                     }

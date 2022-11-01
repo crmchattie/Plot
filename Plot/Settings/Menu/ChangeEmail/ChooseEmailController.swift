@@ -52,7 +52,7 @@ extension ChooseEmailController: GIDSignInDelegate {
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
         if error != nil {
-            basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Oops! Something happened, try again later.", controller: self)
+            basicErrorAlertWithClose(title: "Error", message: error?.localizedDescription ?? "Oops! Something happened, try again later.", controller: self)
             return
         }
         
@@ -62,14 +62,14 @@ extension ChooseEmailController: GIDSignInDelegate {
             
             Auth.auth().signIn(with: credential) { (authResult, error) in
                 if error != nil {
-                    basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Oops! Something happened, try again later.", controller: self)
+                    basicErrorAlertWithClose(title: "Error", message: error?.localizedDescription ?? "Oops! Something happened, try again later.", controller: self)
                     return
                 }
                 if let email = user.profile?.email {
                     let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
                     userReference.updateChildValues(["email" : email]) { (error, reference) in
                         if error != nil {
-                            basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
+                            basicErrorAlertWithClose(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
                             return
                         }
                         

@@ -54,7 +54,7 @@ final class SubtaskCell: Cell<Activity>, CellType {
     //blue dot on the left of cell
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "activity"), for: .normal)
+        button.setImage(UIImage(named: "task"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -112,7 +112,10 @@ final class SubtaskCell: Cell<Activity>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 
-        guard let subtask = row.value else { return }
+        guard let subtask = row.value else {
+            nameLabel.text = "Connecting Task"
+            return
+        }
                 
         nameLabel.text = subtask.name
         
@@ -135,15 +138,15 @@ final class SubtaskCell: Cell<Activity>, CellType {
         if let subcategoryValue = subtask.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
             if subcategory == .uncategorized {
-                activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+                activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             }
         } else if let categoryValue = subtask.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
-                activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+                activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             }
         } else {
-            activityTypeButton.setImage(UIImage(named: "event"), for: .normal)
+            activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
         }
         
         checkImage.tintColor = .secondaryLabel

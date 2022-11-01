@@ -112,7 +112,7 @@ class ScheduleListViewController: FormViewController {
     
     func openSchedule() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if scheduleList.indices.contains(scheduleIndex) {

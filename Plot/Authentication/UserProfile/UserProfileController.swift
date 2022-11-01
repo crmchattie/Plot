@@ -67,7 +67,7 @@ class UserProfileController: UIViewController {
     
     @objc fileprivate func openUserProfilePicture() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         avatarOpener.delegate = self
@@ -98,7 +98,7 @@ extension UserProfileController {
             userProfileContainerView.phone.shake()
         } else {
             if currentReachabilityStatus == .notReachable {
-                basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)
+                basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
                 return
             }
             updateUserData()

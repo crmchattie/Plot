@@ -115,7 +115,7 @@ class SubtaskListViewController: FormViewController {
     
     func openSubtask() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if subtaskList.indices.contains(subtaskIndex) {

@@ -71,7 +71,10 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
         
-        guard let transaction = row.value else { return }
+        guard let transaction = row.value else {
+            nameLabel.text = "Connecting Transaction"
+            return
+        }
         
         // set the texts to the labels
         nameLabel.text = transaction.description

@@ -43,5 +43,6 @@ class AnalyticsLineChartCell: StackedBarChartCell {
         chartView.xAxis.valueFormatter = viewModel.horizontalAxisValueFormatter
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         chartView.data = viewModel.chartData
+        chartView.notifyDataSetChanged()
     }
 }

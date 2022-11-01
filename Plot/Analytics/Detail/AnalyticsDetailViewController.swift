@@ -27,7 +27,6 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         let control = UISegmentedControl(items: DateRangeType.allCases.map { $0.filterTitle } )
         control.selectedSegmentIndex = 0
         control.translatesAutoresizingMaskIntoConstraints = false
-        control.addTarget(AnalyticsDetailViewController.self, action: #selector(rangeChanged), for: .valueChanged)
         return control
     }()
     
@@ -37,6 +36,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
+        tableView.register(TaskCell.self)
         tableView.register(EventCell.self)
         tableView.register(FinanceTableViewCell.self)
         return tableView
@@ -58,6 +58,8 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         navigationItem.largeTitleDisplayMode = .never
         
         navigationItem.title = viewModel.title
+        
+        rangeControlView.addTarget(self, action: #selector(rangeChanged), for: .valueChanged)
         
         let rangeContainer = UIView()
         rangeContainer.translatesAutoresizingMaskIntoConstraints = false
@@ -161,9 +163,25 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         } else {
             switch viewModel.entries.value[indexPath.row] {
             case .activity(let activity):
-                let cell = tableView.dequeueReusableCell(ofType: EventCell.self, for: indexPath)
-                cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
-                return cell
+                if activity.isTask ?? false {
+                    let cell = tableView.dequeueReusableCell(ofType: TaskCell.self, for: indexPath)
+                    if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                        cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                    } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
+                        cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                    }
+                    cell.configureCell(for: indexPath, task: activity)
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(ofType: EventCell.self, for: indexPath)
+                    if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
+                        cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
+                        cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                    }
+                    cell.configureCell(for: indexPath, activity: activity, withInvitation: nil)
+                    return cell
+                }
             case .transaction(let transaction):
                 let cell = tableView.dequeueReusableCell(ofType: FinanceTableViewCell.self, for: indexPath)
                 cell.transaction = transaction
@@ -181,7 +199,11 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         guard indexPath.section > 0 else { return }
         switch viewModel.entries.value[indexPath.row] {
         case .activity(let activity):
-            showEventDetailPush(event: activity)
+            if activity.isTask ?? false {
+                showTaskDetailPush(task: activity)
+            } else {
+                showEventDetailPush(event: activity)
+            }
         case .transaction(let transaction):
             showTransactionDetailPush(transaction: transaction)
         case .account(let account):

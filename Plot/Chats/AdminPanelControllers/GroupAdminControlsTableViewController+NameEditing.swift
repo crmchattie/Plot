@@ -40,7 +40,7 @@ extension GroupAdminControlsTableViewController: UITextFieldDelegate { /* user n
     if currentName.count == 0 ||
         currentName.trimmingCharacters(in: .whitespaces).isEmpty {
         if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWith(title: "No internet", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "No internet", message: noInternetError, controller: self)
             return
         }
         
@@ -73,7 +73,7 @@ extension GroupAdminControlsTableViewController: UITextFieldDelegate { /* user n
   @objc func doneBarButtonPressed() {
     
     if currentReachabilityStatus == .notReachable {
-      basicErrorAlertWith(title: "No internet", message: noInternetError, controller: self)
+      basicErrorAlertWithClose(title: "No internet", message: noInternetError, controller: self)
       return
     }
   

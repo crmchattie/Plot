@@ -49,7 +49,7 @@ class EnterVerificationCodeController: UIViewController {
     @objc fileprivate func sendSMSConfirmation () {
         
         if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
             return
         }
         
@@ -68,7 +68,7 @@ class EnterVerificationCodeController: UIViewController {
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
             if let error = error {
                 print("confirmation error")
-                basicErrorAlertWith(title: "Error", message: error.localizedDescription + "\nPlease try again later.", controller: self)
+                basicErrorAlertWithClose(title: "Error", message: error.localizedDescription + "\nPlease try again later.", controller: self)
                 return
             }
             
@@ -98,7 +98,7 @@ class EnterVerificationCodeController: UIViewController {
         }
         
         if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
             return
         }
         
@@ -114,7 +114,7 @@ class EnterVerificationCodeController: UIViewController {
         Auth.auth().currentUser?.updatePhoneNumber(credential, completion: { (error) in
             if error != nil {
                 self.removeSpinner()
-                basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
+                basicErrorAlertWithClose(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
                 return
             }
             
@@ -133,7 +133,7 @@ class EnterVerificationCodeController: UIViewController {
             userReference.updateChildValues(["phoneNumber" : phoneNumberForFB]) { (error, reference) in
                 if error != nil {
                     self.removeSpinner()
-                    basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
+                    basicErrorAlertWithClose(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
                     return
                 }
                 
@@ -146,7 +146,7 @@ class EnterVerificationCodeController: UIViewController {
     func authenticate() {
         enterVerificationContainerView.verificationCode.resignFirstResponder()
         if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
             return
         }
         
@@ -160,7 +160,7 @@ class EnterVerificationCodeController: UIViewController {
         }
         
         if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
         }
         
         if let navController = self.navigationController {
@@ -176,7 +176,7 @@ class EnterVerificationCodeController: UIViewController {
         Auth.auth().signIn(with: credential) { (authDataResult, error) in
             if error != nil {
                 self.removeSpinner()
-                basicErrorAlertWith(title: "Error", message: error?.localizedDescription ?? "Oops! Something happened, try again later.", controller: self)
+                basicErrorAlertWithClose(title: "Error", message: error?.localizedDescription ?? "Oops! Something happened, try again later.", controller: self)
                 return
             }
             

@@ -273,7 +273,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if segmentedControl.selectedSegmentIndex == 0 {
@@ -377,7 +377,7 @@ class MediaViewController: UIViewController, UICollectionViewDelegate, UICollect
     
     @objc fileprivate func upload() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if segmentedControl.selectedSegmentIndex == 0 {
@@ -472,7 +472,7 @@ extension MediaViewController: AvatarOpenerDelegate {
             self.updateImage(with: image, completion: { (isUpdated) in
                 self.navigationController?.view.isUserInteractionEnabled = true
                 guard isUpdated else {
-                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self)
+                    basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self)
                     return
                 }
             })
@@ -489,7 +489,7 @@ extension MediaViewController: AvatarOpenerDelegate {
         deleteCurrentPhoto { (isDeleted) in
             self.navigationController?.view.isUserInteractionEnabled = true
             guard isDeleted else {
-                basicErrorAlertWith(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self)
+                basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self)
                 return
             }
         }

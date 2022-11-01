@@ -228,7 +228,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     
     @objc fileprivate func updateLocal() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = LocationFinderTableViewController()

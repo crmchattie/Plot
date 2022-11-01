@@ -1337,9 +1337,9 @@ class Activity: NSObject, NSCopying, Codable {
     }
 }
 
-func categorizeActivities(activities: [Activity], start: Date, end: Date, completion: @escaping ([String: Double], [String: [Activity]]) -> ()) {
+func categorizeActivities(activities: [Activity], start: Date, end: Date, completion: @escaping ([String: Double], [Activity]) -> ()) {
     var categoryDict = [String: Double]()
-    var activitiesDict = [String: [Activity]]()
+    var activitiesList = [Activity]()
     var totalValue: Double = end.timeIntervalSince(start)
     // create dateFormatter with UTC time format
     for activity in activities {
@@ -1352,38 +1352,33 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
         
         let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
         if let type = activity.category {
+            print(type)
             guard type != "Not Applicable" else { continue }
             totalValue -= duration
             if categoryDict[type] == nil {
                 categoryDict[type] = duration
-                activitiesDict[type] = [activity]
+                activitiesList.append(activity)
             } else {
                 let double = categoryDict[type]
                 categoryDict[type] = double! + duration
-                
-                var activities = activitiesDict[type]
-                activities!.append(activity)
-                activitiesDict[type] = activities
+                activitiesList.append(activity)
             }
         } else {
             totalValue -= duration
             let type = "No Category"
             if categoryDict[type] == nil {
                 categoryDict[type] = duration
-                activitiesDict[type] = [activity]
+                activitiesList.append(activity)
             } else {
                 let double = categoryDict[type]
                 categoryDict[type] = double! + duration
-                
-                var activities = activitiesDict[type]
-                activities!.append(activity)
-                activitiesDict[type] = activities
+                activitiesList.append(activity)
             }
         }
     }
-    categoryDict["No Activities"] = totalValue
+    categoryDict["No Events"] = totalValue
     
-    completion(categoryDict, activitiesDict)
+    completion(categoryDict, activitiesList)
 }
 
 func activitiesOverTimeChartData(activities: [Activity], activityCategories: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Activity]]) -> ()) {
@@ -1404,10 +1399,12 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
     var nextDate = calendar.date(byAdding: component, value: 1, to: date)!
     while date < end {
         for activityCategory in activityCategories {
-            if activityCategory == "No Activities" {
+            print(activityCategory)
+            if activityCategory == "No Events" {
                 continue
             }
             activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
+                print(stats)
                 if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                     var acStats = statistics[activityCategory]
                     var acActivityList = activityDict[activityCategory]
@@ -1435,7 +1432,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
 ///   - activities: A list of activities to analize.
 ///   - activityCategory: no idea what this is.
 ///   - chunkStart: Start date in which the activities are split and categorized.
-///   - chunkEnd: Start date in which the activities are split and categorized.
+///   - chunkEnd: End date in which the activities are split and categorized.
 ///   - completion: list of statistical elements and activities.
 func activityListStats(
     activities: [Activity],
@@ -1444,16 +1441,28 @@ func activityListStats(
     chunkEnd: Date,
     completion: @escaping ([Statistic], [Activity]) -> ()
 ) {
+    print("activityListStats")
+    print(chunkStart)
+    print(chunkEnd)
     var statistics = [Statistic]()
     var activityList = [Activity]()
     for activity in activities {
-        guard var activityStartDate = activity.startDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }),
-              var activityEndDate = activity.endDateTime.map({ Date(timeIntervalSince1970: $0.doubleValue) }) else { return }
+        print(activity.name)
+        guard var activityStartDate = activity.startDate,
+              var activityEndDate = activity.endDate else {
+            return
+        }
         
+        print("passed the return")
         // Skipping activities that are outside of the interest range.
         if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
+            print(activityStartDate)
+            print(activityEndDate)
+            print("continue")
             continue
         }
+        
+        print("passed the continue")
         
         // Truncate events that out of the [chunkStart, chunkEnd] range.
         // Multi-day events, chunked into single day `Statistic`s are the best example.

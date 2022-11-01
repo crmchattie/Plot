@@ -63,7 +63,7 @@ extension ListsViewController {
 //
 //        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
 //            if self.currentReachabilityStatus == .notReachable {
-//                basicErrorAlertWith(title: "Error deleting message", message: noInternetError, controller: self)
+//                basicErrorAlertWithClose(title: "Error deleting message", message: noInternetError, controller: self)
 //                return
 //            }
 //            if indexPath.section == 0 {

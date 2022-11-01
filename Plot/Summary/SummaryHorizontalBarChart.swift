@@ -67,7 +67,7 @@ class SummaryHorizontalBarChartCell: UICollectionViewCell {
                 l.formSize = 9
                 l.font = UIFont.caption2.with(weight: .regular)
                 l.xEntrySpace = 4
-                
+                chartView.notifyDataSetChanged()
                 setupViews()
             }
         }

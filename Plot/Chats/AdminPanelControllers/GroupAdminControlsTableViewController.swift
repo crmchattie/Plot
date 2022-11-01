@@ -392,7 +392,7 @@ class GroupAdminControlsTableViewController: UITableViewController {
     @objc fileprivate func openUserProfilePicture() {
         if !isCurrentUserAdministrator && groupProfileTableHeaderContainer.profileImageView.image == nil && conversationAdminNeeded { return }
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         avatarOpener.delegate = self

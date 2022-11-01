@@ -24,7 +24,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
     
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
-    let title: String = "Activities"
+    let title: String = "Events"
     
     private lazy var dateFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()

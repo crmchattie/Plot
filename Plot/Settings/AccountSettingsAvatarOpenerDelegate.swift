@@ -15,7 +15,7 @@ extension AccountSettingsController: AvatarOpenerDelegate {
             self?.userProfileDataDatabaseUpdater.updateUserProfile(with: image, completion: { [weak self] (isUpdated) in
                 self?.userProfileContainerView.profileImageView.hideActivityIndicator()
                 guard isUpdated else {
-                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self!)
+                    basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self!)
                     return
                 }
                 self?.userProfileContainerView.addPhotoLabel.isHidden = true
@@ -29,7 +29,7 @@ extension AccountSettingsController: AvatarOpenerDelegate {
         userProfileDataDatabaseUpdater.deleteCurrentPhoto { [weak self] (isDeleted) in
             self?.userProfileContainerView.profileImageView.hideActivityIndicator()
             guard isDeleted else {
-                basicErrorAlertWith(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self!)
+                basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self!)
                 return
             }
             self?.userProfileContainerView.profileImageView.image = nil

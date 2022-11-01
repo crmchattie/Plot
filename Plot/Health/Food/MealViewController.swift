@@ -138,7 +138,7 @@ class MealViewController: FormViewController {
                 print("User click Approve button")
                 // create new meal with updated time
                 guard self.currentReachabilityStatus != .notReachable else {
-                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
                     return
                 }
                 
@@ -589,7 +589,7 @@ class MealViewController: FormViewController {
     
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = SelectActivityMembersViewController()

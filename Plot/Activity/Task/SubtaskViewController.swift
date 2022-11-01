@@ -1005,7 +1005,7 @@ class SubtaskViewController: FormViewController {
     //update so existing invitees are shown as selected
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = SelectActivityMembersViewController()
@@ -1057,7 +1057,7 @@ class SubtaskViewController: FormViewController {
     
     @objc func goToMap() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         

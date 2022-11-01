@@ -81,7 +81,7 @@ class SummaryTimeBarChartCell: UICollectionViewCell {
                 marker.chartView = chartView
                 marker.minimumSize = CGSize(width: 80, height: 40)
                 chartView.marker = marker
-                
+                chartView.notifyDataSetChanged()
                 setupViews()
             }
         }

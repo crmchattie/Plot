@@ -181,6 +181,17 @@ let cameraNotExistsMessage = "You don't have camera"
 let thumbnailUploadError = "Failed to upload your image to database. Please, check your internet connection and try again."
 let fullsizePictureUploadError = "Failed to upload fullsize image to database. Please, check your internet connection and try again. Despite this error, thumbnail version of this picture has been uploaded, but you still should re-upload your fullsize image."
 
+let taskCreatedMessage = "Task Created!"
+let eventCreatedMessage = "Event Created!"
+let workoutCreatedMessage = "Workout Created!"
+let mindfulnessCreatedMessage = "Mindfulness Session Created!"
+let transactionCreatedMessage = "Transaction Created!"
+let holdingCreatedMessage = "Holding Created!"
+let accountCreatedMessage = "Account Created!"
+let transactionRuleCreatedMessage = "Transaction Rule Created!"
+let calendarCreatedMessage = "Calendar Created!"
+let listCreatedMessage = "List Created!"
+
 extension String {
     
     var digits: String {
@@ -1071,9 +1082,83 @@ extension SystemSoundID {
     }
 }
 
-func basicErrorAlertWith (title: String, message: String, controller: UIViewController) {
+let messageAlert = UIAlertController(title: "Activity Sent!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let activityAlert = UIAlertController(title: "Activity Created!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let activityNFAlert = UIAlertController(title: "Could Not Load Activity", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let dupeRecipeAlert = UIAlertController(title: "Recipe already on Grocery List", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let activityAddedAlert = UIAlertController(title: "Activity Added!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let recipeAddedAlert = UIAlertController(title: "Recipe Added!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let addedToActivityAlert = UIAlertController(title: "Added to Activity!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+let conToChatAlert = UIAlertController(title: "Connected to Chat!", message: nil, preferredStyle: UIAlertController.Style.alert)
+
+extension UIViewController {
+    func messageSentAlert() {
+        self.present(messageAlert, animated: true, completion: nil)
+    }
+    func removeMessageAlert() {
+        messageAlert.dismiss(animated: true, completion: nil)
+    }
+    func activityCreatedAlert() {
+        self.present(activityAlert, animated: true, completion: nil)
+    }
+    func removeActivityCreatedAlert() {
+        activityAlert.dismiss(animated: true, completion: nil)
+    }
+    func activityNotFoundAlert() {
+        self.present(activityNFAlert, animated: true, completion: nil)
+    }
+    func removeActivityNotFoundAlert() {
+        activityNFAlert.dismiss(animated: true, completion: nil)
+    }
+    func dupeRecAlert() {
+        self.present(dupeRecipeAlert, animated: true, completion: nil)
+    }
+    func removeDupeRecAlert() {
+        dupeRecipeAlert.dismiss(animated: true, completion: nil)
+    }
+    func actAddAlert() {
+        self.present(activityAddedAlert, animated: true, completion: nil)
+    }
+    func removeActAddAlert() {
+        activityAddedAlert.dismiss(animated: true, completion: nil)
+    }
+    func recAddAlert() {
+        self.present(recipeAddedAlert, animated: true, completion: nil)
+    }
+    func removeRecAddAlert() {
+        recipeAddedAlert.dismiss(animated: true, completion: nil)
+    }
+    func addedToActAlert() {
+        self.present(addedToActivityAlert, animated: true, completion: nil)
+    }
+    func removeAddedToActAlert() {
+        addedToActivityAlert.dismiss(animated: true, completion: nil)
+    }
+    func connectedToChatAlert() {
+        self.present(conToChatAlert, animated: true, completion: nil)
+    }
+    func removeConnectedToChatAlert() {
+        conToChatAlert.dismiss(animated: true, completion: nil)
+    }
+}
+
+func basicErrorAlertWithClose(title: String, message: String, controller: UIViewController) {
     let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
     alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.cancel, handler: nil))
+    DispatchQueue.main.async {
+        controller.present(alert, animated: true, completion: nil)
+    }
+}
+
+func basicAlert(title: String, message: String?, controller: UIViewController) {
+    let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
     DispatchQueue.main.async {
         controller.present(alert, animated: true, completion: nil)
     }
@@ -1610,73 +1695,6 @@ extension UIView {
         let mask = CAShapeLayer()
         mask.path = path.cgPath
         layer.mask = mask
-    }
-}
-
-let messageAlert = UIAlertController(title: "Activity Sent!", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-let activityAlert = UIAlertController(title: "Activity Created!", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-let activityNFAlert = UIAlertController(title: "Could Not Load Activity", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-let dupeRecipeAlert = UIAlertController(title: "Recipe already on Grocery List", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-let activityAddedAlert = UIAlertController(title: "Activity Added!", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-let recipeAddedAlert = UIAlertController(title: "Recipe Added!", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-let addedToActivityAlert = UIAlertController(title: "Added to Activity!", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-let conToChatAlert = UIAlertController(title: "Connected to Chat!", message: nil, preferredStyle: UIAlertController.Style.alert)
-
-extension UIViewController {
-    func messageSentAlert() {
-        self.present(messageAlert, animated: true, completion: nil)
-    }
-    func removeMessageAlert() {
-        messageAlert.dismiss(animated: true, completion: nil)
-    }
-    func activityCreatedAlert() {
-        self.present(activityAlert, animated: true, completion: nil)
-    }
-    func removeActivityCreatedAlert() {
-        activityAlert.dismiss(animated: true, completion: nil)
-    }
-    func activityNotFoundAlert() {
-        self.present(activityNFAlert, animated: true, completion: nil)
-    }
-    func removeActivityNotFoundAlert() {
-        activityNFAlert.dismiss(animated: true, completion: nil)
-    }
-    func dupeRecAlert() {
-        self.present(dupeRecipeAlert, animated: true, completion: nil)
-    }
-    func removeDupeRecAlert() {
-        dupeRecipeAlert.dismiss(animated: true, completion: nil)
-    }
-    func actAddAlert() {
-        self.present(activityAddedAlert, animated: true, completion: nil)
-    }
-    func removeActAddAlert() {
-        activityAddedAlert.dismiss(animated: true, completion: nil)
-    }
-    func recAddAlert() {
-        self.present(recipeAddedAlert, animated: true, completion: nil)
-    }
-    func removeRecAddAlert() {
-        recipeAddedAlert.dismiss(animated: true, completion: nil)
-    }
-    func addedToActAlert() {
-        self.present(addedToActivityAlert, animated: true, completion: nil)
-    }
-    func removeAddedToActAlert() {
-        addedToActivityAlert.dismiss(animated: true, completion: nil)
-    }
-    func connectedToChatAlert() {
-        self.present(conToChatAlert, animated: true, completion: nil)
-    }
-    func removeConnectedToChatAlert() {
-        conToChatAlert.dismiss(animated: true, completion: nil)
     }
 }
 

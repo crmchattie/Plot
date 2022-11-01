@@ -114,9 +114,6 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
                                   || url?.hasPrefix(atriumScheme) == true
                                   || url?.hasPrefix(mxScheme) == true
         
-        print("url")
-        print(url)
-        
         if (isPostMessageFromMX) {
             let urlc = URLComponents(string: url ?? "")
             let path = urlc?.path ?? ""
@@ -183,9 +180,6 @@ class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     func handleOauthRedirect(payload: URLQueryItem?) {
         let metadataString = payload?.value ?? ""
         
-        print("metadataString")
-        print(metadataString)
-
         do {
             if let json = try JSONSerialization.jsonObject(with: Data(metadataString.utf8), options: []) as? [String: Any] {
                 if let url = json["url"] as? String {

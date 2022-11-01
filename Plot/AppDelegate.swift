@@ -84,7 +84,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         fetchCompletionHandler completionHandler:
             @escaping (UIBackgroundFetchResult) -> Void
     ) {
-        print("didReceiveRemoteNotification")
         guard let aps = userInfo["aps"] as? [String: AnyObject] else {
             completionHandler(.failed)
             return

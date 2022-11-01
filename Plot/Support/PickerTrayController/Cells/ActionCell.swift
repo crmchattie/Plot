@@ -84,7 +84,7 @@ class ActionCell: UICollectionViewCell {
     }
     
     guard authorizationStatus else {
-      basicErrorAlertWith(title: basicTitleForAccessError, message: message, controller: self.imagePickerTrayController!)
+      basicErrorAlertWithClose(title: basicTitleForAccessError, message: message, controller: self.imagePickerTrayController!)
       return
     }
     actions[index].call()

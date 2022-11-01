@@ -18,7 +18,7 @@ extension GroupAdminControlsTableViewController: AvatarOpenerDelegate {
                 self.groupProfileTableHeaderContainer.profileImageView.hideActivityIndicator()
                 self.navigationController?.view.isUserInteractionEnabled = true
                 guard isUpdated else {
-                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self)
+                    basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self)
                     return
                 }
                 self.groupProfileTableHeaderContainer.addPhotoLabel.isHidden = true
@@ -34,7 +34,7 @@ extension GroupAdminControlsTableViewController: AvatarOpenerDelegate {
             self.navigationController?.view.isUserInteractionEnabled = true
             self.groupProfileTableHeaderContainer.profileImageView.hideActivityIndicator()
             guard isDeleted else {
-                basicErrorAlertWith(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self)
+                basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self)
                 return
             }
             self.groupProfileTableHeaderContainer.addPhotoLabel.isHidden = false

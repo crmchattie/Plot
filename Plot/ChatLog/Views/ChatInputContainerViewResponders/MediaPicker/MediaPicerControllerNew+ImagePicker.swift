@@ -101,7 +101,7 @@ extension MediaPickerControllerNew {
 							guard isSaved else {
 								let alertMessage = videoRecordedButLibraryUnavailableError
 								self.dismissImagePicker()
-								basicErrorAlertWith(title: basicTitleForAccessError, message: alertMessage, controller: self)
+								basicErrorAlertWithClose(title: basicTitleForAccessError, message: alertMessage, controller: self)
 								return
 							}
 

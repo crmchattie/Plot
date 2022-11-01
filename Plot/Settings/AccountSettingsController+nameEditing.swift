@@ -100,7 +100,7 @@ extension AccountSettingsController { /* user name editing */
     
     @objc func updateBarButtonPressed() {
         if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWith(title: "No internet", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "No internet", message: noInternetError, controller: self)
             return
         }
         

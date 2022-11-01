@@ -62,9 +62,9 @@ extension ChangeEmailController {
         actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
         Auth.auth().sendSignInLink(toEmail: email, actionCodeSettings: actionCodeSettings) { error in
             if let error = error {
-                basicErrorAlertWith(title: "Error", message: error.localizedDescription, controller: self)
+                basicErrorAlertWithClose(title: "Error", message: error.localizedDescription, controller: self)
             } else {
-                basicErrorAlertWith(title: "Verification email sent", message: "Check your inbox for the verification link.", controller: self)
+                basicErrorAlertWithClose(title: "Verification email sent", message: "Check your inbox for the verification link.", controller: self)
             }
         }
     }

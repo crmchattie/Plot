@@ -395,7 +395,7 @@ extension TaskViewController {
     
     func openRepeat() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         
@@ -425,7 +425,7 @@ extension TaskViewController {
     
     func openMedia() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = MediaViewController()
@@ -442,7 +442,7 @@ extension TaskViewController {
     //update so existing invitees are shown as selected
     func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = SelectActivityMembersViewController()
@@ -467,7 +467,7 @@ extension TaskViewController {
     
     func openSubtasks() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         
@@ -483,7 +483,7 @@ extension TaskViewController {
     
     func openEvent() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if eventList.indices.contains(eventIndex) {
@@ -537,7 +537,7 @@ extension TaskViewController {
     
     func openPurchases() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         if purchaseList.indices.contains(purchaseIndex) {
@@ -641,7 +641,7 @@ extension TaskViewController {
     
     func openList() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         
@@ -801,6 +801,12 @@ extension TaskViewController {
         hideActivityIndicator()
         self.delegate?.updateTask(task: activity ?? self.task)
         self.updateDiscoverDelegate?.itemCreated()
+        if !active {
+            let alert = UIAlertController(title: taskCreatedMessage, message: nil, preferredStyle: UIAlertController.Style.alert)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
+                alert.dismiss(animated: true, completion: nil)
+            })
+        }
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {

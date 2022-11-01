@@ -89,7 +89,7 @@ class EnterPhoneNumberController: UIViewController {
     
     @objc func rightBarButtonDidTap () {
         if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWith(title: "No internet connection", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
             return
         }
         
@@ -114,7 +114,7 @@ class EnterPhoneNumberController: UIViewController {
                 
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumberForVerification, uiDelegate: nil) { (verificationID, error) in
             if let error = error {
-                basicErrorAlertWith(title: "Error", message: error.localizedDescription + "\nPlease try again later.", controller: self)
+                basicErrorAlertWithClose(title: "Error", message: error.localizedDescription + "\nPlease try again later.", controller: self)
                 return
             }
 

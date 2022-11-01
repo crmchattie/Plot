@@ -108,7 +108,7 @@ class VoiceRecordingViewController: UIViewController {
           return
         } else {
           
-          basicErrorAlertWith(title: "Error", message: microphoneAccessDeniedMessage, controller: self)
+          basicErrorAlertWithClose(title: "Error", message: microphoneAccessDeniedMessage, controller: self)
           return
         }
       })

@@ -342,7 +342,7 @@ class PackinglistViewController: FormViewController {
     
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = SelectActivityMembersViewController()

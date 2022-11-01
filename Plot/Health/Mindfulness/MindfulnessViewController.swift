@@ -200,7 +200,7 @@ class MindfulnessViewController: FormViewController {
                 print("User click Approve button")
                 // create new mindfulness with updated time
                 guard self.currentReachabilityStatus != .notReachable else {
-                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+                    basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
                     return
                 }
                 
@@ -610,7 +610,7 @@ class MindfulnessViewController: FormViewController {
     
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = SelectActivityMembersViewController()

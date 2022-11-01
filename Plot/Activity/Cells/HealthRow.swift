@@ -36,7 +36,7 @@ final class HealthCell: Cell<HealthContainer>, CellType {
     //blue dot on the left of cell
     let activityTypeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "activity"), for: .normal)
+        button.setImage(UIImage(named: "heart-filled"), for: .normal)
         button.isUserInteractionEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -72,11 +72,14 @@ final class HealthCell: Cell<HealthContainer>, CellType {
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = nil
 
-        guard let healthMetric = row.value else { return }
+        guard let healthMetric = row.value else {
+            nameLabel.text = "Connecting Health"
+            return
+        }
         
         nameLabel.text = healthMetric.name
                 
-        var imageName = "activity"
+        var imageName = "heart-filled"
         
         if let workout = healthMetric.workout {
             let total = "\(healthMetric.total.clean)"

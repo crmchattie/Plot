@@ -162,7 +162,7 @@ class AccountSettingsController: UITableViewController {
     
     @objc fileprivate func openUserProfilePicture() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         avatarOpener.delegate = self
@@ -233,7 +233,7 @@ class AccountSettingsController: UITableViewController {
     func logoutButtonTapped () {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: "Error signing out", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "Error signing out", message: noInternetError, controller: self)
             return
             
         }
@@ -247,7 +247,7 @@ class AccountSettingsController: UITableViewController {
         do {
             try Auth.auth().signOut()
         } catch let signOutError as NSError {
-            basicErrorAlertWith(title: "Error signing out", message: signOutError.localizedDescription, controller: self)
+            basicErrorAlertWithClose(title: "Error signing out", message: signOutError.localizedDescription, controller: self)
             return
         }
 

@@ -763,7 +763,7 @@ class ScheduleViewController: FormViewController {
     
     @objc fileprivate func openLocationFinder() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = LocationFinderTableViewController()
@@ -775,7 +775,7 @@ class ScheduleViewController: FormViewController {
     
     fileprivate func openTimeZoneFinder(startOrEndTimeZone: String) {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = TimeZoneViewController()
@@ -787,7 +787,7 @@ class ScheduleViewController: FormViewController {
     //update so existing invitees are shown as selected
     @objc fileprivate func openParticipantsInviter() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = SelectActivityMembersViewController()
@@ -839,7 +839,7 @@ class ScheduleViewController: FormViewController {
     
     @objc func goToMap() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         

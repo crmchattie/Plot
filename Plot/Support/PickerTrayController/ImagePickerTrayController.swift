@@ -289,7 +289,7 @@ public class ImagePickerTrayController: UIViewController {
         cameraController.takePicture()
         break
       case .denied, .restricted:
-        basicErrorAlertWith(title: basicTitleForAccessError, message: cameraAccessDeniedMessage, controller: self)
+        basicErrorAlertWithClose(title: basicTitleForAccessError, message: cameraAccessDeniedMessage, controller: self)
         return
       case .notDetermined:
         PHPhotoLibrary.requestAuthorization() { status in
@@ -298,7 +298,7 @@ public class ImagePickerTrayController: UIViewController {
             self.cameraController.takePicture()
             break
           case .denied, .restricted, .notDetermined:
-            basicErrorAlertWith(title: basicTitleForAccessError, message: cameraAccessDeniedMessage, controller: self)
+            basicErrorAlertWithClose(title: basicTitleForAccessError, message: cameraAccessDeniedMessage, controller: self)
             break
           case .limited:
               self.cameraController.takePicture()

@@ -21,7 +21,7 @@ extension EventViewController: AvatarOpenerDelegate {
                 viewRow.cell.view!.hideActivityIndicator()
                 self.navigationController?.view.isUserInteractionEnabled = true
                 guard isUpdated else {
-                    basicErrorAlertWith(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self)
+                    basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: thumbnailUploadError, controller: self)
                     return
                 }
             })
@@ -40,7 +40,7 @@ extension EventViewController: AvatarOpenerDelegate {
             self.navigationController?.view.isUserInteractionEnabled = true
             viewRow.cell.view!.hideActivityIndicator()
             guard isDeleted else {
-                basicErrorAlertWith(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self)
+                basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: deletionErrorMessage, controller: self)
                 return
             }
         }

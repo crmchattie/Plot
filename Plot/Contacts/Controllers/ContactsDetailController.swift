@@ -75,7 +75,7 @@ class ContactsDetailController: UITableViewController {
         if indexPath.section == 2 {
             if MFMessageComposeViewController.canSendText() {
                 guard contactPhoneNumbers.indices.contains(0) else {
-                    basicErrorAlertWith(title: "Error", message: "This user doesn't have any phone number provided.", controller: self)
+                    basicErrorAlertWithClose(title: "Error", message: "This user doesn't have any phone number provided.", controller: self)
                     return
                 }
                 let destination = MFMessageComposeViewController()
@@ -84,7 +84,7 @@ class ContactsDetailController: UITableViewController {
                 destination.messageComposeDelegate = self
                 present(destination, animated: true, completion: nil)
             } else {
-                basicErrorAlertWith(title: "Error", message: "You cannot send texts.", controller: self)
+                basicErrorAlertWithClose(title: "Error", message: "You cannot send texts.", controller: self)
             }
         }
         tableView.deselectRow(at: indexPath, animated: false)

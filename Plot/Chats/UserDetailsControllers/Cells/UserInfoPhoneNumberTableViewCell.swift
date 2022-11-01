@@ -16,7 +16,7 @@ extension UIViewController: CNContactViewControllerDelegate {
         switch contactsAuthorityCheck {
             
         case .denied, .notDetermined, .restricted:
-            basicErrorAlertWith(title: "No access", message: contactsAccessDeniedMessage, controller: self)
+            basicErrorAlertWithClose(title: "No access", message: contactsAccessDeniedMessage, controller: self)
             return false
             
         case .authorized:

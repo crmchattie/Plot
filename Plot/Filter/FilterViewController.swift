@@ -593,7 +593,7 @@ class FilterViewController: FormViewController {
     
     @objc fileprivate func openLocationFinder() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         let destination = LocationFinderTableViewController()

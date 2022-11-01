@@ -75,7 +75,7 @@ class GroupProfileTableViewController: UITableViewController {
     
     @objc fileprivate func openUserProfilePicture() {
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         avatarOpener.delegate = self
@@ -190,7 +190,7 @@ extension GroupProfileTableViewController {
     
     @objc func createGroupChat() {
         guard currentReachabilityStatus != .notReachable, let chatName = groupProfileTableHeaderContainer.name.text, let currentUserID = Auth.auth().currentUser?.uid else {
-            basicErrorAlertWith(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
         

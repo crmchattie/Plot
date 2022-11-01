@@ -59,7 +59,7 @@ class CreateContactTableViewController: UITableViewController {
             
             dismiss(animated: true, completion: nil)
         } catch {
-            basicErrorAlertWith(title: "Error", message: error.localizedDescription, controller: self)
+            basicErrorAlertWithClose(title: "Error", message: error.localizedDescription, controller: self)
         }
         
     }

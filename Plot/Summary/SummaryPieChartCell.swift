@@ -46,7 +46,8 @@ class SummaryPieChartCell: UICollectionViewCell {
                 l.xEntrySpace = 7
                 l.yEntrySpace = 0
                 l.yOffset = 0
-                                
+                
+                chartView.notifyDataSetChanged()
                 setupViews()
             }
         }

@@ -89,7 +89,7 @@ extension BaseMessageCell {
         if let cell = self.chatLogController?.collectionView?.cellForItem(at: indexPath) as? OutgoingPhotoMessageCell {
           if cell.messageImageView.image == nil {
             guard let controllerToDisplayOn = self.chatLogController else { return }
-            basicErrorAlertWith(title: basicErrorTitleForAlert,
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert,
                                 message: copyingImageError,
                                 controller: controllerToDisplayOn)
             return
@@ -98,7 +98,7 @@ extension BaseMessageCell {
         } else if let cell = self.chatLogController?.collectionView?.cellForItem(at: indexPath) as? IncomingPhotoMessageCell {
           if cell.messageImageView.image == nil {
             guard let controllerToDisplayOn = self.chatLogController else { return }
-            basicErrorAlertWith(title: basicErrorTitleForAlert,
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert,
                                 message: copyingImageError,
                                 controller: controllerToDisplayOn)
             return
@@ -112,7 +112,7 @@ extension BaseMessageCell {
             UIPasteboard.general.string = cell.textView.text
           if cell.messageImageView.image == nil {
             guard let controllerToDisplayOn = self.chatLogController else { return }
-            basicErrorAlertWith(title: basicErrorTitleForAlert,
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert,
                                 message: copyingImageError,
                                 controller: controllerToDisplayOn)
             return
@@ -122,7 +122,7 @@ extension BaseMessageCell {
             UIPasteboard.general.string = cell.textView.text
           if cell.messageImageView.image == nil {
             guard let controllerToDisplayOn = self.chatLogController else { return }
-            basicErrorAlertWith(title: basicErrorTitleForAlert,
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert,
                                 message: copyingImageError,
                                 controller: controllerToDisplayOn)
             return
@@ -137,7 +137,7 @@ extension BaseMessageCell {
           let messageID = self.message?.messageUID, self.currentReachabilityStatus != .notReachable else {
           self.chatLogController?.collectionView?.reloadItems(at: [indexPath])
           guard let controllerToDisplayOn = self.chatLogController else { return }
-          basicErrorAlertWith(title: basicErrorTitleForAlert,
+          basicErrorAlertWithClose(title: basicErrorTitleForAlert,
                               message: noInternetError,
                               controller: controllerToDisplayOn)
           return
