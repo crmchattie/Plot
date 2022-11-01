@@ -17,7 +17,10 @@ class AnalyticsDetailViewModel {
     
     var title: String { dataSource.title }
     var range: DateRange = .init(type: .week) {
-        didSet { updateRange() }
+        didSet {
+            print(range.type.filterTitle)
+            updateRange()
+        }
     }
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     var entries = CurrentValueSubject<[AnalyticsBreakdownEntry], Never>([])

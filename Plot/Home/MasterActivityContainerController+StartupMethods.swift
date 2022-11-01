@@ -11,6 +11,59 @@ import Firebase
 
 extension MasterActivityContainerController {
     
+    func loadVariables() {
+        isNewUser = Auth.auth().currentUser == nil
+        networkController.askPermissionToTrack()
+        let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+//        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+        UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
+        //if new user, do nothing; if existing user with old version of app, load other variables
+        //if existing user with current version, load everything
+        self.setupData()
+        if !isNewUser {
+            networkController.setupKeyVariables {
+                self.manageAppearanceHome(didFinishLoadingWith: true)
+                self.collectionView.reloadData()
+                self.removeLaunchScreenView()
+                self.networkController.setupOtherVariables()
+                self.openNotification()
+            }
+        } else {
+            self.manageAppearanceHome(didFinishLoadingWith: true)
+            self.removeLaunchScreenView()
+            self.presentOnboardingController()
+        }
+    }
+    
+    @objc func reloadVariables() {
+        networkController.setupKeyVariables {
+            self.collectionView.reloadData()
+            self.networkController.setupOtherVariables()
+        }
+    }
+
+    func presentOnboardingController() {
+        let destination = OnboardingController()
+        let newNavigationController = UINavigationController(rootViewController: destination)
+        newNavigationController.modalTransitionStyle = .crossDissolve
+        newNavigationController.modalPresentationStyle = .fullScreen
+        self.removeLaunchScreenView()
+        present(newNavigationController, animated: false, completion: nil)
+    }
+    
+    func manageAppearanceHome(didFinishLoadingWith state: Bool) {
+        guard !isAppLoaded else { return }
+        isAppLoaded = true
+        let isBiometricalAuthEnabled = userDefaults.currentBoolObjectState(for: userDefaults.biometricalAuth)
+        guard state else { return }
+        if isBiometricalAuthEnabled {
+            splashContainer.authenticationWithTouchID()
+        } else {
+            splashContainer.showSecuredData()
+        }
+    }
+
+    
     @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
         networkController.reloadKeyVariables {
             DispatchQueue.main.async {

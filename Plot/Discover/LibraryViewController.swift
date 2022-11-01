@@ -209,6 +209,9 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
         
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+        navigationItem.rightBarButtonItem = doneBarButton
+
         groups[.custom] = customTypes
         
         fetchTemplates()

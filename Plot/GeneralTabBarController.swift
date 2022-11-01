@@ -33,7 +33,7 @@ class GeneralTabBarController: UITabBarController {
     fileprivate var isNewUser = false
     fileprivate var isOldUser = false
     
-    let homeController = MasterActivityContainerController(networkController: GeneralTabBarController.networkController)
+    let homeController = MasterActivityContainerController()
     let discoverController = LibraryViewController(networkController: GeneralTabBarController.networkController)
     let analyticsController = AnalyticsViewController()
     
