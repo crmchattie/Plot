@@ -36,10 +36,6 @@ class GeneralTabBarController: UITabBarController {
     let homeController = MasterActivityContainerController(networkController: GeneralTabBarController.networkController)
     let discoverController = LibraryViewController(networkController: GeneralTabBarController.networkController)
     let analyticsController = AnalyticsViewController()
-    let launchController: UIViewController = {
-        let storyboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
-        return storyboard.instantiateViewController(withIdentifier: "LaunchScreen")
-    }()
     
     let splashContainer: SplashScreenContainer = {
         let splashContainer = SplashScreenContainer()
@@ -50,9 +46,9 @@ class GeneralTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         homeController.delegate = self
+        loadVariables()
         configureTabBar()
         setTabs()
-        loadVariables()
         addObservers()
         appDelegate.loadNotifications()
         setApplicationBadge()
@@ -70,7 +66,6 @@ class GeneralTabBarController: UITabBarController {
             splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
         onceToken = 1
-        showLaunchScreen()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -104,7 +99,7 @@ class GeneralTabBarController: UITabBarController {
             GeneralTabBarController.networkController.setupKeyVariables {
                 self.analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
                 GeneralTabBarController.networkController.setupOtherVariables()
-                self.removeLaunchScreenView()
+                self.homeController.removeLaunchScreenView()
                 self.homeController.openNotification()
             }
         } else {
@@ -189,25 +184,12 @@ class GeneralTabBarController: UITabBarController {
         newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
         newNavigationController.modalTransitionStyle = .crossDissolve
         newNavigationController.modalPresentationStyle = .fullScreen
-        self.removeLaunchScreenView()
+        homeController.removeLaunchScreenView()
         present(newNavigationController, animated: false, completion: nil)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .default
-    }
-    
-    func showLaunchScreen() {
-        print("showLaunchScreen")
-        launchController.modalPresentationStyle = .fullScreen
-        self.present(launchController, animated: true, completion: nil)
-    }
-    
-    func removeLaunchScreenView() {
-        print("removeLaunchScreenView")
-        DispatchQueue.main.async {
-            self.launchController.dismiss(animated: true)
-        }
     }
 }
 

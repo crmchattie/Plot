@@ -374,8 +374,8 @@ class ActivityService {
                 self?.activitiesWithRepeats = activitiesWithRepeatsInitialAdd
                 completion()
             } else if !activitiesWithRepeatsInitialAdd.isEmpty {
-                if activitiesWithRepeatsInitialAdd.count == 1, let activity = activitiesWithRepeatsInitialAdd.first {
-                    self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == activity.instanceID })
+                if activitiesWithRepeatsInitialAdd.count == 1, let activity = activitiesWithRepeatsInitialAdd.first, let instanceID = activity.instanceID {
+                    self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
                     self?.activitiesWithRepeats.append(activity)
                 } else {
                     self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesWithRepeatsInitialAdd.first?.activityID })
@@ -394,8 +394,8 @@ class ActivityService {
                 }
             }
         }, activitiesWithRepeatsAdded: { [weak self] activitiesWithRepeatsAdded in
-            if activitiesWithRepeatsAdded.count == 1, let activity = activitiesWithRepeatsAdded.first {
-                self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == activity.instanceID })
+            if activitiesWithRepeatsAdded.count == 1, let activity = activitiesWithRepeatsAdded.first, let instanceID = activity.instanceID {
+                self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
                 self?.activitiesWithRepeats.append(activity)
             } else {
                 self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesWithRepeatsAdded.first?.activityID })
@@ -413,8 +413,8 @@ class ActivityService {
                 }
             }
         }, activitiesWithRepeatsChanged: { [weak self] activitiesWithRepeatsChanged in
-            if activitiesWithRepeatsChanged.count == 1, let activity = activitiesWithRepeatsChanged.first {
-                self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == activity.instanceID })
+            if activitiesWithRepeatsChanged.count == 1, let activity = activitiesWithRepeatsChanged.first, let instanceID = activity.instanceID {
+                self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
                 self?.activitiesWithRepeats.append(activity)
             } else {
                 self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesWithRepeatsChanged.first?.activityID })

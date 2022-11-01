@@ -106,6 +106,11 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var isNewUser: Bool = true
         
     var isAppLoaded = false
+    
+    let launchController: UIViewController = {
+        let storyboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
+        return storyboard.instantiateViewController(withIdentifier: "LaunchScreen")
+    }()
             
     let refreshControl = UIRefreshControl()
         
@@ -114,11 +119,26 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         setupViews()
         setNavBar()
         delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
+        showLaunchScreen()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         managePresense()
+    }
+    
+    func showLaunchScreen() {
+        print("showLaunchScreen")
+        launchController.modalPresentationStyle = .fullScreen
+        launchController.hidesBottomBarWhenPushed = true
+        self.present(launchController, animated: true, completion: nil)
+    }
+    
+    func removeLaunchScreenView() {
+        print("removeLaunchScreenView")
+        DispatchQueue.main.async {
+            self.launchController.dismiss(animated: true)
+        }
     }
     
     func setupViews() {
