@@ -116,10 +116,10 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         
     override func viewDidLoad() {
         super.viewDidLoad()
+        showLaunchScreen()
         setupViews()
         setNavBar()
         delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
-        showLaunchScreen()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,7 +131,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         print("showLaunchScreen")
         launchController.modalPresentationStyle = .fullScreen
         launchController.hidesBottomBarWhenPushed = true
-        self.present(launchController, animated: true, completion: nil)
+        self.present(launchController, animated: false, completion: nil)
     }
     
     func removeLaunchScreenView() {
