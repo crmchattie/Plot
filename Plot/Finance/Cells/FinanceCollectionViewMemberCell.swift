@@ -88,7 +88,7 @@ class FinanceCollectionViewMemberCell: UICollectionViewCell {
         
         let labelStack = VerticalStackView(arrangedSubviews: [nameLabel, infoLabel], spacing: 2)
         
-        let stackView = UIStackView(arrangedSubviews: [labelStack, UIView(), statusImageView])
+        let stackView = UIStackView(arrangedSubviews: [labelStack, statusImageView])
         stackView.spacing = 10
         stackView.alignment = .center
         addSubview(stackView)

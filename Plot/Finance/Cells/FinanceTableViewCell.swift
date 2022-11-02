@@ -27,9 +27,7 @@ class FinanceTableViewCell: UITableViewCell {
         didSet {
             if let transaction = transaction {
                 numberFormatter.currencyCode = transaction.currency_code ?? "USD"
-                
-                categoryLabel.isHidden = true
-                
+                                
                 nameLabel.text = transaction.description
                 if let amount = numberFormatter.string(from: transaction.amount as NSNumber) {
                     middleLabel.text = "Amount: \(amount)"
@@ -49,9 +47,7 @@ class FinanceTableViewCell: UITableViewCell {
         didSet {
             if let account = account {
                 numberFormatter.currencyCode = account.currency_code ?? "USD"
-                
-                categoryLabel.isHidden = true
-                
+                                
                 nameLabel.text = account.name
                 
                 let currentBalance = account.finalBalance
@@ -88,16 +84,6 @@ class FinanceTableViewCell: UITableViewCell {
         return label
     }()
     
-    let categoryLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.numberOfLines = 0
-        label.textAlignment = .right
-        label.adjustsFontForContentSizeCategory = true
-        return label
-    }()
-    
     let middleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
@@ -128,7 +114,10 @@ class FinanceTableViewCell: UITableViewCell {
         let labelStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
         labelStackView.spacing = 2
         
-        let stackView = UIStackView(arrangedSubviews: [labelStackView, UIView(), IV, categoryLabel])
+        IV.constrainWidth(20)
+        IV.constrainHeight(20)
+        
+        let stackView = UIStackView(arrangedSubviews: [labelStackView, IV])
         stackView.spacing = 2
         stackView.alignment = .center
         stackView.distribution = .fill
@@ -140,12 +129,10 @@ class FinanceTableViewCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         nameLabel.textColor = .label
-        categoryLabel.textColor = .label
         middleLabel.textColor = .label
         bottomLabel.textColor = .secondaryLabel
         
         nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
-        categoryLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         middleLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         bottomLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         IV.isHidden = false

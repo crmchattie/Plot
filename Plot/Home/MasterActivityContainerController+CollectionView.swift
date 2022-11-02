@@ -155,7 +155,6 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var height: CGFloat = 300
-        
         let object = groups[indexPath.section]
         if let item = object as? Activity {
             if item.isTask ?? false {

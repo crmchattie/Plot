@@ -352,7 +352,11 @@ extension TaskViewController: RecurrencePickerDelegate {
             } else {
                 row.value = "Never"
                 row.updateCell()
-                self.deleteRecurrences()
+                if !active {
+                    task.recurrences = nil
+                } else {
+                    self.deleteRecurrences()
+                }
             }
         }
     }

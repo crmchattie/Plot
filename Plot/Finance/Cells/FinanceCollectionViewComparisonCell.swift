@@ -24,7 +24,7 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
                 
                 nameLeftLabel.text = transactionDetails.name
 
-                if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
+                if (transactionDetails.group == "Income" || transactionDetails.group == "Difference"), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                     nameRightLabel.text = amount
                     if let balance = transactionDetails.lastPeriodAmount, let amount = numberFormatter.string(from: balance as NSNumber), let difference = numberFormatter.string(from: transactionDetails.amount - balance as NSNumber) {
                         middleLeftLabel.isHidden = false
@@ -258,15 +258,12 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
         backgroundView?.fillSuperview()
         backgroundView?.backgroundColor = .secondarySystemGroupedBackground
         backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
-        backgroundView?.layer.shadowOpacity = 0.1
-        backgroundView?.layer.shadowRadius = 10
-        backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         
         let verticalLeftStackView = VerticalStackView(arrangedSubviews: [nameLeftLabel, middleLeftLabel, bottomLeftLabel], spacing: 2)
         
         let verticalRightStackView = VerticalStackView(arrangedSubviews: [nameRightLabel, middleRightLabel, bottomRightLabel], spacing: 2)
 
-        let stackView = UIStackView(arrangedSubviews: [verticalLeftStackView, UIView(), verticalRightStackView])
+        let stackView = UIStackView(arrangedSubviews: [verticalLeftStackView, verticalRightStackView])
         stackView.alignment = .center
         stackView.distribution = .fill
 
@@ -281,6 +278,7 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
         middleLeftLabel.text = nil
         bottomLeftLabel.text = nil
                 
+        nameLeftLabel.isHidden = false
         middleLeftLabel.isHidden = false
         bottomLeftLabel.isHidden = false
         
@@ -288,6 +286,7 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
         middleRightLabel.text = nil
         bottomRightLabel.text = nil
                 
+        nameRightLabel.isHidden = false
         middleRightLabel.isHidden = false
         bottomRightLabel.isHidden = false
         

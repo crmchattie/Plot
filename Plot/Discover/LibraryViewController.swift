@@ -521,6 +521,7 @@ extension LibraryViewController: UpdateDiscover {
     func itemCreated() {
         self.navigationItem.searchController?.isActive = false
         self.dismiss(animated: true)
+        self.tabBarController?.selectedIndex = 1
     }
 }
 

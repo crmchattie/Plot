@@ -79,7 +79,7 @@ class FinanceViewController: UIViewController {
     let dateFormatterPrint = DateFormatter()
     
     var startDate = Date().localTime.startOfMonth
-    var endDate = Date().localTime.endOfMonth
+    var endDate = Date().localTime
     
     var hasViewAppeared = false
     
@@ -420,11 +420,11 @@ class FinanceViewController: UIViewController {
                         }
                         filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
                             if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                                if transactionDate > startDate && endDate > transactionDate {
+                                if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                                     return true
                                 }
                             } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                                if transactionDate > startDate && endDate > transactionDate {
+                                if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                                     return true
                                 }
                             }
@@ -471,7 +471,7 @@ class FinanceViewController: UIViewController {
     
     func openAccountDetails(accountDetails: AccountDetails) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
+        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex
         financeDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(financeDetailViewController, animated: true)
@@ -621,7 +621,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
             height = estimatedSize.height
         }
         return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
-        
+
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -659,7 +659,7 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
+        return UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -702,6 +702,7 @@ extension FinanceViewController: HeaderCellDelegate {
         let destination = FinanceDetailViewController(networkController: networkController)
         destination.title = sectionType.name
         destination.setSections = [sectionType]
+        destination.selectedIndex = selectedIndex
         navigationController?.pushViewController(destination, animated: true)
     }
 }
@@ -719,17 +720,20 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
         if index == 0 {
             startDate = Date().localTime.startOfDay
-            endDate = Date().localTime.endOfDay
+            endDate = Date().localTime
         } else if index == 1 {
             startDate = Date().localTime.startOfWeek
-            endDate = Date().localTime.endOfWeek
+            endDate = Date().localTime
         } else if index == 2 {
             startDate = Date().localTime.startOfMonth
-            endDate = Date().localTime.endOfMonth
+            endDate = Date().localTime
         } else {
             startDate = Date().localTime.startOfYear
-            endDate = Date().localTime.endOfYear
+            endDate = Date().localTime
         }
+        print(startDate)
+        print(endDate)
+        
         selectedIndex = index
         updateCollectionView()
     }

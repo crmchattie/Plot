@@ -72,6 +72,8 @@ class FinanceDetailViewController: UIViewController {
     var endDate = Date().localTime.nextYear
     
     let viewPlaceholder = ViewPlaceholder()
+    
+    var selectedIndex = 2
             
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -87,14 +89,28 @@ class FinanceDetailViewController: UIViewController {
         setupMainView()
         addObservers()
         
+        if selectedIndex == 0 {
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.nextYear
+        } else if selectedIndex == 1 {
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.nextYear
+        } else if selectedIndex == 2 {
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.nextYear
+        } else {
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.nextYear
+        }
+        
         if setSections.contains(.transactions) {
             let filteredTransactions = transactions.filter { (transaction) -> Bool in
                 if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                    if transactionDate > startDate && endDate > transactionDate {
+                    if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                         return true
                     }
                 } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                    if transactionDate > startDate && endDate > transactionDate {
+                    if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                         return true
                     }
                 }
@@ -247,11 +263,11 @@ class FinanceDetailViewController: UIViewController {
                     
                     filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
                         if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                            if transactionDate > startDate && endDate > transactionDate {
+                            if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                                 return true
                             }
                         } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-                            if transactionDate > startDate && endDate > transactionDate {
+                            if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                                 return true
                             }
                         }

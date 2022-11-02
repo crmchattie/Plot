@@ -393,23 +393,20 @@ class FinanceCollectionViewCell: UICollectionViewCell {
             topHeightConstraint = 10
             bottomHeightConstraint = 10
             backgroundView?.roundCorners(corners: [.allCorners], radius: 10)
-            backgroundView?.layer.shadowOpacity = 0.1
-            backgroundView?.layer.shadowRadius = 10
-            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         } else if firstPosition {
             topHeightConstraint = 10
             backgroundView?.roundCorners(corners: [.topLeft, .topRight], radius: 10)
         } else if lastPosition {
             bottomHeightConstraint = 10
             backgroundView?.roundCorners(corners: [.bottomLeft, .bottomRight], radius: 10)
-            backgroundView?.layer.shadowOpacity = 0.1
-            backgroundView?.layer.shadowRadius = 10
-            backgroundView?.layer.shadowOffset = .init(width: 0, height: 10)
         }
         
         let verticalStackView = VerticalStackView(arrangedSubviews: [nameLabel, middleLabel, bottomLabel], spacing: 2)
+        
+        imageView.constrainWidth(20)
+        imageView.constrainHeight(20)
 
-        let stackView = UIStackView(arrangedSubviews: [verticalStackView, UIView(), imageView, subcategoryLabel, categoryLabel])
+        let stackView = UIStackView(arrangedSubviews: [verticalStackView, imageView, subcategoryLabel, categoryLabel])
         stackView.spacing = 2
         stackView.alignment = .center
         stackView.distribution = .fill

@@ -666,7 +666,7 @@ extension TaskViewController {
     @objc func createNewActivity() {              
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
                 let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
                 var instanceValues = newActivity.toAnyObject()
                 
@@ -686,7 +686,7 @@ extension TaskViewController {
                 
             }))
             
-            alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Save For Future Tasks", style: .default, handler: { (_) in
                 print("Save for future events")
                 //update task's recurrence to stop repeating just before this event
                 var oldActivityRule = oldRecurrenceRule
@@ -732,31 +732,32 @@ extension TaskViewController {
                 print("completion block")
             })
         }
-        // do not want to have in duplicate functionality
-        else if !active || true {
+        else {
             self.createActivity(activity: nil)
-        } else {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "Update Event", style: .default, handler: { (_) in
-                print("User click Edit button")
-                self.createActivity(activity: nil)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Duplicate Event", style: .default, handler: { (_) in
-                print("User click Edit button")
-                self.duplicateActivity(recurrenceRule: nil)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
-            
         }
+        // do not want to have in duplicate functionality
+//        else {
+//            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//
+//            alert.addAction(UIAlertAction(title: "Update Task", style: .default, handler: { (_) in
+//                print("User click Edit button")
+//                self.createActivity(activity: nil)
+//            }))
+//
+//            alert.addAction(UIAlertAction(title: "Duplicate Task", style: .default, handler: { (_) in
+//                print("User click Edit button")
+//                self.duplicateActivity(recurrenceRule: nil)
+//            }))
+//
+//            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+//                print("User click Dismiss button")
+//            }))
+//
+//            self.present(alert, animated: true, completion: {
+//                print("completion block")
+//            })
+//
+//        }
     }
     
     func sortSchedule() {
@@ -776,7 +777,6 @@ extension TaskViewController {
     }
     
     func updateRecurrences(recurrences: [String]) {
-        print("updateRecurrences")
         showActivityIndicator()
         let createActivity = ActivityActions(activity: self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.updateRecurrences(recurrences: recurrences)
@@ -801,13 +801,7 @@ extension TaskViewController {
         hideActivityIndicator()
         self.delegate?.updateTask(task: activity ?? self.task)
         self.updateDiscoverDelegate?.itemCreated()
-        if !active {
-            let alert = UIAlertController(title: taskCreatedMessage, message: nil, preferredStyle: UIAlertController.Style.alert)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
-                alert.dismiss(animated: true, completion: nil)
-            })
-        }
-        if navigationItem.leftBarButtonItem != nil {
+        if self.navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
@@ -909,7 +903,6 @@ extension TaskViewController {
             
             alert.addAction(UIAlertAction(title: "Delete This Task Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                
                 //update activity's recurrence to skip repeat on this date
                 var oldActivityRule = oldRecurrenceRule
                 //update existing activity with exlusion date that fall's on this date

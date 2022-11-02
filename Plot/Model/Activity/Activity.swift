@@ -1352,7 +1352,6 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
         
         let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
         if let type = activity.category {
-            print(type)
             guard type != "Not Applicable" else { continue }
             totalValue -= duration
             if categoryDict[type] == nil {
@@ -1399,12 +1398,10 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
     var nextDate = calendar.date(byAdding: component, value: 1, to: date)!
     while date < end {
         for activityCategory in activityCategories {
-            print(activityCategory)
             if activityCategory == "No Events" {
                 continue
             }
             activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
-                print(stats)
                 if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                     var acStats = statistics[activityCategory]
                     var acActivityList = activityDict[activityCategory]
@@ -1441,29 +1438,19 @@ func activityListStats(
     chunkEnd: Date,
     completion: @escaping ([Statistic], [Activity]) -> ()
 ) {
-    print("activityListStats")
-    print(chunkStart)
-    print(chunkEnd)
     var statistics = [Statistic]()
     var activityList = [Activity]()
     for activity in activities {
-        print(activity.name)
         guard var activityStartDate = activity.startDate,
               var activityEndDate = activity.endDate else {
             return
         }
         
-        print("passed the return")
         // Skipping activities that are outside of the interest range.
         if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
-            print(activityStartDate)
-            print(activityEndDate)
-            print("continue")
             continue
         }
-        
-        print("passed the continue")
-        
+                
         // Truncate events that out of the [chunkStart, chunkEnd] range.
         // Multi-day events, chunked into single day `Statistic`s are the best example.
         if activityStartDate < chunkStart {

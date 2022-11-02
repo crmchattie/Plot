@@ -181,16 +181,44 @@ let cameraNotExistsMessage = "You don't have camera"
 let thumbnailUploadError = "Failed to upload your image to database. Please, check your internet connection and try again."
 let fullsizePictureUploadError = "Failed to upload fullsize image to database. Please, check your internet connection and try again. Despite this error, thumbnail version of this picture has been uploaded, but you still should re-upload your fullsize image."
 
-let taskCreatedMessage = "Task Created!"
-let eventCreatedMessage = "Event Created!"
-let workoutCreatedMessage = "Workout Created!"
-let mindfulnessCreatedMessage = "Mindfulness Session Created!"
-let transactionCreatedMessage = "Transaction Created!"
-let holdingCreatedMessage = "Holding Created!"
-let accountCreatedMessage = "Account Created!"
-let transactionRuleCreatedMessage = "Transaction Rule Created!"
-let calendarCreatedMessage = "Calendar Created!"
-let listCreatedMessage = "List Created!"
+let taskCreatedMessage = "Task Created"
+let eventCreatedMessage = "Event Created"
+let workoutCreatedMessage = "Workout Created"
+let mindfulnessCreatedMessage = "Mindfulness Session Created"
+let transactionCreatedMessage = "Transaction Created"
+let holdingCreatedMessage = "Holding Created"
+let accountCreatedMessage = "Account Created"
+let transactionRuleCreatedMessage = "Transaction Rule Created"
+let calendarCreatedMessage = "Calendar Created"
+let listCreatedMessage = "List Created"
+
+let taskUpdatedMessage = "Task Updated"
+let eventUpdatedMessage = "Event Updated"
+let tasksUpdatedMessage = "Tasks Updated"
+let eventsUpdatedMessage = "Events Updated"
+
+let workoutUpdatedMessage = "Workout Updated"
+let mindfulnessUpdatedMessage = "Mindfulness Session Updated"
+let transactionUpdatedMessage = "Transaction Updated"
+let holdingUpdatedMessage = "Holding Updated"
+let accountUpdatedMessage = "Account Updated"
+let transactionRuleUpdatedMessage = "Transaction Rule Updated"
+let calendarUpdatedMessage = "Calendar Updated"
+let listUpdatedMessage = "List Updated"
+
+let taskDeletedMessage = "Task Deleted"
+let eventDeletedMessage = "Event Deleted"
+let workoutDeletedMessage = "Workout Deleted"
+let mindfulnessDeletedMessage = "Mindfulness Session Deleted"
+let transactionDeletedMessage = "Transaction Deleted"
+let holdingDeletedMessage = "Holding Deleted"
+let accountDeletedMessage = "Account Deleted"
+let transactionRuleDeletedMessage = "Transaction Rule Deleted"
+let calendarDeletedMessage = "Calendar Deleted"
+let listDeletedMessage = "List Deleted"
+
+let tasksDeletedMessage = "Tasks Deleted"
+let eventsDeletedMessage = "Events Deleted"
 
 extension String {
     
@@ -1161,13 +1189,14 @@ func basicAlert(title: String, message: String?, controller: UIViewController) {
     let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
     DispatchQueue.main.async {
         controller.present(alert, animated: true, completion: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+            alert.dismiss(animated: true, completion: nil)
+        })
     }
 }
 
 func libraryAccessChecking() -> Bool {
-    
     let status = PHPhotoLibrary.authorizationStatus()
-    
     switch status {
     case .authorized:
         return true
