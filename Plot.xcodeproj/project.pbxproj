@@ -242,6 +242,7 @@
 		10C83346249AD8EA0037F638 /* FoursquareVenueSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C83345249AD8EA0037F638 /* FoursquareVenueSearchResult.swift */; };
 		10C8334824A3A43F0037F638 /* SygicCollectionsSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8334724A3A43F0037F638 /* SygicCollectionsSearchResult.swift */; };
 		10C8334A24A400620037F638 /* FlightSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C8334924A400620037F638 /* FlightSearchResult.swift */; };
+		10C9C0482913EB74008010B6 /* ActivityDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C9C0472913EB72008010B6 /* ActivityDetailService.swift */; };
 		10CA911725367D8D003CEAF7 /* FinancialTransactionActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */; };
 		10CA911925367D9E003CEAF7 /* FinancialAccountActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */; };
 		10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CD68782486AEE400DC02E0 /* PLNotification.swift */; };
@@ -835,6 +836,7 @@
 		10C83345249AD8EA0037F638 /* FoursquareVenueSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoursquareVenueSearchResult.swift; sourceTree = "<group>"; };
 		10C8334724A3A43F0037F638 /* SygicCollectionsSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SygicCollectionsSearchResult.swift; sourceTree = "<group>"; };
 		10C8334924A400620037F638 /* FlightSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightSearchResult.swift; sourceTree = "<group>"; };
+		10C9C0472913EB72008010B6 /* ActivityDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailService.swift; sourceTree = "<group>"; };
 		10CA911625367D8D003CEAF7 /* FinancialTransactionActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialTransactionActions.swift; sourceTree = "<group>"; };
 		10CA911825367D9E003CEAF7 /* FinancialAccountActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialAccountActions.swift; sourceTree = "<group>"; };
 		10CD68782486AEE400DC02E0 /* PLNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLNotification.swift; sourceTree = "<group>"; };
@@ -1211,6 +1213,7 @@
 			children = (
 				10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */,
 				106D758A2442447C0039B534 /* ActivityActions.swift */,
+				10C9C0472913EB72008010B6 /* ActivityDetailService.swift */,
 				10196EF724411B5600B6AFDF /* SelectActivityMembersViewController.swift */,
 				108C37F228997CBF00DC4998 /* ActivityListViewController.swift */,
 				102618C825771FE300CF6F0A /* ActivityLevelViewController.swift */,
@@ -3455,6 +3458,7 @@
 				108BDBC228F5F53300A2285B /* OnboardingCollectionViewCell.swift in Sources */,
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
+				10C9C0482913EB74008010B6 /* ActivityDetailService.swift in Sources */,
 				10F5D00225CB7E670078C821 /* GPlotEventOp.swift in Sources */,
 				10DFC3F5255CC63000565DAD /* WorkoutFetcher.swift in Sources */,
 				10B541DE25479D0700CC9023 /* MealProductSearchViewController.swift in Sources */,

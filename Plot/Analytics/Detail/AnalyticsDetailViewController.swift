@@ -80,7 +80,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         tableView.tableHeaderView?.layoutIfNeeded()
         tableView.tableHeaderView?.frame.size.width = self.view.bounds.width
         tableView.tableHeaderView = self.tableView.tableHeaderView
-        
+
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -133,12 +133,20 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
 
 extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDelegate {
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int { 2 }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return section == 0 ? 1 : viewModel.entries.value.count
     }
-    
+        
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let chartViewModel = viewModel.chartViewModel.value
@@ -215,7 +223,6 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
 // MARK: - StackedBarChartCellDelegate
 
 extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
-    
     func previousTouched(on cell: StackedBarChartCell) {
         viewModel.loadPreviousSegment()
     }

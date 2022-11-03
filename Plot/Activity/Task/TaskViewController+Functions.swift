@@ -667,6 +667,7 @@ extension TaskViewController {
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
+                basicAlert(title: taskUpdatedMessage, message: nil, controller: self)
                 let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
                 var instanceValues = newActivity.toAnyObject()
                 
@@ -696,6 +697,7 @@ extension TaskViewController {
                 let dates = iCalUtility()
                     .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                 if let dateIndex = dates.firstIndex(of: endDate) {
+                    basicAlert(title: tasksUpdatedMessage, message: nil, controller: self)
                     if dateIndex == 0 {
                         //update all instances of task
                         if self.task.recurrences == nil {
@@ -731,11 +733,15 @@ extension TaskViewController {
             self.present(alert, animated: true, completion: {
                 print("completion block")
             })
-        }
-        else {
+        } else {
+            if !active {
+                basicAlert(title: taskCreatedMessage, message: nil, controller: self)
+            } else {
+                basicAlert(title: taskUpdatedMessage, message: nil, controller: self)
+            }
             self.createActivity(activity: nil)
         }
-        // do not want to have in duplicate functionality
+//        do not want to have in duplicate functionality
 //        else {
 //            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 //
@@ -903,6 +909,7 @@ extension TaskViewController {
             
             alert.addAction(UIAlertAction(title: "Delete This Task Only", style: .default, handler: { (_) in
                 print("Save for this event only")
+                basicAlert(title: taskDeletedMessage, message: nil, controller: self)
                 //update activity's recurrence to skip repeat on this date
                 var oldActivityRule = oldRecurrenceRule
                 //update existing activity with exlusion date that fall's on this date
@@ -919,6 +926,7 @@ extension TaskViewController {
                 let dates = iCalUtility()
                     .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                 if let dateIndex = dates.firstIndex(of: endDate) {
+                    basicAlert(title: tasksDeletedMessage, message: nil, controller: self)
                     //will equal true if first instance of repeating event
                     if dateIndex == 0 {
                         self.showActivityIndicator()
@@ -951,6 +959,7 @@ extension TaskViewController {
             
             alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
                 print("Save for this event only")
+                basicAlert(title: taskDeletedMessage, message: nil, controller: self)
                 self.showActivityIndicator()
                 let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)

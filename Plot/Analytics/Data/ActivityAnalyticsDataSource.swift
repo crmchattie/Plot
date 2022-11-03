@@ -18,7 +18,7 @@ private func getTitle(range: DateRange) -> String {
 class ActivityAnalyticsDataSource: AnalyticsDataSource {
     
     private let networkController: NetworkController
-    private let summaryService = SummaryService()
+    private let activityDetailService = ActivityDetailService()
     
     var range: DateRange
     
@@ -51,7 +51,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
         
-        summaryService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats in
+        activityDetailService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats in
             let activities = stats[.calendarSummary] ?? [:]
             
             guard !activities.isEmpty else {

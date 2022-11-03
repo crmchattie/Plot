@@ -117,14 +117,6 @@ class SummaryService: SummaryServiceInterface {
                 }
 
                     
-                    
-//                    transactionDetailsOverTimeChartData(transactions: transactions, transactionDetails: [incomeTransactionDetail, expenseTransactionDetail, differenceTransactionDetail], start: startDate, end: endDate, segmentType: segmentType) { (statisticDict, _) in
-//                        if let incomeStatistics = statisticDict[incomeTransactionDetail], let expenseStatistics = statisticDict[expenseTransactionDetail], let differenceStatistics = statisticDict[differenceTransactionDetail] {
-//                            barChartEntries["Financial Summary"] = ["Income": incomeStatistics, "Expense": expenseStatistics, "Difference": differenceStatistics]
-//                        }
-//                    }
-//                }
-                
                 if let expenseTransactionDetail = transactionDetailsList.first(where: { ($0.level == .group && $0.group == "Expense") }) {
                     totalValue = abs(expenseTransactionDetail.amount)
                     entries = []
@@ -151,10 +143,4 @@ class SummaryService: SummaryServiceInterface {
             completion(activitySummary, pieChartEntries, barChartEntries, barChartStats, nil)
         }
     }
-}
-
-struct Entry {
-    var label: String
-    var value: Double
-    var icon: UIImage?
 }

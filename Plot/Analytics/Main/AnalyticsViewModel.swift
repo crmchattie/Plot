@@ -19,10 +19,6 @@ class AnalyticsViewModel {
         fileprivate let dataSources: [AnalyticsDataSource]
     }
     
-    private let activityService = SummaryService()
-    private let healthDetailService = HealthDetailService()
-    private let healthService = HealthService()
-    
     let networkController: NetworkController
     
     private(set) var sections: [Section] = []
