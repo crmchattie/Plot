@@ -451,21 +451,21 @@ class ChecklistViewController: FormViewController {
         }
     }
     
-    fileprivate func updateLists() {
-            if let mvs = (form.values()["checklistfields"] as? [Any?])?.compactMap({ $0 }) {
-                if !mvs.isEmpty {
-                    var checklistDict = [String : Bool]()
-                    for element in mvs {
-                        if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
-                            let newText = text.removeCharacters()
-                            checklistDict[newText] = state
-                        }
+    func updateLists() {
+        if let mvs = (form.values()["checklistfields"] as? [Any?])?.compactMap({ $0 }) {
+            if !mvs.isEmpty {
+                var checklistDict = [String : Bool]()
+                for element in mvs {
+                    if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
+                        let newText = text.removeCharacters()
+                        checklistDict[newText] = state
                     }
-                    self.checklist.items = checklistDict
-                } else {
-                    self.checklist.items = nil
                 }
+                self.checklist.items = checklistDict
+            } else {
+                self.checklist.items = nil
             }
+        }
     }
     
     @objc fileprivate func openParticipantsInviter() {

@@ -17,7 +17,7 @@ protocol ObjectDetailShowing: UIViewController {
 
 extension ObjectDetailShowing {
     
-    func showTaskDetailPush(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?) {
+    func showTaskDetailPush(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
         let destination = TaskViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.task = task
@@ -30,6 +30,8 @@ extension ObjectDetailShowing {
         destination.template = template
         destination.container = container
         destination.list = list
+        destination.startDateTime = startDateTime
+        destination.endDateTime = endDateTime
         if let users = users {
             destination.users = users
             destination.filteredUsers = users
@@ -241,7 +243,7 @@ extension ObjectDetailShowing {
         navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
-    func showTaskDetailPresent(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?) {
+    func showTaskDetailPresent(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
         let destination = TaskViewController(networkController: networkController)
         destination.hidesBottomBarWhenPushed = true
         destination.task = task
@@ -254,6 +256,8 @@ extension ObjectDetailShowing {
         destination.template = template
         destination.container = container
         destination.list = list
+        destination.startDateTime = startDateTime
+        destination.endDateTime = endDateTime
         if let users = users {
             destination.users = users
             destination.filteredUsers = users
@@ -540,9 +544,9 @@ extension ObjectDetailShowing {
                 }
             } else if category == Identifiers.taskCategory {
                 if let date = aps.date, let activity = networkController.activityService.tasks.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
-                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
+                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
                 } else if let activity = networkController.activityService.tasksNoRepeats.first(where: {$0.activityID == ID }) {
-                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
+                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
                 }
             } else if category == Identifiers.workoutCategory {
                 if let workout = networkController.healthService.workouts.first(where: {$0.id == ID }) {

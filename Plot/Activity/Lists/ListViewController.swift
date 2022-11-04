@@ -211,7 +211,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func newItem() {
-        self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: list)
+        self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: list, startDateTime: nil, endDateTime: nil)
     }
     
     @objc fileprivate func listInfo() {
@@ -410,14 +410,14 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
                 newItem()
             } else if filteredTasks.indices.contains(indexPath.row - 1) {
                 let task = filteredTasks[indexPath.row - 1]
-                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
+                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
             } else {
                 newItem()
             }
         } else {
             if filteredTasks.indices.contains(indexPath.row) {
                 let task = filteredTasks[indexPath.row]
-                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
+                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
             } else {
                 newItem()
             }

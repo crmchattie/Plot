@@ -344,7 +344,6 @@ extension EventViewController {
     }
     
     func updateLists(type: String) {
-        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "schedule" {
             var scheduleIDs = [String]()
             for schedule in scheduleList {
@@ -354,34 +353,23 @@ extension EventViewController {
             }
             if !scheduleIDs.isEmpty {
                 activity.scheduleIDs = scheduleIDs
-                groupActivityReference.updateChildValues(["scheduleIDs": scheduleIDs as AnyObject])
             } else {
                 activity.scheduleIDs = nil
-                groupActivityReference.child("scheduleIDs").removeValue()
             }
         } else if type == "container" {
-            print("update lists container")
             if container != nil {
                 container = Container(id: container.id, activityIDs: container.activityIDs, taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: activity.participantsIDs)
             } else {
                 let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                 container = Container(id: containerID, activityIDs: [activityID], taskIDs: taskList.map({$0.activityID ?? ""}), workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: activity.participantsIDs)
             }
-            ContainerFunctions.updateContainerAndStuffInside(container: container)
             activity.containerID = container.id
-            if active {
-                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
-            }
         } else {
             if listList.isEmpty {
                 activity.checklistIDs = nil
-                groupActivityReference.child("checklistIDs").removeValue()
                 activity.grocerylistID = nil
-                groupActivityReference.child("grocerylistID").removeValue()
                 activity.packinglistIDs = nil
-                groupActivityReference.child("packinglistIDs").removeValue()
                 activity.activitylistIDs = nil
-                groupActivityReference.child("activitylistIDs").removeValue()
             } else {
                 var checklistIDs = [String]()
                 var packinglistIDs = [String]()
@@ -400,32 +388,93 @@ extension EventViewController {
                 }
                 if !checklistIDs.isEmpty {
                     activity.checklistIDs = checklistIDs
-                    groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
                 } else {
                     activity.checklistIDs = nil
-                    groupActivityReference.child("checklistIDs").removeValue()
                 }
                 if !activitylistIDs.isEmpty {
                     activity.activitylistIDs = activitylistIDs
-                    groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
                 } else {
                     activity.activitylistIDs = nil
-                    groupActivityReference.child("activitylistIDs").removeValue()
                 }
                 if grocerylistID != "nothing" {
                     activity.grocerylistID = grocerylistID
-                    groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
                 } else {
                     activity.grocerylistID = nil
-                    groupActivityReference.child("grocerylistID").removeValue()
                 }
                 if !packinglistIDs.isEmpty {
                     activity.packinglistIDs = packinglistIDs
-                    groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
                 } else {
                     activity.packinglistIDs = nil
-                    groupActivityReference.child("packinglistIDs").removeValue()
                 }
+            }
+        }
+    }
+    
+    func updateListsFirebase(id: String) {
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(id).child(messageMetaDataFirebaseFolder)
+        
+        // schedule
+        var scheduleIDs = [String]()
+        for schedule in scheduleList {
+            if let ID = schedule.activityID {
+                scheduleIDs.append(ID)
+            }
+        }
+        if !scheduleIDs.isEmpty {
+            groupActivityReference.updateChildValues(["scheduleIDs": scheduleIDs as AnyObject])
+        } else {
+            groupActivityReference.child("scheduleIDs").removeValue()
+        }
+        
+        // container
+        if let container = container {
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
+            if active {
+                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+            }
+        }
+        
+        //lists
+        if listList.isEmpty {
+            groupActivityReference.child("checklistIDs").removeValue()
+            groupActivityReference.child("grocerylistID").removeValue()
+            groupActivityReference.child("packinglistIDs").removeValue()
+            groupActivityReference.child("activitylistIDs").removeValue()
+        } else {
+            var checklistIDs = [String]()
+            var packinglistIDs = [String]()
+            var activitylistIDs = [String]()
+            var grocerylistID = "nothing"
+            for list in listList {
+                if let checklist = list.checklist {
+                    checklistIDs.append(checklist.ID!)
+                } else if let packinglist = list.packinglist {
+                    packinglistIDs.append(packinglist.ID!)
+                } else if let grocerylist = list.grocerylist {
+                    grocerylistID = grocerylist.ID!
+                } else if let activitylist = list.activitylist {
+                    activitylistIDs.append(activitylist.ID!)
+                }
+            }
+            if !checklistIDs.isEmpty {
+                groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
+            } else {
+                groupActivityReference.child("checklistIDs").removeValue()
+            }
+            if !activitylistIDs.isEmpty {
+                groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
+            } else {
+                groupActivityReference.child("activitylistIDs").removeValue()
+            }
+            if grocerylistID != "nothing" {
+                groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
+            } else {
+                groupActivityReference.child("grocerylistID").removeValue()
+            }
+            if !packinglistIDs.isEmpty {
+                groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
+            } else {
+                groupActivityReference.child("packinglistIDs").removeValue()
             }
         }
     }
@@ -657,7 +706,7 @@ extension EventViewController {
             return
         }
         if taskList.indices.contains(taskIndex) {
-            self.showTaskDetailPush(task: taskList[taskIndex], updateDiscoverDelegate: nil, delegate: self, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil)
+            self.showTaskDetailPush(task: taskList[taskIndex], updateDiscoverDelegate: nil, delegate: self, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil, startDateTime: nil, endDateTime: nil)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Task", style: .default, handler: { (_) in
@@ -665,11 +714,11 @@ extension EventViewController {
                     mvs.remove(at: mvs.count - 2)
                 }
                 if let container = self.container {
-                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.activity, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil)
+                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.activity, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil, startDateTime: nil, endDateTime: nil)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: [self.activityID], taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.activity.participantsIDs)
-                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.activity, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, list: nil)
+                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.activity, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, list: nil, startDateTime: nil, endDateTime: nil)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Existing Task", style: .default, handler: { (_) in
@@ -776,10 +825,20 @@ extension EventViewController {
     }
     
     @objc func createNewActivity() {        
-        if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, let recurrenceStartDate = activity.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never" {
+        if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, let recurrenceStartDate = activity.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
+                var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                var instanceIDs = self.activity.instanceIDs ?? []
+                if let instance = self.activity.instanceID {
+                    self.activity.instanceID = instance
+                } else {
+                    instanceIDs.append(instanceID)
+                    self.activity.instanceIDs = instanceIDs
+                }
+                self.updateListsFirebase(id: instanceID)
+                
                 let newActivity = self.activity.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.activityOld)
                 var instanceValues = newActivity.toAnyObject()
                 
@@ -807,7 +866,7 @@ extension EventViewController {
                         if self.activity.recurrences == nil {
                             self.deleteRecurrences()
                         }
-                        self.createActivity(activity: nil, title: eventsUpdatedMessage)
+                        self.createActivity(title: eventsUpdatedMessage)
                     } else if let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
 
                         //update only future instances of activity
@@ -824,7 +883,6 @@ extension EventViewController {
                         oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
                         
                         self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
-                        
                         self.updateRecurrences(recurrences: self.activityOld.recurrences!, title: eventsUpdatedMessage)
                     }
                 }
@@ -841,9 +899,9 @@ extension EventViewController {
         // do not want to have in duplicate functionality
         else {
             if !active {
-                self.createActivity(activity: nil, title: eventCreatedMessage)
+                self.createActivity(title: eventCreatedMessage)
             } else {
-                self.createActivity(activity: nil, title: eventUpdatedMessage)
+                self.createActivity(title: eventUpdatedMessage)
             }
             
         }
@@ -852,7 +910,7 @@ extension EventViewController {
 //
 //            alert.addAction(UIAlertAction(title: "Update Event", style: .default, handler: { (_) in
 //                print("User click Edit button")
-//                self.createActivity(activity: nil)
+//                self.createActivity(title: eventUpdatedMessage)
 //            }))
 //
 //            alert.addAction(UIAlertAction(title: "Duplicate Event", style: .default, handler: { (_) in
@@ -902,12 +960,13 @@ extension EventViewController {
         createActivity.deleteRecurrences()
     }
     
-    func createActivity(activity: Activity?, title: String) {
+    func createActivity(title: String) {
         showActivityIndicator()
-        let createActivity = ActivityActions(activity: activity ?? self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
+        self.updateListsFirebase(id: activityID) 
+        let createActivity = ActivityActions(activity: self.activity, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.createNewActivity(updateDirectAssociation: true)
         hideActivityIndicator()
-        self.delegate?.updateActivity(activity: activity ?? self.activity)
+        self.delegate?.updateActivity(activity: self.activity)
         closeController(title: title)
     }
     
@@ -1051,8 +1110,11 @@ extension EventViewController {
             let newActivity = activity.copy() as! Activity
             newActivity.activityID = newActivityID
             if let recurrenceRule = recurrenceRule {
+                updateListsFirebase(id: newActivityID)
                 newActivity.recurrences = recurrenceRule
             } else {
+                updateListsFirebase(id: activityID)
+                updateListsFirebase(id: newActivityID)
                 newActivity.recurrences = nil
             }
             

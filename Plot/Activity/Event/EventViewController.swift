@@ -348,7 +348,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                 if let timeZone = activity.startTimeZone {
                     $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                 }
-                $0.value = Date(timeIntervalSince1970: self.activity!.startDateTime as! TimeInterval)
+                $0.value = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
                 if self.activity.allDay == true {
                     $0.dateFormatter?.timeStyle = .none
                 }
@@ -440,7 +440,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                 if let timeZone = activity.endTimeZone {
                     $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                 }
-                $0.value = Date(timeIntervalSince1970: self.activity!.endDateTime as! TimeInterval)
+                $0.value = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
                 if self.activity.allDay == true {
                     $0.dateFormatter?.timeStyle = .none
                 }

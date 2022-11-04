@@ -61,6 +61,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
     var healthIndex: Int = 0
     var eventList = [Activity]()
     var eventIndex: Int = 0
+    var startDateTime: Date?
+    var endDateTime: Date?
     
     var grocerylistIndex: Int = -1
     var thumbnailImage: String = ""
@@ -156,6 +158,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                         list = lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false })
                         task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                         task.category = list?.category
+                        if let endDateTime = endDateTime {
+                            task.endDateTime = NSNumber(value: Int((endDateTime).timeIntervalSince1970))
+                        }
                     }
                     if let container = container {
                         task.containerID = container.id

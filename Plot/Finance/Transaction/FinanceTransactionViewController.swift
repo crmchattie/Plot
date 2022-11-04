@@ -165,6 +165,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
     @IBAction func create(_ sender: AnyObject) {
         movingBackwards = false
         self.showActivityIndicator()
+        self.updateListsFirebase()
         let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
         createTransaction.createNewTransaction()
         self.hideActivityIndicator()

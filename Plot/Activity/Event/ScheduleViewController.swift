@@ -137,8 +137,8 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textField?.textColor = .label
                 $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
-                if self.active {
-                    $0.value = self.schedule.name
+                if let schedule = schedule, let name = schedule.name {
+                    $0.value = name
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
 //                    $0.cell.textField.becomeFirstResponder()
@@ -161,7 +161,7 @@ class ScheduleViewController: FormViewController {
 //                $0.cell.textField?.textColor = .label
 //                $0.placeholderColor = .secondaryLabel
 //                $0.placeholder = $0.tag
-//                if self.active && self.schedule.activityType != nil && self.schedule.activityType != "nothing" {
+//                if let schedule = schedule, schedule.activityType != nil, schedule.activityType != "nothing" {
 //                    $0.value = self.schedule.activityType
 //                }
 //                }.cellUpdate { cell, row in
@@ -176,7 +176,7 @@ class ScheduleViewController: FormViewController {
                 $0.cell.textView?.textColor = .label
                 $0.cell.placeholderLabel?.textColor = .secondaryLabel
                 $0.placeholder = $0.tag
-                if self.active && self.schedule.activityDescription != nil && self.schedule.activityDescription != "nothing" {
+                if let schedule = schedule, schedule.activityDescription != nil, schedule.activityDescription != "nothing" {
                     $0.value = self.schedule.activityDescription
                 }
                 }.cellUpdate({ (cell, row) in
@@ -191,7 +191,7 @@ class ScheduleViewController: FormViewController {
             row.cell.textLabel?.textColor = .label
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
-            if self.active, let localName = schedule.locationName, localName != "locationName" {
+            if let schedule = schedule, let localName = schedule.locationName, localName != "locationName" {
                 row.cell.textLabel?.textColor = .label
                 row.cell.accessoryType = .detailDisclosureButton
                 row.title = localName
@@ -246,8 +246,8 @@ class ScheduleViewController: FormViewController {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.textLabel?.textColor = .label
                 $0.title = $0.tag
-                if self.active {
-                    $0.value = self.schedule.allDay
+                if let schedule = schedule, let allDay = schedule.allDay {
+                    $0.value = allDay
                 } else {
                     $0.value = false
                 }
@@ -282,11 +282,11 @@ class ScheduleViewController: FormViewController {
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
-                if self.active {
+                if let schedule = schedule {
                     if let timeZone = schedule.startTimeZone {
                         $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                     }
-                    $0.value = Date(timeIntervalSince1970: self.schedule!.startDateTime as! TimeInterval)
+                    $0.value = Date(timeIntervalSince1970: schedule.startDateTime as! TimeInterval)
                     if self.schedule.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
                     }
@@ -355,11 +355,8 @@ class ScheduleViewController: FormViewController {
                 row.cell.selectionStyle = .default
                 row.title = "Time Zone"
                 row.hidden = true
-                if active {
-                    row.value = schedule.startTimeZone ?? "UTC"
-                } else {
-                    row.value = TimeZone.current.identifier
-                    schedule.startTimeZone = TimeZone.current.identifier
+                if let schedule = schedule, let startTimeZone = schedule.startTimeZone {
+                    row.value = startTimeZone
                 }
                 }.onCellSelection({ _,_ in
                     self.openTimeZoneFinder(startOrEndTimeZone: "startTimeZone")
@@ -378,11 +375,11 @@ class ScheduleViewController: FormViewController {
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
-                if self.active {
+                if let schedule = schedule {
                     if let timeZone = schedule.endTimeZone {
                         $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                     }
-                    $0.value = Date(timeIntervalSince1970: self.schedule!.endDateTime as! TimeInterval)
+                    $0.value = Date(timeIntervalSince1970: schedule.endDateTime as! TimeInterval)
                     if self.schedule.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
                     }
@@ -449,11 +446,8 @@ class ScheduleViewController: FormViewController {
                 row.cell.selectionStyle = .default
                 row.title = "Time Zone"
                 row.hidden = true
-                if active {
-                    row.value = schedule.endTimeZone ?? "UTC"
-                } else {
-                    row.value = TimeZone.current.identifier
-                    schedule.endTimeZone = TimeZone.current.identifier
+                if let schedule = schedule, let endTimeZone = schedule.endTimeZone {
+                    row.value = endTimeZone
                 }
                 }.onCellSelection({ _,_ in
                     self.openTimeZoneFinder(startOrEndTimeZone: "endTimeZone")
@@ -469,7 +463,7 @@ class ScheduleViewController: FormViewController {
                 row.cell.textLabel?.textColor = .label
                 row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.title = row.tag
-                if self.active, let value = self.schedule.reminder {
+                if let schedule = schedule, let value = schedule.reminder {
                     row.value = EventAlert(rawValue: value)
                 } else {
                     row.value = EventAlert.None
@@ -511,8 +505,8 @@ class ScheduleViewController: FormViewController {
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if self.active && self.schedule.category != nil {
-                    row.value = self.schedule.category
+                if let schedule = schedule, schedule.category != nil {
+                    row.value = schedule.category
                 } else {
                     row.value = "Uncategorized"
                 }

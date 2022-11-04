@@ -224,7 +224,6 @@ class EventBuilder {
         }
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.isSchedule = true
-        activity.name = "Sub-Event"
         activity.admin = event.admin
         activity.category = event.category
         activity.subcategory = event.subcategory
@@ -488,7 +487,6 @@ class TaskBuilder {
         }
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
-        activity.name = "Sub-Task"
         activity.admin = task.admin
         activity.category = task.category
         activity.subcategory = task.subcategory

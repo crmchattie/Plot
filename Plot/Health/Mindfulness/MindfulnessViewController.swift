@@ -165,6 +165,7 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
     
     @objc fileprivate func create() {
         showActivityIndicator()
+        self.updateListsFirebase()
         let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
         createMindfulness.createNewMindfulness(updateDirectAssociation: true)
         self.delegate?.updateMindfulness(mindfulness: self.mindfulness)

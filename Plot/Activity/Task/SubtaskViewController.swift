@@ -127,8 +127,8 @@ class SubtaskViewController: FormViewController {
                 $0.cell.textField?.textColor = .label
                 $0.placeholderColor = .secondaryLabel
                 $0.placeholder = $0.tag
-                if self.active {
-                    $0.value = self.subtask.name
+                if let subtask = subtask, let name = subtask.name {
+                    $0.value = name
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
 //                    $0.cell.textField.becomeFirstResponder()
@@ -151,7 +151,7 @@ class SubtaskViewController: FormViewController {
 //                $0.cell.textField?.textColor = .label
 //                $0.placeholderColor = .secondaryLabel
 //                $0.placeholder = $0.tag
-//                if self.active && self.subtask.activityType != nil && self.subtask.activityType != "nothing" {
+//                if let subtask = subtask, subtask.activityType != nil, self.subtask.activityType != "nothing" {
 //                    $0.value = self.subtask.activityType
 //                }
 //                }.cellUpdate { cell, row in
@@ -166,7 +166,7 @@ class SubtaskViewController: FormViewController {
                 $0.cell.textView?.textColor = .label
                 $0.cell.placeholderLabel?.textColor = .secondaryLabel
                 $0.placeholder = $0.tag
-                if self.active && self.subtask.activityDescription != nil && self.subtask.activityDescription != "nothing" {
+                if let subtask = subtask, subtask.activityDescription != nil, subtask.activityDescription != "nothing" {
                     $0.value = self.subtask.activityDescription
                 }
                 }.cellUpdate({ (cell, row) in
@@ -253,7 +253,7 @@ class SubtaskViewController: FormViewController {
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
-                if self.active, subtask.isCompleted ?? false, let date = subtask.completedDate {
+                if let subtask = subtask, subtask.isCompleted ?? false, let date = subtask.completedDate {
                     $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
                     $0.updateCell()
                 } else {
@@ -288,7 +288,7 @@ class SubtaskViewController: FormViewController {
 //                $0.cell.textLabel?.textColor = .label
 //                $0.cell.detailTextLabel?.textColor = .secondaryLabel
 //                $0.title = $0.tag
-//                if self.active, let subtask = subtask, let startDate = subtask.startDate {
+//                if let subtask = subtask, let startDate = subtask.startDate {
 //                    $0.value = true
 //                    $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
 //                } else {
@@ -357,7 +357,7 @@ class SubtaskViewController: FormViewController {
 //                else {
 //                    $0.cell.datePicker.datePickerMode = .date
 //                }
-//                if self.active, let subtask = subtask, let startDate = subtask.startDate {
+//                if let subtask = subtask, let startDate = subtask.startDate {
 //                    $0.value = startDate
 //                    $0.updateCell()
 //                }
@@ -376,7 +376,7 @@ class SubtaskViewController: FormViewController {
 //                $0.cell.textLabel?.textColor = .label
 //                $0.cell.detailTextLabel?.textColor = .secondaryLabel
 //                $0.title = $0.tag
-//                if self.active, let subtask = subtask, subtask.hasStartTime ?? false, let startDate = subtask.startDate {
+//                if let subtask = subtask, subtask.hasStartTime ?? false, let startDate = subtask.startDate {
 //                    $0.value = true
 //                    $0.cell.detailTextLabel?.text = startDate.getTimeString()
 //                } else {
@@ -453,7 +453,7 @@ class SubtaskViewController: FormViewController {
 //                else {
 //                    $0.cell.datePicker.datePickerMode = .time
 //                }
-//                if self.active, let subtask = subtask, subtask.hasStartTime ?? false, let startDate = subtask.startDate {
+//                if let subtask = subtask, subtask.hasStartTime ?? false, let startDate = subtask.startDate {
 //                    $0.value = startDate
 //                    $0.updateCell()
 //                }
@@ -474,7 +474,7 @@ class SubtaskViewController: FormViewController {
                 $0.cell.textLabel?.textColor = .label
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = "Deadline Date"
-                if self.active, let subtask = subtask, let endDate = subtask.endDate {
+                if let subtask = subtask, let endDate = subtask.endDate {
                     $0.value = true
                     $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                 } else {
@@ -545,7 +545,7 @@ class SubtaskViewController: FormViewController {
                 else {
                     $0.cell.datePicker.datePickerMode = .date
                 }
-                if self.active, let subtask = subtask, let endDate = subtask.endDate {
+                if let subtask = subtask, let endDate = subtask.endDate {
                     $0.value = endDate
                     $0.updateCell()
                 }
@@ -564,7 +564,7 @@ class SubtaskViewController: FormViewController {
                 $0.cell.textLabel?.textColor = .label
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = "Deadline Time"
-                if self.active, let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                if let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
                     $0.value = true
                     $0.cell.detailTextLabel?.text = endDate.getTimeString()
                 } else {
@@ -643,7 +643,7 @@ class SubtaskViewController: FormViewController {
                 else {
                     $0.cell.datePicker.datePickerMode = .time
                 }
-                if self.active, let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                if let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
                     $0.value = endDate
                     $0.updateCell()
                 }
@@ -663,7 +663,7 @@ class SubtaskViewController: FormViewController {
             row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
-            if self.active, let value = self.subtask.reminder {
+            if let subtask = subtask, let value = subtask.reminder {
                 row.value = EventAlert(rawValue: value)
             } else {
                 row.value = EventAlert.None
@@ -704,7 +704,7 @@ class SubtaskViewController: FormViewController {
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if self.active && self.subtask.category != nil {
+                if let subtask = subtask, subtask.category != nil {
                     row.value = self.subtask.category
                 } else {
                     row.value = "Uncategorized"

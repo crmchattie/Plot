@@ -337,8 +337,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
                     destination.users = self.users
                     destination.filteredUsers = self.filteredUsers
                     destination.delegate = self
-                    destination.startDateTime = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
-                    destination.endDateTime = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
                     self.navigationController?.pushViewController(destination, animated: true)
                 } else {
                     let destination = EventViewController(networkController: networkController)

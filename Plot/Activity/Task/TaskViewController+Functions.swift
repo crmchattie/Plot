@@ -235,7 +235,6 @@ extension TaskViewController {
     }
     
     func updateLists(type: String) {
-        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         if type == "subtasks" {
             var subtaskIDs = [String]()
             for subtask in subtaskList {
@@ -245,10 +244,8 @@ extension TaskViewController {
             }
             if !subtaskIDs.isEmpty {
                 task.subtaskIDs = subtaskIDs
-                groupActivityReference.updateChildValues(["subtaskIDs": subtaskIDs as AnyObject])
             } else {
                 task.subtaskIDs = nil
-                groupActivityReference.child("subtaskIDs").removeValue()
             }
         } else if type == "container" {
             if container != nil {
@@ -257,21 +254,13 @@ extension TaskViewController {
                 let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                 container = Container(id: containerID, activityIDs: eventList.map({$0.activityID ?? ""}), taskIDs: [activityID], workoutIDs: healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: purchaseList.map({$0.guid}), participantsIDs: task.participantsIDs)
             }
-            ContainerFunctions.updateContainerAndStuffInside(container: container)
             task.containerID = container.id
-            if active {
-                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
-            }
         } else {
             if listList.isEmpty {
                 task.checklistIDs = nil
-                groupActivityReference.child("checklistIDs").removeValue()
                 task.grocerylistID = nil
-                groupActivityReference.child("grocerylistID").removeValue()
                 task.packinglistIDs = nil
-                groupActivityReference.child("packinglistIDs").removeValue()
                 task.activitylistIDs = nil
-                groupActivityReference.child("activitylistIDs").removeValue()
             } else {
                 var checklistIDs = [String]()
                 var packinglistIDs = [String]()
@@ -290,32 +279,93 @@ extension TaskViewController {
                 }
                 if !checklistIDs.isEmpty {
                     task.checklistIDs = checklistIDs
-                    groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
                 } else {
                     task.checklistIDs = nil
-                    groupActivityReference.child("checklistIDs").removeValue()
                 }
                 if !activitylistIDs.isEmpty {
                     task.activitylistIDs = activitylistIDs
-                    groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
                 } else {
                     task.activitylistIDs = nil
-                    groupActivityReference.child("activitylistIDs").removeValue()
                 }
                 if grocerylistID != "nothing" {
                     task.grocerylistID = grocerylistID
-                    groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
                 } else {
                     task.grocerylistID = nil
-                    groupActivityReference.child("grocerylistID").removeValue()
                 }
                 if !packinglistIDs.isEmpty {
                     task.packinglistIDs = packinglistIDs
-                    groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
                 } else {
                     task.packinglistIDs = nil
-                    groupActivityReference.child("packinglistIDs").removeValue()
                 }
+            }
+        }
+    }
+    
+    func updateListsFirebase(id: String) {
+        let groupActivityReference = Database.database().reference().child(activitiesEntity).child(id).child(messageMetaDataFirebaseFolder)
+        
+        //subtasks
+        var subtaskIDs = [String]()
+        for subtask in subtaskList {
+            if let ID = subtask.activityID {
+                subtaskIDs.append(ID)
+            }
+        }
+        if !subtaskIDs.isEmpty {
+            groupActivityReference.updateChildValues(["subtaskIDs": subtaskIDs as AnyObject])
+        } else {
+            groupActivityReference.child("subtaskIDs").removeValue()
+        }
+        
+        //container
+        if let container = container {
+            ContainerFunctions.updateContainerAndStuffInside(container: container)
+            if active {
+                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+            }
+        }
+        
+        //lists
+        if listList.isEmpty {
+            groupActivityReference.child("checklistIDs").removeValue()
+            groupActivityReference.child("grocerylistID").removeValue()
+            groupActivityReference.child("packinglistIDs").removeValue()
+            groupActivityReference.child("activitylistIDs").removeValue()
+        } else {
+            var checklistIDs = [String]()
+            var packinglistIDs = [String]()
+            var activitylistIDs = [String]()
+            var grocerylistID = "nothing"
+            for list in listList {
+                if let checklist = list.checklist {
+                    checklistIDs.append(checklist.ID!)
+                } else if let packinglist = list.packinglist {
+                    packinglistIDs.append(packinglist.ID!)
+                } else if let grocerylist = list.grocerylist {
+                    grocerylistID = grocerylist.ID!
+                } else if let activitylist = list.activitylist {
+                    activitylistIDs.append(activitylist.ID!)
+                }
+            }
+            if !checklistIDs.isEmpty {
+                groupActivityReference.updateChildValues(["checklistIDs": checklistIDs as AnyObject])
+            } else {
+                groupActivityReference.child("checklistIDs").removeValue()
+            }
+            if !activitylistIDs.isEmpty {
+                groupActivityReference.updateChildValues(["activitylistIDs": activitylistIDs as AnyObject])
+            } else {
+                groupActivityReference.child("activitylistIDs").removeValue()
+            }
+            if grocerylistID != "nothing" {
+                groupActivityReference.updateChildValues(["grocerylistID": grocerylistID as AnyObject])
+            } else {
+                groupActivityReference.child("grocerylistID").removeValue()
+            }
+            if !packinglistIDs.isEmpty {
+                groupActivityReference.updateChildValues(["packinglistIDs": packinglistIDs as AnyObject])
+            } else {
+                groupActivityReference.child("packinglistIDs").removeValue()
             }
         }
     }
@@ -606,9 +656,19 @@ extension TaskViewController {
     }
     
     @objc func createNewActivity() {              
-        if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
+        if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
+                var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                var instanceIDs = self.task.instanceIDs ?? []
+                if let instance = self.task.instanceID {
+                    self.task.instanceID = instance
+                } else {
+                    instanceIDs.append(instanceID)
+                    self.task.instanceIDs = instanceIDs
+                }
+                self.updateListsFirebase(id: instanceID)
+                
                 let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
                 var instanceValues = newActivity.toAnyObject()
                 
@@ -637,7 +697,7 @@ extension TaskViewController {
                         if self.task.recurrences == nil {
                             self.deleteRecurrences()
                         }
-                        self.createActivity(activity: nil, title: tasksUpdatedMessage)
+                        self.createActivity(title: tasksUpdatedMessage)
                     } else if let newRecurrences = self.task.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
 
                         //update only future instances of task
@@ -668,9 +728,9 @@ extension TaskViewController {
             })
         } else {
             if !active {
-                self.createActivity(activity: nil, title: taskCreatedMessage)
+                self.createActivity(title: taskCreatedMessage)
             } else {
-                self.createActivity(activity: nil, title: taskUpdatedMessage)
+                self.createActivity(title: taskUpdatedMessage)
             }
         }
 //        do not want to have in duplicate functionality
@@ -679,7 +739,7 @@ extension TaskViewController {
 //
 //            alert.addAction(UIAlertAction(title: "Update Task", style: .default, handler: { (_) in
 //                print("User click Edit button")
-//                self.createActivity(activity: nil)
+//                self.createActivity(title: taskUpdatedMessage)
 //            }))
 //
 //            alert.addAction(UIAlertAction(title: "Duplicate Task", style: .default, handler: { (_) in
@@ -746,12 +806,13 @@ extension TaskViewController {
         createActivity.deleteRecurrences()
     }
     
-    func createActivity(activity: Activity?, title: String) {
+    func createActivity(title: String) {
         showActivityIndicator()
-        let createActivity = ActivityActions(activity: activity ?? self.task, active: active, selectedFalconUsers: selectedFalconUsers)
+        self.updateListsFirebase(id: activityID)
+        let createActivity = ActivityActions(activity: self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.createNewActivity(updateDirectAssociation: true)
         hideActivityIndicator()
-        self.delegate?.updateTask(task: activity ?? self.task)
+        self.delegate?.updateTask(task: self.task)
         closeController(title: title)
     }
     
@@ -949,8 +1010,11 @@ extension TaskViewController {
             let newActivity = task.copy() as! Activity
             newActivity.activityID = newActivityID
             if let recurrenceRule = recurrenceRule {
+                updateListsFirebase(id: newActivityID)
                 newActivity.recurrences = recurrenceRule
             } else {
+                updateListsFirebase(id: activityID)
+                updateListsFirebase(id: newActivityID)
                 newActivity.recurrences = nil
             }
             

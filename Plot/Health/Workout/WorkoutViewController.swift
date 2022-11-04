@@ -160,6 +160,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
     
     @objc fileprivate func create() {
         showActivityIndicator()
+        self.updateListsFirebase()
         let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
         createNewWorkout.createNewWorkout(updateDirectAssociation: true)
         self.delegate?.updateWorkout(workout: self.workout)
