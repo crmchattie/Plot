@@ -11,14 +11,6 @@ import UIKit
 class HealthViewController: UIViewController, ObjectDetailShowing {
     var participants = [String : [User]]()
     
-    func showActivityIndicator() {
-        
-    }
-    
-    func hideActivityIndicator() {
-        
-    }
-    
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -151,20 +143,11 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
 //        }))
         
         alert.addAction(UIAlertAction(title: "Workout", style: .default, handler: { (_) in
-            let destination = WorkoutViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Mindfulness", style: .default, handler: { (_) in
-            let destination = MindfulnessViewController(networkController: self.networkController)
-            destination.hidesBottomBarWhenPushed = true
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -196,15 +179,11 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     
     func openMetric(metric: AnyHashable) {
         if let healthMetric = metric as? HealthMetric {
-            let healthDetailService = HealthDetailService()
-            let healthDetailViewModel = HealthDetailViewModel(healthMetric: healthMetric, healthDetailService: healthDetailService)
-            let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
-            healthDetailViewController.segmentedControl.selectedSegmentIndex = healthMetric.grabSegment()
-            navigationController?.pushViewController(healthDetailViewController, animated: true)
+            showHealthMetricDetailPush(healthMetric: healthMetric)
         } else if let workout = metric as? Workout {
-            showWorkoutDetailPush(workout: workout)
+            showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         } else if let mindfulness = metric as? Mindfulness {
-            showMindfulnessDetailPush(mindfulness: mindfulness)
+            showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }
 }

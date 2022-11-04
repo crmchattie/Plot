@@ -97,11 +97,24 @@ class FinanceTransactionRuleViewController: FormViewController {
             } catch let error {
                 print(error)
             }
-            self.updateDiscoverDelegate?.itemCreated()
-            if navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
+            if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+                updateDiscoverDelegate.itemCreated(title: transactionRuleCreatedMessage)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
             } else {
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
+                if !active {
+                    basicAlert(title: transactionRuleCreatedMessage, message: nil, controller: self.tabBarController)
+                } else {
+                    basicAlert(title: transactionRuleUpdatedMessage, message: nil, controller: self.tabBarController)
+                }
             }
         }
     }
@@ -123,7 +136,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    $0.cell.textField.becomeFirstResponder()
+//                    $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground

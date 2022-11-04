@@ -5,9 +5,10 @@ PODS:
   - AppAuth/Core (1.5.0)
   - AppAuth/ExternalUserAgent (1.5.0):
     - AppAuth/Core
-  - Charts (3.6.0):
-    - Charts/Core (= 3.6.0)
-  - Charts/Core (3.6.0)
+  - Charts (4.0.3):
+    - Charts/Core (= 4.0.3)
+  - Charts/Core (4.0.3):
+    - SwiftAlgorithms (~> 1.0)
   - CodableFirebase (0.2.1)
   - CropViewController (2.6.1)
   - Eureka (5.3.6)
@@ -165,14 +166,15 @@ PODS:
   - SDWebImage/Core (5.12.6)
   - SplitRow (2.2.0):
     - Eureka (~> 5.3.3)
+  - SwiftAlgorithms (1.0.0)
   - ViewRow (0.8):
     - Eureka (>= 5.0.0)
 
 DEPENDENCIES:
-  - Charts (~> 3.6.0)
+  - Charts
   - CodableFirebase
   - CropViewController
-  - Eureka
+  - Eureka (~> 5.3.6)
   - Firebase/Analytics (~> 8.15.0)
   - Firebase/Auth (~> 8.15.0)
   - Firebase/Core (~> 8.15.0)
@@ -224,11 +226,12 @@ SPEC REPOS:
     - PromisesObjC
     - SDWebImage
     - SplitRow
+    - SwiftAlgorithms
     - ViewRow
 
 SPEC CHECKSUMS:
   AppAuth: 80317d99ac7ff2801a2f18ff86b48cd315ed465d
-  Charts: b1e3a1f5a1c9ba5394438ca3b91bd8c9076310af
+  Charts: d959d6723c8eedfdd0735dfc28cb0a71762ac4d9
   CodableFirebase: 0bf201991eeec35eb9fcd987d271ea463cf34a80
   CropViewController: 58fb440f30dac788b129d2a1f24cffdcb102669c
   Eureka: 28ad9dec6286cd7cd601fdf8e8df39bb7356a8f4
@@ -258,8 +261,9 @@ SPEC CHECKSUMS:
   PromisesObjC: 99b6f43f9e1044bd87a95a60beff28c2c44ddb72
   SDWebImage: a47aea9e3d8816015db4e523daff50cfd294499d
   SplitRow: 1911d2bd0f34e6ac93d83cc741730505a91c4d04
+  SwiftAlgorithms: 38dda4731d19027fdeee1125f973111bf3386b53
   ViewRow: 8da541e9c019f3be63f4e28f311a62cac2045ecf
 
-PODFILE CHECKSUM: 74cc5a50399dd38db35b1babc74d757e1b3c2277
+PODFILE CHECKSUM: 94094e99b8d253d77a3329b502ce26bd4f397005
 
 COCOAPODS: 1.11.3

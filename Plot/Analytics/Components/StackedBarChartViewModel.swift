@@ -21,14 +21,14 @@ struct StackedBarChartViewModel {
     var categories: [CategorySummaryViewModel]
     var chartData: ChartData?
     var fixToZeroOnVertical: Bool
-    var verticalAxisValueFormatter: IAxisValueFormatter?
-    var horizontalAxisValueFormatter: IAxisValueFormatter?
+    var verticalAxisValueFormatter: AxisValueFormatter?
+    var horizontalAxisValueFormatter: AxisValueFormatter?
     
     init(
         chartType: ChartType,
         rangeDescription: String,
-        horizontalAxisValueFormatter: IAxisValueFormatter?,
-        verticalAxisValueFormatter: IAxisValueFormatter? = nil,
+        horizontalAxisValueFormatter: AxisValueFormatter?,
+        verticalAxisValueFormatter: AxisValueFormatter? = nil,
         fixToZeroOnVertical: Bool = true
     ) {
         self.chartType = chartType

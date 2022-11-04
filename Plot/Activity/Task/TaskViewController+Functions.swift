@@ -487,44 +487,26 @@ extension TaskViewController {
             return
         }
         if eventList.indices.contains(eventIndex) {
-            showActivityIndicator()
-            let destination = EventViewController(networkController: networkController)
-            destination.activity = eventList[eventIndex]
-            destination.delegate = self
-            self.hideActivityIndicator()
-            self.navigationController?.pushViewController(destination, animated: true)
+            showEventDetailPush(event: eventList[eventIndex], updateDiscoverDelegate: nil, delegate: self, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: selectedFalconUsers, container: nil, startDateTime: nil, endDateTime: nil)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = EventViewController(networkController: self.networkController)
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
-                destination.delegate = self
                 if let container = self.container {
-                    destination.container = container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showEventDetailPush(event: nil, updateDiscoverDelegate: nil, delegate: self, task: self.task, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, startDateTime: nil, endDateTime: nil)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: [self.activityID], workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.task.participantsIDs)
-                    destination.container = self.container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showEventDetailPush(event: nil, updateDiscoverDelegate: nil, delegate: self, task: self.task, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, startDateTime: nil, endDateTime: nil)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseEventTableViewController(networkController: self.networkController)
-                destination.needDelegate = true
-                destination.movingBackwards = true
-                destination.delegate = self
-                destination.events = self.events
-                destination.filteredEvents = self.events
-                destination.existingEvents = self.eventList
-                self.navigationController?.pushViewController(destination, animated: true)
+                self.showChooseEventDetailPush(needDelegate: true, movingBackwards: true, delegate: self, events: self.events, existingEvents: self.eventList)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
@@ -541,36 +523,20 @@ extension TaskViewController {
             return
         }
         if purchaseList.indices.contains(purchaseIndex) {
-            let destination = FinanceTransactionViewController(networkController: networkController)
-            destination.delegate = self
-            destination.movingBackwards = true
-            destination.transaction = purchaseList[purchaseIndex]
-            self.navigationController?.pushViewController(destination, animated: true)
+            showTransactionDetailPush(transaction: purchaseList[purchaseIndex], updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: nil, movingBackwards: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Transaction", style: .default, handler: { (_) in
-                let destination = FinanceTransactionViewController(networkController: self.networkController)
-                destination.delegate = self
-                destination.movingBackwards = true
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
                 if let container = self.container {
-                    destination.container = container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showTransactionDetailPush(transaction: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: container, movingBackwards: true)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: [self.activityID], workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.task.participantsIDs)
-                    destination.container = self.container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showTransactionDetailPush(transaction: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: self.container, movingBackwards: true)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
-                let destination = ChooseTransactionTableViewController(networkController: self.networkController)
-                destination.delegate = self
-                destination.movingBackwards = true
-                destination.existingTransactions = self.purchaseList
-                destination.transactions = self.transactions
-                self.navigationController?.pushViewController(destination, animated: true)
+                self.showChooseTransactionDetailPush(movingBackwards: true, delegate: self, transactions: self.transactions, existingTransactions: self.purchaseList)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let mvs = self.form.sectionBy(tag: "Transactions") as? MultivaluedSection {
@@ -583,51 +549,27 @@ extension TaskViewController {
     
     func openHealth() {
         if healthList.indices.contains(healthIndex), let workout = healthList[healthIndex].workout {
-            let destination = WorkoutViewController(networkController: networkController)
-            destination.workout = workout
-            destination.delegate = self
-            destination.users = self.selectedFalconUsers
-            destination.filteredUsers = self.selectedFalconUsers
-            self.navigationController?.pushViewController(destination, animated: true)
+            showWorkoutDetailPush(workout: workout, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: nil, movingBackwards: true)
         } else if healthList.indices.contains(healthIndex), let mindfulness = healthList[healthIndex].mindfulness {
-            let destination = MindfulnessViewController(networkController: networkController)
-            destination.mindfulness = mindfulness
-            destination.delegate = self
-            destination.users = self.selectedFalconUsers
-            destination.filteredUsers = self.selectedFalconUsers
-            self.navigationController?.pushViewController(destination, animated: true)
+            showMindfulnessDetailPush(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: nil, movingBackwards: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Workout", style: .default, handler: { (_) in
-                let destination = WorkoutViewController(networkController: self.networkController)
-                destination.delegate = self
-                destination.movingBackwards = true
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
                 if let container = self.container {
-                    destination.container = container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showWorkoutDetailPush(workout: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: container, movingBackwards: true)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: [self.activityID], workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.task.participantsIDs)
-                    destination.container = self.container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showWorkoutDetailPush(workout: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: self.container, movingBackwards: true)
                 }
             }))
             alert.addAction(UIAlertAction(title: "New Mindfulness", style: .default, handler: { (_) in
-                let destination = MindfulnessViewController(networkController: self.networkController)
-                destination.delegate = self
-                destination.movingBackwards = true
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
                 if let container = self.container {
-                    destination.container = container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showMindfulnessDetailPush(mindfulness: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: container, movingBackwards: true)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: [self.activityID], workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.task.participantsIDs)
-                    destination.container = self.container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showMindfulnessDetailPush(mindfulness: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: self.container, movingBackwards: true)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -667,7 +609,6 @@ extension TaskViewController {
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
-                basicAlert(title: taskUpdatedMessage, message: nil, controller: self)
                 let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
                 var instanceValues = newActivity.toAnyObject()
                 
@@ -678,13 +619,7 @@ extension TaskViewController {
                 
                 let createActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
-                if self.navigationItem.leftBarButtonItem != nil {
-                    self.dismiss(animated: true, completion: nil)
-                } else {
-                    self.delegate?.updateTask(task: self.task)
-                    self.navigationController?.popViewController(animated: true)
-                }
-                
+                self.closeController(title: taskUpdatedMessage)
             }))
             
             alert.addAction(UIAlertAction(title: "Save For Future Tasks", style: .default, handler: { (_) in
@@ -697,13 +632,12 @@ extension TaskViewController {
                 let dates = iCalUtility()
                     .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
                 if let dateIndex = dates.firstIndex(of: endDate) {
-                    basicAlert(title: tasksUpdatedMessage, message: nil, controller: self)
                     if dateIndex == 0 {
                         //update all instances of task
                         if self.task.recurrences == nil {
                             self.deleteRecurrences()
                         }
-                        self.createActivity(activity: nil)
+                        self.createActivity(activity: nil, title: tasksUpdatedMessage)
                     } else if let newRecurrences = self.task.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
 
                         //update only future instances of task
@@ -720,8 +654,7 @@ extension TaskViewController {
                         oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
                         
                         self.taskOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
-                        
-                        self.updateRecurrences(recurrences: self.taskOld.recurrences!)
+                        self.updateRecurrences(recurrences: self.taskOld.recurrences!, title: tasksUpdatedMessage)
                     }
                 }
             }))
@@ -735,11 +668,10 @@ extension TaskViewController {
             })
         } else {
             if !active {
-                basicAlert(title: taskCreatedMessage, message: nil, controller: self)
+                self.createActivity(activity: nil, title: taskCreatedMessage)
             } else {
-                basicAlert(title: taskUpdatedMessage, message: nil, controller: self)
+                self.createActivity(activity: nil, title: taskUpdatedMessage)
             }
-            self.createActivity(activity: nil)
         }
 //        do not want to have in duplicate functionality
 //        else {
@@ -766,6 +698,25 @@ extension TaskViewController {
 //        }
     }
     
+    
+    func closeController(title: String) {
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: title)
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+        } else {
+            if navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            basicAlert(title: title, message: nil, controller: self.tabBarController)
+        }
+    }
+    
     func sortSchedule() {
         eventList.sort { (schedule1, schedule2) -> Bool in
             return schedule1.startDateTime?.int64Value ?? 0 < schedule2.startDateTime?.int64Value ?? 0
@@ -782,17 +733,12 @@ extension TaskViewController {
         }
     }
     
-    func updateRecurrences(recurrences: [String]) {
+    func updateRecurrences(recurrences: [String], title: String) {
         showActivityIndicator()
         let createActivity = ActivityActions(activity: self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.updateRecurrences(recurrences: recurrences)
         hideActivityIndicator()
-        if navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
-        } else {
-            self.delegate?.updateTask(task: self.task)
-            self.navigationController?.popViewController(animated: true)
-        }
+        closeController(title: title)
     }
     
     func deleteRecurrences() {
@@ -800,18 +746,13 @@ extension TaskViewController {
         createActivity.deleteRecurrences()
     }
     
-    func createActivity(activity: Activity?) {
+    func createActivity(activity: Activity?, title: String) {
         showActivityIndicator()
         let createActivity = ActivityActions(activity: activity ?? self.task, active: active, selectedFalconUsers: selectedFalconUsers)
         createActivity.createNewActivity(updateDirectAssociation: true)
         hideActivityIndicator()
         self.delegate?.updateTask(task: activity ?? self.task)
-        self.updateDiscoverDelegate?.itemCreated()
-        if self.navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
-        } else {
-            self.navigationController?.popViewController(animated: true)
-        }
+        closeController(title: title)
     }
     
     func showActivityIndicator() {
@@ -891,6 +832,15 @@ extension TaskViewController {
             self.deleteActivity()
         }))
         
+        if let name = task.name, let locationName = task.locationName, locationName != "locationName", let locationAddress = task.locationAddress, let longlat = locationAddress[locationName] {
+            alert.addAction(UIAlertAction(title: "Route Address", style: .default, handler: { (_) in
+                OpenMapDirections.present(in: self, name: name, latitude: longlat[0], longitude: longlat[1])
+            }))
+            alert.addAction(UIAlertAction(title: "Map Address", style: .default, handler: { (_) in
+                self.goToMap()
+            }))
+        }
+        
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
@@ -902,6 +852,28 @@ extension TaskViewController {
         
     }
     
+    @objc func goToMap() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        
+        
+        let destination = MapViewController()
+        destination.sections = [.event]
+        var locations = [task]
+        
+        for subtask in subtaskList {
+            if subtask.locationName != nil, subtask.locationName != "locationName" {
+                locations.append(subtask)
+            }
+        }
+        
+        destination.locations = [.event: locations]
+        navigationController?.pushViewController(destination, animated: true)
+        
+    }
+    
     func deleteActivity() {
         //need to look into equatable protocol for activities
         if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
@@ -909,13 +881,12 @@ extension TaskViewController {
             
             alert.addAction(UIAlertAction(title: "Delete This Task Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                basicAlert(title: taskDeletedMessage, message: nil, controller: self)
                 //update activity's recurrence to skip repeat on this date
                 var oldActivityRule = oldRecurrenceRule
                 //update existing activity with exlusion date that fall's on this date
                 oldActivityRule.exdate = ExclusionDate(dates: [endDate], granularity: .day)
                 self.task.recurrences!.append(oldActivityRule.exdate!.toExDateString()!)
-                self.updateRecurrences(recurrences: self.task.recurrences!)
+                self.updateRecurrences(recurrences: self.task.recurrences!, title: taskDeletedMessage)
             }))
             
             alert.addAction(UIAlertAction(title: "Delete All Future Tasks", style: .default, handler: { (_) in
@@ -926,23 +897,18 @@ extension TaskViewController {
                 let dates = iCalUtility()
                     .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
                 if let dateIndex = dates.firstIndex(of: endDate) {
-                    basicAlert(title: tasksDeletedMessage, message: nil, controller: self)
                     //will equal true if first instance of repeating event
                     if dateIndex == 0 {
                         self.showActivityIndicator()
                         let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                         deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)
                         self.hideActivityIndicator()
-                        if self.navigationItem.leftBarButtonItem != nil {
-                            self.dismiss(animated: true, completion: nil)
-                        } else {
-                            self.navigationController?.popViewController(animated: true)
-                        }
+                        self.closeController(title: tasksDeletedMessage)
                     } else {
                         //update existing activity with end date equaling ocurrence of this date
                         oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
                         self.task.recurrences = [oldActivityRule.toRRuleString()]
-                        self.updateRecurrences(recurrences: self.task.recurrences!)
+                        self.updateRecurrences(recurrences: self.task.recurrences!, title: tasksDeletedMessage)
                     }
                 }
             }))
@@ -959,16 +925,11 @@ extension TaskViewController {
             
             alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
                 print("Save for this event only")
-                basicAlert(title: taskDeletedMessage, message: nil, controller: self)
                 self.showActivityIndicator()
                 let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)
                 self.hideActivityIndicator()
-                if self.navigationItem.leftBarButtonItem != nil {
-                    self.dismiss(animated: true, completion: nil)
-                } else {
-                    self.navigationController?.popViewController(animated: true)
-                }
+                self.closeController(title: taskDeletedMessage)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 print("User click Dismiss button")

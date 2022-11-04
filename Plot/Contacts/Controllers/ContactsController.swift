@@ -319,25 +319,3 @@ extension ContactsController: MessagesDelegate {
     
 }
 
-//extension ContactsController: ContactsUpdatesDelegate {
-//
-//  func contacts(updateDatasource contacts: [CNContact]) {
-//    self.contacts = contacts
-//    self.filteredContacts = contacts
-//    DispatchQueue.main.async { [unowned self] in
-//      self.tableView.reloadData()
-//    }
-//    DispatchQueue.global(qos: .default).async {
-//      self.falconUsersFetcher.fetchFalconUsers(asynchronously: true)
-//    }
-//  }
-
-//  func contacts(handleAccessStatus: Bool) {
-//    guard handleAccessStatus else {
-//      viewPlaceholder.add(for: view, title: .denied, subtitle: .denied, priority: .high, position: .top)
-//      return
-//    }
-//    viewPlaceholder.remove(from: view, priority: .high)
-//
-//  }
-//}

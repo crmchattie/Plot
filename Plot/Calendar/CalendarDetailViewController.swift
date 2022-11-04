@@ -114,11 +114,24 @@ class CalendarDetailViewController: FormViewController {
         createCalendar.createNewCalendar()
         self.hideActivityIndicator()
         self.delegate?.update(calendar: calendar)
-        self.updateDiscoverDelegate?.itemCreated()
-        if navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: calendarCreatedMessage)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         } else {
-            self.navigationController?.popViewController(animated: true)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            if !active {
+                basicAlert(title: calendarCreatedMessage, message: nil, controller: self.tabBarController)
+            } else {
+                basicAlert(title: calendarUpdatedMessage, message: nil, controller: self.tabBarController)
+            }
         }
     }
     
@@ -153,6 +166,7 @@ class CalendarDetailViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
+            basicAlert(title: calendarDeletedMessage, message: nil, controller: self.tabBarController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -176,7 +190,7 @@ class CalendarDetailViewController: FormViewController {
                 $0.value = self.calendar.name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
-                $0.cell.textField.becomeFirstResponder()
+//                $0.cell.textField.becomeFirstResponder()
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         }.onChange() { [unowned self] row in

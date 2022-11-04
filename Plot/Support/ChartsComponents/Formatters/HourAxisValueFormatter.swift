@@ -9,7 +9,7 @@
 import Foundation
 import Charts
 
-public class HourAxisValueFormatter: NSObject, IAxisValueFormatter {
+public class HourAxisValueFormatter: NSObject, AxisValueFormatter {
     
     private let formatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()

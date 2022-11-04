@@ -15,9 +15,13 @@ protocol UpdateTransactionDelegate: AnyObject {
     func updateTransaction(transaction: Transaction)
 }
 
-class FinanceTransactionViewController: FormViewController {
-    var transaction: Transaction!
+class FinanceTransactionViewController: FormViewController, ObjectDetailShowing {
+    weak var delegate : UpdateTransactionDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
+
+    var participants = [String : [User]]()
     
+    var transaction: Transaction!
     var container: Container!
     var eventList = [Activity]()
     var eventIndex: Int = 0
@@ -41,10 +45,7 @@ class FinanceTransactionViewController: FormViewController {
     
     //added for EventViewController
     var movingBackwards: Bool = false
-    
-    weak var delegate : UpdateTransactionDelegate?
-    weak var updateDiscoverDelegate : UpdateDiscover?
-    
+        
     var status = false
     
     let numberFormatter = NumberFormatter()
@@ -168,11 +169,25 @@ class FinanceTransactionViewController: FormViewController {
         createTransaction.createNewTransaction()
         self.hideActivityIndicator()
         self.delegate?.updateTransaction(transaction: transaction)
-        self.updateDiscoverDelegate?.itemCreated()
-        if navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: transactionCreatedMessage)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         } else {
-            self.navigationController?.popViewController(animated: true)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+
+            if !active {
+                basicAlert(title: transactionCreatedMessage, message: nil, controller: self.tabBarController)
+            } else {
+                basicAlert(title: transactionUpdatedMessage, message: nil, controller: self.tabBarController)
+            }
         }
     }
     
@@ -190,7 +205,7 @@ class FinanceTransactionViewController: FormViewController {
                     $0.value = transaction.description
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    $0.cell.textField.becomeFirstResponder()
+//                    $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground
@@ -698,12 +713,7 @@ class FinanceTransactionViewController: FormViewController {
     }
     
     func createRule() {
-        let destination = FinanceTransactionRuleViewController(networkController: networkController)
-        destination.transaction = transaction
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-        destination.navigationItem.leftBarButtonItem = cancelBarButton
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        showTransactionRuleDetailPresent(transactionRule: nil, transaction: transaction, updateDiscoverDelegate: nil)
     }
     
     @objc fileprivate func openLevel(level: String, value: String, otherValue: String?) {

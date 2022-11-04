@@ -18,16 +18,16 @@ protocol UpdateSubtaskListDelegate: AnyObject {
     func updateSubtaskList(subtaskList: [Activity])
 }
 
-class SubtaskListViewController: FormViewController {
-    
+class SubtaskListViewController: FormViewController, ObjectDetailShowing {
+    var networkController = NetworkController()
+    var participants = [String : [User]]()
+
     weak var delegate : UpdateSubtaskListDelegate?
     
     var subtaskList: [Activity]!
     var subtaskIndex: Int = 0
     
     var selectedFalconUsers = [User]()
-    var startDateTime: Date?
-    var endDateTime: Date?
     
     var tasks = [Activity]()
     var task: Activity!
@@ -119,25 +119,9 @@ class SubtaskListViewController: FormViewController {
             return
         }
         if subtaskList.indices.contains(subtaskIndex) {
-            showActivityIndicator()
-            let subtaskItem = subtaskList[subtaskIndex]
-            let destination = SubtaskViewController()
-            destination.subtask = subtaskItem
-            destination.users = selectedFalconUsers
-            destination.filteredUsers = selectedFalconUsers
-            destination.startDateTime = startDateTime
-            destination.endDateTime = endDateTime
-            destination.delegate = self
-            self.hideActivityIndicator()
-            self.navigationController?.pushViewController(destination, animated: true)
+            showSubtaskDetailPush(subtask: subtaskList[subtaskIndex], task: task, delegate: self, users: selectedFalconUsers)
         } else {
-            let destination = SubtaskViewController()
-            destination.users = self.selectedFalconUsers
-            destination.filteredUsers = self.selectedFalconUsers
-            destination.delegate = self
-            destination.startDateTime = self.startDateTime
-            destination.endDateTime = self.endDateTime
-            self.navigationController?.pushViewController(destination, animated: true)
+            showSubtaskDetailPush(subtask: nil, task: task, delegate: self, users: selectedFalconUsers)
             
 //            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 //            alert.addAction(UIAlertAction(title: "New Sub-Task", style: .default, handler: { (_) in

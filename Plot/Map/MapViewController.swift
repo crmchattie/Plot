@@ -46,7 +46,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "close"), for: .normal)
         button.tintColor = .systemBlue
-        button.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
         return button
     }()
     
@@ -83,6 +82,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         addAnnotations()
         setupViews()
         locationsController.mapViewController = self
+        closeButton.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+
         
     }
 
@@ -303,7 +304,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
                         case "personal":
                             type = "personal"
                         default:
-                            type = "activity"
+                            if activity.isTask ?? false {
+                                type = "task"
+                            } else {
+                                type = "event"
+                            }
                         }
                         
                         if let subcategoryValue = activity.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue) {

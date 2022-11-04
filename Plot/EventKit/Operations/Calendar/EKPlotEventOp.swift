@@ -50,7 +50,7 @@ class EKPlotEventOp: AsyncOperation {
                 }
             }
         }
-        dispatchGroup.notify(queue: .global()) {
+        dispatchGroup.notify(queue: .main) {
             self.finish()
         }
     }    

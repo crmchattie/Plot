@@ -211,24 +211,11 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func newItem() {
-        let destination = TaskViewController(networkController: self.networkController)
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-        destination.navigationItem.leftBarButtonItem = cancelBarButton
-        destination.list = list
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
+        self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: list)
     }
     
     @objc fileprivate func listInfo() {
-        let destination = ListDetailViewController(networkController: self.networkController)
-        destination.list = list
-        ParticipantsFetcher.getParticipants(forList: list) { (participants) in
-            destination.selectedFalconUsers = participants
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }
+        showListDetailPresent(list: list, updateDiscoverDelegate: nil)
     }
     
     @objc fileprivate func filter() {
@@ -275,14 +262,6 @@ class ListViewController: UIViewController, ObjectDetailShowing {
         } else {
             return "Due Date"
         }
-    }
-    
-    func showActivityIndicator() {
-        
-    }
-    
-    func hideActivityIndicator() {
-        
     }
     
     func sortTasks() {
@@ -431,14 +410,14 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
                 newItem()
             } else if filteredTasks.indices.contains(indexPath.row - 1) {
                 let task = filteredTasks[indexPath.row - 1]
-                showTaskDetailPush(task: task)
+                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
             } else {
                 newItem()
             }
         } else {
             if filteredTasks.indices.contains(indexPath.row) {
                 let task = filteredTasks[indexPath.row]
-                showTaskDetailPush(task: task)
+                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
             } else {
                 newItem()
             }

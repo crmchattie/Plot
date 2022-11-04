@@ -94,7 +94,7 @@ class SummaryViewModel: SummaryViewModelInterface {
             i += 1
         }
         
-        let set = PieChartDataSet(entries: chartEntries, label: nil)
+        let set = PieChartDataSet(entries: chartEntries, label: "")
         set.drawIconsEnabled = false
         set.sliceSpace = 2
         
@@ -109,7 +109,6 @@ class SummaryViewModel: SummaryViewModelInterface {
         pFormatter.multiplier = 1
         data.setValueFormatter(DefaultValueFormatter(formatter: pFormatter))
         data.setValueFont(UIFont.caption2.with(weight: .light))
-        data.setValueTextColor(.white)
         completion(data)
     }
     
@@ -130,12 +129,10 @@ class SummaryViewModel: SummaryViewModelInterface {
         }
         maxValue *= 1.2
         
-        let dataSet = BarChartDataSet(entries: chartEntries, label: nil)
+        let dataSet = BarChartDataSet(entries: chartEntries, label: "")
         dataSet.colors = ChartColors.palette()
         dataSet.drawValuesEnabled = false
         dataSet.axisDependency = .right
-        data.addDataSet(dataSet)
-        
         completion(data)
     }
     
@@ -162,8 +159,6 @@ class SummaryViewModel: SummaryViewModelInterface {
             dataSet.setColor(ChartColors.palette()[y])
             dataSet.drawValuesEnabled = false
             dataSet.axisDependency = .right
-            data.addDataSet(dataSet)
-            
             y += 1
         }
         
@@ -200,18 +195,10 @@ class SummaryViewModel: SummaryViewModelInterface {
             dataSet.drawCircleHoleEnabled = false
             dataSet.valueFont = UIFont.caption2.with(weight: .regular)
             dataSet.formSize = 15
-            dataSet.lineWidth = 0
-            
-            let colorTop = UIColor.systemBlue.cgColor
-            let colorBottom = UIColor.systemBlue.cgColor
-            let gradientColors = [colorBottom, colorTop] as CFArray
-            let gradient = CGGradient(colorsSpace: nil, colors: gradientColors as CFArray, locations: nil)!
+            dataSet.lineWidth = 0            
             dataSet.fillAlpha = 1
-            dataSet.fill = Fill(linearGradient: gradient, angle: 90)
             dataSet.drawFilledEnabled = true
             dataSet.axisDependency = .right
-            data.addDataSet(dataSet)
-            
             y += 1
         }
         maxValue *= 1.2

@@ -78,7 +78,7 @@ struct DateRange {
         endDate.daysSince(startDate)
     }
     
-    var axisValueFormatter: IAxisValueFormatter? {
+    var axisValueFormatter: AxisValueFormatter? {
         switch type {
         case .week: return WeekdayAxisValueFormatter()
         case .month: return nil

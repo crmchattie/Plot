@@ -8,7 +8,9 @@
 
 import UIKit
 
-class ListInfoViewController: UITableViewController {
+class ListInfoViewController: UITableViewController, ObjectDetailShowing {
+    var participants: [String : [User]] = [:]
+    
     var networkController = NetworkController()
     
     let viewPlaceholder = ViewPlaceholder()
@@ -95,11 +97,7 @@ class ListInfoViewController: UITableViewController {
             }))
                         
             alert.addAction(UIAlertAction(title: "Plot List", style: .default, handler: { (_) in
-                let destination = ListDetailViewController(networkController: self.networkController)
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.showListDetailPresent(list: nil, updateDiscoverDelegate: nil)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -111,11 +109,7 @@ class ListInfoViewController: UITableViewController {
             })
             
         } else {
-            let destination = ListDetailViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            showListDetailPresent(list: nil, updateDiscoverDelegate: nil)
         }
     }
     
@@ -186,12 +180,7 @@ class ListInfoViewController: UITableViewController {
     }
     
     fileprivate func listInfo(list: ListType) {
-        let destination = ListDetailViewController(networkController: self.networkController)
-        destination.list = list
-        ParticipantsFetcher.getParticipants(forList: list) { (participants) in
-            destination.selectedFalconUsers = participants
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
+        showListDetailPresent(list: list, updateDiscoverDelegate: nil)
     }
         
     @objc func updatePrimaryList(_ sender: TapGesture) {

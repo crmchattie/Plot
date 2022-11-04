@@ -10,8 +10,9 @@ import Foundation
 import Firebase
 
 class ParticipantsFetcher: NSObject {
-    class func getParticipants(forActivity activity: Activity, completion: @escaping ([User])->()) {
-        guard let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+    class func getParticipants(forActivity activity: Activity?, completion: @escaping ([User])->()) {
+        guard let activity = activity, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+            completion([])
             return
         }
         
@@ -41,7 +42,11 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getAcceptedParticipant(forActivity activity: Activity, allParticipants participants: [User], completion: @escaping ([User])->Void) {
+    class func getAcceptedParticipant(forActivity activity: Activity?, allParticipants participants: [User], completion: @escaping ([User])->Void) {
+        guard let activity = activity else {
+            completion(participants)
+            return
+        }
         if participants.count > 0 {
             let dispatchGroup = DispatchGroup()
             var acceptedParticipant: [User] = []
@@ -75,8 +80,8 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getParticipants(forTransaction transaction: Transaction, completion: @escaping ([User])->()) {
-        if let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+    class func getParticipants(forTransaction transaction: Transaction?, completion: @escaping ([User])->()) {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
@@ -107,8 +112,8 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getParticipants(forAccount account: MXAccount, completion: @escaping ([User])->()) {
-        if let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+    class func getParticipants(forAccount account: MXAccount?, completion: @escaping ([User])->()) {
+        if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             var participants: [User] = []
             
@@ -139,8 +144,8 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getParticipants(forHolding holding: MXHolding, completion: @escaping ([User])->()) {
-        if let participantsIDs = holding.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+    class func getParticipants(forHolding holding: MXHolding?, completion: @escaping ([User])->()) {
+        if let holding = holding, let participantsIDs = holding.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             var participants: [User] = []
             
@@ -171,8 +176,8 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getParticipants(forList list: ListType, completion: @escaping ([User])->()) {
-        if let participantsIDs = list.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+    class func getParticipants(forList list: ListType?, completion: @escaping ([User])->()) {
+        if let list = list, let participantsIDs = list.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             var participants: [User] = []
             
@@ -203,8 +208,8 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getParticipants(forCalendar calendar: CalendarType, completion: @escaping ([User])->()) {
-        if let participantsIDs = calendar.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+    class func getParticipants(forCalendar calendar: CalendarType?, completion: @escaping ([User])->()) {
+        if let calendar = calendar, let participantsIDs = calendar.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             var participants: [User] = []
             
@@ -235,8 +240,8 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getParticipants(forWorkout workout: Workout, completion: @escaping ([User])->()) {
-        if let participantsIDs = workout.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+    class func getParticipants(forWorkout workout: Workout?, completion: @escaping ([User])->()) {
+        if let workout = workout, let participantsIDs = workout.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             var participants: [User] = []
             
@@ -267,8 +272,8 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
-    class func getParticipants(forMindfulness mindfulness: Mindfulness, completion: @escaping ([User])->()) {
-        if let participantsIDs = mindfulness.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+    class func getParticipants(forMindfulness mindfulness: Mindfulness?, completion: @escaping ([User])->()) {
+        if let mindfulness = mindfulness, let participantsIDs = mindfulness.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()
             var participants: [User] = []
             

@@ -263,7 +263,7 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
                 print(hkSampleID)
                 if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
                     print("found workout")
-                    showWorkoutDetailPush(workout: workout)
+                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
                 }
             }
         case .heartRate:
@@ -277,7 +277,7 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
             if let hkMindfulness = sample as? HKCategorySample {
                 let hkSampleID = hkMindfulness.uuid.uuidString
                 if let mindfulness = self.networkController.healthService.mindfulnesses.first(where: {$0.hkSampleID == hkSampleID }) {
-                    showMindfulnessDetailPush(mindfulness: mindfulness)
+                    showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
                 }
             }
         case .activeEnergy:
@@ -286,20 +286,12 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
             if let hkWorkout = sample as? HKWorkout {
                 let hkSampleID = hkWorkout.uuid.uuidString
                 if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
-                    showWorkoutDetailPush(workout: workout)
+                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
                 }
             }
         case .flightsClimbed:
             print("steps")
         }
-    }
-        
-    func showActivityIndicator() {
-        
-    }
-    
-    func hideActivityIndicator() {
-    
     }
 }
 

@@ -207,6 +207,18 @@ extension Workout {
             } else {
                 return .running
             }
+        case "Triathlon":
+            if #available(iOS 16.0, *) {
+                return .swimBikeRun
+            } else {
+                return .running
+            }
+        case "Transition":
+            if #available(iOS 16.0, *) {
+                return .transition
+            } else {
+                return .walking
+            }
         case "Other":
             return .other
         default:

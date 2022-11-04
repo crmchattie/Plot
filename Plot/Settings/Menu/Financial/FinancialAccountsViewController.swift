@@ -10,7 +10,9 @@ import UIKit
 import Firebase
 import CodableFirebase
 
-class FinancialAccountsViewController: UITableViewController {
+class FinancialAccountsViewController: UITableViewController, ObjectDetailShowing {
+    var participants = [String : [User]]()
+    
     var networkController = NetworkController()
             
     var members = [MXMember]()
@@ -66,12 +68,11 @@ class FinancialAccountsViewController: UITableViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Connect To Account", style: .default, handler: { (_) in
-            self.openMXConnect(current_member_guid: nil)
+            self.openMXConnect(current_member_guid: nil, delegate: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
-            let destination = FinanceAccountViewController(networkController: self.networkController)
-            self.navigationController?.pushViewController(destination, animated: true)
+            self.showAccountDetailPresent(account: nil, updateDiscoverDelegate: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -81,16 +82,6 @@ class FinancialAccountsViewController: UITableViewController {
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-    }
-    
-    func openMXConnect(current_member_guid: String?) {
-        let destination = WebViewController()
-        destination.current_member_guid = current_member_guid
-        destination.controllerTitle = ""
-        destination.delegate = self
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -164,9 +155,7 @@ class FinancialAccountsViewController: UITableViewController {
         let member = members[indexPath.section]
         if let accounts = memberAccountsDict[member] {
             let account = accounts[indexPath.row - 1]
-            let destination = FinanceAccountViewController(networkController: self.networkController)
-            destination.account = account
-            self.navigationController?.pushViewController(destination, animated: true)
+            showAccountDetailPresent(account: account, updateDiscoverDelegate: nil)
         }
         tableView.deselectRow(at: indexPath, animated: false)
     }
@@ -176,7 +165,7 @@ class FinancialAccountsViewController: UITableViewController {
         
         alert.addAction(UIAlertAction(title: "Update", style: .default, handler: { (_) in
             let member = self.members[sender.item]
-            self.openMXConnect(current_member_guid: member.guid)
+            self.openMXConnect(current_member_guid: member.guid, delegate: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { (_) in

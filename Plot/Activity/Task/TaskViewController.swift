@@ -17,7 +17,7 @@ import CodableFirebase
 import RRuleSwift
 import HealthKit
 
-class TaskViewController: FormViewController {
+class TaskViewController: FormViewController, ObjectDetailShowing {
     var task: Activity!
     var taskOld: Activity!
     var invitation: Invitation?
@@ -46,6 +46,7 @@ class TaskViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     var purchaseUsers = [User]()
+    var participants = [String : [User]]()
     var userInvitationStatus: [String: Status] = [:]
     let avatarOpener = AvatarOpener()
     var subtaskList = [Activity]()
@@ -104,7 +105,7 @@ class TaskViewController: FormViewController {
             if task.activityID != nil {
                 activityID = task.activityID!
                 print(activityID)
-                print(task.instanceID)
+                print(task.instanceID as Any)
             }
             if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 task.admin = currentUserID
@@ -114,7 +115,16 @@ class TaskViewController: FormViewController {
         } else {
             title = "New Task"
             if let currentUserID = Auth.auth().currentUser?.uid {
-                if let event = event, let task = TaskBuilder.createActivity(event: event), let activityID = task.activityID {
+                if let transaction = transaction, let task = TaskBuilder.createActivity(from: transaction), let activityID = task.activityID {
+                    self.activityID = activityID
+                    self.task = task
+                } else if let workout = workout, let task = TaskBuilder.createActivity(from: workout), let activityID = task.activityID {
+                    self.activityID = activityID
+                    self.task = task
+                } else if let mindfulness = mindfulness, let task = TaskBuilder.createActivity(from: mindfulness), let activityID = task.activityID {
+                    self.activityID = activityID
+                    self.task = task
+                } else if let event = event, let task = TaskBuilder.createActivity(event: event), let activityID = task.activityID {
                     self.activityID = activityID
                     self.task = task
                     if let list = lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
@@ -231,7 +241,7 @@ class TaskViewController: FormViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
-                $0.cell.textField.becomeFirstResponder()
+//                $0.cell.textField.becomeFirstResponder()
             }
         }.onChange() { [unowned self] row in
             self.task.name = row.value

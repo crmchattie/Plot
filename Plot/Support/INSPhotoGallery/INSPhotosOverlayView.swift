@@ -56,19 +56,19 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
         }
     }
     
-    #if swift(>=4.0)
-	var titleTextAttributes: [NSAttributedString.Key : AnyObject] = [:] {
+#if swift(>=4.0)
+    var titleTextAttributes: [NSAttributedString.Key : AnyObject] = [:] {
         didSet {
             navigationBar.titleTextAttributes = titleTextAttributes
         }
     }
-    #else
+#else
     var titleTextAttributes: [String : AnyObject] = [:] {
         didSet {
             navigationBar.titleTextAttributes = titleTextAttributes
         }
     }
-    #endif
+#endif
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -112,9 +112,9 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
             
             UIView.animate(withDuration: 0.2, delay: 0.0, options: [.allowAnimatedContent, .allowUserInteraction], animations: { () -> Void in
                 self.alpha = hidden ? 0.0 : 1.0
-                }, completion: { result in
-                    self.alpha = 1.0
-                    self.isHidden = hidden
+            }, completion: { result in
+                self.alpha = 1.0
+                self.isHidden = hidden
             })
         } else {
             self.isHidden = hidden
@@ -123,7 +123,7 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
     
     open func populateWithPhoto(_ photo: INSPhotoViewable) {
         self.currentPhoto = photo
-
+        
         if let photosViewController = photosViewController {
             if let index = photosViewController.dataSource.indexOfPhoto(photo) {
                 navigationItem.title = String(format:NSLocalizedString("%d of %d",comment:""), index+1, photosViewController.dataSource.numberOfPhotos)
@@ -138,13 +138,13 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
     }
     
     @objc private func actionButtonTapped(_ sender: UIBarButtonItem) {
-      guard let currentPhoto = currentPhoto else { return }
-      currentPhoto.loadImageWithCompletionHandler({ [weak self] (image, error) -> () in
-        guard let image = (image ?? currentPhoto.thumbnailImage) else { return }
-        let activityController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-        activityController.popoverPresentationController?.barButtonItem = sender
-        self?.photosViewController?.present(activityController, animated: true, completion: nil)
-      })
+        guard let currentPhoto = currentPhoto else { return }
+        currentPhoto.loadImageWithCompletionHandler({ [weak self] (image, error) -> () in
+            guard let image = (image ?? currentPhoto.thumbnailImage) else { return }
+            let activityController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+            activityController.popoverPresentationController?.barButtonItem = sender
+            self?.photosViewController?.present(activityController, animated: true, completion: nil)
+        })
     }
     
     @objc private func deleteButtonTapped(_ sender: UIBarButtonItem) {
@@ -161,14 +161,14 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
         navigationItem = UINavigationItem(title: "")
         navigationBar.items = [navigationItem]
         addSubview(navigationBar)
-      var topConstraint: NSLayoutConstraint!
-      if #available(iOS 11.0, *) {
-				topConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .top, relatedBy: .equal, toItem: self.safeAreaLayoutGuide, attribute: .top, multiplier: 1.0, constant: 0.0)
-      } else {
-				topConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0.0)
-      }
-			let widthConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 1.0, constant: 0.0)
-			let horizontalPositionConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1.0, constant: 0.0)
+        var topConstraint: NSLayoutConstraint!
+        if #available(iOS 11.0, *) {
+            topConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .top, relatedBy: .equal, toItem: self.safeAreaLayoutGuide, attribute: .top, multiplier: 1.0, constant: 0.0)
+        } else {
+            topConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0.0)
+        }
+        let widthConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 1.0, constant: 0.0)
+        let horizontalPositionConstraint = NSLayoutConstraint(item: navigationBar as Any, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1.0, constant: 0.0)
         self.addConstraints([topConstraint,widthConstraint,horizontalPositionConstraint])
         
         if let bundlePath = Bundle(for: type(of: self)).path(forResource: "INSPhotoGallery", ofType: "bundle") {
@@ -187,17 +187,17 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
         captionLabel.backgroundColor = UIColor.clear
         captionLabel.numberOfLines = 0
         addSubview(captionLabel)
-      
-      var bottomSafeArea: CGFloat = 0.0
-      
-      if #available(iOS 11.0, *) {
-        let window = UIApplication.shared.keyWindow
-        bottomSafeArea = window?.safeAreaInsets.bottom ?? 0.0
-      }
+        
+        var bottomSafeArea: CGFloat = 0.0
+        
+        if #available(iOS 11.0, *) {
+            let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+            bottomSafeArea = window?.safeAreaInsets.bottom ?? 0.0
+        }
         
         let bottomConstraint = NSLayoutConstraint(item: self, attribute: .bottom, relatedBy: .equal, toItem: captionLabel, attribute: .bottom, multiplier: 1.0, constant: 8.0 + bottomSafeArea)
-			let leadingConstraint = NSLayoutConstraint(item: captionLabel as Any, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 15.0)
-			let trailingConstraint = NSLayoutConstraint(item: captionLabel as Any, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: 8.0 + bottomSafeArea)
+        let leadingConstraint = NSLayoutConstraint(item: captionLabel as Any, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 15.0)
+        let trailingConstraint = NSLayoutConstraint(item: captionLabel as Any, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: 8.0 + bottomSafeArea)
         self.addConstraints([bottomConstraint,leadingConstraint,trailingConstraint])
     }
     
@@ -217,17 +217,16 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
     }
     
     private func updateShadowFrames(){
-      
-      if #available(iOS 11.0, *) {
         
-        let window = UIApplication.shared.keyWindow
-        let bottomSafeArea = window?.safeAreaInsets.bottom ?? 0.0
-        bottomShadow.frame = CGRect(x: 0, y: self.frame.height - 60 - bottomSafeArea, width: self.frame.width, height: 60 + bottomSafeArea)
-        topShadow.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: UIApplication.shared.statusBarFrame.size.height )
-      } else {
-         bottomShadow.frame = CGRect(x: 0, y: self.frame.height - 60 , width: self.frame.width, height: 60)
-        topShadow.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: 60)
-      }
+        if #available(iOS 11.0, *) {
+            let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+            let bottomSafeArea = window?.safeAreaInsets.bottom ?? 0.0
+            bottomShadow.frame = CGRect(x: 0, y: self.frame.height - 60 - bottomSafeArea, width: self.frame.width, height: 60 + bottomSafeArea)
+            topShadow.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0 )
+        } else {
+            bottomShadow.frame = CGRect(x: 0, y: self.frame.height - 60 , width: self.frame.width, height: 60)
+            topShadow.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: 60)
+        }
     }
     
     private func setupDeleteButton() {
@@ -235,8 +234,8 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
         deleteToolbar.backgroundColor = .black
         deleteToolbar.alpha = 0.8
         deleteToolbar.translatesAutoresizingMaskIntoConstraints = false
-       // deleteToolbar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
-       // deleteToolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
+        // deleteToolbar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
+        // deleteToolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         deleteToolbar.isTranslucent = true
         let item = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(INSPhotosOverlayView.deleteButtonTapped(_:)))
         deleteToolbar.setItems([item], animated: false)
@@ -245,8 +244,8 @@ open class INSPhotosOverlayView: UIView , INSPhotosOverlayViewable {
         let bottomConstraint = NSLayoutConstraint(item: self, attribute: .bottom, relatedBy: .equal, toItem: deleteToolbar, attribute: .bottom, multiplier: 1.0, constant: 0.0)
         let trailingConstraint = NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .equal, toItem: deleteToolbar, attribute: .trailing, multiplier: 1.0, constant: 0.0)
         
-			let widthConstraint = NSLayoutConstraint(item: deleteToolbar as Any, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 65)
-			let heightConstraint = NSLayoutConstraint(item: deleteToolbar as Any, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 50)
+        let widthConstraint = NSLayoutConstraint(item: deleteToolbar as Any, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 65)
+        let heightConstraint = NSLayoutConstraint(item: deleteToolbar as Any, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 50)
         self.addConstraints([bottomConstraint,trailingConstraint,widthConstraint, heightConstraint])
     }
 }

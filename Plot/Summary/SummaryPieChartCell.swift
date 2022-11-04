@@ -29,7 +29,7 @@ class SummaryPieChartCell: UICollectionViewCell {
                 chartView.drawSlicesUnderHoleEnabled = false
                 chartView.holeRadiusPercent = 0.58
                 chartView.transparentCircleRadiusPercent = 0.61
-                chartView.chartDescription?.enabled = false
+                chartView.chartDescription.enabled = false
                 chartView.setExtraOffsets(left: 5, top: 10, right: 5, bottom: 5)
                 
                 chartView.drawHoleEnabled = false

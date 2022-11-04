@@ -17,7 +17,7 @@ enum FinanceLevel: String {
     case top
 }
 
-class FinanceViewController: UIViewController {
+class FinanceViewController: UIViewController, ObjectDetailShowing {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -160,20 +160,12 @@ class FinanceViewController: UIViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Transaction", style: .default, handler: { (_) in
-            let destination = FinanceTransactionViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showTransactionDetailPresent(transaction: nil, updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "Investment", style: .default, handler: { (_) in
-            let destination = FinanceHoldingViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }))
+//        alert.addAction(UIAlertAction(title: "Investment", style: .default, handler: { (_) in
+//            self.showHoldingDetailPresent(holding: nil, updateDiscoverDelegate: nil)
+//        }))
         
         alert.addAction(UIAlertAction(title: "Account", style: .default, handler: { (_) in
             print("User click Edit button")
@@ -182,11 +174,6 @@ class FinanceViewController: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Transaction Rule", style: .default, handler: { (_) in
             print("User click Edit button")
-            let destination = FinanceTransactionRuleViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -212,12 +199,11 @@ class FinanceViewController: UIViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Connect To Account", style: .default, handler: { (_) in
-            self.openMXConnect(current_member_guid: nil)
+            self.openMXConnect(current_member_guid: nil, delegate: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
-            let destination = FinanceAccountViewController(networkController: self.networkController)
-            self.navigationController?.pushViewController(destination, animated: true)
+            self.showAccountDetailPresent(account: nil, updateDiscoverDelegate: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -236,16 +222,6 @@ class FinanceViewController: UIViewController {
                 self.refreshControl.endRefreshing()
             }
         }
-    }
-    
-    func openMXConnect(current_member_guid: String?) {
-        let destination = WebViewController()
-        destination.current_member_guid = current_member_guid
-        destination.controllerTitle = ""
-        destination.delegate = self
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func saveFinanceLevel() {
@@ -460,22 +436,6 @@ class FinanceViewController: UIViewController {
             self.collectionView.reloadData()
         }
     }
-    
-    func openTransactionDetails(transactionDetails: TransactionDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: filterDictionary["financeAccount"],  financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-        financeDetailViewController.selectedIndex = selectedIndex
-        financeDetailViewController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(financeDetailViewController, animated: true)
-    }
-    
-    func openAccountDetails(accountDetails: AccountDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-        financeDetailViewController.selectedIndex = selectedIndex
-        financeDetailViewController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(financeDetailViewController, animated: true)
-    }
 }
 
 extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -665,33 +625,18 @@ extension FinanceViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let section = sections[indexPath.section]
         let object = groups[section]
-        if let object = object as? [TransactionDetails] {
-            openTransactionDetails(transactionDetails: object[indexPath.item])
-        } else if let object = object as? [AccountDetails] {
-            openAccountDetails(accountDetails: object[indexPath.item])
+        if let object = object as? [TransactionDetails], let specificTransactions = transactionsDictionary[object[indexPath.item]] {
+            showTransactionDetailDetailPush(transactionDetails: object[indexPath.item], allTransactions: transactions, transactions: specificTransactions, filterDictionary: filterDictionary["financeAccount"], selectedIndex: selectedIndex)
+        } else if let object = object as? [AccountDetails], let accounts = accountsDictionary[object[indexPath.item]] {
+            showAccountDetailDetailPush(accountDetails: object[indexPath.item], allAccounts: accounts, accounts: accounts, selectedIndex: selectedIndex)
         } else if let object = object as? [Transaction] {
-            let destination = FinanceTransactionViewController(networkController: self.networkController)
-            destination.transaction = object[indexPath.item]
-            ParticipantsFetcher.getParticipants(forTransaction: object[indexPath.item]) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
+            showTransactionDetailPresent(transaction: object[indexPath.item], updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
         } else if let object = object as? [MXAccount] {
-            let destination = FinanceAccountViewController(networkController: self.networkController)
-            destination.account = object[indexPath.item]
-            ParticipantsFetcher.getParticipants(forAccount: object[indexPath.item]) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
+            showAccountDetailPresent(account: object[indexPath.item], updateDiscoverDelegate: nil)
         } else if let object = object as? [MXHolding] {
-            let destination = FinanceHoldingViewController(networkController: self.networkController)
-            destination.holding = object[indexPath.item]
-            ParticipantsFetcher.getParticipants(forHolding: object[indexPath.item]) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
+            showHoldingDetailPresent(holding: object[indexPath.item], updateDiscoverDelegate: nil)
         } else if let object = object as? [MXMember] {
-            self.openMXConnect(current_member_guid: object[indexPath.item].guid)
+            self.openMXConnect(current_member_guid: object[indexPath.item].guid, delegate: self)
         }
         collectionView.deselectItem(at: indexPath, animated: true)
     }

@@ -12,6 +12,8 @@ import SystemConfiguration
 import SDWebImage
 import Photos
 import Eureka
+import MapKit
+import CoreLocation
 
 struct ScreenSize {
     static let width = UIScreen.main.bounds.size.width
@@ -83,7 +85,7 @@ extension Array {
 }
 
 extension UIApplication {
-    class func topViewController(controller: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
+    class func topViewController(controller: UIViewController? = UIApplication.shared.windows.filter({$0.isKeyWindow}).first?.rootViewController) -> UIViewController? {
         if let navigationController = controller as? UINavigationController {
             return topViewController(controller: navigationController.visibleViewController)
         }
@@ -114,6 +116,28 @@ extension UIApplication {
             }
         }
         return vc
+    }
+}
+
+class OpenMapDirections {
+    // If you are calling the coordinate from a Model, don't forgot to pass it in the function parenthesis.
+    static func present(in viewController: UIViewController, name: String, latitude: Double, longitude: Double) {
+        let actionSheet = UIAlertController(title: "Open Location", message: nil, preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Google Maps", style: .default, handler: { _ in
+            // Pass the coordinate inside this URL
+//            URL(string:"comgooglemaps://?center=\(self.location.coordinate.latitude),\(self.location.coordinate.longitude)&zoom=14&views=traffic&q=\(self.location.coordinate.latitude),\(self.location.coordinate.longitude)")!, options: [:], completionHandler: nil)
+            let url = URL(string: "comgooglemaps://?daddr=\(latitude),\(longitude))&directionsmode=driving&zoom=14&views=traffic")!
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Apple Maps", style: .default, handler: { _ in
+            // Pass the coordinate that you want here
+            let coordinate = CLLocationCoordinate2DMake(latitude,longitude)
+            let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate, addressDictionary: nil))
+            mapItem.name = name
+            mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving])
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        viewController.present(actionSheet, animated: true, completion: nil)
     }
 }
 
@@ -1185,7 +1209,10 @@ func basicErrorAlertWithClose(title: String, message: String, controller: UIView
     }
 }
 
-func basicAlert(title: String, message: String?, controller: UIViewController) {
+func basicAlert(title: String, message: String?, controller: UIViewController?) {
+    print("basicAlert")
+    print(controller)
+    guard let controller = controller else { return }
     let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
     DispatchQueue.main.async {
         controller.present(alert, animated: true, completion: nil)

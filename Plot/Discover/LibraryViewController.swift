@@ -12,10 +12,10 @@ import CodableFirebase
 import GoogleSignIn
 
 protocol UpdateDiscover: AnyObject {
-    func itemCreated()
+    func itemCreated(title: String)
 }
 
-class LibraryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class LibraryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, ObjectDetailShowing {
     let networkController: NetworkController
     
     private let kCompositionalHeader = "CompositionalHeader"
@@ -23,6 +23,8 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     private let kSubLibraryCell = "SubLibraryCell"
     
     var favAct = [String: [String]]()
+    
+    var participants = [String : [User]]()
     
     var sections: [SectionType] = [.custom, .templates, .allTemplates]
     var groups = [SectionType: [AnyHashable]]()
@@ -320,71 +322,33 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         if let customType = object as? CustomType {
             switch customType {
             case .event:
-                let destination = EventViewController(networkController: networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showEventDetailPresent(event: nil, updateDiscoverDelegate: self, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
             case .task:
-                let destination = TaskViewController(networkController: networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
             case .calendar:
-                let destination = CalendarDetailViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showCalendarDetailPresent(calendar: nil, updateDiscoverDelegate: self)
             case .lists:
-                let destination = ListDetailViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showListDetailPresent(list: nil, updateDiscoverDelegate: self)
             case .meal:
-                let destination = MealViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                print("meal")
             case .workout:
-                let destination = WorkoutViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: self, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             case .mindfulness:
-                let destination = MindfulnessViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: self, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             case .mood:
-                let destination = MoodViewController()
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                print("mood")
             case .sleep:
-                let destination = SchedulerViewController()
-                destination.type = customType
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                print("sleep")
             case .work:
-                let destination = SchedulerViewController()
-                destination.type = customType
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                print("work")
             case .transaction:
-                let destination = FinanceTransactionViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showTransactionDetailPresent(transaction: nil, updateDiscoverDelegate: self, delegate: nil, users: nil, container: nil, movingBackwards: nil)
             case .investment:
-                let destination = FinanceHoldingViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showHoldingDetailPresent(holding: nil, updateDiscoverDelegate: self)
             case .financialAccount:
                 self.newAccount()
             case .transactionRule:
-                let destination = FinanceTransactionRuleViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showTransactionRuleDetailPresent(transactionRule: nil, transaction: nil, updateDiscoverDelegate: self)
             default:
                 let destination = SubLibraryViewController()
                 destination.networkController = networkController
@@ -401,29 +365,13 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         } else if let template = object as? Template {
             switch template.object {
             case .event:
-                let destination = EventViewController(networkController: networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showEventDetailPresent(event: nil, updateDiscoverDelegate: self, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
             case .task:
-                let destination = TaskViewController(networkController: networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, list: nil)
             case .workout:
-                let destination = WorkoutViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: self, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
             case .mindfulness:
-                let destination = MindfulnessViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: self, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
             case .subtask:
                 print("subtask")
             case .schedule:
@@ -436,14 +384,11 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Connect To Account", style: .default, handler: { (_) in
-            self.openMXConnect(current_member_guid: nil)
+            self.openMXConnect(current_member_guid: nil, delegate: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
-            let destination = FinanceAccountViewController(networkController: self.networkController)
-            destination.updateDiscoverDelegate = self
-            destination.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(destination, animated: true)
+            self.showAccountDetailPresent(account: nil, updateDiscoverDelegate: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -453,16 +398,6 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-    }
-    
-    func openMXConnect(current_member_guid: String?) {
-        let destination = WebViewController()
-        destination.current_member_guid = current_member_guid
-        destination.controllerTitle = ""
-        destination.delegate = self
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func fetchFavAct() {
@@ -514,14 +449,6 @@ extension LibraryViewController: GIDSignInDelegate {
         } else {
           print("\(error.localizedDescription)")
         }
-    }
-}
-
-extension LibraryViewController: UpdateDiscover {
-    func itemCreated() {
-        self.navigationItem.searchController?.isActive = false
-        self.dismiss(animated: true)
-        self.tabBarController?.selectedIndex = 1
     }
 }
 
@@ -615,5 +542,14 @@ extension LibraryViewController { /* hiding keyboard */
         } else {
             self.searchBar.endEditing(true)
         }
+    }
+}
+
+extension LibraryViewController: UpdateDiscover {
+    func itemCreated(title: String) {
+        self.navigationItem.searchController?.isActive = false
+        self.dismiss(animated: true)
+        self.tabBarController?.selectedIndex = 1
+        basicAlert(title: title, message: nil, controller: self.tabBarController)
     }
 }

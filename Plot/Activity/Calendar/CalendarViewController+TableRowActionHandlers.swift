@@ -50,70 +50,70 @@ extension CalendarViewController {
         }
     }
         
-    func setupMuteAction(at indexPath: IndexPath) -> UITableViewRowAction {
-        let mute = UITableViewRowAction(style: .default, title: "Mute") { _, _ in
-            if indexPath.section == 0 {
-                if #available(iOS 11.0, *) {} else {
-                    self.activityView.tableView.setEditing(false, animated: true)
-                }
-                self.delayWithSeconds(1, completion: {
-                    self.handleMuteActivity(section: indexPath.section, for: self.filteredPinnedActivities[indexPath.row])
-                })
-            } else if indexPath.section == 1 {
-                if #available(iOS 11.0, *) {} else {
-                    self.activityView.tableView.setEditing(false, animated: true)
-                }
-                self.delayWithSeconds(1, completion: {
-                    self.handleMuteActivity(section: indexPath.section, for: self.filteredActivities[indexPath.row])
-                })
-            }
-        }
-        
-        if indexPath.section == 0 {
-            let isPinnedActivityMuted = filteredPinnedActivities[indexPath.row].muted == true
-            let muteTitle = isPinnedActivityMuted ? "Unmute" : "Mute"
-            mute.title = muteTitle
-        } else if indexPath.section == 1 {
-            let isActivityMuted = filteredActivities[indexPath.row].muted == true
-            let muteTitle = isActivityMuted ? "Unmute" : "Mute"
-            mute.title = muteTitle
-        }
-        mute.backgroundColor = UIColor(red:0.56, green:0.64, blue:0.68, alpha:1.0)
-        return mute
-    }
-    
-    func setupPinAction(at indexPath: IndexPath) -> UITableViewRowAction {
-        let pin = UITableViewRowAction(style: .default, title: "Pin") { _, _ in
-            if indexPath.section == 0 {
-                self.unpinActivity(at: indexPath)
-            } else if indexPath.section == 1 {
-                self.pinActivity(at: indexPath)
-            }
-        }
-        
-        let pinTitle = indexPath.section == 0 ? "Unpin" : "Pin"
-        pin.title = pinTitle
-        pin.backgroundColor = UIColor(red:0.96, green:0.49, blue:0.00, alpha:1.0)
-        return pin
-    }
-    
-    func setupDeleteAction(at indexPath: IndexPath) -> UITableViewRowAction {
-        
-        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
-            if self.currentReachabilityStatus == .notReachable {
-                basicErrorAlertWithClose(title: "Error deleting message", message: noInternetError, controller: self)
-                return
-            }
-            if indexPath.section == 0 {
-                self.deletePinnedActivity(at: indexPath)
-            } else if indexPath.section == 1 {
-                self.deleteUnPinnedActivity(at: indexPath)
-            }
-        }
-        
-        delete.backgroundColor = UIColor(red:0.90, green:0.22, blue:0.21, alpha:1.0)
-        return delete
-    }
+//    func setupMuteAction(at indexPath: IndexPath) -> UITableViewRowAction {
+//        let mute = UITableViewRowAction(style: .default, title: "Mute") { _, _ in
+//            if indexPath.section == 0 {
+//                if #available(iOS 11.0, *) {} else {
+//                    self.activityView.tableView.setEditing(false, animated: true)
+//                }
+//                self.delayWithSeconds(1, completion: {
+//                    self.handleMuteActivity(section: indexPath.section, for: self.filteredPinnedActivities[indexPath.row])
+//                })
+//            } else if indexPath.section == 1 {
+//                if #available(iOS 11.0, *) {} else {
+//                    self.activityView.tableView.setEditing(false, animated: true)
+//                }
+//                self.delayWithSeconds(1, completion: {
+//                    self.handleMuteActivity(section: indexPath.section, for: self.filteredActivities[indexPath.row])
+//                })
+//            }
+//        }
+//        
+//        if indexPath.section == 0 {
+//            let isPinnedActivityMuted = filteredPinnedActivities[indexPath.row].muted == true
+//            let muteTitle = isPinnedActivityMuted ? "Unmute" : "Mute"
+//            mute.title = muteTitle
+//        } else if indexPath.section == 1 {
+//            let isActivityMuted = filteredActivities[indexPath.row].muted == true
+//            let muteTitle = isActivityMuted ? "Unmute" : "Mute"
+//            mute.title = muteTitle
+//        }
+//        mute.backgroundColor = UIColor(red:0.56, green:0.64, blue:0.68, alpha:1.0)
+//        return mute
+//    }
+//    
+//    func setupPinAction(at indexPath: IndexPath) -> UITableViewRowAction {
+//        let pin = UITableViewRowAction(style: .default, title: "Pin") { _, _ in
+//            if indexPath.section == 0 {
+//                self.unpinActivity(at: indexPath)
+//            } else if indexPath.section == 1 {
+//                self.pinActivity(at: indexPath)
+//            }
+//        }
+//        
+//        let pinTitle = indexPath.section == 0 ? "Unpin" : "Pin"
+//        pin.title = pinTitle
+//        pin.backgroundColor = UIColor(red:0.96, green:0.49, blue:0.00, alpha:1.0)
+//        return pin
+//    }
+//    
+//    func setupDeleteAction(at indexPath: IndexPath) -> UITableViewRowAction {
+//        
+//        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
+//            if self.currentReachabilityStatus == .notReachable {
+//                basicErrorAlertWithClose(title: "Error deleting message", message: noInternetError, controller: self)
+//                return
+//            }
+//            if indexPath.section == 0 {
+//                self.deletePinnedActivity(at: indexPath)
+//            } else if indexPath.section == 1 {
+//                self.deleteUnPinnedActivity(at: indexPath)
+//            }
+//        }
+//        
+//        delete.backgroundColor = UIColor(red:0.90, green:0.22, blue:0.21, alpha:1.0)
+//        return delete
+//    }
     func unpinActivity(at indexPath: IndexPath) {
 //        let activity = filteredPinnedActivities[indexPath.row]
 //        guard let currentUserID = Auth.auth().currentUser?.uid, let activityID = activity.activityID else { return }

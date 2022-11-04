@@ -12,6 +12,7 @@ import CodableFirebase
 
 extension NSNotification.Name {
     static let financeUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeUpdated")
+    static let transactionRulesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".transactionRulesUpdated")
     static let hasLoadedFinancials = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedFinancials")
 }
 
@@ -76,13 +77,22 @@ class FinanceService {
             }
         }
     }
+    var transactionRules = [TransactionRule]() {
+        didSet {
+            if oldValue != transactionRules {
+                transactionRules.sort { (rule1, rule2) -> Bool in
+                    return rule1.match_description < rule2.match_description
+                }
+                NotificationCenter.default.post(name: .transactionRulesUpdated, object: nil)
+            }
+        }
+    }
     var hasLoadedFinancials = false {
         didSet {
             NotificationCenter.default.post(name: .hasLoadedFinancials, object: nil)
         }
     }
     var memberAccountsDict = [MXMember: [MXAccount]]()
-    var transactionRules = [TransactionRule]()
     var institutionDict = [String: String]()
     var mxUser: MXUser!
     

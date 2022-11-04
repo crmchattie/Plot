@@ -60,7 +60,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                         i += 1
                     }
                                         
-                    let dataSet = LineChartDataSet(entries: entries, label: nil)
+                    let dataSet = LineChartDataSet(entries: entries, label: "")
                     dataSet.fillColor = .systemBlue
                     dataSet.fillAlpha = 0.5
                     dataSet.drawFilledEnabled = true
@@ -93,7 +93,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                         i += 1
                     }
                                         
-                    let dataSet = LineChartDataSet(entries: entries, label: nil)
+                    let dataSet = LineChartDataSet(entries: entries, label: "")
                     dataSet.fillColor = .systemBlue
                     dataSet.fillAlpha = 0.5
                     dataSet.drawFilledEnabled = true

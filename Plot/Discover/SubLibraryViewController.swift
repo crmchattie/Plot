@@ -11,7 +11,8 @@ import Firebase
 import CodableFirebase
 import GoogleSignIn
 
-class SubLibraryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class SubLibraryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, ObjectDetailShowing {
+    var participants = [String : [User]]()
         
     private let kCompositionalHeader = "CompositionalHeader"
     private let kSubLibraryCell = "SubLibraryCell"
@@ -145,29 +146,13 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         if let template = object as? Template {
             switch template.object {
             case .event:
-                let destination = EventViewController(networkController: networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showEventDetailPresent(event: nil, updateDiscoverDelegate: self, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
             case .task:
-                let destination = TaskViewController(networkController: networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, list: nil)
             case .workout:
-                let destination = WorkoutViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: self, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
             case .mindfulness:
-                let destination = MindfulnessViewController(networkController: self.networkController)
-                destination.updateDiscoverDelegate = self
-                destination.template = template
-                destination.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(destination, animated: true)
+                showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: self, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
             case .subtask:
                 print("subtask")
             case .schedule:
@@ -195,14 +180,11 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Connect To Account", style: .default, handler: { (_) in
-            self.openMXConnect(current_member_guid: nil)
+            self.openMXConnect(current_member_guid: nil, delegate: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Manually Add Account", style: .default, handler: { (_) in
-            let destination = FinanceAccountViewController(networkController: self.networkController)
-            destination.updateDiscoverDelegate = self
-            destination.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(destination, animated: true)
+            self.showAccountDetailPresent(account: nil, updateDiscoverDelegate: self)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -212,16 +194,6 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-    }
-    
-    func openMXConnect(current_member_guid: String?) {
-        let destination = WebViewController()
-        destination.current_member_guid = current_member_guid
-        destination.controllerTitle = ""
-        destination.delegate = self
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func fetchFavAct() {
@@ -277,10 +249,10 @@ extension SubLibraryViewController: GIDSignInDelegate {
 }
 
 extension SubLibraryViewController: UpdateDiscover {
-    func itemCreated() {
+    func itemCreated(title: String) {
         self.navigationItem.searchController?.isActive = false
         self.dismiss(animated: true)
-        self.updateDiscoverDelegate?.itemCreated()
+        self.updateDiscoverDelegate?.itemCreated(title: title)
     }
 }
 

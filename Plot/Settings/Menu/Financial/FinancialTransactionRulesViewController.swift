@@ -10,20 +10,20 @@ import UIKit
 import Firebase
 import CodableFirebase
 
-class FinancialTransactionRulesViewController: UITableViewController {
+class FinancialTransactionRulesViewController: UITableViewController, ObjectDetailShowing {
+    var participants = [String : [User]]()
+    
     var networkController = NetworkController()
         
-    var transactionRules: [TransactionRule] {
-        networkController.financeService.transactionRules
-    }
+    var transactionRules = [TransactionRule]()
     
     let viewPlaceholder = ViewPlaceholder()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        
         title = "Transaction Rules"
+    
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
@@ -31,6 +31,25 @@ class FinancialTransactionRulesViewController: UITableViewController {
         let barButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newTransactionRule))
         navigationItem.rightBarButtonItem = barButton
         
+        transactionRules = networkController.financeService.transactionRules
+        
+        addObservers()
+        
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    fileprivate func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(transactionRulesUpdated), name: .transactionRulesUpdated, object: nil)
+    }
+    
+    @objc fileprivate func transactionRulesUpdated() {
+        DispatchQueue.main.async {
+            self.transactionRules = self.networkController.financeService.transactionRules
+            self.tableView.reloadData()
+        }
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {
@@ -42,12 +61,7 @@ class FinancialTransactionRulesViewController: UITableViewController {
     }
     
     @objc func newTransactionRule() {
-        let destination = FinanceTransactionRuleViewController(networkController: networkController)
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-        destination.navigationItem.leftBarButtonItem = cancelBarButton
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        self.present(navigationViewController, animated: true, completion: nil)
-
+        showTransactionRuleDetailPresent(transactionRule: nil, transaction: nil, updateDiscoverDelegate: nil)
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -84,9 +98,6 @@ class FinancialTransactionRulesViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
-        let rule = transactionRules[indexPath.item]
-        let destination = FinanceTransactionRuleViewController(networkController: networkController)
-        destination.transactionRule = rule
-        self.navigationController?.pushViewController(destination, animated: true)
+        showTransactionRuleDetailPresent(transactionRule: transactionRules[indexPath.item], transaction: nil, updateDiscoverDelegate: nil)
     }
 }

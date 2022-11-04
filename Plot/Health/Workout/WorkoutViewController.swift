@@ -17,7 +17,7 @@ protocol UpdateWorkoutDelegate: AnyObject {
     func updateWorkout(workout: Workout)
 }
 
-class WorkoutViewController: FormViewController {    
+class WorkoutViewController: FormViewController, ObjectDetailShowing {    
     var workout: Workout!
     var container: Container!
     var eventList = [Activity]()
@@ -34,6 +34,7 @@ class WorkoutViewController: FormViewController {
     lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
+    var participants = [String : [User]]()
     
     let numberFormatter = NumberFormatter()
     
@@ -162,14 +163,27 @@ class WorkoutViewController: FormViewController {
         let createNewWorkout = WorkoutActions(workout: self.workout, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
         createNewWorkout.createNewWorkout(updateDirectAssociation: true)
         self.delegate?.updateWorkout(workout: self.workout)
-        self.updateDiscoverDelegate?.itemCreated()
         self.hideActivityIndicator()
-        if self.navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: workoutCreatedMessage)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         } else {
-            self.navigationController?.popViewController(animated: true)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+
+            if !active {
+                basicAlert(title: workoutCreatedMessage, message: nil, controller: self.tabBarController)
+            } else {
+                basicAlert(title: workoutUpdatedMessage, message: nil, controller: self.tabBarController)
+            }
         }
-        
         if active && false {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
@@ -266,6 +280,7 @@ class WorkoutViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
+            basicAlert(title: workoutDeletedMessage, message: nil, controller: self.tabBarController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -292,7 +307,7 @@ class WorkoutViewController: FormViewController {
                 $0.value = workout.name
             } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
-                $0.cell.textField.becomeFirstResponder()
+//                $0.cell.textField.becomeFirstResponder()
             }
         }.onChange() { [unowned self] row in
             if let rowValue = row.value {
@@ -342,12 +357,16 @@ class WorkoutViewController: FormViewController {
             row.title = row.tag
             row.value = workout.type?.capitalized
             row.options = []
-            if #available(iOS 14.0, *) {
+            if #available(iOS 16.0, *) {
                 HKWorkoutActivityType.allCases.forEach {
                     row.options?.append($0.name)
                 }
-            } else {
+            } else if #available(iOS 14.0, *) {
                 HKWorkoutActivityType.oldAllCases.forEach {
+                    row.options?.append($0.name)
+                }
+            } else {
+                HKWorkoutActivityType.oldOldAllCases.forEach {
                     row.options?.append($0.name)
                 }
             }

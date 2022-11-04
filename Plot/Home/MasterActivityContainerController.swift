@@ -10,7 +10,6 @@ import UIKit
 import Contacts
 import Firebase
 import CodableFirebase
-import LBTATools
 import HealthKit
 import GoogleSignIn
 
@@ -574,88 +573,6 @@ extension MasterActivityContainerController {
 }
 
 extension MasterActivityContainerController: GIDSignInDelegate {
-    func newListItem() {
-        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) || !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-                let destination = EventViewController(networkController: self.networkController)
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
-                self.newList()
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
-        } else {
-            let destination = TaskViewController(networkController: networkController)
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }
-    }
-    
-    func newCalendarItem() {
-        if !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.apple.name) || !networkController.activityService.calendars.keys.contains(CalendarSourceOptions.google.name) {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "Event", style: .default, handler: { (_) in
-                let destination = EventViewController(networkController: self.networkController)
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
-                self.newCalendar()
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
-        } else {
-            let destination = EventViewController(networkController: networkController)
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
-        }
-    }
-    
-    func newList() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if !networkController.activityService.lists.keys.contains(ListSourceOptions.apple.name) {
-            alert.addAction(UIAlertAction(title: ListSourceOptions.apple.name, style: .default, handler: { (_) in
-                self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
-            }))
-        }
-        
-        if !networkController.activityService.lists.keys.contains(ListSourceOptions.google.name) {
-            alert.addAction(UIAlertAction(title: ListSourceOptions.google.name, style: .default, handler: { (_) in
-                GIDSignIn.sharedInstance().delegate = self
-                GIDSignIn.sharedInstance()?.presentingViewController = self
-                GIDSignIn.sharedInstance()?.signIn()
-            }))
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
-    }
-    
     func newCalendar() {
         let destination = SignInAppleGoogleViewController(networkController: networkController)
         destination.title = "Providers"
@@ -691,27 +608,7 @@ extension MasterActivityContainerController: GIDSignInDelegate {
 
 // MARK: - ActivitiesControllerCellDelegate
 
-extension MasterActivityContainerController: ActivitiesControllerCellDelegate, UpdateInvitationDelegate {
-    func headerTapped(sectionType: SectionType) {
-        if sectionType == .tasks {
-            let destination = ListsViewController(networkController: networkController)
-            destination.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(destination, animated: true)
-        } else if sectionType == .calendar {
-            let destination = CalendarViewController(networkController: networkController)
-            destination.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(destination, animated: true)
-        }
-    }
-    
-    func cellTapped(activity: Activity) {
-        if activity.isTask ?? false {
-            showTaskDetailPush(task: activity)
-        } else {
-            showEventDetailPush(event: activity)
-        }
-    }
-    
+extension MasterActivityContainerController: UpdateInvitationDelegate {
     func updateInvitation(invitation: Invitation) {
         InvitationsFetcher.update(invitation: invitation) { result in
             if result {
@@ -720,74 +617,6 @@ extension MasterActivityContainerController: ActivitiesControllerCellDelegate, U
             }
         }
     }
-}
-
-extension MasterActivityContainerController: HealthControllerCellDelegate {
-    func cellTapped(metric: HealthMetric) {
-        let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
-        let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
-        healthDetailViewController.segmentedControl.selectedSegmentIndex = metric.grabSegment()
-        healthDetailViewController.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(healthDetailViewController, animated: true)
-    }
-}
-
-extension MasterActivityContainerController: FinanceControllerCellDelegate {
-    func openTransactionDetails(transactionDetails: TransactionDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-        financeDetailViewController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(financeDetailViewController, animated: true)
-    }
-    
-    func openAccountDetails(accountDetails: AccountDetails) {
-        let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: networkController.financeService.accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-        financeDetailViewController.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(financeDetailViewController, animated: true)
-    }
-    
-    func openHolding(holding: MXHolding) {
-        let destination = FinanceHoldingViewController(networkController: networkController)
-        destination.holding = holding
-        destination.hidesBottomBarWhenPushed = true
-        ParticipantsFetcher.getParticipants(forHolding: holding) { (participants) in
-            destination.selectedFalconUsers = participants
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-    }
-    
-    func openTransaction(transaction: Transaction) {
-        let destination = FinanceTransactionViewController(networkController: self.networkController)
-        destination.transaction = transaction
-        destination.hidesBottomBarWhenPushed = true
-        ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
-            destination.selectedFalconUsers = participants
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
-    }
-    
-    func openMember(member: MXMember) {
-        openMXConnect(current_member_guid: member.guid)
-    }
-    
-    func viewTappedFinance(sectionType: SectionType) {
-        let destination = FinanceDetailViewController(networkController: networkController)
-        destination.title = sectionType.name
-        destination.setSections = [sectionType]
-        navigationController?.pushViewController(destination, animated: true)
-    }
-    
-    func openMXConnect(current_member_guid: String?) {
-        let destination = WebViewController()
-        destination.current_member_guid = current_member_guid
-        destination.controllerTitle = ""
-        destination.delegate = self
-        let navigationViewController = UINavigationController(rootViewController: destination)
-        navigationViewController.modalPresentationStyle = .fullScreen
-        self.present(navigationViewController, animated: true, completion: nil)
-    }
-    
 }
 
 

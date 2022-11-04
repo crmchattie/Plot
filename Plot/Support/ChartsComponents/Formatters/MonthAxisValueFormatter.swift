@@ -9,7 +9,7 @@
 import Foundation
 import Charts
 
-class MonthAxisValueFormatter: IAxisValueFormatter {
+class MonthAxisValueFormatter: AxisValueFormatter {
     
     func stringForValue(_ value: Double, axis: AxisBase?) -> String {
         let intValue = Int(value)

@@ -145,16 +145,6 @@ class EKCalendarEventOp: AsyncOperation {
             if let notes = event.notes {
                 activity.activityDescription = notes
             }
-            if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location {
-                let coordinates = geoLocation.coordinate
-                let latitude = coordinates.latitude
-                let longitude = coordinates.longitude
-                activity.locationName = location.removeCharacters()
-                activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
-            } else {
-                activity.locationName = nil
-                activity.locationAddress = nil
-            }
             activity.recurrences = event.recurrenceRules?.map { $0.iCalRuleString() }
             activity.allDay = event.isAllDay
             activity.startDateTime = NSNumber(value: Int(event.startDate.timeIntervalSince1970))
@@ -167,7 +157,30 @@ class EKCalendarEventOp: AsyncOperation {
             if let date = event.lastModifiedDate {
                 activity.lastModifiedDate = NSNumber(value: Int(date.timeIntervalSince1970))
             }
-            completion(activity)
+            if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location {
+                let coordinates = geoLocation.coordinate
+                let latitude = coordinates.latitude
+                let longitude = coordinates.longitude
+                activity.locationName = location.removeCharacters()
+                activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
+                completion(activity)
+            } else if let location = event.location {
+                lookupLocation(for: location) { coordinates in
+                    if let coordinates = coordinates {
+                        let latitude = coordinates.latitude
+                        let longitude = coordinates.longitude
+                        activity.locationName = location.removeCharacters()
+                        activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
+                        completion(activity)
+                    } else {
+                        completion(activity)
+                    }
+                }
+            } else {
+                activity.locationName = nil
+                activity.locationAddress = nil
+                completion(activity)
+            }
         } else if let originalOccurrenceDate = event.originalOccurrenceDate {
             activity.instanceID = event.calendarItemIdentifier
             
@@ -189,25 +202,50 @@ class EKCalendarEventOp: AsyncOperation {
                         
             if event.title != activity.name {
                 values["name"] = event.title as Any
-            } else if event.notes != activity.activityDescription {
-                values["activityDescription"] = event.notes as Any
-            } else {
-                if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location, activity.locationName != location.removeCharacters() {
-                    let coordinates = geoLocation.coordinate
-                    let latitude = coordinates.latitude
-                    let longitude = coordinates.longitude
-                    values["locationName"] = location.removeCharacters() as Any
-                    values["locationAddress"] = [location.removeCharacters(): [latitude, longitude]] as Any
-                }
             }
-            
-            values["externalActivityID"] = event.calendarItemIdentifier as Any
-            
-            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-            activityAction.updateInstance(instanceValues: values, updateExternal: false)
-            
-            activity.instanceID = nil
-            completion(activity)
+            if event.notes != activity.activityDescription {
+                values["activityDescription"] = event.notes as Any
+            }
+            if let structuredLocation = event.structuredLocation, let geoLocation = structuredLocation.geoLocation, let location = event.location, activity.locationName != location.removeCharacters() {
+                let coordinates = geoLocation.coordinate
+                let latitude = coordinates.latitude
+                let longitude = coordinates.longitude
+                values["locationName"] = location.removeCharacters() as Any
+                values["locationAddress"] = [location.removeCharacters(): [latitude, longitude]] as Any
+                
+                values["externalActivityID"] = event.calendarItemIdentifier as Any
+                let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                activityAction.updateInstance(instanceValues: values, updateExternal: false)
+                activity.instanceID = nil
+                completion(activity)
+                
+            } else if let location = event.location, activity.locationName != location.removeCharacters() {
+                lookupLocation(for: location) { coordinates in
+                    if let coordinates = coordinates {
+                        let latitude = coordinates.latitude
+                        let longitude = coordinates.longitude
+                        activity.locationName = location.removeCharacters()
+                        activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
+                        values["externalActivityID"] = self.event.calendarItemIdentifier as Any
+                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                        activityAction.updateInstance(instanceValues: values, updateExternal: false)
+                        activity.instanceID = nil
+                        completion(activity)
+                    } else {
+                        values["externalActivityID"] = self.event.calendarItemIdentifier as Any
+                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                        activityAction.updateInstance(instanceValues: values, updateExternal: false)
+                        activity.instanceID = nil
+                        completion(activity)
+                    }
+                }
+            } else {
+                values["externalActivityID"] = event.calendarItemIdentifier as Any
+                let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                activityAction.updateInstance(instanceValues: values, updateExternal: false)
+                activity.instanceID = nil
+                completion(activity)
+            }
         } else {
             completion(activity)
         }

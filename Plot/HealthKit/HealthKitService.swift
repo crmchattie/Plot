@@ -294,8 +294,48 @@ class HealthKitService {
         let dispatchGroup = DispatchGroup()
         var workouts = [HKWorkout]()
         var errors = [Error]()
-        if #available(iOS 14.0, *) {
+        if #available(iOS 16.0, *) {
             for workout in HKWorkoutActivityType.allCases {
+                dispatchGroup.enter()
+                let workoutPredicate = HKQuery.predicateForWorkouts(with: workout)
+                
+                let datePredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+                
+                // Combine the predicates into a single predicate.
+                let compound = NSCompoundPredicate(andPredicateWithSubpredicates:
+                                                    [workoutPredicate, datePredicate])
+                
+                let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate,
+                                                      ascending: true)
+                
+                let query = HKSampleQuery(
+                    sampleType: .workoutType(),
+                    predicate: compound,
+                    limit: 0,
+                    sortDescriptors: [sortDescriptor]) { (query, samples, error) in
+                        DispatchQueue.main.async {
+                            
+                            // Cast the samples as HKWorkout
+                            guard let samples = samples as? [HKWorkout], error == nil else {
+                                if let error = error {
+                                    errors.append(error)
+                                }
+                                dispatchGroup.leave()
+                                return
+                            }
+                            workouts.append(contentsOf: samples)
+                            dispatchGroup.leave()
+                        }
+                    }
+                
+                healthStore.execute(query)
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                completion(workouts, errors)
+            }
+        } else if #available(iOS 14.0, *) {
+            for workout in HKWorkoutActivityType.oldAllCases {
                 dispatchGroup.enter()
                 let workoutPredicate = HKQuery.predicateForWorkouts(with: workout)
                 
@@ -336,7 +376,7 @@ class HealthKitService {
             }
         } else {
             // Fallback on earlier versions
-            for workout in HKWorkoutActivityType.oldAllCases {
+            for workout in HKWorkoutActivityType.oldOldAllCases {
                 dispatchGroup.enter()
                 let workoutPredicate = HKQuery.predicateForWorkouts(with: workout)
                 

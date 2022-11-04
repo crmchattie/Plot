@@ -46,7 +46,7 @@ extension GTLRCalendar_Event {
             dateFormatter.dateFormat = "yyyyMMdd'T'HHmmss"
         }
         
-        guard let last = identifierSegments.last, let _ = dateFormatter.date(from: last), let firstSegment = identifierSegments.first else { return false }
+        guard let last = identifierSegments.last, let _ = dateFormatter.date(from: last), let _ = identifierSegments.first else { return false }
         return true
     }
 

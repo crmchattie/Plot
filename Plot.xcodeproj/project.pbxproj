@@ -293,7 +293,6 @@
 		10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5424BE43B600F6EE18 /* VerticalStackView.swift */; };
 		10E93D5924BE43B700F6EE18 /* BetterSnappingLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5524BE43B600F6EE18 /* BetterSnappingLayout.swift */; };
 		10E93D5A24BE43B700F6EE18 /* UIView+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5624BE43B700F6EE18 /* UIView+Layout.swift */; };
-		10ED76B22639F899002838F5 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 10ED76B12639F899002838F5 /* FacebookCore */; };
 		10ED76C426403CA7002838F5 /* TrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10ED76C326403CA7002838F5 /* TrackingService.swift */; };
 		10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */; };
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
@@ -543,7 +542,6 @@
 		4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB46C6B2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift */; };
 		4BCB128C224ADD450046DFF3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */; };
 		4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */; };
-		4ED658A2BE8AC368D77831D1 /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */; };
 		A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53D0336E7A51EFB22060D82 /* libPods-Plot.a */; };
 		F902FFC92613B55900EF5881 /* ColorHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F902FFC82613B55900EF5881 /* ColorHash.swift */; };
 		F916C764260E66170062F952 /* DateRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916C763260E66170062F952 /* DateRange.swift */; };
@@ -968,8 +966,6 @@
 		26E3179E2379FEBA007D1F21 /* ActivityTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityTypeCell.swift; sourceTree = "<group>"; };
 		26E8E3A5238B2CA9000F30C8 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		26E8EFE6237F393900B9067E /* MapActivitiesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapActivitiesViewController.swift; sourceTree = "<group>"; };
-		286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ShareExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2928EFFC1124EED65963BE1D /* Pods-ShareExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.release.xcconfig"; sourceTree = "<group>"; };
 		4B4F452B1F32230C00A6FF96 /* Plot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4F452E1F32230C00A6FF96 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4B4F45371F32230C00A6FF96 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1139,7 +1135,6 @@
 		4BB46C6B2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatLogController+ChatHistoryFetcherDelegate.swift"; sourceTree = "<group>"; };
 		4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFetcher.swift; sourceTree = "<group>"; };
-		91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShareExtension/Pods-ShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.debug.xcconfig"; sourceTree = "<group>"; };
 		E53D0336E7A51EFB22060D82 /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F902FFC82613B55900EF5881 /* ColorHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHash.swift; sourceTree = "<group>"; };
@@ -1178,7 +1173,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4ED658A2BE8AC368D77831D1 /* libPods-ShareExtension.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1190,7 +1184,6 @@
 				2623AA8D24FA2A250020A316 /* HealthKit.framework in Frameworks */,
 				10E93D4924BE2E7A00F6EE18 /* LBTATools in Frameworks */,
 				A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */,
-				10ED76B22639F899002838F5 /* FacebookCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2044,7 +2037,6 @@
 				105F34522885D649007531EB /* RRuleSwift.xcframework */,
 				2623AA8C24FA2A250020A316 /* HealthKit.framework */,
 				E53D0336E7A51EFB22060D82 /* libPods-Plot.a */,
-				286BEECB12022AC013CF08A5 /* libPods-ShareExtension.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2922,8 +2914,6 @@
 			children = (
 				BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */,
 				1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */,
-				91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */,
-				2928EFFC1124EED65963BE1D /* Pods-ShareExtension.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -3010,7 +3000,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 10314116230D712E00DB471B /* Build configuration list for PBXNativeTarget "ShareExtension" */;
 			buildPhases = (
-				ABCFD92B1FFB266B342FB432 /* [CP] Check Pods Manifest.lock */,
 				10314105230D712E00DB471B /* Sources */,
 				10314106230D712E00DB471B /* Frameworks */,
 				10314107230D712E00DB471B /* Resources */,
@@ -3042,7 +3031,6 @@
 			name = Plot;
 			packageProductDependencies = (
 				10E93D4824BE2E7A00F6EE18 /* LBTATools */,
-				10ED76B12639F899002838F5 /* FacebookCore */,
 			);
 			productName = "Pigeon-project";
 			productReference = 4B4F452B1F32230C00A6FF96 /* Plot.app */;
@@ -3055,7 +3043,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1410;
 				ORGANIZATIONNAME = "Immature Creations";
 				TargetAttributes = {
 					10314108230D712E00DB471B = {
@@ -3107,7 +3095,6 @@
 			mainGroup = 4B4F45221F32230C00A6FF96;
 			packageReferences = (
 				10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */,
-				10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 			);
 			productRefGroup = 4B4F452C1F32230C00A6FF96 /* Products */;
 			projectDirPath = "";
@@ -3171,28 +3158,6 @@
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-Plot-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		ABCFD92B1FFB266B342FB432 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ShareExtension-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3804,7 +3769,6 @@
 /* Begin XCBuildConfiguration section */
 		10314114230D712E00DB471B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 91A83A529CAE65BCF53847AD /* Pods-ShareExtension.debug.xcconfig */;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -3837,7 +3801,6 @@
 		};
 		10314115230D712E00DB471B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2928EFFC1124EED65963BE1D /* Pods-ShareExtension.release.xcconfig */;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -3870,6 +3833,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -3918,7 +3882,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
@@ -3935,6 +3899,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -3979,7 +3944,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
@@ -4025,6 +3990,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ENABLE_BATCH_MODE = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
@@ -4065,6 +4033,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ENABLE_BATCH_MODE = NO;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
 				SWIFT_VERSION = 5.0;
@@ -4113,14 +4084,6 @@
 				minimumVersion = 1.0.17;
 			};
 		};
-		10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.2.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -4128,11 +4091,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 10E93D4724BE2E7A00F6EE18 /* XCRemoteSwiftPackageReference "LBTATools" */;
 			productName = LBTATools;
-		};
-		10ED76B12639F899002838F5 /* FacebookCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 10ED76B02639F899002838F5 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
-			productName = FacebookCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

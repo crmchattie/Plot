@@ -213,7 +213,7 @@ class InAppNotificationManager: NSObject {
                                     backgroundColor: .systemGroupedBackground,
                                     textColor: .label,
                                     dragIndicatordColor: .label) {}
-    guard let rc = UIApplication.shared.keyWindow?.rootViewController else { return }
+      guard let rc = UIApplication.shared.windows.filter({$0.isKeyWindow}).first?.rootViewController else { return }
     Plot.show(shout: announcement, to: rc)
   }
   

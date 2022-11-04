@@ -259,7 +259,7 @@ public class ImagePickerTrayController: UIViewController {
         let size = CGSize(width: 200, height: 200)
       
         if asset.representsBurst {
-          self.imageManager?.requestImageData(for: asset, options: self.requestOptions) { data, _, _, _ in
+          self.imageManager?.requestImageDataAndOrientation(for: asset, options: self.requestOptions) { data, _, _, _ in
               let image = data.flatMap { UIImage(data: $0) }
               completion(image)
             }

@@ -8,7 +8,9 @@
 
 import UIKit
 
-class CalendarInfoViewController: UITableViewController {
+class CalendarInfoViewController: UITableViewController, ObjectDetailShowing {
+    var participants: [String : [User]] = [:]
+    
     var networkController = NetworkController()
     
     let viewPlaceholder = ViewPlaceholder()
@@ -95,11 +97,7 @@ class CalendarInfoViewController: UITableViewController {
             }))
             
             alert.addAction(UIAlertAction(title: "Plot Calendar", style: .default, handler: { (_) in
-                let destination = CalendarDetailViewController(networkController: self.networkController)
-                let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                destination.navigationItem.leftBarButtonItem = cancelBarButton
-                let navigationViewController = UINavigationController(rootViewController: destination)
-                self.present(navigationViewController, animated: true, completion: nil)
+                self.showCalendarDetailPresent(calendar: nil, updateDiscoverDelegate: nil)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -110,11 +108,7 @@ class CalendarInfoViewController: UITableViewController {
                 print("completion block")
             })
         } else {
-            let destination = CalendarDetailViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showCalendarDetailPresent(calendar: nil, updateDiscoverDelegate: nil)
         }
     }
     
@@ -179,18 +173,9 @@ class CalendarInfoViewController: UITableViewController {
         let section = sections[indexPath.section]
         let calendarsSorted = calendars[section]?.sorted()
         if let calendar = calendarsSorted?[indexPath.row] {
-            calendarInfo(calendar: calendar)
+            self.showCalendarDetailPresent(calendar: calendar, updateDiscoverDelegate: nil)
         }
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-    
-    fileprivate func calendarInfo(calendar: CalendarType) {
-        let destination = CalendarDetailViewController(networkController: self.networkController)
-        destination.calendar = calendar
-        ParticipantsFetcher.getParticipants(forCalendar: calendar) { (participants) in
-            destination.selectedFalconUsers = participants
-            self.navigationController?.pushViewController(destination, animated: true)
-        }
     }
         
     @objc func updatePrimaryCalendar(_ sender: TapGesture) {

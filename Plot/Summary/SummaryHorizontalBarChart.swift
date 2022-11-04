@@ -27,7 +27,7 @@ class SummaryHorizontalBarChartCell: UICollectionViewCell {
                 
                 chartData.barWidth = 0.5
                 chartView.data = chartData
-                chartView.chartDescription?.enabled = false
+                chartView.chartDescription.enabled = false
                 
                 chartView.dragEnabled = true
                 chartView.setScaleEnabled(true)

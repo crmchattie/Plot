@@ -308,7 +308,7 @@ class FinancialTransactionFetcher: NSObject {
             })
         }
         
-        group.notify(queue: .global()) {
+        group.notify(queue: .main) {
             completion(transactions)
         }
     }

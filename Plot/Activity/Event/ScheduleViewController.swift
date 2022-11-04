@@ -24,13 +24,12 @@ class ScheduleViewController: FormViewController {
     weak var delegate : UpdateActivityDelegate?
     
     var schedule: Activity!
+    var event: Activity!
     
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
     var checklist: Checklist!
-    var startDateTime: Date?
-    var endDateTime: Date?
     
     var scheduleID = String()
     
@@ -68,10 +67,15 @@ class ScheduleViewController: FormViewController {
             schedule.isSchedule = true
         } else {
             title = "New Sub-Event"
-            scheduleID = UUID().uuidString
-            schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
-            schedule.isSchedule = true
-            schedule.admin = Auth.auth().currentUser?.uid
+            if let event = event {
+                schedule = EventBuilder.createSchedule(event: event)
+                scheduleID = schedule.activityID ?? UUID().uuidString
+            } else {
+                scheduleID = UUID().uuidString
+                schedule = Activity(dictionary: ["activityID": scheduleID as AnyObject])
+                schedule.isSchedule = true
+                schedule.admin = Auth.auth().currentUser?.uid
+            }
         }
         
         setupMainView()
@@ -137,7 +141,7 @@ class ScheduleViewController: FormViewController {
                     $0.value = self.schedule.name
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
-                    $0.cell.textField.becomeFirstResponder()
+//                    $0.cell.textField.becomeFirstResponder()
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                 }
                 }.onChange() { [unowned self] row in
@@ -297,7 +301,6 @@ class ScheduleViewController: FormViewController {
                     $0.value = rounded
                     self.schedule.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
-                self.startDateTime = $0.value
                 }.onChange { [weak self] row in
                     let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
                     if row.value?.compare(endRow.value!) == .orderedDescending {
@@ -305,7 +308,6 @@ class ScheduleViewController: FormViewController {
                         endRow.updateCell()
                     }
                     self!.schedule.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-                    self!.startDateTime = row.value
                     if self!.active {
                         self!.scheduleReminder()
                     }
@@ -395,7 +397,6 @@ class ScheduleViewController: FormViewController {
                     $0.value = rounded
                     self.schedule.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
                 }
-                self.endDateTime = $0.value
                 }.onChange { [weak self] row in
                     let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
                     if row.value?.compare(startRow.value!) == .orderedAscending {
@@ -403,7 +404,6 @@ class ScheduleViewController: FormViewController {
                         startRow.updateCell()
                     }
                     self!.schedule.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
-                    self!.endDateTime = row.value
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -728,7 +728,7 @@ class ScheduleViewController: FormViewController {
     }
     
     func scheduleReminder() {
-        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = schedule.allDay else {
+        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = schedule.startDate, let endDate = schedule.endDate, let allDay = schedule.allDay else {
             return
         }
         let center = UNUserNotificationCenter.current()
@@ -821,10 +821,14 @@ class ScheduleViewController: FormViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
-        alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
-            print("User click Edit button")
-            self.goToMap()
-        }))
+        if let name = schedule.name, let locationName = schedule.locationName, locationName != "locationName", let locationAddress = schedule.locationAddress, let longlat = locationAddress[locationName] {
+            alert.addAction(UIAlertAction(title: "Route Address", style: .default, handler: { (_) in
+                OpenMapDirections.present(in: self, name: name, latitude: longlat[0], longitude: longlat[1])
+            }))
+            alert.addAction(UIAlertAction(title: "Map Address", style: .default, handler: { (_) in
+                self.goToMap()
+            }))
+        }
 
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -870,7 +874,7 @@ class ScheduleViewController: FormViewController {
     }
     
     @objc(tableView:accessoryButtonTappedForRowWithIndexPath:) func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let locationName = schedule.locationName, let locationAddress = schedule.locationAddress, let longlat = locationAddress[locationName] else {
+        guard let row: LabelRow = form.rowBy(tag: "Location"), indexPath == row.indexPath, let name = schedule.name, let locationName = schedule.locationName, let locationAddress = schedule.locationAddress, let longlat = locationAddress[locationName] else {
             return
         }
         let latitude = longlat[0]
@@ -900,12 +904,11 @@ class ScheduleViewController: FormViewController {
             }
             
             let alertController = UIAlertController(title: locationName, message: addressString, preferredStyle: .alert)
+            let routeAddress = UIAlertAction(title: "Route Address", style: .default) { (action:UIAlertAction) in
+                OpenMapDirections.present(in: self, name: name, latitude: latitude, longitude: longitude)
+            }
             let mapAddress = UIAlertAction(title: "Map Address", style: .default) { (action:UIAlertAction) in
                 self.goToMap()
-            }
-            let copyAddress = UIAlertAction(title: "Copy Address", style: .default) { (action:UIAlertAction) in
-                let pasteboard = UIPasteboard.general
-                pasteboard.string = addressString
             }
             let changeAddress = UIAlertAction(title: "Change Address", style: .default) { (action:UIAlertAction) in
                 self.openLocationFinder()
@@ -921,9 +924,8 @@ class ScheduleViewController: FormViewController {
             let cancelAlert = UIAlertAction(title: "Cancel", style: .cancel) { (action:UIAlertAction) in
                 
             }
-            
+            alertController.addAction(routeAddress)
             alertController.addAction(mapAddress)
-            alertController.addAction(copyAddress)
             alertController.addAction(changeAddress)
             alertController.addAction(removeAddress)
             alertController.addAction(cancelAlert)

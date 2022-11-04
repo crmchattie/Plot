@@ -23,14 +23,12 @@ class SubtaskViewController: FormViewController {
     weak var delegate : UpdateTaskDelegate?
     
     var subtask: Activity!
+    var task: Activity!
     
     var users = [User]()
     var filteredUsers = [User]()
     var selectedFalconUsers = [User]()
-    var checklist: Checklist!
-    var startDateTime: Date?
-    var endDateTime: Date?
-    
+    var checklist: Checklist!    
     var subtaskID = String()
     
     fileprivate var active: Bool = false
@@ -67,10 +65,15 @@ class SubtaskViewController: FormViewController {
             subtask.isSubtask = true
         } else {
             title = "New Sub-Task"
-            subtaskID = UUID().uuidString
-            subtask = Activity(dictionary: ["activityID": subtaskID as AnyObject])
-            subtask.isSubtask = true
-            subtask.admin = Auth.auth().currentUser?.uid
+            if let task = task {
+                subtask = TaskBuilder.createSubTask(task: task)
+                subtaskID = subtask.activityID ?? UUID().uuidString
+            } else {
+                subtaskID = UUID().uuidString
+                subtask = Activity(dictionary: ["activityID": subtaskID as AnyObject])
+                subtask.isSubtask = true
+                subtask.admin = Auth.auth().currentUser?.uid
+            }
         }
         
         setupMainView()
@@ -128,7 +131,7 @@ class SubtaskViewController: FormViewController {
                     $0.value = self.subtask.name
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
-                    $0.cell.textField.becomeFirstResponder()
+//                    $0.cell.textField.becomeFirstResponder()
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                 }
                 }.onChange() { [unowned self] row in
@@ -1039,10 +1042,14 @@ class SubtaskViewController: FormViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             
-        alert.addAction(UIAlertAction(title: "Go to Map", style: .default, handler: { (_) in
-            print("User click Edit button")
-            self.goToMap()
-        }))
+        if let name = subtask.name, let locationName = subtask.locationName, locationName != "locationName", let locationAddress = subtask.locationAddress, let longlat = locationAddress[locationName] {
+            alert.addAction(UIAlertAction(title: "Route Address", style: .default, handler: { (_) in
+                OpenMapDirections.present(in: self, name: name, latitude: longlat[0], longitude: longlat[1])
+            }))
+            alert.addAction(UIAlertAction(title: "Map Address", style: .default, handler: { (_) in
+                self.goToMap()
+            }))
+        }
 
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

@@ -123,37 +123,35 @@ extension MediaPickerControllerNew {
 			}
 
 		} else {
+            let asset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset
+            
+//                let result = PHAsset.fetchAssets(withALAssetURLs: [imageURL], options: nil)
+//                let asset = result.firstObject
 
-            if let imageURL = info[UIImagePickerController.InfoKey.imageURL] as? URL {
-                
-				let result = PHAsset.fetchAssets(withALAssetURLs: [imageURL], options: nil)
-				let asset = result.firstObject
+            guard let selectedIndexPaths = self.collectionView.indexPathsForSelectedItems else { return }
 
-				guard let selectedIndexPaths = self.collectionView.indexPathsForSelectedItems else { return }
+            for selectedIndexPath in selectedIndexPaths where self.assets[selectedIndexPath.item] == asset {
+                //  if  {
+                print("you selected already selected image")
+                dismissImagePicker()
+                return
+                //  }
+            }
 
-				for selectedIndexPath in selectedIndexPaths where self.assets[selectedIndexPath.item] == asset {
-					//  if  {
-					print("you selected already selected image")
-					dismissImagePicker()
-					return
-					//  }
-				}
+            guard let indexForSelection = self.assets.firstIndex(where: { (phAsset) -> Bool in
+                return phAsset == asset
+            }) else {
+                print("you selected image which is not in preview, processing...")
+                self.delegate?.controller?(self, didSelectAsset: asset!, at: nil)
+                dismissImagePicker()
+                return
+            }
 
-				guard let indexForSelection = self.assets.firstIndex(where: { (phAsset) -> Bool in
-					return phAsset == asset
-				}) else {
-					print("you selected image which is not in preview, processing...")
-					self.delegate?.controller?(self, didSelectAsset: asset!, at: nil)
-					dismissImagePicker()
-					return
-				}
-
-				print("you selected not selected image, selecting...")
-				let indexPathForSelection = IndexPath(item: indexForSelection, section: 2)
-				self.collectionView.selectItem(at: indexPathForSelection, animated: false, scrollPosition: .left)
-				self.delegate?.controller?(self, didSelectAsset: asset!, at: indexPathForSelection)
-				dismissImagePicker()
-			}
+            print("you selected not selected image, selecting...")
+            let indexPathForSelection = IndexPath(item: indexForSelection, section: 2)
+            self.collectionView.selectItem(at: indexPathForSelection, animated: false, scrollPosition: .left)
+            self.delegate?.controller?(self, didSelectAsset: asset!, at: indexPathForSelection)
+            dismissImagePicker()
 		}
 	}
   

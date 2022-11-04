@@ -225,6 +225,14 @@ class HealthDetailSampleCell: UITableViewCell {
                 subtitleLabel.text = "In Bed"
             case .awake:
                 subtitleLabel.text = "Awake"
+            case .asleepUnspecified:
+                subtitleLabel.text = "Unspecified Sleep"
+            case .asleepCore:
+                subtitleLabel.text = "Core Sleep"
+            case .asleepDeep:
+                subtitleLabel.text = "Deep Sleep"
+            case .asleepREM:
+                subtitleLabel.text = "REM Sleep"
             @unknown default:
                 print("unknown default")
             }

@@ -277,19 +277,11 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-            let destination = TaskViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
-            let destination = ListDetailViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showListDetailPresent(list: nil, updateDiscoverDelegate: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -315,14 +307,6 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func search() {
         setupSearchController()
-    }
-    
-    func showActivityIndicator() {
-        
-    }
-    
-    func hideActivityIndicator() {
-        
     }
     
     func saveUserDefaults() {
@@ -486,7 +470,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             openList(list: list)
         } else {
             let task = filteredTasks[indexPath.row]
-            showTaskDetailPush(task: task)
+            showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
         }
     }
     

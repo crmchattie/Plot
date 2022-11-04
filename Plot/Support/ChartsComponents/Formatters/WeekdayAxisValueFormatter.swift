@@ -9,7 +9,7 @@
 import Foundation
 import Charts
 
-class WeekdayAxisValueFormatter: IAxisValueFormatter {
+class WeekdayAxisValueFormatter: AxisValueFormatter {
     
     let weekdaySymbols: [String] = {
         var weekDays = Calendar.current.veryShortWeekdaySymbols

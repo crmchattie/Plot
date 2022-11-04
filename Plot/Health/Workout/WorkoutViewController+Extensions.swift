@@ -83,44 +83,26 @@ extension WorkoutViewController {
             return
         }
         if taskList.indices.contains(taskIndex) {
-            showActivityIndicator()
-            let destination = TaskViewController(networkController: networkController)
-            destination.task = taskList[taskIndex]
-            destination.delegate = self
-            self.hideActivityIndicator()
-            self.navigationController?.pushViewController(destination, animated: true)
+            self.showTaskDetailPush(task: taskList[taskIndex], updateDiscoverDelegate: nil, delegate: self, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Task", style: .default, handler: { (_) in
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = TaskViewController(networkController: self.networkController)
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
-                destination.delegate = self
                 if let container = self.container {
-                    destination.container = container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: nil, transaction: nil, workout: self.workout, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: [self.workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.workout.participantsIDs)
-                    destination.container = self.container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: nil, transaction: nil, workout: self.workout, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, list: nil)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Existing Task", style: .default, handler: { (_) in
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseTaskTableViewController(networkController: self.networkController)
-                destination.needDelegate = true
-                destination.movingBackwards = true
-                destination.delegate = self
-                destination.tasks = self.tasks
-                destination.filteredTasks = self.tasks
-                destination.existingTasks = self.taskList
-                self.navigationController?.pushViewController(destination, animated: true)
+                self.showChooseTaskDetailPush(needDelegate: true, movingBackwards: true, delegate: self, tasks: self.tasks, existingTasks: self.taskList)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
@@ -137,44 +119,26 @@ extension WorkoutViewController {
             return
         }
         if eventList.indices.contains(eventIndex) {
-            showActivityIndicator()
-            let destination = EventViewController(networkController: networkController)
-            destination.activity = eventList[eventIndex]
-            destination.delegate = self
-            self.hideActivityIndicator()
-            self.navigationController?.pushViewController(destination, animated: true)
+            showEventDetailPush(event: eventList[eventIndex], updateDiscoverDelegate: nil, delegate: self, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: selectedFalconUsers, container: nil, startDateTime: nil, endDateTime: nil)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = EventViewController(networkController: self.networkController)
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
-                destination.delegate = self
                 if let container = self.container {
-                    destination.container = container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showEventDetailPush(event: nil, updateDiscoverDelegate: nil, delegate: self, task: nil, transaction: nil, workout: self.workout, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, startDateTime: nil, endDateTime: nil)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: [self.workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.workout.participantsIDs)
-                    destination.container = self.container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showEventDetailPush(event: nil, updateDiscoverDelegate: nil, delegate: self, task: nil, transaction: nil, workout: self.workout, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, startDateTime: nil, endDateTime: nil)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Existing Event", style: .default, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
-                let destination = ChooseEventTableViewController(networkController: self.networkController)
-                destination.needDelegate = true
-                destination.movingBackwards = true
-                destination.delegate = self
-                destination.events = self.events
-                destination.filteredEvents = self.events
-                destination.existingEvents = self.eventList
-                self.navigationController?.pushViewController(destination, animated: true)
+                self.showChooseEventDetailPush(needDelegate: true, movingBackwards: true, delegate: self, events: self.events, existingEvents: self.eventList)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
@@ -191,36 +155,20 @@ extension WorkoutViewController {
             return
         }
         if purchaseList.indices.contains(purchaseIndex) {
-            let destination = FinanceTransactionViewController(networkController: networkController)
-            destination.delegate = self
-            destination.movingBackwards = true
-            destination.transaction = purchaseList[purchaseIndex]
-            self.navigationController?.pushViewController(destination, animated: true)
+            showTransactionDetailPush(transaction: purchaseList[purchaseIndex], updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: nil, movingBackwards: true)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "New Transaction", style: .default, handler: { (_) in
-                let destination = FinanceTransactionViewController(networkController: self.networkController)
-                destination.delegate = self
-                destination.movingBackwards = true
-                destination.users = self.selectedFalconUsers
-                destination.filteredUsers = self.selectedFalconUsers
                 if let container = self.container {
-                    destination.container = container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showTransactionDetailPush(transaction: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: container, movingBackwards: true)
                 } else {
                     let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                     self.container = Container(id: containerID, activityIDs: self.eventList.map({$0.activityID ?? ""}), taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: [self.workout.hkSampleID ?? ""], mindfulnessIDs: nil, mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.workout.participantsIDs)
-                    destination.container = self.container
-                    self.navigationController?.pushViewController(destination, animated: true)
+                    self.showTransactionDetailPush(transaction: nil, updateDiscoverDelegate: nil, delegate: self, template: nil, users: self.selectedFalconUsers, container: self.container, movingBackwards: true)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Existing Transaction", style: .default, handler: { (_) in
-                let destination = ChooseTransactionTableViewController(networkController: self.networkController)
-                destination.delegate = self
-                destination.movingBackwards = true
-                destination.existingTransactions = self.purchaseList
-                destination.transactions = self.transactions
-                self.navigationController?.pushViewController(destination, animated: true)
+                self.showChooseTransactionDetailPush(movingBackwards: true, delegate: self, transactions: self.transactions, existingTransactions: self.purchaseList)
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let mvs = self.form.sectionBy(tag: "Transactions") as? MultivaluedSection {

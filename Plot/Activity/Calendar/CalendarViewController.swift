@@ -249,30 +249,15 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.selectedDate)
             dateComponents.hour = calendar.component(.hour, from: Date())
             dateComponents.minute = calendar.component(.minute, from: Date())
-            
-            let destination = EventViewController(networkController: self.networkController)
-            destination.startDateTime = calendar.date(from: dateComponents)
-            destination.endDateTime = calendar.date(from: dateComponents)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showEventDetailPresent(event: nil, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: calendar.date(from: dateComponents), endDateTime: calendar.date(from: dateComponents))
         }))
         
         alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-            let destination = TaskViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
-            let destination = CalendarDetailViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showCalendarDetailPresent(calendar: nil, updateDiscoverDelegate: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
@@ -749,9 +734,9 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func loadActivity(activity: Activity) {
         if activity.isTask ?? false {
-            showTaskDetailPush(task: activity)
+            showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
         } else {
-            showEventDetailPush(event: activity)
+            showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
         }
     }
     

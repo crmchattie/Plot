@@ -457,7 +457,7 @@ class ActivitiesFetcher: NSObject {
                 }
             }
         }
-        group.notify(queue: .global()) {
+        group.notify(queue: .main) {
             completion(activities)
         }
     }
@@ -500,7 +500,7 @@ class ActivitiesFetcher: NSObject {
                 })
             }
         })
-        group.notify(queue: .global()) {
+        group.notify(queue: .main) {
             completion(activities)
         }
     }
@@ -531,7 +531,7 @@ class ActivitiesFetcher: NSObject {
             }
         }
         
-        group.notify(queue: .global()) {
+        group.notify(queue: .main) {
             completion(activities)
         }
     }
@@ -574,7 +574,7 @@ class ActivitiesFetcher: NSObject {
                 })
             }
         })
-        group.notify(queue: .global()) {
+        group.notify(queue: .main) {
             completion(activities)
         }
     }

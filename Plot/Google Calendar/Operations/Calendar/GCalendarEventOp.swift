@@ -185,16 +185,46 @@ class GCalendarEventOp: AsyncOperation {
             
             if event.summary != activity.name {
                 values["name"] = event.summary as Any
-            } else if event.descriptionProperty != activity.activityDescription {
+            }
+            if event.descriptionProperty != activity.activityDescription {
                 values["activityDescription"] = event.descriptionProperty as Any
             }
-            values["externalActivityID"] = event.identifier as Any
             
-            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-            activityAction.updateInstance(instanceValues: values, updateExternal: false)
-            
-            activity.instanceID = nil
-            completion(activity)
+            if let location = event.location, activity.locationName != location.removeCharacters() {
+                lookupLocation(for: location) { coordinates in
+                    if let coordinates = coordinates {
+                        let latitude = coordinates.latitude
+                        let longitude = coordinates.longitude
+                        activity.locationName = location.removeCharacters()
+                        activity.locationAddress = [location.removeCharacters(): [latitude, longitude]]
+                        values["externalActivityID"] = self.event.identifier as Any
+                        
+                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                        activityAction.updateInstance(instanceValues: values, updateExternal: false)
+                        
+                        activity.instanceID = nil
+                        completion(activity)
+                    } else {
+                        values["externalActivityID"] = self.event.identifier as Any
+                        
+                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                        activityAction.updateInstance(instanceValues: values, updateExternal: false)
+                        
+                        activity.instanceID = nil
+                        completion(activity)
+                    }
+                }
+            } else {
+                activity.locationName = nil
+                activity.locationAddress = nil
+                values["externalActivityID"] = event.identifier as Any
+                
+                let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                activityAction.updateInstance(instanceValues: values, updateExternal: false)
+                
+                activity.instanceID = nil
+                completion(activity)
+            }
         } else {
             completion(activity)
         }

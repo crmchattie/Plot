@@ -286,22 +286,12 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
 //
 //        }
         let notification = notifications[indexPath.row]
-        openNotification(forNotification: notification)
+        openNotification(notification: notification)
         tableView.deselectRow(at: indexPath, animated: false)
     }
     
     func loadActivity(activity: Activity) {
-        let destination = EventViewController(networkController: networkController)
-        destination.hidesBottomBarWhenPushed = true
-        destination.activity = activity
-        destination.invitation = invitations[activity.activityID ?? ""]
-        ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-            ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                destination.acceptedParticipant = acceptedParticipant
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
-        }
+        showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
     }
     
     func showActivityIndicator() {
@@ -320,144 +310,8 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
         loadActivity(activity: activity)
     }
     
-    func openNotification(forNotification notification: PLNotification) {
-        let aps = notification.aps
-        if let ID = notification.objectID {
-            let category = aps.category
-            if category == Identifiers.eventCategory {
-                if let date = aps.date, let activity = networkController.activityService.events.first(where: {$0.instanceID == ID && Int(truncating: $0.startDateTime ?? 0) == date }) {
-                    ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-                        ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                            let destination = EventViewController(networkController: self.networkController)
-                            destination.acceptedParticipant = acceptedParticipant
-                            destination.selectedFalconUsers = participants
-                            destination.activity = activity
-                            destination.hidesBottomBarWhenPushed = true
-                            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                            destination.navigationItem.leftBarButtonItem = cancelBarButton
-                            let navigationViewController = UINavigationController(rootViewController: destination)
-                            self.present(navigationViewController, animated: true)
-                        }
-                    }
-                } else if let activity = networkController.activityService.events.first(where: {$0.activityID == ID }) {
-                    ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-                        ParticipantsFetcher.getAcceptedParticipant(forActivity: activity, allParticipants: participants) { acceptedParticipant in
-                            let destination = EventViewController(networkController: self.networkController)
-                            destination.acceptedParticipant = acceptedParticipant
-                            destination.selectedFalconUsers = participants
-                            destination.activity = activity
-                            destination.hidesBottomBarWhenPushed = true
-                            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                            destination.navigationItem.leftBarButtonItem = cancelBarButton
-                            let navigationViewController = UINavigationController(rootViewController: destination)
-                            self.present(navigationViewController, animated: true)
-                        }
-                    }
-                }
-            } else if category == Identifiers.taskCategory {
-                if let date = aps.date, let activity = networkController.activityService.tasks.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
-                    ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-                        let destination = TaskViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.task = activity
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                } else if let activity = networkController.activityService.tasks.first(where: {$0.activityID == ID }) {
-                    ParticipantsFetcher.getParticipants(forActivity: activity) { (participants) in
-                        let destination = TaskViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.task = activity
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                }
-            } else if category == Identifiers.workoutCategory {
-                if let workout = networkController.healthService.workouts.first(where: {$0.id == ID }) {
-                    ParticipantsFetcher.getParticipants(forWorkout: workout) { (participants) in
-                        let destination = WorkoutViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.workout = workout
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                }
-            } else if category == Identifiers.mindfulnessCategory {
-                if let mindfulness = networkController.healthService.mindfulnesses.first(where: {$0.id == ID }) {
-                    ParticipantsFetcher.getParticipants(forMindfulness: mindfulness) { (participants) in
-                        let destination = MindfulnessViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.mindfulness = mindfulness
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                }
-            } else if category == Identifiers.transactionCategory {
-                if let transaction = networkController.financeService.transactions.first(where: {$0.guid == ID }) {
-                    ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
-                        let destination = FinanceTransactionViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.transaction = transaction
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                }
-            } else if category == Identifiers.accountCategory {
-                if let account = networkController.financeService.accounts.first(where: {$0.guid == ID }) {
-                    ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
-                        let destination = FinanceAccountViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.account = account
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                }
-            } else if category == Identifiers.listCategory {
-                if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.id == ID }) {
-                    ParticipantsFetcher.getParticipants(forList: list) { (participants) in
-                        let destination = ListDetailViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.list = list
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                }
-            } else if category == Identifiers.calendarCategory {
-                if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.id == ID }) {
-                    ParticipantsFetcher.getParticipants(forCalendar: calendar) { (participants) in
-                        let destination = CalendarDetailViewController(networkController: self.networkController)
-                        destination.selectedFalconUsers = participants
-                        destination.calendar = calendar
-                        destination.hidesBottomBarWhenPushed = true
-                        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-                        destination.navigationItem.leftBarButtonItem = cancelBarButton
-                        let navigationViewController = UINavigationController(rootViewController: destination)
-                        self.present(navigationViewController, animated: true)
-                    }
-                }
-            }
-        }
+    func openNotification(notification: PLNotification) {
+        openNotification(forNotification: notification)
     }
 }
 

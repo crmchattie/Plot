@@ -294,7 +294,7 @@ class ChecklistViewController: FormViewController {
                 $0.value = checklist.name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
-                $0.cell.textField.becomeFirstResponder()
+//                $0.cell.textField.becomeFirstResponder()
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
             }.onChange() { [unowned self] row in

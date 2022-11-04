@@ -184,7 +184,6 @@ class MealViewController: FormViewController {
             createMeal.createNewMeal()
             self.hideActivityIndicator()
             self.delegate?.updateMeal(meal: meal)
-            self.updateDiscoverDelegate?.itemCreated()
             if navigationItem.leftBarButtonItem != nil {
                 self.dismiss(animated: true, completion: nil)
             } else {

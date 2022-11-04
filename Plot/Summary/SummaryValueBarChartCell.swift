@@ -35,7 +35,7 @@ class SummaryValueBarChartCell: UICollectionViewCell {
                 chartData.setValueFormatter(valuesNumberFormatter)
                 chartData.barWidth = barWidth
                 chartView.data = chartData
-                chartView.chartDescription?.enabled = false
+                chartView.chartDescription.enabled = false
                 
                 chartView.dragEnabled = true
                 chartView.setScaleEnabled(true)

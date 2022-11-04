@@ -141,6 +141,10 @@ public extension HKWorkoutActivityType {
             return "Cooldown"
         case .other:
             return "Other"
+        case .swimBikeRun:
+            return "Triathlon"
+        case .transition:
+            return "Transition"
         @unknown default:
             return "Running"
         }
@@ -310,6 +314,10 @@ public extension HKWorkoutActivityType {
             return 0.024
         case .other:
             return 0.024
+        case .swimBikeRun:
+            return 0.056
+        case .transition:
+            return 0.0024
         @unknown default:
             return 0.024
         }
@@ -479,12 +487,16 @@ public extension HKWorkoutActivityType {
             return "jump"
         case .other:
             return "jump"
+        case .swimBikeRun:
+            return "jump"
+        case .transition:
+            return "jump"
         @unknown default:
             return "jump"
         }
     }
     
-    static let oldAllCases: [HKWorkoutActivityType] = [
+    static let oldOldAllCases: [HKWorkoutActivityType] = [
             .americanFootball,
             .archery,
             .australianFootball,
@@ -502,7 +514,6 @@ public extension HKWorkoutActivityType {
             .curling,
             .cycling,
             .dance,
-            .danceInspiredTraining,
             .discSports,
             .downhillSkiing,
             .elliptical,
@@ -564,7 +575,7 @@ public extension HKWorkoutActivityType {
         ]
     
     @available(iOS 14.0, *)
-    static let allCases: [HKWorkoutActivityType] = [
+    static let oldAllCases: [HKWorkoutActivityType] = [
             .americanFootball,
             .archery,
             .australianFootball,
@@ -584,7 +595,6 @@ public extension HKWorkoutActivityType {
             .curling,
             .cycling,
             .dance,
-            .danceInspiredTraining,
             .discSports,
             .downhillSkiing,
             .elliptical,
@@ -636,6 +646,90 @@ public extension HKWorkoutActivityType {
             .tennis,
             .trackAndField,
             .traditionalStrengthTraining,
+            .volleyball,
+            .walking,
+            .waterFitness,
+            .waterPolo,
+            .waterSports,
+            .wheelchairRunPace,
+            .wheelchairWalkPace,
+            .wrestling,
+            .yoga
+        ]
+    @available(iOS 16.0, *)
+    static let allCases: [HKWorkoutActivityType] = [
+            .americanFootball,
+            .archery,
+            .australianFootball,
+            .badminton,
+            .barre,
+            .baseball,
+            .basketball,
+            .bowling,
+            .boxing,
+            .cardioDance,
+            .climbing,
+            .cooldown,
+            .coreTraining,
+            .cricket,
+            .crossCountrySkiing,
+            .crossTraining,
+            .curling,
+            .cycling,
+            .dance,
+            .discSports,
+            .downhillSkiing,
+            .elliptical,
+            .equestrianSports,
+            .fencing,
+            .fishing,
+            .fitnessGaming,
+            .flexibility,
+            .functionalStrengthTraining,
+            .golf,
+            .gymnastics,
+            .handCycling,
+            .handball,
+            .highIntensityIntervalTraining,
+            .hiking,
+            .hockey,
+            .hunting,
+            .jumpRope,
+            .kickboxing,
+            .lacrosse,
+            .martialArts,
+            .mindAndBody,
+            .mixedCardio,
+            .other,
+            .paddleSports,
+            .pickleball,
+            .pilates,
+            .play,
+            .preparationAndRecovery,
+            .racquetball,
+            .rowing,
+            .rugby,
+            .running,
+            .sailing,
+            .skatingSports,
+            .snowSports,
+            .snowboarding,
+            .soccer,
+            .socialDance,
+            .softball,
+            .squash,
+            .stairClimbing,
+            .stairs,
+            .stepTraining,
+            .surfingSports,
+            .swimBikeRun,
+            .swimming,
+            .tableTennis,
+            .taiChi,
+            .tennis,
+            .trackAndField,
+            .traditionalStrengthTraining,
+            .transition,
             .volleyball,
             .walking,
             .waterFitness,

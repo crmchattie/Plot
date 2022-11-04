@@ -29,9 +29,9 @@ class AccountSettingsController: UITableViewController {
     var secondSection = [( icon: UIImage(named: "Feedback") , title: "Feedback")]
     var thirdSection = [( icon: UIImage(named: "Logout") , title: "Log Out")]
     
-    let cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonPressed))
-    let updateBarButton = UIBarButtonItem(title: "Update", style: .done, target: self, action:  #selector(updateBarButtonPressed))
-    var doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
+    var cancelBarButton = UIBarButtonItem()
+    var updateBarButton = UIBarButtonItem()
+    var doneBarButton = UIBarButtonItem()
     var currentName = String()
     var currentBio = String()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
@@ -54,7 +54,10 @@ class AccountSettingsController: UITableViewController {
         edgesForExtendedLayout = UIRectEdge.top
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
         
+        cancelBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(cancelBarButtonPressed))
+        updateBarButton = UIBarButtonItem(title: "Update", style: .done, target: self, action:  #selector(updateBarButtonPressed))
         doneBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action:  #selector(doneBarButtonPressed))
+        
         navigationItem.rightBarButtonItem = doneBarButton
         
         configureTableView()

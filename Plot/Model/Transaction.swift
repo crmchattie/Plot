@@ -679,20 +679,20 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
             guard accounts!.contains(transaction.account_guid ?? "") else { continue }
         }
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
-            if transactionDate < start || end < transactionDate {
+            if transactionDate.localTime < start || end < transactionDate.localTime {
                 continue
             }
         } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-            if transactionDate < start || end < transactionDate {
+            if transactionDate.localTime < start || end < transactionDate.localTime {
                 continue
             }
         }
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
-            if transactionDate < date || nextDate < transactionDate {
+            if transactionDate.localTime < date || nextDate < transactionDate.localTime {
                 continue
             }
         } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-            if transactionDate < date || nextDate < transactionDate {
+            if transactionDate.localTime < date || nextDate < transactionDate.localTime {
                 continue
             }
         }

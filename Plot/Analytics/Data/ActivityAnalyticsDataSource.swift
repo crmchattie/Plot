@@ -65,6 +65,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
             
             DispatchQueue.global(qos: .background).async {
                 var categories: [CategorySummaryViewModel] = []
+                var categoryColors: [UIColor] = []
                 var activityCount = 0
                 
                 let activityKeys = activities.keys.sorted(by: <)
@@ -72,10 +73,12 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                     guard let stats = activities[category] else { continue }
                     let total = stats.reduce(0, { $0 + $1.value * 60 })
                     let totalString = self.dateFormatter.string(from: total) ?? "NaN"
+                    let categoryColor = topLevelCategoryColor(category)
                     categories.append(CategorySummaryViewModel(title: category,
-                                                               color: .systemBlue,
+                                                               color: categoryColor,
                                                                value: total,
                                                                formattedValue: totalString))
+                    categoryColors.append(categoryColor)
                     activityCount += stats.count
                 }
                 categories.sort(by: { $0.value > $1.value })
@@ -93,8 +96,10 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 
                 DispatchQueue.main.async {
                     let chartDataSet = BarChartDataSet(entries: dataEntries)
+                    if !categoryColors.isEmpty {
+                        chartDataSet.colors = categoryColors
+                    }
                     let chartData = BarChartData(dataSets: [chartDataSet])
-                    chartDataSet.colors = categories.map { $0.color }
                     chartData.barWidth = 0.5
                     chartData.setDrawValues(false)
                     newChartViewModel.chartData = chartData

@@ -169,7 +169,6 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 if let activityID = item.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
-                dummyCell.updateInvitationDelegate = self
                 dummyCell.configureCell(for: indexPath, activity: item, withInvitation: invitation)
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
@@ -276,50 +275,28 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             } else if section == .health {
                 networkController.healthService.regrabHealth {}
             } else {
-                self.openMXConnect(current_member_guid: nil)
+                openMXConnect(current_member_guid: nil, delegate: self)
             }
         } else {
             let object = groups[indexPath.section]
             if let activity = object as? Activity {
                 if activity.isTask ?? false {
-                    showTaskDetailPush(task: activity)
+                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
                 } else {
-                    showEventDetailPush(event: activity)
+                    showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
                 }
             } else if let metric = object as? HealthMetric {
-                let healthDetailViewModel = HealthDetailViewModel(healthMetric: metric, healthDetailService: HealthDetailService())
-                let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
-                healthDetailViewController.segmentedControl.selectedSegmentIndex = metric.grabSegment()
-                healthDetailViewController.hidesBottomBarWhenPushed = true
-                navigationController?.pushViewController(healthDetailViewController, animated: true)
+                showHealthMetricDetailPush(healthMetric: metric)
             } else if let member = object as? MXMember {
-                openMXConnect(current_member_guid: member.guid)
-            } else if let transactionDetails = object as? TransactionDetails {
-                let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactionsDictionary[transactionDetails], filterAccounts: nil, financeDetailService: FinanceDetailService())
-                let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-                financeDetailViewController.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(financeDetailViewController, animated: true)
-            } else if let accountDetails = object as? AccountDetails {
-                let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: networkController.financeService.accounts, accounts: accountsDictionary[accountDetails], transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-                let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
-                financeDetailViewController.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(financeDetailViewController, animated: true)
+                openMXConnect(current_member_guid: member.guid, delegate: self)
+            } else if let transactionDetails = object as? TransactionDetails, let transactions = transactionsDictionary[transactionDetails] {
+                showTransactionDetailDetailPush(transactionDetails: transactionDetails, allTransactions: networkController.financeService.transactions, transactions: transactions, filterDictionary: nil, selectedIndex: nil)
+            } else if let accountDetails = object as? AccountDetails, let accounts = accountsDictionary[accountDetails] {
+                showAccountDetailDetailPush(accountDetails: accountDetails, allAccounts: networkController.financeService.accounts, accounts: accounts, selectedIndex: nil)
             } else if let holding = object as? MXHolding {
-                let destination = FinanceHoldingViewController(networkController: networkController)
-                destination.holding = holding
-                destination.hidesBottomBarWhenPushed = true
-                ParticipantsFetcher.getParticipants(forHolding: holding) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+                showHoldingDetailPresent(holding: holding, updateDiscoverDelegate: nil)
             } else if let transaction = object as? Transaction {
-                let destination = FinanceTransactionViewController(networkController: self.networkController)
-                destination.transaction = transaction
-                destination.hidesBottomBarWhenPushed = true
-                ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
-                    destination.selectedFalconUsers = participants
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+                showTransactionDetailPresent(transaction: transaction, updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
             } else if let section = object as? SectionType {
                 if section == .time || section == .health || section == .finances {
                     goToVC(section: section)

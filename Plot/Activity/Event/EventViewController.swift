@@ -17,7 +17,7 @@ import CodableFirebase
 import RRuleSwift
 import HealthKit
 
-class EventViewController: FormViewController {
+class EventViewController: FormViewController, ObjectDetailShowing {
     var activity: Activity!
     var activityOld: Activity!
     var invitation: Invitation?
@@ -44,6 +44,7 @@ class EventViewController: FormViewController {
     
     var selectedFalconUsers = [User]()
     var purchaseUsers = [User]()
+    var participants = [String : [User]]()
     var userInvitationStatus: [String: Status] = [:]
     let avatarOpener = AvatarOpener()
     var scheduleList = [Activity]()
@@ -114,17 +115,17 @@ class EventViewController: FormViewController {
             title = "New Event"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 if let transaction = transaction, let activity = EventBuilder.createActivity(from: transaction), let activityID = activity.activityID {
-                    self.activity = activity
                     self.activityID = activityID
+                    self.activity = activity
                 } else if let workout = workout, let activity = EventBuilder.createActivity(from: workout), let activityID = activity.activityID {
-                    self.activity = activity
                     self.activityID = activityID
+                    self.activity = activity
                 } else if let mindfulness = mindfulness, let activity = EventBuilder.createActivity(from: mindfulness), let activityID = activity.activityID {
-                    self.activity = activity
                     self.activityID = activityID
+                    self.activity = activity
                 } else if let task = task, let activity = EventBuilder.createActivity(task: task), let activityID = activity.activityID {
-                    self.activity = activity
                     self.activityID = activityID
+                    self.activity = activity
                 } else if let template = template, let activityList = EventBuilder.createActivity(template: template), let activity = activityList.0, let activityID = activity.activityID {
                     self.activityID = activityID
                     self.activity = activity
@@ -134,17 +135,21 @@ class EventViewController: FormViewController {
                         updateLists(type: "schedule")
                     }
                 } else {
-                    activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                    print(activityID)
+                    
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    
+                    var startDate = rounded
+                    var endDate = rounded
+                    if let startDateTime = startDateTime, let endDateTime = endDateTime {
+                        startDate = startDateTime
+                        endDate = endDateTime
+                    }
                     if let calendar = calendar {
-                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar.id ?? "", calendarName: calendar.name ?? "", calendarColor: calendar.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((startDate).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((endDate).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
                     } else {
                         let calendar = calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false })
-                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((rounded).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
+                        activity = Activity(activityID: activityID, admin: currentUserID, calendarID: calendar?.id ?? "", calendarName: calendar?.name ?? "", calendarColor: calendar?.color ?? CIColor(color: ChartColors.palette()[1]).stringRepresentation, calendarSource: calendar?.source ?? "", allDay: false, startDateTime: NSNumber(value: Int((startDate).timeIntervalSince1970)), startTimeZone: TimeZone.current.identifier, endDateTime: NSNumber(value: Int((endDate).timeIntervalSince1970)), endTimeZone: TimeZone.current.identifier, isEvent: true, createdDate: NSNumber(value: Int((rounded).timeIntervalSince1970)))
 
                     }
                 }
@@ -231,7 +236,7 @@ class EventViewController: FormViewController {
                 $0.value = name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
-                $0.cell.textField.becomeFirstResponder()
+//                $0.cell.textField.becomeFirstResponder()
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         }.onChange() { [unowned self] row in
@@ -352,19 +357,11 @@ class EventViewController: FormViewController {
                 }
                 $0.updateCell()
             } else {
-                if let startDateTime = startDateTime {
-                    let original = startDateTime
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                }
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                $0.value = rounded
+                self.activity.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
             }
         }.onChange { [weak self] row in
             let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
@@ -452,19 +449,11 @@ class EventViewController: FormViewController {
                 }
                 $0.updateCell()
             } else {
-                if let endDateTime = endDateTime {
-                    let original = endDateTime
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                } else {
-                    let original = Date()
-                    let rounded = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    $0.value = rounded
-                    self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
-                }
+                let original = Date()
+                let rounded = Date(timeIntervalSinceReferenceDate:
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                $0.value = rounded
+                self.activity.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
             }
         }.onChange { [weak self] row in
             let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")

@@ -208,14 +208,14 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         switch viewModel.entries.value[indexPath.row] {
         case .activity(let activity):
             if activity.isTask ?? false {
-                showTaskDetailPush(task: activity)
+                showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil)
             } else {
-                showEventDetailPush(event: activity)
+                showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
             }
         case .transaction(let transaction):
-            showTransactionDetailPush(transaction: transaction)
+            showTransactionDetailPresent(transaction: transaction, updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
         case .account(let account):
-            showAccountDetailPush(account: account)
+            showAccountDetailPresent(account: account, updateDiscoverDelegate: nil)
         }
     }
 }

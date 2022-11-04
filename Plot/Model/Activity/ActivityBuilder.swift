@@ -216,6 +216,27 @@ class EventBuilder {
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         return activity
     }
+    
+    class func createSchedule(event: Activity) -> Activity {
+        var activityID = UUID().uuidString
+        if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
+            activityID = newId
+        }
+        let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
+        activity.isSchedule = true
+        activity.name = "Sub-Event"
+        activity.admin = event.admin
+        activity.category = event.category
+        activity.subcategory = event.subcategory
+        activity.startTimeZone = event.startTimeZone
+        activity.endTimeZone = event.endTimeZone
+        activity.startDateTime = event.startDateTime
+        activity.endDateTime = event.endDateTime
+        activity.allDay = event.allDay
+        activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        return activity
+    }
 }
 
 class TaskBuilder {
@@ -454,6 +475,26 @@ class TaskBuilder {
         if let endDate = subtemplate.getEndDate() {
             activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
         }
+        activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+        activity.isSubtask = true
+        return activity
+    }
+    
+    class func createSubTask(task: Activity) -> Activity {
+        var activityID = UUID().uuidString
+        if let currentUserID = Auth.auth().currentUser?.uid, let newId = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key {
+            activityID = newId
+        }
+
+        let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
+        activity.name = "Sub-Task"
+        activity.admin = task.admin
+        activity.category = task.category
+        activity.subcategory = task.subcategory
+        activity.endDateTime = task.endDateTime
+        activity.hasDeadlineTime = task.hasDeadlineTime
+        
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.isSubtask = true

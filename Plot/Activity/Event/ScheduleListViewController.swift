@@ -18,7 +18,9 @@ protocol UpdateScheduleListDelegate: AnyObject {
     func updateScheduleList(scheduleList: [Activity])
 }
 
-class ScheduleListViewController: FormViewController {
+class ScheduleListViewController: FormViewController, ObjectDetailShowing {
+    var networkController = NetworkController()
+    var participants = [String : [User]]()
     
     weak var delegate : UpdateScheduleListDelegate?
     
@@ -26,9 +28,6 @@ class ScheduleListViewController: FormViewController {
     var scheduleIndex: Int = 0
     
     var acceptedParticipant = [User]()
-    var startDateTime: Date?
-    var endDateTime: Date?
-    var locationAddress = [String : [Double]]()
     
     var activities = [Activity]()
     var activity: Activity!
@@ -116,30 +115,9 @@ class ScheduleListViewController: FormViewController {
             return
         }
         if scheduleList.indices.contains(scheduleIndex) {
-            showActivityIndicator()
-            let scheduleItem = scheduleList[scheduleIndex]
-            let destination = ScheduleViewController()
-            destination.schedule = scheduleItem
-            destination.users = acceptedParticipant
-            destination.filteredUsers = acceptedParticipant
-            destination.startDateTime = startDateTime
-            destination.endDateTime = endDateTime
-            if let scheduleLocationAddress = scheduleList[scheduleIndex].locationAddress {
-                for (key, _) in scheduleLocationAddress {
-                    locationAddress[key] = nil
-                }
-            }
-            destination.delegate = self
-            self.hideActivityIndicator()
-            self.navigationController?.pushViewController(destination, animated: true)
+            showScheduleDetailPush(schedule: scheduleList[scheduleIndex], event: activity, delegate: self, users: acceptedParticipant)
         } else {            
-            let destination = ScheduleViewController()
-            destination.users = self.acceptedParticipant
-            destination.filteredUsers = self.acceptedParticipant
-            destination.delegate = self
-            destination.startDateTime = self.startDateTime
-            destination.endDateTime = self.endDateTime
-            self.navigationController?.pushViewController(destination, animated: true)
+            showScheduleDetailPush(schedule: nil, event: activity, delegate: self, users: acceptedParticipant)
                         
 //            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 //            alert.addAction(UIAlertAction(title: "New Sub-Event", style: .default, handler: { (_) in
@@ -184,11 +162,6 @@ class ScheduleListViewController: FormViewController {
         DispatchQueue.main.async { [weak self] in
             if row is ScheduleRow, row.tag != "label" {
                 if self!.scheduleList.indices.contains(rowNumber) {
-                    if let scheduleLocationAddress = self!.scheduleList[rowNumber].locationAddress {
-                        for (key, _) in scheduleLocationAddress {
-                            self!.locationAddress[key] = nil
-                        }
-                    }
                     self!.scheduleList.remove(at: rowNumber)
                     self!.sortSchedule()
                 }
@@ -258,11 +231,6 @@ extension ScheduleListViewController: UpdateActivityDelegate {
             }
             
             sortSchedule()
-            if let localAddress = activity.locationAddress {
-                for (key, value) in localAddress {
-                    locationAddress[key] = value
-                }
-            }
         }
     }
 }
@@ -295,11 +263,6 @@ extension ScheduleListViewController: ChooseActivityDelegate {
             scheduleList.append(mergeActivity)
             
             sortSchedule()
-            if let localAddress = mergeActivity.locationAddress {
-                for (key, value) in localAddress {
-                    locationAddress[key] = value
-                }
-            }
         }
     }
 }

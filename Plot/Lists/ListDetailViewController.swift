@@ -12,6 +12,7 @@ import Firebase
 
 class ListDetailViewController: FormViewController {
     weak var delegate : UpdateListDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
     var list: ListType!
     
@@ -21,9 +22,7 @@ class ListDetailViewController: FormViewController {
     var selectedFalconUsers = [User]()
     
     var active: Bool = false
-    
-    weak var updateDiscoverDelegate : UpdateDiscover?
-    
+        
     let numberFormatter = NumberFormatter()
     
     // create dateFormatter with UTC time format
@@ -116,11 +115,24 @@ class ListDetailViewController: FormViewController {
         createList.createNewList()
         self.hideActivityIndicator()
         self.delegate?.update(list: list)
-        self.updateDiscoverDelegate?.itemCreated()
-        if navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: listCreatedMessage)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         } else {
-            self.navigationController?.popViewController(animated: true)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            if !active {
+                basicAlert(title: listCreatedMessage, message: nil, controller: self.tabBarController)
+            } else {
+                basicAlert(title: listUpdatedMessage, message: nil, controller: self.tabBarController)
+            }
         }
     }
     
@@ -154,6 +166,7 @@ class ListDetailViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
+            basicAlert(title: listDeletedMessage, message: nil, controller: self.tabBarController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -177,7 +190,7 @@ class ListDetailViewController: FormViewController {
                 $0.value = self.list.name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
-                $0.cell.textField.becomeFirstResponder()
+//                $0.cell.textField.becomeFirstResponder()
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         }.onChange() { [unowned self] row in

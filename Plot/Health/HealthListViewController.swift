@@ -9,14 +9,6 @@
 class HealthListViewController: UIViewController, ObjectDetailShowing {
     var participants = [String : [User]]()
     
-    func showActivityIndicator() {
-        
-    }
-    
-    func hideActivityIndicator() {
-        
-    }
-    
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -123,18 +115,9 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func newItem() {
         if filteredHealthMetricSections.contains(.workoutsList) {
-            let destination = WorkoutViewController(networkController: self.networkController)
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         } else if filteredHealthMetricSections.contains(.mindfulnessList) {
-            let destination = MindfulnessViewController(networkController: self.networkController)
-            destination.hidesBottomBarWhenPushed = true
-            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-            destination.navigationItem.leftBarButtonItem = cancelBarButton
-            let navigationViewController = UINavigationController(rootViewController: destination)
-            self.present(navigationViewController, animated: true, completion: nil)
+            self.showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }
     
@@ -149,9 +132,9 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     
     func openMetric(metric: AnyHashable) {
         if let workout = metric as? Workout {
-            showWorkoutDetailPush(workout: workout)
+            showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         } else if let mindfulness = metric as? Mindfulness {
-            showMindfulnessDetailPush(mindfulness: mindfulness)
+            showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 import Charts
 
-class ChartValueFormatter: NSObject, IValueFormatter {
+class ChartValueFormatter: NSObject, ValueFormatter {
     fileprivate var numberFormatter: NumberFormatter?
 
     convenience init(numberFormatter: NumberFormatter) {

@@ -205,10 +205,12 @@ enum filter: String {
         case .calendarCategory: return []
         case .healthCategory: return []
         case .workoutCategory:
-            if #available(iOS 14.0, *) {
+            if #available(iOS 16.0, *) {
                 return HKWorkoutActivityType.allCases.map({$0.name})
-            } else {
+            } else if #available(iOS 14.0, *) {
                 return HKWorkoutActivityType.oldAllCases.map({$0.name})
+            } else {
+                return HKWorkoutActivityType.oldOldAllCases.map({$0.name})
             }
         case .taskCategory: return []
         case .showCompletedTasks: return ["Yes", "No"]

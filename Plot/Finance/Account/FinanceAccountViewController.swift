@@ -147,11 +147,24 @@ class FinanceAccountViewController: FormViewController {
         createAccount.createNewAccount()
         self.hideActivityIndicator()
         self.delegate?.updateAccount(account: account)
-        self.updateDiscoverDelegate?.itemCreated()
-        if navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: accountCreatedMessage)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         } else {
-            self.navigationController?.popViewController(animated: true)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            if !active {
+                basicAlert(title: accountCreatedMessage, message: nil, controller: self.tabBarController)
+            } else {
+                basicAlert(title: accountUpdatedMessage, message: nil, controller: self.tabBarController)
+            }
         }
     }
     
@@ -169,7 +182,7 @@ class FinanceAccountViewController: FormViewController {
                     $0.value = account.name
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    $0.cell.textField.becomeFirstResponder()
+//                    $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground

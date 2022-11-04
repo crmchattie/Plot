@@ -17,7 +17,7 @@ protocol UpdateMindfulnessDelegate: AnyObject {
     func updateMindfulness(mindfulness: Mindfulness)
 }
 
-class MindfulnessViewController: FormViewController {
+class MindfulnessViewController: FormViewController, ObjectDetailShowing {
     var mindfulness: Mindfulness!
     var container: Container!
     var eventList = [Activity]()
@@ -38,6 +38,7 @@ class MindfulnessViewController: FormViewController {
     lazy var transactions: [Transaction] = networkController.financeService.transactions
     
     var selectedFalconUsers = [User]()
+    var participants = [String : [User]]()
     
     //added for EventViewController
     var movingBackwards: Bool = false
@@ -167,13 +168,25 @@ class MindfulnessViewController: FormViewController {
         let createMindfulness = MindfulnessActions(mindfulness: self.mindfulness, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
         createMindfulness.createNewMindfulness(updateDirectAssociation: true)
         self.delegate?.updateMindfulness(mindfulness: self.mindfulness)
-        self.updateDiscoverDelegate?.itemCreated()
         self.hideActivityIndicator()
-        
-        if self.navigationItem.leftBarButtonItem != nil {
-            self.dismiss(animated: true, completion: nil)
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: mindfulnessCreatedMessage)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
         } else {
-            self.navigationController?.popViewController(animated: true)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            if !active {
+                basicAlert(title: mindfulnessCreatedMessage, message: nil, controller: self.tabBarController)
+            } else {
+                basicAlert(title: mindfulnessUpdatedMessage, message: nil, controller: self.tabBarController)
+            }
         }
         
         if active && false {
@@ -273,6 +286,7 @@ class MindfulnessViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
+            basicAlert(title: mindfulnessDeletedMessage, message: nil, controller: self.tabBarController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -297,7 +311,7 @@ class MindfulnessViewController: FormViewController {
                     $0.value = mindfulness.name
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    $0.cell.textField.becomeFirstResponder()
+//                    $0.cell.textField.becomeFirstResponder()
                 }
             }.onChange() { [unowned self] row in
                 if let rowValue = row.value {

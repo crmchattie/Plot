@@ -9,7 +9,6 @@
 import Foundation
 import AppTrackingTransparency
 import AdSupport
-import FacebookCore
 
 class TrackingService {
     func requestPermission() {
@@ -19,23 +18,18 @@ class TrackingService {
                 case .authorized:
                     // Tracking authorization dialog was shown
                     // and we are authorized
-                    print("TrackingService Authorized")
-                    Settings.setAdvertiserTrackingEnabled(true)
-                    
+                    print("TrackingService Authorized")                    
                     // Now that we are authorized we can get the IDFA
                     print(ASIdentifierManager.shared().advertisingIdentifier)
                 case .denied:
                     // Tracking authorization dialog was
                     // shown and permission is denied
                     print("TrackingService Denied")
-                    Settings.setAdvertiserTrackingEnabled(false)
                 case .notDetermined:
                     // Tracking authorization dialog has not been shown
                     print("TrackingService Not Determined")
-                    Settings.setAdvertiserTrackingEnabled(false)
                 case .restricted:
                     print("TrackingService Restricted")
-                    Settings.setAdvertiserTrackingEnabled(false)
                 @unknown default:
                     print("TrackingService Unknown")
                 }
