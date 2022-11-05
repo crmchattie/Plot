@@ -1020,33 +1020,33 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             }
         }
         
-        <<< LabelRow("Checklists") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.cell.textLabel?.textColor = .label
-            row.title = row.tag
-            if let task = task, let checklistIDs = task.checklistIDs {
-                row.value = String(checklistIDs.count)
-            } else {
-                row.value = "0"
-            }
-            row.hidden = "$showExtras == false"
-        }.onCellSelection({ _,_ in
-            self.openList()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-            cell.textLabel?.textColor = .label
-            if let checklistIDs = self.task.checklistIDs {
-                row.value = String(checklistIDs.count)
-            } else {
-                row.value = "0"
-            }
-        }
+//        <<< LabelRow("Checklists") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.cell.textLabel?.textColor = .label
+//            row.title = row.tag
+//            if let task = task, let checklistIDs = task.checklistIDs {
+//                row.value = String(checklistIDs.count)
+//            } else {
+//                row.value = "0"
+//            }
+//            row.hidden = "$showExtras == false"
+//        }.onCellSelection({ _,_ in
+//            self.openList()
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//            cell.textLabel?.textAlignment = .left
+//            cell.textLabel?.textColor = .label
+//            if let checklistIDs = self.task.checklistIDs {
+//                row.value = String(checklistIDs.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }
         
         <<< LabelRow("Media") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground

@@ -91,10 +91,9 @@ class Activity: NSObject, NSCopying, Codable {
     //instance variables
     var recurringEventID: String?
     var instanceOriginalStartDateTime: NSNumber?
-    var instanceOriginalAllDay: Bool?
-    var instanceOriginalStartTimeZone: String?
     var instanceIDs: [String]?
     var instanceID: String?
+    var parentID: String?
     var directAssociation: Bool?
     var directAssociationObjectID: String?
     var directAssociationType: ObjectType?
@@ -150,6 +149,7 @@ class Activity: NSObject, NSCopying, Codable {
         case recurringEventID
         case instanceIDs
         case instanceID
+        case parentID
         case directAssociation
         case directAssociationObjectID
         case directAssociationType
@@ -261,10 +261,9 @@ class Activity: NSObject, NSCopying, Codable {
         lastModifiedDate = dictionary?["lastModifiedDate"] as? NSNumber
         recurringEventID = dictionary?["recurringEventID"] as? String
         instanceOriginalStartDateTime = dictionary?["instanceOriginalStartDateTime"] as? NSNumber
-        instanceOriginalAllDay = dictionary?["instanceOriginalAllDay"] as? Bool
-        instanceOriginalStartTimeZone = dictionary?["instanceOriginalStartTimeZone"] as? String
         instanceIDs = dictionary?["instanceIDs"] as? [String]
         instanceID = dictionary?["instanceID"] as? String
+        parentID = dictionary?["parentID"] as? String
         directAssociation = dictionary?["directAssociation"] as? Bool
         directAssociationObjectID = dictionary?["directAssociationObjectID"] as? String
         if let value = dictionary?["directAssociationType"] as? String {
@@ -277,6 +276,7 @@ class Activity: NSObject, NSCopying, Codable {
         return copy
     }
     
+    //only store parent properties; all instance specific properties are stored via instanceValues dictionary
     func toAnyObject() -> [String: AnyObject] {
         var dictionary = [String: AnyObject]()
         if let value = self.activityID as AnyObject? {
@@ -804,20 +804,16 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.instanceID = value
         }
         
+        if let value = updatingActivity.parentID {
+            newActivity.parentID = value
+        }
+        
         if let value = updatingActivity.recurringEventID {
             newActivity.recurringEventID = value
         }
         
         if let value = updatingActivity.instanceOriginalStartDateTime {
             newActivity.instanceOriginalStartDateTime = value
-        }
-        
-        if let value = updatingActivity.instanceOriginalAllDay {
-            newActivity.instanceOriginalAllDay = value
-        }
-        
-        if let value = updatingActivity.instanceOriginalStartTimeZone {
-            newActivity.instanceOriginalStartTimeZone = value
         }
         
         if let value = updatingActivity.directAssociation {
@@ -1057,6 +1053,10 @@ class Activity: NSObject, NSCopying, Codable {
             self.instanceID = value
         }
         
+        if let value = updatingActivity.parentID {
+            self.parentID = value
+        }
+        
         if let value = updatingActivity.recurringEventID {
             self.recurringEventID = value
         }
@@ -1064,15 +1064,7 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = updatingActivity.instanceOriginalStartDateTime {
             self.instanceOriginalStartDateTime = value
         }
-        
-        if let value = updatingActivity.instanceOriginalAllDay {
-            self.instanceOriginalAllDay = value
-        }
-        
-        if let value = updatingActivity.instanceOriginalStartTimeZone {
-            self.instanceOriginalStartTimeZone = value
-        }
-        
+                
         if let value = updatingActivity.directAssociation {
             self.directAssociation = value
         }
@@ -1301,20 +1293,16 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.instanceID = self.instanceID
         }
         
+        if self.parentID != otherActivity.parentID {
+            newActivity.parentID = self.parentID
+        }
+        
         if self.recurringEventID != otherActivity.recurringEventID {
             newActivity.recurringEventID = self.recurringEventID
         }
         
         if self.instanceOriginalStartDateTime != otherActivity.instanceOriginalStartDateTime {
             newActivity.instanceOriginalStartDateTime = self.instanceOriginalStartDateTime
-        }
-        
-        if self.instanceOriginalAllDay != otherActivity.instanceOriginalAllDay {
-            newActivity.instanceOriginalAllDay = self.instanceOriginalAllDay
-        }
-        
-        if self.instanceOriginalStartTimeZone != otherActivity.instanceOriginalStartTimeZone {
-            newActivity.instanceOriginalStartTimeZone = self.instanceOriginalStartTimeZone
         }
         
         if self.directAssociation != otherActivity.directAssociation {
@@ -1499,7 +1487,7 @@ extension Activity {
     }
     
     var finalDate: Date? {
-        if self.isTask ?? false {
+        if isTask ?? false {
             return endDate
         } else {
             return startDate
@@ -1508,7 +1496,7 @@ extension Activity {
     
     //for tasks where deadline date is more likely to be set than start date
     var finalDateTime: NSNumber? {
-        if self.isTask ?? false {
+        if isTask ?? false {
             return endDateTime
         } else {
             return startDateTime
@@ -1527,11 +1515,60 @@ extension Activity {
         return nil
     }
     var finalTimeZone: String? {
-        if self.isTask ?? false {
+        if isTask ?? false {
             return endTimeZone
         } else {
             return startTimeZone
         }
+    }
+    func getSubStartDateTime(parent: Activity) -> NSNumber? {
+        guard let originalParentDateTime = parent.recurrenceStartDateTime, let originalChildDateTime = startDateTime, let currentParentDateTime = parent.startDateTime else {
+            return startDateTime ?? nil
+        }
+        return getChildDateTime(originalParentDateTime: originalParentDateTime, originalChildDateTime: originalChildDateTime, currentParentDateTime: currentParentDateTime)
+    }
+    func getSubEndDateTime(parent: Activity) -> NSNumber? {
+        if let currentChildDateTime = getSubStartDateTime(parent: parent), let originalChildDateTime = startDateTime, let originalChildEndDateTime = endDateTime {
+            return NSNumber(value: currentChildDateTime.intValue + originalChildEndDateTime.intValue - originalChildDateTime.intValue)
+        } else if isSubtask ?? false, let originalParentDateTime = parent.recurrenceStartDateTime, let originalChildDateTime = endDateTime, let currentParentDateTime = parent.endDateTime {
+            return getChildDateTime(originalParentDateTime: originalParentDateTime, originalChildDateTime: originalChildDateTime, currentParentDateTime: currentParentDateTime)
+        } else {
+            return endDateTime ?? nil
+        }
+    }
+    func getSubStartDate(parent: Activity) -> Date? {
+        guard let originalParentDate = parent.recurrenceStartDate, let originalChildDate = startDate, let currentParentDate = parent.startDate else {
+            return startDate ?? nil
+        }
+        return getChildDate(originalParentDate: originalParentDate, originalChildDate: originalChildDate, currentParentDate: currentParentDate)
+    }
+    func getSubEndDate(parent: Activity) -> Date? {
+        if let currentChildDate = getSubStartDate(parent: parent), let originalChildDate = startDate, let originalChildEndDate = endDate {
+            let duration = originalChildEndDate.timeIntervalSince(originalChildDate)
+            return currentChildDate + duration
+        } else if isSubtask ?? false, let originalParentDate = parent.recurrenceStartDate, let originalChildDate = endDate, let currentParentDate = parent.endDate {
+            return getChildDate(originalParentDate: originalParentDate, originalChildDate: originalChildDate, currentParentDate: currentParentDate)
+        } else {
+            return endDate ?? nil
+        }
+    }
+    
+    func getNewSubStartDateTime(parent: Activity, currentDate: Date) -> NSNumber? {
+        guard let currentChildDateTime = getSubStartDateTime(parent: parent), let originalChildDateTime = startDateTime else {
+            return NSNumber(value: Int(currentDate.timeIntervalSince1970))
+        }
+        let currentRowDateTime = Int(currentDate.timeIntervalSince1970)
+        let duration = currentRowDateTime - currentChildDateTime.intValue
+        return NSNumber(value: originalChildDateTime.intValue + duration)
+    }
+    
+    func getNewSubEndDateTime(parent: Activity, currentDate: Date) -> NSNumber? {
+        guard let currentChildDateTime = getSubEndDateTime(parent: parent), let originalChildDateTime = endDateTime else {
+            return NSNumber(value: Int(currentDate.timeIntervalSince1970))
+        }
+        let currentRowDateTime = Int(currentDate.timeIntervalSince1970)
+        let duration = currentRowDateTime - currentChildDateTime.intValue
+        return NSNumber(value: originalChildDateTime.intValue + duration)
     }
 }
 

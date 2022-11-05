@@ -183,7 +183,7 @@ class GoogleCalService {
                     }
                 })
             })
-        } else if span == .thisEvent, let originalStartDate = activity.instanceOriginalStartDate, let originalStartTime = dateToGLTRDate(date: originalStartDate, allDay: activity.instanceOriginalAllDay ?? false, timeZone: TimeZone(identifier: activity.instanceOriginalStartTimeZone ?? "UTC")) {
+        } else if span == .thisEvent, let originalStartDate = activity.instanceOriginalStartDate, let originalStartTime = dateToGLTRDate(date: originalStartDate, allDay: activity.allDay ?? false, timeZone: TimeZone(identifier: activity.startTimeZone ?? "UTC")) {
             let instancesQuery = GTLRCalendarQuery_EventsInstances.query(withCalendarId: calendarID, eventId: eventID)
             service.executeQuery(instancesQuery, completionHandler: { (ticket, result, error) in
                 guard error == nil, let events = result as? GTLRCalendar_Events, let instances = events.items else {

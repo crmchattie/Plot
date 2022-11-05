@@ -13,6 +13,7 @@ protocol UpdateTaskCellDelegate: AnyObject {
 }
 
 final class SubtaskCell: Cell<Activity>, CellType {
+    var parentTask: Activity?
     weak var delegate: UpdateTaskCellDelegate?
     
     var formattedDate: (Int, String, String) = (1, "", "")
@@ -120,13 +121,24 @@ final class SubtaskCell: Cell<Activity>, CellType {
         nameLabel.text = subtask.name
         
         if let endDate = subtask.endDate {
-            dateTimeLabel.isHidden = false
-            formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
-            dateTimeLabel.numberOfLines = formattedDate.0
-            if formattedDate.0 == 2 {
-                dateTimeLabel.text = formattedDate.1 + "\n" + formattedDate.2
+            if let parentTask = parentTask, let currentEndDate = subtask.getSubEndDate(parent: parentTask) {
+                dateTimeLabel.isHidden = false
+                formattedDate = timestampOfTask(endDate: currentEndDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.getSubStartDate(parent: parentTask), hasStartTime: subtask.hasStartTime)
+                dateTimeLabel.numberOfLines = formattedDate.0
+                if formattedDate.0 == 2 {
+                    dateTimeLabel.text = formattedDate.1 + "\n" + formattedDate.2
+                } else {
+                    dateTimeLabel.text = formattedDate.1 + formattedDate.2
+                }
             } else {
-                dateTimeLabel.text = formattedDate.1 + formattedDate.2
+                dateTimeLabel.isHidden = false
+                formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
+                dateTimeLabel.numberOfLines = formattedDate.0
+                if formattedDate.0 == 2 {
+                    dateTimeLabel.text = formattedDate.1 + "\n" + formattedDate.2
+                } else {
+                    dateTimeLabel.text = formattedDate.1 + formattedDate.2
+                }
             }
         } else {
             dateTimeLabel.isHidden = true

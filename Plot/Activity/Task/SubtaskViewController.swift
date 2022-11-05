@@ -23,6 +23,7 @@ class SubtaskViewController: FormViewController {
     weak var delegate : UpdateTaskDelegate?
     
     var subtask: Activity!
+    var subtaskOld: Activity!
     var task: Activity!
     
     var users = [User]()
@@ -48,6 +49,7 @@ class SubtaskViewController: FormViewController {
         if subtask != nil {
             title = "Sub-Task"
             active = true
+            subtaskOld = subtask.copy() as? Activity
             if subtask.activityID != nil {
                 subtaskID = subtask.activityID!
             } else {
@@ -61,7 +63,7 @@ class SubtaskViewController: FormViewController {
                     }
                 }
             }
-            setupLists()
+//            setupLists()
             subtask.isSubtask = true
         } else {
             title = "New Sub-Task"
@@ -199,89 +201,89 @@ class SubtaskViewController: FormViewController {
 //                cell.textLabel?.textAlignment = .left
 //            }
         
-            <<< CheckRow("Completed") {
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.cell.tintColor = FalconPalette.defaultBlue
-                $0.cell.textLabel?.textColor = .label
-                $0.cell.detailTextLabel?.textColor = .secondaryLabel
-                $0.cell.accessoryType = .checkmark
-                $0.title = $0.tag
-                $0.value = subtask.isCompleted ?? false
-                if $0.value ?? false {
-                    $0.cell.tintAdjustmentMode = .automatic
-                } else {
-                    $0.cell.tintAdjustmentMode = .dimmed
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.tintColor = FalconPalette.defaultBlue
-                cell.accessoryType = .checkmark
-                if row.value == false {
-                    cell.tintAdjustmentMode = .dimmed
-                } else {
-                    cell.tintAdjustmentMode = .automatic
-                }
-            }.onChange { row in
-                self.subtask.isCompleted = row.value
-                if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
-                    row.cell.tintAdjustmentMode = .automatic
-                    
-                    let original = Date()
-                    let updateDate = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    
-                    completedRow.value = updateDate
-                    completedRow.updateCell()
-                    completedRow.hidden = false
-                    completedRow.evaluateHidden()
-                    self.subtask.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
-                } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
-                    row.cell.tintAdjustmentMode = .dimmed
-                    completedRow.value = nil
-                    completedRow.updateCell()
-                    completedRow.hidden = true
-                    completedRow.evaluateHidden()
-                    self.subtask.completedDate = nil
-                }
-            }
-            
-            <<< DateTimeInlineRow("Completed On") {
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.cell.textLabel?.textColor = .label
-                $0.cell.detailTextLabel?.textColor = .secondaryLabel
-                $0.title = $0.tag
-                $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .medium
-                $0.dateFormatter?.timeStyle = .short
-                if let subtask = subtask, subtask.isCompleted ?? false, let date = subtask.completedDate {
-                    $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
-                    $0.updateCell()
-                } else {
-                    $0.hidden = true
-                }
-            }.onChange { [weak self] row in
-                if let value = row.value {
-                    self?.subtask.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
-                }
-            }.onExpandInlineRow { cell, row, inlineRow in
-                inlineRow.cellUpdate { (cell, row) in
-                    row.cell.backgroundColor = .secondarySystemGroupedBackground
-                    row.cell.tintColor = .secondarySystemGroupedBackground
-                    if #available(iOS 14.0, *) {
-                        cell.datePicker.preferredDatePickerStyle = .inline
-                        cell.datePicker.tintColor = .systemBlue
-                    }
-                    else {
-                        cell.datePicker.datePickerMode = .dateAndTime
-                    }
-                }
-                cell.detailTextLabel?.textColor = cell.tintColor
-            }.onCollapseInlineRow { cell, _, _ in
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-            }
+//            <<< CheckRow("Completed") {
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.cell.tintColor = FalconPalette.defaultBlue
+//                $0.cell.textLabel?.textColor = .label
+//                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+//                $0.cell.accessoryType = .checkmark
+//                $0.title = $0.tag
+//                $0.value = subtask.isCompleted ?? false
+//                if $0.value ?? false {
+//                    $0.cell.tintAdjustmentMode = .automatic
+//                } else {
+//                    $0.cell.tintAdjustmentMode = .dimmed
+//                }
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.tintColor = FalconPalette.defaultBlue
+//                cell.accessoryType = .checkmark
+//                if row.value == false {
+//                    cell.tintAdjustmentMode = .dimmed
+//                } else {
+//                    cell.tintAdjustmentMode = .automatic
+//                }
+//            }.onChange { row in
+//                self.subtask.isCompleted = row.value
+//                if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+//                    row.cell.tintAdjustmentMode = .automatic
+//                    
+//                    let original = Date()
+//                    let updateDate = Date(timeIntervalSinceReferenceDate:
+//                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+//                    
+//                    completedRow.value = updateDate
+//                    completedRow.updateCell()
+//                    completedRow.hidden = false
+//                    completedRow.evaluateHidden()
+//                    self.subtask.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+//                } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+//                    row.cell.tintAdjustmentMode = .dimmed
+//                    completedRow.value = nil
+//                    completedRow.updateCell()
+//                    completedRow.hidden = true
+//                    completedRow.evaluateHidden()
+//                    self.subtask.completedDate = nil
+//                }
+//            }
+//            
+//            <<< DateTimeInlineRow("Completed On") {
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.cell.textLabel?.textColor = .label
+//                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+//                $0.title = $0.tag
+//                $0.minuteInterval = 5
+//                $0.dateFormatter?.dateStyle = .medium
+//                $0.dateFormatter?.timeStyle = .short
+//                if let subtask = subtask, subtask.isCompleted ?? false, let date = subtask.completedDate {
+//                    $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
+//                    $0.updateCell()
+//                } else {
+//                    $0.hidden = true
+//                }
+//            }.onChange { [weak self] row in
+//                if let value = row.value {
+//                    self?.subtask.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
+//                }
+//            }.onExpandInlineRow { cell, row, inlineRow in
+//                inlineRow.cellUpdate { (cell, row) in
+//                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+//                    row.cell.tintColor = .secondarySystemGroupedBackground
+//                    if #available(iOS 14.0, *) {
+//                        cell.datePicker.preferredDatePickerStyle = .inline
+//                        cell.datePicker.tintColor = .systemBlue
+//                    }
+//                    else {
+//                        cell.datePicker.datePickerMode = .dateAndTime
+//                    }
+//                }
+//                cell.detailTextLabel?.textColor = cell.tintColor
+//            }.onCollapseInlineRow { cell, _, _ in
+//                cell.detailTextLabel?.textColor = .secondaryLabel
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textLabel?.textColor = .label
+//            }
             
 //            <<< SwitchRow("Start Date") {
 //                $0.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -474,7 +476,7 @@ class SubtaskViewController: FormViewController {
                 $0.cell.textLabel?.textColor = .label
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = "Deadline Date"
-                if let subtask = subtask, let endDate = subtask.endDate {
+                if let subtask = subtask, let endDate = subtask.getSubEndDate(parent: self.task) {
                     $0.value = true
                     $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                 } else {
@@ -484,7 +486,7 @@ class SubtaskViewController: FormViewController {
             }.onChange { [weak self] row in
                 if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
                     if value, let endTime = self?.form.rowBy(tag: "DeadlineTime") {
-                        if let subtask = self?.subtask, let endDate = subtask.endDate {
+                        if let subtask = self?.subtask, let task = self?.task, let endDate = subtask.getSubEndDate(parent: task) {
                             row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                             endDateRow.value = endDate
                         } else {
@@ -523,7 +525,7 @@ class SubtaskViewController: FormViewController {
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
                 cell.detailTextLabel?.textColor = .secondaryLabel
-                if let subtask = self.subtask, let endDate = subtask.endDate {
+                if let subtask = self.subtask, let endDate = subtask.getSubEndDate(parent: self.task) {
                     cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                 } else {
                     cell.detailTextLabel?.text = nil
@@ -545,7 +547,7 @@ class SubtaskViewController: FormViewController {
                 else {
                     $0.cell.datePicker.datePickerMode = .date
                 }
-                if let subtask = subtask, let endDate = subtask.endDate {
+                if let subtask = subtask, let endDate = subtask.getSubEndDate(parent: task) {
                     $0.value = endDate
                     $0.updateCell()
                 }
@@ -564,7 +566,7 @@ class SubtaskViewController: FormViewController {
                 $0.cell.textLabel?.textColor = .label
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = "Deadline Time"
-                if let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                if let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.getSubEndDate(parent: task) {
                     $0.value = true
                     $0.cell.detailTextLabel?.text = endDate.getTimeString()
                 } else {
@@ -574,7 +576,7 @@ class SubtaskViewController: FormViewController {
             }.onChange { [weak self] row in
                 if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
                     if value, let endDateDateRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
-                        if let subtask = self?.subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                        if let subtask = self?.subtask, subtask.hasDeadlineTime ?? false, let task = self?.task, let endDate = subtask.getSubEndDate(parent: task) {
                             row.cell.detailTextLabel?.text = endDate.getTimeString()
                             endTimeRow.value = endDate
                             if !(endDateSwitchRow.value ?? false) {
@@ -622,7 +624,7 @@ class SubtaskViewController: FormViewController {
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
                 cell.detailTextLabel?.textColor = .secondaryLabel
-                if let subtask = self.subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                if let subtask = self.subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.getSubEndDate(parent: self.task) {
                     cell.detailTextLabel?.text = endDate.getTimeString()
                 } else {
                     cell.detailTextLabel?.text = nil
@@ -643,7 +645,7 @@ class SubtaskViewController: FormViewController {
                 else {
                     $0.cell.datePicker.datePickerMode = .time
                 }
-                if let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.endDate {
+                if let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.getSubEndDate(parent: self.task) {
                     $0.value = endDate
                     $0.updateCell()
                 }
@@ -720,90 +722,90 @@ class SubtaskViewController: FormViewController {
             }
 
         
-        form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
-                               header: "Checklist",
-                               footer: "Add a checklist item") {
-                                $0.tag = "checklistfields"
-                                $0.addButtonProvider = { section in
-                                    return ButtonRow(){
-                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                        $0.title = "Add New Item"
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = .secondarySystemGroupedBackground
-                                            cell.textLabel?.textAlignment = .left
-                                            
-                                    }
-                                }
-                                $0.multivaluedRowToInsertAt = { index in
-                                    return SplitRow<TextRow, CheckRow>(){
-                                        $0.rowLeftPercentage = 0.75
-                                        $0.rowLeft = TextRow(){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.cell.textField?.textColor = .label
-                                            $0.placeholderColor = .secondaryLabel
-                                            $0.placeholder = "Item"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textField?.textColor = .label
-                                                row.placeholderColor = .secondaryLabel
-                                        }
-                                        
-                                        $0.rowRight = CheckRow() {
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.cell.tintColor = FalconPalette.defaultBlue
-                                            $0.value = false
-                                            $0.cell.accessoryType = .checkmark
-                                            $0.cell.tintAdjustmentMode = .dimmed
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.tintColor = FalconPalette.defaultBlue
-                                                cell.accessoryType = .checkmark
-                                                if row.value == false {
-                                                    cell.tintAdjustmentMode = .dimmed
-                                                } else {
-                                                    cell.tintAdjustmentMode = .automatic
-                                                }
-                                        }
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = .secondarySystemGroupedBackground
-                                    }
-                                    
-                                }
+//        form +++
+//            MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
+//                               header: "Checklist",
+//                               footer: "Add a checklist item") {
+//                                $0.tag = "checklistfields"
+//                                $0.addButtonProvider = { section in
+//                                    return ButtonRow(){
+//                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                        $0.title = "Add New Item"
+//                                        }.cellUpdate { cell, row in
+//                                            cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            cell.textLabel?.textAlignment = .left
+//                                            
+//                                    }
+//                                }
+//                                $0.multivaluedRowToInsertAt = { index in
+//                                    return SplitRow<TextRow, CheckRow>(){
+//                                        $0.rowLeftPercentage = 0.75
+//                                        $0.rowLeft = TextRow(){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.cell.textField?.textColor = .label
+//                                            $0.placeholderColor = .secondaryLabel
+//                                            $0.placeholder = "Item"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textField?.textColor = .label
+//                                                row.placeholderColor = .secondaryLabel
+//                                        }
+//                                        
+//                                        $0.rowRight = CheckRow() {
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.cell.tintColor = FalconPalette.defaultBlue
+//                                            $0.value = false
+//                                            $0.cell.accessoryType = .checkmark
+//                                            $0.cell.tintAdjustmentMode = .dimmed
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.tintColor = FalconPalette.defaultBlue
+//                                                cell.accessoryType = .checkmark
+//                                                if row.value == false {
+//                                                    cell.tintAdjustmentMode = .dimmed
+//                                                } else {
+//                                                    cell.tintAdjustmentMode = .automatic
+//                                                }
+//                                        }
+//                                        }.cellUpdate { cell, row in
+//                                            cell.backgroundColor = .secondarySystemGroupedBackground
+//                                    }
+//                                    
+//                                }
                                 
-        }
+//        }
     }
     
     @objc fileprivate func rightBarButtonTapped() {
-        let mvs = (form.values()["checklistfields"] as! [Any?]).compactMap { $0 }
-        if !mvs.isEmpty {
-            var checklistDict = [String : Bool]()
-            for element in mvs {
-                if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
-                    let newText = text.removeCharacters()
-                    checklistDict[newText] = state
-                }
-            }
-            
-            if subtask.checklistIDs == nil, let currentUserID = Auth.auth().currentUser?.uid {
-                let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
-                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
-                checklist.name = "CheckList"
-                checklist.createdDate = Date()
-                checklist.activityID = subtask.activityID
-                checklist.items = checklistDict
-                subtask.checklistIDs = [checklist.ID ?? ""]
-                
-                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
-                createChecklist.createNewChecklist()
-            } else {
-                checklist.items = checklistDict
-                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
-                createChecklist.createNewChecklist()
-            }
-        } else {
-            subtask.checklistIDs = []
-        }
+        //        let mvs = (form.values()["checklistfields"] as! [Any?]).compactMap { $0 }
+        //        if !mvs.isEmpty {
+        //            var checklistDict = [String : Bool]()
+        //            for element in mvs {
+        //                if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
+        //                    let newText = text.removeCharacters()
+        //                    checklistDict[newText] = state
+        //                }
+        //            }
+        //
+        //            if subtask.checklistIDs == nil, let currentUserID = Auth.auth().currentUser?.uid {
+        //                let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+        //                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
+        //                checklist.name = "CheckList"
+        //                checklist.createdDate = Date()
+        //                checklist.activityID = subtask.activityID
+        //                checklist.items = checklistDict
+        //                subtask.checklistIDs = [checklist.ID ?? ""]
+        //
+        //                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
+        //                createChecklist.createNewChecklist()
+        //            } else {
+        //                checklist.items = checklistDict
+        //                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
+        //                createChecklist.createNewChecklist()
+        //            }
+        //        } else {
+        //            subtask.checklistIDs = []
+        //        }
         
         let valuesDictionary = form.values()
         
@@ -830,18 +832,65 @@ class SubtaskViewController: FormViewController {
         let membersIDs = fetchMembersIDs()
 
         subtask.participantsIDs = membersIDs.0
-        
-        let createActivity = ActivityActions(activity: subtask, active: false, selectedFalconUsers: [])
-        createActivity.createSubActivity()
-        
+                        
+        if task.recurrences != nil || subtask.instanceID != nil {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                
+            alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                    var instanceIDs = self.subtask.instanceIDs ?? []
+                    if let instance = self.subtask.instanceID {
+                        self.subtask.instanceID = instance
+                    } else {
+                        instanceIDs.append(instanceID)
+                        self.subtask.instanceIDs = instanceIDs
+                    }
+                    self.subtask.parentID = self.task.activityID
+                    
+                    let newActivity = self.subtask.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.subtaskOld)
+                    var instanceValues = newActivity.toAnyObject()
+                    
+                    let createActivity = ActivityActions(activity: self.subtask, active: false, selectedFalconUsers: self.selectedFalconUsers)
+                    createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
+                    
+                    self.closeController(title: subtaskUpdatedMessage)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Save For All Tasks", style: .default, handler: { (_) in
+                let createActivity = ActivityActions(activity: self.subtask, active: false, selectedFalconUsers: [])
+                createActivity.createSubActivity()
+
+                self.closeController(title: subtaskUpdatedMessage)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            print("shareButtonTapped")
+        } else {
+            let createActivity = ActivityActions(activity: subtask, active: false, selectedFalconUsers: [])
+            createActivity.createSubActivity()
+            if !active {
+                closeController(title: subtaskCreatedMessage)
+            } else {
+                closeController(title: subtaskUpdatedMessage)
+            }
+        }
+    }
+    
+    func closeController(title: String) {
         movingBackwards = false
         delegate?.updateTask(task: subtask)
-        
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
         }
+        basicAlert(title: title, message: nil, controller: self.navigationController?.visibleViewController)
     }
     
     func setupLists() {
@@ -927,7 +976,7 @@ class SubtaskViewController: FormViewController {
                 dateComponents.hour = timeRowValue.hourNumber()
                 dateComponents.minute = timeRowValue.minuteNumber()
                 let date = Calendar.current.date(from: dateComponents)
-                self.subtask.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.startDateTime = self.subtask.getNewSubStartDateTime(parent: self.task, currentDate: date ?? Date())
                 self.subtask.hasStartTime = true
             } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
                 print(dateRowValue.yearNumber())
@@ -936,7 +985,7 @@ class SubtaskViewController: FormViewController {
                 dateComponents.month = dateRowValue.monthNumber()
                 dateComponents.day = dateRowValue.dayNumber()
                 let date = Calendar.current.date(from: dateComponents)
-                self.subtask.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.startDateTime = self.subtask.getNewSubStartDateTime(parent: self.task, currentDate: date ?? Date())
                 self.subtask.hasStartTime = false
             } else {
                 self.subtask.startDateTime = nil
@@ -956,7 +1005,7 @@ class SubtaskViewController: FormViewController {
                 dateComponents.hour = timeRowValue.hourNumber()
                 dateComponents.minute = timeRowValue.minuteNumber()
                 let date = Calendar.current.date(from: dateComponents)
-                self.subtask.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.endDateTime = self.subtask.getNewSubEndDateTime(parent: self.task, currentDate: date ?? Date())
                 self.subtask.hasDeadlineTime = true
             } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
                 var dateComponents = DateComponents()
@@ -964,7 +1013,7 @@ class SubtaskViewController: FormViewController {
                 dateComponents.month = dateRowValue.monthNumber()
                 dateComponents.day = dateRowValue.dayNumber()
                 let date = Calendar.current.date(from: dateComponents)
-                self.subtask.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.subtask.endDateTime = self.subtask.getNewSubEndDateTime(parent: self.task, currentDate: date ?? Date())
                 self.subtask.hasDeadlineTime = false
             } else {
                 self.subtask.endDateTime = nil
@@ -975,7 +1024,7 @@ class SubtaskViewController: FormViewController {
     }
     
     func subtaskReminder() {
-        guard let subtask = subtask, let activityReminder = subtask.reminder, let endDate = subtask.endDate else {
+        guard let subtask = subtask, let activityReminder = subtask.reminder, let endDate = subtask.getSubEndDate(parent: task) else {
             return
         }
         let center = UNUserNotificationCenter.current()

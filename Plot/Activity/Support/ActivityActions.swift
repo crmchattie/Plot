@@ -344,7 +344,7 @@ class ActivityActions: NSObject {
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
-        if activity.recurrences != nil {
+        if activity.recurrences != nil || activity.instanceID != nil {
             var values:[String : Any] = [:]
             activity.isCompleted = isComplete
             if isComplete {
@@ -420,11 +420,12 @@ class ActivityActions: NSObject {
         } else {
             updateInstanceValues["isEvent"] = true
         }
+        if activity.isSubtask ?? false || activity.isSchedule ?? false {
+            updateInstanceValues["parentID"] = activity.parentID
+        }
         updateInstanceValues["name"] = activity.name
         updateInstanceValues["recurringEventID"] = activityID
-        
-        print(updateInstanceValues)
-                
+                        
         let groupInstanceActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)
         groupInstanceActivityReference.updateChildValues(updateInstanceValues) { _,_ in
             let groupRecurringActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)

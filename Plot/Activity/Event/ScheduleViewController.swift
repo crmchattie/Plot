@@ -24,6 +24,7 @@ class ScheduleViewController: FormViewController {
     weak var delegate : UpdateActivityDelegate?
     
     var schedule: Activity!
+    var scheduleOld: Activity!
     var event: Activity!
     
     var users = [User]()
@@ -50,6 +51,7 @@ class ScheduleViewController: FormViewController {
         if schedule != nil {
             title = "Sub-Event"
             active = true
+            scheduleOld = schedule.copy() as? Activity
             if schedule.activityID != nil {
                 scheduleID = schedule.activityID!
             } else {
@@ -63,7 +65,7 @@ class ScheduleViewController: FormViewController {
                     }
                 }
             }
-            setupLists()
+//            setupLists()
             schedule.isSchedule = true
         } else {
             title = "New Sub-Event"
@@ -286,7 +288,7 @@ class ScheduleViewController: FormViewController {
                     if let timeZone = schedule.startTimeZone {
                         $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                     }
-                    $0.value = Date(timeIntervalSince1970: schedule.startDateTime as! TimeInterval)
+                    $0.value = Date(timeIntervalSince1970: schedule.getSubStartDateTime(parent: self.event) as! TimeInterval)
                     if self.schedule.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
                     }
@@ -299,7 +301,7 @@ class ScheduleViewController: FormViewController {
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     $0.value = rounded
-                    self.schedule.startDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    self.schedule.startDateTime = schedule.getNewSubStartDateTime(parent: self.event, currentDate: rounded)
                 }
                 }.onChange { [weak self] row in
                     let endRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Ends")
@@ -307,7 +309,7 @@ class ScheduleViewController: FormViewController {
                         endRow.value = Date(timeInterval: 0, since: row.value!)
                         endRow.updateCell()
                     }
-                    self!.schedule.startDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
+                    self!.schedule.startDateTime = self!.schedule.getNewSubStartDateTime(parent: self!.event, currentDate: row.value ?? Date())
                     if self!.active {
                         self!.scheduleReminder()
                     }
@@ -379,7 +381,7 @@ class ScheduleViewController: FormViewController {
                     if let timeZone = schedule.endTimeZone {
                         $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
                     }
-                    $0.value = Date(timeIntervalSince1970: schedule.endDateTime as! TimeInterval)
+                    $0.value = Date(timeIntervalSince1970: schedule.getSubEndDateTime(parent: self.event) as! TimeInterval)
                     if self.schedule.allDay == true {
                         $0.dateFormatter?.timeStyle = .none
                     }
@@ -392,7 +394,7 @@ class ScheduleViewController: FormViewController {
                     let rounded = Date(timeIntervalSinceReferenceDate:
                     (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     $0.value = rounded
-                    self.schedule.endDateTime = NSNumber(value: Int(($0.value!).timeIntervalSince1970))
+                    self.schedule.endDateTime = schedule.getNewSubEndDateTime(parent: self.event, currentDate: rounded)
                 }
                 }.onChange { [weak self] row in
                     let startRow: DateTimeInlineRow! = self?.form.rowBy(tag: "Starts")
@@ -400,7 +402,7 @@ class ScheduleViewController: FormViewController {
                         startRow.value = Date(timeInterval: 0, since: row.value!)
                         startRow.updateCell()
                     }
-                    self!.schedule.endDateTime = NSNumber(value: Int((row.value!).timeIntervalSince1970))
+                    self!.schedule.endDateTime = self!.schedule.getNewSubEndDateTime(parent: self!.event, currentDate: row.value ?? Date())
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -521,90 +523,90 @@ class ScheduleViewController: FormViewController {
             }
 
         
-        form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
-                               header: "Checklist",
-                               footer: "Add a checklist item") {
-                                $0.tag = "checklistfields"
-                                $0.addButtonProvider = { section in
-                                    return ButtonRow(){
-                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                        $0.title = "Add New Item"
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = .secondarySystemGroupedBackground
-                                            cell.textLabel?.textAlignment = .left
-                                            
-                                    }
-                                }
-                                $0.multivaluedRowToInsertAt = { index in
-                                    return SplitRow<TextRow, CheckRow>(){
-                                        $0.rowLeftPercentage = 0.75
-                                        $0.rowLeft = TextRow(){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.cell.textField?.textColor = .label
-                                            $0.placeholderColor = .secondaryLabel
-                                            $0.placeholder = "Item"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textField?.textColor = .label
-                                                row.placeholderColor = .secondaryLabel
-                                        }
-                                        
-                                        $0.rowRight = CheckRow() {
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.cell.tintColor = FalconPalette.defaultBlue
-                                            $0.value = false
-                                            $0.cell.accessoryType = .checkmark
-                                            $0.cell.tintAdjustmentMode = .dimmed
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.tintColor = FalconPalette.defaultBlue
-                                                cell.accessoryType = .checkmark
-                                                if row.value == false {
-                                                    cell.tintAdjustmentMode = .dimmed
-                                                } else {
-                                                    cell.tintAdjustmentMode = .automatic
-                                                }
-                                        }
-                                        }.cellUpdate { cell, row in
-                                            cell.backgroundColor = .secondarySystemGroupedBackground
-                                    }
-                                    
-                                }
-                                
-        }
+//        form +++
+//            MultivaluedSection(multivaluedOptions: [.Insert, .Delete, .Reorder],
+//                               header: "Checklist",
+//                               footer: "Add a checklist item") {
+//                                $0.tag = "checklistfields"
+//                                $0.addButtonProvider = { section in
+//                                    return ButtonRow(){
+//                                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                        $0.title = "Add New Item"
+//                                        }.cellUpdate { cell, row in
+//                                            cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            cell.textLabel?.textAlignment = .left
+//                                            
+//                                    }
+//                                }
+//                                $0.multivaluedRowToInsertAt = { index in
+//                                    return SplitRow<TextRow, CheckRow>(){
+//                                        $0.rowLeftPercentage = 0.75
+//                                        $0.rowLeft = TextRow(){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.cell.textField?.textColor = .label
+//                                            $0.placeholderColor = .secondaryLabel
+//                                            $0.placeholder = "Item"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textField?.textColor = .label
+//                                                row.placeholderColor = .secondaryLabel
+//                                        }
+//                                        
+//                                        $0.rowRight = CheckRow() {
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.cell.tintColor = FalconPalette.defaultBlue
+//                                            $0.value = false
+//                                            $0.cell.accessoryType = .checkmark
+//                                            $0.cell.tintAdjustmentMode = .dimmed
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.tintColor = FalconPalette.defaultBlue
+//                                                cell.accessoryType = .checkmark
+//                                                if row.value == false {
+//                                                    cell.tintAdjustmentMode = .dimmed
+//                                                } else {
+//                                                    cell.tintAdjustmentMode = .automatic
+//                                                }
+//                                        }
+//                                        }.cellUpdate { cell, row in
+//                                            cell.backgroundColor = .secondarySystemGroupedBackground
+//                                    }
+//                                    
+//                                }
+//                                
+//        }
     }
     
     @objc fileprivate func rightBarButtonTapped() {
-        let mvs = (form.values()["checklistfields"] as! [Any?]).compactMap { $0 }
-        if !mvs.isEmpty {
-            var checklistDict = [String : Bool]()
-            for element in mvs {
-                if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
-                    let newText = text.removeCharacters()
-                    checklistDict[newText] = state
-                }
-            }
-            
-            if schedule.checklistIDs == nil, let currentUserID = Auth.auth().currentUser?.uid {
-                let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
-                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
-                checklist.name = "CheckList"
-                checklist.createdDate = Date()
-                checklist.activityID = schedule.activityID
-                checklist.items = checklistDict
-                schedule.checklistIDs = [checklist.ID ?? ""]
-                
-                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
-                createChecklist.createNewChecklist()
-            } else {
-                checklist.items = checklistDict
-                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
-                createChecklist.createNewChecklist()
-            }
-        } else {
-            schedule.checklistIDs = []
-        }
+//        let mvs = (form.values()["checklistfields"] as! [Any?]).compactMap { $0 }
+//        if !mvs.isEmpty {
+//            var checklistDict = [String : Bool]()
+//            for element in mvs {
+//                if let value = element as? SplitRowValue<Swift.String, Swift.Bool>, let text = value.left, let state = value.right {
+//                    let newText = text.removeCharacters()
+//                    checklistDict[newText] = state
+//                }
+//            }
+//            
+//            if schedule.checklistIDs == nil, let currentUserID = Auth.auth().currentUser?.uid {
+//                let ID = Database.database().reference().child(userChecklistsEntity).child(currentUserID).childByAutoId().key ?? ""
+//                checklist = Checklist(dictionary: ["ID": ID as AnyObject])
+//                checklist.name = "CheckList"
+//                checklist.createdDate = Date()
+//                checklist.activityID = schedule.activityID
+//                checklist.items = checklistDict
+//                schedule.checklistIDs = [checklist.ID ?? ""]
+//                
+//                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
+//                createChecklist.createNewChecklist()
+//            } else {
+//                checklist.items = checklistDict
+//                let createChecklist = ChecklistActions(checklist: checklist, active: true, selectedFalconUsers: [])
+//                createChecklist.createNewChecklist()
+//            }
+//        } else {
+//            schedule.checklistIDs = []
+//        }
         
         let valuesDictionary = form.values()
         
@@ -625,8 +627,8 @@ class ScheduleViewController: FormViewController {
         }
         
         schedule.allDay = valuesDictionary["All-day"] as? Bool
-        schedule.startDateTime = NSNumber(value: Int((valuesDictionary["Starts"] as! Date).timeIntervalSince1970))
-        schedule.endDateTime = NSNumber(value: Int((valuesDictionary["Ends"] as! Date).timeIntervalSince1970))
+        schedule.startDateTime = schedule.getNewSubStartDateTime(parent: self.event, currentDate: valuesDictionary["Starts"] as! Date)
+        schedule.endDateTime = schedule.getNewSubEndDateTime(parent: self.event, currentDate: valuesDictionary["Ends"] as! Date)
         
         if let value = valuesDictionary["Reminder"] as? String {
             schedule.reminder = value
@@ -635,18 +637,67 @@ class ScheduleViewController: FormViewController {
         let membersIDs = fetchMembersIDs()
 
         schedule.participantsIDs = membersIDs.0
+                
+        if event.recurrences != nil || schedule.instanceID != nil {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                
+            alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
+                if let currentUserID = Auth.auth().currentUser?.uid {
+                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                    var instanceIDs = self.schedule.instanceIDs ?? []
+                    if let instance = self.schedule.instanceID {
+                        self.schedule.instanceID = instance
+                    } else {
+                        instanceIDs.append(instanceID)
+                        self.schedule.instanceIDs = instanceIDs
+                    }
+                    self.schedule.parentID = self.event.activityID
+                    
+                    let newActivity = self.schedule.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.scheduleOld)
+                    var instanceValues = newActivity.toAnyObject()
+                    
+                    let createActivity = ActivityActions(activity: self.schedule, active: false, selectedFalconUsers: self.selectedFalconUsers)
+                    createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
+                    
+                    self.closeController(title: subeventUpdatedMessage)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Save For All Events", style: .default, handler: { (_) in
+                let createActivity = ActivityActions(activity: self.schedule, active: false, selectedFalconUsers: [])
+                createActivity.createSubActivity()
+
+                self.closeController(title: subeventUpdatedMessage)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+            print("shareButtonTapped")
+        } else {
+            let createActivity = ActivityActions(activity: schedule, active: false, selectedFalconUsers: [])
+            createActivity.createSubActivity()
+            
+            if !active {
+                closeController(title: subeventCreatedMessage)
+            } else {
+                closeController(title: subeventUpdatedMessage)
+            }
+        }
         
-        let createActivity = ActivityActions(activity: schedule, active: false, selectedFalconUsers: [])
-        createActivity.createSubActivity()
-        
+    }
+    
+    func closeController(title: String) {
         movingBackwards = false
         delegate?.updateActivity(activity: schedule)
-        
         if navigationItem.leftBarButtonItem != nil {
             self.dismiss(animated: true, completion: nil)
         } else {
             self.navigationController?.popViewController(animated: true)
         }
+        basicAlert(title: title, message: nil, controller: self.navigationController?.visibleViewController)
     }
     
     func setupLists() {
@@ -722,7 +773,7 @@ class ScheduleViewController: FormViewController {
     }
     
     func scheduleReminder() {
-        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = schedule.startDate, let endDate = schedule.endDate, let allDay = schedule.allDay else {
+        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = schedule.getSubStartDate(parent: event), let endDate = schedule.getSubEndDate(parent: event), let allDay = schedule.allDay else {
             return
         }
         let center = UNUserNotificationCenter.current()

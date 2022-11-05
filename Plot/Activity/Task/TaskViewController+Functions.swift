@@ -117,17 +117,12 @@ extension TaskViewController {
     
     func setupLists() {
         let dispatchGroup = DispatchGroup()
-        for ID in task.subtaskIDs ?? [] {
+        for taskID in task.subtaskIDs ?? [] {
             dispatchGroup.enter()
-            let dataReference = Database.database().reference().child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder)
-            dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
-                    let subtask = Activity(dictionary: snapshotValue)
-                    self.subtaskList.append(subtask)
-
-                }
+            ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
+                self.subtaskList.append(contentsOf: fetched)
                 dispatchGroup.leave()
-            })
+            }
         }
         for checklistID in task.checklistIDs ?? [] {
             dispatchGroup.enter()
@@ -659,7 +654,7 @@ extension TaskViewController {
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
-                var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 var instanceIDs = self.task.instanceIDs ?? []
                 if let instance = self.task.instanceID {
                     self.task.instanceID = instance

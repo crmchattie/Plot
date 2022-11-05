@@ -99,6 +99,7 @@ class ScheduleListViewController: FormViewController, ObjectDetailShowing {
         for schedule in scheduleList {
             var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
             mvs.insert(ScheduleRow() {
+                $0.cell.parentEvent = activity
                 $0.value = schedule
                 }.onCellSelection() { cell, row in
                     self.scheduleIndex = row.indexPath!.row
@@ -216,6 +217,7 @@ extension ScheduleListViewController: UpdateActivityDelegate {
             } else {
                 var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
+                    $0.cell.parentEvent = self.activity
                     $0.value = activity
                     }.onCellSelection() { cell, row in
                         self.scheduleIndex = row.indexPath!.row

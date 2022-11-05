@@ -9,7 +9,7 @@
 import Eureka
 
 final class ScheduleCell: Cell<Activity>, CellType {
-    
+    var parentEvent: Activity?
     var formattedDate: (String, String) = ("", "")
     var allDay: Bool = false
     
@@ -98,8 +98,12 @@ final class ScheduleCell: Cell<Activity>, CellType {
         }
 
         nameLabel.text = schedule.name
-
-        if let startDate = schedule.startDate, let endDate = schedule.endDate, let allDay = schedule.allDay {
+        
+        if let parentEvent = parentEvent, let startDate = schedule.getSubStartDate(parent: parentEvent), let endDate = schedule.getSubEndDate(parent: parentEvent), let allDay = schedule.allDay {
+            let startTimeZone = schedule.startTimeZone ?? "UTC"
+            let endTimeZone = schedule.endTimeZone ?? "UTC"
+            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+        } else if let startDate = schedule.startDate, let endDate = schedule.endDate, let allDay = schedule.allDay {
             let startTimeZone = schedule.startTimeZone ?? "UTC"
             let endTimeZone = schedule.endTimeZone ?? "UTC"
             formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)

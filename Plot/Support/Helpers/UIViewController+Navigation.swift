@@ -44,6 +44,7 @@ extension ObjectDetailShowing {
     
     func showSubtaskDetailPush(subtask: Activity?, task: Activity?, delegate: UpdateTaskDelegate?, users: [User]) {
         let destination = SubtaskViewController()
+        destination.subtask = subtask
         destination.task = task
         destination.users = users
         destination.filteredUsers = users
@@ -91,6 +92,7 @@ extension ObjectDetailShowing {
     
     func showScheduleDetailPush(schedule: Activity?, event: Activity?, delegate: UpdateActivityDelegate?, users: [User]) {
         let destination = ScheduleViewController()
+        destination.schedule = schedule
         destination.event = event
         destination.users = users
         destination.filteredUsers = users
@@ -273,6 +275,7 @@ extension ObjectDetailShowing {
     
     func showSubtaskDetailPresent(subtask: Activity?, task: Activity?, delegate: UpdateTaskDelegate?, users: [User]) {
         let destination = SubtaskViewController()
+        destination.subtask = subtask
         destination.task = task
         destination.users = users
         destination.filteredUsers = users
@@ -329,6 +332,7 @@ extension ObjectDetailShowing {
     
     func showScheduleDetailPresent(schedule: Activity?, event: Activity?, delegate: UpdateActivityDelegate?, users: [User]) {
         let destination = ScheduleViewController()
+        destination.schedule = schedule
         destination.event = event
         destination.users = users
         destination.filteredUsers = users

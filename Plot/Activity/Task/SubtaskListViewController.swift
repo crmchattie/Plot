@@ -102,6 +102,7 @@ class SubtaskListViewController: FormViewController, ObjectDetailShowing {
         for subtask in subtaskList {
             var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
             mvs.insert(SubtaskRow() {
+                $0.cell.parentTask = task
                 $0.value = subtask
                 $0.cell.delegate = self
                 }.onCellSelection() { cell, row in
@@ -233,6 +234,7 @@ extension SubtaskListViewController: UpdateTaskDelegate {
             } else {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {
+                    $0.cell.parentTask = self.task
                     $0.value = task
                     $0.cell.delegate = self
                     }.onCellSelection() { cell, row in
@@ -255,7 +257,7 @@ extension SubtaskListViewController: UpdateTaskDelegate {
 
 extension SubtaskListViewController: UpdateTaskCellDelegate {
     func updateCompletion(task: Activity) {
-        if let index = subtaskList.firstIndex(where: {$0.activityID == task.activityID} ) {
+        if let index = subtaskList.firstIndex(where: {$0.activityID == task.activityID}), let currentUserID = Auth.auth().currentUser?.uid {
             subtaskList[index].isCompleted = task.isCompleted ?? false
             if (subtaskList[index].isCompleted ?? false) {
                 let original = Date()
@@ -265,6 +267,16 @@ extension SubtaskListViewController: UpdateTaskCellDelegate {
             } else {
                 subtaskList[index].completedDate = nil
             }
+            
+            let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+            var instanceIDs = self.task.instanceIDs ?? []
+            if let instance = self.task.instanceID {
+                subtaskList[index].instanceID = instance
+            } else {
+                instanceIDs.append(instanceID)
+                subtaskList[index].instanceIDs = instanceIDs
+            }
+            subtaskList[index].parentID = task.activityID
             
             let updateTask = ActivityActions(activity: subtaskList[index], active: true, selectedFalconUsers: [])
             updateTask.updateCompletion(isComplete: subtaskList[index].isCompleted ?? false)

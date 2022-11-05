@@ -183,15 +183,10 @@ extension EventViewController {
         let dispatchGroup = DispatchGroup()
         for scheduleID in activity.scheduleIDs ?? [] {
             dispatchGroup.enter()
-            let dataReference = Database.database().reference().child(activitiesEntity).child(scheduleID).child(messageMetaDataFirebaseFolder)
-            dataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject] {
-                    let schedule = Activity(dictionary: snapshotValue)
-                    self.scheduleList.append(schedule)
-
-                }
+            ActivitiesFetcher.getDataFromSnapshot(ID: scheduleID) { fetched in
+                self.scheduleList.append(contentsOf: fetched)
                 dispatchGroup.leave()
-            })
+            }
         }
         for checklistID in activity.checklistIDs ?? [] {
             dispatchGroup.enter()
@@ -829,7 +824,7 @@ extension EventViewController {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                var instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 var instanceIDs = self.activity.instanceIDs ?? []
                 if let instance = self.activity.instanceID {
                     self.activity.instanceID = instance

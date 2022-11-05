@@ -19,6 +19,7 @@ class Checklist: NSObject, NSCopying, Codable {
     var participantsIDs: [String]?
     var activity: Activity?
     var activityID: String?
+    var containerID: String?
     var conversationID: String?
     var admin: String?
     var badge: Int?
@@ -38,6 +39,7 @@ class Checklist: NSObject, NSCopying, Codable {
         muted = dictionary?["muted"] as? Bool
         conversationID = dictionary?["conversationID"] as? String
         activityID = dictionary?["activityID"] as? String
+        containerID = dictionary?["containerID"] as? String
         lastModifiedDate = dictionary?["lastModifiedDate"] as? Date
         createdDate = dictionary?["lastModifiedDate"] as? Date
         
@@ -84,6 +86,10 @@ class Checklist: NSObject, NSCopying, Codable {
         
         if let value = self.activityID as AnyObject? {
             dictionary["activityID"] = value
+        }
+        
+        if let value = self.containerID as AnyObject? {
+            dictionary["containerID"] = value
         }
         
         if let value = self.lastModifiedDate {

@@ -211,7 +211,11 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func newItem() {
-        self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: list, startDateTime: nil, endDateTime: nil)
+        if let id = list.id, id != "" {
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: list, startDateTime: nil, endDateTime: nil)
+        } else {
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+        }
     }
     
     @objc fileprivate func listInfo() {

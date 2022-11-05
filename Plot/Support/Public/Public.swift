@@ -206,7 +206,9 @@ let thumbnailUploadError = "Failed to upload your image to database. Please, che
 let fullsizePictureUploadError = "Failed to upload fullsize image to database. Please, check your internet connection and try again. Despite this error, thumbnail version of this picture has been uploaded, but you still should re-upload your fullsize image."
 
 let taskCreatedMessage = "Task Created"
+let subtaskCreatedMessage = "Sub-Task Created"
 let eventCreatedMessage = "Event Created"
+let subeventCreatedMessage = "Sub-Event Created"
 let workoutCreatedMessage = "Workout Created"
 let mindfulnessCreatedMessage = "Mindfulness Session Created"
 let transactionCreatedMessage = "Transaction Created"
@@ -217,7 +219,9 @@ let calendarCreatedMessage = "Calendar Created"
 let listCreatedMessage = "List Created"
 
 let taskUpdatedMessage = "Task Updated"
+let subtaskUpdatedMessage = "Sub-Task Updated"
 let eventUpdatedMessage = "Event Updated"
+let subeventUpdatedMessage = "Sub-Event Updated"
 let tasksUpdatedMessage = "Tasks Updated"
 let eventsUpdatedMessage = "Events Updated"
 
@@ -1210,8 +1214,6 @@ func basicErrorAlertWithClose(title: String, message: String, controller: UIView
 }
 
 func basicAlert(title: String, message: String?, controller: UIViewController?) {
-    print("basicAlert")
-    print(controller)
     guard let controller = controller else { return }
     let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
     DispatchQueue.main.async {
@@ -2396,4 +2398,14 @@ extension UIFont {
     func with(weight: UIFont.Weight) -> UIFont {
         return UIFont.systemFont(ofSize: pointSize, weight: weight)
     }
+}
+
+func getChildDateTime(originalParentDateTime: NSNumber, originalChildDateTime: NSNumber, currentParentDateTime: NSNumber) -> NSNumber {
+    let duration = originalChildDateTime.intValue - originalParentDateTime.intValue
+    return NSNumber(value: currentParentDateTime.intValue + duration)
+}
+
+func getChildDate(originalParentDate: Date, originalChildDate: Date, currentParentDate: Date) -> Date {
+    let duration = originalChildDate.timeIntervalSince(originalParentDate)
+    return currentParentDate + duration
 }

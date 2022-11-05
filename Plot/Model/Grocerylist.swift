@@ -24,6 +24,7 @@ class Grocerylist: NSObject, NSCopying, Codable {
     var activity: Activity?
     var conversationID: String?
     var activityID: String?
+    var containerID: String?
     var admin: String?
     var badge: Int?
     var pinned: Bool?
@@ -60,6 +61,7 @@ class Grocerylist: NSObject, NSCopying, Codable {
         
         conversationID = dictionary?["conversationID"] as? String
         activityID = dictionary?["activityID"] as? String
+        containerID = dictionary?["containerID"] as? String
         admin = dictionary?["admin"] as? String
         badge = dictionary?["badge"] as? Int
         pinned = dictionary?["pinned"] as? Bool
@@ -136,6 +138,10 @@ class Grocerylist: NSObject, NSCopying, Codable {
         
         if let value = self.activityID as AnyObject? {
             dictionary["activityID"] = value
+        }
+        
+        if let value = self.containerID as AnyObject? {
+            dictionary["containerID"] = value
         }
         
         if let value = self.notes as AnyObject? {
