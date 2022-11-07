@@ -107,7 +107,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         else if segmentType == .week {
             interval.day = 1
-            startDate = anchorDate.weekBefore
+            startDate = anchorDate.weekBefore.advanced(by: 86400)
         }
         else if segmentType == .month {
             interval.day = 1

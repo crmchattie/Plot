@@ -37,7 +37,8 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
 
         chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
                                                         rangeDescription: getTitle(range: range),
-                                                        horizontalAxisValueFormatter: range.axisValueFormatter))
+                                                        units: "calories",
+                                                        formatType: range.timeSegment))
     }
     
     func loadData(completion: (() -> Void)?) {
@@ -47,7 +48,7 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
         
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
-        newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
+        newChartViewModel.formatType = range.timeSegment
 
         let predicate: NSPredicate = {
             let units: Set<Calendar.Component> = [.day, .month, .year]
@@ -59,14 +60,14 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
         }()
         
         let group = DispatchGroup()
-        var eneryResult: [HKQuantitySample] = []
+//        var eneryResult: [HKQuantitySample] = []
         var activityResult: [HKActivitySummary] = []
         
-        let type = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed)!
-        let caloriesConsumedQuery = HKSampleQuery(sampleType: type, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (_, samples, error) in
-            eneryResult = samples?.compactMap { $0 as? HKQuantitySample } ?? []
-            group.leave()
-        }
+//        let type = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed)!
+//        let caloriesConsumedQuery = HKSampleQuery(sampleType: type, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (_, samples, error) in
+//            eneryResult = samples?.compactMap { $0 as? HKQuantitySample } ?? []
+//            group.leave()
+//        }
         
         let activityQuery = HKActivitySummaryQuery(predicate: predicate) { (_, summary, error) in
             activityResult = summary ?? []
@@ -75,14 +76,14 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
         
         group.enter()
         healthStore.execute(activityQuery)
-        group.enter()
-        healthStore.execute(caloriesConsumedQuery)
+//        group.enter()
+//        healthStore.execute(caloriesConsumedQuery)
         
         group.notify(queue: .main) { [range] in
             let daysInRange = range.daysInRange
             
-            var energyValues: [Int: Double] = [:]
-            var dietaryValues: [Int: Double] = [:]
+            var energyValues: [Statistic] = []
+//            var dietaryValues: [Int: Double] = [:]
             var average: Double = 0
             activityResult.forEach { summary in
                 var components = summary.dateComponents(for: .current)
@@ -90,7 +91,7 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
                 guard let entryDate = components.date else { return }
                 let indexInRange = entryDate.daysSince(range.startDate)
                 let value = summary.activeEnergyBurned.doubleValue(for: HKUnit.kilocalorie())
-                energyValues[indexInRange] = value
+                energyValues.append(Statistic(date: entryDate, value: value, xValue: indexInRange))
                 average += value
             }
             average /= Double(activityResult.count)
@@ -98,26 +99,26 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
                 average = 0
             }
             
-            newChartViewModel.rangeAverageValue = "\(Int(average)) kcal"
+            newChartViewModel.rangeAverageValue = "\(Int(average)) calories"
     
-            eneryResult.forEach { summary in
-                let indexInRange = summary.startDate.daysSince(range.startDate)
-                let value = summary.quantity.doubleValue(for: HKUnit.kilocalorie())
-                dietaryValues[indexInRange] = value
-            }
+//            eneryResult.forEach { summary in
+//                let indexInRange = summary.startDate.daysSince(range.startDate)
+//                let value = summary.quantity.doubleValue(for: HKUnit.kilocalorie())
+//                dietaryValues[indexInRange] = value
+//            }
     
             let dataEntries = (0...daysInRange).map {
-                BarChartDataEntry(x: Double($0) + 0.5, y: energyValues[$0] ?? 0)
+                BarChartDataEntry(x: Double($0) + 0.5, y: energyValues[$0].value, data: energyValues[$0].date)
             }
     
-            let dataEntries2 = (0...daysInRange).map {
-                BarChartDataEntry(x: Double($0) + 0.5, y: dietaryValues[$0] ?? 0)
-            }
+//            let dataEntries2 = (0...daysInRange).map {
+//                BarChartDataEntry(x: Double($0) + 0.5, y: dietaryValues[$0] ?? 0)
+//            }
     
             let chartDataSet = BarChartDataSet(dataEntries)
-            chartDataSet.colors = [.red]
-            let dataSet2 = BarChartDataSet(dataEntries2)
-            dataSet2.colors = [.green]
+            chartDataSet.colors = [.systemBlue]
+//            let dataSet2 = BarChartDataSet(dataEntries2)
+//            dataSet2.colors = [.green]
             let chartData = BarChartData(dataSets: [chartDataSet])
 //            float barSpace = 0.02f; // x2 dataset
 //            float barWidth = 0.45f; // x2 dataset

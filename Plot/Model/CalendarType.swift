@@ -50,11 +50,11 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
 
 let prebuiltCalendars: [CalendarType] = [defaultCalendar, personalCalendar, homeCalendar, workCalendar, socialCalendar]
 
-let defaultCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.defaultCal.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: true)
+let defaultCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.defaultCal.rawValue, color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: true)
 let homeCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.homeCal.rawValue, color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: false)
-let personalCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.personalCal.rawValue, color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: false)
+let personalCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.personalCal.rawValue, color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: false)
 let socialCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.socialCal.rawValue, color: CIColor(color: ChartColors.palette()[3]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: false)
-let workCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.workCal.rawValue, color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: false)
+let workCalendar = CalendarType(id: UUID().uuidString, name: CalendarOptions.workCal.rawValue, color: CIColor(color: ChartColors.palette()[4]).stringRepresentation, source: CalendarSourceOptions.plot.name, admin: nil, defaultCalendar: false)
 
 enum CalendarSourceOptions: String, CaseIterable {
     case plot = "Plot"

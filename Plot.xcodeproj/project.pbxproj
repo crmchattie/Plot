@@ -55,6 +55,8 @@
 		1028A10B230DFA8B00619907 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1028A10A230DFA8B00619907 /* GoogleService-Info.plist */; };
 		102BE8C4243CB7EF00722E7B /* CustomUIPickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102BE8C3243CB7EF00722E7B /* CustomUIPickers.swift */; };
 		102BE8C6243E47F000722E7B /* AttractionDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102BE8C5243E47F000722E7B /* AttractionDetailCell.swift */; };
+		103038EC2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103038EB2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift */; };
+		103038EE29197A21006F76DA /* AnalyticsPieChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103038ED29197A21006F76DA /* AnalyticsPieChartCell.swift */; };
 		1031410C230D712E00DB471B /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1031410B230D712E00DB471B /* ShareViewController.swift */; };
 		1031410F230D712E00DB471B /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1031410D230D712E00DB471B /* MainInterface.storyboard */; };
 		10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10323D5D2479A58500749706 /* GrocerylistActions.swift */; };
@@ -639,6 +641,8 @@
 		1028A10A230DFA8B00619907 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		102BE8C3243CB7EF00722E7B /* CustomUIPickers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIPickers.swift; sourceTree = "<group>"; };
 		102BE8C5243E47F000722E7B /* AttractionDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttractionDetailCell.swift; sourceTree = "<group>"; };
+		103038EB2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHorizontalBarChartCell.swift; sourceTree = "<group>"; };
+		103038ED29197A21006F76DA /* AnalyticsPieChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsPieChartCell.swift; sourceTree = "<group>"; };
 		10314109230D712E00DB471B /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1031410B230D712E00DB471B /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		1031410E230D712E00DB471B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -2980,6 +2984,8 @@
 				F9DD16C02613D04400B8374D /* StackedBarChartViewModel.swift */,
 				F9DD16FE2613E65F00B8374D /* AnalyticsLineChartCell.swift */,
 				F9DD17022613E67300B8374D /* AnalyticsBarChartCell.swift */,
+				103038EB2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift */,
+				103038ED29197A21006F76DA /* AnalyticsPieChartCell.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -3285,6 +3291,7 @@
 				4B5E99DE212CC0C0001F067F /* InAppNotificationManager.swift in Sources */,
 				26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */,
 				108C37F7289C089500DC4998 /* HKCategorySampleViewController.swift in Sources */,
+				103038EE29197A21006F76DA /* AnalyticsPieChartCell.swift in Sources */,
 				10BA3BCE259BEDF9005D98EC /* SetupCell.swift in Sources */,
 				10DFAFCC2877775800D38016 /* HealthRow.swift in Sources */,
 				4BA1E77C2152511B00391BCB /* UploadProgress.swift in Sources */,
@@ -3340,6 +3347,7 @@
 				10B541E225479D3100CC9023 /* MealViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
 				100FE70C28931D2100D3124C /* CalendarActions.swift in Sources */,
+				103038EC2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift in Sources */,
 				10F7241828E39C7A003C13A0 /* SubLibraryViewController.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4EA21272D890045AB10 /* InformationMessageSender.swift in Sources */,

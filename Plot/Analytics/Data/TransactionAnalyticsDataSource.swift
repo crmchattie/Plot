@@ -45,14 +45,15 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         
         chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
                                                         rangeDescription: getTitle(range: range),
-                                                        horizontalAxisValueFormatter: range.axisValueFormatter,
-                                                        fixToZeroOnVertical: false))
+                                                        fixToZeroOnVertical: false,
+                                                        units: "currency",
+                                                        formatType: range.timeSegment))
     }
     
     func loadData(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
-        newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
+        newChartViewModel.formatType = range.timeSegment
         
         let daysInRange = range.daysInRange
         
@@ -90,7 +91,12 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             }
             sum += incomeValue - expenseValue
             
-            let categoryColor = topLevelCategoryColor(category)
+            var categoryColor = UIColor()
+            if let index = financialTransactionsGroupsStatic.firstIndex(where: {$0 == category} ) {
+                categoryColor = ChartColors.palette()[index % 9]
+            } else {
+                categoryColor = topLevelCategoryColor(category)
+            }
             categories.append(CategorySummaryViewModel(title: category,
                                                        color: categoryColor,
                                                        value: sum,
@@ -102,8 +108,9 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
         newChartViewModel.rangeAverageValue = "In \(self.currencyFormatter.string(from: NSNumber(value: incomeValue))!), Out \(self.currencyFormatter.string(from: NSNumber(value: expenseValue))!)"
         
-        let dataEntries = (0...daysInRange).map { index in
-            BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] })
+        let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
+            let current = self.range.startDate.addDays(index)
+            return BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] }, data: current)
         }
         
         if !transactions.isEmpty {

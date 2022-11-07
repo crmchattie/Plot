@@ -186,7 +186,6 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         chartView.xAxis.granularity = 1
         chartView.xAxis.labelCount = 5
         chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
-        
         chartView.leftAxis.enabled = false
         
         let rightAxisFormatter = NumberFormatter()
@@ -248,46 +247,24 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         }
     }
     
-    func openSample(sample: HKSample, type: HealthMetricType) {
-        switch type {
-        case .steps:
-            print("steps")
-        case .nutrition(_):
-            print("steps")
-        case .workout:
-            if let hkWorkout = sample as? HKWorkout {
-                let hkSampleID = hkWorkout.uuid.uuidString
-                print(hkSampleID)
-                if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
-                    print("found workout")
-                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-                }
+    func openSample(sample: HKSample) {
+        if let hkWorkout = sample as? HKWorkout {
+            let hkSampleID = hkWorkout.uuid.uuidString
+            if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
+                showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             }
-        case .heartRate:
-            print("steps")
-        case .weight:
-            print("steps")
-        case .sleep:
-            print("steps")
-        case .mindfulness:
-            print("steps")
-            if let hkMindfulness = sample as? HKCategorySample {
-                let hkSampleID = hkMindfulness.uuid.uuidString
-                if let mindfulness = self.networkController.healthService.mindfulnesses.first(where: {$0.hkSampleID == hkSampleID }) {
-                    showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-                }
+        }
+        else if let hkMindfulness = sample as? HKCategorySample {
+            let hkSampleID = hkMindfulness.uuid.uuidString
+            if let mindfulness = self.networkController.healthService.mindfulnesses.first(where: {$0.hkSampleID == hkSampleID }) {
+                showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             }
-        case .activeEnergy:
-            print("steps")
-        case .workoutMinutes:
-            if let hkWorkout = sample as? HKWorkout {
-                let hkSampleID = hkWorkout.uuid.uuidString
-                if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
-                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-                }
+        }
+        else if let hkWorkout = sample as? HKWorkout {
+            let hkSampleID = hkWorkout.uuid.uuidString
+            if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
+                showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             }
-        case .flightsClimbed:
-            print("steps")
         }
     }
 }
@@ -337,7 +314,7 @@ extension HealthDetailViewController: UITableViewDelegate, UITableViewDataSource
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let sample = viewModel.samples[indexPath.row]
-        openSample(sample: sample, type: viewModel.healthMetric.type)
+        openSample(sample: sample)
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

@@ -128,7 +128,7 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         if let object = object as? Template, let section = snapshot.sectionIdentifier(containingItem: object) {
             let totalItems = (self.groups[section]?.count ?? 1) - 1
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
-            cell.intColor = (indexPath.item % 5)
+            cell.intColor = (indexPath.item % 9)
             if indexPath.item == 0 {
                 cell.firstPosition = true
             }

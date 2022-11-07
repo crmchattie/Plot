@@ -15,8 +15,8 @@ extension BarChartView {
         pinchZoomEnabled = false
         doubleTapToZoomEnabled = false
         setScaleEnabled(false)
-        highlightPerTapEnabled = false
-        highlightPerDragEnabled = false
+        highlightPerTapEnabled = true
+        highlightPerDragEnabled = true
         minOffset = 0
         noDataText = "No data available for the selected period"
 
@@ -43,8 +43,8 @@ extension LineChartView {
         pinchZoomEnabled = false
         doubleTapToZoomEnabled = false
         setScaleEnabled(false)
-        highlightPerTapEnabled = false
-        highlightPerDragEnabled = false
+        highlightPerTapEnabled = true
+        highlightPerDragEnabled = true
         minOffset = 0
         noDataText = "No data available for the selected period"
 
@@ -68,5 +68,11 @@ extension LineChartView {
         marker.chartView = self
         marker.minimumSize = CGSize(width: 80, height: 40)
         self.marker = marker
+    }
+}
+
+extension PieChartView {
+    func defaultChartStyle() {
+        
     }
 }

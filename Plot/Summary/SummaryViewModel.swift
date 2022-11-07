@@ -144,11 +144,9 @@ class SummaryViewModel: SummaryViewModelInterface {
         var y = 0
         var maxValue: Double = 0
         for (key, stats) in statsDictionary {
-            print("key \(key)")
             var i = 0
             var entries: [BarChartDataEntry] = []
             for stat in stats {
-                print("stat \(stat)")
                 maxValue = max(maxValue, stat.value)
                 let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                 entries.append(entry)

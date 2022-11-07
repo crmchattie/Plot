@@ -10,7 +10,7 @@ import UIKit
 
 class SubLibraryCell: UICollectionViewCell {
     
-    var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultOrange, FalconPalette.defaultGreen, FalconPalette.defaultDarkBlue]
+    var colors : [UIColor] = ChartColors.palette()
     var intColor: Int = 0
     
     var template: Template! {

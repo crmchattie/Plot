@@ -131,8 +131,13 @@ class EKCalendarEventOp: AsyncOperation {
             activity.admin = Auth.auth().currentUser?.uid
             activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
             activity.activityType = CustomType.iOSCalendarEvent.categoryText
-            activity.category = ActivityCategory.categorize(activity).rawValue
-            activity.subcategory = ActivitySubcategory.categorize(activity).rawValue
+            if (self.event.calendar.title.lowercased().contains("holiday") || self.event.calendar.title.lowercased().contains("birthday")) {
+                activity.category = ActivityCategory.notApplicable.rawValue
+                activity.subcategory = ActivityCategory.notApplicable.rawValue
+            } else {
+                activity.category = ActivityCategory.categorize(activity).rawValue
+                activity.subcategory = ActivitySubcategory.categorize(activity).rawValue
+            }
             activity.showExtras = false
             completion(activity)
         }

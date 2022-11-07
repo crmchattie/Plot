@@ -42,14 +42,15 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         
         chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
                                                         rangeDescription: getTitle(range: range),
-                                                        horizontalAxisValueFormatter: range.axisValueFormatter,
-                                                        verticalAxisValueFormatter: HourAxisValueFormatter()))
+                                                        verticalAxisValueFormatter: HourAxisValueFormatter(),
+                                                        units: "hrs",
+                                                        formatType: range.timeSegment))
     }
     
     func loadData(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
-        newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
+        newChartViewModel.formatType = range.timeSegment
         
         activityDetailService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats in
             let activities = stats[.calendarSummary] ?? [:]
@@ -69,12 +70,12 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 var activityCount = 0
                 
                 let activityKeys = activities.keys.sorted(by: <)
-                for category in activityKeys {
-                    guard let stats = activities[category] else { continue }
+                for index in 0...activityKeys.count - 1 {
+                    guard let stats = activities[activityKeys[index]] else { continue }
                     let total = stats.reduce(0, { $0 + $1.value * 60 })
                     let totalString = self.dateFormatter.string(from: total) ?? "NaN"
-                    let categoryColor = topLevelCategoryColor(category)
-                    categories.append(CategorySummaryViewModel(title: category,
+                    let categoryColor = ChartColors.palette()[index % 9]
+                    categories.append(CategorySummaryViewModel(title: activityKeys[index],
                                                                color: categoryColor,
                                                                value: total,
                                                                formattedValue: totalString))
@@ -91,7 +92,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                     let yValues = categories.map {
                         (activities[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
                     }
-                    return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues)
+                    return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
                 }
                 
                 DispatchQueue.main.async {

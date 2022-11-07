@@ -15,9 +15,9 @@ enum DateRangeType: CaseIterable {
     
     var initial: (Date, Date) {
         switch self {
-        case .week: return (Date().wStart, Date().wEnd)
-        case .month: return (Date().mStart, Date().mEnd)
-//        case .year: return (Date().yStart, Date().yEnd)
+        case .week: return (Date().localTime.startOfDay.UTCTime.weekBefore.advanced(by: 86400), Date().localTime.startOfDay.UTCTime.advanced(by: 86399))
+        case .month: return (Date().monthBefore, Date().localTime)
+//        case .year: return (Date().yearBefore, Date())
         }
     }
     
@@ -50,13 +50,13 @@ struct DateRange {
         switch type {
         case .week:
             startDate = Calendar.current.date(byAdding: .day, value: 7, to: startDate)!
-            endDate = startDate.wEnd
+            endDate = Calendar.current.date(byAdding: .day, value: 7, to: endDate)!
         case .month:
             startDate = Calendar.current.date(byAdding: .month, value: 1, to: startDate)!
-            endDate = startDate.mEnd
+            endDate = Calendar.current.date(byAdding: .month, value: 1, to: endDate)!
 //        case .year:
 //            startDate = Calendar.current.date(byAdding: .year, value: 1, to: startDate)!
-//            endDate = startDate.yEnd
+//            endDate = Calendar.current.date(byAdding: .year, value: 1, to: endDate)!
         }
     }
     
@@ -64,26 +64,18 @@ struct DateRange {
         switch type {
         case .week:
             startDate = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
-            endDate = startDate.wEnd
+            endDate = Calendar.current.date(byAdding: .day, value: -7, to: endDate)!
         case .month:
             startDate = Calendar.current.date(byAdding: .month, value: -1, to: startDate)!
-            endDate = startDate.mEnd
+            endDate = Calendar.current.date(byAdding: .month, value: -1, to: endDate)!
 //        case .year:
 //            startDate = Calendar.current.date(byAdding: .year, value: -1, to: startDate)!
-//            endDate = startDate.yEnd
+//            endDate = Calendar.current.date(byAdding: .year, value: -1, to: endDate)!
         }
     }
     
     var daysInRange: Int {
         endDate.daysSince(startDate)
-    }
-    
-    var axisValueFormatter: AxisValueFormatter? {
-        switch type {
-        case .week: return WeekdayAxisValueFormatter()
-        case .month: return nil
-//        case .year: return MonthAxisValueFormatter()
-        }
     }
     
     var timeSegment: TimeSegmentType {

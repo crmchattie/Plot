@@ -9,6 +9,7 @@
 import UIKit
 import Combine
 import Firebase
+import HealthKit
 
 class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     
@@ -39,6 +40,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         tableView.register(TaskCell.self)
         tableView.register(EventCell.self)
         tableView.register(FinanceTableViewCell.self)
+        tableView.register(HealthDetailSampleCell.self)
         return tableView
     }()
     
@@ -62,7 +64,6 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         rangeControlView.addTarget(self, action: #selector(rangeChanged), for: .valueChanged)
         
         let rangeContainer = UIView()
-        rangeContainer.backgroundColor = .systemBackground
         rangeContainer.translatesAutoresizingMaskIntoConstraints = false
         rangeContainer.addSubview(rangeControlView)
         
@@ -199,6 +200,24 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 let cell = tableView.dequeueReusableCell(ofType: FinanceTableViewCell.self, for: indexPath)
                 cell.account = account
                 return cell
+            case .sample(let sample):
+                let cell = tableView.dequeueReusableCell(ofType: HealthDetailSampleCell.self, for: indexPath)
+                if let healthMetric = viewModel.healthMetric {
+                    if case .workout = healthMetric.type {
+                        cell.selectionStyle = .default
+                    } else if case .mindfulness = healthMetric.type {
+                        cell.selectionStyle = .default
+                    } else if case .workoutMinutes = healthMetric.type {
+                        cell.selectionStyle = .default
+                    } else {
+                        cell.selectionStyle = .none
+                    }
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.healthMetric = healthMetric
+                    let segmentType = TimeSegmentType(rawValue: rangeControlView.selectedSegmentIndex)
+                    cell.configure(sample, segmentType: segmentType ?? .week)
+                }
+                return cell
             }
         }
     }
@@ -217,6 +236,27 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
             showTransactionDetailPresent(transaction: transaction, updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
         case .account(let account):
             showAccountDetailPresent(account: account, updateDiscoverDelegate: nil)
+        case .sample(let sample):
+            if let hkWorkout = sample as? HKWorkout {
+                let hkSampleID = hkWorkout.uuid.uuidString
+                print(hkSampleID)
+                if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
+                    print("found workout")
+                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+                }
+            }
+            else if let hkMindfulness = sample as? HKCategorySample {
+                let hkSampleID = hkMindfulness.uuid.uuidString
+                if let mindfulness = self.networkController.healthService.mindfulnesses.first(where: {$0.hkSampleID == hkSampleID }) {
+                    showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+                }
+            }
+            else if let hkWorkout = sample as? HKWorkout {
+                let hkSampleID = hkWorkout.uuid.uuidString
+                if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
+                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+                }
+            }
         }
     }
 }

@@ -37,7 +37,7 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
                 var entries: [BarChartDataEntry] = []
                 for stat in stats {
                     maxValue = max(maxValue, stat.value)
-                    let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
+                    let entry = BarChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
                     entries.append(entry)
                     i += 1
                 }
@@ -48,7 +48,6 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
                 dataSet.axisDependency = .right
                 
                 data = BarChartData(dataSet: dataSet)
-                data?.setValueFont(UIFont(name: "HelveticaNeue-Light", size: 10)!)
             }
             
             DispatchQueue.main.async {

@@ -96,7 +96,7 @@ class ActivityLevelViewController: FormViewController {
     }
     
     fileprivate func initializeForm() {
-        form +++ SelectableSection<ListCheckRow<String>>(level, selectionType: .singleSelection(enableDeselection: false))
+        form +++ SelectableSection<ListCheckRow<String>>(header: level, footer: "Choosing not applicable will result in task or event being ignored in analytics", selectionType: .singleSelection(enableDeselection: false))
         
         for level in levels {
             form.last!

@@ -95,11 +95,16 @@ class GCalendarEventOp: AsyncOperation {
     private func createActivity(for activityID: String, completion: @escaping (Activity) -> Void) {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         update(activity: activity) { activity in
-            activity.activityType = CustomType.googleCalendarEvent.categoryText
-            activity.category = ActivityCategory.categorize(activity).rawValue
-            activity.subcategory = ActivitySubcategory.categorize(activity).rawValue
             activity.admin = Auth.auth().currentUser?.uid
             activity.participantsIDs = [Auth.auth().currentUser?.uid ?? ""]
+            activity.activityType = CustomType.googleCalendarEvent.categoryText
+            if let name = self.calendar.summary, (name.lowercased().contains("holiday") || name.lowercased().contains("birthday")) {
+                activity.category = ActivityCategory.notApplicable.rawValue
+                activity.subcategory = ActivityCategory.notApplicable.rawValue
+            } else {
+                activity.category = ActivityCategory.categorize(activity).rawValue
+                activity.subcategory = ActivitySubcategory.categorize(activity).rawValue
+            }
             activity.showExtras = false
             completion(activity)
         }

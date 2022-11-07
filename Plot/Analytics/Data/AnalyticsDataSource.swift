@@ -9,6 +9,7 @@
 import Foundation
 import Charts
 import Combine
+import HealthKit
 
 protocol AnalyticsDataSource: AnyObject {    
     var title: String { get }
@@ -40,4 +41,5 @@ enum AnalyticsBreakdownEntry {
     case activity(Activity)
     case transaction(Transaction)
     case account(MXAccount)
+    case sample(HKSample)
 }

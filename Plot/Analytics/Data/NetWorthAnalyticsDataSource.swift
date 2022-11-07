@@ -47,14 +47,15 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         
         chartViewModel = .init(StackedBarChartViewModel(chartType: .continous,
                                                         rangeDescription: getTitle(range: range),
-                                                        horizontalAxisValueFormatter: range.axisValueFormatter,
-                                                        verticalAxisValueFormatter: nil))
+                                                        verticalAxisValueFormatter: nil,
+                                                        units: "currency",
+                                                        formatType: range.timeSegment))
     }
     
     func loadData(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
-        newChartViewModel.horizontalAxisValueFormatter = range.axisValueFormatter
+        newChartViewModel.formatType = range.timeSegment
         
         let accounts = networkController.financeService.accounts
         

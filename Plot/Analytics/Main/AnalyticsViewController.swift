@@ -93,10 +93,12 @@ extension AnalyticsViewController {
             switch cellViewModel.chartType {
             case .continous:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsLineChartCell.self, for: indexPath)
+                cell.isUserInteractionEnabled = false
                 cell.configure(with: cellViewModel)
                 return cell
             case .values:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsBarChartCell.self, for: indexPath)
+                cell.isUserInteractionEnabled = false
                 cell.configure(with: cellViewModel)
                 return cell
             }

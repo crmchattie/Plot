@@ -107,4 +107,5 @@ class FinanceDetailService: FinanceDetailServiceInterface {
 struct Statistic {
     var date: Date
     var value: Double
+    var xValue: Int?
 }

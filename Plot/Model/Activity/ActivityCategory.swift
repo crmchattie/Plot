@@ -36,6 +36,7 @@ enum ActivityCategory: String, Codable, CaseIterable {
     case work = "Work"
     case uncategorized = "Uncategorized"
     /// Same as uncategorized by not included in the analytics
+    case notApplicable = "Not Applicable"
     
     var icon: UIImage {
         switch self {
@@ -50,6 +51,7 @@ enum ActivityCategory: String, Codable, CaseIterable {
         case .todo: return UIImage(named: "todo")!
         case .finances: return UIImage(named: "money")!
         case .uncategorized: return UIImage(named: "event")!
+        case .notApplicable: return UIImage(named: "event")!
         }
     }
     
@@ -66,6 +68,7 @@ enum ActivityCategory: String, Codable, CaseIterable {
         case .todo: return "todo"
         case .finances: return "money"
         case .uncategorized: return "event"
+        case .notApplicable: return "event"
         }
     }
     

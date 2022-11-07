@@ -298,13 +298,13 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         let snapshot = self.diffableDataSource.snapshot()
         if let object = object as? CustomType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kLibraryCell, for: indexPath) as! LibraryCell
-            cell.intColor = (indexPath.item % 5)
+            cell.intColor = (indexPath.item % 9)
             cell.customType = object
             return cell
         } else if let object = object as? Template, let section = snapshot.sectionIdentifier(containingItem: object) {
             let totalItems = (self.groups[section]?.count ?? 1) - 1
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
-            cell.intColor = (indexPath.item % 5)
+            cell.intColor = (indexPath.item % 9)
             if indexPath.item == 0 {
                 cell.firstPosition = true
             }

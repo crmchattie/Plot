@@ -22,14 +22,16 @@ struct StackedBarChartViewModel {
     var chartData: ChartData?
     var fixToZeroOnVertical: Bool
     var verticalAxisValueFormatter: AxisValueFormatter?
-    var horizontalAxisValueFormatter: AxisValueFormatter?
+    var units: String
+    var formatType: TimeSegmentType
     
     init(
         chartType: ChartType,
         rangeDescription: String,
-        horizontalAxisValueFormatter: AxisValueFormatter?,
         verticalAxisValueFormatter: AxisValueFormatter? = nil,
-        fixToZeroOnVertical: Bool = true
+        fixToZeroOnVertical: Bool = true,
+        units: String,
+        formatType: TimeSegmentType
     ) {
         self.chartType = chartType
         self.rangeDescription = rangeDescription
@@ -38,7 +40,8 @@ struct StackedBarChartViewModel {
         self.chartData = nil
         self.fixToZeroOnVertical = fixToZeroOnVertical
         self.verticalAxisValueFormatter = verticalAxisValueFormatter
-        self.horizontalAxisValueFormatter = horizontalAxisValueFormatter
+        self.units = units
+        self.formatType = formatType
     }
 }
 

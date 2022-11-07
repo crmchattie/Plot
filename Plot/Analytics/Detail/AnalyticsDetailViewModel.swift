@@ -21,6 +21,7 @@ class AnalyticsDetailViewModel {
     }
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     var entries = CurrentValueSubject<[AnalyticsBreakdownEntry], Never>([])
+    var healthMetric: HealthMetric?
     
     init(
         dataSource: AnalyticsDataSource,
