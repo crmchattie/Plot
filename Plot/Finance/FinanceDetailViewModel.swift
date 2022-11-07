@@ -54,7 +54,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     var entries: [ChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
-                        minValue = min(maxValue, stat.value)
+                        minValue = min(minValue, stat.value)
                         let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
@@ -87,7 +87,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     var entries: [ChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
-                        minValue = min(maxValue, stat.value)
+                        minValue = min(minValue, stat.value)
                         let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
@@ -124,7 +124,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     var entries: [BarChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
-                        minValue = min(maxValue, stat.value)
+                        minValue = min(minValue, stat.value)
                         let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
@@ -156,7 +156,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     var entries: [BarChartDataEntry] = []
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
-                        minValue = min(maxValue, stat.value)
+                        minValue = min(minValue, stat.value)
                         let entry = BarChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1

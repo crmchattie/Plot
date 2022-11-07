@@ -19,7 +19,6 @@ extension ObjectDetailShowing {
     
     func showTaskDetailPush(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
         let destination = TaskViewController(networkController: networkController)
-        destination.hidesBottomBarWhenPushed = true
         destination.task = task
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         destination.delegate = delegate
@@ -38,6 +37,7 @@ extension ObjectDetailShowing {
         }
         ParticipantsFetcher.getParticipants(forActivity: task) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -49,6 +49,7 @@ extension ObjectDetailShowing {
         destination.users = users
         destination.filteredUsers = users
         destination.delegate = delegate
+        destination.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -59,12 +60,12 @@ extension ObjectDetailShowing {
         destination.delegate = delegate
         destination.tasks = tasks
         destination.existingTasks = existingTasks
+        destination.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
     func showEventDetailPush(event: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateActivityDelegate?, task: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, startDateTime: Date?, endDateTime: Date?) {
         let destination = EventViewController(networkController: networkController)
-        destination.hidesBottomBarWhenPushed = true
         destination.activity = event
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         destination.delegate = delegate
@@ -85,6 +86,7 @@ extension ObjectDetailShowing {
             ParticipantsFetcher.getAcceptedParticipant(forActivity: event, allParticipants: participants) { acceptedParticipant in
                 destination.acceptedParticipant = acceptedParticipant
                 destination.selectedFalconUsers = participants
+                destination.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         }
@@ -97,6 +99,7 @@ extension ObjectDetailShowing {
         destination.users = users
         destination.filteredUsers = users
         destination.delegate = delegate
+        destination.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -107,6 +110,7 @@ extension ObjectDetailShowing {
         destination.delegate = delegate
         destination.events = events
         destination.existingEvents = existingEvents
+        destination.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -123,6 +127,7 @@ extension ObjectDetailShowing {
         }
         ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -133,6 +138,7 @@ extension ObjectDetailShowing {
         destination.delegate = delegate
         destination.transactions = transactions
         destination.existingTransactions = existingTransactions
+        destination.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -141,6 +147,7 @@ extension ObjectDetailShowing {
         destination.transactionRule = transactionRule
         destination.transaction = transaction
         destination.updateDiscoverDelegate = updateDiscoverDelegate
+        destination.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(destination, animated: true)
     }
     
@@ -150,6 +157,7 @@ extension ObjectDetailShowing {
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -160,6 +168,7 @@ extension ObjectDetailShowing {
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         ParticipantsFetcher.getParticipants(forHolding: holding) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -170,6 +179,7 @@ extension ObjectDetailShowing {
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         ParticipantsFetcher.getParticipants(forList: list) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -180,6 +190,7 @@ extension ObjectDetailShowing {
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         ParticipantsFetcher.getParticipants(forCalendar: calendar) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -198,6 +209,7 @@ extension ObjectDetailShowing {
         }
         ParticipantsFetcher.getParticipants(forWorkout: workout) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -216,6 +228,7 @@ extension ObjectDetailShowing {
         }
         ParticipantsFetcher.getParticipants(forMindfulness: mindfulness) { (participants) in
             destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(destination, animated: true)
         }
     }
@@ -225,6 +238,7 @@ extension ObjectDetailShowing {
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: healthMetric, healthDetailService: healthDetailService)
         let healthDetailViewController = HealthDetailViewController(viewModel: healthDetailViewModel, networkController: networkController)
         healthDetailViewController.segmentedControl.selectedSegmentIndex = healthMetric.grabSegment()
+        healthDetailViewController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(healthDetailViewController, animated: true)
     }
     
@@ -247,7 +261,6 @@ extension ObjectDetailShowing {
     
     func showTaskDetailPresent(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
         let destination = TaskViewController(networkController: networkController)
-        destination.hidesBottomBarWhenPushed = true
         destination.task = task
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         destination.delegate = delegate
@@ -268,6 +281,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -282,6 +296,7 @@ extension ObjectDetailShowing {
         destination.delegate = delegate
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -295,13 +310,13 @@ extension ObjectDetailShowing {
         destination.existingTasks = existingTasks
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
     func showEventDetailPresent(event: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateActivityDelegate?, task: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, startDateTime: Date?, endDateTime: Date?) {
         let destination = EventViewController(networkController: networkController)
-        destination.hidesBottomBarWhenPushed = true
         destination.activity = event
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         destination.delegate = delegate
@@ -324,6 +339,7 @@ extension ObjectDetailShowing {
                 destination.selectedFalconUsers = participants
                 let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
                 destination.navigationItem.leftBarButtonItem = cancelBarButton
+                destination.hidesBottomBarWhenPushed = true
                 let navigationViewController = UINavigationController(rootViewController: destination)
                 self.present(navigationViewController, animated: true, completion: nil)
             }
@@ -339,6 +355,7 @@ extension ObjectDetailShowing {
         destination.delegate = delegate
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -352,6 +369,7 @@ extension ObjectDetailShowing {
         destination.existingEvents = existingEvents
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -371,6 +389,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -384,6 +403,7 @@ extension ObjectDetailShowing {
         destination.existingTransactions = existingTransactions
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -395,6 +415,7 @@ extension ObjectDetailShowing {
         destination.updateDiscoverDelegate = updateDiscoverDelegate
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -407,6 +428,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -420,6 +442,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -433,6 +456,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -446,6 +470,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -467,6 +492,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -488,6 +514,7 @@ extension ObjectDetailShowing {
             destination.selectedFalconUsers = participants
             let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
             destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
             let navigationViewController = UINavigationController(rootViewController: destination)
             self.present(navigationViewController, animated: true, completion: nil)
         }
@@ -500,6 +527,7 @@ extension ObjectDetailShowing {
         healthDetailViewController.segmentedControl.selectedSegmentIndex = healthMetric.grabSegment()
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: healthDetailViewController, action: nil)
         healthDetailViewController.navigationItem.leftBarButtonItem = cancelBarButton
+        healthDetailViewController.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: healthDetailViewController)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -508,9 +536,9 @@ extension ObjectDetailShowing {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: allTransactions, transactions: transactions, filterAccounts: filterDictionary,  financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex ?? 2
-        financeDetailViewController.hidesBottomBarWhenPushed = true
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: financeDetailViewController, action: nil)
         financeDetailViewController.navigationItem.leftBarButtonItem = cancelBarButton
+        financeDetailViewController.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: financeDetailViewController)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -522,6 +550,7 @@ extension ObjectDetailShowing {
         financeDetailViewController.hidesBottomBarWhenPushed = true
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: financeDetailViewController, action: nil)
         financeDetailViewController.navigationItem.leftBarButtonItem = cancelBarButton
+        financeDetailViewController.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: financeDetailViewController)
         self.present(navigationViewController, animated: true, completion: nil)
     }
@@ -531,6 +560,7 @@ extension ObjectDetailShowing {
         destination.controllerTitle = ""
         destination.current_member_guid = current_member_guid
         destination.delegate = delegate
+        destination.hidesBottomBarWhenPushed = true
         let navigationViewController = UINavigationController(rootViewController: destination)
         navigationViewController.modalPresentationStyle = .fullScreen
         self.present(navigationViewController, animated: true, completion: nil)

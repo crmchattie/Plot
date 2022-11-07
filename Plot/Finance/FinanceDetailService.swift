@@ -59,16 +59,16 @@ class FinanceDetailService: FinanceDetailServiceInterface {
             endDate = range.endDate
         } else if segmentType == .day {
             startDate = Date().localTime.startOfDay
-            endDate = Date().localTime.endOfDay
+            endDate = Date().localTime
         } else if segmentType == .week {
             startDate = Date().localTime.startOfWeek
-            endDate = Date().localTime.endOfWeek
+            endDate = Date().localTime
         } else if segmentType == .month {
             startDate = Date().localTime.startOfMonth
-            endDate = Date().localTime.endOfMonth
+            endDate = Date().localTime
         } else if segmentType == .year {
             startDate = Date().localTime.startOfYear
-            endDate = Date().localTime.endOfYear
+            endDate = Date().localTime
         }
         
         DispatchQueue.global(qos: .background).async {

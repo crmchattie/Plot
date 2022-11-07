@@ -58,6 +58,15 @@ class StackedBarChartCell: UITableViewCell {
         return button
     }()
     
+    lazy var stack: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, valueLabel, chartContainer, categoriesStackView])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        stackView.setCustomSpacing(0, after: titleLabel)
+        return stackView
+    }()
+    
     lazy var prevNextStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [previousButton, nextButton])
         stackView.isHidden = true
@@ -98,12 +107,7 @@ class StackedBarChartCell: UITableViewCell {
     func initUI() {
         selectionStyle = .none
         backgroundColor = .secondarySystemGroupedBackground
-
-        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel, chartContainer, categoriesStackView])
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .vertical
-        stack.spacing = 8
-        stack.setCustomSpacing(0, after: titleLabel)
+        
         contentView.addSubview(stack)
         
         contentView.addSubview(prevNextStackView)

@@ -30,8 +30,6 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
     lazy var backgroundChartView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-//        view.layer.cornerRadius = 10
-//        view.layer.masksToBounds = true
         return view
     }()
     
@@ -109,14 +107,14 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         }
         
         view.backgroundColor = .systemGroupedBackground
+        containerView.backgroundColor = .systemBackground
         backgroundChartView.backgroundColor = .systemBackground
         chartView.backgroundColor = .systemBackground
         bufferView.backgroundColor = .systemGroupedBackground
         
         view.addSubview(activityIndicator)
         
-        view.addSubview(segmentedControl)
-        
+        containerView.addSubview(segmentedControl)
         containerView.addSubview(backgroundChartView)
         containerView.addSubview(bufferView)
         backgroundChartView.addSubview(chartView)
@@ -140,18 +138,17 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
                                               .flexibleRightMargin]
         
         NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            segmentedControl.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-            segmentedControl.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            
-            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
-            
         ])
         
-        backgroundChartView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 0).isActive = true
+        segmentedControl.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
+        segmentedControl.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 16).isActive = true
+        segmentedControl.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -16).isActive = true
+        
+        backgroundChartView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10).isActive = true
         backgroundChartView.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 0).isActive = true
         backgroundChartView.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: 0).isActive = true
         backgroundChartView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -10).isActive = true
@@ -166,7 +163,7 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         bufferView.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: 0).isActive = true
         bufferView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 0).isActive = true
         
-        containerView.constrainHeight(320)
+        containerView.constrainHeight(340)
         tableView.tableHeaderView = containerView
         containerView.centerXAnchor.constraint(equalTo: tableView.centerXAnchor).isActive = true
         containerView.widthAnchor.constraint(equalTo: tableView.widthAnchor).isActive = true

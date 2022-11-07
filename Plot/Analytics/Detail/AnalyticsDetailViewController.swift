@@ -62,6 +62,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         rangeControlView.addTarget(self, action: #selector(rangeChanged), for: .valueChanged)
         
         let rangeContainer = UIView()
+        rangeContainer.backgroundColor = .systemBackground
         rangeContainer.translatesAutoresizingMaskIntoConstraints = false
         rangeContainer.addSubview(rangeControlView)
         
