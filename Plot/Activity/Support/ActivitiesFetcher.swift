@@ -175,13 +175,13 @@ class ActivitiesFetcher: NSObject {
         currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.activitiesRemoved {
                 self.userActivities[snapshot.key] = nil
-                ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, parentID: nil, completion: completion)
             }
         })
         
         currentUserActivitiesChangeHandle = userActivitiesDatabaseRef.observe(.childChanged, with: { snapshot in
             if let completion = self.activitiesChanged, let completionRepeats = self.activitiesWithRepeatsAdded {
-                ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key) { activityList in
+                ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, parentID: nil) { activityList in
                     for activity in activityList {
                         self.userActivities[activity.activityID ?? ""] = activity
                         if let rules = activity.recurrences, !rules.isEmpty {
@@ -199,7 +199,7 @@ class ActivitiesFetcher: NSObject {
         })
     }
     
-    class func getDataFromSnapshot(ID: String, completion: @escaping ([Activity])->()) {
+    class func getDataFromSnapshot(ID: String, parentID: String?, completion: @escaping ([Activity])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -228,17 +228,45 @@ class ActivitiesFetcher: NSObject {
                         activity.badgeDate = userActivity.badgeDate
                         activity.muted = userActivity.muted
                         activity.pinned = userActivity.pinned
-                        activities.append(activity)
+                        if let parentID = parentID, let instanceIDs = activity.instanceIDs {
+                            ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { _ , instanceActivities in
+                                if let instanceActivity = instanceActivities[parentID] {
+                                    let newActivity = activity.updateActivityWActivityNewInstance(updatingActivity: instanceActivity)
+                                    activities.append(newActivity)
+                                } else {
+                                    activities.append(activity)
+                                }
+                                group.leave()
+                            }
+                        } else {
+                            activities.append(activity)
+                            group.leave()
+                        }
+                    } else {
+                        group.leave()
                     }
-                    group.leave()
                 })
             } else {
                 ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
                     if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
                         let activity = Activity(dictionary: activitySnapshotValue)
-                        activities.append(activity)
+                        if let parentID = parentID, let instanceIDs = activity.instanceIDs {
+                            ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { _ , instanceActivities in
+                                if let instanceActivity = instanceActivities[parentID] {
+                                    let newActivity = activity.updateActivityWActivityNewInstance(updatingActivity: instanceActivity)
+                                    activities.append(newActivity)
+                                } else {
+                                    activities.append(activity)
+                                }
+                                group.leave()
+                            }
+                        } else {
+                            activities.append(activity)
+                            group.leave()
+                        }
+                    } else {
+                        group.leave()
                     }
-                    group.leave()
                 })
             }
         })
@@ -257,7 +285,7 @@ class ActivitiesFetcher: NSObject {
             counter += 1
             if activity.isTask ?? false {
                 if let instanceIDs = activity.instanceIDs {
-                    ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                    ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities, _ in
                         guard counter > 0 else {
                             for (_, instanceActivity) in activities {
                                 if let instanceID = instanceActivity.instanceID, let activity = self.instanceActivities[instanceID] {
@@ -306,7 +334,7 @@ class ActivitiesFetcher: NSObject {
                 }
             } else {
                 if let instanceIDs = activity.instanceIDs {
-                    ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities in
+                    ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities, _ in
                         guard counter > 0 else {
                             for (_, instanceActivity) in activities {
                                 if let instanceID = instanceActivity.instanceID, let activity = self.instanceActivities[instanceID] {
@@ -372,9 +400,10 @@ class ActivitiesFetcher: NSObject {
         }
     }
     
-    class func grabInstanceActivities(IDs: [String], completion: @escaping ([NSNumber: Activity])->()) {
+    class func grabInstanceActivities(IDs: [String], completion: @escaping ([NSNumber: Activity], [String: Activity])->()) {
         let ref = Database.database().reference()
-        var activities: [NSNumber: Activity] = [:]
+        var activitiesDate: [NSNumber: Activity] = [:]
+        var activitiesParent: [String: Activity] = [:]
         let group = DispatchGroup()
         var counter = 0
         for ID in IDs {
@@ -387,16 +416,23 @@ class ActivitiesFetcher: NSObject {
                     let activity = Activity(dictionary: activitySnapshotValue)
                     if counter > 0 {
                         if let instanceOriginalStartDateTime = activity.instanceOriginalStartDateTime {
-                            activities[Int(truncating: instanceOriginalStartDateTime) as NSNumber] = activity
+                            activitiesDate[Int(truncating: instanceOriginalStartDateTime) as NSNumber] = activity
+                        }
+                        if let parentID = activity.parentID {
+                            activitiesParent[parentID] = activity
                         }
                         group.leave()
                         counter -= 1
                     } else {
                         if let instanceOriginalStartDateTime = activity.instanceOriginalStartDateTime {
-                            activities = [:]
-                            activities[Int(truncating: instanceOriginalStartDateTime) as NSNumber] = activity
-                            completion(activities)
+                            activitiesDate = [:]
+                            activitiesDate[Int(truncating: instanceOriginalStartDateTime) as NSNumber] = activity
                         }
+                        if let parentID = activity.parentID {
+                            activitiesParent = [:]
+                            activitiesParent[parentID] = activity
+                        }
+                        completion(activitiesDate, activitiesParent)
                     }
                 } else {
                     if counter > 0 {
@@ -408,7 +444,7 @@ class ActivitiesFetcher: NSObject {
         }
         
         group.notify(queue: .main) {
-            completion(activities)
+            completion(activitiesDate, activitiesParent)
         }
     }
     

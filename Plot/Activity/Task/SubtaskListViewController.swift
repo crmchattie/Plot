@@ -43,6 +43,7 @@ class SubtaskListViewController: FormViewController, ObjectDetailShowing {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Sub-Tasks"
+        sortSubtask()
         setupMainView()
         initializeForm()
         
@@ -267,16 +268,35 @@ extension SubtaskListViewController: UpdateTaskCellDelegate {
             } else {
                 subtaskList[index].completedDate = nil
             }
+            sortSubtask()
             
-            let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-            var instanceIDs = self.task.instanceIDs ?? []
-            if let instance = self.task.instanceID {
-                subtaskList[index].instanceID = instance
-            } else {
+            //child-activity
+            if subtaskList[index].instanceID == nil {
+                let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                subtaskList[index].instanceID = instanceID
+                
+                var instanceIDs = subtaskList[index].instanceIDs ?? []
                 instanceIDs.append(instanceID)
                 subtaskList[index].instanceIDs = instanceIDs
             }
-            subtaskList[index].parentID = task.activityID
+            
+            //parent-activity; need to assign parent activity's instanceID to child-activity
+            if self.task.instanceID == nil {
+                let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                self.task.instanceID = instanceID
+                
+                subtaskList[index].parentID = instanceID
+                
+                var instanceIDs = self.task.instanceIDs ?? []
+                instanceIDs.append(instanceID)
+                self.task.instanceIDs = instanceIDs
+                
+                let updateTask = ActivityActions(activity: self.task, active: true, selectedFalconUsers: [])
+                updateTask.updateInstance(instanceValues: [:], updateExternal: false)
+            } else {
+                subtaskList[index].parentID = self.task.instanceID
+            }
+            
             
             let updateTask = ActivityActions(activity: subtaskList[index], active: true, selectedFalconUsers: [])
             updateTask.updateCompletion(isComplete: subtaskList[index].isCompleted ?? false)

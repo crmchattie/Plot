@@ -546,7 +546,7 @@ class FinanceService {
                         if let activityID = accountTasks[payment_due_at] {
                             let transactions = self.transactions.filter({ $0.account_guid == account.guid && $0.type == .credit && $0.description.lowercased().contains("payment") &&  Calendar.current.numberOfDaysBetween(isodateFormatter.date(from: $0.transacted_at) ?? Date.distantPast, and: isodateFormatter.date(from: payment_due_at) ?? Date.distantFuture) < 30 })
                             if !transactions.isEmpty {
-                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
+                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                     if let activity = activities.first, !(activity.isCompleted ?? false) {
                                         let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                         activityAction.updateCompletion(isComplete: true)
@@ -714,7 +714,7 @@ class FinanceService {
                                         transactionAction.deleteTransaction()
                                     }
                                     
-                                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
+                                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                         if let activity = activities.first, !(activity.isCompleted ?? false) {
                                             let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                             activityAction.updateCompletion(isComplete: true)
@@ -754,7 +754,7 @@ class FinanceService {
                                             let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
                                             transactionAction.deleteTransaction()
                                         }
-                                        ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
+                                        ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                             if let activity = activities.first {
                                                 ParticipantsFetcher.getParticipants(forActivity: activity) { users in
                                                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
@@ -776,7 +776,7 @@ class FinanceService {
                                     transactionAction.deleteTransaction()
                                 }
                                 
-                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { activities in
+                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                     if let activity = activities.first, !(activity.isCompleted ?? false) {
                                         let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                         activityAction.updateCompletion(isComplete: true)

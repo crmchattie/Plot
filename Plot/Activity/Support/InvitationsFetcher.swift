@@ -98,7 +98,7 @@ class InvitationsFetcher: NSObject {
                                 invitations[invitation.activityID] = invitation
                                 self.userInvitations[invitation.activityID] = invitation
                                 group.enter()
-                                ActivitiesFetcher.getDataFromSnapshot(ID: invitation.activityID) { activities in
+                                ActivitiesFetcher.getDataFromSnapshot(ID: invitation.activityID, parentID: nil) { activities in
                                     if let activity = activities.first {
                                         if counter > 0 {
                                             activitiesForInvitations.append(activity)

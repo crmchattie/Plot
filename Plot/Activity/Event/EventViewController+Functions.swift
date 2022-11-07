@@ -183,7 +183,7 @@ extension EventViewController {
         let dispatchGroup = DispatchGroup()
         for scheduleID in activity.scheduleIDs ?? [] {
             dispatchGroup.enter()
-            ActivitiesFetcher.getDataFromSnapshot(ID: scheduleID) { fetched in
+            ActivitiesFetcher.getDataFromSnapshot(ID: scheduleID, parentID: activity.instanceID ?? activityID) { fetched in
                 self.scheduleList.append(contentsOf: fetched)
                 dispatchGroup.leave()
             }
@@ -824,15 +824,15 @@ extension EventViewController {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
-                let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                var instanceIDs = self.activity.instanceIDs ?? []
-                if let instance = self.activity.instanceID {
-                    self.activity.instanceID = instance
-                } else {
+                if self.activity.instanceID == nil {
+                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                    self.activity.instanceID = instanceID
+                    
+                    var instanceIDs = self.activity.instanceIDs ?? []
                     instanceIDs.append(instanceID)
                     self.activity.instanceIDs = instanceIDs
                 }
-                self.updateListsFirebase(id: instanceID)
+                self.updateListsFirebase(id: self.activity.instanceID!)
                 
                 let newActivity = self.activity.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.activityOld)
                 var instanceValues = newActivity.toAnyObject()

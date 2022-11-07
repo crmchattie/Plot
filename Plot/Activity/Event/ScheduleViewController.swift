@@ -643,18 +643,35 @@ class ScheduleViewController: FormViewController {
                 
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 if let currentUserID = Auth.auth().currentUser?.uid {
-                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                    var instanceIDs = self.schedule.instanceIDs ?? []
-                    if let instance = self.schedule.instanceID {
-                        self.schedule.instanceID = instance
-                    } else {
+                    //child-activity
+                    if self.schedule.instanceID == nil {
+                        let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                        self.schedule.instanceID = instanceID
+                        
+                        var instanceIDs = self.schedule.instanceIDs ?? []
                         instanceIDs.append(instanceID)
                         self.schedule.instanceIDs = instanceIDs
                     }
-                    self.schedule.parentID = self.event.activityID
+                    
+                    //parent-activity; need to assign parent activity's instanceID to child-activity
+                    if self.event.instanceID == nil {
+                        let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                        self.event.instanceID = instanceID
+                        
+                        self.schedule.parentID = instanceID
+                        
+                        var instanceIDs = self.event.instanceIDs ?? []
+                        instanceIDs.append(instanceID)
+                        self.event.instanceIDs = instanceIDs
+                        
+                        let updateTask = ActivityActions(activity: self.event, active: true, selectedFalconUsers: [])
+                        updateTask.updateInstance(instanceValues: [:], updateExternal: false)
+                    } else {
+                        self.schedule.parentID = self.event.instanceID
+                    }
                     
                     let newActivity = self.schedule.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.scheduleOld)
-                    var instanceValues = newActivity.toAnyObject()
+                    let instanceValues = newActivity.toAnyObject()
                     
                     let createActivity = ActivityActions(activity: self.schedule, active: false, selectedFalconUsers: self.selectedFalconUsers)
                     createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)

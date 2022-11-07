@@ -341,10 +341,12 @@ class ActivityActions: NSObject {
     }
     
     func updateCompletion(isComplete: Bool) {
+        print("updateCompletion")
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
         if activity.recurrences != nil || activity.instanceID != nil {
+            print("activity.recurrences != nil || activity.instanceID != nil")
             var values:[String : Any] = [:]
             activity.isCompleted = isComplete
             if isComplete {
@@ -415,6 +417,11 @@ class ActivityActions: NSObject {
                 
         var updateInstanceValues = instanceValues
         updateInstanceValues["instanceID"] = instanceID
+        
+        if activity.instanceOriginalStartDateTime == nil {
+            updateInstanceValues["instanceOriginalStartDateTime"] = activity.finalDateTime
+        }
+        
         if activity.isTask ?? false {
             updateInstanceValues["isTask"] = true
         } else {

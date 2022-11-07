@@ -838,18 +838,35 @@ class SubtaskViewController: FormViewController {
                 
             alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
                 if let currentUserID = Auth.auth().currentUser?.uid {
-                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                    var instanceIDs = self.subtask.instanceIDs ?? []
-                    if let instance = self.subtask.instanceID {
-                        self.subtask.instanceID = instance
-                    } else {
+                    //child-activity
+                    if self.subtask.instanceID == nil {
+                        let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                        self.subtask.instanceID = instanceID
+                        
+                        var instanceIDs = self.subtask.instanceIDs ?? []
                         instanceIDs.append(instanceID)
                         self.subtask.instanceIDs = instanceIDs
                     }
-                    self.subtask.parentID = self.task.activityID
+                    
+                    //parent-activity; need to assign parent activity's instanceID to child-activity
+                    if self.task.instanceID == nil {
+                        let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                        self.task.instanceID = instanceID
+                        
+                        self.subtask.parentID = instanceID
+                        
+                        var instanceIDs = self.task.instanceIDs ?? []
+                        instanceIDs.append(instanceID)
+                        self.task.instanceIDs = instanceIDs
+                        
+                        let updateTask = ActivityActions(activity: self.task, active: true, selectedFalconUsers: [])
+                        updateTask.updateInstance(instanceValues: [:], updateExternal: false)
+                    } else {
+                        self.subtask.parentID = self.task.instanceID
+                    }
                     
                     let newActivity = self.subtask.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.subtaskOld)
-                    var instanceValues = newActivity.toAnyObject()
+                    let instanceValues = newActivity.toAnyObject()
                     
                     let createActivity = ActivityActions(activity: self.subtask, active: false, selectedFalconUsers: self.selectedFalconUsers)
                     createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)

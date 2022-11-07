@@ -119,7 +119,7 @@ extension TaskViewController {
         let dispatchGroup = DispatchGroup()
         for taskID in task.subtaskIDs ?? [] {
             dispatchGroup.enter()
-            ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
+            ActivitiesFetcher.getDataFromSnapshot(ID: taskID, parentID: task.instanceID ?? activityID) { fetched in
                 self.subtaskList.append(contentsOf: fetched)
                 dispatchGroup.leave()
             }
@@ -654,15 +654,16 @@ extension TaskViewController {
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, let recurrenceStartDate = task.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
-                let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                var instanceIDs = self.task.instanceIDs ?? []
-                if let instance = self.task.instanceID {
-                    self.task.instanceID = instance
-                } else {
+                if self.task.instanceID == nil {
+                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                    self.task.instanceID = instanceID
+                    
+                    var instanceIDs = self.task.instanceIDs ?? []
                     instanceIDs.append(instanceID)
                     self.task.instanceIDs = instanceIDs
                 }
-                self.updateListsFirebase(id: instanceID)
+                
+                self.updateListsFirebase(id: self.task.instanceID!)
                 
                 let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
                 var instanceValues = newActivity.toAnyObject()

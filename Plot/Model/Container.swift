@@ -81,7 +81,7 @@ class ContainerFunctions {
                 reference.child(containerEntity).child(container.id).updateChildValues(["participantsIDs": membersIDs.sorted() as AnyObject])
                 
                 for activityID in container.activityIDs ?? [] {
-                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in
+                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { fetched in
                         if let fetch = fetched.first {
                             let create = ActivityActions(activity: fetch, active: true, selectedFalconUsers: selectedFalconUsers)
                             create.updateActivityParticipants()
@@ -89,7 +89,7 @@ class ContainerFunctions {
                     }
                 }
                 for taskID in container.taskIDs ?? [] {
-                    ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
+                    ActivitiesFetcher.getDataFromSnapshot(ID: taskID, parentID: nil) { fetched in
                         if let fetch = fetched.first {
                             let create = ActivityActions(activity: fetch, active: true, selectedFalconUsers: selectedFalconUsers)
                             create.updateActivityParticipants()
@@ -126,6 +126,7 @@ class ContainerFunctions {
     }
     
     class func grabContainerAndStuffInside(id: String, completion: @escaping (Container, [Activity]?, [Activity]?, [HealthContainer]?, [Transaction]?) -> Void) {
+        let isodateFormatter = ISO8601DateFormatter()
         var container = Container(id: id, activityIDs: nil, taskIDs: nil, workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: nil)
         var activities = [Activity]()
         var tasks = [Activity]()
@@ -139,14 +140,14 @@ class ContainerFunctions {
                 container = contain
                 for activityID in container.activityIDs ?? [] {
                     dispatchGroup.enter()
-                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID) { fetched in
+                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { fetched in
                         activities.append(contentsOf: fetched)
                         dispatchGroup.leave()
                     }
                 }
                 for taskID in container.taskIDs ?? [] {
                     dispatchGroup.enter()
-                    ActivitiesFetcher.getDataFromSnapshot(ID: taskID) { fetched in
+                    ActivitiesFetcher.getDataFromSnapshot(ID: taskID, parentID: nil) { fetched in
                         tasks.append(contentsOf: fetched)
                         dispatchGroup.leave()
                     }
@@ -186,6 +187,38 @@ class ContainerFunctions {
         })
         
         dispatchGroup.notify(queue: .main) {
+            activities.sort { (schedule1, schedule2) -> Bool in
+                return schedule1.startDateTime?.int64Value ?? 0 < schedule2.startDateTime?.int64Value ?? 0
+            }
+            tasks.sort { (task1, task2) -> Bool in
+                if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                    if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                        if task1.priority == task2.priority {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return TaskPriority(rawValue: task1.priority ?? "None")! > TaskPriority(rawValue: task2.priority ?? "None")!
+                    }
+                    return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                    if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                        return task1.name ?? "" < task2.name ?? ""
+                    }
+                    return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                }
+                return !(task1.isCompleted ?? false)
+            }
+            healths.sort { (health1, health2) -> Bool in
+                return health1.date < health2.date
+            }
+            transactions.sort { (transaction1, transaction2) -> Bool in
+                if transaction1.should_link ?? true == transaction2.should_link ?? true {
+                    if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
+                        return date1 > date2
+                    }
+                    return transaction1.description < transaction2.description
+                }
+                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
+            }
             completion(container, activities, tasks, healths, transactions)
         }
     }

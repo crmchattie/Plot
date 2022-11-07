@@ -43,6 +43,7 @@ class ScheduleListViewController: FormViewController, ObjectDetailShowing {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Sub-Events"
+        sortSchedule()
         setupMainView()
         initializeForm()
         

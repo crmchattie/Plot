@@ -60,7 +60,7 @@ class WorkoutActions: NSObject {
         })
         
         if updateDirectAssociation, workout.directAssociation ?? false, let ID = workout.directAssociationObjectID {
-            ActivitiesFetcher.getDataFromSnapshot(ID: ID) { activities in
+            ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activities in
                 if let activity = activities.first {
                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: selectedFalconUsers)
                     activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
