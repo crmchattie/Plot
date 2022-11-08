@@ -1338,7 +1338,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
             continue
         }
         
-        var duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
+        let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
         if let type = activity.category {
             guard type != "Not Applicable" else { continue }
             totalValue -= duration

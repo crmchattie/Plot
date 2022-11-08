@@ -52,7 +52,7 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
 
 let prebuiltLists: [ListType] = [defaultList, financeList, healthList]
 
-let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: true, financeList: false, healthList: false)
+let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[5]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: true, financeList: false, healthList: false)
 let financeList = ListType(id: UUID().uuidString, name: "Finances", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: true, healthList: false)
 let healthList = ListType(id: UUID().uuidString, name: "Health", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: false, healthList: true)
 

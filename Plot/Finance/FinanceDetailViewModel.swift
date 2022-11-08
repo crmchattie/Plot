@@ -131,7 +131,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     }
                     
                     let dataSet = BarChartDataSet(entries: entries, label: "")
-                    dataSet.setColor(ChartColors.palette()[0])
+                    dataSet.setColor(ChartColors.palette()[5])
                     dataSet.drawValuesEnabled = false
                     dataSet.axisDependency = .right
                     
@@ -162,7 +162,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     }
                     
                     let dataSet = BarChartDataSet(entries: entries, label: "")
-                    dataSet.setColor(ChartColors.palette()[0])
+                    dataSet.setColor(ChartColors.palette()[5])
                     dataSet.drawValuesEnabled = false
                     dataSet.axisDependency = .right
                     

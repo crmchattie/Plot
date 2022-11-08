@@ -186,6 +186,7 @@ class TableViewHeader: UITableViewHeaderFooterView {
     }
     
     func setupViews() {
+        backgroundColor = .systemGroupedBackground
         addSubview(view)
         view.addSubview(titleLabel)
         view.addSubview(subTitleLabel)
@@ -201,6 +202,7 @@ class TableViewHeader: UITableViewHeaderFooterView {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        backgroundColor = .systemGroupedBackground
         titleLabel.textColor = .label
         subTitleLabel.tintColor = .systemBlue
         

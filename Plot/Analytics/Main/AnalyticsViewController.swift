@@ -32,6 +32,8 @@ class AnalyticsViewController: UITableViewController {
     
     let viewPlaceholder = ViewPlaceholder()
     
+    let headerCellID = "headerCellID"
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -43,7 +45,8 @@ class AnalyticsViewController: UITableViewController {
 //        tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
-        
+        tableView.register(TableViewHeader.self,
+                           forHeaderFooterViewReuseIdentifier: headerCellID)
         
         
     }
@@ -115,8 +118,17 @@ extension AnalyticsViewController {
         indexPath.row > 0 ? indexPath : nil
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        viewModel!.sections[section].title.capitalized
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier:
+                                                                headerCellID) as? TableViewHeader ?? TableViewHeader()
+        header.titleLabel.text = viewModel!.sections[section].title.capitalized
+        header.subTitleLabel.isHidden = true
+        return header
+
+    }
+
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 50
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

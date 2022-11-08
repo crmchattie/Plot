@@ -66,7 +66,6 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
                 guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
                 return range.startDate <= date && date <= range.endDate
             }
-            .sorted(by: { $0.transacted_at > $1.transacted_at })
         
         var incomeValue: Double = 0
         var expenseValue: Double = 0
@@ -75,7 +74,10 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
         
+        print(transactions.count)
         transactions.grouped(by: \.group).forEach { (category, transactions) in
+            print(category)
+            print(transactions.count)
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
             transactions.forEach { transaction in
@@ -84,12 +86,13 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
                 if transaction.type == .credit {
                     incomeValue += transaction.amount
                     values[daysInBetween] += transaction.amount
+                    sum += transaction.amount
                 } else {
                     expenseValue += transaction.amount
                     values[daysInBetween] -= transaction.amount
+                    sum -= transaction.amount
                 }
             }
-            sum += incomeValue - expenseValue
             
             var categoryColor = UIColor()
             if let index = financialTransactionsGroupsStatic.firstIndex(where: {$0 == category} ) {

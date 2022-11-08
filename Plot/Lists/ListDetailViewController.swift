@@ -101,7 +101,7 @@ class ListDetailViewController: FormViewController {
         } else if let currentUser = Auth.auth().currentUser?.uid {
             title = "New List"
             let ID = Database.database().reference().child(userListEntity).child(currentUser).childByAutoId().key ?? ""
-            list = ListType(id: ID, name: nil, color: CIColor(color: ChartColors.palette()[0]).stringRepresentation, source: ListSourceOptions.plot.name, admin: currentUser, defaultList: false, financeList: false, healthList: false)
+            list = ListType(id: ID, name: nil, color: CIColor(color: ChartColors.palette()[5]).stringRepresentation, source: ListSourceOptions.plot.name, admin: currentUser, defaultList: false, financeList: false, healthList: false)
         }
     }
     

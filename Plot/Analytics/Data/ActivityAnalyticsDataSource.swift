@@ -87,20 +87,20 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 newChartViewModel.rangeAverageValue = "\(activityCount) events"
                 
                 let daysInRange = self.range.daysInRange
-                let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
-                    let current = self.range.startDate.addDays(index)
-                    let yValues = categories.map {
-                        (activities[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
+                var dataSets = [BarChartDataSet]()
+                for category in categories {
+                    let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
+                        let current = self.range.startDate.addDays(index)
+                        let yValue = (activities[category.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
+                        return BarChartDataEntry(x: Double(index) + 0.5, y: yValue, data: current)
                     }
-                    return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
+                    let chartDataSet = BarChartDataSet(entries: dataEntries)
+                    chartDataSet.colors = [category.color]
+                    dataSets.append(chartDataSet)
                 }
                 
                 DispatchQueue.main.async {
-                    let chartDataSet = BarChartDataSet(entries: dataEntries)
-                    if !categoryColors.isEmpty {
-                        chartDataSet.colors = categoryColors
-                    }
-                    let chartData = BarChartData(dataSets: [chartDataSet])
+                    let chartData = BarChartData(dataSets: dataSets)
                     chartData.barWidth = 0.5
                     chartData.setDrawValues(false)
                     newChartViewModel.chartData = chartData
@@ -120,7 +120,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 return false
             }
             // at this point all activities should have a startDate (see above)
-            .sorted(by: { $0.startDate! < $1.startDate! })
+            .sorted(by: { $0.startDate! > $1.startDate! })
             .map { AnalyticsBreakdownEntry.activity($0) }
         completion(entries)
     }

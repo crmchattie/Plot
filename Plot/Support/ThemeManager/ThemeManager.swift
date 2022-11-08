@@ -98,15 +98,15 @@ open class ChartColors: NSObject
     @objc open class func palette() -> [UIColor]
     {
         return [
+            .systemRed,
+            .systemOrange,
+            .systemYellow,
+            .systemGreen,
             .systemTeal,
             .systemBlue,
             .systemIndigo,
             .systemPurple,
             .systemPink,
-            .systemRed,
-            .systemOrange,
-            .systemYellow,
-            .systemGreen,
 //            UIColor(red: 0/255.0, green: 127/255.0, blue: 255/255.0, alpha: 1.0),
 //            UIColor(red: 123/255.0, green: 104/255.0, blue: 142/255.0, alpha: 1.0),
 //            UIColor(red: 246/255.0, green: 81/255.0, blue: 29/255.0, alpha: 1.0),
