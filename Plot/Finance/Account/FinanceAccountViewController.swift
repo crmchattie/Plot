@@ -161,9 +161,9 @@ class FinanceAccountViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: accountCreatedMessage, message: nil, controller: self.tabBarController)
+                basicAlert(title: accountCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: accountUpdatedMessage, message: nil, controller: self.tabBarController)
+                basicAlert(title: accountUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }
@@ -182,7 +182,7 @@ class FinanceAccountViewController: FormViewController {
                     $0.value = account.name
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-//                    $0.cell.textField.becomeFirstResponder()
+                    $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground

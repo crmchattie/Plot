@@ -1214,6 +1214,7 @@ func basicErrorAlertWithClose(title: String, message: String, controller: UIView
 }
 
 func basicAlert(title: String, message: String?, controller: UIViewController?) {
+    print(controller)
     guard let controller = controller else { return }
     let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
     DispatchQueue.main.async {

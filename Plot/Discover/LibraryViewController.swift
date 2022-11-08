@@ -11,10 +11,6 @@ import Firebase
 import CodableFirebase
 import GoogleSignIn
 
-protocol UpdateDiscover: AnyObject {
-    func itemCreated(title: String)
-}
-
 class LibraryViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, ObjectDetailShowing {
     let networkController: NetworkController
     
@@ -45,6 +41,8 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     let viewPlaceholder = ViewPlaceholder()
     
     var timer: Timer?
+    
+    weak var updateDiscoverDelegate : UpdateDiscover?
     
     lazy var searchBar : UISearchBar = {
         let searchBar = UISearchBar()
@@ -210,6 +208,9 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
+        
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+        navigationItem.rightBarButtonItem = doneBarButton
         
         groups[.custom] = customTypes
         
@@ -549,7 +550,7 @@ extension LibraryViewController: UpdateDiscover {
     func itemCreated(title: String) {
         self.navigationItem.searchController?.isActive = false
         self.dismiss(animated: true)
-        self.tabBarController?.selectedIndex = 1
-        basicAlert(title: title, message: nil, controller: self.tabBarController)
+        self.updateDiscoverDelegate?.itemCreated(title: title)
+//        self.tabBarController?.selectedIndex = 1
     }
 }

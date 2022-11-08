@@ -185,9 +185,9 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
             }
 
             if !active {
-                basicAlert(title: transactionCreatedMessage, message: nil, controller: self.tabBarController)
+                basicAlert(title: transactionCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: transactionUpdatedMessage, message: nil, controller: self.tabBarController)
+                basicAlert(title: transactionUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }
@@ -206,7 +206,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                     $0.value = transaction.description
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-//                    $0.cell.textField.becomeFirstResponder()
+                    $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground

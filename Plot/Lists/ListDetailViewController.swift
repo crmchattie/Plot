@@ -129,9 +129,9 @@ class ListDetailViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: listCreatedMessage, message: nil, controller: self.tabBarController)
+                basicAlert(title: listCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: listUpdatedMessage, message: nil, controller: self.tabBarController)
+                basicAlert(title: listUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }
@@ -166,7 +166,7 @@ class ListDetailViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: listDeletedMessage, message: nil, controller: self.tabBarController)
+            basicAlert(title: listDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -190,7 +190,7 @@ class ListDetailViewController: FormViewController {
                 $0.value = self.list.name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
-//                $0.cell.textField.becomeFirstResponder()
+                $0.cell.textField.becomeFirstResponder()
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         }.onChange() { [unowned self] row in

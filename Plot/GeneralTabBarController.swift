@@ -33,7 +33,8 @@ class GeneralTabBarController: UITabBarController {
     fileprivate var isNewUser = false
     fileprivate var isOldUser = false
     
-    let homeController = MasterActivityContainerController(networkController: GeneralTabBarController.networkController)
+    let homeController = MasterActivityContainerController()
+//    let homeController = MasterActivityContainerController(networkController: GeneralTabBarController.networkController)
     let discoverController = LibraryViewController(networkController: GeneralTabBarController.networkController)
     let analyticsController = AnalyticsViewController()
     
@@ -185,7 +186,7 @@ class GeneralTabBarController: UITabBarController {
         newNavigationController.modalTransitionStyle = .crossDissolve
         newNavigationController.modalPresentationStyle = .fullScreen
         homeController.removeLaunchScreenView()
-        present(newNavigationController, animated: false, completion: nil)
+        self.present(newNavigationController, animated: false, completion: nil)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

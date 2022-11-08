@@ -99,7 +99,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         super.viewDidLoad()
         
         setupMainView()
-        
+                
         if task != nil {
             title = "Task"
             active = true
@@ -246,7 +246,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
-//                $0.cell.textField.becomeFirstResponder()
+                $0.cell.textField.becomeFirstResponder()
             }
         }.onChange() { [unowned self] row in
             self.task.name = row.value

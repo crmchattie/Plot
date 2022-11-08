@@ -938,7 +938,7 @@ extension EventViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: title, message: nil, controller: self.tabBarController)
+            basicAlert(title: title, message: nil, controller: self.navigationController?.presentingViewController)
         }
     }
     

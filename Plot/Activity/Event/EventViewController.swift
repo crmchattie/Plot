@@ -135,7 +135,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                         updateLists(type: "schedule")
                     }
                 } else {
-                    
+                    activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
@@ -236,7 +236,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                 $0.value = name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
-//                $0.cell.textField.becomeFirstResponder()
+                $0.cell.textField.becomeFirstResponder()
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         }.onChange() { [unowned self] row in

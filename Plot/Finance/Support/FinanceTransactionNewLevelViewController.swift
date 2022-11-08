@@ -113,7 +113,7 @@ class FinanceTransactionNewLevelViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-//                    $0.cell.textField.becomeFirstResponder()
+                    $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground

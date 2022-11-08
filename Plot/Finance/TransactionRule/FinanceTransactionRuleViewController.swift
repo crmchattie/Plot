@@ -111,9 +111,9 @@ class FinanceTransactionRuleViewController: FormViewController {
                     self.navigationController?.popViewController(animated: true)
                 }
                 if !active {
-                    basicAlert(title: transactionRuleCreatedMessage, message: nil, controller: self.tabBarController)
+                    basicAlert(title: transactionRuleCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
                 } else {
-                    basicAlert(title: transactionRuleUpdatedMessage, message: nil, controller: self.tabBarController)
+                    basicAlert(title: transactionRuleUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
                 }
             }
         }
@@ -136,7 +136,7 @@ class FinanceTransactionRuleViewController: FormViewController {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-//                    $0.cell.textField.becomeFirstResponder()
+                    $0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground

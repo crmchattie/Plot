@@ -13,7 +13,7 @@ import UIKit
 import Firebase
 import Charts
 
-class FinanceBarChartViewController: UIViewController {
+class FinanceBarChartViewController: UIViewController, ObjectDetailShowing {
         
     private let kFinanceTableViewCell = "FinanceTableViewCell"
         
@@ -345,20 +345,10 @@ extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSou
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let transactions = viewModel.transactions, !transactions.isEmpty {
             let transaction = transactions[indexPath.row]
-            let destination = FinanceTransactionViewController(networkController: networkController)
-            destination.transaction = transaction
-            ParticipantsFetcher.getParticipants(forTransaction: transaction) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
+            showTransactionDetailPresent(transaction: transaction, updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
         } else if let accounts = viewModel.accounts, !accounts.isEmpty {
             let account = accounts[indexPath.row]
-            let destination = FinanceAccountViewController(networkController: networkController)
-            destination.account = account
-            ParticipantsFetcher.getParticipants(forAccount: account) { (participants) in
-                destination.selectedFalconUsers = participants
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
+            showAccountDetailPresent(account: account, updateDiscoverDelegate: nil)
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }

@@ -71,10 +71,10 @@ class StorageTableViewController: UITableViewController {
                 cell.textLabel?.textColor = .label
                 
             } else {
-                
+                cell.accessoryType = .none
                 cell.textLabel?.text = "Cache is Empty"
                 cell.isUserInteractionEnabled = false
-                cell.textLabel?.textColor = .secondaryLabel
+                cell.textLabel?.textColor = .label
             }
         }
         
