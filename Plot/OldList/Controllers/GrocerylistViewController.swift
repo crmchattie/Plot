@@ -312,7 +312,7 @@ class GrocerylistViewController: FormViewController {
                     $0.value = grocerylist.name
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-//                    $0.cell.textField.becomeFirstResponder()
+//                    //$0.cell.textField.becomeFirstResponder()
                 }
             }.onChange() { [unowned self] row in
                 if let rowValue = row.value {

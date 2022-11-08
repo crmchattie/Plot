@@ -128,9 +128,9 @@ class CalendarDetailViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: calendarCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: calendarCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             } else {
-                basicAlert(title: calendarUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: calendarUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             }
         }
     }
@@ -166,7 +166,7 @@ class CalendarDetailViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: calendarDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+            basicAlert(title: calendarDeletedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -190,7 +190,7 @@ class CalendarDetailViewController: FormViewController {
                 $0.value = self.calendar.name
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
-                $0.cell.textField.becomeFirstResponder()
+                //$0.cell.textField.becomeFirstResponder()
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         }.onChange() { [unowned self] row in

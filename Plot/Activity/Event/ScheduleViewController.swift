@@ -143,7 +143,7 @@ class ScheduleViewController: FormViewController {
                     $0.value = name
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
-                    $0.cell.textField.becomeFirstResponder()
+                    //$0.cell.textField.becomeFirstResponder()
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                 }
                 }.onChange() { [unowned self] row in
@@ -714,7 +714,7 @@ class ScheduleViewController: FormViewController {
         } else {
             self.navigationController?.popViewController(animated: true)
         }
-        basicAlert(title: title, message: nil, controller: self.navigationController?.presentingViewController)
+        basicAlert(title: title, message: nil, controller: self.tabBarController?.presentingViewController)
     }
     
     func setupLists() {

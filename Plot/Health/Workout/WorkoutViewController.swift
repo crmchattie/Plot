@@ -180,9 +180,9 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
             }
 
             if !active {
-                basicAlert(title: workoutCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: workoutCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             } else {
-                basicAlert(title: workoutUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: workoutUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             }
         }
         if active && false {
@@ -281,7 +281,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: workoutDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+            basicAlert(title: workoutDeletedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -308,7 +308,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
                 $0.value = workout.name
             } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
-                $0.cell.textField.becomeFirstResponder()
+                //$0.cell.textField.becomeFirstResponder()
             }
         }.onChange() { [unowned self] row in
             if let rowValue = row.value {

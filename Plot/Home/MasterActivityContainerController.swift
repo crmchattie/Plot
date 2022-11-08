@@ -29,28 +29,22 @@ enum Mode {
     case small, fullscreen
 }
 
-protocol UpdateDiscover: AnyObject {
-    func itemCreated(title: String)
-}
-
 protocol ManageAppearanceHome: AnyObject {
     func manageAppearanceHome(_ homeController: MasterActivityContainerController, didFinishLoadingWith state: Bool )
 }
 
 class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
-//    init(networkController: NetworkController) {
-//        self.networkController = networkController
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    let networkController: NetworkController
-    
-    var networkController = NetworkController()
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    let networkController: NetworkController
+    
     let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
         
@@ -110,26 +104,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     
     var isNewUser: Bool = true
         
-    var isOldUser: Bool = false
-    
-    var onceToken = 0
-    
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
     var isAppLoaded = false
         
-    var window: UIWindow?
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .default
-    }
-
-    let splashContainer: SplashScreenContainer = {
-        let splashContainer = SplashScreenContainer()
-        splashContainer.translatesAutoresizingMaskIntoConstraints = false
-        return splashContainer
-    }()
-
     let launchController: UIViewController = {
         let storyboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
         return storyboard.instantiateViewController(withIdentifier: "LaunchScreen")
@@ -158,51 +134,15 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     override func viewDidLoad() {
         super.viewDidLoad()
         showLaunchScreen()
-        loadVariables()
         setupViews()
         setNavBar()
-        addObservers()
-        appDelegate.loadNotifications()
-        setOnlineStatus()
-        setApplicationBadge()
-////        delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
+        setupData()
+        delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if onceToken == 0 {
-            splashContainer.backgroundColor = .systemGroupedBackground
-            view.addSubview(splashContainer)
-            splashContainer.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-            splashContainer.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-            splashContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-            splashContainer.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        }
-        onceToken = 1
         managePresense()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if isNewUser {
-            //has to be here given currentUserID = nil on app start
-            self.networkController.setupFirebase()
-            self.networkController.setupOtherVariables()
-            //change to stop from running
-            isNewUser = false
-        } else if isOldUser {
-            reloadVariables()
-            isOldUser = false
-        }
-    }
-    
-    func setApplicationBadge() {
-        let badge = 0
-        UIApplication.shared.applicationIconBadgeNumber = badge
-        if let uid = Auth.auth().currentUser?.uid {
-            let ref = Database.database().reference().child("users").child(uid)
-            ref.updateChildValues(["badge": badge])
-        }
     }
     
     func setupViews() {
@@ -215,7 +155,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = .systemGroupedBackground
         
-        extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         layout.scrollDirection = UICollectionView.ScrollDirection.vertical
         collectionView.setCollectionViewLayout(layout, animated: true)
@@ -251,7 +190,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedHealth), name: .hasLoadedHealth, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
     }
     
     func setupData() {
@@ -404,10 +342,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         }
     }
     
-    @objc fileprivate func oldUserLoggedIn() {
-        isOldUser = true
-    }
-    
     func setNavBar() {
         navigationItem.title = {
             let dateFormatter = DateFormatter()
@@ -423,10 +357,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                                                             style: .plain,
                                                             target: self,
                                                             action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItems = [settingsBarButton, notificationsBarButton]
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
-                                                            target: self,
-                                                            action: #selector(newItem))
+        navigationItem.leftBarButtonItem = settingsBarButton
+        navigationItem.rightBarButtonItem = notificationsBarButton
 
         if !isNewUser {
             refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
@@ -645,12 +577,6 @@ extension MasterActivityContainerController {
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
-    @objc fileprivate func newItem() {
-        let discoverController = LibraryViewController(networkController: networkController)
-        discoverController.updateDiscoverDelegate = self
-        present(UINavigationController(rootViewController: discoverController), animated: true)
-    }
-
 }
 
 extension MasterActivityContainerController: GIDSignInDelegate {
@@ -723,14 +649,6 @@ extension MasterActivityContainerController {
     func hideActivityIndicator() {
         self.navigationController?.view.isUserInteractionEnabled = true
         self.removeSpinner()
-    }
-}
-
-extension MasterActivityContainerController: UpdateDiscover {
-    func itemCreated(title: String) {
-        self.dismiss(animated: true, completion: {
-            basicAlert(title: title, message: nil, controller: self.navigationController)
-        })
     }
 }
 

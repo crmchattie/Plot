@@ -11,7 +11,7 @@ import Charts
 import Combine
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+    DateRangeFormatter(currentWeek: "Last week", currentMonth: "Last month", currentYear: "Last year")
         .format(range: range)
 }
 
@@ -43,7 +43,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: HourAxisValueFormatter(),
-                                                        units: "hrs",
+                                                        units: "time",
                                                         formatType: range.timeSegment))
     }
     
@@ -58,7 +58,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
             guard !activities.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
-                newChartViewModel.rangeAverageValue = "0 events"
+                newChartViewModel.rangeAverageValue = "-"
                 self.chartViewModel.send(newChartViewModel)
                 completion?()
                 return
@@ -87,20 +87,20 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 newChartViewModel.rangeAverageValue = "\(activityCount) events"
                 
                 let daysInRange = self.range.daysInRange
-                var dataSets = [BarChartDataSet]()
-                for category in categories {
-                    let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
-                        let current = self.range.startDate.addDays(index)
-                        let yValue = (activities[category.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
-                        return BarChartDataEntry(x: Double(index) + 0.5, y: yValue, data: current)
+                let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
+                    let current = self.range.startDate.addDays(index)
+                    let yValues = categories.map {
+                        (activities[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
                     }
-                    let chartDataSet = BarChartDataSet(entries: dataEntries)
-                    chartDataSet.colors = [category.color]
-                    dataSets.append(chartDataSet)
+                    return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
                 }
                 
                 DispatchQueue.main.async {
-                    let chartData = BarChartData(dataSets: dataSets)
+                    let chartDataSet = BarChartDataSet(entries: dataEntries)
+                    if !categoryColors.isEmpty {
+                        chartDataSet.colors = categoryColors
+                    }
+                    let chartData = BarChartData(dataSets: [chartDataSet])
                     chartData.barWidth = 0.5
                     chartData.setDrawValues(false)
                     newChartViewModel.chartData = chartData
@@ -115,7 +115,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         let entries = networkController.activityService.events
             .filter {
                 if let startDate = $0.startDate, let endDate = $0.endDate {
-                    return startDate < range.endDate && endDate > range.startDate
+                    return startDate < range.endDate && endDate > range.startDate && !($0.allDay ?? false) && (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970 > 0)
                 }
                 return false
             }

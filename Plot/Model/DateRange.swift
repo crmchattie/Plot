@@ -16,7 +16,7 @@ enum DateRangeType: CaseIterable {
     var initial: (Date, Date) {
         switch self {
         case .week: return (Date().localTime.startOfDay.UTCTime.weekBefore.advanced(by: 86400), Date().localTime.startOfDay.UTCTime.advanced(by: 86399))
-        case .month: return (Date().monthBefore, Date().localTime)
+        case .month: return (Date().localTime.startOfDay.UTCTime.monthBefore.advanced(by: 86400), Date().localTime.startOfDay.UTCTime.advanced(by: 86399))
 //        case .year: return (Date().yearBefore, Date())
         }
     }

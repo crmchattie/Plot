@@ -1333,6 +1333,10 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
     for activity in activities {
         guard let activityStartDate = activity.startDate, let activityEndDate = activity.endDate else { continue }
         
+        if activity.allDay ?? false {
+            continue
+        }
+        
         // Skipping activities that are outside of the interest range.
         if activityStartDate > end || activityEndDate <= start {
             continue

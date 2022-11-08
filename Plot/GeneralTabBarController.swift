@@ -33,8 +33,7 @@ class GeneralTabBarController: UITabBarController {
     fileprivate var isNewUser = false
     fileprivate var isOldUser = false
     
-    let homeController = MasterActivityContainerController()
-//    let homeController = MasterActivityContainerController(networkController: GeneralTabBarController.networkController)
+    let homeController = MasterActivityContainerController(networkController: GeneralTabBarController.networkController)
     let discoverController = LibraryViewController(networkController: GeneralTabBarController.networkController)
     let analyticsController = AnalyticsViewController()
     
@@ -71,10 +70,11 @@ class GeneralTabBarController: UITabBarController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if isNewUser {
+        if isNewUser && Auth.auth().currentUser != nil {
             //has to be here given currentUserID = nil on app start
             GeneralTabBarController.networkController.setupFirebase()
             GeneralTabBarController.networkController.setupOtherVariables()
+            discoverController.fetchTemplates()
             //change to stop from running
             isNewUser = false
         } else if isOldUser {
@@ -100,8 +100,9 @@ class GeneralTabBarController: UITabBarController {
             GeneralTabBarController.networkController.setupKeyVariables {
                 self.analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
                 GeneralTabBarController.networkController.setupOtherVariables()
-                self.homeController.removeLaunchScreenView()
-                self.homeController.openNotification()
+                self.homeController.removeLaunchScreenView(animated: true) {
+                    self.homeController.openNotification()
+                }
             }
         } else {
             UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
@@ -185,8 +186,9 @@ class GeneralTabBarController: UITabBarController {
         newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
         newNavigationController.modalTransitionStyle = .crossDissolve
         newNavigationController.modalPresentationStyle = .fullScreen
-        homeController.removeLaunchScreenView()
-        self.present(newNavigationController, animated: false, completion: nil)
+        homeController.removeLaunchScreenView(animated: false) {
+            self.present(newNavigationController, animated: false, completion: nil)
+        }
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

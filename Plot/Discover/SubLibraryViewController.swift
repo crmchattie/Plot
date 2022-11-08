@@ -95,9 +95,6 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
         collectionView.backgroundColor = .systemGroupedBackground
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
         
-        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
-        navigationItem.rightBarButtonItem = doneBarButton
-
         filteredTemplates = templates.sorted(by: { $0.name < $1.name })
         setupData()
         setupSearchController()

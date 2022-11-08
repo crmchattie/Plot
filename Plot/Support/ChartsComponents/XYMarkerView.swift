@@ -16,6 +16,7 @@ public class XYMarkerView: BalloonMarker {
     public var xAxisValueFormatter: DayAxisValueFormatter
     fileprivate var yFormatter = NumberFormatter()
     fileprivate var units = String()
+    fileprivate var dateFormatter = DateComponentsFormatter()
     
     public init(color: UIColor, font: UIFont, textColor: UIColor, insets: UIEdgeInsets,
                 xAxisValueFormatter: DayAxisValueFormatter, units: String) {
@@ -30,6 +31,13 @@ public class XYMarkerView: BalloonMarker {
         if units == "currency" {
             yFormatter.numberStyle = .currency
             let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + "\n"
+                + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
+            setLabel(string)
+        } else if units == "time" {
+            dateFormatter.unitsStyle = .abbreviated
+            dateFormatter.allowedUnits = [.hour, .minute]
+            let totalString = dateFormatter.string(from: entry.y) ?? "NaN"
+            let string = totalString + "\n"
                 + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
             setLabel(string)
         } else {

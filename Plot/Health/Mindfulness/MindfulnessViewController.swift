@@ -184,9 +184,9 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: mindfulnessCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: mindfulnessCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             } else {
-                basicAlert(title: mindfulnessUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: mindfulnessUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             }
         }
         
@@ -287,7 +287,7 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: mindfulnessDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+            basicAlert(title: mindfulnessDeletedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -312,7 +312,7 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
                     $0.value = mindfulness.name
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    $0.cell.textField.becomeFirstResponder()
+                    //$0.cell.textField.becomeFirstResponder()
                 }
             }.onChange() { [unowned self] row in
                 if let rowValue = row.value {

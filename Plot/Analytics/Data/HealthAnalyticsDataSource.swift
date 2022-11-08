@@ -80,6 +80,15 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
 //        healthStore.execute(caloriesConsumedQuery)
         
         group.notify(queue: .main) { [range] in
+            guard !activityResult.isEmpty else {
+                newChartViewModel.chartData = nil
+                newChartViewModel.categories = []
+                newChartViewModel.rangeAverageValue = "-"
+                self.chartViewModel.send(newChartViewModel)
+                completion?()
+                return
+            }
+            
             let daysInRange = range.daysInRange
             
             var energyValues: [Statistic] = []

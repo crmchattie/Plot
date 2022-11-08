@@ -11,7 +11,7 @@ import Combine
 import Charts
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "This week", currentMonth: "This month", currentYear: "This year")
+    DateRangeFormatter(currentWeek: "Last week", currentMonth: "Last month", currentYear: "Last year")
         .format(range: range)
 }
 
@@ -74,7 +74,6 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
         
-        print(transactions.count)
         transactions.grouped(by: \.group).forEach { (category, transactions) in
             print(category)
             print(transactions.count)
@@ -127,6 +126,8 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             newChartViewModel.chartData = chartData
         } else {
             newChartViewModel.chartData = nil
+            newChartViewModel.categories = []
+            newChartViewModel.rangeAverageValue = "-"
         }
         
         chartViewModel.send(newChartViewModel)

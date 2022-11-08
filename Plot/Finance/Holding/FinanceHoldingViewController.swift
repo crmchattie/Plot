@@ -146,9 +146,9 @@ class FinanceHoldingViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: holdingCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: holdingCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             } else {
-                basicAlert(title: holdingUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                basicAlert(title: holdingUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
             }
         }
     }
@@ -167,7 +167,7 @@ class FinanceHoldingViewController: FormViewController {
                     $0.value = holding.description
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
-                    $0.cell.textField.becomeFirstResponder()
+                    //$0.cell.textField.becomeFirstResponder()
                 }
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground
