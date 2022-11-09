@@ -245,7 +245,7 @@ extension ObjectDetailShowing {
     
     func showTransactionDetailDetailPush(transactionDetails: TransactionDetails, allTransactions: [Transaction], transactions: [Transaction], filterDictionary: [String]?, selectedIndex: Int?) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: allTransactions, transactions: transactions, filterAccounts: filterDictionary,  financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
+        let financeDetailViewController = FinanceBarChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex ?? 2
         financeDetailViewController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(financeDetailViewController, animated: true)
@@ -253,7 +253,7 @@ extension ObjectDetailShowing {
     
     func showAccountDetailDetailPush(accountDetails: AccountDetails, allAccounts: [MXAccount], accounts: [MXAccount], selectedIndex: Int?) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: allAccounts, accounts: accounts, transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
+        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex ?? 2
         financeDetailViewController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(financeDetailViewController, animated: true)
@@ -534,7 +534,7 @@ extension ObjectDetailShowing {
     
     func showTransactionDetailDetailPresent(transactionDetails: TransactionDetails, allTransactions: [Transaction], transactions: [Transaction], filterDictionary: [String]?, selectedIndex: Int?) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: allTransactions, transactions: transactions, filterAccounts: filterDictionary,  financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
+        let financeDetailViewController = FinanceBarChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex ?? 2
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: financeDetailViewController, action: nil)
         financeDetailViewController.navigationItem.leftBarButtonItem = cancelBarButton
@@ -545,7 +545,7 @@ extension ObjectDetailShowing {
     
     func showAccountDetailDetailPresent(accountDetails: AccountDetails, allAccounts: [MXAccount], accounts: [MXAccount], selectedIndex: Int?) {
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: accountDetails, allAccounts: allAccounts, accounts: accounts, transactionDetails: nil, allTransactions: nil, transactions: nil, filterAccounts: nil, financeDetailService: FinanceDetailService())
-        let financeDetailViewController = FinanceBarChartViewController(viewModel: financeDetailViewModel, networkController: networkController)
+        let financeDetailViewController = FinanceLineChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex ?? 2
         financeDetailViewController.hidesBottomBarWhenPushed = true
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: financeDetailViewController, action: nil)

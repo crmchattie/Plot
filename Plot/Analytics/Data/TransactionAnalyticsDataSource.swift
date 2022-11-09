@@ -11,7 +11,7 @@ import Combine
 import Charts
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Last week", currentMonth: "Last month", currentYear: "Last year")
+    DateRangeFormatter(currentWeek: "The last week", currentMonth: "The last month", currentYear: "The last year")
         .format(range: range)
 }
 
@@ -28,7 +28,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
     
     private var transactions: [Transaction] = []
     
-    private lazy var currencyFormatter: NumberFormatter = {
+    var currencyFormatter: NumberFormatter = {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
         numberFormatter.numberStyle = .currency
@@ -45,7 +45,8 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         
         chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
                                                         rangeDescription: getTitle(range: range),
-                                                        fixToZeroOnVertical: false,
+                                                        verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
+                                                        verticalAxisType: .fixZeroToMiddleOnVertical,
                                                         units: "currency",
                                                         formatType: range.timeSegment))
     }
@@ -60,34 +61,30 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         transactions = networkController.financeService.transactions
             .filter { $0.should_link ?? true }
             .filter { $0.top_level_category != "Investments" && $0.category != "Investments" }
-            .filter { $0.type == .debit || $0.type == .credit }
+            .filter { $0.group != "Income" }
             .filter { transaction -> Bool in
 //                #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
                 guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
                 return range.startDate <= date && date <= range.endDate
             }
         
-        var incomeValue: Double = 0
-        var expenseValue: Double = 0
-        
+        var totalValue: Double = 0
         var categoryValues: [[Double]] = []
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
         
         transactions.grouped(by: \.group).forEach { (category, transactions) in
-            print(category)
-            print(transactions.count)
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
             transactions.forEach { transaction in
                 guard let day = dateFormatter.date(from: transaction.transacted_at) else { return }
                 let daysInBetween = day.daysSince(range.startDate)
                 if transaction.type == .credit {
-                    incomeValue += transaction.amount
+                    totalValue += transaction.amount
                     values[daysInBetween] += transaction.amount
                     sum += transaction.amount
                 } else {
-                    expenseValue += transaction.amount
+                    totalValue -= transaction.amount
                     values[daysInBetween] -= transaction.amount
                     sum -= transaction.amount
                 }
@@ -108,15 +105,21 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         }
         
         newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-        newChartViewModel.rangeAverageValue = "In \(self.currencyFormatter.string(from: NSNumber(value: incomeValue))!), Out \(self.currencyFormatter.string(from: NSNumber(value: expenseValue))!)"
-        
+        if totalValue < 0 {
+            newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
+        } else {
+            newChartViewModel.rangeAverageValue = "Saved \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
+
+        }
         let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
             let current = self.range.startDate.addDays(index)
-            return BarChartDataEntry(x: Double(index) + 0.5, yValues: categoryValues.map { $0[index] }, data: current)
+            let yValues = categoryValues.map { $0[index] }
+            return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
         }
-        
+                
         if !transactions.isEmpty {
             let chartDataSet = BarChartDataSet(entries: dataEntries)
+            chartDataSet.axisDependency = .right
             if !categoryColors.isEmpty {
                 chartDataSet.colors = categoryColors
             }

@@ -49,8 +49,6 @@ class SummaryValueBarChartCell: UICollectionViewCell {
                 xAxis.valueFormatter = IndexAxisValueFormatter(values: values)
                 xAxis.labelPosition = .bottom
                 xAxis.labelFont = UIFont.caption2.with(weight: .regular)
-                xAxis.granularity = 1
-                xAxis.labelCount = 5
                 xAxis.drawGridLinesEnabled = false
                                         
                 chartView.rightAxis.enabled = true

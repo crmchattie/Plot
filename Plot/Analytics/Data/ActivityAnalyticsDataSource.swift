@@ -11,7 +11,7 @@ import Charts
 import Combine
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Last week", currentMonth: "Last month", currentYear: "Last year")
+    DateRangeFormatter(currentWeek: "The last week", currentMonth: "The last month", currentYear: "The last year")
         .format(range: range)
 }
 
@@ -55,6 +55,14 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         activityDetailService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats in
             let activities = stats[.calendarSummary] ?? [:]
             
+            for (category, stats) in activities {
+                print(category)
+                for stat in stats {
+                    print(stat.date)
+                    print(stat.value)
+                }
+            }
+            
             guard !activities.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
@@ -66,7 +74,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
             
             DispatchQueue.global(qos: .background).async {
                 var categories: [CategorySummaryViewModel] = []
-                var categoryColors: [UIColor] = []
                 var activityCount = 0
                 
                 let activityKeys = activities.keys.sorted(by: <)
@@ -79,7 +86,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                                                                color: categoryColor,
                                                                value: total,
                                                                formattedValue: totalString))
-                    categoryColors.append(categoryColor)
                     activityCount += stats.count
                 }
                 categories.sort(by: { $0.value > $1.value })
@@ -97,9 +103,8 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 
                 DispatchQueue.main.async {
                     let chartDataSet = BarChartDataSet(entries: dataEntries)
-                    if !categoryColors.isEmpty {
-                        chartDataSet.colors = categoryColors
-                    }
+                    chartDataSet.axisDependency = .right
+                    chartDataSet.colors = categories.map { $0.color }
                     let chartData = BarChartData(dataSets: [chartDataSet])
                     chartData.barWidth = 0.5
                     chartData.setDrawValues(false)

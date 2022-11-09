@@ -183,8 +183,6 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
     func configureChart() {
         dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
         chartView.xAxis.valueFormatter = dayAxisValueFormatter
-        chartView.xAxis.granularity = 1
-        chartView.xAxis.labelCount = 5
         chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         chartView.leftAxis.enabled = false
         

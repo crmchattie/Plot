@@ -57,9 +57,10 @@ class AnalyticsViewModel {
         
         group.notify(queue: .main) {
             self.sections = [
-                Section(title: "Calendar", items: [activitiesDataSource.chartViewModel.value], dataSources: [activitiesDataSource]),
+                Section(title: "Events", items: [activitiesDataSource.chartViewModel.value], dataSources: [activitiesDataSource]),
                 Section(title: "Active Calories", items: [healthDataSource.chartViewModel.value], dataSources: [healthDataSource]),
-                Section(title: "Finances", items: [financeDataSource.chartViewModel.value, netWorthViewModel.chartViewModel.value], dataSources: [financeDataSource, netWorthViewModel])
+                Section(title: "Spending", items: [financeDataSource.chartViewModel.value], dataSources: [financeDataSource]),
+                Section(title: "Net Worth", items: [netWorthViewModel.chartViewModel.value], dataSources: [netWorthViewModel])
             ]
             completion()
         }

@@ -26,25 +26,28 @@ class AnalyticsBarChartCell: StackedBarChartCell {
 
     override func updateData() {
         super.updateData()
-        
+                
         guard let viewModel = viewModel else {
             chartView.data = nil
             return
         }
-        if viewModel.fixToZeroOnVertical {
-            chartView.leftAxis.axisMinimum = 0
+        
+        switch viewModel.verticalAxisType {
+        case .fixZeroToMinimumOnVertical:
             chartView.rightAxis.axisMinimum = 0
-        } else {
-            chartView.leftAxis.resetCustomAxisMin()
-            chartView.rightAxis.resetCustomAxisMin()
+            chartView.rightAxis.resetCustomAxisMax()
+        case .fixZeroToMiddleOnVertical:
+            print("")
+        case .fixZeroToMaximumOnVertical:
+            print("")
         }
         
         let dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
         dayAxisValueFormatter.formatType = viewModel.formatType.rawValue
         chartView.xAxis.valueFormatter = dayAxisValueFormatter
+        chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         chartView.xAxis.granularity = 1
         chartView.xAxis.labelCount = 5
-        chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         let marker = XYMarkerView(color: .systemGroupedBackground,
                                   font: UIFont.body.with(weight: .regular),
@@ -54,8 +57,8 @@ class AnalyticsBarChartCell: StackedBarChartCell {
         marker.chartView = chartView
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
-        
         chartView.data = viewModel.chartData
+        chartView.resetZoom()
         chartView.notifyDataSetChanged()
     }
 }

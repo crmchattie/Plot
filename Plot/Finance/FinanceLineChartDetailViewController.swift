@@ -100,10 +100,10 @@ class FinanceLineChartDetailViewController: UIViewController, ObjectDetailShowin
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.barTintColor = .systemBackground
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
         
         
         extendedLayoutIncludesOpaqueBars = true
@@ -272,6 +272,7 @@ class FinanceLineChartDetailViewController: UIViewController, ObjectDetailShowin
             weakSelf.chartView.data = lineChartData
             if minValue > 0 {
                 weakSelf.chartView.rightAxis.axisMinimum = 0
+                weakSelf.chartView.rightAxis.resetCustomAxisMax()
             }
 //            weakSelf.chartView.rightAxis.axisMaximum = maxValue * 1.1
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex

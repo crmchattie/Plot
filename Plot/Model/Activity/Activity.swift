@@ -1343,6 +1343,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
         }
         
         let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
+        
         if let type = activity.category {
             guard type != "Not Applicable" else { continue }
             totalValue -= duration
@@ -1368,7 +1369,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
         }
     }
     categoryDict["No Events"] = totalValue
-    
+        
     completion(categoryDict, activitiesList)
 }
 
@@ -1430,6 +1431,7 @@ func activityListStats(
     chunkEnd: Date,
     completion: @escaping ([Statistic], [Activity]) -> ()
 ) {
+    print(activityCategory)
     var statistics = [Statistic]()
     var activityList = [Activity]()
     for activity in activities {
@@ -1464,7 +1466,7 @@ func activityListStats(
                 statistics.append(stat)
                 activityList.append(activity)
             } else {
-                if let index = statistics.firstIndex(where: { $0.date == chunkEnd }) {
+                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
                     statistics[index].value += duration
                     activityList.append(activity)
                 }

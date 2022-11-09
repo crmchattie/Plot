@@ -20,7 +20,7 @@ struct StackedBarChartViewModel {
     var rangeAverageValue: String
     var categories: [CategorySummaryViewModel]
     var chartData: ChartData?
-    var fixToZeroOnVertical: Bool
+    var verticalAxisType: VerticalAxisType
     var verticalAxisValueFormatter: AxisValueFormatter?
     var units: String
     var formatType: TimeSegmentType
@@ -29,7 +29,7 @@ struct StackedBarChartViewModel {
         chartType: ChartType,
         rangeDescription: String,
         verticalAxisValueFormatter: AxisValueFormatter? = nil,
-        fixToZeroOnVertical: Bool = true,
+        verticalAxisType: VerticalAxisType = .fixZeroToMinimumOnVertical,
         units: String,
         formatType: TimeSegmentType
     ) {
@@ -38,7 +38,7 @@ struct StackedBarChartViewModel {
         self.rangeAverageValue = "-"
         self.categories = []
         self.chartData = nil
-        self.fixToZeroOnVertical = fixToZeroOnVertical
+        self.verticalAxisType = verticalAxisType
         self.verticalAxisValueFormatter = verticalAxisValueFormatter
         self.units = units
         self.formatType = formatType
@@ -50,4 +50,10 @@ struct CategorySummaryViewModel {
     let color: UIColor
     let value: Double
     let formattedValue: String
+}
+
+enum VerticalAxisType {
+    case fixZeroToMinimumOnVertical
+    case fixZeroToMaximumOnVertical
+    case fixZeroToMiddleOnVertical
 }

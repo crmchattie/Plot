@@ -55,20 +55,20 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         var endDate = anchorDate
 
         if let range = range {
-            startDate = range.startDate
+            startDate = range.startDate.startOfDay.dayBefore
             endDate = range.endDate
         } else if segmentType == .day {
             startDate = Date().localTime.startOfDay
-            endDate = Date().localTime
+            endDate = Date().localTime.dayAfter
         } else if segmentType == .week {
             startDate = Date().localTime.startOfWeek
-            endDate = Date().localTime
+            endDate = Date().localTime.dayAfter
         } else if segmentType == .month {
             startDate = Date().localTime.startOfMonth
-            endDate = Date().localTime
+            endDate = Date().localTime.dayAfter
         } else if segmentType == .year {
             startDate = Date().localTime.startOfYear
-            endDate = Date().localTime
+            endDate = Date().localTime.dayAfter
         }
         
         DispatchQueue.global(qos: .background).async {

@@ -42,8 +42,6 @@ class SummaryTimeBarChartCell: UICollectionViewCell {
                 xAxis.valueFormatter = dayAxisValueFormatter
                 xAxis.labelPosition = .bottom
                 xAxis.labelFont = UIFont.caption2.with(weight: .regular)
-                xAxis.granularity = 1
-                xAxis.labelCount = 5
                 xAxis.drawGridLinesEnabled = false
                                         
                 chartView.rightAxis.enabled = true

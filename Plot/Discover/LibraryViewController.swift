@@ -198,9 +198,6 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         navigationController?.navigationBar.layoutIfNeeded()        
         navigationItem.largeTitleDisplayMode = .always
                 
-        tabBarController?.tabBar.barTintColor = .systemGroupedBackground
-        tabBarController?.tabBar.barStyle = .default
-        
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top

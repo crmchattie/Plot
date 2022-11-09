@@ -32,16 +32,19 @@ class AnalyticsHorizontalBarChartCell: StackedBarChartCell {
             return
         }
         
-        if viewModel.fixToZeroOnVertical {
-            chartView.leftAxis.axisMinimum = 0
+        switch viewModel.verticalAxisType {
+        case .fixZeroToMinimumOnVertical:
             chartView.rightAxis.axisMinimum = 0
-        } else {
-            chartView.leftAxis.resetCustomAxisMin()
-            chartView.rightAxis.resetCustomAxisMin()
+            chartView.rightAxis.resetCustomAxisMax()
+        case .fixZeroToMiddleOnVertical:
+            print("")
+        case .fixZeroToMaximumOnVertical:
+            print("")
         }
         
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         chartView.data = viewModel.chartData
+        chartView.resetZoom()
         chartView.notifyDataSetChanged()
     }
 }

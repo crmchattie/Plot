@@ -82,9 +82,6 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
 
         navigationController?.navigationBar.layoutIfNeeded()
         navigationItem.largeTitleDisplayMode = .always
-                
-        tabBarController?.tabBar.barTintColor = .systemGroupedBackground
-        tabBarController?.tabBar.barStyle = .default
         
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = false

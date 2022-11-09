@@ -126,6 +126,7 @@ class HealthAnalyticsDataSource: AnalyticsDataSource {
     
             let chartDataSet = BarChartDataSet(dataEntries)
             chartDataSet.colors = [.systemBlue]
+            chartDataSet.axisDependency = .right
 //            let dataSet2 = BarChartDataSet(dataEntries2)
 //            dataSet2.colors = [.green]
             let chartData = BarChartData(dataSets: [chartDataSet])

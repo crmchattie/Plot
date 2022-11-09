@@ -126,9 +126,6 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
         let doneBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(updateLocal))
         navigationItem.rightBarButtonItems = [mapBarButton, doneBarButton]
         
-        tabBarController?.tabBar.barTintColor = .systemGroupedBackground
-        tabBarController?.tabBar.barStyle = .default
-        
         extendedLayoutIncludesOpaqueBars = true
         definesPresentationContext = true
         edgesForExtendedLayout = UIRectEdge.top

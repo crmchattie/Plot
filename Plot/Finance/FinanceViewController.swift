@@ -675,10 +675,7 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
         } else {
             startDate = Date().localTime.startOfYear
             endDate = Date().localTime
-        }
-        print(startDate)
-        print(endDate)
-        
+        }        
         selectedIndex = index
         updateCollectionView()
     }

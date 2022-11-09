@@ -13,7 +13,7 @@ import UIKit
 import Firebase
 import Charts
 
-class FinanceBarChartViewController: UIViewController, ObjectDetailShowing {
+class FinanceBarChartDetailViewController: UIViewController, ObjectDetailShowing {
         
     private let kFinanceTableViewCell = "FinanceTableViewCell"
         
@@ -274,6 +274,7 @@ class FinanceBarChartViewController: UIViewController, ObjectDetailShowing {
             weakSelf.chartView.data = barChartData
             if minValue > 0 {
                 weakSelf.chartView.rightAxis.axisMinimum = 0
+                weakSelf.chartView.rightAxis.resetCustomAxisMax()
             }
 //            weakSelf.chartView.rightAxis.axisMaximum = maxValue * 1.1
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
@@ -300,7 +301,7 @@ class FinanceBarChartViewController: UIViewController, ObjectDetailShowing {
     
 }
 
-extension FinanceBarChartViewController: ChartViewDelegate {
+extension FinanceBarChartDetailViewController: ChartViewDelegate {
     
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
         
@@ -319,7 +320,7 @@ extension FinanceBarChartViewController: ChartViewDelegate {
     }
 }
 
-extension FinanceBarChartViewController: UITableViewDelegate, UITableViewDataSource {
+extension FinanceBarChartDetailViewController: UITableViewDelegate, UITableViewDataSource {
 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

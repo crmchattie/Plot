@@ -55,14 +55,15 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
                         minValue = min(minValue, stat.value)
-                        let entry = ChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
+                        let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
                     }
                                         
                     let dataSet = LineChartDataSet(entries: entries, label: "")
+                    dataSet.setDrawHighlightIndicators(false)
                     dataSet.fillColor = .systemBlue
-                    dataSet.fillAlpha = 0.5
+                    dataSet.fillAlpha = 1
                     dataSet.drawFilledEnabled = true
                     dataSet.drawCirclesEnabled = false
                     
@@ -88,14 +89,15 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                     for stat in stats {
                         maxValue = max(maxValue, stat.value)
                         minValue = min(minValue, stat.value)
-                        let entry = ChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
+                        let entry = ChartDataEntry(x: Double(i), y: stat.value, data: stat.date)
                         entries.append(entry)
                         i += 1
                     }
                                         
                     let dataSet = LineChartDataSet(entries: entries, label: "")
+                    dataSet.setDrawHighlightIndicators(false)
                     dataSet.fillColor = .systemBlue
-                    dataSet.fillAlpha = 0.5
+                    dataSet.fillAlpha = 1
                     dataSet.drawFilledEnabled = true
                     dataSet.drawCirclesEnabled = false
                     

@@ -11,7 +11,7 @@ import Combine
 import Charts
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Last week", currentMonth: "Last month", currentYear: "Last year")
+    DateRangeFormatter(currentWeek: "The last week", currentMonth: "The last month", currentYear: "The last year")
         .format(range: range)
 }
 
@@ -30,7 +30,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
     
     private lazy var dateFormatter = ISO8601DateFormatter()
 
-    private lazy var currencyFormatter: NumberFormatter = {
+    var currencyFormatter: NumberFormatter = {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
         numberFormatter.numberStyle = .currency
@@ -47,7 +47,8 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         
         chartViewModel = .init(StackedBarChartViewModel(chartType: .continous,
                                                         rangeDescription: getTitle(range: range),
-                                                        verticalAxisValueFormatter: nil,
+                                                        verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
+                                                        verticalAxisType: .fixZeroToMiddleOnVertical,
                                                         units: "currency",
                                                         formatType: range.timeSegment))
     }
@@ -75,16 +76,13 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             }
             
             var dataEntries: [ChartDataEntry] = []
-            var maxValue: Double = 0
             var firstValue: Double?
             var lastValue: Double?
             for (index, stat) in stats.enumerated() {
-                maxValue = max(maxValue, stat.value)
                 if firstValue == nil { firstValue = stat.value }
                 else { lastValue = stat.value }
-                dataEntries.append(ChartDataEntry(x: Double(index), y: stat.value, data: stat.date))
+                dataEntries.append(ChartDataEntry(x: Double(index) + 1, y: stat.value, data: stat.date))
             }
-            maxValue *= 1.2
             
             if let firstValue = firstValue, let lastValue = lastValue {
                 newChartViewModel.rangeAverageValue = self.currencyFormatter.string(from: NSNumber(value: lastValue - firstValue))!
@@ -93,13 +91,14 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             }
             
             let chartDataSet = LineChartDataSet(entries: dataEntries)
+            chartDataSet.setDrawHighlightIndicators(false)
+            chartDataSet.axisDependency = .right
             chartDataSet.fillColor = .systemBlue
-            chartDataSet.fillAlpha = 0.5
+            chartDataSet.fillAlpha = 1
             chartDataSet.drawFilledEnabled = true
             chartDataSet.drawCirclesEnabled = false
             let chartData = LineChartData(dataSets: [chartDataSet])
             chartData.setDrawValues(false)
-            
             newChartViewModel.chartData = chartData
             
             self.chartViewModel.send(newChartViewModel)
