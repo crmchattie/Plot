@@ -100,11 +100,9 @@ class FinanceLineChartDetailViewController: UIViewController, ObjectDetailShowin
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.barTintColor = .systemBackground
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
         
         extendedLayoutIncludesOpaqueBars = true
 //        

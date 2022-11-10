@@ -244,6 +244,7 @@ extension ObjectDetailShowing {
     
     
     func showTransactionDetailDetailPush(transactionDetails: TransactionDetails, allTransactions: [Transaction], transactions: [Transaction], filterDictionary: [String]?, selectedIndex: Int?) {
+        print(transactionDetails)
         let financeDetailViewModel = FinanceDetailViewModel(accountDetails: nil, allAccounts: nil, accounts: nil, transactionDetails: transactionDetails, allTransactions: allTransactions, transactions: transactions, filterAccounts: filterDictionary,  financeDetailService: FinanceDetailService())
         let financeDetailViewController = FinanceBarChartDetailViewController(viewModel: financeDetailViewModel, networkController: networkController)
         financeDetailViewController.selectedIndex = selectedIndex ?? 2

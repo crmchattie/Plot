@@ -30,10 +30,9 @@ protocol AnalyticsDataSource: AnyObject {
 }
 
 extension AnalyticsDataSource {
-    
-    func updateRange(_ newRange: DateRange) {
-        self.range = newRange
-        loadData(completion: nil)
+    func updateRange(_ newRange: DateRange, completion: @escaping () -> Void) {
+        range = newRange
+        loadData(completion: completion)
     }
 }
 

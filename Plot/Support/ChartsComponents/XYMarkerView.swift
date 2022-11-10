@@ -28,7 +28,7 @@ public class XYMarkerView: BalloonMarker {
     }
     
     public override func refreshContent(entry: ChartDataEntry, highlight: Highlight) {
-        if units == "currencyNetWorth" {
+        if units == "currencyShifted" {
             yFormatter.numberStyle = .currency
             let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + "\n"
                 + xAxisValueFormatter.stringForMarker(entry.x - 1, axis: XAxis())

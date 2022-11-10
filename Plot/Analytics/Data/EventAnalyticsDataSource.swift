@@ -16,6 +16,9 @@ private func getTitle(range: DateRange) -> String {
 }
 
 class EventAnalyticsDataSource: AnalyticsDataSource {
+    func updateRange(_ newRange: DateRange) {
+        
+    }
     
     private let networkController: NetworkController
     private let activityDetailService = ActivityDetailService()
@@ -25,6 +28,8 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
     let title: String = "Events"
+    
+    private var activities: [Activity] = []
         
     private lazy var dateFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
@@ -64,6 +69,8 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                 completion?()
                 return
             }
+            
+            self.activities = activityList
                         
             self.dataExists = true
             
@@ -117,16 +124,6 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        let entries = networkController.activityService.events
-            .filter {
-                if let startDate = $0.startDate, let endDate = $0.endDate {
-                    return startDate < range.endDate && endDate > range.startDate && !($0.allDay ?? false) && (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970 > 0)
-                }
-                return false
-            }
-            // at this point all activities should have a startDate (see above)
-            .sorted(by: { $0.startDate! > $1.startDate! })
-            .map { AnalyticsBreakdownEntry.activity($0) }
-        completion(entries)
+        completion(activities.map { .activity($0) })
     }
 }

@@ -16,6 +16,9 @@ private func getTitle(range: DateRange) -> String {
 }
 
 class TaskAnalyticsDataSource: AnalyticsDataSource {
+    func updateRange(_ newRange: DateRange) {
+        
+    }
     
     private let networkController: NetworkController
     private let activityDetailService = ActivityDetailService()
@@ -28,14 +31,14 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
     
     private var tasks: [Activity] = []
     
-    private lazy var dateFormatter: DateComponentsFormatter = {
-        let formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .abbreviated
-        formatter.allowedUnits = [.hour, .minute]
+    var dataExists: Bool?
+    
+    private var numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 0
+        formatter.minimumFractionDigits = 0
         return formatter
     }()
-    
-    var dataExists: Bool?
     
     init(
         range: DateRange,
@@ -46,6 +49,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         
         chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
+                                                        verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: numberFormatter),
                                                         units: "completed",
                                                         formatType: range.timeSegment))
     }

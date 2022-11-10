@@ -10,7 +10,7 @@ import Foundation
 import HealthKit
 
 protocol HealthDetailServiceInterface {
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
 }
 
 class HealthDetailService: HealthDetailServiceInterface {
@@ -18,11 +18,11 @@ class HealthDetailService: HealthDetailServiceInterface {
     var workouts = [String: [HKWorkout]]()
     var mindfulnesses = [HKCategorySample]()
     
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
-        getStatisticalSamples(for: healthMetric, segmentType: segmentType, completion: completion)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
+        getStatisticalSamples(for: healthMetric, segmentType: segmentType, anchorDate: anchorDate, completion: completion)
     }
     
-    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
+    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
         let healthMetricType = healthMetric.type
         var interval = DateComponents()
         var quantityType: HKQuantityType?
@@ -98,7 +98,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         // Use start of the day in local time
         let timezone = TimeZone.current
         let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-        let anchorDate = Date().localTime.startOfDay.addingTimeInterval(-seconds)
+        let anchorDate = anchorDate ?? Date().localTime.startOfDay.addingTimeInterval(-seconds)
         var startDate = anchorDate
         let endDate = anchorDate.advanced(by: 86399)
                         
@@ -129,6 +129,10 @@ class HealthDetailService: HealthDetailServiceInterface {
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
         }
+        
+        print("service")
+        print(startDate)
+        print(endDate)
         
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
@@ -493,10 +497,6 @@ class HealthDetailService: HealthDetailServiceInterface {
                     let hours = TimeInterval(item.value).totalHours
                     let stat = Statistic(date: item.key, value: hours)
                     customStats.append(stat)
-                    
-                    print(item.key.addingTimeInterval(-item.value))
-                    print(hours)
-                    print(item.key)
                     
                     let customSample = HKCategorySample(type: relevantSamples.first!.categoryType, value: typeOfSleep.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
                     customSamples.append(customSample)

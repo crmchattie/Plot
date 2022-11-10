@@ -18,6 +18,9 @@ private func getTitle(range: DateRange) -> String {
 
 // Steps
 class SleepAnalyticsDataSource: AnalyticsDataSource {
+    func updateRange(_ newRange: DateRange) {
+        
+    }
     
     private let networkController: NetworkController
     private let healthDetailService = HealthDetailService()
@@ -63,14 +66,16 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
         if let workoutMetrics = networkController.healthService.healthMetrics[.general], let healthMetric = workoutMetrics.first(where: {$0.type == .sleep}) {
             dataExists = true
             newChartViewModel.healthMetric = healthMetric
-            healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment) { stats, samples, error in
+            healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { stats, samples, error in
                 var data: BarChartData?
+                var sum = 0.0
                 if let stats = stats, stats.count > 0 {
                     var i = 0
                     var entries: [BarChartDataEntry] = []
                     for stat in stats {
                         let entry = BarChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
                         entries.append(entry)
+                        sum += stat.value
                         i += 1
                     }
                     
@@ -84,7 +89,10 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                 
                 DispatchQueue.main.async {
                     newChartViewModel.chartData = data
-                    if let averageValue = healthMetric.average, let totalString = self.dateFormatter.string(from: averageValue) {
+                    print("averageValue")
+                    let averageValue = sum / Double(stats!.count) * 3600
+                    print(averageValue)
+                    if let totalString = self.dateFormatter.string(from: averageValue) {
                         newChartViewModel.rangeAverageValue = totalString
                     }
                     self.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []

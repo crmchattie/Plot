@@ -665,17 +665,13 @@ extension FinanceViewController: CustomSegmentedControlDelegate {
     func changeToIndex(index:Int) {
         if index == 0 {
             startDate = Date().localTime.startOfDay
-            endDate = Date().localTime.dayAfter
         } else if index == 1 {
             startDate = Date().localTime.startOfWeek
-            endDate = Date().localTime.dayAfter
         } else if index == 2 {
             startDate = Date().localTime.startOfMonth
-            endDate = Date().localTime.dayAfter
         } else {
             startDate = Date().localTime.startOfYear
-            endDate = Date().localTime.dayAfter
-        }        
+        }
         selectedIndex = index
         updateCollectionView()
     }

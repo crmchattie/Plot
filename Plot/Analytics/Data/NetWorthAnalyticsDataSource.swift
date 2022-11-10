@@ -16,6 +16,9 @@ private func getTitle(range: DateRange) -> String {
 }
 
 class NetWorthAnalyticsDataSource: AnalyticsDataSource {
+    func updateRange(_ newRange: DateRange) {
+        
+    }
     
     private let networkController: NetworkController
     private let financeService = FinanceDetailService()
@@ -51,7 +54,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
                                                         verticalAxisType: .fixZeroToMiddleOnVertical,
-                                                        units: "currencyNetWorth",
+                                                        units: "currencyShifted",
                                                         formatType: range.timeSegment))
     }
     

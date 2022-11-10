@@ -18,6 +18,10 @@ private func getTitle(range: DateRange) -> String {
 
 // Steps
 class StepsAnalyticsDataSource: AnalyticsDataSource {
+    func updateRange(_ newRange: DateRange) {
+        
+    }
+    
     
     private let networkController: NetworkController
     private let healthDetailService = HealthDetailService()
@@ -56,14 +60,17 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
         if let workoutMetrics = networkController.healthService.healthMetrics[.general], let healthMetric = workoutMetrics.first(where: {$0.type == .steps}) {
             dataExists = true
             newChartViewModel.healthMetric = healthMetric
-            healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment) { stats, samples, error in
+            print(range.endDate)
+            healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { stats, samples, error in
                 var data: BarChartData?
+                var sum = 0.0
                 if let stats = stats, stats.count > 0 {
                     var i = 0
                     var entries: [BarChartDataEntry] = []
                     for stat in stats {
                         let entry = BarChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
                         entries.append(entry)
+                        sum += stat.value
                         i += 1
                     }
                     
@@ -77,9 +84,7 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                 
                 DispatchQueue.main.async {
                     newChartViewModel.chartData = data
-                    if let averageValue = healthMetric.average {
-                        newChartViewModel.rangeAverageValue = "\(Int(averageValue)) steps"
-                    }
+                    newChartViewModel.rangeAverageValue = "\(Int(sum / Double(stats!.count))) steps"
                     self.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
                     self.chartViewModel.send(newChartViewModel)
                     completion?()

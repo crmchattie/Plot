@@ -16,6 +16,9 @@ private func getTitle(range: DateRange) -> String {
 }
 
 class TransactionAnalyticsDataSource: AnalyticsDataSource {
+    func updateRange(_ newRange: DateRange) {
+        
+    }
     
     private let networkController: NetworkController
     private let financeService = FinanceDetailService()
@@ -57,6 +60,52 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
+                
+//        let transactions = networkController.financeService.transactions
+//
+//        let detail = TransactionDetails(name: "Expense", amount: 0, level: .group, category: nil, topLevelCategory: nil, group: "Expense", currencyCode: "USD")
+//        financeService.getSamples(for: range, segment: range.timeSegment, accountDetails: nil, transactionDetails: detail, accounts: nil, transactions: transactions) { (stats, _, transactions, _) in
+//            let stats = stats ?? []
+//
+//            if stats.isEmpty {
+//                newChartViewModel.chartData = nil
+//                self.chartViewModel.send(newChartViewModel)
+//                completion?()
+//                return
+//            }
+//
+//            self.dataExists = true
+//            self.transactions = transactions ?? []
+//
+//            var dataEntries: [ChartDataEntry] = []
+//            var firstValue: Double?
+//            var lastValue: Double?
+//            for (index, stat) in stats.enumerated() {
+//                if firstValue == nil { firstValue = stat.value }
+//                else { lastValue = stat.value }
+//                dataEntries.append(ChartDataEntry(x: Double(index) + 1, y: stat.value, data: stat.date))
+//            }
+//
+//            if let firstValue = firstValue, let lastValue = lastValue {
+//                newChartViewModel.rangeAverageValue = self.currencyFormatter.string(from: NSNumber(value: lastValue - firstValue))!
+//            } else {
+//                newChartViewModel.rangeAverageValue = "-"
+//            }
+//
+//            let chartDataSet = LineChartDataSet(entries: dataEntries)
+//            chartDataSet.setDrawHighlightIndicators(false)
+//            chartDataSet.axisDependency = .right
+//            chartDataSet.fillColor = .systemBlue
+//            chartDataSet.fillAlpha = 1
+//            chartDataSet.drawFilledEnabled = true
+//            chartDataSet.drawCirclesEnabled = false
+//            let chartData = LineChartData(dataSets: [chartDataSet])
+//            chartData.setDrawValues(false)
+//            newChartViewModel.chartData = chartData
+//
+//            self.chartViewModel.send(newChartViewModel)
+//            completion?()
+//        }
         
         let daysInRange = range.daysInRange
         
@@ -69,12 +118,12 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
                 guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
                 return range.startDate <= date && date <= range.endDate
             }
-        
+
         var totalValue: Double = 0
         var categoryValues: [[Double]] = []
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
-        
+
         transactions.grouped(by: \.group).forEach { (category, transactions) in
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
@@ -82,16 +131,16 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
                 guard let day = dateFormatter.date(from: transaction.transacted_at) else { return }
                 let daysInBetween = day.daysSince(range.startDate)
                 if transaction.type == .credit {
-                    totalValue += transaction.amount
-                    values[daysInBetween] += transaction.amount
-                    sum += transaction.amount
-                } else {
                     totalValue -= transaction.amount
                     values[daysInBetween] -= transaction.amount
                     sum -= transaction.amount
+                } else {
+                    totalValue += transaction.amount
+                    values[daysInBetween] += transaction.amount
+                    sum += transaction.amount
                 }
             }
-            
+
             var categoryColor = UIColor()
             if let index = financialTransactionsGroupsStatic.firstIndex(where: {$0 == category} ) {
                 categoryColor = ChartColors.palette()[index % 9]
@@ -105,9 +154,9 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             categoryColors.append(categoryColor)
             categoryValues.append(values)
         }
-        
-        newChartViewModel.categories = Array(categories.sorted(by: { $0.value < $1.value }).prefix(3))
-        if totalValue < 0 {
+
+        newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
+        if totalValue > 0 {
             newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
         } else {
             newChartViewModel.rangeAverageValue = "Saved \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
@@ -118,7 +167,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             let yValues = categoryValues.map { $0[index] }
             return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
         }
-                
+
         if !transactions.isEmpty {
             dataExists = true
             let chartDataSet = BarChartDataSet(entries: dataEntries)
@@ -134,7 +183,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             newChartViewModel.categories = []
             newChartViewModel.rangeAverageValue = "-"
         }
-        
+
         chartViewModel.send(newChartViewModel)
         completion?()
     }
