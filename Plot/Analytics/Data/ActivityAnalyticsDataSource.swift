@@ -33,6 +33,8 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         return formatter
     }()
     
+    var dataExists: Bool?
+    
     init(
         range: DateRange,
         networkController: NetworkController
@@ -55,14 +57,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         activityDetailService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats in
             let activities = stats[.calendarSummary] ?? [:]
             
-            for (category, stats) in activities {
-                print(category)
-                for stat in stats {
-                    print(stat.date)
-                    print(stat.value)
-                }
-            }
-            
             guard !activities.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
@@ -71,6 +65,8 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 completion?()
                 return
             }
+            
+            self.dataExists = true
             
             DispatchQueue.global(qos: .background).async {
                 var categories: [CategorySummaryViewModel] = []

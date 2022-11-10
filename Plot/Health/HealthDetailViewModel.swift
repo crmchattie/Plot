@@ -14,7 +14,7 @@ protocol HealthDetailViewModelInterface {
     var healthMetric: HealthMetric { get }
     var samples: [HKSample] { get }
     
-    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double) -> ())
+    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?) -> ())
 }
 
 class HealthDetailViewModel: HealthDetailViewModelInterface {
@@ -27,16 +27,14 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
         self.healthDetailService = healthDetailService
     }
     
-    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?, Double) -> ()) {
+    func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?) -> ()) {
         healthDetailService.getSamples(for: healthMetric, segmentType: segmentType) { [weak self] (stats, samples, error) in
 
             var data: BarChartData?
-            var maxValue: Double = 0
             if let stats = stats, stats.count > 0 {
                 var i = 0
                 var entries: [BarChartDataEntry] = []
                 for stat in stats {
-                    maxValue = max(maxValue, stat.value)
                     let entry = BarChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
                     entries.append(entry)
                     i += 1
@@ -52,7 +50,7 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
             
             DispatchQueue.main.async {
                 self?.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
-                completion(data, maxValue)
+                completion(data)
             }
         }
     }

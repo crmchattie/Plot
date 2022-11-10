@@ -196,6 +196,9 @@ class HealthKitService {
             
             if total > 0 {
                 total /= Double(statistics.count)
+                if identifier == .activeEnergyBurned {
+                    print(statistics.count)
+                }
             }
             
             let recent = statistics.last?.sumQuantity()?.doubleValue(for: unit)

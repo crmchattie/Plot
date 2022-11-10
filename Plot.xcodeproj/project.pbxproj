@@ -191,6 +191,10 @@
 		109FEB3B22A1ACE300621D2F /* ScheduleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */; };
 		109FEB3D22A7003000621D2F /* CalendarType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB3C22A7003000621D2F /* CalendarType.swift */; };
 		109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109FEB4122A9C3DD00621D2F /* Purchase.swift */; };
+		10A18656291C635A009AB7F4 /* AnnualAverageActiveEnergyOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18655291C635A009AB7F4 /* AnnualAverageActiveEnergyOperation.swift */; };
+		10A18658291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18657291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift */; };
+		10A1865A291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */; };
+		10A1865C291C9014009AB7F4 /* SleepAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */; };
 		10A2AE9F2508131700D49A0C /* FinanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */; };
 		10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAA257ACC7200E3A798 /* Scheduler.swift */; };
 		10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAE257ACC9000E3A798 /* Mood.swift */; };
@@ -559,7 +563,7 @@
 		F9773A862601453500D1B204 /* HourAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */; };
 		F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */; };
 		F9773A8F26014C7B00D1B204 /* AnalyticsDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */; };
-		F983298C2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983298B2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift */; };
+		F983298C2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983298B2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift */; };
 		F98329952602B25100EB51F7 /* ActivityCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98329942602B25100EB51F7 /* ActivityCategory.swift */; };
 		F990815D26161DE4000D5EC4 /* EventKit+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F990815C26161DE4000D5EC4 /* EventKit+Utility.swift */; };
 		F99E45B0262F22B600F59D0E /* iCalUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99E45AF262F22B600F59D0E /* iCalUtility.swift */; };
@@ -785,6 +789,10 @@
 		109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRow.swift; sourceTree = "<group>"; };
 		109FEB3C22A7003000621D2F /* CalendarType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarType.swift; sourceTree = "<group>"; };
 		109FEB4122A9C3DD00621D2F /* Purchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
+		10A18655291C635A009AB7F4 /* AnnualAverageActiveEnergyOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnualAverageActiveEnergyOperation.swift; sourceTree = "<group>"; };
+		10A18657291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AverageAnnualFlightsClimbedOperation.swift; sourceTree = "<group>"; };
+		10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewCell.swift; sourceTree = "<group>"; };
 		10B2BBAA257ACC7200E3A798 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		10B2BBAE257ACC9000E3A798 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
@@ -1155,7 +1163,7 @@
 		F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourAxisValueFormatter.swift; sourceTree = "<group>"; };
 		F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewController.swift; sourceTree = "<group>"; };
 		F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewModel.swift; sourceTree = "<group>"; };
-		F983298B2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		F983298B2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveEnergyAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F98329942602B25100EB51F7 /* ActivityCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCategory.swift; sourceTree = "<group>"; };
 		F990815C26161DE4000D5EC4 /* EventKit+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventKit+Utility.swift"; sourceTree = "<group>"; };
 		F99E45AF262F22B600F59D0E /* iCalUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCalUtility.swift; sourceTree = "<group>"; };
@@ -1949,6 +1957,7 @@
 				260C87CF2500BFDF00715A64 /* AnnualAverageStepsOperation.swift */,
 				260C87D12500C0D400715A64 /* StepsGroupOperation.swift */,
 				260C87CD24FF60B100715A64 /* StepsOperation.swift */,
+				10A18657291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift */,
 				10B3E52028B6943000E1713D /* FlightsClimbedOperation.swift */,
 				26836B4E251338BD00AFC2D7 /* AnnualAverageHeartRateOperation.swift */,
 				26836B50251338E800AFC2D7 /* HeartRateOperation.swift */,
@@ -1959,6 +1968,7 @@
 				1092E28028BA7C3C0018FCAA /* WorkoutMinutesOperation.swift */,
 				26958552255A7355008FEE9B /* NutritionOperation.swift */,
 				26BDCDCB2582097700E850CF /* SleepOperation.swift */,
+				10A18655291C635A009AB7F4 /* AnnualAverageActiveEnergyOperation.swift */,
 				10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
@@ -2927,7 +2937,9 @@
 			children = (
 				F9B82C8F25FAB1FE0072BE74 /* AnalyticsDataSource.swift */,
 				F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */,
-				F983298B2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift */,
+				10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */,
+				10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */,
+				F983298B2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift */,
 				F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */,
 				F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */,
 				F916C767260E793F0062F952 /* DateRangeFormatter.swift */,
@@ -3237,6 +3249,7 @@
 				10C0CC662885FED4007CC9F3 /* CustomRecurrenceViewController.swift in Sources */,
 				269105F7253E8E2E00A02C5F /* DateValueFormatter.swift in Sources */,
 				1080873B2585073500FB9BB0 /* MindfulnessFetcher.swift in Sources */,
+				10A18658291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift in Sources */,
 				102618C925771FE300CF6F0A /* ActivityLevelViewController.swift in Sources */,
 				F990815D26161DE4000D5EC4 /* EventKit+Utility.swift in Sources */,
 				10E8E4FB25923B3F0076BE42 /* HealthControllerCell.swift in Sources */,
@@ -3383,6 +3396,7 @@
 				10C7F92525A520ED004E9277 /* ActiveEnergyOperation.swift in Sources */,
 				4BAEE4E921272D890045AB10 /* MediaPickerControllerNew.swift in Sources */,
 				F9773A8F26014C7B00D1B204 /* AnalyticsDetailViewModel.swift in Sources */,
+				10A18656291C635A009AB7F4 /* AnnualAverageActiveEnergyOperation.swift in Sources */,
 				4BAEE52121272D890045AB10 /* ChatLogController+CollectionDelegate.swift in Sources */,
 				4BAEE5E3212735E50045AB10 /* ThemeManager.swift in Sources */,
 				10217A7723102CA4004CBA9E /* CalendarView.swift in Sources */,
@@ -3409,7 +3423,7 @@
 				4BAEE5BB212735E50045AB10 /* INSPhotosOverlayView.swift in Sources */,
 				105F34AC2885EF7A007531EB /* Constants.swift in Sources */,
 				26036778256DC76900FE9142 /* EKSyncCalendarEventsOp.swift in Sources */,
-				F983298C2602A7B300EB51F7 /* HealthAnalyticsDataSource.swift in Sources */,
+				F983298C2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift in Sources */,
 				105F34B82885EF7A007531EB /* EKWeekday+Sequence.swift in Sources */,
 				10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
@@ -3426,6 +3440,7 @@
 				102076CE23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift in Sources */,
 				10C50FA42274EF9100111033 /* Activity.swift in Sources */,
 				4BAEE48621272C4F0045AB10 /* OnboardingController.swift in Sources */,
+				10A1865A291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift in Sources */,
 				105F34B02885EF7A007531EB /* GridSelectorLayout.swift in Sources */,
 				260C87D02500BFDF00715A64 /* AnnualAverageStepsOperation.swift in Sources */,
 				108BDBC228F5F53300A2285B /* OnboardingCollectionViewCell.swift in Sources */,
@@ -3690,6 +3705,7 @@
 				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,
 				F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */,
 				2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */,
+				10A1865C291C9014009AB7F4 /* SleepAnalyticsDataSource.swift in Sources */,
 				4BAEE5D3212735E50045AB10 /* RoundProgressView.swift in Sources */,
 				26036762256CC4DA00FE9142 /* EventKitSetupAssistant.swift in Sources */,
 				10DE97392475837B00D4A7E8 /* ListContainer.swift in Sources */,

@@ -31,8 +31,7 @@ class HeartRateOperation: AsyncOperation {
         let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
         // Get average day heart rate for the most recent heart rate sample endDate
         HealthKitService.getLatestDiscreteDailyAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit) { [weak self] heartRate, date in
-            
-            guard let heartRate = heartRate, let date = date, let _self = self else {
+            guard let heartRate = heartRate, heartRate > 0, let date = date, let _self = self else {
                 self?.finish()
                 return
             }

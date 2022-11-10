@@ -37,6 +37,8 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         numberFormatter.maximumFractionDigits = 0
         return numberFormatter
     }()
+    
+    var dataExists: Bool?
 
     init(
         range: DateRange,
@@ -49,7 +51,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
                                                         verticalAxisType: .fixZeroToMiddleOnVertical,
-                                                        units: "currency",
+                                                        units: "currencyNetWorth",
                                                         formatType: range.timeSegment))
     }
     
@@ -74,6 +76,8 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
                 completion?()
                 return
             }
+            
+            self.dataExists = true
             
             var dataEntries: [ChartDataEntry] = []
             var firstValue: Double?

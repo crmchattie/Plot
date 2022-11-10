@@ -10,11 +10,12 @@ import Foundation
 import HealthKit
 
 class FlightsClimbedOperation: AsyncOperation {
-    private var date: Date
+    private var startDate: Date
     weak var delegate: MetricOperationDelegate?
+    var annualAverageFloors: Double?
     
     init(date: Date) {
-        self.date = date
+        self.startDate = date
     }
     
     override func main() {
@@ -22,16 +23,14 @@ class FlightsClimbedOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let endDate = date
-        let startDate = endDate.lastYear
-        HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .flightsClimbed, unit: .count(), startDate: startDate, endDate: endDate) { [weak self] annualAverage, dailyTotal, recentStatDate in
-            guard let annualAverage = annualAverage, let dailyTotal = dailyTotal, let recentStatDate = recentStatDate, let _self = self else {
+        HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .flightsClimbed, unit: .count(), date: self.startDate) { [weak self]  floorsResult, _, _ in
+            guard let floorsResult = floorsResult, floorsResult > 0, let _self = self else {
                 self?.finish()
                 return
             }
             
-            var metric = HealthMetric(type: HealthMetricType.flightsClimbed, total: dailyTotal, date: recentStatDate, unitName: "floors", rank: HealthMetricType.flightsClimbed.rank)
-            metric.average = annualAverage
+            var metric = HealthMetric(type: HealthMetricType.flightsClimbed, total: floorsResult, date: _self.startDate, unitName: "floors", rank: HealthMetricType.flightsClimbed.rank)
+            metric.average = _self.annualAverageFloors
             _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
             self?.finish()
 

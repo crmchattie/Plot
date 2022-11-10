@@ -202,7 +202,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 return cell
             case .sample(let sample):
                 let cell = tableView.dequeueReusableCell(ofType: HealthDetailSampleCell.self, for: indexPath)
-                if let healthMetric = viewModel.healthMetric {
+                if let healthMetric = viewModel.chartViewModel.value.healthMetric {
                     if case .workout = healthMetric.type {
                         cell.selectionStyle = .default
                     } else if case .mindfulness = healthMetric.type {
@@ -214,7 +214,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                     }
                     cell.backgroundColor = .secondarySystemGroupedBackground
                     cell.healthMetric = healthMetric
-                    let segmentType = TimeSegmentType(rawValue: rangeControlView.selectedSegmentIndex)
+                    let segmentType = TimeSegmentType(rawValue: rangeControlView.selectedSegmentIndex + 1)
                     cell.configure(sample, segmentType: segmentType ?? .week)
                 }
                 return cell

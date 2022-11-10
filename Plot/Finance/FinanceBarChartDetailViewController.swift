@@ -265,7 +265,7 @@ class FinanceBarChartDetailViewController: UIViewController, ObjectDetailShowing
         
         guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex) else { return }
         
-        viewModel.fetchBarChartData(segmentType: segmentType, useAll: useAll) { [weak self] (barChartData, maxValue, minValue) in
+        viewModel.fetchBarChartData(segmentType: segmentType, useAll: useAll) { [weak self] (barChartData, minValue) in
             guard let weakSelf = self else { return }
             
             weakSelf.backgroundChartView.isHidden = false
@@ -276,7 +276,6 @@ class FinanceBarChartDetailViewController: UIViewController, ObjectDetailShowing
                 weakSelf.chartView.rightAxis.axisMinimum = 0
                 weakSelf.chartView.rightAxis.resetCustomAxisMax()
             }
-//            weakSelf.chartView.rightAxis.axisMaximum = maxValue * 1.1
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.notifyDataSetChanged()

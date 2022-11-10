@@ -36,6 +36,8 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         return numberFormatter
     }()
     
+    var dataExists: Bool?
+    
     init(
         range: DateRange,
         networkController: NetworkController
@@ -118,6 +120,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         }
                 
         if !transactions.isEmpty {
+            dataExists = true
             let chartDataSet = BarChartDataSet(entries: dataEntries)
             chartDataSet.axisDependency = .right
             if !categoryColors.isEmpty {

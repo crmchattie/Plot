@@ -1431,7 +1431,6 @@ func activityListStats(
     chunkEnd: Date,
     completion: @escaping ([Statistic], [Activity]) -> ()
 ) {
-    print(activityCategory)
     var statistics = [Statistic]()
     var activityList = [Activity]()
     for activity in activities {

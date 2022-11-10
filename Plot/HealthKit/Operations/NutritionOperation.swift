@@ -30,7 +30,7 @@ class NutritionOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let endDate = date
+        let endDate = date.dayAfter
         let startDate = endDate.lastYear
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: nutritionTypeIdentifier, unit: unit, startDate: startDate, endDate: endDate) { [weak self] annualAverage, dailyTotal, recentStatDate in
             guard let annualAverage = annualAverage, let dailyTotal = dailyTotal, let recentStatDate = recentStatDate, let _self = self else {

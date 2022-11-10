@@ -59,9 +59,16 @@ class HealthKitManager {
             groupOperation.addDependency(adapter)
             
             // Flights Climbed
+            let annualAverageFlightsClimbedOperation = AverageAnnualFlightsClimbedOperation(date: today)
             let flightsClimbedOperation = FlightsClimbedOperation(date: today)
             flightsClimbedOperation.delegate = self
-    
+            
+            let flightsClimbedOpAdapter = BlockOperation() { [unowned annualAverageFlightsClimbedOperation, unowned flightsClimbedOperation] in
+                flightsClimbedOperation.annualAverageFloors = annualAverageFlightsClimbedOperation.floors
+            }
+            
+            flightsClimbedOpAdapter.addDependency(annualAverageFlightsClimbedOperation)
+            flightsClimbedOperation.addDependency(flightsClimbedOpAdapter)
             
             // Heart Rate
             let annualAverageHeartRateOperation = AnnualAverageHeartRateOperation(date: today)
@@ -91,37 +98,33 @@ class HealthKitManager {
             let sleepOp = SleepOperation(date: today)
             sleepOp.delegate = self
             
+            
+            //Mindfulness
             let mindfulnessOp = MindfulnessOperation(date: today)
             mindfulnessOp.delegate = self
             mindfulnessOp.lastSyncDate = lastSyncDate
             
+            
+            //Active energy
+            let annualAverageActiveEnergyOperation = AnnualAverageActiveEnergyOperation(date: today)
             let activeEnergyOp = ActiveEnergyOperation(date: today)
             activeEnergyOp.delegate = self
             
-            // Nutrition
-            let dietaryEnergyConsumedOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryEnergyConsumed, unit: .kilocalorie(), unitTitle: "calories", rank: 1)
-            dietaryEnergyConsumedOp.delegate = self
+            let activeEnergyOpAdapter = BlockOperation() { [unowned annualAverageActiveEnergyOperation, unowned activeEnergyOp] in
+                activeEnergyOp.annualAverageCalories = annualAverageActiveEnergyOperation.calories
+            }
             
-            let gramsText = "grams"
-            let dietaryFatTotalOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryFatTotal, unit: .gram(), unitTitle: gramsText, rank: 2)
-            dietaryFatTotalOp.delegate = self
-            
-            let dietaryProteinOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryProtein, unit: .gram(), unitTitle: gramsText, rank: 3)
-            dietaryProteinOp.delegate = self
-            
-            let dietaryCarbohydratesOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryCarbohydrates, unit: .gram(), unitTitle: gramsText, rank: 4)
-            dietaryCarbohydratesOp.delegate = self
-            
-            let dietarySugarOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietarySugar, unit: .gram(), unitTitle: gramsText, rank: 5)
-            dietarySugarOp.delegate = self
+            activeEnergyOpAdapter.addDependency(annualAverageActiveEnergyOperation)
+            activeEnergyOp.addDependency(activeEnergyOpAdapter)
             
             let futureDay = today.dayAfter
             
+            //Workout minutes
             let workoutMinutesOp = WorkoutMinutesOperation(date: futureDay)
             workoutMinutesOp.delegate = self
             
             // Setup queue
-            self?.queue.addOperations([workoutMinutesOp, annualAverageStepsOperation, groupOperation, adapter, flightsClimbedOperation, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, activeEnergyOp, dietaryEnergyConsumedOp, dietaryFatTotalOp, dietaryProteinOp, dietaryCarbohydratesOp, dietarySugarOp], waitUntilFinished: false)
+            self?.queue.addOperations([workoutMinutesOp, annualAverageStepsOperation, groupOperation, adapter, annualAverageFlightsClimbedOperation, flightsClimbedOperation, flightsClimbedOpAdapter, annualAverageHeartRateOperation, heartRateOperation, heartRateOpAdapter, annualAverageWeightOperation, weightOperation, weightOpAdapter, sleepOp, mindfulnessOp, annualAverageActiveEnergyOperation, activeEnergyOp, activeEnergyOpAdapter], waitUntilFinished: false)
             
             if #available(iOS 16.0, *) {
                 for index in 0...HKWorkoutActivityType.allCases.count - 1 {
@@ -246,3 +249,20 @@ protocol MetricOperationDelegate: AnyObject {
     func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: HealthMetricCategory)
     func insertMetric(_ operation: AsyncOperation, _ metric: HealthMetric, _ category: HealthMetricCategory, _ containers: [Container])
 }
+
+//// Nutrition
+//let dietaryEnergyConsumedOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryEnergyConsumed, unit: .kilocalorie(), unitTitle: "calories", rank: 1)
+//dietaryEnergyConsumedOp.delegate = self
+//
+//let gramsText = "grams"
+//let dietaryFatTotalOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryFatTotal, unit: .gram(), unitTitle: gramsText, rank: 2)
+//dietaryFatTotalOp.delegate = self
+//
+//let dietaryProteinOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryProtein, unit: .gram(), unitTitle: gramsText, rank: 3)
+//dietaryProteinOp.delegate = self
+//
+//let dietaryCarbohydratesOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietaryCarbohydrates, unit: .gram(), unitTitle: gramsText, rank: 4)
+//dietaryCarbohydratesOp.delegate = self
+//
+//let dietarySugarOp = NutritionOperation(date: today, nutritionTypeIdentifier: .dietarySugar, unit: .gram(), unitTitle: gramsText, rank: 5)
+//dietarySugarOp.delegate = self

@@ -229,13 +229,12 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
         
         activityIndicator.startAnimating()
         
-        viewModel.fetchChartData(for: segmentType) { [weak self] (data, maxValue) in
+        viewModel.fetchChartData(for: segmentType) { [weak self] (data) in
             guard let weakSelf = self else { return }
             weakSelf.backgroundChartView.isHidden = false
             weakSelf.tableView.isHidden = false
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMinimum = 0
-//            weakSelf.chartView.rightAxis.axisMaximum = maxValue * 1.1
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.notifyDataSetChanged()

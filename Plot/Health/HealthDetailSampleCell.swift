@@ -104,7 +104,7 @@ class HealthDetailSampleCell: UITableViewCell {
         titleLabelRight.text = ""
     }
     
-    func configure(_ sample: HKSample, segmentType: TimeSegmentType) {
+    func configure(_ sample: HKSample, segmentType: TimeSegmentType) {        
         titleLabel.textColor = .label
         titleLabelRight.textColor = .label
         subtitleLabel.textColor = .secondaryLabel
@@ -132,7 +132,7 @@ class HealthDetailSampleCell: UITableViewCell {
         }
         else if case .heartRate = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-            let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit))
+            let count = String(format: "%.0f", quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit))
             let string = "\(count) bpm"
             titleLabel.text = string
             
@@ -142,6 +142,10 @@ class HealthDetailSampleCell: UITableViewCell {
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
+            } else {
+                let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit))
+                let string = "\(count) bpm"
+                titleLabel.text = string
             }
         }
         else if case .weight = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
@@ -186,16 +190,19 @@ class HealthDetailSampleCell: UITableViewCell {
             }
         }
         else if case .activeEnergy = healthMetric.type, let quantitySample = sample as? HKQuantitySample, let unit = healthMetric.unit {
-            let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: unit))
+            let count = String(format: "%.0f", quantitySample.quantity.doubleValue(for: unit))
             let string = "\(count) \(healthMetric.unitName)"
             titleLabel.text = string
-            
             if segmentType == .week || segmentType == .month {
                 dateFormatter.dateFormat = "MMM dd, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
+            } else {
+                let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: unit))
+                let string = "\(count) \(healthMetric.unitName)"
+                titleLabel.text = string
             }
         }
         else if case .flightsClimbed = healthMetric.type, let quantitySample = sample as? HKQuantitySample {

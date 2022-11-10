@@ -38,8 +38,20 @@ class AnalyticsViewModel {
         }
         
         group.enter()
-        let healthDataSource = HealthAnalyticsDataSource(range: range, networkController: networkController)
-        healthDataSource.loadData {
+        let stepsDataSource = StepsAnalyticsDataSource(range: range, networkController: networkController)
+        stepsDataSource.loadData {
+            group.leave()
+        }
+        
+        group.enter()
+        let sleepDataSource = SleepAnalyticsDataSource(range: range, networkController: networkController)
+        sleepDataSource.loadData {
+            group.leave()
+        }
+        
+        group.enter()
+        let activeEnergyDataSource = ActiveEnergyAnalyticsDataSource(range: range, networkController: networkController)
+        activeEnergyDataSource.loadData {
             group.leave()
         }
         
@@ -56,12 +68,32 @@ class AnalyticsViewModel {
         }
         
         group.notify(queue: .main) {
-            self.sections = [
-                Section(title: "Events", items: [activitiesDataSource.chartViewModel.value], dataSources: [activitiesDataSource]),
-                Section(title: "Active Calories", items: [healthDataSource.chartViewModel.value], dataSources: [healthDataSource]),
-                Section(title: "Spending", items: [financeDataSource.chartViewModel.value], dataSources: [financeDataSource]),
-                Section(title: "Net Worth", items: [netWorthViewModel.chartViewModel.value], dataSources: [netWorthViewModel])
-            ]
+            self.sections = []
+            
+            if activitiesDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Events", items: [activitiesDataSource.chartViewModel.value], dataSources: [activitiesDataSource]))
+            }
+            
+            if stepsDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Steps", items: [stepsDataSource.chartViewModel.value], dataSources: [stepsDataSource]))
+            }
+            
+            if sleepDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Sleep", items: [sleepDataSource.chartViewModel.value], dataSources: [sleepDataSource]))
+            }
+            
+            if activeEnergyDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Active Calories", items: [activeEnergyDataSource.chartViewModel.value], dataSources: [activeEnergyDataSource]))
+            }
+            
+            if financeDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Spending", items: [financeDataSource.chartViewModel.value], dataSources: [financeDataSource]))
+            }
+            
+            if netWorthViewModel.dataExists ?? false {
+                self.sections.append(Section(title: "Net Worth", items: [netWorthViewModel.chartViewModel.value], dataSources: [netWorthViewModel]))
+            }
+            
             completion()
         }
     }

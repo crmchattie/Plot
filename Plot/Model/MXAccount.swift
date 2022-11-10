@@ -571,18 +571,16 @@ func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, lev
     var accountsList = [AccountDetails]()
     var accountsDict = [AccountDetails: [MXAccount]]()
     for account in accounts {
-        var finalDate = Date()
+        var finalDate = Date().localTime.dayAfter
         var balance = 0.0
         guard account.should_link ?? true else { continue }
         if let date = date {
             finalDate = date
-            if let balanceGivenDate = account.balanceGivenDate(date: finalDate) {
-                balance = balanceGivenDate
-            } else {
-                continue
-            }
+        }
+        if let balanceGivenDate = account.balanceGivenDate(date: finalDate) {
+            balance = balanceGivenDate
         } else {
-            balance = account.finalBalance
+            continue
         }
         switch level {
         case .account:
