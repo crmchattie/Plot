@@ -1104,7 +1104,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
 //            }
 //        }
         
-        if delegate == nil && (!active || (task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground

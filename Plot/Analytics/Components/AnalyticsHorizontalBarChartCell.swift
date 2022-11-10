@@ -37,13 +37,29 @@ class AnalyticsHorizontalBarChartCell: StackedBarChartCell {
             chartView.rightAxis.axisMinimum = 0
             chartView.rightAxis.resetCustomAxisMax()
         case .fixZeroToMiddleOnVertical:
+            chartView.rightAxis.resetCustomAxisMin()
             print("")
         case .fixZeroToMaximumOnVertical:
             print("")
         }
         
+        let dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
+        dayAxisValueFormatter.formatType = viewModel.formatType.rawValue
+        chartView.xAxis.valueFormatter = dayAxisValueFormatter
+        chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
+        chartView.xAxis.granularity = 1
+        chartView.xAxis.labelCount = 5
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
+        let marker = XYMarkerView(color: .systemGroupedBackground,
+                                  font: UIFont.body.with(weight: .regular),
+                                  textColor: .label,
+                                  insets: UIEdgeInsets(top: 8, left: 8, bottom: 20, right: 8),
+                                  xAxisValueFormatter: dayAxisValueFormatter, units: viewModel.units)
+        marker.chartView = chartView
+        marker.minimumSize = CGSize(width: 80, height: 40)
+        chartView.marker = marker
         chartView.data = viewModel.chartData
+        chartView.extraBottomOffset = 3
         chartView.resetZoom()
         chartView.notifyDataSetChanged()
     }

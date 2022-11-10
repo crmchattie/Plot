@@ -146,9 +146,9 @@ class FinanceHoldingViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: holdingCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: holdingCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: holdingUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: holdingUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }

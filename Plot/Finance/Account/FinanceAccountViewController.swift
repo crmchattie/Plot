@@ -161,9 +161,9 @@ class FinanceAccountViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: accountCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: accountCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: accountUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: accountUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }

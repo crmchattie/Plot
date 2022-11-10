@@ -184,9 +184,9 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: mindfulnessCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: mindfulnessCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: mindfulnessUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: mindfulnessUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
         
@@ -287,7 +287,7 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: mindfulnessDeletedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+            basicAlert(title: mindfulnessDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -456,7 +456,7 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
             }
         }
         
-        if delegate == nil, active, (mindfulness?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false) {
+        if delegate == nil && (!active || ((mindfulness?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || mindfulness?.admin == Auth.auth().currentUser?.uid))) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground

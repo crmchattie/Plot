@@ -32,7 +32,7 @@ extension MindfulnessViewController {
     }
     
     func listRow() {
-        if delegate == nil, active, (mindfulness?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false) {
+        if delegate == nil && (!active || ((mindfulness?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || mindfulness?.admin == Auth.auth().currentUser?.uid))) {
             for task in taskList {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {

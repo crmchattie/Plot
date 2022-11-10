@@ -45,7 +45,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
         self.networkController = networkController
         self.range = range
      
-        chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
                                                         units: "hrs",
                                                         formatType: range.timeSegment))
@@ -79,7 +79,6 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                     dataSet.axisDependency = .right
                     dataSet.colors = [ChartColors.palette()[6]]
                     data = BarChartData(dataSets: [dataSet])
-                    data?.barWidth = 0.5
                     data?.setDrawValues(false)
                 }
                 

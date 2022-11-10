@@ -219,7 +219,7 @@ extension EventViewController {
 
     
     func listRow() {
-        if delegate == nil && (!active || (activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+        if delegate == nil && (!active || ((activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || activity?.admin == Auth.auth().currentUser?.uid))) {
             for task in taskList {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {
@@ -938,9 +938,10 @@ extension EventViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: title, message: nil, controller: self.tabBarController?.presentingViewController)
+            basicAlert(title: title, message: nil, controller: self.navigationController?.presentingViewController)
         }
     }
+
     
     func updateRecurrences(recurrences: [String], title: String) {
         showActivityIndicator()

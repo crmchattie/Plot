@@ -47,7 +47,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         self.range = range
         self.networkController = networkController
         
-        chartViewModel = .init(StackedBarChartViewModel(chartType: .continous,
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
                                                         verticalAxisType: .fixZeroToMiddleOnVertical,

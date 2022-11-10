@@ -32,7 +32,7 @@ extension WorkoutViewController {
     }
     
     func listRow() {
-        if delegate == nil, active, (workout?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false) {
+        if delegate == nil && (!active || ((workout?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || workout?.admin == Auth.auth().currentUser?.uid))) {
             for task in taskList {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {

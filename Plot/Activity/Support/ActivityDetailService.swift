@@ -10,30 +10,30 @@ import Foundation
 
 protocol ActivityDetailServiceInterface {
     
-    func getSamples(
+    func getEventCategoriesSamples(
         segmentType: TimeSegmentType,
         activities: [Activity]?,
-        completion: @escaping ([SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Void)
+        completion: @escaping ([SectionType: [String: [Statistic]]]?, [Activity]?, Error?) -> Void)
     
-    func getSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType: [String: [Statistic]]]) -> Void)
+    func getEventCategoriesSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType: [String: [Statistic]]], [Activity]) -> Void)
 }
 
 class ActivityDetailService: ActivityDetailServiceInterface {
-    func getSamples(segmentType: TimeSegmentType, activities: [Activity]?, completion: @escaping ([SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Swift.Void) {
-        getStatisticalSamples(segmentType: segmentType, range: nil, activities: activities, completion: completion)
+    func getEventCategoriesSamples(segmentType: TimeSegmentType, activities: [Activity]?, completion: @escaping ([SectionType: [String: [Statistic]]]?, [Activity]?, Error?) -> Swift.Void) {
+        getEventCategoriesStatisticalSamples(segmentType: segmentType, range: nil, activities: activities, completion: completion)
     }
     
-    func getSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType : [String : [Statistic]]]) -> Void) {
-        getStatisticalSamples(segmentType: segment, range: range, activities: activities) { (_, stats, _) in
-            completion(stats ?? [:])
+    func getEventCategoriesSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([SectionType : [String : [Statistic]]], [Activity]) -> Void) {
+        getEventCategoriesStatisticalSamples(segmentType: segment, range: range, activities: activities) { (stats, activities, _) in
+            completion(stats ?? [:], activities ?? [])
         }
     }
 
-    private func getStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, activities: [Activity]?, completion: @escaping ([SectionType: [Entry]]?, [SectionType: [String: [Statistic]]]?, Error?) -> Void) {
+    private func getEventCategoriesStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, activities: [Activity]?, completion: @escaping ([SectionType: [String: [Statistic]]]?, [Activity]?, Error?) -> Void) {
 
         let dispatchGroup = DispatchGroup()
-        var pieChartEntries = [SectionType: [Entry]]()
         var barChartStats = [SectionType: [String: [Statistic]]]()
+        var activitiesList = [Activity]()
         
         let anchorDate = Date()
         var startDate = anchorDate
@@ -59,10 +59,11 @@ class ActivityDetailService: ActivityDetailServiceInterface {
         if let activities = activities {
             var entries = [Entry]()
             dispatchGroup.enter()
-            categorizeActivities(activities: activities, start: startDate, end: endDate) { (categoryDict, activitiesList) in
-                activitiesOverTimeChartData(activities: activitiesList, activityCategories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
+            categorizeActivities(activities: activities, start: startDate, end: endDate) { (categoryDict, categorizedActivitiesList) in
+                activitiesOverTimeChartData(activities: categorizedActivitiesList, activityCategories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
                     if !statsDict.isEmpty {
                         barChartStats[.calendarSummary] = statsDict
+                        activitiesList = categorizedActivitiesList
                     }
                 }
                 
@@ -71,15 +72,12 @@ class ActivityDetailService: ActivityDetailServiceInterface {
                     let entry = Entry(label: key.capitalized, value: value / totalValue, icon: nil)
                     entries.append(entry)
                 }
-                if !entries.isEmpty {
-                    pieChartEntries[.calendarMix] = entries
-                }
                 dispatchGroup.leave()
             }
         }
         
         dispatchGroup.notify(queue: .main) {
-            completion(pieChartEntries, barChartStats, nil)
+            completion(barChartStats, activitiesList, nil)
         }
     }
 }

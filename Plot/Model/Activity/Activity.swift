@@ -1344,6 +1344,10 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
         
         let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
         
+        guard duration > 0 else {
+            continue
+        }
+
         if let type = activity.category {
             guard type != "Not Applicable" else { continue }
             totalValue -= duration
@@ -1369,7 +1373,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
         }
     }
     categoryDict["No Events"] = totalValue
-        
+            
     completion(categoryDict, activitiesList)
 }
 
@@ -1497,6 +1501,13 @@ extension Activity {
         } else {
             return startDate
         }
+    }
+    
+    var completedDateDate: Date? {
+        if let completedDate = completedDate?.doubleValue {
+            return Date(timeIntervalSince1970: completedDate)
+        }
+        return nil
     }
     
     //for tasks where deadline date is more likely to be set than start date

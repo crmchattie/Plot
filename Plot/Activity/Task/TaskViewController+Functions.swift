@@ -157,7 +157,7 @@ extension TaskViewController {
 
     
     func listRow() {
-        if delegate == nil && (!active || (task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) {
             for activity in eventList {
                 var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
@@ -769,7 +769,7 @@ extension TaskViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: title, message: nil, controller: self.tabBarController?.presentingViewController)
+            basicAlert(title: title, message: nil, controller: self.navigationController?.presentingViewController)
         }
     }
     

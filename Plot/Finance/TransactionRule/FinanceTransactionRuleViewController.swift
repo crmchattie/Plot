@@ -111,9 +111,9 @@ class FinanceTransactionRuleViewController: FormViewController {
                     self.navigationController?.popViewController(animated: true)
                 }
                 if !active {
-                    basicAlert(title: transactionRuleCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                    basicAlert(title: transactionRuleCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
                 } else {
-                    basicAlert(title: transactionRuleUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                    basicAlert(title: transactionRuleUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
                 }
             }
         }

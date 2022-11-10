@@ -37,6 +37,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
+        tableView.register(AnalyticsHorizontalBarChartCell.self)
         tableView.register(TaskCell.self)
         tableView.register(EventCell.self)
         tableView.register(FinanceTableViewCell.self)
@@ -153,7 +154,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         if indexPath.section == 0 {
             let chartViewModel = viewModel.chartViewModel.value
             switch chartViewModel.chartType {
-            case .continous:
+            case .line:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsLineChartCell.self, for: indexPath)
                 cell.prevNextStackView.isHidden = false
                 cell.chartView.highlightPerTapEnabled = true
@@ -161,8 +162,16 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.delegate = self
                 cell.configure(with: chartViewModel)
                 return cell
-            case .values:
+            case .verticalBar:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsBarChartCell.self, for: indexPath)
+                cell.prevNextStackView.isHidden = false
+                cell.chartView.highlightPerTapEnabled = true
+                cell.chartView.highlightPerDragEnabled = true
+                cell.delegate = self
+                cell.configure(with: chartViewModel)
+                return cell
+            case .horizontalBar:
+                let cell = tableView.dequeueReusableCell(ofType: AnalyticsHorizontalBarChartCell.self, for: indexPath)
                 cell.prevNextStackView.isHidden = false
                 cell.chartView.highlightPerTapEnabled = true
                 cell.chartView.highlightPerDragEnabled = true

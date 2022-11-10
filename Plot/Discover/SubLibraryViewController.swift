@@ -245,14 +245,6 @@ extension SubLibraryViewController: GIDSignInDelegate {
     }
 }
 
-extension SubLibraryViewController: UpdateDiscover {
-    func itemCreated(title: String) {
-        self.navigationItem.searchController?.isActive = false
-        self.dismiss(animated: true)
-        self.updateDiscoverDelegate?.itemCreated(title: title)
-    }
-}
-
 extension SubLibraryViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {}
@@ -334,5 +326,13 @@ extension SubLibraryViewController { /* hiding keyboard */
         } else {
             self.searchBar.endEditing(true)
         }
+    }
+}
+
+extension SubLibraryViewController: UpdateDiscover {
+    func itemCreated(title: String) {
+        self.navigationItem.searchController?.isActive = false
+        self.dismiss(animated: true)
+        self.updateDiscoverDelegate?.itemCreated(title: title)
     }
 }

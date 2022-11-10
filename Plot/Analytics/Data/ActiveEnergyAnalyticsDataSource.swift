@@ -38,7 +38,7 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
         self.networkController = networkController
         self.range = range
      
-        chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
                                                         units: "calories",
                                                         formatType: range.timeSegment))
@@ -72,7 +72,6 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                     dataSet.axisDependency = .right
                     dataSet.colors = [ChartColors.palette()[7]]
                     data = BarChartData(dataSets: [dataSet])
-                    data?.barWidth = 0.5
                     data?.setDrawValues(false)
                 }
                 

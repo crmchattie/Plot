@@ -33,12 +33,14 @@ class AnalyticsDetailViewModel {
     }
     
     private func reloadData() {
+        print("reloadData")
         dataSource.fetchEntries(range: range) { entries in
             self.entries.send(entries)
         }
     }
     
     private func updateRange() {
+        print("updateRange")
         dataSource.updateRange(range)
         reloadData()
     }

@@ -185,9 +185,9 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
             }
 
             if !active {
-                basicAlert(title: transactionCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: transactionCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: transactionUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: transactionUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }
@@ -601,7 +601,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
 //            }
 //        }
         
-        if delegate == nil && status && (!active || (transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+        if delegate == nil && status && (!active || ((transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || transaction?.admin == Auth.auth().currentUser?.uid))) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground

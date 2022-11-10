@@ -180,9 +180,9 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
             }
 
             if !active {
-                basicAlert(title: workoutCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: workoutCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: workoutUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: workoutUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
         if active && false {
@@ -281,7 +281,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: workoutDeletedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+            basicAlert(title: workoutDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
@@ -546,7 +546,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
             }
         }
         
-        if delegate == nil, active, (workout?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false) {
+        if delegate == nil && (!active || ((workout?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || workout?.admin == Auth.auth().currentUser?.uid))) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground

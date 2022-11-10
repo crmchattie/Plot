@@ -128,9 +128,9 @@ class CalendarDetailViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: calendarCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: calendarCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: calendarUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: calendarUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }
@@ -166,7 +166,7 @@ class CalendarDetailViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: calendarDeletedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+            basicAlert(title: calendarDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

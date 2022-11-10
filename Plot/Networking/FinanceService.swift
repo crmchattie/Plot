@@ -707,7 +707,7 @@ class FinanceService {
                             let deleteTransaction = filteredTransactions[0]
                             if first.getShortMonthAndYear() == second.getShortMonthAndYear() {
                                 let keepTransaction = filteredTransactions[1]
-                                if let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
+                                if keepTransaction.containerID == nil, let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
                                     userReference.child(deleteTransaction.guid).setValue(nil)
                                     ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
                                         let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
@@ -729,6 +729,18 @@ class FinanceService {
                                             var newContainer = container
                                             newContainer.transactionIDs = newTransactions.map({ $0.guid })
                                             ContainerFunctions.updateContainerAndStuffInside(container: newContainer)
+                                        }
+                                    }
+                                } else if let activityID = dataSnapshotValue[deleteTransaction.guid] {
+                                    ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
+                                        let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
+                                        transactionAction.deleteTransaction()
+                                    }
+                                    
+                                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                        if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
                                         }
                                     }
                                 }
@@ -769,7 +781,7 @@ class FinanceService {
                             //delete second transaction, assign first transaction to container, update reference & update task to complete; create next plot_created transaction/activity
                             let keepTransaction = filteredTransactions[0]
                             let deleteTransaction = filteredTransactions[1]
-                            if let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
+                            if keepTransaction.containerID == nil, let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
                                 userReference.child(deleteTransaction.guid).setValue(nil)
                                 ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
                                     let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
@@ -791,6 +803,18 @@ class FinanceService {
                                         var newContainer = container
                                         newContainer.transactionIDs = newTransactions.map({ $0.guid })
                                         ContainerFunctions.updateContainerAndStuffInside(container: newContainer)
+                                    }
+                                }
+                            } else if let activityID = dataSnapshotValue[deleteTransaction.guid] {
+                                ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
+                                    let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
+                                    transactionAction.deleteTransaction()
+                                }
+                                
+                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
                                     }
                                 }
                             }

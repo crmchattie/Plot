@@ -11,7 +11,7 @@ import Charts
 
 struct StackedBarChartViewModel {
     enum ChartType {
-        case continous, values
+        case line, horizontalBar, verticalBar
     }
     
     var chartType: ChartType

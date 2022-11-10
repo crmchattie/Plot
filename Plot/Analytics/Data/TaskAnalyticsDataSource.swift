@@ -1,39 +1,38 @@
 //
-//  TransactionAnalyticsDataSource.swift
+//  TaskAnalyticsDataSource.swift
 //  Plot
 //
-//  Created by Botond Magyarosi on 20.03.2021.
-//  Copyright © 2021 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 11/10/22.
+//  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
 import Foundation
-import Combine
 import Charts
+import Combine
 
 private func getTitle(range: DateRange) -> String {
     DateRangeFormatter(currentWeek: "The last week", currentMonth: "The last month", currentYear: "The last year")
         .format(range: range)
 }
 
-class TransactionAnalyticsDataSource: AnalyticsDataSource {
+class TaskAnalyticsDataSource: AnalyticsDataSource {
     
     private let networkController: NetworkController
-    private let financeService = FinanceDetailService()
+    private let activityDetailService = ActivityDetailService()
     
     var range: DateRange
     
-    var title: String = "Transactions"
-    
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
-    private var transactions: [Transaction] = []
+    let title: String = "Completed Tasks"
     
-    var currencyFormatter: NumberFormatter = {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.currencyCode = "USD"
-        numberFormatter.numberStyle = .currency
-        numberFormatter.maximumFractionDigits = 0
-        return numberFormatter
+    private var tasks: [Activity] = []
+    
+    private lazy var dateFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .abbreviated
+        formatter.allowedUnits = [.hour, .minute]
+        return formatter
     }()
     
     var dataExists: Bool?
@@ -42,14 +41,12 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         range: DateRange,
         networkController: NetworkController
     ) {
-        self.range = range
         self.networkController = networkController
+        self.range = range
         
         chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
-                                                        verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
-                                                        verticalAxisType: .fixZeroToMiddleOnVertical,
-                                                        units: "currency",
+                                                        units: "completed",
                                                         formatType: range.timeSegment))
     }
     
@@ -60,13 +57,11 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         
         let daysInRange = range.daysInRange
         
-        transactions = networkController.financeService.transactions
-            .filter { $0.should_link ?? true }
-            .filter { $0.top_level_category != "Investments" && $0.category != "Investments" }
-            .filter { $0.group != "Income" }
-            .filter { transaction -> Bool in
-//                #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
-                guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+        tasks = networkController.activityService.tasks
+            .filter { $0.isTask ?? false }
+            .filter { $0.isCompleted ?? false }
+            .filter { task -> Bool in
+                guard let date = task.completedDateDate else { return false }
                 return range.startDate <= date && date <= range.endDate
             }
         
@@ -75,51 +70,55 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
         
-        transactions.grouped(by: \.group).forEach { (category, transactions) in
+        tasks.grouped(by: \.category).forEach { (uncertainCategory, tasks) in
+            let category = uncertainCategory ?? "Uncategorized"
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
-            transactions.forEach { transaction in
-                guard let day = dateFormatter.date(from: transaction.transacted_at) else { return }
+            tasks.forEach { task in
+                guard let day = task.completedDateDate else { return }
                 let daysInBetween = day.daysSince(range.startDate)
-                if transaction.type == .credit {
-                    totalValue += transaction.amount
-                    values[daysInBetween] += transaction.amount
-                    sum += transaction.amount
-                } else {
-                    totalValue -= transaction.amount
-                    values[daysInBetween] -= transaction.amount
-                    sum -= transaction.amount
-                }
+                totalValue += 1
+                values[daysInBetween] += 1
+                sum += 1
             }
             
             var categoryColor = UIColor()
-            if let index = financialTransactionsGroupsStatic.firstIndex(where: {$0 == category} ) {
-                categoryColor = ChartColors.palette()[index % 9]
+            if let activityCategory = ActivityCategory(rawValue: category) {
+                categoryColor = activityCategory.color
             } else {
-                categoryColor = topLevelCategoryColor(category)
+                categoryColor = ActivityCategory.uncategorized.color
             }
+            
+            var totalString = String()
+            if sum == 1 {
+                totalString = "1 tasks"
+            } else {
+                totalString = "\(Int(sum)) tasks"
+            }
+            
             categories.append(CategorySummaryViewModel(title: category,
                                                        color: categoryColor,
                                                        value: sum,
-                                                       formattedValue: self.currencyFormatter.string(from: NSNumber(value: sum))!))
+                                                       formattedValue: totalString))
             categoryColors.append(categoryColor)
             categoryValues.append(values)
         }
         
-        newChartViewModel.categories = Array(categories.sorted(by: { $0.value < $1.value }).prefix(3))
-        if totalValue < 0 {
-            newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
+        newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
+        if totalValue == 0 {
+            newChartViewModel.rangeAverageValue = "No tasks"
         } else {
-            newChartViewModel.rangeAverageValue = "Saved \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
+            newChartViewModel.rangeAverageValue = "\(Int(totalValue)) tasks"
 
         }
+        
         let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
             let current = self.range.startDate.addDays(index)
             let yValues = categoryValues.map { $0[index] }
             return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
         }
                 
-        if !transactions.isEmpty {
+        if !tasks.isEmpty {
             dataExists = true
             let chartDataSet = BarChartDataSet(entries: dataEntries)
             chartDataSet.axisDependency = .right
@@ -137,11 +136,11 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         
         chartViewModel.send(newChartViewModel)
         completion?()
+        
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(transactions.map { .transaction($0) })
+        completion(tasks.sorted(by: { $0.completedDateDate! > $1.completedDateDate! }).map { .activity($0) })
     }
 }
 
-private let dateFormatter = ISO8601DateFormatter()

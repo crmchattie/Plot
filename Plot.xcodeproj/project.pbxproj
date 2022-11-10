@@ -195,6 +195,7 @@
 		10A18658291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18657291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift */; };
 		10A1865A291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */; };
 		10A1865C291C9014009AB7F4 /* SleepAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */; };
+		10A1865E291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A1865D291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift */; };
 		10A2AE9F2508131700D49A0C /* FinanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */; };
 		10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAA257ACC7200E3A798 /* Scheduler.swift */; };
 		10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAE257ACC9000E3A798 /* Mood.swift */; };
@@ -559,7 +560,7 @@
 		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
 		F94EDC4D260667A000B97FF6 /* TransactionAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */; };
 		F95D8EF4261B8C2F006DED56 /* Charts+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */; };
-		F9773A5A2601339A00D1B204 /* ActivityAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */; };
+		F9773A5A2601339A00D1B204 /* EventAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* EventAnalyticsDataSource.swift */; };
 		F9773A862601453500D1B204 /* HourAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */; };
 		F9773A8B26014AE700D1B204 /* AnalyticsDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */; };
 		F9773A8F26014C7B00D1B204 /* AnalyticsDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */; };
@@ -793,6 +794,7 @@
 		10A18657291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AverageAnnualFlightsClimbedOperation.swift; sourceTree = "<group>"; };
 		10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		10A1865D291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewCell.swift; sourceTree = "<group>"; };
 		10B2BBAA257ACC7200E3A798 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		10B2BBAE257ACC9000E3A798 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
@@ -1159,7 +1161,7 @@
 		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Charts+Style.swift"; sourceTree = "<group>"; };
-		F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		F9773A592601339A00D1B204 /* EventAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourAxisValueFormatter.swift; sourceTree = "<group>"; };
 		F9773A8A26014AE700D1B204 /* AnalyticsDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewController.swift; sourceTree = "<group>"; };
 		F9773A8E26014C7B00D1B204 /* AnalyticsDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsDetailViewModel.swift; sourceTree = "<group>"; };
@@ -2936,7 +2938,8 @@
 			isa = PBXGroup;
 			children = (
 				F9B82C8F25FAB1FE0072BE74 /* AnalyticsDataSource.swift */,
-				F9773A592601339A00D1B204 /* ActivityAnalyticsDataSource.swift */,
+				10A1865D291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift */,
+				F9773A592601339A00D1B204 /* EventAnalyticsDataSource.swift */,
 				10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */,
 				10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */,
 				F983298B2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift */,
@@ -3315,6 +3318,7 @@
 				4BAEE5EF212735E50045AB10 /* RevealableCollectionViewCell.swift in Sources */,
 				10021A1624F1A480006A1B25 /* FinancialMemberCell.swift in Sources */,
 				10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */,
+				10A1865E291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift in Sources */,
 				4BAEE4F621272D890045AB10 /* GroupPictureAvatarOpenerDelegate.swift in Sources */,
 				4BAEE4FB21272D890045AB10 /* InputBlockerContainerView.swift in Sources */,
 				10C50F972274E21900111033 /* CalendarViewController+SearchHandlers.swift in Sources */,
@@ -3694,7 +3698,7 @@
 				4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */,
 				105F34AE2885EF7A007531EB /* SelectorItemCell.swift in Sources */,
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,
-				F9773A5A2601339A00D1B204 /* ActivityAnalyticsDataSource.swift in Sources */,
+				F9773A5A2601339A00D1B204 /* EventAnalyticsDataSource.swift in Sources */,
 				4BAEE5DC212735E50045AB10 /* AnimationController.swift in Sources */,
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
 				106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */,

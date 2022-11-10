@@ -1,5 +1,5 @@
 //
-//  ActivityAnalyticsDataSource.swift
+//  EventAnalyticsDataSource.swift
 //  Plot
 //
 //  Created by Botond Magyarosi on 16.03.2021.
@@ -15,7 +15,7 @@ private func getTitle(range: DateRange) -> String {
         .format(range: range)
 }
 
-class ActivityAnalyticsDataSource: AnalyticsDataSource {
+class EventAnalyticsDataSource: AnalyticsDataSource {
     
     private let networkController: NetworkController
     private let activityDetailService = ActivityDetailService()
@@ -25,7 +25,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
     let title: String = "Events"
-    
+        
     private lazy var dateFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.unitsStyle = .abbreviated
@@ -42,7 +42,7 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         self.networkController = networkController
         self.range = range
         
-        chartViewModel = .init(StackedBarChartViewModel(chartType: .values,
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: HourAxisValueFormatter(),
                                                         units: "time",
@@ -53,11 +53,10 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
-        
-        activityDetailService.getSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats in
-            let activities = stats[.calendarSummary] ?? [:]
+        activityDetailService.getEventCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats, activityList in
+            let categoryStats = stats[.calendarSummary] ?? [:]
             
-            guard !activities.isEmpty else {
+            guard !categoryStats.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
                 newChartViewModel.rangeAverageValue = "-"
@@ -65,19 +64,25 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 completion?()
                 return
             }
-            
+                        
             self.dataExists = true
             
             DispatchQueue.global(qos: .background).async {
                 var categories: [CategorySummaryViewModel] = []
                 var activityCount = 0
                 
-                let activityKeys = activities.keys.sorted(by: <)
+                let activityKeys = categoryStats.keys.sorted(by: <)
                 for index in 0...activityKeys.count - 1 {
-                    guard let stats = activities[activityKeys[index]] else { continue }
+                    guard let stats = categoryStats[activityKeys[index]] else { continue }
                     let total = stats.reduce(0, { $0 + $1.value * 60 })
                     let totalString = self.dateFormatter.string(from: total) ?? "NaN"
-                    let categoryColor = ChartColors.palette()[index % 9]
+                    
+                    var categoryColor = UIColor()
+                    if let activityCategory = ActivityCategory(rawValue: activityKeys[index]) {
+                        categoryColor = activityCategory.color
+                    } else {
+                        categoryColor = ActivityCategory.uncategorized.color
+                    }
                     categories.append(CategorySummaryViewModel(title: activityKeys[index],
                                                                color: categoryColor,
                                                                value: total,
@@ -86,13 +91,13 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                 }
                 categories.sort(by: { $0.value > $1.value })
                 newChartViewModel.categories = Array(categories.prefix(3))
-                newChartViewModel.rangeAverageValue = "\(activityCount) events"
+                newChartViewModel.rangeAverageValue = "\(activityList.count) events"
                 
                 let daysInRange = self.range.daysInRange
                 let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
                     let current = self.range.startDate.addDays(index)
                     let yValues = categories.map {
-                        (activities[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
+                        (categoryStats[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value * 60 })
                     }
                     return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
                 }
@@ -102,7 +107,6 @@ class ActivityAnalyticsDataSource: AnalyticsDataSource {
                     chartDataSet.axisDependency = .right
                     chartDataSet.colors = categories.map { $0.color }
                     let chartData = BarChartData(dataSets: [chartDataSet])
-                    chartData.barWidth = 0.5
                     chartData.setDrawValues(false)
                     newChartViewModel.chartData = chartData
                     self.chartViewModel.send(newChartViewModel)

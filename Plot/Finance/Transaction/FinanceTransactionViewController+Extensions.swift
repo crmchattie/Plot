@@ -31,7 +31,7 @@ extension FinanceTransactionViewController {
     }
     
     func listRow() {
-        if delegate == nil && status && (!active || (transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+        if delegate == nil && (!active || ((transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || transaction?.admin == Auth.auth().currentUser?.uid))) {
             for task in taskList {
                 var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
                 mvs.insert(SubtaskRow() {

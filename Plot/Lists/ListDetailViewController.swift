@@ -129,9 +129,9 @@ class ListDetailViewController: FormViewController {
                 self.navigationController?.popViewController(animated: true)
             }
             if !active {
-                basicAlert(title: listCreatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: listCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             } else {
-                basicAlert(title: listUpdatedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+                basicAlert(title: listUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }
@@ -166,7 +166,7 @@ class ListDetailViewController: FormViewController {
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: listDeletedMessage, message: nil, controller: self.tabBarController?.presentingViewController)
+            basicAlert(title: listDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

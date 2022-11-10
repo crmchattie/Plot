@@ -836,7 +836,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
         //                    self.activity.notes = row.value
         //                }
         
-        if delegate == nil && (!active || (activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false)) {
+        if delegate == nil && (!active || ((activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || activity?.admin == Auth.auth().currentUser?.uid))) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground

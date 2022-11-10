@@ -26,14 +26,21 @@ class AnalyticsViewModel {
     
     init(networkController: NetworkController) {
         self.networkController = networkController
+        addObservers()
     }
     
     func loadData(completion: @escaping () -> Void) {
         let group = DispatchGroup()
+        
+        group.enter()
+        let taskDataSource = TaskAnalyticsDataSource(range: range, networkController: networkController)
+        taskDataSource.loadData {
+            group.leave()
+        }
 
         group.enter()
-        let activitiesDataSource = ActivityAnalyticsDataSource(range: range, networkController: networkController)
-        activitiesDataSource.loadData {
+        let eventDataSource = EventAnalyticsDataSource(range: range, networkController: networkController)
+        eventDataSource.loadData {
             group.leave()
         }
         
@@ -70,8 +77,12 @@ class AnalyticsViewModel {
         group.notify(queue: .main) {
             self.sections = []
             
-            if activitiesDataSource.dataExists ?? false {
-                self.sections.append(Section(title: "Events", items: [activitiesDataSource.chartViewModel.value], dataSources: [activitiesDataSource]))
+            if taskDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Completed Tasks", items: [taskDataSource.chartViewModel.value], dataSources: [taskDataSource]))
+            }
+            
+            if eventDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Events", items: [eventDataSource.chartViewModel.value], dataSources: [eventDataSource]))
             }
             
             if stepsDataSource.dataExists ?? false {
@@ -101,5 +112,49 @@ class AnalyticsViewModel {
     func makeDetailViewModel(for indexPath: IndexPath) -> AnalyticsDetailViewModel {
         let dataSource = sections[indexPath.section].dataSources[indexPath.row / 2]
         return AnalyticsDetailViewModel(dataSource: dataSource, networkController: networkController)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func tasksUpdated() {
+        if let section = sections.first(where: {$0.title == "Tasks"}) {
+            section.dataSources[0].loadData(completion: nil)
+        }
+    }
+    
+    @objc fileprivate func eventsUpdated() {
+        if let section = sections.first(where: {$0.title == "Events"}) {
+            section.dataSources[0].loadData(completion: nil)
+        }
+    }
+    
+    @objc fileprivate func healthUpdated() {
+        if let section = sections.first(where: {$0.title == "Steps"}) {
+            section.dataSources[0].loadData(completion: nil)
+        }
+        if let section = sections.first(where: {$0.title == "Sleep"}) {
+            section.dataSources[0].loadData(completion: nil)
+        }
+        if let section = sections.first(where: {$0.title == "Active Energy"}) {
+            section.dataSources[0].loadData(completion: nil)
+        }
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        if let section = sections.first(where: {$0.title == "Spending"}) {
+            section.dataSources[0].loadData(completion: nil)
+        }
+        if let section = sections.first(where: {$0.title == "Net Worth"}) {
+            section.dataSources[0].loadData(completion: nil)
+        }
     }
 }

@@ -45,6 +45,7 @@ class AnalyticsViewController: UITableViewController {
 //        tableView.rowHeight = UITableView.automaticDimension
         tableView.register(AnalyticsBarChartCell.self)
         tableView.register(AnalyticsLineChartCell.self)
+        tableView.register(AnalyticsHorizontalBarChartCell.self)
         tableView.register(TableViewHeader.self,
                            forHeaderFooterViewReuseIdentifier: headerCellID)
         
@@ -94,14 +95,19 @@ extension AnalyticsViewController {
         if indexPath.row % 2 == 0 {
             let cellViewModel = viewModel!.sections[indexPath.section].items[indexPath.row / 2]
             switch cellViewModel.chartType {
-            case .continous:
+            case .line:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsLineChartCell.self, for: indexPath)
-                cell.isUserInteractionEnabled = false
+                cell.chartView.isUserInteractionEnabled = false
                 cell.configure(with: cellViewModel)
                 return cell
-            case .values:
+            case .verticalBar:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsBarChartCell.self, for: indexPath)
-                cell.isUserInteractionEnabled = false
+                cell.chartView.isUserInteractionEnabled = false
+                cell.configure(with: cellViewModel)
+                return cell
+            case .horizontalBar:
+                let cell = tableView.dequeueReusableCell(ofType: AnalyticsHorizontalBarChartCell.self, for: indexPath)
+                cell.chartView.isUserInteractionEnabled = false
                 cell.configure(with: cellViewModel)
                 return cell
             }
@@ -114,9 +120,9 @@ extension AnalyticsViewController {
         }
     }
     
-    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        indexPath.row > 0 ? indexPath : nil
-    }
+//    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+//        indexPath.row > 0 ? indexPath : nil
+//    }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier:
@@ -132,6 +138,7 @@ extension AnalyticsViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("didSelectRowAt")
         openDetail(for: indexPath)
     }
 }
