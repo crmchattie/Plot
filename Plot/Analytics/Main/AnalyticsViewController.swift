@@ -138,7 +138,6 @@ extension AnalyticsViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("didSelectRowAt")
         openDetail(for: indexPath)
     }
 }

@@ -21,7 +21,6 @@ class EnterPhoneNumberController: UIViewController {
         extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = .systemGroupedBackground
         configurePhoneNumberContainerView()
-        phoneNumberContainerView.phoneNumber.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         phoneNumberContainerView.selectCountry.addTarget(self, action: #selector(openCountryCodesList), for: .touchUpInside)
         setCountry()
 
@@ -31,7 +30,6 @@ class EnterPhoneNumberController: UIViewController {
         view.addSubview(phoneNumberContainerView)
         phoneNumberContainerView.frame = view.bounds
         phoneNumberContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
-        phoneNumberContainerView.nextView.isEnabled = false
     }
     
     @objc func leftBarButtonDidTap() {
@@ -48,41 +46,12 @@ class EnterPhoneNumberController: UIViewController {
         }
     }
     
-    fileprivate func configureNavigationBar () {
-        let rightBarButton = UIBarButtonItem(title: "Next", style: .done, target: self, action: #selector(rightBarButtonDidTap))
-        self.navigationItem.rightBarButtonItem = rightBarButton
-        self.navigationItem.rightBarButtonItem?.isEnabled = false
-    }
-    
     
     @objc func openCountryCodesList() {
         let picker = SelectCountryCodeController()
         picker.delegate = self
         phoneNumberContainerView.phoneNumber.resignFirstResponder()
         navigationController?.pushViewController(picker, animated: true)
-    }
-    
-    @objc func textFieldDidChange(_ textField: UITextField) {
-        setRightBarButtonStatus()
-    }
-    
-    func setRightBarButtonStatus() {
-        var phoneNumberForVerification = String()
-        
-        do {
-            let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.phoneNumber.text!)
-            phoneNumberForVerification = String(phoneNumber.nationalNumber)
-        } catch {
-            phoneNumberForVerification = phoneNumberContainerView.phoneNumber.text!
-        }
-        
-        if phoneNumberForVerification.count < 4 || phoneNumberForVerification.count > 13 || phoneNumberContainerView.countryCode.text == " - " {
-            self.navigationItem.rightBarButtonItem?.isEnabled = false
-            phoneNumberContainerView.nextView.isEnabled = false
-        } else {
-            self.navigationItem.rightBarButtonItem?.isEnabled = true
-            phoneNumberContainerView.nextView.isEnabled = true
-        }
     }
     
     var isVerificationSent = false
@@ -93,10 +62,35 @@ class EnterPhoneNumberController: UIViewController {
             return
         }
         
-        if !isVerificationSent {
-            sendSMSConfirmation()
+        var phoneNumberForVerification = String()
+        
+        do {
+            let phoneNumber = try self.phoneNumberKit.parse(phoneNumberContainerView.phoneNumber.text!)
+            phoneNumberForVerification = String(phoneNumber.nationalNumber)
+        } catch {
+            phoneNumberForVerification = phoneNumberContainerView.phoneNumber.text!
+        }
+        
+        print(phoneNumberForVerification)
+        print(phoneNumberForVerification.isEmpty)
+        print(phoneNumberForVerification.count < 4)
+        print(phoneNumberForVerification.count < 4)
+        print(phoneNumberContainerView.countryCode.text == " - ")
+        
+        if phoneNumberForVerification.isEmpty || phoneNumberForVerification.count < 4 || phoneNumberForVerification.count < 4 || phoneNumberContainerView.countryCode.text == " - " {
+            phoneNumberContainerView.phoneNumber.shake()
         } else {
-            print("verification has already been sent once")
+            if !isVerificationSent {
+                sendSMSConfirmation()
+            } else {
+                print("verification has already been sent once")
+            }
+            guard self.navigationController != nil else { return }
+            if !(self.navigationController!.topViewController!.isKind(of: AuthVerificationController.self)) {
+                let destination = AuthVerificationController()
+                destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
+                self.navigationController?.pushViewController(destination, animated: true)
+            }
         }
     }
     
@@ -128,7 +122,6 @@ extension EnterPhoneNumberController: CountryPickerDelegate {
     func countryPicker(_ picker: SelectCountryCodeController, didSelectCountryWithName name: String, code: String, dialCode: String) {
         phoneNumberContainerView.selectCountry.setTitle(name, for: .normal)
         phoneNumberContainerView.countryCode.text = dialCode
-        setRightBarButtonStatus()
         picker.navigationController?.popViewController(animated: true)
     }
 }

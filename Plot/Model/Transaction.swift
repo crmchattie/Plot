@@ -104,6 +104,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var containerID: String?
     var plot_is_recurring: Bool?
     var plot_created: Bool?
+    var transfer_between_accounts: Bool?
     var cash_flow_type: String? {
         if type == .credit {
             return "Inflow"
@@ -281,7 +282,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     // create dateFormatter with UTC time format
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
-        guard transaction.should_link ?? true && !(transaction.plot_created ?? false) else { continue }
+        guard transaction.should_link ?? true && !(transaction.plot_created ?? false) && !(transaction.transfer_between_accounts ?? false) else { continue }
         guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
         if accounts != nil {
             guard accounts!.contains(transaction.account_guid ?? "") else { continue }
@@ -675,7 +676,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
     var transactionList = [Transaction]()
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
-        guard transaction.should_link ?? true else { continue }
+        guard transaction.should_link ?? true && !(transaction.plot_created ?? false) && !(transaction.transfer_between_accounts ?? false) else { continue }
         guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
         if accounts != nil {
             guard accounts!.contains(transaction.account_guid ?? "") else { continue }

@@ -107,19 +107,21 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
             categoryColors.append(categoryColor)
             categoryValues.append(values)
         }
+                
+        var maxValue = Double()
+        let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
+            let current = self.range.startDate.addDays(index)
+            let yValues = categoryValues.map { $0[index] }
+            maxValue = max(maxValue, yValues.reduce(0, +))
+            return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
+        }
         
         newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
         if totalValue == 0 {
             newChartViewModel.rangeAverageValue = "No tasks"
         } else {
             newChartViewModel.rangeAverageValue = "\(Int(totalValue)) tasks"
-
-        }
-        
-        let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
-            let current = self.range.startDate.addDays(index)
-            let yValues = categoryValues.map { $0[index] }
-            return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
+            newChartViewModel.maxValue = maxValue + 1
         }
                 
         if !tasks.isEmpty {

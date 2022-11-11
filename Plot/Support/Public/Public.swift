@@ -799,7 +799,7 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
             endDay = numberFormatter.string(from: number) ?? ""
         }
         
-        startDateFormatter.dateFormat = "EEEE, MMM"
+        startDateFormatter.dateFormat = "E, MMM"
         value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
         
         if allDay {
@@ -813,7 +813,7 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
             value += "\n"
             numberOfLines = 2
             
-            endDateFormatter.dateFormat = "EEEE, MMM"
+            endDateFormatter.dateFormat = "E, MMM"
             value += "\(endDateFormatter.string(from: endDate)) \(endDay) "
             
             if allDay {
@@ -854,7 +854,7 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             day = numberFormatter.string(from: number) ?? ""
         }
         
-        dateFormatter.dateFormat = "EEEE, MMM"
+        dateFormatter.dateFormat = "E, MMM"
         value += "\(dateFormatter.string(from: date)) \(day)"
         
     } else if let startDate = task.startDate, let endDate = task.endDate {
@@ -874,7 +874,7 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             startDay = numberFormatter.string(from: number) ?? ""
         }
         
-        startDateFormatter.dateFormat = "EEEE, MMM"
+        startDateFormatter.dateFormat = "E, MMM"
         value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
         
         if !startAllDay {
@@ -896,7 +896,7 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             endDay = numberFormatter.string(from: number) ?? ""
         }
         
-        endDateFormatter.dateFormat = "EEEE, MMM"
+        endDateFormatter.dateFormat = "E, MMM"
         value += "\(endDateFormatter.string(from: endDate)) \(endDay)"
         
         if !endAllDay {
@@ -920,7 +920,7 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             day = numberFormatter.string(from: number) ?? ""
         }
         
-        dateFormatter.dateFormat = "EEEE, MMM"
+        dateFormatter.dateFormat = "E, MMM"
         value += "\(dateFormatter.string(from: date)) \(day)"
         
         if !allDay {
@@ -944,7 +944,7 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             day = numberFormatter.string(from: number) ?? ""
         }
         
-        dateFormatter.dateFormat = "EEEE, MMM"
+        dateFormatter.dateFormat = "E, MMM"
         value += "\(dateFormatter.string(from: date)) \(day)"
         
         if !allDay {

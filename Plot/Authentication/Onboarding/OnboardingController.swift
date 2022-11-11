@@ -16,6 +16,18 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     
     let items: [CustomType] = [.tutorialOne, .tutorialTwo, .tutorialThree, .tutorialFour]
     
+    lazy var activities: [Activity] = {
+        return createActivities()
+    }()
+    
+    lazy var healthMetrics: [HealthMetric] = {
+        return createHealthMetrics()
+    }()
+    
+    lazy var finances: [AnyHashable] = {
+        return createFinances()
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -64,11 +76,11 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
             cell.finances = nil
             cell.collectionView.reloadData()
         } else if indexPath.item == 1 {
-            cell.activities = createActivities()
+            cell.activities = activities
         } else if indexPath.item == 2 {
-            cell.healthMetrics = createHealthMetrics()
+            cell.healthMetrics = healthMetrics
         } else if indexPath.item == 3 {
-            cell.finances = createFinances()
+            cell.finances = finances
         }
         return cell
     }

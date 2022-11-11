@@ -162,11 +162,11 @@ class TaskCell: UITableViewCell {
         
         nameLabel.topAnchor.constraint(equalTo: checkView.topAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
-        nameLabel.rightAnchor.constraint(equalTo: badgeLabel.leftAnchor, constant: -5).isActive = true
+        nameLabel.rightAnchor.constraint(equalTo: badgeLabel.leftAnchor, constant: -2).isActive = true
         
         endLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2).isActive = true
         endLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true
-        endLabel.rightAnchor.constraint(equalTo: badgeLabel.leftAnchor, constant: -5).isActive = true
+        endLabel.rightAnchor.constraint(equalTo: badgeLabel.leftAnchor, constant: -2).isActive = true
 //
         activityTypeLabel.topAnchor.constraint(equalTo: endLabel.bottomAnchor, constant: 2).isActive = true
         activityTypeLabel.leftAnchor.constraint(equalTo: checkView.rightAnchor, constant: 10).isActive = true

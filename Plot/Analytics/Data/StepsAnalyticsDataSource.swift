@@ -35,6 +35,13 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
     
     var dataExists: Bool?
     
+    var numberFormatter: NumberFormatter = {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumFractionDigits = 0
+        return numberFormatter
+    }()
+    
     init(
         range: DateRange,
         networkController: NetworkController
@@ -84,7 +91,9 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                 
                 DispatchQueue.main.async {
                     newChartViewModel.chartData = data
-                    newChartViewModel.rangeAverageValue = "\(Int(sum / Double(stats!.count))) steps"
+                    let averageValue = sum / Double(stats!.count)
+                    let totalValue = self.numberFormatter.string(from: averageValue as NSNumber) ?? ""
+                    newChartViewModel.rangeAverageValue = "\(totalValue) steps"
                     self.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
                     self.chartViewModel.send(newChartViewModel)
                     completion?()

@@ -34,6 +34,13 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
     
     var dataExists: Bool?
     
+    var numberFormatter: NumberFormatter = {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumFractionDigits = 0
+        return numberFormatter
+    }()
+    
     init(
         range: DateRange,
         networkController: NetworkController
@@ -82,7 +89,9 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                 
                 DispatchQueue.main.async {
                     newChartViewModel.chartData = data
-                    newChartViewModel.rangeAverageValue = "\(Int(sum / Double(stats!.count))) calories"
+                    let averageValue = sum / Double(stats!.count)
+                    let totalValue = self.numberFormatter.string(from: averageValue as NSNumber) ?? ""
+                    newChartViewModel.rangeAverageValue = "\(totalValue) calories"
                     self.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
                     self.chartViewModel.send(newChartViewModel)
                     completion?()

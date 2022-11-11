@@ -114,6 +114,9 @@ class HealthDetailSampleCell: UITableViewCell {
         titleLabel.text = interval.duration.stringTime
 
         let dateFormatter = DateFormatter()
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumFractionDigits = 0
         
         dateFormatter.dateFormat = "MMM dd, yyy hh:mm a"
         titleLabelRight.text = dateFormatter.string(from: sample.startDate)
@@ -124,11 +127,11 @@ class HealthDetailSampleCell: UITableViewCell {
         
         if case .workout = healthMetric.type, let workout = sample as? HKWorkout {
             let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-            subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
+            subtitleLabel.text = "\(Int(totalEnergyBurned)) calories"
         }
         else if case .workoutMinutes = healthMetric.type, let workout = sample as? HKWorkout {
             let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-            subtitleLabel.text = "\(totalEnergyBurned.clean) calories"
+            subtitleLabel.text = "\(Int(totalEnergyBurned)) calories"
         }
         else if case .heartRate = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
@@ -142,10 +145,6 @@ class HealthDetailSampleCell: UITableViewCell {
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
-            } else {
-                let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: beatsPerMinuteUnit))
-                let string = "\(count) bpm"
-                titleLabel.text = string
             }
         }
         else if case .weight = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
@@ -164,7 +163,7 @@ class HealthDetailSampleCell: UITableViewCell {
         }
         else if case .steps = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let unit = HKUnit.count()
-            let count = Int(quantitySample.quantity.doubleValue(for: unit))
+            let count = numberFormatter.string(from: quantitySample.quantity.doubleValue(for: unit) as NSNumber) ?? ""
             let string = "\(count) steps"
             titleLabel.text = string
             
@@ -190,7 +189,7 @@ class HealthDetailSampleCell: UITableViewCell {
             }
         }
         else if case .activeEnergy = healthMetric.type, let quantitySample = sample as? HKQuantitySample, let unit = healthMetric.unit {
-            let count = String(format: "%.0f", quantitySample.quantity.doubleValue(for: unit))
+            let count = numberFormatter.string(from: quantitySample.quantity.doubleValue(for: unit) as NSNumber) ?? ""
             let string = "\(count) \(healthMetric.unitName)"
             titleLabel.text = string
             if segmentType == .week || segmentType == .month {
@@ -200,7 +199,8 @@ class HealthDetailSampleCell: UITableViewCell {
                 dateFormatter.dateFormat = "MMM, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else {
-                let count = String(format: "%.1f", quantitySample.quantity.doubleValue(for: unit))
+                numberFormatter.maximumFractionDigits = 1
+                let count = numberFormatter.string(from: quantitySample.quantity.doubleValue(for: unit) as NSNumber) ?? ""
                 let string = "\(count) \(healthMetric.unitName)"
                 titleLabel.text = string
             }

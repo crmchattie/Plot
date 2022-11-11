@@ -131,6 +131,10 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
         titleLabel.textColor = .label
         subtitleLabel.textColor = .label
         detailLabel.textColor = .secondaryLabel
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumFractionDigits = 0
 
         if let healthMetric = metric as? HealthMetric {
             let isToday = NSCalendar.current.isDateInToday(healthMetric.date)
@@ -146,7 +150,8 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             
             titleLabel.text = title
             
-            var total = "\(Int(healthMetric.total))"
+            let totalValue = numberFormatter.string(from: healthMetric.total as NSNumber) ?? ""
+            var total = "\(totalValue)"
             var subtitleLabelText = "\(total) \(healthMetric.unitName) \(timeAgo)"
             
             if case HealthMetricType.weight = healthMetric.type {
@@ -171,7 +176,8 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             subtitleLabel.text = subtitleLabelText
             
             if let averageValue = healthMetric.average {
-                var averageText = "\(Int(averageValue)) \(healthMetric.unitName) on average"
+                let value = numberFormatter.string(from: averageValue as NSNumber) ?? ""
+                var averageText = "\(value) \(healthMetric.unitName) on average"
                 if case HealthMetricType.weight = healthMetric.type {
                     averageText = "\(averageValue.clean) \(healthMetric.unitName) on average"
                 }

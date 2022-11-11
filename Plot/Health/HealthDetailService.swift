@@ -130,10 +130,6 @@ class HealthDetailService: HealthDetailServiceInterface {
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
         }
         
-        print("service")
-        print(startDate)
-        print(endDate)
-        
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
                 let workoutActivityType = hkWorkout.workoutActivityType

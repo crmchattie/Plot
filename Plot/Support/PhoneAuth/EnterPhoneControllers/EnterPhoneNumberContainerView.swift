@@ -81,16 +81,15 @@ class EnterPhoneNumberContainerView: UIView {
     }()
     
     let nextView: UIButton = {
-        let next = UIButton()
-        next.translatesAutoresizingMaskIntoConstraints = false
-        next.setTitle("Next", for: .normal)
-        next.contentVerticalAlignment = .center
-        next.contentHorizontalAlignment = .center
-        next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
-        next.setTitleColor(.secondaryLabel, for: .highlighted)
-        next.setTitleColor(.secondaryLabel, for: .disabled)
-        next.titleLabel?.font = UIFont.title3.with(weight: .medium)
-        return next
+        let nextView = UIButton()
+        nextView.translatesAutoresizingMaskIntoConstraints = false
+        nextView.setTitle("Next", for: .normal)
+        nextView.setTitleColor(.white, for: .normal)
+        nextView.titleLabel?.backgroundColor = .clear
+        nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
+        nextView.backgroundColor = .systemBlue
+        nextView.layer.cornerRadius = 10
+        return nextView
     }()
     
     

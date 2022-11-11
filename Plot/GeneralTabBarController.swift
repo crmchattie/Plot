@@ -75,6 +75,7 @@ class GeneralTabBarController: UITabBarController {
             GeneralTabBarController.networkController.setupFirebase()
             GeneralTabBarController.networkController.setupOtherVariables()
             discoverController.fetchTemplates()
+            analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
             //change to stop from running
             isNewUser = false
         } else if isOldUser {

@@ -123,10 +123,8 @@ class EnterVerificationCodeController: UIViewController {
             do {
                 let phoneNumber = try self.phoneNumberKit.parse(self.enterVerificationContainerView.titleNumber.text!)
                 phoneNumberForFB = self.phoneNumberKit.format(phoneNumber, toType: .e164)
-                print(phoneNumberForFB)
             } catch {
                 phoneNumberForFB = self.enterVerificationContainerView.titleNumber.text!
-                print(phoneNumberForFB)
             }
             
             let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
@@ -153,7 +151,7 @@ class EnterVerificationCodeController: UIViewController {
         let verificationID = userDefaults.currentStringObjectState(for: userDefaults.authVerificationID)
         let verificationCode = enterVerificationContainerView.verificationCode.text
         
-        guard let unwrappedVerificationID = verificationID, let unwrappedVerificationCode = verificationCode else {
+        guard let unwrappedVerificationID = verificationID, let unwrappedVerificationCode = verificationCode, !unwrappedVerificationCode.isEmpty else {
             self.removeSpinner()
             self.enterVerificationContainerView.verificationCode.shake()
             return

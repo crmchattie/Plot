@@ -43,6 +43,11 @@ class AnalyticsBarChartCell: StackedBarChartCell {
             print("")
         }
         
+        if let maxValue = viewModel.maxValue {
+            chartView.rightAxis.axisMaximum = maxValue + 0.25
+            chartView.rightAxis.labelCount = Int(maxValue)
+        }
+        
         let dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
         dayAxisValueFormatter.formatType = viewModel.formatType.rawValue
         chartView.xAxis.valueFormatter = dayAxisValueFormatter
@@ -59,6 +64,7 @@ class AnalyticsBarChartCell: StackedBarChartCell {
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
         chartView.data = viewModel.chartData
+        chartView.extraTopOffset = 3
         chartView.resetZoom()
         chartView.notifyDataSetChanged()
     }

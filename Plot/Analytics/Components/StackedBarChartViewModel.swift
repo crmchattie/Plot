@@ -24,6 +24,7 @@ struct StackedBarChartViewModel {
     var verticalAxisValueFormatter: AxisValueFormatter?
     var units: String
     var formatType: TimeSegmentType
+    var maxValue: Double?
     var healthMetric: HealthMetric?
     
     init(

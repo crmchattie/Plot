@@ -117,6 +117,7 @@ class FinanceService {
             self.observeTransactionsForCurrentUser {
                 self.grabAccountTransactions()
                 self.removePendingTransactions()
+                self.flagTransfersBetweenAccounts()
                 if self.isRunning {
                     self.isRunning = false
                     completion()
@@ -497,6 +498,16 @@ class FinanceService {
         }
     }
     
+    private func flagTransfersBetweenAccounts() {
+        let reference = Database.database().reference().child(financialTransactionsEntity)
+        for transaction in transactions {
+            guard !(transaction.transfer_between_accounts ?? false) else { continue }
+            if (transaction.type == .credit && accounts.first(where: {$0.guid == transaction.account_guid})?.type == .creditCard) || transaction.category == "Credit Card Payment" {
+                reference.child(transaction.guid).child("transfer_between_accounts").setValue(true)
+            }
+        }
+    }
+    
     private func createTasksFromAccounts(accounts: [MXAccount]) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -614,6 +625,7 @@ class FinanceService {
         
         let userReference = Database.database().reference().child(userFinancialTransactionsTasksEntity).child(currentUserID)
         let reference = Database.database().reference().child(financialTransactionsEntity)
+        
         
         userReference.observeSingleEvent(of: .value) { dataSnapshot in
             if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: String] {

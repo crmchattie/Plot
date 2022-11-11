@@ -18,6 +18,7 @@ private let dateFormatterPrint: DateFormatter = {
 private let numberFormatter: NumberFormatter = {
     let numberFormatter = NumberFormatter()
     numberFormatter.numberStyle = .currency
+    numberFormatter.maximumFractionDigits = 0
     return numberFormatter
 }()
 
