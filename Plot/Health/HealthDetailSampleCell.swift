@@ -223,7 +223,7 @@ class HealthDetailSampleCell: UITableViewCell {
             if segmentType != .day {
                 dateFormatter.dateFormat = "MMM dd, yyy"
             }
-            titleLabelRight.text = dateFormatter.string(from: sample.startDate)
+            titleLabelRight.text = dateFormatter.string(from: sample.endDate)
             
             switch sleepValue {
             case .asleep:
