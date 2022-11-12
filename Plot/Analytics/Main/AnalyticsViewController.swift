@@ -33,7 +33,7 @@ class AnalyticsViewController: UITableViewController {
     let viewPlaceholder = ViewPlaceholder()
     
     let headerCellID = "headerCellID"
-    
+        
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -49,7 +49,18 @@ class AnalyticsViewController: UITableViewController {
         tableView.register(TableViewHeader.self,
                            forHeaderFooterViewReuseIdentifier: headerCellID)
         
+        refreshControl = UIRefreshControl()
+        refreshControl!.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
         
+        addObservers()
+        
+    }
+    
+    @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        viewModel?.loadData {
+            self.tableView.reloadData()
+            self.refreshControl!.endRefreshing()
+        }
     }
     
     private func loadData() {
@@ -63,6 +74,7 @@ class AnalyticsViewController: UITableViewController {
         viewModel?.loadData {
             self.activityIndicator.removeFromSuperview()
             self.tableView.reloadData()
+            self.refreshControl!.endRefreshing()
         }
     }
     
@@ -71,6 +83,33 @@ class AnalyticsViewController: UITableViewController {
         let controller = AnalyticsDetailViewController(viewModel: viewModel.makeDetailViewModel(for: indexPath))
         controller.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func tasksUpdated() {
+        viewModel?.loadData {}
+    }
+    
+    @objc fileprivate func eventsUpdated() {
+        viewModel?.loadData {}
+    }
+    
+    @objc fileprivate func healthUpdated() {
+        viewModel?.loadData {}
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        viewModel?.loadData {}
     }
 }
 

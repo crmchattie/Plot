@@ -94,6 +94,8 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         ])
         
         initBindings()
+        addObservers()
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -130,6 +132,34 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func tasksUpdated() {
+        if title == "Completed Tasks" {
+            rangeChanged(rangeControlView)
+        }
+    }
+    
+    @objc fileprivate func eventsUpdated() {
+        if title == "Events" {
+            rangeChanged(rangeControlView)
+        }
+    }
+    
+    @objc fileprivate func financeUpdated() {
+        if title == "Spending" || title == "Net Worth" {
+            rangeChanged(rangeControlView)
+        }
     }
 }
 

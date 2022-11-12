@@ -371,20 +371,29 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["allDay"] = value
         }
         
+        //need to be able to remove dates for tasks
         if let value = self.startDateTime as AnyObject? {
             dictionary["startDateTime"] = value
+        } else {
+            dictionary["startDateTime"] = NSNull()
         }
         
         if let value = self.startTimeZone as AnyObject? {
             dictionary["startTimeZone"] = value
+        } else {
+            dictionary["startTimeZone"] = NSNull()
         }
         
         if let value = self.endDateTime as AnyObject? {
             dictionary["endDateTime"] = value
+        } else {
+            dictionary["endDateTime"] = NSNull()
         }
         
         if let value = self.endTimeZone as AnyObject? {
             dictionary["endTimeZone"] = value
+        } else {
+            dictionary["endTimeZone"] = NSNull()
         }
         
         if let value = self.recurrences as AnyObject? {

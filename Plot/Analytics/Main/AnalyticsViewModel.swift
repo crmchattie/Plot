@@ -26,7 +26,6 @@ class AnalyticsViewModel {
     
     init(networkController: NetworkController) {
         self.networkController = networkController
-        addObservers()
     }
     
     func loadData(completion: @escaping () -> Void) {
@@ -112,98 +111,5 @@ class AnalyticsViewModel {
     func makeDetailViewModel(for indexPath: IndexPath) -> AnalyticsDetailViewModel {
         let dataSource = sections[indexPath.section].dataSources[indexPath.row / 2]
         return AnalyticsDetailViewModel(dataSource: dataSource, networkController: networkController)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
-    func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
-    }
-    
-    @objc fileprivate func tasksUpdated() {
-        if let section = sections.first(where: {$0.title == "Tasks"}) {
-            section.dataSources[0].loadData(completion: nil)
-        } else if sections.isEmpty {
-            let dataSource = TaskAnalyticsDataSource(range: range, networkController: networkController)
-            dataSource.loadData {
-                if dataSource.dataExists ?? false {
-                    self.sections.append(Section(title: "Completed Tasks", items: [dataSource.chartViewModel.value], dataSources: [dataSource]))
-                }
-            }
-        }
-    }
-    
-    @objc fileprivate func eventsUpdated() {
-        if let section = sections.first(where: {$0.title == "Events"}) {
-            section.dataSources[0].loadData(completion: nil)
-        } else if sections.isEmpty {
-            let dataSource = EventAnalyticsDataSource(range: range, networkController: networkController)
-            dataSource.loadData {
-                if dataSource.dataExists ?? false {
-                    self.sections.append(Section(title: "Events", items: [dataSource.chartViewModel.value], dataSources: [dataSource]))
-                }
-            }
-        }
-    }
-    
-    @objc fileprivate func healthUpdated() {
-        if let section = sections.first(where: {$0.title == "Steps"}) {
-            section.dataSources[0].loadData(completion: nil)
-        } else if sections.isEmpty {
-            let dataSource = StepsAnalyticsDataSource(range: range, networkController: networkController)
-            dataSource.loadData {
-                if dataSource.dataExists ?? false {
-                    self.sections.append(Section(title: "Steps", items: [dataSource.chartViewModel.value], dataSources: [dataSource]))
-                }
-            }
-        }
-        if let section = sections.first(where: {$0.title == "Sleep"}) {
-            section.dataSources[0].loadData(completion: nil)
-        } else if sections.isEmpty {
-            let dataSource = SleepAnalyticsDataSource(range: range, networkController: networkController)
-            dataSource.loadData {
-                if dataSource.dataExists ?? false {
-                    self.sections.append(Section(title: "Sleep", items: [dataSource.chartViewModel.value], dataSources: [dataSource]))
-                }
-            }
-        }
-        if let section = sections.first(where: {$0.title == "Active Energy"}) {
-            section.dataSources[0].loadData(completion: nil)
-        } else if sections.isEmpty {
-            let dataSource = ActiveEnergyAnalyticsDataSource(range: range, networkController: networkController)
-            dataSource.loadData {
-                if dataSource.dataExists ?? false {
-                    self.sections.append(Section(title: "Active Energy", items: [dataSource.chartViewModel.value], dataSources: [dataSource]))
-                }
-            }
-        }
-    }
-    
-    @objc fileprivate func financeUpdated() {
-        if let section = sections.first(where: {$0.title == "Spending"}) {
-            section.dataSources[0].loadData(completion: nil)
-        } else if sections.isEmpty {
-            let dataSource = TransactionAnalyticsDataSource(range: range, networkController: networkController)
-            dataSource.loadData {
-                if dataSource.dataExists ?? false {
-                    self.sections.append(Section(title: "Spending", items: [dataSource.chartViewModel.value], dataSources: [dataSource]))
-                }
-            }
-        }
-        if let section = sections.first(where: {$0.title == "Net Worth"}) {
-            section.dataSources[0].loadData(completion: nil)
-        } else if sections.isEmpty {
-            let dataSource = NetWorthAnalyticsDataSource(range: range, networkController: networkController)
-            dataSource.loadData {
-                if dataSource.dataExists ?? false {
-                    self.sections.append(Section(title: "Net Worth", items: [dataSource.chartViewModel.value], dataSources: [dataSource]))
-                }
-            }
-        }
-    }
+    }    
 }
