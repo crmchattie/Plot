@@ -11,7 +11,7 @@ import Combine
 import Charts
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "The last week", currentMonth: "The last month", currentYear: "The last year")
+    DateRangeFormatter(currentWeek: "Over the last week", currentMonth: "Over the last month", currentYear: "Over the last year")
         .format(range: range)
 }
 
@@ -52,7 +52,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
                                                         verticalAxisType: .fixZeroToMiddleOnVertical,
-                                                        units: "currency",
+                                                        units: "currencyShifted",
                                                         formatType: range.timeSegment))
     }
     
@@ -156,7 +156,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
         let dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
             let current = startDate.addDays(index)
             cumulativeSpend += categoryValues.map { $0[index] }.reduce(0, +)
-            return ChartDataEntry(x: Double(index), y: cumulativeSpend, data: current)
+            return ChartDataEntry(x: Double(index) + 1, y: cumulativeSpend, data: current)
         }
 
         if !transactions.isEmpty {

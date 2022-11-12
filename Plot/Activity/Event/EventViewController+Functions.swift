@@ -820,7 +820,7 @@ extension EventViewController {
     }
     
     @objc func createNewActivity() {        
-        if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, let recurrenceStartDate = activity.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
+        if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
                 print("Save for this event only")
@@ -849,13 +849,7 @@ extension EventViewController {
             
             alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
                 //update activity's recurrence to stop repeating just before this event
-                var oldActivityRule = oldRecurrenceRule
-                //will equal true if first instance of repeating event
-                let futureDate = Calendar.current.date(byAdding: .month, value: 3, to: Date())
-                let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: recurrenceStartDate)
-                let dates = iCalUtility()
-                    .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
-                if let dateIndex = dates.firstIndex(of: startDate) {
+                if let dateIndex = self.activity.instanceIndex {
                     if dateIndex == 0 {
                         //update all instances of activity
                         if self.activity.recurrences == nil {
@@ -863,7 +857,7 @@ extension EventViewController {
                         }
                         self.createActivity(title: eventsUpdatedMessage)
                     } else if let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
-
+                        var oldActivityRule = oldRecurrenceRule
                         //update only future instances of activity
                         var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
                         newActivityRule!.startDate = self.activity.startDate ?? Date()
@@ -879,6 +873,28 @@ extension EventViewController {
                         
                         self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
                         self.updateRecurrences(recurrences: self.activityOld.recurrences!, title: eventsUpdatedMessage)
+                    }
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Save For All Events", style: .default, handler: { (_) in
+                //update all instances of activity
+                if let dateIndex = self.activity.instanceIndex {
+                    if dateIndex == 0 {
+                        //update all instances of activity
+                        if self.activity.recurrences == nil {
+                            self.deleteRecurrences()
+                        }
+                        self.createActivity(title: eventsUpdatedMessage)
+                    } else if let date = self.activity.recurrenceStartDate, let startDate = self.activity.startDate, let endDate = self.activity.endDate {
+                        //update all instances of activity
+                        let duration = endDate.timeIntervalSince(startDate)
+                        self.activity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                        self.activity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
+                        if self.activity.recurrences == nil {
+                            self.deleteRecurrences()
+                        }
+                        self.createActivity(title: eventsUpdatedMessage)
                     }
                 }
             }))
@@ -1032,7 +1048,7 @@ extension EventViewController {
     
     func deleteActivity() {
         //need to look into equatable protocol for activities
-        if let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, let recurrenceStartDate = activity.recurrenceStartDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", activity.calendarName != "Birthdays", activity.calendarSource != CalendarSourceOptions.apple.name {
+        if let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", activity.calendarName != "Birthdays", activity.calendarSource != CalendarSourceOptions.apple.name {
             let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Event Only", style: .default, handler: { (_) in
@@ -1047,13 +1063,7 @@ extension EventViewController {
             
             alert.addAction(UIAlertAction(title: "Delete All Future Events", style: .default, handler: { (_) in
                 //update activity's recurrence to stop repeating at this event
-                var oldActivityRule = oldRecurrenceRule
-                let yearFromNowDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())
-                let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: recurrenceStartDate)
-                let dates = iCalUtility()
-                    .recurringDates(forRules: oldRecurrences, ruleStartDate: recurrenceStartDate, startDate: dayBeforeNowDate ?? Date(), endDate: yearFromNowDate ?? Date())
-                
-                if let dateIndex = dates.firstIndex(of: startDate) {
+                if let dateIndex = self.activity.instanceIndex {
                     //will equal true if first instance of repeating event
                     if dateIndex == 0 {
                         self.showActivityIndicator()
@@ -1062,12 +1072,21 @@ extension EventViewController {
                         self.hideActivityIndicator()
                         self.closeController(title: eventsDeletedMessage)
                     } else {
+                        var oldActivityRule = oldRecurrenceRule
                         //update existing activity with end date equaling ocurrence of this date
                         oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
                         self.activity.recurrences = [oldActivityRule.toRRuleString()]
                         self.updateRecurrences(recurrences: self.activity.recurrences!, title: eventsDeletedMessage)
                     }
                 }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Delete All Events", style: .default, handler: { (_) in
+                self.showActivityIndicator()
+                let deleteActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)
+                self.hideActivityIndicator()
+                self.closeController(title: eventsDeletedMessage)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in

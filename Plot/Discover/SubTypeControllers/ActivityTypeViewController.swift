@@ -328,7 +328,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
             switch activityTypeName {
             case "basic":
                 print("basic")
-                if let activity = self.umbrellaActivity {
+                if let _ = self.umbrellaActivity {
                     let destination = ScheduleViewController()
                     destination.hidesBottomBarWhenPushed = true
                     destination.users = self.users

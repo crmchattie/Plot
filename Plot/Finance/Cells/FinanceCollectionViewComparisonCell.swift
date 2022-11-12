@@ -36,11 +36,11 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
                         case .day:
                             middleLeftLabel.text = "Yesterday"
                         case .week:
-                            middleLeftLabel.text = "Last Week"
+                            middleLeftLabel.text = "Last Week to Date"
                         case .month:
-                            middleLeftLabel.text = "Last Month"
+                            middleLeftLabel.text = "Last Month to Date"
                         case .year:
-                            middleLeftLabel.text = "Last Year"
+                            middleLeftLabel.text = "Last Year to Date"
                         }
                         bottomLeftLabel.text = "Difference"
                         
@@ -59,11 +59,11 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
                         case .day:
                             middleLeftLabel.text = "Yesterday"
                         case .week:
-                            middleLeftLabel.text = "Last Week"
+                            middleLeftLabel.text = "Last Week to Date"
                         case .month:
-                            middleLeftLabel.text = "Last Month"
+                            middleLeftLabel.text = "Last Month to Date"
                         case .year:
-                            middleLeftLabel.text = "Last Year"
+                            middleLeftLabel.text = "Last Year to Date"
                         }
                         bottomLeftLabel.text = "Difference"
                         

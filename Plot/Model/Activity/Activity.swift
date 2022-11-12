@@ -93,6 +93,7 @@ class Activity: NSObject, NSCopying, Codable {
     var instanceOriginalStartDateTime: NSNumber?
     var instanceIDs: [String]?
     var instanceID: String?
+    var instanceIndex: Int?
     var parentID: String?
     var directAssociation: Bool?
     var directAssociationObjectID: String?
@@ -263,6 +264,7 @@ class Activity: NSObject, NSCopying, Codable {
         instanceOriginalStartDateTime = dictionary?["instanceOriginalStartDateTime"] as? NSNumber
         instanceIDs = dictionary?["instanceIDs"] as? [String]
         instanceID = dictionary?["instanceID"] as? String
+        instanceIndex = dictionary?["instanceIndex"] as? Int
         parentID = dictionary?["parentID"] as? String
         directAssociation = dictionary?["directAssociation"] as? Bool
         directAssociationObjectID = dictionary?["directAssociationObjectID"] as? String
@@ -387,10 +389,6 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.recurrences as AnyObject? {
             dictionary["recurrences"] = value
-        }
-        
-        if let value = self.recurrenceStartDateTime as AnyObject? {
-            dictionary["recurrenceStartDateTime"] = value
         }
         
         if let value = self.notes as AnyObject? {
@@ -679,6 +677,10 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.recurrenceStartDateTime = value
         }
         
+        if let value = updatingActivity.instanceIndex {
+            newActivity.instanceIndex = value
+        }
+        
         if let value = updatingActivity.notes {
             newActivity.notes = value
         }
@@ -926,6 +928,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.recurrenceStartDateTime {
             self.recurrenceStartDateTime = value
+        }
+        
+        if let value = updatingActivity.instanceIndex {
+            self.instanceIndex = value
         }
         
         if let value = updatingActivity.notes {

@@ -10,6 +10,7 @@ import UIKit
 import Combine
 import Firebase
 import HealthKit
+import Charts
 
 class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     
@@ -160,6 +161,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.chartView.highlightPerTapEnabled = true
                 cell.chartView.highlightPerDragEnabled = true
                 cell.delegate = self
+                cell.chartView.delegate = self
                 cell.configure(with: chartViewModel)
                 return cell
             case .verticalBar:
@@ -168,6 +170,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.chartView.highlightPerTapEnabled = true
                 cell.chartView.highlightPerDragEnabled = true
                 cell.delegate = self
+                cell.chartView.delegate = self
                 cell.configure(with: chartViewModel)
                 return cell
             case .horizontalBar:
@@ -176,6 +179,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.chartView.highlightPerTapEnabled = true
                 cell.chartView.highlightPerDragEnabled = true
                 cell.delegate = self
+                cell.chartView.delegate = self
                 cell.configure(with: chartViewModel)
                 return cell
             }
@@ -250,7 +254,6 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 let hkSampleID = hkWorkout.uuid.uuidString
                 print(hkSampleID)
                 if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
-                    print("found workout")
                     showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
                 }
             }
@@ -282,32 +285,21 @@ extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
     }
 }
 
-// MARK: - UpdateTransactionDelegate
-
-extension AnalyticsDetailViewController: UpdateTransactionDelegate {
-    func updateTransaction(transaction: Transaction) {
-        guard let index = viewModel.entries.value.firstIndex(where: {
-            if case .transaction(let trs) = $0 {
-                return trs == transaction
-            }
-            return false
-        }) else { return }
-        viewModel.entries.value[index] = .transaction(transaction)
-        tableView.reloadData()
+// MARK: - ChartViewDelegate
+extension AnalyticsDetailViewController: ChartViewDelegate {
+    func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {        
+        
     }
-}
-
-// MARK: - UpdateAccountDelegate
-
-extension AnalyticsDetailViewController: UpdateAccountDelegate {
-    func updateAccount(account: MXAccount) {
-        guard let index = viewModel.entries.value.firstIndex(where: {
-            if case .account(let acct) = $0 {
-                return acct == account
-            }
-            return false
-        }) else { return }
-        viewModel.entries.value[index] = .account(account)
-        tableView.reloadData()
+    
+    func chartValueNothingSelected(_ chartView: ChartViewBase) {
+        
+    }
+    
+    func chartScaled(_ chartView: ChartViewBase, scaleX: CGFloat, scaleY: CGFloat) {
+        
+    }
+    
+    func chartTranslated(_ chartView: ChartViewBase, dX: CGFloat, dY: CGFloat) {
+        
     }
 }
