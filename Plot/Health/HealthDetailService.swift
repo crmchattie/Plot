@@ -463,7 +463,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     group.append(statistic)
                     monthMap[key] = group
                     
-                    let customSample = HKCategorySample(type: relevantSamples.first!.categoryType, value: typeOfSleep.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
+                    let customSample = HKCategorySample(type: HKCategoryType.categoryType(forIdentifier: .sleepAnalysis)!, value: typeOfSleep.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
                     customSamples.append(customSample)
 
                 }
@@ -494,7 +494,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     let stat = Statistic(date: item.key, value: hours)
                     customStats.append(stat)
                     
-                    let customSample = HKCategorySample(type: relevantSamples.first!.categoryType, value: typeOfSleep.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
+                    let customSample = HKCategorySample(type: HKCategoryType.categoryType(forIdentifier: .sleepAnalysis)!, value: typeOfSleep.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
                     customSamples.append(customSample)
                 }
             }

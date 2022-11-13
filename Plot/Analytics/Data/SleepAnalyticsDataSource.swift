@@ -27,7 +27,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
     
     var range: DateRange
 
-    var title: String = "Steps"
+    var title: String = "Sleep"
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     var healthMetric: HealthMetric?
     private var samples: [HKSample] = []
