@@ -62,8 +62,14 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
         if let date = date {
             samples = priorSamples
             
-            samples = samples.filter { sample -> Bool in
-                return date == sample.startDate
+            if case .sleep = healthMetric.type {
+                samples = samples.filter { sample -> Bool in
+                    return date == sample.endDate
+                }
+            } else {
+                samples = samples.filter { sample -> Bool in
+                    return date == sample.startDate
+                }
             }
             completion()
         } else {

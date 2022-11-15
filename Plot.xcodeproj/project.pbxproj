@@ -53,6 +53,7 @@
 		1028A104230D8F4200619907 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028A103230D8F4200619907 /* Activity.swift */; };
 		1028A108230DB70F00619907 /* ShareHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028A107230DB70F00619907 /* ShareHeaderView.swift */; };
 		1028A10B230DFA8B00619907 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1028A10A230DFA8B00619907 /* GoogleService-Info.plist */; };
+		102B8A6029242B3E00121103 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 102B8A5F29242B3E00121103 /* GoogleService-Info.plist */; };
 		102BE8C4243CB7EF00722E7B /* CustomUIPickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102BE8C3243CB7EF00722E7B /* CustomUIPickers.swift */; };
 		102BE8C6243E47F000722E7B /* AttractionDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102BE8C5243E47F000722E7B /* AttractionDetailCell.swift */; };
 		103038EC2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103038EB2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift */; };
@@ -547,7 +548,6 @@
 		4BAEE5F7212735E50045AB10 /* AvatarOpenerOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE5B4212735E50045AB10 /* AvatarOpenerOverlay.swift */; };
 		4BB46C6A2136E6F8005405BB /* ChatLogHistoryFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB46C692136E6F8005405BB /* ChatLogHistoryFetcher.swift */; };
 		4BB46C6C2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB46C6B2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift */; };
-		4BCB128C224ADD450046DFF3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */; };
 		4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */; };
 		A91C565F9C14D37AA1CD19F7 /* libPods-Plot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53D0336E7A51EFB22060D82 /* libPods-Plot.a */; };
 		F902FFC92613B55900EF5881 /* ColorHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F902FFC82613B55900EF5881 /* ColorHash.swift */; };
@@ -644,6 +644,7 @@
 		1028A103230D8F4200619907 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		1028A107230DB70F00619907 /* ShareHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHeaderView.swift; sourceTree = "<group>"; };
 		1028A10A230DFA8B00619907 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		102B8A5F29242B3E00121103 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		102BE8C3243CB7EF00722E7B /* CustomUIPickers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIPickers.swift; sourceTree = "<group>"; };
 		102BE8C5243E47F000722E7B /* AttractionDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttractionDetailCell.swift; sourceTree = "<group>"; };
 		103038EB2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHorizontalBarChartCell.swift; sourceTree = "<group>"; };
@@ -1147,7 +1148,6 @@
 		4BAEE5B4212735E50045AB10 /* AvatarOpenerOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarOpenerOverlay.swift; sourceTree = "<group>"; };
 		4BB46C692136E6F8005405BB /* ChatLogHistoryFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogHistoryFetcher.swift; sourceTree = "<group>"; };
 		4BB46C6B2136E71F005405BB /* ChatLogController+ChatHistoryFetcherDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatLogController+ChatHistoryFetcherDelegate.swift"; sourceTree = "<group>"; };
-		4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4BE44DA9212B5CC600E722B8 /* ContactsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFetcher.swift; sourceTree = "<group>"; };
 		BC6AC60F727DABD6623D616B /* Pods-Plot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.debug.xcconfig"; sourceTree = "<group>"; };
 		E53D0336E7A51EFB22060D82 /* libPods-Plot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Plot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2118,7 +2118,7 @@
 				26CDFB21239E278200567666 /* NewUserActivities.json */,
 				105AA1362481B56B009DD09B /* NewUserChecklists.json */,
 				4B4F45371F32230C00A6FF96 /* Assets.xcassets */,
-				4BCB128B224ADD450046DFF3 /* GoogleService-Info.plist */,
+				102B8A5F29242B3E00121103 /* GoogleService-Info.plist */,
 				4B4F453C1F32230C00A6FF96 /* Info.plist */,
 				10217A7923103377004CBA9E /* Plot-Bridging-Header.h */,
 				10ED542C22CAEA41003797CF /* Plot.entitlements */,
@@ -3154,7 +3154,7 @@
 				1092E27F28B93CE10018FCAA /* Roboto-Medium.ttf in Resources */,
 				4B4F45381F32230C00A6FF96 /* Assets.xcassets in Resources */,
 				4BAEE5B9212735E50045AB10 /* INSPhotoGallery.bundle in Resources */,
-				4BCB128C224ADD450046DFF3 /* GoogleService-Info.plist in Resources */,
+				102B8A6029242B3E00121103 /* GoogleService-Info.plist in Resources */,
 				105F34B62885EF7A007531EB /* MonthOrDaySelectorCell.xib in Resources */,
 				26B975E52363F992003BFBE3 /* Invitations.storyboard in Resources */,
 				26B915212383B9B0007536E0 /* LaunchScreen.storyboard in Resources */,

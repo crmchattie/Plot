@@ -175,12 +175,12 @@ DEPENDENCIES:
   - CodableFirebase
   - CropViewController
   - Eureka (~> 5.3.6)
-  - Firebase/Analytics (~> 8.15.0)
-  - Firebase/Auth (~> 8.15.0)
-  - Firebase/Core (~> 8.15.0)
-  - Firebase/Database (~> 8.15.0)
-  - Firebase/Messaging (~> 8.15.0)
-  - Firebase/Storage (~> 8.15.0)
+  - Firebase/Analytics
+  - Firebase/Auth
+  - Firebase/Core
+  - Firebase/Database
+  - Firebase/Messaging
+  - Firebase/Storage
   - FLAnimatedImage
   - FloatingPanel (~> 1.6.5)
   - FSCalendar
@@ -264,6 +264,6 @@ SPEC CHECKSUMS:
   SwiftAlgorithms: 38dda4731d19027fdeee1125f973111bf3386b53
   ViewRow: 8da541e9c019f3be63f4e28f311a62cac2045ecf
 
-PODFILE CHECKSUM: 94094e99b8d253d77a3329b502ce26bd4f397005
+PODFILE CHECKSUM: e7652b7b6999c1137685f0a5e661a341140acc96
 
 COCOAPODS: 1.11.3
