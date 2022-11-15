@@ -116,6 +116,7 @@ class FinanceService {
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
                 self.grabAccountTransactions()
+                self.createFutureTasksFromRecurringTransactions(transactions: self.transactions)
                 self.removePendingTransactions()
                 self.flagTransfersBetweenAccounts()
                 if self.isRunning {
@@ -336,7 +337,6 @@ class FinanceService {
             }
             self?.createEventsFromTransactions(transactions: transactionsInitialAdd)
             self?.createTasksFromTransactions(transactions: transactionsInitialAdd)
-            self?.createFutureTasksFromRecurringTransactions(transactions: transactionsInitialAdd)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
         }, transactionsAdded: { [weak self] transactionsAdded in
             for transaction in transactionsAdded {
@@ -354,7 +354,6 @@ class FinanceService {
             }
             self?.createEventsFromTransactions(transactions: transactionsAdded)
             self?.createTasksFromTransactions(transactions: transactionsAdded)
-            self?.createFutureTasksFromRecurringTransactions(transactions: transactionsAdded)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
         }, transactionsRemoved: { [weak self] transactionsRemoved in
             for transaction in transactionsRemoved {

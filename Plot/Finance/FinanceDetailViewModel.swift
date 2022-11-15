@@ -187,32 +187,31 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
     func filterSamples(segmentType: TimeSegmentType?, date: Date?, completion: () -> Void) {
         if let _ = transactions {
             if let segmentType = segmentType, let date = date {
-                print(date)
                 self.transactions = priorTransactions ?? []
                 
                 switch segmentType {
                 case .day:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
                         guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
-                        return date.hourBefore < transactionDate && transactionDate < date
+                        return date.UTCTime.hourBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()
                 case .week:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
                         guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
-                        return date.dayBefore < transactionDate && transactionDate < date
+                        return date.UTCTime.dayBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()
                 case .month:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
                         guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
-                        return date.dayBefore < transactionDate && transactionDate < date
+                        return date.UTCTime.dayBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()
                 case .year:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
                         guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
-                        return date.monthBefore < transactionDate && transactionDate < date
+                        return date.UTCTime.monthBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()
                 }

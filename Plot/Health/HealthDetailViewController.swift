@@ -236,6 +236,7 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
             weakSelf.chartView.data = data
             weakSelf.chartView.rightAxis.axisMinimum = 0
             weakSelf.dayAxisValueFormatter?.formatType = weakSelf.segmentedControl.selectedSegmentIndex
+            weakSelf.chartView.highlightValue(nil)
             weakSelf.chartView.resetZoom()
             weakSelf.chartView.notifyDataSetChanged()
             weakSelf.tableView.setContentOffset(weakSelf.tableView.contentOffset, animated: false)

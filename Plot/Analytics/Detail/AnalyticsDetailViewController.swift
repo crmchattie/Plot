@@ -24,6 +24,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     // transaction
     var users = [User]()
     var filteredUsers = [User]()
+    var filterOff = true
     
     private let rangeControlView: UISegmentedControl = {
         let control = UISegmentedControl(items: DateRangeType.allCases.map { $0.filterTitle } )
@@ -131,6 +132,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
+        filterOff = true
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
         viewModel.updateType()
     }
@@ -194,6 +196,9 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.delegate = self
                 cell.chartView.delegate = self
                 cell.configure(with: chartViewModel)
+                if filterOff {
+                    cell.chartView.highlightValue(nil)
+                }
                 return cell
             case .verticalBar:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsBarChartCell.self, for: indexPath)
@@ -203,6 +208,9 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.delegate = self
                 cell.chartView.delegate = self
                 cell.configure(with: chartViewModel)
+                if filterOff {
+                    cell.chartView.highlightValue(nil)
+                }
                 return cell
             case .horizontalBar:
                 let cell = tableView.dequeueReusableCell(ofType: AnalyticsHorizontalBarChartCell.self, for: indexPath)
@@ -212,6 +220,9 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.delegate = self
                 cell.chartView.delegate = self
                 cell.configure(with: chartViewModel)
+                if filterOff {
+                    cell.chartView.highlightValue(nil)
+                }
                 return cell
             }
         } else {
@@ -308,10 +319,12 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
 
 extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
     func previousTouched(on cell: StackedBarChartCell) {
+        filterOff = true
         viewModel.loadPreviousSegment()
     }
     
     func nextTouched(on cell: StackedBarChartCell) {
+        filterOff = true
         viewModel.loadNextSegment()
     }
 }
@@ -320,10 +333,12 @@ extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
 extension AnalyticsDetailViewController: ChartViewDelegate {
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {        
         guard let date = entry.data as? Date else { return }
+        filterOff = false
         viewModel.filter(date: date)
     }
     
     func chartValueNothingSelected(_ chartView: ChartViewBase) {
+        filterOff = true
         viewModel.filter(date: nil)
     }
     

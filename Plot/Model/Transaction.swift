@@ -978,7 +978,7 @@ var subscriptionProviders = ["spotify", "netflix", "amazon prime", "disney plus"
 func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @escaping ([Transaction: Activity]) -> Void) {
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
-        guard !(transaction.plot_is_recurring ?? false) && transaction.status == .posted else { continue }
+        guard !(transaction.plot_is_recurring ?? false) && !(transaction.plot_created ?? false) else { continue }
         //amount period to period differs
         //transactions.filter({ abs($0.amount) == abs(transaction.amount) }).count == 1,
         if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), abs(transaction.amount) > 0 {
