@@ -89,9 +89,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                 
                 DispatchQueue.main.async {
                     newChartViewModel.chartData = data
-                    print("averageValue")
                     let averageValue = sum / Double(stats!.count) * 3600
-                    print(averageValue)
                     if let totalString = self.dateFormatter.string(from: averageValue) {
                         newChartViewModel.rangeAverageValue = totalString
                     }
@@ -110,6 +108,14 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(samples.map { .sample($0) })
+        if range.filterOff {
+            completion(samples.map { .sample($0) })
+        } else {
+            let filteredSamples = samples
+                .filter { sample -> Bool in
+                    return range.startDate <= sample.startDate && sample.startDate <= range.endDate
+                }
+            completion(filteredSamples.map { .sample($0) })
+        }
     }
 }

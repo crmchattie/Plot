@@ -146,7 +146,16 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(tasks.sorted(by: { $0.completedDateDate! > $1.completedDateDate! }).map { .activity($0) })
+        if range.filterOff {
+            completion(tasks.sorted(by: { $0.completedDateDate ?? Date() > $1.completedDateDate ?? Date() }).map { .activity($0) })
+        } else {
+            let filteredTasks = tasks
+                .filter { task -> Bool in
+                    guard let date = task.completedDateDate else { return false }
+                    return range.startDate <= date && date <= range.endDate
+                }
+            completion(filteredTasks.map { .activity($0) })
+        }
     }
 }
 

@@ -67,7 +67,6 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
         if let workoutMetrics = networkController.healthService.healthMetrics[.general], let healthMetric = workoutMetrics.first(where: {$0.type == .steps}) {
             dataExists = true
             newChartViewModel.healthMetric = healthMetric
-            print(range.endDate)
             healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { stats, samples, error in
                 var data: BarChartData?
                 var sum = 0.0
@@ -109,6 +108,14 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(samples.map { .sample($0) })
+        if range.filterOff {
+            completion(samples.map { .sample($0) })
+        } else {
+            let filteredSamples = samples
+                .filter { sample -> Bool in
+                    return range.startDate <= sample.startDate && sample.startDate <= range.endDate
+                }
+            completion(filteredSamples.map { .sample($0) })
+        }
     }
 }

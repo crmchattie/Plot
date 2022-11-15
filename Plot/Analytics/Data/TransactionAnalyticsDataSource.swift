@@ -182,7 +182,16 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(transactions.map { .transaction($0) })
+        if range.filterOff {
+            completion(transactions.map { .transaction($0) })
+        } else {
+            let filteredTransactions = transactions
+                .filter { transaction -> Bool in
+                    guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                    return range.startDate <= date && date <= range.endDate
+                }
+            completion(filteredTransactions.map { .transaction($0) })
+        }
     }
 }
 

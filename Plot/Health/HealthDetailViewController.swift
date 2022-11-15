@@ -268,11 +268,16 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
 
 extension HealthDetailViewController: ChartViewDelegate {
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
-        
+        guard let date = entry.data as? Date  else { return }
+        viewModel.filterSamples(date: date) {
+            tableView.reloadData()
+        }
     }
     
     func chartValueNothingSelected(_ chartView: ChartViewBase) {
-        
+        viewModel.filterSamples(date: nil) {
+            tableView.reloadData()
+        }
     }
     
     func chartScaled(_ chartView: ChartViewBase, scaleX: CGFloat, scaleY: CGFloat) {

@@ -18,6 +18,8 @@ protocol FinanceDetailViewModelInterface {
     func fetchLineChartData(segmentType: TimeSegmentType, useAll: Bool,completion: @escaping (LineChartData?, Double) -> ())
     
     func fetchBarChartData(segmentType: TimeSegmentType, useAll: Bool, completion: @escaping (BarChartData?, Double) -> ())
+    
+    func filterSamples(segmentType: TimeSegmentType?, date: Date?, completion: () -> Void)
 }
 
 class FinanceDetailViewModel: FinanceDetailViewModelInterface {
@@ -29,6 +31,8 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
     var allTransactions: [Transaction]?
     var accounts: [MXAccount]?
     var transactions: [Transaction]?
+    var priorAccounts: [MXAccount]?
+    var priorTransactions: [Transaction]?
     var filterAccounts: [String]?
     
     init(accountDetails: AccountDetails?, allAccounts: [MXAccount]?, accounts: [MXAccount]?, transactionDetails: TransactionDetails?, allTransactions: [Transaction]?, transactions: [Transaction]?, filterAccounts: [String]?, financeDetailService: FinanceDetailServiceInterface) {
@@ -57,7 +61,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                         entries.append(entry)
                         i += 1
                     }
-                                        
+                    
                     let dataSet = LineChartDataSet(entries: entries, label: "")
                     dataSet.setDrawHighlightIndicators(false)
                     dataSet.fillColor = .systemBlue
@@ -72,6 +76,8 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
+                    self?.priorAccounts = accounts ?? []
+                    self?.priorTransactions = transactions ?? []
                     completion(lineChartData, minValue)
                 }
             }
@@ -89,7 +95,7 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                         entries.append(entry)
                         i += 1
                     }
-                                        
+                    
                     let dataSet = LineChartDataSet(entries: entries, label: "")
                     dataSet.setDrawHighlightIndicators(false)
                     dataSet.fillColor = .systemBlue
@@ -104,6 +110,8 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
+                    self?.priorAccounts = accounts ?? []
+                    self?.priorTransactions = transactions ?? []
                     completion(lineChartData, minValue)
                 }
             }
@@ -137,6 +145,8 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
+                    self?.priorAccounts = accounts ?? []
+                    self?.priorTransactions = transactions ?? []
                     completion(barChartData, minValue)
                 }
             }
@@ -166,9 +176,52 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 DispatchQueue.main.async {
                     self?.accounts = accounts ?? []
                     self?.transactions = transactions ?? []
+                    self?.priorAccounts = accounts ?? []
+                    self?.priorTransactions = transactions ?? []
                     completion(barChartData, minValue)
                 }
             }
         }
     }
+    
+    func filterSamples(segmentType: TimeSegmentType?, date: Date?, completion: () -> Void) {
+        if let _ = transactions {
+            if let segmentType = segmentType, let date = date {
+                print(date)
+                self.transactions = priorTransactions ?? []
+                
+                switch segmentType {
+                case .day:
+                    self.transactions = self.transactions!.filter { transaction -> Bool in
+                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        return date.hourBefore < transactionDate && transactionDate < date
+                    }
+                    completion()
+                case .week:
+                    self.transactions = self.transactions!.filter { transaction -> Bool in
+                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        return date.dayBefore < transactionDate && transactionDate < date
+                    }
+                    completion()
+                case .month:
+                    self.transactions = self.transactions!.filter { transaction -> Bool in
+                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        return date.dayBefore < transactionDate && transactionDate < date
+                    }
+                    completion()
+                case .year:
+                    self.transactions = self.transactions!.filter { transaction -> Bool in
+                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        return date.monthBefore < transactionDate && transactionDate < date
+                    }
+                    completion()
+                }
+            } else {
+                self.transactions = priorTransactions
+                completion()
+            }
+        }
+    }
 }
+
+private let dateFormatter = ISO8601DateFormatter()

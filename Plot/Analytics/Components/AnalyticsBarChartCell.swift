@@ -45,7 +45,9 @@ class AnalyticsBarChartCell: StackedBarChartCell {
         
         if let maxValue = viewModel.maxValue {
             chartView.rightAxis.axisMaximum = maxValue + 0.25
-            chartView.rightAxis.labelCount = Int(maxValue)
+            if maxValue < 25 {
+                chartView.rightAxis.labelCount = Int(maxValue)
+            }
         }
         
         let dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)

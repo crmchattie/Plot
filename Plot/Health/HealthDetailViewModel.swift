@@ -15,12 +15,14 @@ protocol HealthDetailViewModelInterface {
     var samples: [HKSample] { get }
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?) -> ())
+    func filterSamples(date: Date?, completion: () -> Void)
 }
 
 class HealthDetailViewModel: HealthDetailViewModelInterface {
     let healthMetric: HealthMetric
     let healthDetailService: HealthDetailServiceInterface
     var samples: [HKSample] = []
+    var priorSamples: [HKSample] = []
     
     init(healthMetric: HealthMetric, healthDetailService: HealthDetailServiceInterface) {
         self.healthMetric = healthMetric
@@ -50,8 +52,23 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
             
             DispatchQueue.main.async {
                 self?.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
+                self?.priorSamples = self?.samples ?? []
                 completion(data)
             }
+        }
+    }
+    
+    func filterSamples(date: Date?, completion: () -> Void) {
+        if let date = date {
+            samples = priorSamples
+            
+            samples = samples.filter { sample -> Bool in
+                return date == sample.startDate
+            }
+            completion()
+        } else {
+            samples = priorSamples
+            completion()
         }
     }
 }

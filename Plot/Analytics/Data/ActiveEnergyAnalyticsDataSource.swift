@@ -108,6 +108,14 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(samples.map { .sample($0) })
+        if range.filterOff {
+            completion(samples.map { .sample($0) })
+        } else {
+            let filteredSamples = samples
+                .filter { sample -> Bool in
+                    return range.startDate <= sample.startDate && sample.startDate <= range.endDate
+                }
+            completion(filteredSamples.map { .sample($0) })
+        }
     }
 }

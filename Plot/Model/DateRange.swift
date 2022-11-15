@@ -34,12 +34,17 @@ struct DateRange {
     
     var type: DateRangeType {
         didSet {
+            filterOff = true
             (startDate, endDate) = type.initial
         }
     }
     
     private(set) var startDate: Date
     private(set) var endDate: Date
+    private(set) var priorStartDate: Date?
+    private(set) var priorEndDate: Date?
+    
+    var filterOff: Bool = true
     
     init(type: DateRangeType) {
         self.type = type
@@ -47,6 +52,11 @@ struct DateRange {
     }
     
     mutating func next() {
+        if !filterOff, let priorStartDate = priorStartDate, let priorEndDate = priorEndDate {
+            startDate = priorStartDate
+            endDate = priorEndDate
+            filterOff = true
+        }
         switch type {
         case .week:
             startDate = Calendar.current.date(byAdding: .day, value: 7, to: startDate)!
@@ -61,6 +71,11 @@ struct DateRange {
     }
     
     mutating func previous() {
+        if !filterOff, let priorStartDate = priorStartDate, let priorEndDate = priorEndDate {
+            startDate = priorStartDate
+            endDate = priorEndDate
+            filterOff = true
+        }
         switch type {
         case .week:
             startDate = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
@@ -74,10 +89,26 @@ struct DateRange {
         }
     }
     
+    mutating func filter(date: Date?) {
+        if let date = date {
+            if filterOff {
+                priorStartDate = startDate
+                priorEndDate = endDate
+            }
+            startDate = date.startOfDay
+            endDate = date.endOfDay
+            filterOff = false
+        } else if let priorStartDate = priorStartDate, let priorEndDate = priorEndDate {
+            startDate = priorStartDate
+            endDate = priorEndDate
+            filterOff = true
+        }
+    }
+    
     var daysInRange: Int {
         endDate.daysSince(startDate)
     }
-    
+        
     var timeSegment: TimeSegmentType {
         switch type {
         case .week: return .week

@@ -16,9 +16,7 @@ class AnalyticsDetailViewModel {
     private let dataSource: AnalyticsDataSource
     
     var title: String { dataSource.title }
-    var range: DateRange = .init(type: .week) {
-        didSet { updateRange() }
-    }
+    var range: DateRange = .init(type: .week)
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     var entries = CurrentValueSubject<[AnalyticsBreakdownEntry], Never>([])
     
@@ -46,11 +44,22 @@ class AnalyticsDetailViewModel {
     
     // MARK: - Actions
     
+    func updateType() {
+        updateRange()
+    }
+    
     func loadPreviousSegment() {
         range.previous()
+        updateRange()
     }
     
     func loadNextSegment() {
         range.next()
+        updateRange()
+    }
+    
+    func filter(date: Date?) {
+        range.filter(date: date)
+        reloadData()
     }
 }

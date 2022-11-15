@@ -97,19 +97,27 @@ class AnalyticsViewController: UITableViewController {
     }
     
     @objc fileprivate func tasksUpdated() {
-        viewModel?.loadData {}
+        viewModel?.loadData {
+            self.tableView.reloadData()
+        }
     }
     
     @objc fileprivate func eventsUpdated() {
-        viewModel?.loadData {}
+        viewModel?.loadData {
+            self.tableView.reloadData()
+        }
     }
     
     @objc fileprivate func healthUpdated() {
-        viewModel?.loadData {}
+        viewModel?.loadData {
+            self.tableView.reloadData()
+        }
     }
     
     @objc fileprivate func financeUpdated() {
-        viewModel?.loadData {}
+        viewModel?.loadData {
+            self.tableView.reloadData()
+        }
     }
 }
 

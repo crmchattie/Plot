@@ -124,6 +124,15 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
-        completion(activities.map { .activity($0) })
+        if range.filterOff {
+            completion(activities.sorted(by: { $0.startDate ?? Date() > $1.startDate ?? Date() }).map { .activity($0) })
+        } else {
+            let filteredActivities = activities
+                .filter { activity -> Bool in
+                    guard let date = activity.startDateWTZ else { return false }
+                    return range.startDate <= date && date <= range.endDate
+                }
+            completion(filteredActivities.map { .activity($0) })
+        }
     }
 }

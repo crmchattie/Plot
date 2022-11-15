@@ -2147,6 +2147,19 @@ extension Date {
         return Date(timeIntervalSince1970: timezoneEpochOffset)
     }
     
+    var startOfHour: Date {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let components = cal.dateComponents([.year, .month, .day, .hour], from: self)
+        return cal.date(from: components)!
+    }
+    
+    var endOfHour: Date {
+        var components = DateComponents()
+        components.hour = 1
+        return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfHour)!
+    }
+    
     var startOfDay: Date {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(secondsFromGMT: 0)!

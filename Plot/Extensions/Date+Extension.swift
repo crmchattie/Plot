@@ -79,6 +79,10 @@ extension Date {
         return date
     }
     
+    var hourBefore: Date {
+        return Calendar.current.date(byAdding: .hour, value: -1, to: self)!
+    }
+    
     var dayBefore: Date {
         return Calendar.current.date(byAdding: .day, value: -1, to: self)!
     }

@@ -285,13 +285,17 @@ class FinanceLineChartDetailViewController: UIViewController, ObjectDetailShowin
 }
 
 extension FinanceLineChartDetailViewController: ChartViewDelegate {
-    
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
-        
+        guard let segmentType = TimeSegmentType(rawValue: segmentedControl.selectedSegmentIndex), let date = entry.data as? Date  else { return }
+        viewModel.filterSamples(segmentType: segmentType, date: date) {
+            tableView.reloadData()
+        }
     }
     
     func chartValueNothingSelected(_ chartView: ChartViewBase) {
-        
+        viewModel.filterSamples(segmentType: nil, date: nil) {
+            tableView.reloadData()
+        }
     }
     
     func chartScaled(_ chartView: ChartViewBase, scaleX: CGFloat, scaleY: CGFloat) {

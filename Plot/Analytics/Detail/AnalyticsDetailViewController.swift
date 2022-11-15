@@ -132,6 +132,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
+        viewModel.updateType()
     }
     
     deinit {
@@ -145,19 +146,19 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func tasksUpdated() {
-        if title == "Completed Tasks" {
+        if navigationItem.title == "Completed Tasks" {
             rangeChanged(rangeControlView)
         }
     }
     
     @objc fileprivate func eventsUpdated() {
-        if title == "Events" {
+        if navigationItem.title == "Events" {
             rangeChanged(rangeControlView)
         }
     }
     
     @objc fileprivate func financeUpdated() {
-        if title == "Spending" || title == "Net Worth" {
+        if navigationItem.title == "Spending" || navigationItem.title == "Net Worth" {
             rangeChanged(rangeControlView)
         }
     }
@@ -318,11 +319,12 @@ extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
 // MARK: - ChartViewDelegate
 extension AnalyticsDetailViewController: ChartViewDelegate {
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {        
-        
+        guard let date = entry.data as? Date else { return }
+        viewModel.filter(date: date)
     }
     
     func chartValueNothingSelected(_ chartView: ChartViewBase) {
-        
+        viewModel.filter(date: nil)
     }
     
     func chartScaled(_ chartView: ChartViewBase, scaleX: CGFloat, scaleY: CGFloat) {
