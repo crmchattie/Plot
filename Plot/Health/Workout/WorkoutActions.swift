@@ -59,6 +59,10 @@ class WorkoutActions: NSObject {
             }
         })
         
+        if let _ = workout.containerID {
+            ContainerFunctions.deleteStuffInside(type: .workout, ID: ID)
+        }
+        
         if updateDirectAssociation, workout.directAssociation ?? false, let ID = workout.directAssociationObjectID {
             ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activities in
                 if let activity = activities.first {

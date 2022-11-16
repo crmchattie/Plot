@@ -116,7 +116,6 @@ class FinanceService {
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
                 self.grabAccountTransactions()
-                self.createFutureTasksFromRecurringTransactions(transactions: self.transactions)
                 self.removePendingTransactions()
                 self.flagTransfersBetweenAccounts()
                 if self.isRunning {
@@ -336,7 +335,9 @@ class FinanceService {
                 completion()
             }
             self?.createEventsFromTransactions(transactions: transactionsInitialAdd)
-            self?.createTasksFromTransactions(transactions: transactionsInitialAdd)
+            self?.createTasksFromTransactions(transactions: transactionsInitialAdd) {
+                self?.createFutureTasksFromRecurringTransactions(transactions: self!.transactions)
+            }
             self?.updateTasksFromAccounts(accounts: self!.accounts)
         }, transactionsAdded: { [weak self] transactionsAdded in
             for transaction in transactionsAdded {
@@ -353,7 +354,9 @@ class FinanceService {
                 }
             }
             self?.createEventsFromTransactions(transactions: transactionsAdded)
-            self?.createTasksFromTransactions(transactions: transactionsAdded)
+            self?.createTasksFromTransactions(transactions: transactionsAdded) {
+                self?.createFutureTasksFromRecurringTransactions(transactions: self!.transactions)
+            }
             self?.updateTasksFromAccounts(accounts: self!.accounts)
         }, transactionsRemoved: { [weak self] transactionsRemoved in
             for transaction in transactionsRemoved {
@@ -617,7 +620,7 @@ class FinanceService {
         }
     }
     
-    private func createTasksFromTransactions(transactions: [Transaction]) {
+    private func createTasksFromTransactions(transactions: [Transaction], completion: @escaping () -> Void) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -636,6 +639,7 @@ class FinanceService {
                             self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                         }
                     }
+                    completion()
                 }
             } else {
                 categorizeTransactionsIntoTasks(transactions: transactions) { transactionsActivities in
@@ -646,6 +650,7 @@ class FinanceService {
                             self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                         }
                     }
+                    completion()
                 }
             }
         }
@@ -710,13 +715,14 @@ class FinanceService {
                                 days = Calendar.current.numberOfDaysBetween(second, and: first)
                             }
                             let newDate = first.addDays(days)
-                            if newDate > Date() {
+                            if newDate > Date(), !filteredTransactions.contains(where: { $0.transacted_at == isodateFormatter.string(from: newDate) }) {
                                 self.createFutureTransaction(oldTransaction: filteredTransactions[0], newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                                 
                             }
                         } else if filteredTransactions[0].plot_created ?? false, !(filteredTransactions[1].plot_created ?? false), let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at), let second = isodateFormatter.date(from: filteredTransactions[1].transacted_at) {
                             let deleteTransaction = filteredTransactions[0]
-                            if first.getShortMonthAndYear() == second.getShortMonthAndYear() {
+                            let days = Calendar.current.numberOfDaysBetween(first, and: second)
+                            if days < 7 {
                                 let keepTransaction = filteredTransactions[1]
                                 if keepTransaction.containerID == nil, let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
                                     userReference.child(deleteTransaction.guid).setValue(nil)
@@ -759,13 +765,13 @@ class FinanceService {
                                 var days = 0
                                 if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
                                     days = mostFrequentDays
-                                } else if let second = isodateFormatter.date(from: deleteTransaction.transacted_at), filteredTransactions.count > 2, let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
+                                } else if filteredTransactions.count > 2, let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
                                     days = Calendar.current.numberOfDaysBetween(third, and: second)
                                 } else {
                                     days = Calendar.current.numberOfDaysBetween(second, and: first)
                                 }
-                                let newDate = first.addDays(days)
-                                if newDate > Date() {
+                                let newDate = second.addDays(days)
+                                if newDate > Date(), !filteredTransactions.contains(where: { $0.transacted_at == isodateFormatter.string(from: newDate) }) {
                                     self.createFutureTransaction(oldTransaction: keepTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                                 }
                             } else {
@@ -788,57 +794,61 @@ class FinanceService {
                                     }
                                 }
                             }
-                        } else if !(filteredTransactions[0].plot_created ?? false), filteredTransactions[1].plot_created ?? false, let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at) {
-                            //delete second transaction, assign first transaction to container, update reference & update task to complete; create next plot_created transaction/activity
-                            let keepTransaction = filteredTransactions[0]
-                            let deleteTransaction = filteredTransactions[1]
-                            if keepTransaction.containerID == nil, let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
-                                userReference.child(deleteTransaction.guid).setValue(nil)
-                                ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
-                                    let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
-                                    transactionAction.deleteTransaction()
-                                }
-                                
-                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                        activityAction.updateCompletion(isComplete: true)
+                        }
+                        else if !(filteredTransactions[0].plot_created ?? false), filteredTransactions[1].plot_created ?? false, let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at), let second = isodateFormatter.date(from: filteredTransactions[1].transacted_at) {
+                            let days = Calendar.current.numberOfDaysBetween(first, and: second)
+                            if days < 7 {
+                                //delete second transaction, assign first transaction to container, update reference & update task to complete; create next plot_created transaction/activity
+                                let keepTransaction = filteredTransactions[0]
+                                let deleteTransaction = filteredTransactions[1]
+                                if keepTransaction.containerID == nil, let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
+                                    userReference.child(deleteTransaction.guid).setValue(nil)
+                                    ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
+                                        let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
+                                        transactionAction.deleteTransaction()
                                     }
-                                }
+                                    
+                                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                        if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                            activityAction.updateCompletion(isComplete: true)
+                                        }
+                                    }
 
-                                userReference.child(keepTransaction.guid).setValue(activityID)
-                                ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, _, _, transactions in
-                                    if let transactions = transactions {
-                                        var newTransactions = transactions.filter({ $0.guid != deleteTransaction.guid })
-                                        newTransactions.append(keepTransaction)
-                                        var newContainer = container
-                                        newContainer.transactionIDs = newTransactions.map({ $0.guid })
-                                        ContainerFunctions.updateContainerAndStuffInside(container: newContainer)
+                                    userReference.child(keepTransaction.guid).setValue(activityID)
+                                    ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, _, _, _, transactions in
+                                        if let transactions = transactions {
+                                            var newTransactions = transactions.filter({ $0.guid != deleteTransaction.guid })
+                                            newTransactions.append(keepTransaction)
+                                            var newContainer = container
+                                            newContainer.transactionIDs = newTransactions.map({ $0.guid })
+                                            ContainerFunctions.updateContainerAndStuffInside(container: newContainer)
+                                        }
                                     }
-                                }
-                            } else if let activityID = dataSnapshotValue[deleteTransaction.guid] {
-                                ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
-                                    let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
-                                    transactionAction.deleteTransaction()
+                                } else if let activityID = dataSnapshotValue[deleteTransaction.guid] {
+                                    ParticipantsFetcher.getParticipants(forTransaction: deleteTransaction) { users in
+                                        let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
+                                        transactionAction.deleteTransaction()
+                                    }
+                                    
+                                    ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                        if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
+                                        }
+                                    }
                                 }
                                 
-                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                    }
+                                var days = 0
+                                if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
+                                    days = mostFrequentDays
+                                } else if filteredTransactions.count > 2, let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
+                                    days = Calendar.current.numberOfDaysBetween(third, and: second)
                                 }
-                            }
-                            
-                            var days = 0
-                            if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
-                                days = mostFrequentDays
-                            } else if let second = isodateFormatter.date(from: deleteTransaction.transacted_at), let third = isodateFormatter.date(from: filteredTransactions[2].transacted_at) {
-                                days = Calendar.current.numberOfDaysBetween(third, and: second)
-                            }
-                            let newDate = first.addDays(days)
-                            if newDate > Date() {
-                                self.createFutureTransaction(oldTransaction: keepTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
+                                let newDate = first.addDays(days)
+                                if newDate > Date(), !filteredTransactions.contains(where: { $0.transacted_at == isodateFormatter.string(from: newDate) }) {
+                                    self.createFutureTransaction(oldTransaction: keepTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
+                                }
                             }
                         }
                     }

@@ -27,6 +27,7 @@ class User: NSObject {
     var onlineStatus: AnyObject?
     var weight: Int?
     var height: Int?
+    var contacted: Bool? // used for reaching out to users
     var isSelected: Bool! = false // local only
 
     init(dictionary: [String: AnyObject]) {
@@ -38,6 +39,7 @@ class User: NSObject {
         phoneNumber = dictionary["phoneNumber"] as? String
         fcmToken = dictionary["fcmToken"] as? String
         badge = dictionary["badge"] as? Int
+        contacted = dictionary["contacted"] as? Bool
         onlineStatus = dictionary["OnlineStatus"]// as? AnyObject
     }
     

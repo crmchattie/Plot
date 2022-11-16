@@ -55,6 +55,10 @@ class ActivityActions: NSObject {
             }
         })
         
+        if let _ = activity.containerID {
+            ContainerFunctions.deleteStuffInside(type: .activity, ID: activityID)
+        }
+        
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
         

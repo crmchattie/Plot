@@ -1098,7 +1098,6 @@ class Service {
                 var urlRequest = URLRequest(url: baseURL)
                 urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
                                                   "Authorization" : "Bearer \(token)"]
-                
                 urlRequest.httpMethod = "POST"
                 let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
                 urlRequest.httpBody = jsonData
@@ -1160,6 +1159,37 @@ class Service {
             }
         }
         
+    }
+    
+    func sendUserTextMessage(type_of_user: String, completion: @escaping (([String: String]?), Error?) -> ()) {
+        let baseURL: URL = {
+            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/sendUserTextMessage")!
+        }()
+        
+        //newUser
+        //oldUser
+        let parameters = ["typeOfUser":"\(type_of_user)"]
+        
+        let currentUser = Auth.auth().currentUser
+        currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
+            if let error = error {
+                print("error getting token \(error)")
+                // Handle error
+                return
+            }
+            if let token = token {
+                var urlRequest = URLRequest(url: baseURL)
+                urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
+                                                  "Authorization" : "Bearer \(token)"]
+                
+                urlRequest.httpMethod = "POST"
+                
+                let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
+                urlRequest.httpBody = jsonData
+                
+                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+            }
+        }
     }
     
     // declare my generic json function here

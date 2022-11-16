@@ -73,6 +73,9 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
         
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "E, MMM dd, yyyy"
+        
+        status = transaction.status == .posted
+
         setupVariables()
         configureTableView()
         initializeForm()
@@ -129,8 +132,6 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                 transaction.containerID = container.id
             }
         }
-        
-        status = transaction.status == .posted
         
     }
     
@@ -550,7 +551,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                 cell.textLabel?.textAlignment = .left
             }
         
-        if delegate == nil {
+        if delegate == nil && status && (!active || ((transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || transaction?.admin == Auth.auth().currentUser?.uid))) {
             form.last!
             <<< LabelRow("Participants") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -705,6 +706,12 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
         alert.addAction(UIAlertAction(title: "Create Transaction Rule", style: .default, handler: { (_) in
             self.createRule()
         }))
+        
+        if transaction.plot_created ?? false {
+            alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { (_) in
+                self.delete()
+            }))
+        }
 
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
         }))
@@ -715,6 +722,30 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
     
     func createRule() {
         showTransactionRuleDetailPresent(transactionRule: nil, transaction: transaction, updateDiscoverDelegate: nil)
+    }
+    
+    func delete() {
+        let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
+            self.showActivityIndicator()
+            let transactionAction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            transactionAction.deleteTransaction()
+            self.hideActivityIndicator()
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            basicAlert(title: workoutDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     @objc fileprivate func openLevel(level: String, value: String, otherValue: String?) {

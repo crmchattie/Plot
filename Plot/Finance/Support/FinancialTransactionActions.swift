@@ -59,6 +59,10 @@ class TransactionActions: NSObject {
                 reference.updateChildValues(["participantsIDs": varMemberIDs as AnyObject])
             }
         })
+        
+        if let _ = transaction.containerID {
+            ContainerFunctions.deleteStuffInside(type: .transaction, ID: ID)
+        }
                 
     }
     

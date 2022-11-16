@@ -59,6 +59,10 @@ class MindfulnessActions: NSObject {
             }
         })
         
+        if let _ = mindfulness.containerID {
+            ContainerFunctions.deleteStuffInside(type: .mindfulness, ID: ID)
+        }
+        
         if updateDirectAssociation, mindfulness.directAssociation ?? false, let ID = mindfulness.directAssociationObjectID {
             ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activities in
                 if let activity = activities.first {
