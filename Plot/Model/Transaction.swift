@@ -998,6 +998,7 @@ func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @e
             }
         }
     }
+    completion([:])
 }
 
 func categorizeTransactionsIntoEvents(transactions: [Transaction], completion: @escaping ([Transaction: Activity]) -> Void) {

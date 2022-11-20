@@ -335,10 +335,9 @@ class FinanceService {
                 completion()
             }
             self?.createEventsFromTransactions(transactions: transactionsInitialAdd)
-            self?.createTasksFromTransactions(transactions: transactionsInitialAdd) {
-                self?.createFutureTasksFromRecurringTransactions(transactions: self!.transactions)
-            }
+            self?.createTasksFromTransactions(transactions: transactionsInitialAdd)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
+            self?.createFutureTasksFromRecurringTransactions(transactions: self!.transactions)
         }, transactionsAdded: { [weak self] transactionsAdded in
             for transaction in transactionsAdded {
                 updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
@@ -354,9 +353,7 @@ class FinanceService {
                 }
             }
             self?.createEventsFromTransactions(transactions: transactionsAdded)
-            self?.createTasksFromTransactions(transactions: transactionsAdded) {
-                self?.createFutureTasksFromRecurringTransactions(transactions: self!.transactions)
-            }
+            self?.createTasksFromTransactions(transactions: transactionsAdded)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
         }, transactionsRemoved: { [weak self] transactionsRemoved in
             for transaction in transactionsRemoved {
@@ -620,7 +617,7 @@ class FinanceService {
         }
     }
     
-    private func createTasksFromTransactions(transactions: [Transaction], completion: @escaping () -> Void) {
+    private func createTasksFromTransactions(transactions: [Transaction]) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -639,7 +636,6 @@ class FinanceService {
                             self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                         }
                     }
-                    completion()
                 }
             } else {
                 categorizeTransactionsIntoTasks(transactions: transactions) { transactionsActivities in
@@ -650,7 +646,6 @@ class FinanceService {
                             self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                         }
                     }
-                    completion()
                 }
             }
         }
@@ -667,11 +662,18 @@ class FinanceService {
         newTransaction.guid = ID
         newTransaction.status = .pending
         newTransaction.plot_created = true
+        newTransaction.plot_is_recurring = true
         newTransaction.amount = averageAmount
         newTransaction.transacted_at = newDateString
         newTransaction.containerID = nil
         TaskBuilder.createActivityWithList(from: newTransaction) { task in
             if let task = task, let activityID = task.activityID {
+                if let index = self.transactions.firstIndex(where: {$0.guid == newTransaction.guid}) {
+                    self.transactions[index] = newTransaction
+                } else {
+                    self.transactions.append(newTransaction)
+                }
+                
                 let createTransaction = TransactionActions(transaction: newTransaction, active: false, selectedFalconUsers: [])
                 createTransaction.createNewTransaction()
 
@@ -679,7 +681,6 @@ class FinanceService {
                 self.updateTransactionCreateContainer(transaction: newTransaction, activity: task)
             }
         }
-        
     }
     
     private func createFutureTasksFromRecurringTransactions(transactions: [Transaction]) {
@@ -715,13 +716,13 @@ class FinanceService {
                                 days = Calendar.current.numberOfDaysBetween(second, and: first)
                             }
                             let newDate = first.addDays(days)
-                            if newDate > Date(), !filteredTransactions.contains(where: { $0.transacted_at == isodateFormatter.string(from: newDate) }) {
+                            if newDate > Date(), !filteredTransactions.contains(where: { isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() == newDate.getShortDayMonthAndYear() }) {
                                 self.createFutureTransaction(oldTransaction: filteredTransactions[0], newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                                 
                             }
                         } else if filteredTransactions[0].plot_created ?? false, !(filteredTransactions[1].plot_created ?? false), let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at), let second = isodateFormatter.date(from: filteredTransactions[1].transacted_at) {
                             let deleteTransaction = filteredTransactions[0]
-                            let days = Calendar.current.numberOfDaysBetween(first, and: second)
+                            let days = Calendar.current.numberOfDaysBetween(second, and: first)
                             if days < 7 {
                                 let keepTransaction = filteredTransactions[1]
                                 if keepTransaction.containerID == nil, let activityID = dataSnapshotValue[deleteTransaction.guid], let containerID = deleteTransaction.containerID {
@@ -771,7 +772,7 @@ class FinanceService {
                                     days = Calendar.current.numberOfDaysBetween(second, and: first)
                                 }
                                 let newDate = second.addDays(days)
-                                if newDate > Date(), !filteredTransactions.contains(where: { $0.transacted_at == isodateFormatter.string(from: newDate) }) {
+                                if newDate > Date(), !filteredTransactions.contains(where: { isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() == newDate.getShortDayMonthAndYear() }) {
                                     self.createFutureTransaction(oldTransaction: keepTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                                 }
                             } else {
@@ -796,7 +797,7 @@ class FinanceService {
                             }
                         }
                         else if !(filteredTransactions[0].plot_created ?? false), filteredTransactions[1].plot_created ?? false, let first = isodateFormatter.date(from: filteredTransactions[0].transacted_at), let second = isodateFormatter.date(from: filteredTransactions[1].transacted_at) {
-                            let days = Calendar.current.numberOfDaysBetween(first, and: second)
+                            let days = Calendar.current.numberOfDaysBetween(second, and: first)
                             if days < 7 {
                                 //delete second transaction, assign first transaction to container, update reference & update task to complete; create next plot_created transaction/activity
                                 let keepTransaction = filteredTransactions[0]
@@ -846,7 +847,7 @@ class FinanceService {
                                     days = Calendar.current.numberOfDaysBetween(third, and: second)
                                 }
                                 let newDate = first.addDays(days)
-                                if newDate > Date(), !filteredTransactions.contains(where: { $0.transacted_at == isodateFormatter.string(from: newDate) }) {
+                                if newDate > Date(), !filteredTransactions.contains(where: { isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() == newDate.getShortDayMonthAndYear() }) {
                                     self.createFutureTransaction(oldTransaction: keepTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                                 }
                             }

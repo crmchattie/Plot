@@ -737,7 +737,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
             } else {
                 self.navigationController?.popViewController(animated: true)
             }
-            basicAlert(title: workoutDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+            basicAlert(title: transactionDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
