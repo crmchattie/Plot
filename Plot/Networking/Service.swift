@@ -652,23 +652,6 @@ class Service {
         
     }
     
-    func deleteMXUser(guid: String, completion: @escaping ((String?), Error?) -> ()) {
-        
-        let baseURL: URL = {
-            return URL(string: MXAPI.baseURL+"users/"+guid)!
-        }()
-        
-        var urlRequest = URLRequest(url: baseURL)
-        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-                                          "MX-Client-ID": MXAPI.clientID,
-                                          "Accept": MXAPI.version,
-                                          "Content-Type": MXAPI.contentType]
-        urlRequest.httpMethod = "DELETE"
-        
-        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-        
-    }
-    
     func getMXConnectURL(guid: String, current_member_guid: String?, completion: @escaping ((MXUserResult?), Error?) -> ()) {
         
         let baseURL: URL = {
@@ -768,22 +751,6 @@ class Service {
         
         fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
     }
-    
-//    func deleteMXMember(guid: String, member_guid: String, completion: @escaping ((String?), Error?) -> ()) {
-//
-//        let baseURL: URL = {
-//            return URL(string: MXAPI.baseURL+"users/"+guid+"/members/"+member_guid)!
-//        }()
-//
-//        var urlRequest = URLRequest(url: baseURL)
-//        urlRequest.allHTTPHeaderFields = ["MX-API-Key": MXAPI.apiKey,
-//                                          "MX-Client-ID": MXAPI.clientID,
-//                                          "Accept": MXAPI.version,
-//                                          "Content-Type": MXAPI.contentType]
-//        urlRequest.httpMethod = "DELETE"
-//
-//        fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
-//    }
     
     func getMXAccounts(guid: String, page: String, records_per_page: String, completion: @escaping ((MXAccountResult?), Error?) -> ()) {
         
@@ -1131,6 +1098,37 @@ class Service {
         }
     }
     
+    func deleteMXUser(user_guid: String, completion: @escaping ((String?), Error?) -> ()) {
+        
+        let baseURL: URL = {
+            return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/deleteMXUser")!
+        }()
+        
+        let parameters = ["userGuid":"\(user_guid)"]
+        
+        let currentUser = Auth.auth().currentUser
+        currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in
+            if let error = error {
+                print("error getting token \(error)")
+                // Handle error
+                return
+            }
+            if let token = token {
+                var urlRequest = URLRequest(url: baseURL)
+                urlRequest.allHTTPHeaderFields = ["Content-Type": "application/json",
+                                                  "Authorization" : "Bearer \(token)"]
+                
+                urlRequest.httpMethod = "POST"
+                
+                let jsonData = try? JSONSerialization.data(withJSONObject: parameters)
+                urlRequest.httpBody = jsonData
+                
+                self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
+            }
+        }
+        
+    }
+    
     func deleteMXMember(current_member_guid: String, completion: @escaping (([String: String]?), Error?) -> ()) {
         let baseURL: URL = {
             return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/deleteMXMember")!
@@ -1158,7 +1156,6 @@ class Service {
                 self?.fetchGenericJSONData(encodedURLRequest: urlRequest, completion: completion)
             }
         }
-        
     }
     
     func sendUserTextMessage(type_of_user: String, completion: @escaping (([String: String]?), Error?) -> ()) {

@@ -27,46 +27,50 @@ class HealthKitSetupAssistant {
         
         // Prepare the data types that will interact with HealthKit
         guard let bodyMassIndex = HKObjectType.quantityType(forIdentifier: .bodyMassIndex),
-            let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass),
-            let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate),
-            let stepCount = HKObjectType.quantityType(forIdentifier: .stepCount),
-            let flightCount = HKObjectType.quantityType(forIdentifier: .flightsClimbed),
-            let distanceWalkingRunning = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
-            let distanceCycling = HKObjectType.quantityType(forIdentifier: .distanceCycling),
-            let sleepAnalysis = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
-            let mindfulSession = HKObjectType.categoryType(forIdentifier: .mindfulSession),
-            let activeEnergy = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
-                completion(false, HealthkitSetupError.dataTypeNotAvailable)
-                return
+              let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass),
+              let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate),
+              let stepCount = HKObjectType.quantityType(forIdentifier: .stepCount),
+              let flightCount = HKObjectType.quantityType(forIdentifier: .flightsClimbed),
+              let distanceWalkingRunning = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
+              let distanceCycling = HKObjectType.quantityType(forIdentifier: .distanceCycling),
+              let sleepAnalysis = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
+              let mindfulSession = HKObjectType.categoryType(forIdentifier: .mindfulSession),
+              let activeEnergy = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            completion(false, HealthkitSetupError.dataTypeNotAvailable)
+            return
         }
         let summaryType = HKObjectType.activitySummaryType()
         
         // Prepare a list of types you want HealthKit to read and write
         let healthKitTypesToRead: Set<HKObjectType> = [summaryType,
-                                                        activeEnergy,
-                                                        stepCount,
-                                                        flightCount,
-                                                        sleepAnalysis,
-                                                        mindfulSession,
-                                                        heartRate,
-                                                        bodyMass,
-                                                        bodyMassIndex,
-                                                        distanceWalkingRunning,
-                                                        distanceCycling,
-                                                        HKObjectType.workoutType()]
-        
-        let healthKitTypesToWrite: Set<HKSampleType> = [
+                                                       activeEnergy,
+                                                       stepCount,
+                                                       flightCount,
+                                                       sleepAnalysis,
+                                                       mindfulSession,
+                                                       heartRate,
+                                                       bodyMass,
+                                                       bodyMassIndex,
                                                        distanceWalkingRunning,
                                                        distanceCycling,
-                                                       mindfulSession,
                                                        HKObjectType.workoutType()]
+        
+        let healthKitTypesToWrite: Set<HKSampleType> = [
+            distanceWalkingRunning,
+            distanceCycling,
+            mindfulSession,
+            HKObjectType.workoutType()]
         // Request Authorization
         healthStore.requestAuthorization(toShare: healthKitTypesToWrite,
-                                             read: healthKitTypesToRead) { (success, error) in
-                                                completion(success, error)
+                                         read: healthKitTypesToRead) { (success, error) in
+            completion(success, error)
         }
     }
 }
+
+//let exerciseTime = HKObjectType.quantityType(forIdentifier: .appleExerciseTime),
+//let standTime = HKObjectType.quantityType(forIdentifier: .appleStandTime),
+//let moveTime = HKObjectType.quantityType(forIdentifier: .appleMoveTime),
 
 //            let dietaryFatTotal = HKObjectType.quantityType(forIdentifier: .dietaryFatTotal),
 //            let dietaryCarbohydrates = HKObjectType.quantityType(forIdentifier: .dietaryCarbohydrates),

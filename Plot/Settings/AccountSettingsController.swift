@@ -21,13 +21,14 @@ class AccountSettingsController: UITableViewController {
     
     var firstSection = [( icon: UIImage(named: "CalendarAccounts") , title: "Time Info" ),
                         ( icon: UIImage(named: "FinancialAccounts") , title: "Financial Info" ),
-//                        ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
+                        //                        ( icon: UIImage(named: "Notification") , title: "Notifications and Sounds" ),
                         ( icon: UIImage(named: "Privacy") , title: "Privacy and Security" ),
-//                        ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
+                        //                        ( icon: UIImage(named: "ChangeNumber") , title: "Change Number"),
                         ( icon: UIImage(named: "DataStorage") , title: "Data and Storage")]
     
     var secondSection = [( icon: UIImage(named: "Feedback") , title: "Feedback")]
     var thirdSection = [( icon: UIImage(named: "Logout") , title: "Log Out")]
+    var fourthSection = [( icon: UIImage(named: "Delete") , title: "Delete Account")]
     
     var cancelBarButton = UIBarButtonItem()
     var updateBarButton = UIBarButtonItem()
@@ -49,7 +50,7 @@ class AccountSettingsController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Settings"
-                
+        
         extendedLayoutIncludesOpaqueBars = true
         edgesForExtendedLayout = UIRectEdge.top
         tableView = UITableView(frame: tableView.frame, style: .insetGrouped)
@@ -118,7 +119,7 @@ class AccountSettingsController: UITableViewController {
         userProfileContainerView.backgroundColor = .systemGroupedBackground
         userProfileContainerView.bio.backgroundColor = .secondarySystemGroupedBackground
         userProfileContainerView.userData.backgroundColor = .secondarySystemGroupedBackground
-//        userProfileContainerView.email.backgroundColor = .secondarySystemGroupedBackground
+        //        userProfileContainerView.email.backgroundColor = .secondarySystemGroupedBackground
         userProfileContainerView.name.textColor = .label
         userProfileContainerView.phone.textColor = .label
         userProfileContainerView.bio.textColor = .label
@@ -130,15 +131,15 @@ class AccountSettingsController: UITableViewController {
     @objc func doneBarButtonPressed() {
         self.dismiss(animated: true, completion: nil)
     }
-
+    
     @objc private func emailVerified(_ notification: Notification) {
         guard let email = notification.object as? String, email.isValidEmail else { return }
-
+        
         userProfileContainerView.email.text = email
-
+        
         let userNameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
         userNameReference.updateChildValues(["email": email])
-
+        
         // Dismiss Change email controller if presented
         if (presentedViewController as? UINavigationController)?.viewControllers.first is ChangeEmailController {
             dismiss(animated: true, completion: nil)
@@ -233,43 +234,92 @@ class AccountSettingsController: UITableViewController {
         present(destination, animated: true, completion: nil)
     }
     
-    func logoutButtonTapped () {
+    func logoutButtonTapped() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         guard currentReachabilityStatus != .notReachable else {
-            basicErrorAlertWithClose(title: "Error signing out", message: noInternetError, controller: self)
+            basicErrorAlertWithClose(title: "Error Signing Out", message: noInternetError, controller: self)
             return
             
         }
-
-//        warning("Not sure if still used.")
+        
+        //        warning("Not sure if still used.")
         Database.database().reference(withPath: ".info/connected").removeAllObservers()
-
+        
         let onlineStatusReference = Database.database().reference().child("users").child(uid).child("OnlineStatus")
         onlineStatusReference.setValue(ServerValue.timestamp())
-
+        
         do {
             try Auth.auth().signOut()
-        } catch let signOutError as NSError {
-            basicErrorAlertWithClose(title: "Error signing out", message: signOutError.localizedDescription, controller: self)
+        } catch let error as NSError {
+            basicErrorAlertWithClose(title: "Error Signing Out", message: error.localizedDescription, controller: self)
             return
         }
-
+        
         UIApplication.shared.applicationIconBadgeNumber = 0
-
+        
         let destination = OnboardingController()
-
+        
         let newNavigationController = UINavigationController(rootViewController: destination)
         newNavigationController.navigationBar.shadowImage = UIImage()
         newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
-
+        
         newNavigationController.modalPresentationStyle = .fullScreen
         newNavigationController.navigationBar.isTranslucent = false
         newNavigationController.modalTransitionStyle = .crossDissolve
-
+        
         present(newNavigationController, animated: true, completion: {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearContacts"), object: nil)
             self.tabBarController?.selectedIndex = Tabs.home.rawValue
+        })
+    }
+    
+    func deleteButtonTapped() {
+        print("deleteButtonTapped")
+        guard let user = Auth.auth().currentUser else { return }
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWithClose(title: "Error Deleting Account", message: noInternetError, controller: self)
+            return
+            
+        }
+        
+        //        warning("Not sure if still used.")
+        Database.database().reference(withPath: ".info/connected").removeAllObservers()
+        
+        Database.database().reference().child("user-financial").child(user.uid).observe(.value, with: { snapshot in
+            print(snapshot)
+            
+            if snapshot.exists(), let userInfo = snapshot.value as? [String: Any], let user_guid = userInfo["guid"] as? String {
+                Service.shared.deleteMXUser(user_guid: user_guid) {_,_ in }
+            }
+                        
+            user.delete { error in
+                guard error == nil else {
+                    basicErrorAlertWithClose(title: "Error Deleting Account", message: error?.localizedDescription ?? "", controller: self)
+                    return
+                }
+                
+                Database.database().reference().child("users").child(user.uid).removeValue()
+                
+                UIApplication.shared.applicationIconBadgeNumber = 0
+                
+                let destination = OnboardingController()
+                
+                let newNavigationController = UINavigationController(rootViewController: destination)
+                newNavigationController.navigationBar.shadowImage = UIImage()
+                newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+                
+                newNavigationController.modalPresentationStyle = .fullScreen
+                newNavigationController.navigationBar.isTranslucent = false
+                newNavigationController.modalTransitionStyle = .crossDissolve
+                
+                self.present(newNavigationController, animated: true, completion: {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearUserData"), object: nil)
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "clearContacts"), object: nil)
+                    self.tabBarController?.selectedIndex = Tabs.home.rawValue
+                })
+                
+            }
         })
     }
 }
@@ -293,6 +343,12 @@ extension AccountSettingsController {
         if indexPath.section == 2 {
             cell.icon.image = thirdSection[indexPath.row].icon
             cell.title.text = thirdSection[indexPath.row].title
+            cell.accessoryType = .none
+        }
+        
+        if indexPath.section == 3 {
+            cell.icon.image = fourthSection[indexPath.row].icon
+            cell.title.text = fourthSection[indexPath.row].title
             cell.accessoryType = .none
         }
         return cell
@@ -337,10 +393,26 @@ extension AccountSettingsController {
         if indexPath.section == 2 {
             logoutButtonTapped()
         }
+        if indexPath.section == 3 {
+            let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
+                print("Save for this event only")
+                self.deleteButtonTapped()
+
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
+        }
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
     
     override  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -355,6 +427,8 @@ extension AccountSettingsController {
             return secondSection.count
         } else if section == 2 {
             return thirdSection.count
+        } else if section == 3 {
+            return fourthSection.count
         } else {
             return 0
         }

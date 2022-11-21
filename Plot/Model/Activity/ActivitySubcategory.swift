@@ -36,6 +36,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
     case health = "Health"
     case home = "Home"
     case hygiene = "Hygiene"
+    case investments = "Investments"
     case kids = "Kids"
     case leisure = "Leisure"
     case meal = "Meal"
@@ -49,6 +50,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
     case skill = "Skill"
     case sleep = "Sleep"
     case social = "Social"
+    case spending = "Spending"
     case todo = "To-do"
     case travel = "Travel"
     case wedding = "Wedding"
@@ -70,6 +72,8 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .personal: return UIImage(named: "personal")!
         case .todo: return UIImage(named: "todo")!
         case .finances: return UIImage(named: "money")!
+        case .spending: return UIImage(named: "transaction")!
+        case .investments: return UIImage(named: "money")!
         case .uncategorized: return UIImage(named: "event")!
         case .bills: return UIImage(named: "transaction")!
         case .car: return UIImage(named: "car")!
@@ -106,6 +110,8 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .personal: return "personal"
         case .todo: return "todo"
         case .finances: return "money"
+        case .spending: return "transaction"
+        case .investments: return "money"
         case .uncategorized: return "event"
         case .bills: return "transaction"
         case .car: return "car"
