@@ -409,6 +409,7 @@ extension AccountSettingsController {
                 print("completion block")
             })
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

@@ -90,7 +90,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     var filters: [filter] = [.search, .calendarView, .calendarCategory]
     var filterDictionary = [String: [String]]()
     
-    var selectedDate = Date().localTime
+    var selectedDate = Date()
     
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -403,12 +403,12 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func scrollToFirstActivityWithDate(animated: Bool) {
-        let date = selectedDate
+        let date = selectedDate.localTime
         var index = 0
         var activityFound = false
         for activity in self.filteredActivities {
-            if let endDate = activity.endDate?.localTime {
-                if date < endDate {
+            if let scrollDate = activity.scrollDate?.localTime {
+                if date <= scrollDate {
                     activityFound = true
                     break
                 }

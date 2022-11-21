@@ -1512,10 +1512,20 @@ extension Activity {
     
     var finalDate: Date? {
         if isTask ?? false {
+            if isCompleted ?? false {
+                return completedDateDate
+            }
             return endDate
         } else {
             return startDate
         }
+    }
+    
+    var scrollDate: Date? {
+        if isCompleted ?? false {
+            return completedDateDate
+        }
+        return endDate
     }
     
     var completedDateDate: Date? {
@@ -1528,6 +1538,7 @@ extension Activity {
     //for tasks where deadline date is more likely to be set than start date
     var finalDateTime: NSNumber? {
         if isTask ?? false {
+            //do not add in completed date; this is used for recurrences
             return endDateTime
         } else {
             return startDateTime
