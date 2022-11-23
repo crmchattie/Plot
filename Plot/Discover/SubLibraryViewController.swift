@@ -26,9 +26,7 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
     var intColor: Int = 0
     
     var umbrellaActivity: Activity!
-    
-    var activityType: String!
-    
+        
     var networkController = NetworkController()
     
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()

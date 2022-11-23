@@ -19,7 +19,7 @@ private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", 
                            "Doctor": ["appointment", "therapy", "dr", "doctor"],
                            "Personal": ["consultation", "haircut", "read", "journal"],
                            "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation"],
-                           "Leisure": ["trip", "vacation"],
+                           "Travel": ["trip", "vacation"],
                            "Bills": ["bill", "payment"],
                            "Kids": ["kids"]
 ]
@@ -51,6 +51,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
     case sleep = "Sleep"
     case social = "Social"
     case spending = "Spending"
+    case timeOff = "Time Off"
     case todo = "To-do"
     case travel = "Travel"
     case wedding = "Wedding"
@@ -91,6 +92,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .shopping: return UIImage(named: "shopping")!
         case .skill: return UIImage(named: "school")!
         case .sleep: return UIImage(named: "sleep")!
+        case .timeOff: return UIImage(named: "leisure")!
         case .travel: return UIImage(named: "plane")!
         case .wedding: return UIImage(named: "wedding")!
         case .workout: return UIImage(named: "workout")!
@@ -129,6 +131,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .shopping: return "shopping"
         case .skill: return "school"
         case .sleep: return "sleep"
+        case .timeOff: return "leisure"
         case .travel: return "plane"
         case .wedding: return "wedding"
         case .workout: return "workout"

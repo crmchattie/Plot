@@ -345,51 +345,46 @@ class ActivityActions: NSObject {
     }
     
     func updateCompletion(isComplete: Bool) {
-        print("updateCompletion")
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
         if activity.recurrences != nil || activity.instanceID != nil {
-            print("activity.recurrences != nil || activity.instanceID != nil")
             var values:[String : Any] = [:]
             activity.isCompleted = isComplete
             if isComplete {
-                let original = Date()
-                let updateDate = Date(timeIntervalSinceReferenceDate:
-                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                let completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
-                values = ["isCompleted": isComplete, "completedDate": completedDate as Any]
-                if activity.instanceOriginalStartDateTime == nil {
-                    activity.instanceOriginalStartDateTime = activity.finalDateTime
-                    values["instanceOriginalStartDateTime"] = activity.finalDateTime as Any
+                var finalCompletedDate = NSNumber()
+                if let completedDate = activity.completedDate {
+                    finalCompletedDate = completedDate
+                } else {
+                    let original = Date()
+                    let updateDate = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    finalCompletedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
                 }
-                activity.completedDate = completedDate
+                values = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any]
                 updateInstance(instanceValues: values, updateExternal: true)
             } else {
-                values = ["isCompleted": isComplete]
-                if activity.instanceOriginalStartDateTime == nil {
-                    activity.instanceOriginalStartDateTime = activity.finalDateTime
-                    values["instanceOriginalStartDateTime"] = activity.finalDateTime as Any
-                }
-                activity.completedDate = nil
+                values = ["isCompleted": isComplete, "completedDate": NSNull() as Any]
                 updateInstance(instanceValues: values, updateExternal: true)
             }
         } else if let currentUserID = Auth.auth().currentUser?.uid {
             let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
             activity.isCompleted = isComplete
             if isComplete {
-                let original = Date()
-                let updateDate = Date(timeIntervalSinceReferenceDate:
-                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                let completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
-                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": completedDate as Any]
-                activity.completedDate = completedDate
+                var finalCompletedDate = NSNumber()
+                if let completedDate = activity.completedDate {
+                    finalCompletedDate = completedDate
+                } else {
+                    let original = Date()
+                    let updateDate = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    finalCompletedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                }
+                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any]
                 groupActivityReference.updateChildValues(values)
             } else {
-                let values:[String : Any] = ["isCompleted": isComplete]
+                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": NSNull() as Any]
                 groupActivityReference.updateChildValues(values)
-                activity.completedDate = nil
-                groupActivityReference.child("completedDate").removeValue()
             }
             incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])
             
@@ -434,7 +429,6 @@ class ActivityActions: NSObject {
         if activity.isSubtask ?? false || activity.isSchedule ?? false {
             updateInstanceValues["parentID"] = activity.parentID
         }
-        updateInstanceValues["name"] = activity.name
         updateInstanceValues["recurringEventID"] = activityID
                         
         let groupInstanceActivityReference = Database.database().reference().child(activitiesEntity).child(instanceID).child(messageMetaDataFirebaseFolder)

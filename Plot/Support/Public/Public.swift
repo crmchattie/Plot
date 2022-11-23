@@ -838,7 +838,7 @@ func dateTimeValue(forActivity activity: Activity) -> (Int, String) {
 func dateTimeValue(forTask task: Activity) -> (Int, String) {
     var value = ""
     var numberOfLines = 1
-    if let date = task.completedDateDate {
+    if task.isCompleted ?? false, let date = task.completedDateDate {
         value += "Completed: "
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d"

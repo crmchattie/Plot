@@ -324,43 +324,48 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
 //            }
 //        }
         
-//        <<< DateTimeInlineRow("Completed On") {
-//            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-//            $0.cell.textLabel?.textColor = .label
-//            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-//            $0.title = $0.tag
-//            $0.minuteInterval = 5
-//            $0.dateFormatter?.dateStyle = .medium
-//            $0.dateFormatter?.timeStyle = .short
-//            if let task = task, task.isCompleted ?? false, let date = task.completedDate {
-//                $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
-//                $0.updateCell()
-//            } else {
-//                $0.hidden = true
-//            }
-//        }.onChange { [weak self] row in
-//            if let value = row.value {
-//                self?.task.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
-//            }
-//        }.onExpandInlineRow { cell, row, inlineRow in
-//            inlineRow.cellUpdate { (cell, row) in
-//                row.cell.backgroundColor = .secondarySystemGroupedBackground
-//                row.cell.tintColor = .secondarySystemGroupedBackground
-//                if #available(iOS 14.0, *) {
-//                    cell.datePicker.preferredDatePickerStyle = .inline
-//                    cell.datePicker.tintColor = .systemBlue
-//                }
-//                else {
-//                    cell.datePicker.datePickerMode = .dateAndTime
-//                }
-//            }
-//            cell.detailTextLabel?.textColor = cell.tintColor
-//        }.onCollapseInlineRow { cell, _, _ in
-//            cell.detailTextLabel?.textColor = .secondaryLabel
-//        }.cellUpdate { cell, row in
-//            cell.backgroundColor = .secondarySystemGroupedBackground
-//            cell.textLabel?.textColor = .label
-//        }
+        if task.isCompleted ?? false {
+            form.last!
+            <<< DateTimeInlineRow("Completed On") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.title = $0.tag
+                $0.minuteInterval = 5
+                $0.dateFormatter?.dateStyle = .medium
+                $0.dateFormatter?.timeStyle = .short
+                if let task = task, task.isCompleted ?? false, let date = task.completedDate {
+                    $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
+                    $0.updateCell()
+                } else {
+                    $0.hidden = true
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value {
+                    self?.task.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
+                    let updateTask = ActivityActions(activity: self!.task, active: self!.active, selectedFalconUsers: self!.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: self!.task.isCompleted ?? false)
+                }
+            }.onExpandInlineRow { cell, row, inlineRow in
+                inlineRow.cellUpdate { (cell, row) in
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.tintColor = .secondarySystemGroupedBackground
+                    if #available(iOS 14.0, *) {
+                        cell.datePicker.preferredDatePickerStyle = .inline
+                        cell.datePicker.tintColor = .systemBlue
+                    }
+                    else {
+                        cell.datePicker.datePickerMode = .dateAndTime
+                    }
+                }
+                cell.detailTextLabel?.textColor = cell.tintColor
+            }.onCollapseInlineRow { cell, _, _ in
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+            }
+        }
         
         
 //        <<< SwitchRow("startDateSwitch") {
@@ -544,6 +549,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
 //            cell.textLabel?.textColor = .label
 //        }
 
+        form.last!
         <<< SwitchRow("deadlineDateSwitch") {
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.textLabel?.textColor = .label
@@ -924,12 +930,34 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             row.cell.selectionStyle = .default
             row.title = row.tag
             if let task = task, task.category != nil {
-                row.value = self.task.category
+                row.value = task.category
             } else {
                 row.value = "Uncategorized"
             }
         }.onCellSelection({ _, row in
             self.openLevel(value: row.value ?? "Uncategorized", level: "Category")
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textAlignment = .left
+        }
+        
+        <<< LabelRow("Subcategory") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if let task = task, task.subcategory != nil {
+                row.value = task.subcategory
+            } else {
+                row.value = "Uncategorized"
+            }
+        }.onCellSelection({ _, row in
+            self.openLevel(value: row.value ?? "Uncategorized", level: "Subcategory")
         }).cellUpdate { cell, row in
             cell.accessoryType = .disclosureIndicator
             cell.backgroundColor = .secondarySystemGroupedBackground

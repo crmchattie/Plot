@@ -104,6 +104,7 @@
 		105F66EB2415942B00F6EDB6 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66EA2415942B00F6EDB6 /* Workout.swift */; };
 		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
 		105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */; };
+		1061BF72292D3BA50037CED0 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1061BF71292D3BA50037CED0 /* Goal.swift */; };
 		10623B9428CA2CF800E05AF0 /* ParticipantsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */; };
 		10623B9628CF7C4500E05AF0 /* HealthListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */; };
 		10623B9828CF7D5F00E05AF0 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */; };
@@ -703,6 +704,7 @@
 		105F66EA2415942B00F6EDB6 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailCell.swift; sourceTree = "<group>"; };
 		105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailCell.swift; sourceTree = "<group>"; };
+		1061BF71292D3BA50037CED0 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
 		10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantsFetcher.swift; sourceTree = "<group>"; };
 		10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthListViewController.swift; sourceTree = "<group>"; };
 		10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -2590,6 +2592,8 @@
 			isa = PBXGroup;
 			children = (
 				F983298F2602AB3200EB51F7 /* Activity */,
+				1061BF71292D3BA50037CED0 /* Goal.swift */,
+				10F7241128E3598D003C13A0 /* Template.swift */,
 				109FEB3C22A7003000621D2F /* CalendarType.swift */,
 				10B3E4FC28AE9F7000E1713D /* Event.swift */,
 				10B3E4FE28AEAC4E00E1713D /* ListType.swift */,
@@ -2608,7 +2612,6 @@
 				1017D32A24F2B746001D7CBE /* MXHolding.swift */,
 				1017D32C24F2B879001D7CBE /* MXMerchant.swift */,
 				1017D32E24F2B8E5001D7CBE /* MXMerchantLocation.swift */,
-				10F7241128E3598D003C13A0 /* Template.swift */,
 				10D6277028DE0B20009D2BD0 /* Feedback.swift */,
 				4BAEE549212735880045AB10 /* Conversation.swift */,
 				4BAEE54A212735880045AB10 /* Message.swift */,
@@ -3462,6 +3465,7 @@
 				1034A04525C5ECD4006D3DB8 /* CalendarInfoViewController.swift in Sources */,
 				F932E05B261CE1FB007E4336 /* UIViewController+Navigation.swift in Sources */,
 				4BAEE48221272C4F0045AB10 /* UserProfileController.swift in Sources */,
+				1061BF72292D3BA50037CED0 /* Goal.swift in Sources */,
 				4BAEE50A21272D890045AB10 /* GroupAdminControlsTableViewController+NameEditing.swift in Sources */,
 				4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */,
 				4BAEE5F1212735E50045AB10 /* UICollectionView+Extension.swift in Sources */,
@@ -3805,7 +3809,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 90;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3816,7 +3820,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.9;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
@@ -3837,7 +3841,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 90;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3847,7 +3851,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.9;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3910,6 +3914,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3972,6 +3977,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3996,7 +4002,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 90;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4012,7 +4018,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.9;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4039,7 +4045,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 90;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4055,7 +4061,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.9;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";

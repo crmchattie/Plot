@@ -37,9 +37,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     var intColor: Int = 0
     
     var umbrellaActivity: Activity!
-    
-    var activityType: String!
-        
+            
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     
     let viewPlaceholder = ViewPlaceholder()

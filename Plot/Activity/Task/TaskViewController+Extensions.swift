@@ -66,7 +66,7 @@ extension TaskViewController: UpdateActivityLevelDelegate {
             if level == "Category" {
                 self.task.category = value
             } else if level == "Subcategory" {
-                self.task.activityType = value
+                self.task.subcategory = value
             }
         }
     }

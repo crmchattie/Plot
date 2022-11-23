@@ -115,10 +115,7 @@ class NetworkController {
     }
     
     func sendUserTextMessage(type_of_user: String, completion: @escaping () -> Void) {
-        print("sendUserTextMessage")
         Service.shared.sendUserTextMessage(type_of_user: type_of_user) { (json, err) in
-            print("json")
-            print(json)
             completion()
         }
     }

@@ -118,16 +118,14 @@
 	<string>We use exercise, nutritional and mindful minutes data to help you keep track of your health activities.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Show your location on the map</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>To record video with the sound</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>To save selected media to your photo library</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To select a profile photo or send photo or video via message</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>To help you keep track of your reminders</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads to you.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>To record voice messages</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto-Medium.ttf</string>

@@ -654,6 +654,28 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             cell.textLabel?.textAlignment = .left
         }
         
+        <<< LabelRow("Subcategory") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if let activity = activity, let subcategory = activity.subcategory {
+                row.value = subcategory
+            } else {
+                row.value = "Uncategorized"
+            }
+        }.onCellSelection({ _, row in
+            self.openLevel(value: row.value ?? "Uncategorized", level: "Subcategory")
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textAlignment = .left
+        }
+        
         //        if let _ = activity.activityType {
         //            form.last!
         //            <<< LabelRow("Subcategory") { row in

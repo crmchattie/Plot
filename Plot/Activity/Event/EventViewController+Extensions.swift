@@ -66,7 +66,7 @@ extension EventViewController: UpdateActivityLevelDelegate {
             if level == "Category" {
                 self.activity.category = value
             } else if level == "Subcategory" {
-                self.activity.activityType = value
+                self.activity.subcategory = value
             }
         }
     }

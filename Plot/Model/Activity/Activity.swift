@@ -70,7 +70,9 @@ class Activity: NSObject, NSCopying, Codable {
     var isEvent: Bool?
     //task will key off of isTask and isCompleted
     var isTask: Bool?
-    
+    var isGoal: Bool?
+    var goalNumber: NSNumber?
+    var goalUnit: String?
     //instance variable
     var isCompleted: Bool?
     //instance variable
@@ -133,6 +135,8 @@ class Activity: NSObject, NSCopying, Codable {
         case isCompleted
         case userIsCompleted
         case isTask
+        case isGoal
+        case goalUnit
         case isEvent
         case isSchedule
         case scheduleIDs
@@ -244,6 +248,9 @@ class Activity: NSObject, NSCopying, Codable {
         userIsCompleted = dictionary?["userIsCompleted"] as? Bool
         userCompletedDate = dictionary?["userCompletedDate"] as? NSNumber
         isTask = dictionary?["isTask"] as? Bool
+        isGoal = dictionary?["isGoal"] as? Bool
+        goalNumber = dictionary?["goalNumber"] as? NSNumber
+        goalUnit = dictionary?["goalUnit"] as? String
         isEvent = dictionary?["isEvent"] as? Bool
         isSchedule = dictionary?["isSchedule"] as? Bool
         scheduleIDs = dictionary?["scheduleIDs"] as? [String]
@@ -446,15 +453,15 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["showExtras"] = value
         }
         
-        if let value = self.isCompleted as AnyObject? {
-            dictionary["isCompleted"] = value
-        }
-        
-        if let value = self.completedDate as AnyObject? {
-            dictionary["completedDate"] = value
-        } else {
-            dictionary["completedDate"] = NSNull()
-        }
+//        if let value = self.isCompleted as AnyObject? {
+//            dictionary["isCompleted"] = value
+//        }
+//        
+//        if let value = self.completedDate as AnyObject? {
+//            dictionary["completedDate"] = value
+//        } else {
+//            dictionary["completedDate"] = NSNull()
+//        }
         
         if let value = self.userIsCompleted as AnyObject? {
             dictionary["userIsCompleted"] = value
@@ -468,6 +475,18 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.isTask as AnyObject? {
             dictionary["isTask"] = value
+        }
+        
+        if let value = self.isGoal as AnyObject? {
+            dictionary["isGoal"] = value
+        }
+        
+        if let value = self.goalNumber as AnyObject? {
+            dictionary["goalNumber"] = value
+        }
+        
+        if let value = self.goalUnit as AnyObject? {
+            dictionary["goalUnit"] = value
         }
         
         if let value = self.isEvent as AnyObject? {
@@ -742,6 +761,18 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.isTask = value
         }
         
+        if let value = updatingActivity.isGoal {
+            newActivity.isGoal = value
+        }
+        
+        if let value = updatingActivity.goalNumber {
+            newActivity.goalNumber = value
+        }
+        
+        if let value = updatingActivity.goalUnit {
+            newActivity.goalUnit = value
+        }
+        
         if let value = updatingActivity.isEvent {
             newActivity.isEvent = value
         }
@@ -995,6 +1026,18 @@ class Activity: NSObject, NSCopying, Codable {
             self.isTask = value
         }
         
+        if let value = updatingActivity.isGoal {
+            self.isGoal = value
+        }
+        
+        if let value = updatingActivity.goalNumber {
+            self.goalNumber = value
+        }
+        
+        if let value = updatingActivity.goalUnit {
+            self.goalUnit = value
+        }
+        
         if let value = updatingActivity.isEvent {
             self.isEvent = value
         }
@@ -1233,6 +1276,18 @@ class Activity: NSObject, NSCopying, Codable {
         
         if self.isTask != otherActivity.isTask {
             newActivity.isTask = self.isTask
+        }
+        
+        if self.isGoal != otherActivity.isGoal {
+            newActivity.isGoal = self.isGoal
+        }
+        
+        if self.goalNumber != otherActivity.goalNumber {
+            newActivity.goalNumber = self.goalNumber
+        }
+        
+        if self.goalUnit != otherActivity.goalUnit {
+            newActivity.goalUnit = self.goalUnit
         }
         
         if self.isEvent != otherActivity.isEvent {
