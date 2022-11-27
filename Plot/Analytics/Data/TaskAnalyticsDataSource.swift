@@ -151,7 +151,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         } else {
             let filteredTasks = tasks
                 .filter { task -> Bool in
-                    guard let date = task.completedDateDate else { return false }
+                    guard let date = task.completedDateDate?.localTime else { return false }
                     return range.startDate <= date && date <= range.endDate
                 }
             completion(filteredTasks.map { .activity($0) })

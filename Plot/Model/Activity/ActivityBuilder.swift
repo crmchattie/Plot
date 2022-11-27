@@ -359,7 +359,7 @@ class TaskBuilder {
         activity.hasDeadlineTime = false
         activity.participantsIDs = transaction.participantsIDs
         activity.containerID = transaction.containerID
-        if end.timeIntervalSinceNow.sign == .minus {
+        if !(transaction.plot_created ?? false) {
             activity.isCompleted = true
             activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         }
@@ -658,7 +658,7 @@ class TaskBuilder {
                     activity.hasDeadlineTime = false
                     activity.participantsIDs = transaction.participantsIDs
                     activity.containerID = transaction.containerID
-                    if end.timeIntervalSinceNow.sign == .minus {
+                    if !(transaction.plot_created ?? false) {
                         activity.isCompleted = true
                         activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     }

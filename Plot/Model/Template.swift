@@ -120,6 +120,7 @@ enum ObjectType: String, Codable, CaseIterable {
     case workout = "Workout"
     case mindfulness = "Mindfulness"
     case schedule = "Schedule"
+    case goal = "Goal"
 }
 
 enum PlotRecurrenceFrequency: String, Codable {

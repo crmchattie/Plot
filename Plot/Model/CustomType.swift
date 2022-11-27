@@ -9,12 +9,13 @@
 import Foundation
 
 enum CustomType: String, Equatable, Hashable {
-    case event, task, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour
+    case event, task, goal, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour
     
     var name: String {
         switch self {
         case .event: return "Event"
         case .task: return "Task"
+        case .goal: return "Goal"
         case .lists: return "List"
         case .meal: return "Meal"
         case .workout: return "Workout"
@@ -55,8 +56,9 @@ enum CustomType: String, Equatable, Hashable {
     var categoryText: String {
         switch self {
         case .event: return "Build your own event"
-        case .task: return "Build your own task list"
-        case .lists: return "Build your own task"
+        case .task: return "Build your own task"
+        case .goal: return "Build your own goal"
+        case .lists: return "Build your own task list"
         case .meal: return "Build your own meal"
         case .workout: return "Build your own workout"
         case .flight: return "Look up your flight"
@@ -96,7 +98,8 @@ enum CustomType: String, Equatable, Hashable {
     var subcategoryText: String {
         switch self {
         case .event: return "Includes basic event fields plus task, health and transaction fields"
-        case .task: return "Includes basic event fields plus event, health and transaction fields"
+        case .task: return "Includes basic task fields plus event, health and transaction fields"
+        case .goal: return "Includes basic task fields plus event, health and transaction fields"
         case .lists: return "Includes basic event fields plus a checklist, health and transaction fields"
         case .meal: return "Build a meal by looking up grocery products and/or restaurant menu items"
         case .workout: return "Build a workout by setting type, duration and intensity"
@@ -128,6 +131,7 @@ enum CustomType: String, Equatable, Hashable {
         switch self {
         case .event: return "event"
         case .task: return "task"
+        case .goal: return "goal"
         case .lists: return "list"
         case .meal: return "food"
         case .workout: return "workout"

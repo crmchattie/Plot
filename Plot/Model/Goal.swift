@@ -20,16 +20,24 @@ struct Goal: Codable, Equatable, Hashable {
     }
 }
 
-enum GoalMetric: Codable, CaseIterable {
-    case time
-    case income
-    case expenses
-    case event
-    case financialAccount
-    case workout
-    case mindfulness
-    case sleep
-    case steps
+enum GoalMetric: String, Codable, CaseIterable {
+    case time = "Time"
+    case income = "Income"
+    case expenses = "Expenses"
+    case events = "Events"
+    case accounts = "Accounts"
+    case workout = "Workout"
+    case mindfulness = "Mindfulness"
+    case sleep = "Sleep"
+    case steps = "Steps"
+    
+    static var allValues: [String] {
+        var array = [String]()
+        GoalMetric.allCases.forEach { metric in
+            array.append(metric.rawValue)
+        }
+        return array
+    }
     
     var options: [GoalUnit] {
         switch self {
@@ -39,10 +47,10 @@ enum GoalMetric: Codable, CaseIterable {
             return [.dollars]
         case .expenses:
             return [.dollars]
-        case .event:
-            return [.event]
-        case .financialAccount:
-            return [.financialAccount]
+        case .events:
+            return [.events]
+        case .accounts:
+            return [.accounts]
         case .workout:
             return [.minutes]
         case .mindfulness:
@@ -55,12 +63,12 @@ enum GoalMetric: Codable, CaseIterable {
     }
 }
 
-enum GoalUnit: Codable, CaseIterable {
-    case minutes
-    case hours
-    case days
-    case dollars
-    case event
-    case financialAccount
-    case steps
+enum GoalUnit: String, Codable, CaseIterable {
+    case minutes = "Minutes"
+    case hours = "Hours"
+    case days = "Days"
+    case dollars = "Dollars"
+    case events = "Events"
+    case accounts = "Accounts"
+    case steps = "Steps"
 }

@@ -129,7 +129,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
         } else {
             let filteredActivities = activities
                 .filter { activity -> Bool in
-                    guard let date = activity.startDateWTZ else { return false }
+                    guard let date = activity.startDate?.localTime else { return false }
                     return range.startDate <= date && date <= range.endDate
                 }
             completion(filteredActivities.map { .activity($0) })

@@ -42,6 +42,32 @@ extension ObjectDetailShowing {
         }
     }
     
+    func showGoalDetailPush(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
+        let destination = TaskViewController(networkController: networkController)
+        destination.task = task
+        destination.updateDiscoverDelegate = updateDiscoverDelegate
+        destination.delegate = delegate
+        destination.event = event
+        destination.transaction = transaction
+        destination.workout = workout
+        destination.mindfulness = mindfulness
+        destination.template = template
+        destination.container = container
+        destination.list = list
+        destination.startDateTime = startDateTime
+        destination.endDateTime = endDateTime
+        destination.isGoal = true
+        if let users = users {
+            destination.users = users
+            destination.filteredUsers = users
+        }
+        ParticipantsFetcher.getParticipants(forActivity: task) { (participants) in
+            destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
     func showSubtaskDetailPush(subtask: Activity?, task: Activity?, delegate: UpdateTaskDelegate?, users: [User]) {
         let destination = SubtaskViewController()
         destination.subtask = subtask
@@ -273,6 +299,35 @@ extension ObjectDetailShowing {
         destination.list = list
         destination.startDateTime = startDateTime
         destination.endDateTime = endDateTime
+        if let users = users {
+            destination.users = users
+            destination.filteredUsers = users
+        }
+        ParticipantsFetcher.getParticipants(forActivity: task) { (participants) in
+            destination.selectedFalconUsers = participants
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
+    }
+    
+    func showGoalDetailPresent(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
+        let destination = TaskViewController(networkController: networkController)
+        destination.task = task
+        destination.updateDiscoverDelegate = updateDiscoverDelegate
+        destination.delegate = delegate
+        destination.event = event
+        destination.transaction = transaction
+        destination.workout = workout
+        destination.mindfulness = mindfulness
+        destination.template = template
+        destination.container = container
+        destination.list = list
+        destination.startDateTime = startDateTime
+        destination.endDateTime = endDateTime
+        destination.isGoal = true
         if let users = users {
             destination.users = users
             destination.filteredUsers = users

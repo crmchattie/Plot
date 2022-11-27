@@ -345,9 +345,9 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
             if let activity = activity {
-                if let timeZone = activity.startTimeZone {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
-                }
+//                if let timeZone = activity.startTimeZone {
+//                    $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
+//                }
                 $0.value = Date(timeIntervalSince1970: activity.startDateTime as! TimeInterval)
                 if self.activity.allDay == true {
                     $0.dateFormatter?.timeStyle = .none
@@ -389,9 +389,9 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                 else {
                     cell.datePicker.datePickerMode = .dateAndTime
                 }
-                if let startTimeZone = self?.activity.startTimeZone {
-                    cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
-                }
+//                if let startTimeZone = self?.activity.startTimeZone {
+//                    cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
+//                }
             }
             cell.detailTextLabel?.textColor = cell.tintColor
             if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "startTimeZone") {
@@ -417,7 +417,10 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
             row.hidden = true
-            if let activity = activity, let timeZone = activity.startTimeZone {
+            if let activity = activity, let timeZone = activity.endTimeZone, Calendar.current.timeZone.identifier != timeZone {
+                row.value = Calendar.current.timeZone.identifier
+            }
+            else if let activity = activity, let timeZone = activity.startTimeZone {
                 row.value = timeZone
             }
         }.onCellSelection({ _,_ in
@@ -437,9 +440,9 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             $0.dateFormatter?.dateStyle = .medium
             $0.dateFormatter?.timeStyle = .short
             if let activity = activity {
-                if let timeZone = activity.endTimeZone {
-                    $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
-                }
+//                if let timeZone = activity.endTimeZone {
+//                    $0.dateFormatter?.timeZone = TimeZone(identifier: timeZone)
+//                }
                 $0.value = Date(timeIntervalSince1970: activity.endDateTime as! TimeInterval)
                 if self.activity.allDay == true {
                     $0.dateFormatter?.timeStyle = .none
@@ -467,9 +470,9 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             inlineRow.cellUpdate { (cell, row) in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.tintColor = .secondarySystemGroupedBackground
-                if let endTimeZone = self?.activity.endTimeZone {
-                    cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
-                }
+//                if let endTimeZone = self?.activity.endTimeZone {
+//                    cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
+//                }
                 if #available(iOS 14.0, *) {
                     cell.datePicker.preferredDatePickerStyle = .inline
                     cell.datePicker.tintColor = .systemBlue
@@ -507,7 +510,10 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             row.cell.selectionStyle = .default
             row.title = "Time Zone"
             row.hidden = true
-            if let activity = activity, let timeZone = activity.endTimeZone {
+            if let activity = activity, let timeZone = activity.endTimeZone, Calendar.current.timeZone.identifier != timeZone {
+                row.value = Calendar.current.timeZone.identifier
+            }
+            else if let activity = activity, let timeZone = activity.endTimeZone {
                 row.value = timeZone
             }
         }.onCellSelection({ _,_ in
