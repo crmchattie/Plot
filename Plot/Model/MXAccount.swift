@@ -191,6 +191,16 @@ enum BalanceSheetType: String, CaseIterable, Codable {
     case Liability
     case None
     
+    static var allValues: [String] {
+        var array = [String]()
+        BalanceSheetType.allCases.forEach { bs_type in
+            if bs_type != .None {
+                array.append(bs_type.name)
+            }
+        }
+        return array
+    }
+    
     var name: String {
         switch self {
         case .NetWorth: return "Net Worth"
@@ -214,6 +224,16 @@ enum MXAccountType: String, CaseIterable, Codable {
     case loan = "LOAN"
     case lineOfCredit = "LINE_OF_CREDIT"
     case any = "ANY"
+    
+    static var allValues: [String] {
+        var array = [String]()
+        MXAccountType.allCases.forEach { type in
+            if type != .any {
+                array.append(type.name)
+            }
+        }
+        return array
+    }
     
     var name: String {
         switch self {
@@ -341,6 +361,16 @@ enum MXAccountSubType: String, CaseIterable, Codable {
     case limitedLiabilityAccount = "LIMITED_LIABILITY_ACCOUNT"
     case none = "NONE"
     case any = "ANY"
+    
+    static var allValues: [String] {
+        var array = [String]()
+        MXAccountSubType.allCases.forEach { subtype in
+            if subtype != .none && subtype != .any {
+                array.append(subtype.name)
+            }
+        }
+        return array
+    }
     
     var name: String {
         switch self {

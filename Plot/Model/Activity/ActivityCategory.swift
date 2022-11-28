@@ -38,6 +38,16 @@ enum ActivityCategory: String, Codable, CaseIterable {
     /// Same as uncategorized by not included in the analytics
     case notApplicable = "Not Applicable"
     
+    static var allValues: [String] {
+        var array = [String]()
+        ActivityCategory.allCases.forEach { category in
+            if category != .uncategorized && category != .notApplicable {
+                array.append(category.rawValue)
+            }
+        }
+        return array
+    }
+    
     var icon: UIImage {
         switch self {
         case .health: return UIImage(named: "heart-filled")!

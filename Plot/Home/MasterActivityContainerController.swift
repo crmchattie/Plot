@@ -555,6 +555,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             let destination = FinanceDetailViewController(networkController: networkController)
             destination.title = SectionType.transactions.name
             destination.setSections = [.transactions]
+            destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
         } else if !financeSections.isEmpty {
             let destination = FinanceViewController(networkController: networkController)

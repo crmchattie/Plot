@@ -15,7 +15,6 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -26,7 +25,6 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         label.textColor = .secondaryLabel
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -36,7 +34,6 @@ final class PurchaseCell: Cell<Transaction>, CellType {
         label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

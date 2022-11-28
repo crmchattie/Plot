@@ -102,7 +102,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         setupMainView()
         
         if task != nil {
-            title = "Task"
+            title = !isGoal ? "Task":"Goal"
             active = true
             taskOld = task.copy() as? Activity
             if task.activityID != nil {
@@ -116,7 +116,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             setupLists()
             resetBadgeForSelf()
         } else {
-            title = "New Task"
+            title = !isGoal ? "New Task":"New Goal"
             if let currentUserID = Auth.auth().currentUser?.uid {
                 if let transaction = transaction, let task = TaskBuilder.createActivity(from: transaction), let activityID = task.activityID {
                     self.activityID = activityID
@@ -283,57 +283,52 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         if task.isGoal ?? false {
             form.last!
             
-            <<< DecimalRow("Number") {
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.cell.textField?.textColor = .secondaryLabel
+            <<< GoalPickerInlineRow<String>("Goal") {
                 $0.title = $0.tag
-                $0.formatter = NumberFormatter()
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textField?.textColor = .secondaryLabel
-            }
-            //            .onChange { row in
-            //                self.meal.amount = row.value
-            //                self.timer?.invalidate()
-            //
-            //                self.timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (_) in
-            //                    self.calcNutrition()
-            //                })
-            //            }
-            
-            <<< DoublePickerInlineRow<String, String>() {
-                $0.title = "Goal"
-                $0.firstOptions = { return GoalMetric.allValues }
-                $0.secondOptions = { firstChoice in
-                    if let metric = GoalMetric(rawValue: firstChoice) {
-                        var array = [String]()
-                        metric.options.forEach { unit in
-                            array.append(unit.rawValue)
+            }.onChange({ row in
+                switch row.selectedGoalProperty {
+                case .metric:
+                    if let value = row.value, let updatedValue = GoalMetric(rawValue: value) {
+                        if let _ = row.cell.goal {
+                            row.cell.goal!.metric = updatedValue
+                        } else {
+                            let goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, number: nil)
+                            row.cell.goal = goal
                         }
-                        return array
+//                        row.updateCell()
                     }
-                    return []
+                case .unit:
+                    if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
+                        if let _ = row.cell.goal {
+                            row.cell.goal!.unit = updatedValue
+                        } else {
+                            let goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, number: nil)
+                            row.cell.goal = goal
+                        }
+//                        row.updateCell()
+                    }
+                case .submetric:
+                    if let value = row.value, let updatedValue = GoalSubMetric(rawValue: value) {
+                        if let _ = row.cell.goal {
+                            row.cell.goal!.submetric = updatedValue
+                        } else {
+                            let goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, number: nil)
+                            row.cell.goal = goal
+                        }
+//                        row.updateCell()
+                    }
+                case .option:
+                    if let updatedValue = row.value {
+                        if let _ = row.cell.goal {
+                            row.cell.goal!.option = updatedValue
+                        } else {
+                            let goal = Goal(name: nil, metric: nil, submetric: nil, option: updatedValue, unit: nil, number: nil)
+                            row.cell.goal = goal
+                        }
+//                        row.updateCell()
+                    }
                 }
-            }
-            
-            <<< PickerInlineRow<String>("Metric") { row in
-                row.title = row.tag
-                row.options = []
-                GoalMetric.allCases.forEach { metric in
-                    row.options.append(metric.rawValue.capitalized)
-                }
-                row.value = row.options[0]
-            }
-            
-            <<< PickerInlineRow<String>("Unit") { row in
-                row.title = row.tag
-                row.options = []
-                GoalUnit.allCases.forEach { unit in
-                    row.options.append(unit.rawValue.capitalized)
-                }
-                row.value = row.options[0]
-            }
-            
+            })
         }
         
         form.last!

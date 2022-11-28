@@ -9,27 +9,150 @@
 struct Goal: Codable, Equatable, Hashable {
     var name: String?
     var metric: GoalMetric?
+    var submetric: GoalSubMetric?
+    var option: String?
     var unit: GoalUnit?
     var number: Double?
     
-    init(name: String?, metric: GoalMetric, unit: GoalUnit, number: Double?) {
+    init(name: String?, metric: GoalMetric?, submetric: GoalSubMetric?, option: String?, unit: GoalUnit?, number: Double?) {
         self.name = name
         self.metric = metric
+        self.submetric = submetric
+        self.option = option
         self.unit = unit
         self.number = number
+    }
+    
+    func options() -> [String]? {
+        switch self.metric {
+        case .events:
+            switch self.submetric {
+            case .group:
+                return nil
+            case .category:
+                return ActivityCategory.allValues
+            case .subcategory:
+                return ActivitySubcategory.allValues
+            case .none:
+                return nil
+            }
+        case .tasks:
+            switch self.submetric {
+            case .group:
+                return nil
+            case .category:
+                return ActivityCategory.allValues
+            case .subcategory:
+                return ActivitySubcategory.allValues
+            case .none:
+                return nil
+            }
+        case .transactions:
+            switch self.submetric {
+            case .group:
+                return financialTransactionsGroupsWExpenseStatic
+            case .category:
+                return financialTransactionsTopLevelCategoriesStaticWOUncategorized
+            case .subcategory:
+                return financialTransactionsCategoriesStaticWOUncategorized
+            case .none:
+                return nil
+            }
+        case .accounts:
+            switch self.submetric {
+            case .group:
+                return BalanceSheetType.allValues
+            case .category:
+                return MXAccountType.allValues
+            case .subcategory:
+                return MXAccountSubType.allValues
+            case .none:
+                return nil
+            }
+        case .workout:
+            return nil
+        case .mindfulness:
+            return nil
+        case .sleep:
+            return nil
+        case .steps:
+            return nil
+        case .flightsClimbed:
+            return nil
+        case .activeCalories:
+            return nil
+        case .none:
+            return nil
+        }
+    }
+    
+    func options(submetric: GoalSubMetric) -> [String]? {
+        switch self.metric {
+        case .events:
+            switch submetric {
+            case .group:
+                return nil
+            case .category:
+                return ActivityCategory.allValues
+            case .subcategory:
+                return ActivitySubcategory.allValues
+            }
+        case .tasks:
+            switch submetric {
+            case .group:
+                return nil
+            case .category:
+                return ActivityCategory.allValues
+            case .subcategory:
+                return ActivitySubcategory.allValues
+            }
+        case .transactions:
+            switch submetric {
+            case .group:
+                return financialTransactionsGroupsWExpenseStatic
+            case .category:
+                return financialTransactionsTopLevelCategoriesStaticWOUncategorized
+            case .subcategory:
+                return financialTransactionsCategoriesStaticWOUncategorized
+            }
+        case .accounts:
+            switch submetric {
+            case .group:
+                return BalanceSheetType.allValues
+            case .category:
+                return MXAccountType.allValues
+            case .subcategory:
+                return MXAccountSubType.allValues
+            }
+        case .workout:
+            return nil
+        case .mindfulness:
+            return nil
+        case .sleep:
+            return nil
+        case .steps:
+            return nil
+        case .flightsClimbed:
+            return nil
+        case .activeCalories:
+            return nil
+        case .none:
+            return nil
+        }
     }
 }
 
 enum GoalMetric: String, Codable, CaseIterable {
-    case time = "Time"
-    case income = "Income"
-    case expenses = "Expenses"
     case events = "Events"
+    case tasks = "Tasks"
+    case transactions = "Transactions"
     case accounts = "Accounts"
-    case workout = "Workout"
+    case workout = "Workouts"
     case mindfulness = "Mindfulness"
     case sleep = "Sleep"
     case steps = "Steps"
+    case flightsClimbed = "Flights Climbed"
+    case activeCalories = "Active Calories"
     
     static var allValues: [String] {
         var array = [String]()
@@ -38,37 +161,64 @@ enum GoalMetric: String, Codable, CaseIterable {
         }
         return array
     }
-    
-    var options: [GoalUnit] {
+        
+    var submetrics: [GoalSubMetric] {
         switch self {
-        case .time:
-            return [.minutes, .hours, .days]
-        case .income:
-            return [.dollars]
-        case .expenses:
-            return [.dollars]
         case .events:
-            return [.events]
+            return [.category, .subcategory]
+        case .tasks:
+            return [.category, .subcategory]
+        case .transactions:
+            return [.group, .category, .subcategory]
         case .accounts:
-            return [.accounts]
+            return [.group, .category, .subcategory]
+        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
+            return []
+        }
+    }
+    
+    var units: [GoalUnit] {
+        switch self {
+        case .events:
+            return [.count, .time]
+        case .tasks:
+            return [.count]
+        case .transactions:
+            return [.dollars]
+        case .accounts:
+            return [.dollars]
         case .workout:
-            return [.minutes]
+            return [.time, .calories, .count]
         case .mindfulness:
-            return [.minutes]
+            return [.time, .count]
         case .sleep:
-            return [.hours]
+            return [.time]
         case .steps:
-            return [.steps]
+            return [.count]
+        case .flightsClimbed:
+            return [.count]
+        case .activeCalories:
+            return [.calories]
         }
     }
 }
 
+enum GoalSubMetric: String, Codable, CaseIterable {
+    case group = "Group"
+    case category = "Category"
+    case subcategory = "Subcategory"
+//    case account = "Account"
+//    case workout = "Workout"
+//    case mindfulness = "Mindfulness"
+//    case sleep = "Sleep"
+//    case steps = "Steps"
+//    case flightsClimbed = "Flights Climbed"
+//    case activeCalories = "Active Calories"
+}
+
 enum GoalUnit: String, Codable, CaseIterable {
-    case minutes = "Minutes"
-    case hours = "Hours"
-    case days = "Days"
+    case time = "Minutes"
     case dollars = "Dollars"
-    case events = "Events"
-    case accounts = "Accounts"
-    case steps = "Steps"
+    case calories = "Calories"
+    case count = "Count"
 }

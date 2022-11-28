@@ -50,7 +50,6 @@ final class ColorPushSelectorCell<T: Equatable> : Cell<T>, CellType {
 }
 
 open class _ColorPushRow<Cell: CellType>: SelectorRow<Cell> where Cell: BaseCell {
-
     public required init(tag: String?) {
         super.init(tag: tag)
         presentationMode = .show(controllerProvider: ControllerProvider.callback { return SelectorViewController<SelectorRow<Cell>> { _ in } }, onDismiss: { vc in
