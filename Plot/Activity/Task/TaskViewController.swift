@@ -286,6 +286,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             <<< GoalPickerInlineRow<String>("Goal") {
                 $0.title = $0.tag
             }.onChange({ row in
+                print(row.cell.numberTextField.text)
                 switch row.selectedGoalProperty {
                 case .metric:
                     if let value = row.value, let updatedValue = GoalMetric(rawValue: value) {
@@ -295,7 +296,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                             let goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, number: nil)
                             row.cell.goal = goal
                         }
-//                        row.updateCell()
                     }
                 case .unit:
                     if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
@@ -305,7 +305,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                             let goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, number: nil)
                             row.cell.goal = goal
                         }
-//                        row.updateCell()
                     }
                 case .submetric:
                     if let value = row.value, let updatedValue = GoalSubMetric(rawValue: value) {
@@ -315,7 +314,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                             let goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, number: nil)
                             row.cell.goal = goal
                         }
-//                        row.updateCell()
                     }
                 case .option:
                     if let updatedValue = row.value {
@@ -325,7 +323,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                             let goal = Goal(name: nil, metric: nil, submetric: nil, option: updatedValue, unit: nil, number: nil)
                             row.cell.goal = goal
                         }
-//                        row.updateCell()
                     }
                 }
             })
