@@ -104,7 +104,7 @@ class SummaryService: SummaryServiceInterface {
                 var entries = [Entry]()
                 for transactionDetail in transactionDetailsList {
                     if transactionDetail.level == .group {
-                        if transactionDetail.name == "Expense" || transactionDetail.name == "Income" || transactionDetail.name == "Difference" {
+                        if transactionDetail.name == "Expense" || transactionDetail.name == "Income" || transactionDetail.name == "Net Spending" || transactionDetail.name == "Net Savings" {
                             let entry = Entry(label: transactionDetail.name, value: transactionDetail.amount, icon: nil)
                             entries.append(entry)
                         } else {
@@ -123,7 +123,7 @@ class SummaryService: SummaryServiceInterface {
                     //just expense groups excluding 'Expense'
                     for transactionDetail in transactionDetailsList {
                         if transactionDetail.level == .group {
-                            if transactionDetail.name == "Expense" || transactionDetail.name == "Income" || transactionDetail.name == "Difference" {
+                            if transactionDetail.name == "Expense" || transactionDetail.name == "Income" || transactionDetail.name == "Net Spending" || transactionDetail.name == "Net Savings" {
                                 continue
                             } else {
                                 let entry = Entry(label: transactionDetail.name, value: abs(transactionDetail.amount) / totalValue, icon: nil)

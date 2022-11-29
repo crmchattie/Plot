@@ -74,6 +74,15 @@ internal extension Constant {
                 internationalControl.localizedString("basicRecurrence.everySixMonths"),
                 internationalControl.localizedString("basicRecurrence.everyYear"),]
     }
+    
+    static func goalRecurrenceStrings(of language: RecurrencePickerLanguage = InternationalControl.shared.language) -> [String] {
+        let internationalControl = InternationalControl(language: language)
+        return [internationalControl.localizedString("basicRecurrence.never"),
+                internationalControl.localizedString("basicRecurrence.everyDay"),
+                internationalControl.localizedString("basicRecurrence.everyWeek"),
+                internationalControl.localizedString("basicRecurrence.everyMonth"),
+                internationalControl.localizedString("basicRecurrence.everyYear")]
+    }
 
     static func frequencyStrings(of language: RecurrencePickerLanguage = InternationalControl.shared.language) -> [String] {
         let internationalControl = InternationalControl(language: language)

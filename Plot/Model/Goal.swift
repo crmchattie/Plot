@@ -12,15 +12,106 @@ struct Goal: Codable, Equatable, Hashable {
     var submetric: GoalSubMetric?
     var option: String?
     var unit: GoalUnit?
-    var number: Double?
+    var targetNumber: Double?
+    var currentNumber: Double?
     
-    init(name: String?, metric: GoalMetric?, submetric: GoalSubMetric?, option: String?, unit: GoalUnit?, number: Double?) {
+    init(name: String?, metric: GoalMetric?, submetric: GoalSubMetric?, option: String?, unit: GoalUnit?, targetNumber: Double?, currentNumber: Double?) {
         self.name = name
         self.metric = metric
         self.submetric = submetric
         self.option = option
         self.unit = unit
-        self.number = number
+        self.targetNumber = targetNumber
+        self.currentNumber = currentNumber
+    }
+    
+    init(goal: Goal) {
+        self.name = goal.name
+        self.metric = goal.metric
+        self.submetric = goal.submetric
+        self.option = goal.option
+        self.unit = goal.unit
+        self.targetNumber = goal.targetNumber
+        self.currentNumber = goal.currentNumber
+    }
+    
+    var build: Bool {
+        return metric != nil && targetNumber != nil
+    }
+    
+    var description: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.maximumFractionDigits = 0
+        var description = "Goal is Complete when"
+        if let unit = unit, let metric = metric, let submetric = submetric, let option = option, let targetNumber = targetNumber as? NSNumber {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            description += " " + unit.rawValue + " of"
+
+            if let string = numberFormatter.string(from: targetNumber), metric == .tasks || metric == .events {
+                description += " " + metric.rawValue + " in the " + option + " " + submetric.rawValue + " hits " + string
+                return description
+            } else if let string = numberFormatter.string(from: targetNumber) {
+                description += " " + option + " hits " + string
+                return description
+            }
+        } else if let unit = unit, let metric = metric, let targetNumber = targetNumber as? NSNumber {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            if let string = numberFormatter.string(from: targetNumber), metric == .activeCalories || metric == .steps || metric == .flightsClimbed {
+                description += " " + metric.rawValue + " hits " + string
+                return description
+            } else if let string = numberFormatter.string(from: targetNumber) {
+                description += " " + unit.rawValue + " of"
+                description += " " + metric.rawValue + " hits " + string
+                return description
+            }
+        }
+        
+        return nil
     }
     
     func options() -> [String]? {
@@ -33,7 +124,9 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .none:
+            case .some(.none):
+                return nil
+            case nil:
                 return nil
             }
         case .tasks:
@@ -44,7 +137,9 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .none:
+            case .some(.none):
+                return nil
+            case nil:
                 return nil
             }
         case .transactions:
@@ -55,7 +150,9 @@ struct Goal: Codable, Equatable, Hashable {
                 return financialTransactionsTopLevelCategoriesStaticWOUncategorized
             case .subcategory:
                 return financialTransactionsCategoriesStaticWOUncategorized
-            case .none:
+            case .some(.none):
+                return nil
+            case nil:
                 return nil
             }
         case .accounts:
@@ -66,10 +163,12 @@ struct Goal: Codable, Equatable, Hashable {
                 return MXAccountType.allValues
             case .subcategory:
                 return MXAccountSubType.allValues
-            case .none:
+            case .some(.none):
+                return nil
+            case nil:
                 return nil
             }
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories, .weight:
+        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return nil
         case .none:
             return nil
@@ -86,6 +185,8 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
+            case .none:
+                return nil
             }
         case .tasks:
             switch submetric {
@@ -95,6 +196,8 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
+            case .none:
+                return nil
             }
         case .transactions:
             switch submetric {
@@ -104,6 +207,8 @@ struct Goal: Codable, Equatable, Hashable {
                 return financialTransactionsTopLevelCategoriesStaticWOUncategorized
             case .subcategory:
                 return financialTransactionsCategoriesStaticWOUncategorized
+            case .none:
+                return nil
             }
         case .accounts:
             switch submetric {
@@ -113,8 +218,10 @@ struct Goal: Codable, Equatable, Hashable {
                 return MXAccountType.allValues
             case .subcategory:
                 return MXAccountSubType.allValues
+            case .none:
+                return nil
             }
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories, .weight:
+        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return nil
         case .none:
             return nil
@@ -124,7 +231,7 @@ struct Goal: Codable, Equatable, Hashable {
 
 enum GoalMetric: String, Codable, CaseIterable {
     case events = "Events"
-    case tasks = "Tasks"
+    case tasks = "Completed Tasks"
     case transactions = "Transactions"
     case accounts = "Accounts"
     case workout = "Workouts"
@@ -133,27 +240,27 @@ enum GoalMetric: String, Codable, CaseIterable {
     case steps = "Steps"
     case flightsClimbed = "Flights Climbed"
     case activeCalories = "Active Calories"
-    case weight = "Weight"
+//    case weight = "Weight"
     
     static var allValues: [String] {
         var array = [String]()
         GoalMetric.allCases.forEach { metric in
             array.append(metric.rawValue)
         }
-        return array
+        return array.sorted()
     }
-        
+    
     var submetrics: [GoalSubMetric] {
         switch self {
         case .events:
-            return [.category, .subcategory]
+            return [.none, .category, .subcategory]
         case .tasks:
-            return [.category, .subcategory]
+            return [.none, .category, .subcategory]
         case .transactions:
-            return [.group, .category, .subcategory]
+            return [.none, .group, .category, .subcategory]
         case .accounts:
-            return [.group, .category, .subcategory]
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories, .weight:
+            return [.none, .group, .category, .subcategory]
+        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return []
         }
     }
@@ -165,9 +272,9 @@ enum GoalMetric: String, Codable, CaseIterable {
         case .tasks:
             return [.count]
         case .transactions:
-            return [.amount, .percent, .multiple]
+            return [.amount, .percent]
         case .accounts:
-            return [.amount, .percent, .multiple]
+            return [.amount, .percent]
         case .workout:
             return [.count, .calories, .minutes]
         case .mindfulness:
@@ -180,23 +287,22 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.count]
         case .activeCalories:
             return [.calories]
-        case .weight:
-            return [.amount]
         }
     }
 }
 
 enum GoalSubMetric: String, Codable, CaseIterable {
+    case none = "None"
     case group = "Group"
     case category = "Category"
     case subcategory = "Subcategory"
-//    case account = "Account"
-//    case workout = "Workout"
-//    case mindfulness = "Mindfulness"
-//    case sleep = "Sleep"
-//    case steps = "Steps"
-//    case flightsClimbed = "Flights Climbed"
-//    case activeCalories = "Active Calories"
+    //    case account = "Account"
+    //    case workout = "Workout"
+    //    case mindfulness = "Mindfulness"
+    //    case sleep = "Sleep"
+    //    case steps = "Steps"
+    //    case flightsClimbed = "Flights Climbed"
+    //    case activeCalories = "Active Calories"
 }
 
 enum GoalUnit: String, Codable, CaseIterable {
@@ -208,4 +314,5 @@ enum GoalUnit: String, Codable, CaseIterable {
     case minutes = "Minutes"
     case hours = "Hours"
     case days = "Days"
+    case level = "Level"
 }

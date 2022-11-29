@@ -24,6 +24,7 @@ open class RecurrencePicker: UITableViewController {
     open var separatorColor: UIColor?
     open var supportedCustomRecurrenceFrequencies = Constant.frequencies
     open var customRecurrenceMaximumInterval = Constant.pickerMaxRowCount
+    open var isGoal = false
     fileprivate var movingBackwards = true
 
     fileprivate var isModal: Bool {
@@ -72,11 +73,17 @@ open class RecurrencePicker: UITableViewController {
 extension RecurrencePicker {
     // MARK: - Table view data source and delegate
     open override func numberOfSections(in tableView: UITableView) -> Int {
+        if isGoal {
+            return 1
+        }
         return 2
     }
 
     open override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
+            if isGoal {
+                return Constant.goalRecurrenceStrings().count
+            }
             return Constant.basicRecurrenceStrings().count
         } else {
             return 1
@@ -99,7 +106,11 @@ extension RecurrencePicker {
         cell?.backgroundColor = .secondarySystemGroupedBackground
         if indexPath.section == 0 {
             cell?.accessoryType = .none
-            cell?.textLabel?.text = Constant.basicRecurrenceStrings()[indexPath.row]
+            if isGoal {
+                cell?.textLabel?.text = Constant.goalRecurrenceStrings()[indexPath.row]
+            } else {
+                cell?.textLabel?.text = Constant.basicRecurrenceStrings()[indexPath.row]
+            }
         } else {
             cell?.accessoryType = .disclosureIndicator
             cell?.textLabel?.text = LocalizedString("RecurrencePicker.textLabel.custom")

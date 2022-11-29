@@ -24,7 +24,7 @@ class FinanceCollectionViewComparisonCell: UICollectionViewCell {
                 
                 nameLeftLabel.text = transactionDetails.name
 
-                if (transactionDetails.group == "Income" || transactionDetails.group == "Difference"), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
+                if (transactionDetails.group == "Income" || transactionDetails.group == "Net Spending" || transactionDetails.group == "Net Savings"), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                     nameRightLabel.text = amount
                     if let balance = transactionDetails.lastPeriodAmount, let amount = numberFormatter.string(from: balance as NSNumber), let difference = numberFormatter.string(from: transactionDetails.amount - balance as NSNumber) {
                         middleLeftLabel.isHidden = false

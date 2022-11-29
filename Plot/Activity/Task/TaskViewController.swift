@@ -262,70 +262,85 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             cell.textField?.textColor = .label
         }
         
-        
-        <<< TextAreaRow("Description") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textView?.textColor = .label
-            $0.cell.placeholderLabel?.textColor = .secondaryLabel
-            $0.placeholder = $0.tag
-            if let task = task, task.activityDescription != "nothing" {
-                $0.value = self.task.activityDescription
-            }
-        }.cellUpdate({ (cell, row) in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textView?.backgroundColor = .secondarySystemGroupedBackground
-            cell.textView?.textColor = .label
-        }).onChange() { [unowned self] row in
-            self.task.activityDescription = row.value
-        }
-        
-        if task.isGoal ?? false {
+        if !(task.isGoal ?? false) {
             form.last!
+            
+            <<< TextAreaRow("Description") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textView?.textColor = .label
+                $0.cell.placeholderLabel?.textColor = .secondaryLabel
+                $0.placeholder = $0.tag
+                if let task = task, task.activityDescription != "nothing" {
+                    $0.value = self.task.activityDescription
+                }
+            }.cellUpdate({ (cell, row) in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textView?.backgroundColor = .secondarySystemGroupedBackground
+                cell.textView?.textColor = .label
+            }).onChange() { [unowned self] row in
+                self.task.activityDescription = row.value
+            }
+        } else {
+            form.last!
+            
+            <<< LabelRow("Goal Description") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.cell.accessoryType = .none
+                row.cell.selectionStyle = .none
+                row.cell.textLabel?.numberOfLines = 0
+                row.hidden = self.task.goal == nil ? true : false
+                if let task = task, let goal = task.goal, let description = goal.description {
+                    row.title = description
+                }
+            }.cellUpdate { cell, row in
+                cell.textLabel?.textAlignment = .left
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                cell.accessoryType = .none
+            }
             
             <<< GoalPickerInlineRow<String>("Goal") {
                 $0.title = $0.tag
-            }.onChange({ row in
-                print(row.cell.numberTextField.text)
-                switch row.selectedGoalProperty {
-                case .metric:
-                    if let value = row.value, let updatedValue = GoalMetric(rawValue: value) {
-                        if let _ = row.cell.goal {
-                            row.cell.goal!.metric = updatedValue
-                        } else {
-                            let goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, number: nil)
-                            row.cell.goal = goal
-                        }
-                    }
-                case .unit:
-                    if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
-                        if let _ = row.cell.goal {
-                            row.cell.goal!.unit = updatedValue
-                        } else {
-                            let goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, number: nil)
-                            row.cell.goal = goal
-                        }
-                    }
-                case .submetric:
-                    if let value = row.value, let updatedValue = GoalSubMetric(rawValue: value) {
-                        if let _ = row.cell.goal {
-                            row.cell.goal!.submetric = updatedValue
-                        } else {
-                            let goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, number: nil)
-                            row.cell.goal = goal
-                        }
-                    }
-                case .option:
-                    if let updatedValue = row.value {
-                        if let _ = row.cell.goal {
-                            row.cell.goal!.option = updatedValue
-                        } else {
-                            let goal = Goal(name: nil, metric: nil, submetric: nil, option: updatedValue, unit: nil, number: nil)
-                            row.cell.goal = goal
-                        }
+                if let task = task, let goal = task.goal {
+                    $0.cell.goal = goal
+                }
+            }.cellUpdate({ cell, _ in
+                self.task.goal = cell.goal
+                if let labelRow: LabelRow = self.form.rowBy(tag: "Goal Description") {
+                    if let goal = cell.goal, let description = goal.description {
+                        labelRow.title = description
+                        labelRow.updateCell()
+                        labelRow.hidden = false
+                        labelRow.evaluateHidden()
+                    } else {
+                        labelRow.hidden = true
+                        labelRow.evaluateHidden()
                     }
                 }
             })
+            
+            if active {
+                form.last!
+                <<< LabelRow("Progress") { row in
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.textLabel?.textColor = .label
+                    row.cell.detailTextLabel?.textColor = .secondaryLabel
+                    row.cell.accessoryType = .none
+                    row.cell.selectionStyle = .none
+                    row.cell.textLabel?.numberOfLines = 0
+                    row.title = row.tag
+                }.cellUpdate { cell, row in
+                    cell.textLabel?.textAlignment = .left
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                    cell.accessoryType = .none
+                }
+            }
         }
         
         form.last!
@@ -335,6 +350,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             $0.cell.textLabel?.textColor = .label
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.cell.accessoryType = .checkmark
+            $0.cell.isUserInteractionEnabled = !(self.task.isGoal ?? false)
             $0.title = $0.tag
             $0.value = task.isCompleted ?? false
             if $0.value ?? false {
@@ -359,7 +375,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 let original = Date()
                 let updateDate = Date(timeIntervalSinceReferenceDate:
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                
                 completedRow.value = updateDate
                 completedRow.updateCell()
                 completedRow.hidden = false
@@ -606,6 +621,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             $0.cell.textLabel?.textColor = .label
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Deadline Date"
+            if self.task.isGoal ?? false {
+                $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
+            }
             if let task = task, let endDate = task.endDate {
                 $0.value = true
                 $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
@@ -669,6 +687,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.detailTextLabel?.text = nil
             }
+            if self.task.isGoal ?? false {
+                row.hidden = "$Repeat != 'Never'"
+            }
         }
         
         <<< DatePickerRow("DeadlineDate") {
@@ -711,6 +732,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             } else {
                 $0.value = false
                 $0.cell.detailTextLabel?.text = nil
+            }
+            if self.task.isGoal ?? false {
+                $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
             }
         }.onChange { [weak self] row in
             if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
@@ -776,6 +800,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.detailTextLabel?.text = nil
             }
+            if self.task.isGoal ?? false {
+                row.hidden = "$Repeat != 'Never'"
+            }
         }
         
         <<< TimePickerRow("DeadlineTime") {
@@ -806,60 +833,64 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             cell.textLabel?.textColor = .label
         }
         
-        <<< SwitchRow("Flag") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.title = row.tag
-            if let flagged = task.flagged {
-                row.value = flagged
-            } else {
-                row.value = false
-                self.task.flagged = false
+        if !(task.isGoal ?? false) {
+            form.last!
+            <<< SwitchRow("Flag") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.title = row.tag
+                if let flagged = task.flagged {
+                    row.value = flagged
+                } else {
+                    row.value = false
+                    self.task.flagged = false
+                }
+            }.onChange { [weak self] row in
+                self?.task.flagged = row.value
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }
-        }.onChange { [weak self] row in
-            self?.task.flagged = row.value
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-        }
-        
-        <<< PushRow<TaskPriority>("Priority") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            if let task = task, let value = task.priority {
-                row.value = TaskPriority(rawValue: value)
-            } else {
-                row.value = TaskPriority.None
+            
+            <<< PushRow<TaskPriority>("Priority") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.title = row.tag
+                if let task = task, let value = task.priority {
+                    row.value = TaskPriority(rawValue: value)
+                } else {
+                    row.value = TaskPriority.None
+                    if let priority = row.value?.rawValue {
+                        self.task.priority = priority
+                    }
+                }
+                row.options = TaskPriority.allCases
+            }.onPresent { from, to in
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.title = "Priority"
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.tableViewStyle = .insetGrouped
+                to.selectableRowCellUpdate = { cell, row in
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
+                    to.tableView.separatorStyle = .none
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }.onChange() { [unowned self] row in
                 if let priority = row.value?.rawValue {
                     self.task.priority = priority
                 }
             }
-            row.options = TaskPriority.allCases
-        }.onPresent { from, to in
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.title = "Priority"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                to.tableView.separatorStyle = .none
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange() { [unowned self] row in
-            if let priority = row.value?.rawValue {
-                self.task.priority = priority
-            }
         }
         
+        form.last!
         <<< LabelRow("Repeat") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
@@ -867,7 +898,11 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            row.hidden = "$deadlineDateSwitch == false"
+            if self.task.isGoal ?? false {
+                row.hidden = "$deadlineDateSwitch == true"
+            } else {
+                row.hidden = "$deadlineDateSwitch == false"
+            }
             if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
                 if let endDate = self.task.instanceOriginalStartDate {
                     row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
@@ -887,48 +922,48 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             cell.accessoryType = .disclosureIndicator
         }
         
-        <<< PushRow<EventAlert>("Reminder") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            row.hidden = "$deadlineDateSwitch == false"
-            if let task = task, let value = task.reminder {
-                row.value = EventAlert(rawValue: value)
-            } else {
-                row.value = EventAlert.None
-                if let reminder = row.value?.description {
-                    self.task.reminder = reminder
+        if delegate == nil && !(task.isGoal ?? false) {
+            form.last!
+            <<< PushRow<EventAlert>("Reminder") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.title = row.tag
+                row.hidden = "$deadlineDateSwitch == false"
+                if let task = task, let value = task.reminder {
+                    row.value = EventAlert(rawValue: value)
+                } else {
+                    row.value = EventAlert.None
+                    if let reminder = row.value?.description {
+                        self.task.reminder = reminder
+                    }
                 }
-            }
-            row.options = EventAlert.allCases
-        }.onPresent { from, to in
-            to.title = "Reminder"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                to.tableView.separatorStyle = .none
+                row.options = EventAlert.allCases
+            }.onPresent { from, to in
+                to.title = "Reminder"
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.tableViewStyle = .insetGrouped
+                to.selectableRowCellUpdate = { cell, row in
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
+                    to.tableView.separatorStyle = .none
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }
+            }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
                 cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange() { [unowned self] row in
-            if let reminder = row.value?.description {
-                self.task.reminder = reminder
-                if self.active {
-                    self.scheduleReminder()
+            }.onChange() { [unowned self] row in
+                if let reminder = row.value?.description {
+                    self.task.reminder = reminder
+                    if self.active {
+                        self.scheduleReminder()
+                    }
                 }
             }
-        }
-        
-        if delegate == nil {
-            form.last!
+            
             <<< LabelRow("Participants") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textColor = .label
@@ -1043,59 +1078,89 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         //        }
         
         
-        
-        <<< SwitchRow("showExtras") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.title = "Show Extras"
-            if let showExtras = task.showExtras {
-                row.value = showExtras
-            } else {
-                row.value = true
-                self.task.showExtras = true
+        if !(task.isGoal ?? false) {
+            form.last!
+            <<< SwitchRow("showExtras") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.title = "Show Extras"
+                if let showExtras = task.showExtras {
+                    row.value = showExtras
+                } else {
+                    row.value = true
+                    self.task.showExtras = true
+                }
+            }.onChange { [weak self] row in
+                if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+                    self?.segmentRowValue = segmentRow.value ?? "Health"
+                    segmentRow.value = "Hidden"
+                } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
+                    segmentRow.value = self?.segmentRowValue
+                }
+                self?.task.showExtras = row.value
+                guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+                let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
+                let values:[String : Any] = ["showExtras": row.value ?? false]
+                userReference.updateChildValues(values)
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }
-        }.onChange { [weak self] row in
-            if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
-                self?.segmentRowValue = segmentRow.value ?? "Health"
-                segmentRow.value = "Hidden"
-            } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
-                segmentRow.value = self?.segmentRowValue
+            
+            <<< LabelRow("Sub-Tasks") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if let task = task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
+                    row.value = "0"
+                } else {
+                    row.value = String(self.task.subtaskIDs?.count ?? 0)
+                }
+                row.hidden = "$showExtras == false"
+            }.onCellSelection({ _,_ in
+                self.openSubtasks()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                cell.textLabel?.textAlignment = .left
+                cell.textLabel?.textColor = .label
+                if let task = self.task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
+                    row.value = "0"
+                } else {
+                    row.value = String(self.task.subtaskIDs?.count ?? 0)
+                }
             }
-            self?.task.showExtras = row.value
-            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["showExtras": row.value ?? false]
-            userReference.updateChildValues(values)
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-        }
-        
-        <<< LabelRow("Sub-Tasks") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if let task = task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String(self.task.subtaskIDs?.count ?? 0)
-            }
-            row.hidden = "$showExtras == false"
-        }.onCellSelection({ _,_ in
-            self.openSubtasks()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-            cell.textLabel?.textColor = .label
-            if let task = self.task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String(self.task.subtaskIDs?.count ?? 0)
+            
+            <<< LabelRow("Media") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                row.hidden = "$showExtras == false"
+                if let task = task, let photos = task.activityPhotos, let files = task.activityFiles, photos.isEmpty, files.isEmpty {
+                    row.value = "0"
+                } else {
+                    row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
+                }
+            }.onCellSelection({ _,_ in
+                self.openMedia()
+            }).cellUpdate { cell, row in
+                cell.accessoryType = .disclosureIndicator
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                cell.textLabel?.textAlignment = .left
+                cell.textLabel?.textColor = .label
+                if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
+                    row.value = "0"
+                } else {
+                    row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
+                }
             }
         }
         
@@ -1127,33 +1192,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         //            }
         //        }
         
-        <<< LabelRow("Media") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            row.hidden = "$showExtras == false"
-            if let task = task, let photos = task.activityPhotos, let files = task.activityFiles, photos.isEmpty, files.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
-            }
-        }.onCellSelection({ _,_ in
-            self.openMedia()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-            cell.textLabel?.textColor = .label
-            if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
-            }
-        }
         
         //        <<< LabelRow("Tags") { row in
         //            row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -1183,7 +1221,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         //            }
         //        }
         
-        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) {
+        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) && !(task?.isGoal ?? false) {
             form.last!
             <<< SegmentedRow<String>("sections"){
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground

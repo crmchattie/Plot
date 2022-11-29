@@ -525,7 +525,8 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                 if let incomeTransactionDetail = transactionsList.first(where: { ($0.level == .group && $0.group == "Income") }), let incomeTransactions = transactionsDict[incomeTransactionDetail] {
                     let diffAmount = incomeTransactionDetail.amount + expenseTransactionDetail.amount
                     let diffTransactions = incomeTransactions + transactions
-                    let diffTransactionDetail = TransactionDetails(name: "Difference", amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: "Difference", currencyCode: "USD")
+                    let diffName = diffAmount > 0 ? "Net Savings" : "Net Spending"
+                    let diffTransactionDetail = TransactionDetails(name: diffName, amount: diffAmount, level: .group, category: nil, topLevelCategory: nil, group: diffName, currencyCode: "USD")
                     sortedTransactionsList.insert(diffTransactionDetail, at: 0)
                     transactionsDict[diffTransactionDetail] = diffTransactions
                 }
@@ -702,7 +703,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
             }
         }
         
-        if transactionDetail.name == "Difference" {
+        if transactionDetail.name == "Net Savings" || transactionDetail.name == "Net Spending" {
             switch transaction.type {
             case .debit:
                 if statistics.isEmpty {

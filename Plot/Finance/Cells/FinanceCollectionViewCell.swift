@@ -66,7 +66,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         topHeightConstraint = 5
                     }
                     
-                    if (transactionDetails.group == "Income" || transactionDetails.group == "Expense" || transactionDetails.group == "Difference") {
+                    if (transactionDetails.group == "Income" || transactionDetails.group == "Expense" || transactionDetails.group == "Net Spending" || transactionDetails.group == "Net Savings") {
                         nameLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                         categoryLabel.font = UIFont.preferredFont(forTextStyle: .headline)
                     } else {
@@ -74,7 +74,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                         categoryLabel.font = UIFont.preferredFont(forTextStyle: .body)
                     }
                     
-                    if (transactionDetails.group == "Income" || transactionDetails.group == "Difference"), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
+                    if (transactionDetails.group == "Income" || transactionDetails.group == "Net Spending" || transactionDetails.group == "Net Savings"), let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = amount
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
                         categoryLabel.text = amount

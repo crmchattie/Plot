@@ -155,6 +155,18 @@ enum PlotRecurrenceFrequency: String, Codable {
         case .yearly: return .yearly
         }
     }
+    
+    var name: String {
+        switch self {
+        case .secondly: return "Secondly"
+        case .minutely: return "Minutely"
+        case .hourly: return "Hourly"
+        case .daily: return "Daily"
+        case .weekly: return "Weekly"
+        case .monthly: return "Monthly"
+        case .yearly: return "Yearly"
+        }
+    }
 }
 
 enum DateType: String, Codable, CaseIterable {

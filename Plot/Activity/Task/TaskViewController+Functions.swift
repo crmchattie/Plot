@@ -137,8 +137,6 @@ extension TaskViewController {
             })
         }
         if let containerID = task.containerID {
-            print("containerID")
-            print(containerID)
             dispatchGroup.enter()
             ContainerFunctions.grabContainerAndStuffInside(id: containerID) { container, activities, _, health, transactions in
                 self.container = container
@@ -157,7 +155,7 @@ extension TaskViewController {
 
     
     func listRow() {
-        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) {
+        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) && !(task?.isGoal ?? false) {
             for activity in eventList {
                 var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
@@ -444,22 +442,18 @@ extension TaskViewController {
             return
         }
         
-        // prepare a recurrence rule and an occurrence date
-        // occurrence date is the date which the repeat event occurs this time
-        let recurrences = task.recurrences
-        let occurrenceDate = task.endDate ?? Date()
-
         // initialization and configuration
         // RecurrencePicker can be initialized with a recurrence rule or nil, nil means "never repeat"
         var recurrencePicker = RecurrencePicker(recurrenceRule: nil)
-        if let recurrences = recurrences {
-            let recurrenceRule = RecurrenceRule(rruleString: recurrences[0])
+        if let recurrences = task.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
+            let recurrenceRule = RecurrenceRule(rruleString: recurrence)
             recurrencePicker = RecurrencePicker(recurrenceRule: recurrenceRule)
         }
         recurrencePicker.language = .english
         recurrencePicker.calendar = Calendar.current
         recurrencePicker.tintColor = FalconPalette.defaultBlue
-        recurrencePicker.occurrenceDate = occurrenceDate
+        recurrencePicker.occurrenceDate = task.endDate ?? Date()
+        recurrencePicker.isGoal = task.isGoal ?? false
 
         // assign delegate
         recurrencePicker.delegate = self

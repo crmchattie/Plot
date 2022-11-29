@@ -556,23 +556,18 @@ extension EventViewController {
             basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
             return
         }
-        
-        // prepare a recurrence rule and an occurrence date
-        // occurrence date is the date which the repeat event occurs this time
-        let recurrences = activity.recurrences
-        let occurrenceDate = activity.startDate
 
         // initialization and configuration
         // RecurrencePicker can be initialized with a recurrence rule or nil, nil means "never repeat"
         var recurrencePicker = RecurrencePicker(recurrenceRule: nil)
-        if let recurrences = recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
+        if let recurrences = activity.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }) {
             let recurrenceRule = RecurrenceRule(rruleString: recurrence)
             recurrencePicker = RecurrencePicker(recurrenceRule: recurrenceRule)
         }        
         recurrencePicker.language = .english
         recurrencePicker.calendar = Calendar.current
         recurrencePicker.tintColor = FalconPalette.defaultBlue
-        recurrencePicker.occurrenceDate = occurrenceDate
+        recurrencePicker.occurrenceDate = activity.startDate
 
         // assign delegate
         recurrencePicker.delegate = self

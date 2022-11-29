@@ -258,7 +258,13 @@ extension String {
     var doubleValue: Double {
         return Double(self) ?? 0
     }
+    
+    var filteredNumbers: String {
+        return String(self.filter{decimals.contains($0)} )
+    }
 }
+
+let decimals = Set("0123456789.")
 
 extension UINavigationController {
     

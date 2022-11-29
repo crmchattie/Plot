@@ -71,8 +71,6 @@ class Activity: NSObject, NSCopying, Codable {
     //task will key off of isTask and isCompleted
     var isTask: Bool?
     var isGoal: Bool?
-    var goalNumber: NSNumber?
-    var goalUnit: String?
     //instance variable
     var isCompleted: Bool?
     //instance variable
@@ -100,6 +98,13 @@ class Activity: NSObject, NSCopying, Codable {
     var directAssociation: Bool?
     var directAssociationObjectID: String?
     var directAssociationType: ObjectType?
+    var goalMetric: String?
+    var goalSubmetric: String?
+    var goalOption: String?
+    var goalUnit: String?
+    var goalTargetNumber: NSNumber?
+    var goalCurrentNumber: NSNumber?
+    var goal: Goal?
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -136,7 +141,6 @@ class Activity: NSObject, NSCopying, Codable {
         case userIsCompleted
         case isTask
         case isGoal
-        case goalUnit
         case isEvent
         case isSchedule
         case scheduleIDs
@@ -158,6 +162,10 @@ class Activity: NSObject, NSCopying, Codable {
         case directAssociation
         case directAssociationObjectID
         case directAssociationType
+        case goalMetric
+        case goalSubmetric
+        case goalOption
+        case goalUnit
     }
     
     init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool, createdDate: NSNumber) {
@@ -249,8 +257,6 @@ class Activity: NSObject, NSCopying, Codable {
         userCompletedDate = dictionary?["userCompletedDate"] as? NSNumber
         isTask = dictionary?["isTask"] as? Bool
         isGoal = dictionary?["isGoal"] as? Bool
-        goalNumber = dictionary?["goalNumber"] as? NSNumber
-        goalUnit = dictionary?["goalUnit"] as? String
         isEvent = dictionary?["isEvent"] as? Bool
         isSchedule = dictionary?["isSchedule"] as? Bool
         scheduleIDs = dictionary?["scheduleIDs"] as? [String]
@@ -278,6 +284,12 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = dictionary?["directAssociationType"] as? String {
             directAssociationType = ObjectType(rawValue: value)
         }
+        goalMetric = dictionary?["goalMetric"] as? String
+        goalSubmetric = dictionary?["goalSubmetric"] as? String
+        goalOption = dictionary?["goalOption"] as? String
+        goalUnit = dictionary?["goalUnit"] as? String
+        goalTargetNumber = dictionary?["goalTargetNumber"] as? NSNumber
+        goalCurrentNumber = dictionary?["goalCurrentNumber"] as? NSNumber
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -481,14 +493,6 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["isGoal"] = value
         }
         
-        if let value = self.goalNumber as AnyObject? {
-            dictionary["goalNumber"] = value
-        }
-        
-        if let value = self.goalUnit as AnyObject? {
-            dictionary["goalUnit"] = value
-        }
-        
         if let value = self.isEvent as AnyObject? {
             dictionary["isEvent"] = value
         }
@@ -603,6 +607,34 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["directAssociationType"] = value
         }
         
+        if let value = self.directAssociationObjectID as AnyObject? {
+            dictionary["directAssociationObjectID"] = value
+        }
+        
+        if let value = self.goalMetric as AnyObject? {
+            dictionary["goalMetric"] = value
+        }
+        
+        if let value = self.goalSubmetric as AnyObject? {
+            dictionary["goalSubmetric"] = value
+        }
+        
+        if let value = self.goalOption as AnyObject? {
+            dictionary["goalOption"] = value
+        }
+        
+        if let value = self.goalUnit as AnyObject? {
+            dictionary["goalUnit"] = value
+        }
+        
+        if let value = self.goalTargetNumber as AnyObject? {
+            dictionary["goalTargetNumber"] = value
+        }
+        
+        if let value = self.goalCurrentNumber as AnyObject? {
+            dictionary["goalCurrentNumber"] = value
+        }
+                
         return dictionary
     }
     
@@ -765,14 +797,6 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.isGoal = value
         }
         
-        if let value = updatingActivity.goalNumber {
-            newActivity.goalNumber = value
-        }
-        
-        if let value = updatingActivity.goalUnit {
-            newActivity.goalUnit = value
-        }
-        
         if let value = updatingActivity.isEvent {
             newActivity.isEvent = value
         }
@@ -868,6 +892,30 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.directAssociationType {
             newActivity.directAssociationType = value
+        }
+        
+        if let value = updatingActivity.goalMetric {
+            newActivity.goalMetric = value
+        }
+        
+        if let value = updatingActivity.goalSubmetric {
+            newActivity.goalSubmetric = value
+        }
+        
+        if let value = updatingActivity.goalOption {
+            newActivity.goalOption = value
+        }
+        
+        if let value = updatingActivity.goalUnit {
+            newActivity.goalUnit = value
+        }
+        
+        if let value = updatingActivity.goalTargetNumber {
+            newActivity.goalTargetNumber = value
+        }
+        
+        if let value = updatingActivity.goalCurrentNumber {
+            newActivity.goalCurrentNumber = value
         }
         
         return newActivity
@@ -1030,14 +1078,6 @@ class Activity: NSObject, NSCopying, Codable {
             self.isGoal = value
         }
         
-        if let value = updatingActivity.goalNumber {
-            self.goalNumber = value
-        }
-        
-        if let value = updatingActivity.goalUnit {
-            self.goalUnit = value
-        }
-        
         if let value = updatingActivity.isEvent {
             self.isEvent = value
         }
@@ -1133,6 +1173,30 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.directAssociationType {
             self.directAssociationType = value
+        }
+        
+        if let value = updatingActivity.goalMetric {
+            self.goalMetric = value
+        }
+        
+        if let value = updatingActivity.goalSubmetric {
+            self.goalSubmetric = value
+        }
+        
+        if let value = updatingActivity.goalOption {
+            self.goalOption = value
+        }
+        
+        if let value = updatingActivity.goalUnit {
+            self.goalUnit = value
+        }
+        
+        if let value = updatingActivity.goalTargetNumber {
+            self.goalTargetNumber = value
+        }
+        
+        if let value = updatingActivity.goalCurrentNumber {
+            self.goalCurrentNumber = value
         }
     }
     
@@ -1282,14 +1346,6 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.isGoal = self.isGoal
         }
         
-        if self.goalNumber != otherActivity.goalNumber {
-            newActivity.goalNumber = self.goalNumber
-        }
-        
-        if self.goalUnit != otherActivity.goalUnit {
-            newActivity.goalUnit = self.goalUnit
-        }
-        
         if self.isEvent != otherActivity.isEvent {
             newActivity.isEvent = self.isEvent
         }
@@ -1385,6 +1441,30 @@ class Activity: NSObject, NSCopying, Codable {
         
         if self.directAssociationType != otherActivity.directAssociationType {
             newActivity.directAssociationType = self.directAssociationType
+        }
+        
+        if self.goalMetric != otherActivity.goalMetric {
+            newActivity.goalMetric = self.goalMetric
+        }
+        
+        if self.goalSubmetric != otherActivity.goalSubmetric {
+            newActivity.goalSubmetric = self.goalSubmetric
+        }
+        
+        if self.goalOption != otherActivity.goalOption {
+            newActivity.goalOption = self.goalOption
+        }
+        
+        if self.goalUnit != otherActivity.goalUnit {
+            newActivity.goalUnit = self.goalUnit
+        }
+        
+        if self.goalTargetNumber != otherActivity.goalTargetNumber {
+            newActivity.goalTargetNumber = self.goalTargetNumber
+        }
+        
+        if self.goalCurrentNumber != otherActivity.goalCurrentNumber {
+            newActivity.goalCurrentNumber = self.goalCurrentNumber
         }
         
         return newActivity

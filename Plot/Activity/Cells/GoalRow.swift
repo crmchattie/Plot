@@ -25,7 +25,7 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
     lazy var numberTextField: UITextField = {
         let textField = UITextField()
         textField.textColor = .label
-        textField.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        textField.font = UIFont.preferredFont(forTextStyle: .callout)
         textField.textAlignment = .center
         textField.adjustsFontForContentSizeCategory = true
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -44,7 +44,7 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
     
     lazy var unitLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.textAlignment = .center
         label.textColor = .label
         label.numberOfLines = 1
@@ -64,7 +64,7 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
     
     lazy var metricLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.textAlignment = .center
         label.textColor = .label
         label.numberOfLines = 1
@@ -84,7 +84,7 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
     
     lazy var submetricLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.textAlignment = .center
         label.textColor = .label
         label.numberOfLines = 1
@@ -104,7 +104,7 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
     
     lazy var optionLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.textAlignment = .center
         label.textColor = .label
         label.numberOfLines = 1
@@ -153,8 +153,6 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
         stackView.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: 5).isActive = true
         stackView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -5).isActive = true
         
-        numberTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
-        
     }
     
     override func update() {
@@ -166,7 +164,7 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
         
         guard goal != nil else {
             metricLabel.text = "Metric"
-            numberTextField.text = "0"
+            numberTextField.text = "Number"
             unitLabel.text = "Unit"
             submetricLabel.text = "None"
             optionView.isHidden = true
@@ -191,7 +189,7 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
         }
         
         updateTextField()
-        
+                
         if let value = goal!.submetric, let metric = goal!.metric, metric.submetrics.contains(value) {
             submetricView.isHidden = false
             submetricLabel.text = value.rawValue
@@ -222,22 +220,6 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
         }
     }
     
-    @objc func textFieldDidChange(_ textField: UITextField) {
-        if let text = textField.text, text != "" {
-            if goal != nil {
-                goal!.number = Double(text)
-            } else {
-                goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, number: Double(text))
-            }
-            
-            timer?.invalidate()
-            
-            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
-                self.updateTextField()
-            })
-        }
-    }
-    
     func updateTextField() {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
@@ -248,11 +230,10 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
                 numberFormatter.numberStyle = .decimal
             case .count:
                 numberFormatter.numberStyle = .decimal
-            case .level:
+            case .amount:
                 numberFormatter.numberStyle = .currency
             case .percent:
                 numberFormatter.numberStyle = .percent
-                goal!.number = goal!.number ?? 0 / 100
             case .multiple:
                 numberFormatter.numberStyle = .decimal
             case .minutes:
@@ -263,8 +244,14 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
             case .days:
                 numberFormatter.numberStyle = .decimal
                 numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
             }
-            numberTextField.text = numberFormatter.string(from: goal!.number as? NSNumber ?? 0)
+            if let number = goal!.targetNumber as? NSNumber {
+                numberTextField.text = numberFormatter.string(from: number)
+            } else {
+                numberTextField.text = "Number"
+            }
         }
     }
 }
@@ -293,12 +280,65 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
         let optionTap = UITapGestureRecognizer(target: self, action: #selector(GoalPickerInlineRow.optionTapped(_:)))
         cell.optionLabel.addGestureRecognizer(optionTap)
         
+        cell.numberTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingDidBegin)
+        cell.numberTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
+        
         onExpandInlineRow { cell, row, _ in
             let color = cell.detailTextLabel?.textColor
             row.onCollapseInlineRow { cell, _, _ in
                 cell.detailTextLabel?.textColor = color
             }
             cell.detailTextLabel?.textColor = cell.tintColor
+        }
+        onChange { row in
+            switch self.selectedGoalProperty {
+            case .metric:
+                if let value = row.value, let updatedValue = GoalMetric(rawValue: value) {
+                    if let goal = row.cell.goal, goal.targetNumber != 0 {
+                        row.cell.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: goal.targetNumber, currentNumber: nil)
+                    } else {
+                        row.cell.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+                    }
+                }
+            case .unit:
+                if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
+                    if let _ = row.cell.goal {
+                        if updatedValue == .percent, let number = row.cell.goal!.number {
+                            row.cell.goal?.number = number / 100
+                        }
+                        row.cell.goal!.unit = updatedValue
+                    } else {
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, number: nil, currentNumber: nil)
+                    }
+                }
+            case .submetric:
+                if let value = row.value, let updatedValue = GoalSubMetric(rawValue: value) {
+                    if let _ = row.cell.goal {
+                        row.cell.goal!.submetric = updatedValue
+                    } else {
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, number: nil, currentNumber: nil)
+                    }
+                }
+            case .option:
+                if let updatedValue = row.value {
+                    if let _ = row.cell.goal {
+                        row.cell.goal!.option = updatedValue
+                    } else {
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: updatedValue, unit: nil, number: nil, currentNumber: nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    public override func customDidSelect() {
+        super.customDidSelect()
+        if !isDisabled {
+            if isExpanded {
+                collapseInlineRow()
+            } else {
+                metricTapped(UITapGestureRecognizer())
+            }
         }
     }
     
@@ -309,14 +349,21 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
     }
     
     @objc func metricTapped(_ sender: UITapGestureRecognizer) {
-        self.selectedGoalProperty = .metric
         self.options = GoalMetric.allValues
         if let goal = cell.goal, let metric = goal.metric {
             self.value = metric.rawValue
         } else {
             self.value = GoalMetric.allValues[0]
+            cell.goal = Goal(name: nil, metric: GoalMetric(rawValue: GoalMetric.allValues[0]), submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+            cell.update()
         }
-        toggleInlineRow()
+        if isExpanded, self.selectedGoalProperty != .metric {
+            toggleInlineRow()
+            toggleInlineRow()
+        } else {
+            toggleInlineRow()
+        }
+        self.selectedGoalProperty = .metric
         cell.numberTextField.resignFirstResponder()
     }
     
@@ -324,7 +371,6 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
         guard let goal = cell.goal, let metric = goal.metric, metric.units.count > 0 else {
             return
         }
-        self.selectedGoalProperty = .unit
         var array = [String]()
         metric.units.forEach { unit in
             array.append(unit.rawValue)
@@ -335,7 +381,13 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
         } else {
             self.value = metric.units[0].rawValue
         }
-        toggleInlineRow()
+        if isExpanded, self.selectedGoalProperty != .unit {
+            toggleInlineRow()
+            toggleInlineRow()
+        } else {
+            toggleInlineRow()
+        }
+        self.selectedGoalProperty = .unit
         cell.numberTextField.resignFirstResponder()
     }
     
@@ -343,7 +395,6 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
         guard let goal = cell.goal, let metric = goal.metric, metric.submetrics.count > 0 else {
             return
         }
-        self.selectedGoalProperty = .submetric
         var array = [String]()
         metric.submetrics.forEach { submetric in
             array.append(submetric.rawValue)
@@ -354,7 +405,13 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
         } else {
             self.value = metric.submetrics[0].rawValue
         }
-        toggleInlineRow()
+        if isExpanded, self.selectedGoalProperty != .submetric {
+            toggleInlineRow()
+            toggleInlineRow()
+        } else {
+            toggleInlineRow()
+        }
+        self.selectedGoalProperty = .submetric
         cell.numberTextField.resignFirstResponder()
     }
     
@@ -362,15 +419,44 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
         guard let goal = cell.goal, let options = goal.options() else {
             return
         }
-        self.selectedGoalProperty = .option
         self.options = options
         if let option = goal.option {
             self.value = option
         } else {
             self.value = options[0]
         }
-        toggleInlineRow()
+        if isExpanded, self.selectedGoalProperty != .option {
+            toggleInlineRow()
+            toggleInlineRow()
+        } else {
+            toggleInlineRow()
+        }
+        self.selectedGoalProperty = .option
         cell.numberTextField.resignFirstResponder()
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        collapseInlineRow()
+        guard let text = textField.text, text != "Number" else {
+            cell.numberTextField.text = nil
+            return
+        }
+        
+        if cell.goal != nil {
+            if let unit = cell.goal!.unit, unit == .percent {
+                cell.goal!.targetNumber = (Double(text.filteredNumbers) ?? 0) / 100
+            } else {
+                cell.goal!.targetNumber = Double(text.filteredNumbers)
+            }
+        } else {
+            cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: Double(text.filteredNumbers), currentNumber: nil)
+        }
+        
+        cell.timer?.invalidate()
+        
+        cell.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+            self.updateCell()
+        })
     }
 }
 
