@@ -337,7 +337,7 @@ class FinanceService {
             self?.createEventsFromTransactions(transactions: transactionsInitialAdd)
             self?.createTasksFromTransactions(transactions: transactionsInitialAdd)
             self?.updateTasksFromAccounts(accounts: self!.accounts)
-            self?.createFutureTasksFromRecurringTransactions(transactions: self!.transactions)
+//            self?.createFutureTasksFromRecurringTransactions(transactions: self!.transactions)
         }, transactionsAdded: { [weak self] transactionsAdded in
             for transaction in transactionsAdded {
                 updateTransactionWRule(transaction: transaction, transactionRules: self!.transactionRules) { (transaction, bool) in
@@ -703,6 +703,15 @@ class FinanceService {
                     let filteredTransactions = recurringTransactions.filter({ $0.description == description && $0.merchant_guid ?? "" == merchant }).sorted(by: {
                         return isodateFormatter.date(from: $0.transacted_at) ?? Date() > isodateFormatter.date(from: $1.transacted_at) ?? Date()
                     })
+                    
+                    let daysArray = getMostDaysArrayBetweenRecurringTransactions(transactions: filteredTransactions)
+                    print("description")
+                    print(description)
+                    print(daysArray)
+                    print(daysArray.avg())
+                    print(daysArray.std())
+    
+
                     //make sure first && second transactions are not plot_created, if not create new transaction/task
                     //if most recent is plot_created && transacted_date is more than 7 days past, then delete transaction and activity given recurrances may have stopped, otherwise do nothing
                     //if second most recent is plot_created, potentially delete if first is 'real' transaction and reassign existing task to 'real' transaction
@@ -718,7 +727,7 @@ class FinanceService {
                             let newDate = first.addDays(days)
                             if newDate > Date(), !filteredTransactions.contains(where: { isodateFormatter.date(from: $0.transacted_at)?.getShortDayMonthAndYear() == newDate.getShortDayMonthAndYear() }) {
                                 self.createFutureTransaction(oldTransaction: filteredTransactions[0], newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
-                                
+
                             }
                         }
                         //if most recent is plot_created && transacted_date is more than 7 days past, then delete transaction and activity given recurrances may have stopped, otherwise do nothing
@@ -733,7 +742,7 @@ class FinanceService {
                                         let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
                                         transactionAction.deleteTransaction()
                                     }
-                                    
+
                                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                         if let activity = activities.first, !(activity.isCompleted ?? false) {
                                             let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
@@ -756,7 +765,7 @@ class FinanceService {
                                         let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
                                         transactionAction.deleteTransaction()
                                     }
-                                    
+
                                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                         if let activity = activities.first, !(activity.isCompleted ?? false) {
                                             let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
@@ -764,7 +773,7 @@ class FinanceService {
                                         }
                                     }
                                 }
-                                
+
                                 var days = 0
                                 if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
                                     days = mostFrequentDays
@@ -811,7 +820,7 @@ class FinanceService {
                                         let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
                                         transactionAction.deleteTransaction()
                                     }
-                                    
+
                                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                         if let activity = activities.first, !(activity.isCompleted ?? false) {
                                             let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
@@ -834,7 +843,7 @@ class FinanceService {
                                         let transactionAction = TransactionActions(transaction: deleteTransaction, active: true, selectedFalconUsers: users)
                                         transactionAction.deleteTransaction()
                                     }
-                                    
+
                                     ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                         if let activity = activities.first, !(activity.isCompleted ?? false) {
                                             let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
@@ -842,7 +851,7 @@ class FinanceService {
                                         }
                                     }
                                 }
-                                
+
                                 var days = 0
                                 if let mostFrequentDays = getMostFrequentDaysBetweenRecurringTransactions(transactions: filteredTransactions) {
                                     days = mostFrequentDays

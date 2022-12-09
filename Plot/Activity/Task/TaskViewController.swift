@@ -284,16 +284,18 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         } else {
             form.last!
             
-            <<< LabelRow("Goal Description") { row in
+            <<< LabelRow("Description") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textColor = .label
                 row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.cell.accessoryType = .none
                 row.cell.selectionStyle = .none
                 row.cell.textLabel?.numberOfLines = 0
-                row.hidden = self.task.goal == nil ? true : false
                 if let task = task, let goal = task.goal, let description = goal.description {
                     row.title = description
+                    row.hidden = false
+                } else {
+                    row.hidden = true
                 }
             }.cellUpdate { cell, row in
                 cell.textLabel?.textAlignment = .left
@@ -303,36 +305,129 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 cell.accessoryType = .none
             }
             
-            <<< GoalPickerInlineRow<String>("Goal") {
-                $0.title = $0.tag
-                if let task = task, let goal = task.goal {
-                    $0.cell.goal = goal
+            <<< PushRow<String>("Metric") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.title = row.tag
+                row.options = GoalMetric.allValues
+                if let task = task, let goal = task.goal, let value = goal.metric {
+                    row.value = value.rawValue
+                } else {
+                    row.value = GoalMetric.allValues[0]
+                    self.task.goal = Goal(name: nil, metric: GoalMetric(rawValue: GoalMetric.allValues[0]), submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
                 }
-            }.cellUpdate({ cell, _ in
-                self.task.goal = cell.goal
-                if let labelRow: LabelRow = self.form.rowBy(tag: "Goal Description") {
-                    if let goal = cell.goal, let description = goal.description {
-                        labelRow.title = description
-                        labelRow.updateCell()
-                        labelRow.hidden = false
-                        labelRow.evaluateHidden()
-                    } else {
-                        labelRow.hidden = true
-                        labelRow.evaluateHidden()
+            }.onPresent { from, to in
+                to.title = "Metrics"
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.tableViewStyle = .insetGrouped
+                to.dismissOnSelection = true
+                to.dismissOnChange = true
+                to.enableDeselection = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.tableView.separatorStyle = .none
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }.onChange { row in
+                self.updateGoal(selectedGoalProperty: .metric, value: row.value)
+            }
+            
+            <<< PushRow<String>("Unit") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.title = row.tag
+                row.options = []
+                if let task = task, let goal = task.goal, let metric = goal.metric {
+                    row.options = metric.allValuesUnits
+                    if let value = goal.unit {
+                        row.value = value.rawValue
+                    } else if metric.allValuesUnits.count > 0 {
+                        row.value = metric.allValuesUnits[0]
                     }
                 }
-            })
+            }.onPresent { from, to in
+                to.title = "Units"
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.tableViewStyle = .insetGrouped
+                to.dismissOnSelection = true
+                to.dismissOnChange = true
+                to.enableDeselection = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.tableView.separatorStyle = .none
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                if let options = row.options, !options.isEmpty {
+                    cell.isUserInteractionEnabled = true
+                } else {
+                    cell.isUserInteractionEnabled = false
+                }
+            }.onChange { row in
+                if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
+                    if let _ = self.task.goal {
+                        if updatedValue == .percent, let number = self.task.goal!.targetNumber {
+                            self.task.goal!.targetNumber = number / 100
+                        }
+                        self.task.goal!.unit = updatedValue
+                    } else {
+                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, targetNumber: nil, currentNumber: nil)
+                    }
+                    self.updateNumberRows()
+                    self.updateDescriptionRow()
+                }
+            }
+            
+            <<< DecimalRow("Target") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .secondaryLabel
+                $0.title = $0.tag
+                if let task = task, let goal = task.goal, let number = goal.targetNumber {
+                    $0.value = number
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .secondaryLabel
+            }.onChange { row in
+                if let value = row.value {
+                    if let _ = self.task.goal {
+                        self.task.goal!.targetNumber = value
+                    } else {
+                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: value, currentNumber: nil)
+                    }
+                }
+                self.updateDescriptionRow()
+            }
             
             if active {
                 form.last!
-                <<< LabelRow("Progress") { row in
+                <<< DecimalRow("Current") { row in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.textLabel?.textColor = .label
                     row.cell.detailTextLabel?.textColor = .secondaryLabel
                     row.cell.accessoryType = .none
                     row.cell.selectionStyle = .none
                     row.cell.textLabel?.numberOfLines = 0
+                    row.cell.isUserInteractionEnabled = false
                     row.title = row.tag
+                    if let task = task, let goal = task.goal, let number = goal.currentNumber {
+                        row.value = number
+                    }
                 }.cellUpdate { cell, row in
                     cell.textLabel?.textAlignment = .left
                     cell.backgroundColor = .secondarySystemGroupedBackground
@@ -340,6 +435,100 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     cell.detailTextLabel?.textColor = .secondaryLabel
                     cell.accessoryType = .none
                 }
+            }
+            
+            form.last!
+            <<< PushRow<String>("Submetric") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.title = row.tag
+                row.options = []
+                if let task = task, let goal = task.goal, let metric = goal.metric {
+                    row.options = metric.allValuesSubmetrics
+                    if let value = goal.submetric {
+                        row.value = value.rawValue
+                    } else if metric.allValuesSubmetrics.count > 0 {
+                        row.value = metric.allValuesSubmetrics[0]
+                    } else {
+                        row.hidden = true
+                    }
+                }
+            }.onPresent { from, to in
+                to.title = "Submetrics"
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.tableViewStyle = .insetGrouped
+                to.dismissOnSelection = true
+                to.dismissOnChange = true
+                to.enableDeselection = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.tableView.separatorStyle = .none
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                if let options = row.options, !options.isEmpty {
+                    cell.isUserInteractionEnabled = true
+                } else {
+                    cell.isUserInteractionEnabled = false
+                }
+            }.onChange { row in
+                self.updateGoal(selectedGoalProperty: .submetric, value: row.value)
+            }
+            
+            <<< PushRow<String>("Option") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.title = row.tag
+                row.options = []
+                if let task = task, let goal = task.goal, let _ = goal.metric, let options = goal.options() {
+                    row.options = options
+                    if let value = goal.option {
+                        row.value = value
+                    }
+                } else {
+                    row.hidden = true
+                }
+            }.onPresent { from, to in
+                to.title = "Options"
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.tableViewStyle = .insetGrouped
+                to.dismissOnSelection = true
+                to.dismissOnChange = true
+                to.enableDeselection = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.tableView.separatorStyle = .none
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                if let options = row.options, !options.isEmpty {
+                    cell.isUserInteractionEnabled = true
+                } else {
+                    cell.isUserInteractionEnabled = false
+                }
+            }.onChange { row in
+                if let value = row.value {
+                    if let _ = self.task.goal {
+                        self.task.goal!.option = value
+                    } else {
+                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: value, unit: nil, targetNumber: nil, currentNumber: nil)
+                    }
+                }
+                self.updateDescriptionRow()
             }
         }
         

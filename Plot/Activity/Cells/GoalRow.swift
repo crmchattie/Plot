@@ -8,6 +8,26 @@
 
 import Eureka
 
+//            <<< GoalPickerInlineRow<String>("Goal") {
+//                $0.title = $0.tag
+//                if let task = task, let goal = task.goal {
+//                    $0.cell.goal = goal
+//                }
+//            }.cellUpdate({ cell, _ in
+//                self.task.goal = cell.goal
+//                if let labelRow: LabelRow = self.form.rowBy(tag: "Goal Description") {
+//                    if let goal = cell.goal, let description = goal.description {
+//                        labelRow.title = description
+//                        labelRow.updateCell()
+//                        labelRow.hidden = false
+//                        labelRow.evaluateHidden()
+//                    } else {
+//                        labelRow.hidden = true
+//                        labelRow.evaluateHidden()
+//                    }
+//                }
+//            })
+
 final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
     var goal: Goal?
     
@@ -156,7 +176,6 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
     }
     
     override func update() {
-        print("update")
         // we do not want to show the default UITableViewCell's textLabel
         textLabel?.text = "Goal"
         detailTextLabel?.isHidden = true
@@ -290,6 +309,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
             }
             cell.detailTextLabel?.textColor = cell.tintColor
         }
+                
         onChange { row in
             switch self.selectedGoalProperty {
             case .metric:
@@ -303,12 +323,12 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
             case .unit:
                 if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
                     if let _ = row.cell.goal {
-                        if updatedValue == .percent, let number = row.cell.goal!.number {
-                            row.cell.goal?.number = number / 100
+                        if updatedValue == .percent, let number = row.cell.goal!.targetNumber {
+                            row.cell.goal!.targetNumber = number / 100
                         }
                         row.cell.goal!.unit = updatedValue
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, number: nil, currentNumber: nil)
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, targetNumber: nil, currentNumber: nil)
                     }
                 }
             case .submetric:
@@ -316,7 +336,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
                     if let _ = row.cell.goal {
                         row.cell.goal!.submetric = updatedValue
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, number: nil, currentNumber: nil)
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
                     }
                 }
             case .option:
@@ -324,7 +344,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
                     if let _ = row.cell.goal {
                         row.cell.goal!.option = updatedValue
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: updatedValue, unit: nil, number: nil, currentNumber: nil)
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: updatedValue, unit: nil, targetNumber: nil, currentNumber: nil)
                     }
                 }
             }
@@ -376,8 +396,8 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
             array.append(unit.rawValue)
         }
         self.options = array
-        if let submetric = goal.submetric {
-            self.value = submetric.rawValue
+        if let unit = goal.unit {
+            self.value = unit.rawValue
         } else {
             self.value = metric.units[0].rawValue
         }

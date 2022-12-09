@@ -18,15 +18,22 @@ let userFinancialTransactionsEventsEntity = "user-financial-transactions-events"
 let userFinancialTransactionsTasksEntity = "user-financial-transactions-tasks"
 
 var financialTransactionsGroupsStatic = ["Income", "Bills", "Discretionary", "Kids", "Living", "Transfer", "Work", "Uncategorized"]
-var financialTransactionsGroupsWExpenseStatic = ["Income", "Expense", "Bills", "Discretionary", "Kids", "Living", "Transfer", "Work"]
 
 var financialTransactionsTopLevelCategoriesStatic = ["Auto & Transport", "Bills & Utilities", "Business Services", "Education", "Entertainment", "Fees & Charges", "Financial", "Food & Dining", "Gifts & Donations", "Health & Fitness", "Home", "Income", "Invesments", "Kids", "Personal Care", "Pets", "Shopping", "Taxes", "Transfer", "Travel", "Uncategorized"]
-var financialTransactionsTopLevelCategoriesStaticWOUncategorized = ["Auto & Transport", "Bills & Utilities", "Business Services", "Education", "Entertainment", "Fees & Charges", "Financial", "Food & Dining", "Gifts & Donations", "Health & Fitness", "Home", "Income", "Invesments", "Kids", "Personal Care", "Pets", "Shopping", "Taxes", "Transfer", "Travel"]
 var financialTransactionsTopLevelCategoriesDictionaryStatic = ["Auto & Transport": ["Auto Payment", "Auto Insurance", "Gas", "Parking", "Public Transportation", "Service & Parts", "Auto & Transport"], "Bills & Utilities": ["Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills & Utilities"], "Business Services": ["Advertising", "Legal", "Office Supplies", "Printing", "Shipping", "Business Services"], "Education": ["Book Supplies", "Student Loans", "Tuition", "Education"], "Entertainment": ["Amusement", "Arts", "Movies & DVDs", "Music", "Newspapers & Magazines", "Entertainment"], "Fees & Charges": ["ATM Fee", "Banking Fee", "Finance Charge", "Late Fee", "Service Fee", "Trade Commissions", "Fees & Charges"], "Financial": ["Financial Advisor", "Life Insurance", "Financial"], "Food & Dining": ["Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining"], "Gifts & Donations": ["Charity", "Gift", "Gifts & Donations"], "Health & Fitness": ["Dentist", "Doctor", "Eyecare", "Gym", "Health Insurance", "Pharmacy", "Sports", "Health & Fitness"], "Home": ["Furnishings", "Home Improvement", "Home Insurance", "Home Services", "Home Supplies", "Lawn & Garden", "Mortgage & Rent", "Home"], "Income": ["Bonus", "Interest Income", "Paycheck", "Reimbursement", "Rental Income", "Income"], "Invesments": ["Buy", "Deposit", "Dividend & Cap Gains", "Sell", "Withdrawal", "Investments"], "Kids": ["Allowance", "Baby Supplies", "Babysitter & Daycare", "Child Support", "Kids Activities", "Toys", "Kids"], "Personal Care": ["Hair", "Laundry", "Spa & Massage", "Personal Care"], "Pets": ["Pet Food & Supplies", "Pet Grooming", "Veterinary", "Pets"], "Shopping": ["Books", "Clothing", "Hobbies", "Sporting Goods", "Shopping"], "Taxes": ["Federal Tax", "Local Tax", "Property Tax", "Sales Tax", "State Tax", "Taxes"], "Transfer": ["Credit Card Payment", "Transfer for Cash Spending", "Mortgage Payment", "Transfer"], "Travel": ["Air Travel", "Hotel", "Rental Car & Taxi", "Vacation", "Travel"], "Uncategorized": ["Cash", "Check", "Uncategorized"]]
 
 var financialTransactionsCategoriesStatic = ["Auto Payment", "Auto Insurance", "Gas", "Parking", "Public Transportation", "Service & Parts", "Auto & Transport", "Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills & Utilities", "Advertising", "Legal", "Office Supplies", "Printing", "Shipping", "Business Services", "Book Supplies", "Student Loans", "Tuition", "Education", "Amusement", "Arts", "Movies & DVDs", "Music", "Newspapers & Magazines", "Entertainment", "ATM Fee", "Banking Fee", "Finance Charge", "Late Fee", "Service Fee", "Trade Commissions", "Fees & Charges", "Financial Advisor", "Life Insurance", "Financial", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining", "Charity", "Gift", "Gifts & Donations", "Dentist", "Doctor", "Eyecare", "Gym", "Health Insurance", "Pharmacy", "Sports", "Health & Fitness", "Furnishings", "Home Improvement", "Home Insurance", "Home Services", "Home Supplies", "Lawn & Garden", "Mortgage & Rent", "Home", "Bonus", "Interest Income", "Paycheck", "Reimbursement", "Rental Income", "Income", "Buy", "Deposit", "Dividend & Cap Gains", "Sell", "Withdrawal", "Investments", "Allowance", "Baby Supplies", "Babysitter & Daycare", "Child Support", "Kids Activities", "Toys", "Kids", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Pets", "Books", "Clothing", "Hobbies", "Sporting Goods", "Shopping", "Federal Tax", "Local Tax", "Property Tax", "Sales Tax", "State Tax", "Taxes", "Credit Card Payment", "Transfer for Cash Spending", "Mortgage Payment", "Transfer", "Air Travel", "Hotel", "Rental Car & Taxi", "Vacation", "Travel", "Cash", "Check", "Uncategorized"]
-var financialTransactionsCategoriesStaticWOUncategorized = ["Auto Payment", "Auto Insurance", "Gas", "Parking", "Public Transportation", "Service & Parts", "Auto & Transport", "Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills & Utilities", "Advertising", "Legal", "Office Supplies", "Printing", "Shipping", "Business Services", "Book Supplies", "Student Loans", "Tuition", "Education", "Amusement", "Arts", "Movies & DVDs", "Music", "Newspapers & Magazines", "Entertainment", "ATM Fee", "Banking Fee", "Finance Charge", "Late Fee", "Service Fee", "Trade Commissions", "Fees & Charges", "Financial Advisor", "Life Insurance", "Financial", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining", "Charity", "Gift", "Gifts & Donations", "Dentist", "Doctor", "Eyecare", "Gym", "Health Insurance", "Pharmacy", "Sports", "Health & Fitness", "Furnishings", "Home Improvement", "Home Insurance", "Home Services", "Home Supplies", "Lawn & Garden", "Mortgage & Rent", "Home", "Bonus", "Interest Income", "Paycheck", "Reimbursement", "Rental Income", "Income", "Buy", "Deposit", "Dividend & Cap Gains", "Sell", "Withdrawal", "Investments", "Allowance", "Baby Supplies", "Babysitter & Daycare", "Child Support", "Kids Activities", "Toys", "Kids", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Pets", "Books", "Clothing", "Hobbies", "Sporting Goods", "Shopping", "Federal Tax", "Local Tax", "Property Tax", "Sales Tax", "State Tax", "Taxes", "Credit Card Payment", "Transfer for Cash Spending", "Mortgage Payment", "Transfer", "Air Travel", "Hotel", "Rental Car & Taxi", "Vacation", "Travel", "Cash", "Check"]
 var financialTransactionsCategoriesDictionaryStatic = ["Auto Payment": "Auto & Transport", "Auto Insurance": "Auto & Transport", "Gas": "Auto & Transport", "Parking": "Auto & Transport", "Public Transportation": "Auto & Transport", "Service & Parts": "Auto & Transport", "Auto & Transport": "Auto & Transport", "Domain Names": "Bills & Utilities", "Fraud Protection": "Bills & Utilities", "Home Phone": "Bills & Utilities", "Hosting": "Bills & Utilities", "Internet": "Bills & Utilities", "Mobile Phone": "Bills & Utilities", "Television": "Bills & Utilities", "Utilities": "Bills & Utilities", "Bills & Utilities": "Bills & Utilities", "Advertising": "Business Services", "Legal": "Business Services", "Office Supplies": "Business Services", "Printing": "Business Services", "Shipping": "Business Services", "Business Services": "Business Services", "Book Supplies": "Education", "Student Loans": "Education", "Tuition": "Education", "Education": "Education", "Amusement": "Entertainment", "Arts": "Entertainment", "Movies & DVDs": "Entertainment", "Music": "Entertainment", "Newspapers & Magazines": "Entertainment", "Entertainment": "Entertainment", "ATM Fee": "Fees & Charges", "Banking Fee": "Fees & Charges", "Finance Charge": "Fees & Charges", "Late Fee": "Fees & Charges", "Service Fee": "Fees & Charges", "Trade Commissions": "Fees & Charges", "Fees & Charges": "Fees & Charges", "Financial Advisor": "Financial", "Life Insurance": "Financial", "Financial": "Financial", "Alcohol & Bars": "Food & Dining", "Coffee Shops": "Food & Dining", "Fast Food": "Food & Dining", "Groceries": "Food & Dining", "Restaurants": "Food & Dining", "Food & Dining": "Food & Dining", "Charity": "Gifts & Donations", "Gift": "Gifts & Donations", "Gifts & Donations": "Gifts & Donations", "Dentist": "Health & Fitness", "Doctor": "Health & Fitness", "Eyecare": "Health & Fitness", "Gym": "Health & Fitness", "Health Insurance": "Health & Fitness", "Pharmacy": "Health & Fitness", "Sports": "Health & Fitness", "Health & Fitness": "Health & Fitness", "Furnishings": "Home", "Home Improvement": "Home", "Home Insurance": "Home", "Home Services": "Home", "Home Supplies": "Home", "Lawn & Garden": "Home", "Mortgage & Rent": "Home", "Home": "Home", "Bonus": "Income", "Interest Income": "Income", "Paycheck": "Income", "Reimbursement": "Income", "Rental Income": "Income", "Income": "Income", "Buy": "Investments", "Deposit": "Investments", "Dividend & Cap Gains": "Investments", "Sell": "Investments", "Withdrawal": "Investments", "Investments": "Investments", "Allowance": "Kids", "Baby Supplies": "Kids", "Babysitter & Daycare": "Kids", "Child Support": "Kids", "Kids Activities": "Kids", "Toys": "Kids", "Kids": "Kids", "Hair": "Personal Care", "Laundry": "Personal Care", "Spa & Massage": "Personal Care", "Personal Care": "Personal Care", "Pet Food & Supplies": "Pets", "Pet Grooming": "Pets", "Veterinary": "Pets", "Pets": "Pets", "Books": "Shopping", "Clothing": "Shopping", "Hobbies": "Shopping", "Sporting Goods": "Shopping", "Shopping": "Shopping", "Federal Tax": "Taxes", "Local Tax": "Taxes", "Property Tax": "Taxes", "Sales Tax": "Taxes", "State Tax": "Taxes", "Taxes": "Taxes", "Credit Card Payment": "Transfer", "Transfer for Cash Spending": "Transfer", "Mortgage Payment": "Transfer", "Transfer": "Transfer", "Air Travel": "Travel", "Hotel": "Travel", "Rental Car & Taxi": "Travel", "Vacation": "Travel", "Travel": "Travel", "Cash": "Uncategorized", "Check": "Uncategorized", "Uncategorized": "Uncategorized"]
+
+var financialTransactionsGroupsWExpenseStatic = ["Expense", "Bills", "Discretionary", "Kids", "Living", "Transfer", "Work"]
+var financialTransactionsTopLevelCategoriesStaticWOUncategorizedExpense = ["Auto & Transport", "Bills & Utilities", "Business Services", "Education", "Entertainment", "Fees & Charges", "Financial", "Food & Dining", "Gifts & Donations", "Health & Fitness", "Home", "Invesments", "Kids", "Personal Care", "Pets", "Shopping", "Taxes", "Transfer", "Travel"]
+var financialTransactionsCategoriesStaticWOUncategorizedExpense = ["Auto Payment", "Auto Insurance", "Gas", "Parking", "Public Transportation", "Service & Parts", "Auto & Transport", "Domain Names", "Fraud Protection", "Home Phone", "Hosting", "Internet", "Mobile Phone", "Television", "Utilities", "Bills & Utilities", "Advertising", "Legal", "Office Supplies", "Printing", "Shipping", "Business Services", "Book Supplies", "Student Loans", "Tuition", "Education", "Amusement", "Arts", "Movies & DVDs", "Music", "Newspapers & Magazines", "Entertainment", "ATM Fee", "Banking Fee", "Finance Charge", "Late Fee", "Service Fee", "Trade Commissions", "Fees & Charges", "Financial Advisor", "Life Insurance", "Financial", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining", "Charity", "Gift", "Gifts & Donations", "Dentist", "Doctor", "Eyecare", "Gym", "Health Insurance", "Pharmacy", "Sports", "Health & Fitness", "Furnishings", "Home Improvement", "Home Insurance", "Home Services", "Home Supplies", "Lawn & Garden", "Mortgage & Rent", "Home", "Buy", "Deposit", "Dividend & Cap Gains", "Sell", "Withdrawal", "Investments", "Allowance", "Baby Supplies", "Babysitter & Daycare", "Child Support", "Kids Activities", "Toys", "Kids", "Hair", "Laundry", "Spa & Massage", "Personal Care", "Pet Food & Supplies", "Pet Grooming", "Veterinary", "Pets", "Books", "Clothing", "Hobbies", "Sporting Goods", "Shopping", "Federal Tax", "Local Tax", "Property Tax", "Sales Tax", "State Tax", "Taxes", "Credit Card Payment", "Transfer for Cash Spending", "Mortgage Payment", "Transfer", "Air Travel", "Hotel", "Rental Car & Taxi", "Vacation", "Travel", "Cash", "Check"]
+
+var financialTransactionsGroupsWIncomeStatic = ["Income"]
+var financialTransactionsTopLevelCategoriesStaticWOUncategorizedIncome = ["Income"]
+var financialTransactionsCategoriesStaticWOUncategorizedIncome = ["Bonus", "Interest Income", "Paycheck", "Reimbursement", "Rental Income", "Income", ]
+
+
 
 
 func topLevelCategoryColor(_ value: String) -> UIColor {
@@ -105,6 +112,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var transactionIDs: [String]?
     var containerID: String?
     var plot_is_recurring: Bool?
+    var plot_recurrence_frequency: PlotRecurrenceFrequency?
     var plot_created: Bool?
     var transfer_between_accounts: Bool?
     var cash_flow_type: String? {
@@ -979,22 +987,27 @@ func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @e
     for transaction in transactions {
         guard !(transaction.plot_is_recurring ?? false) && !(transaction.plot_created ?? false) else { continue }
         //amount period to period differs
-        //transactions.filter({ abs($0.amount) == abs(transaction.amount) }).count == 1,
         if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), abs(transaction.amount) > 0 {
             TaskBuilder.createActivityWithList(from: transaction) { task in
                 if let task = task {
                     completion([transaction:task])
                 }
             }
-        }
-        
-        //amount period to period is the same
-        else if transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortMonthAndYear() }).count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
-            TaskBuilder.createActivityWithList(from: transaction) { task in
-                if let task = task {
-                    completion([transaction:task])
+        } else {
+            
+            //amount period to period is the same
+            let filteredTransactions = transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortMonthAndYear() }).sorted(by: {
+                return isodateFormatter.date(from: $0.transacted_at) ?? Date() > isodateFormatter.date(from: $1.transacted_at) ?? Date()
+            })
+                        
+            if filteredTransactions.count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
+                TaskBuilder.createActivityWithList(from: transaction) { task in
+                    if let task = task {
+                        completion([transaction:task])
+                    }
                 }
             }
+            
         }
     }
     completion([:])
@@ -1007,6 +1020,18 @@ func categorizeTransactionsIntoEvents(transactions: [Transaction], completion: @
             completion([transaction:event])
         }
     }
+}
+
+func getMostDaysArrayBetweenRecurringTransactions(transactions: [Transaction]) -> [Double] {
+    let isodateFormatter = ISO8601DateFormatter()
+    var counts = [Double]()
+    for index in 0...transactions.count - 1 {
+        if transactions.indices.contains(index), transactions.indices.contains(index + 1), let first = isodateFormatter.date(from: transactions[index].transacted_at), let second = isodateFormatter.date(from: transactions[index + 1].transacted_at) {
+            let days = Calendar.current.numberOfDaysBetween(second, and: first)
+            counts.append(Double(days))
+        }
+    }
+    return counts
 }
 
 func getMostFrequentDaysBetweenRecurringTransactions(transactions: [Transaction]) -> Int? {

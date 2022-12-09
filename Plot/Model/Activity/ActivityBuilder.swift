@@ -260,7 +260,7 @@ class TaskBuilder {
         activity.containerID = workout.containerID
         if end.timeIntervalSinceNow.sign == .minus {
             activity.isCompleted = true
-            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+            activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
         }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -316,7 +316,7 @@ class TaskBuilder {
         activity.containerID = meal.containerID
         if end.timeIntervalSinceNow.sign == .minus {
             activity.isCompleted = true
-            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+            activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
         }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -359,9 +359,9 @@ class TaskBuilder {
         activity.hasDeadlineTime = false
         activity.participantsIDs = transaction.participantsIDs
         activity.containerID = transaction.containerID
-        if !(transaction.plot_created ?? false) {
+        if end.timeIntervalSinceNow.sign == .minus {
             activity.isCompleted = true
-            activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+            activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
         }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -527,7 +527,7 @@ class TaskBuilder {
                     activity.containerID = workout.containerID
                     if end.timeIntervalSinceNow.sign == .minus {
                         activity.isCompleted = true
-                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                        activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
                     }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -566,7 +566,7 @@ class TaskBuilder {
                     activity.containerID = mindfulness.containerID
                     if end.timeIntervalSinceNow.sign == .minus {
                         activity.isCompleted = true
-                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                        activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
                     }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -605,7 +605,7 @@ class TaskBuilder {
                     activity.containerID = meal.containerID
                     if end.timeIntervalSinceNow.sign == .minus {
                         activity.isCompleted = true
-                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                        activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
                     }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -658,9 +658,9 @@ class TaskBuilder {
                     activity.hasDeadlineTime = false
                     activity.participantsIDs = transaction.participantsIDs
                     activity.containerID = transaction.containerID
-                    if !(transaction.plot_created ?? false) {
+                    if end.timeIntervalSinceNow.sign == .minus {
                         activity.isCompleted = true
-                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                        activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
                     }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -747,7 +747,7 @@ class TaskBuilder {
                     activity.containerID = event.containerID
                     if let endDate = event.endDate, endDate.timeIntervalSinceNow.sign == .minus {
                         activity.isCompleted = true
-                        activity.completedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                        activity.completedDate = event.endDateTime
                     }
                     activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))

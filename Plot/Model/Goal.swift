@@ -142,20 +142,33 @@ struct Goal: Codable, Equatable, Hashable {
             case nil:
                 return nil
             }
-        case .transactions:
+        case .savings:
             switch self.submetric {
             case .group:
-                return financialTransactionsGroupsWExpenseStatic
+                return nil
             case .category:
-                return financialTransactionsTopLevelCategoriesStaticWOUncategorized
+                return nil
             case .subcategory:
-                return financialTransactionsCategoriesStaticWOUncategorized
+                return financialTransactionsCategoriesStaticWOUncategorizedIncome.sorted()
             case .some(.none):
                 return nil
             case nil:
                 return nil
             }
-        case .accounts:
+        case .spending:
+            switch self.submetric {
+            case .group:
+                return financialTransactionsGroupsWExpenseStatic.sorted()
+            case .category:
+                return financialTransactionsTopLevelCategoriesStaticWOUncategorizedExpense.sorted()
+            case .subcategory:
+                return financialTransactionsCategoriesStaticWOUncategorizedExpense.sorted()
+            case .some(.none):
+                return nil
+            case nil:
+                return nil
+            }
+        case .balances:
             switch self.submetric {
             case .group:
                 return BalanceSheetType.allValues
@@ -199,18 +212,29 @@ struct Goal: Codable, Equatable, Hashable {
             case .none:
                 return nil
             }
-        case .transactions:
+        case .savings:
             switch submetric {
             case .group:
-                return financialTransactionsGroupsWExpenseStatic
+                return nil
             case .category:
-                return financialTransactionsTopLevelCategoriesStaticWOUncategorized
+                return nil
             case .subcategory:
-                return financialTransactionsCategoriesStaticWOUncategorized
+                return financialTransactionsCategoriesStaticWOUncategorizedIncome.sorted()
             case .none:
                 return nil
             }
-        case .accounts:
+        case .spending:
+            switch submetric {
+            case .group:
+                return financialTransactionsGroupsWExpenseStatic.sorted()
+            case .category:
+                return financialTransactionsTopLevelCategoriesStaticWOUncategorizedExpense.sorted()
+            case .subcategory:
+                return financialTransactionsCategoriesStaticWOUncategorizedExpense.sorted()
+            case .none:
+                return nil
+            }
+        case .balances:
             switch submetric {
             case .group:
                 return BalanceSheetType.allValues
@@ -230,10 +254,30 @@ struct Goal: Codable, Equatable, Hashable {
 }
 
 enum GoalMetric: String, Codable, CaseIterable {
+//    case time = "Time"
+//    case tasks = "Completed Tasks"
+//    case spending = "Spending"
+//    case savings = "Savings"
+//    case cash = "Cash"
+//    case investments = "Investments"
+//    case assets = "Assets"
+//    case creditCardDebt = "Credit Card Debt"
+//    case mortgage = "Mortgage"
+//    case autoLoans = "Auto Loans"
+//    case studentLoans = "Student Loans"
+//    case liabilities = "Liabilities"
+//    case workout = "Workouts"
+//    case mindfulness = "Mindfulness"
+//    case sleep = "Sleep"
+//    case steps = "Steps"
+//    case flightsClimbed = "Flights Climbed"
+//    case activeCalories = "Active Calories"
+    
     case events = "Events"
     case tasks = "Completed Tasks"
-    case transactions = "Transactions"
-    case accounts = "Accounts"
+    case savings = "Savings"
+    case spending = "Spending"
+    case balances = "Balances"
     case workout = "Workouts"
     case mindfulness = "Mindfulness"
     case sleep = "Sleep"
@@ -250,15 +294,33 @@ enum GoalMetric: String, Codable, CaseIterable {
         return array.sorted()
     }
     
+    var allValuesSubmetrics: [String] {
+        var array = [String]()
+        self.submetrics.forEach { submetric in
+            array.append(submetric.rawValue)
+        }
+        return array
+    }
+    
+    var allValuesUnits: [String] {
+        var array = [String]()
+        self.units.forEach { unit in
+            array.append(unit.rawValue)
+        }
+        return array
+    }
+    
     var submetrics: [GoalSubMetric] {
         switch self {
         case .events:
             return [.none, .category, .subcategory]
         case .tasks:
             return [.none, .category, .subcategory]
-        case .transactions:
+        case .savings:
+            return [.none, .subcategory]
+        case .spending:
             return [.none, .group, .category, .subcategory]
-        case .accounts:
+        case .balances:
             return [.none, .group, .category, .subcategory]
         case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return []
@@ -271,9 +333,11 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.count, .minutes, .hours, .days]
         case .tasks:
             return [.count]
-        case .transactions:
+        case .savings:
             return [.amount, .percent]
-        case .accounts:
+        case .spending:
+            return [.amount]
+        case .balances:
             return [.amount, .percent]
         case .workout:
             return [.count, .calories, .minutes]
@@ -315,4 +379,10 @@ enum GoalUnit: String, Codable, CaseIterable {
     case hours = "Hours"
     case days = "Days"
     case level = "Level"
+    
+}
+
+enum FormatterType: String {
+    case number = "Number"
+    case date = "Date"
 }

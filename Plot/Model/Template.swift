@@ -126,7 +126,9 @@ enum ObjectType: String, Codable, CaseIterable {
 enum PlotRecurrenceFrequency: String, Codable {
     case yearly = "YEARLY"
     case monthly = "MONTHLY"
+    case bimonthly = "BIMONTHLY"
     case weekly = "WEEKLY"
+    case biweekly = "BIWEEKLY"
     case daily = "DAILY"
     case hourly = "HOURLY"
     case minutely = "MINUTELY"
@@ -141,6 +143,8 @@ enum PlotRecurrenceFrequency: String, Codable {
         case .weekly: return "WEEKLY"
         case .monthly: return "MONTHLY"
         case .yearly: return "YEARLY"
+        case .bimonthly: return "BIMONTHLY"
+        case .biweekly: return "BIWEEKLY"
         }
     }
     
@@ -153,6 +157,8 @@ enum PlotRecurrenceFrequency: String, Codable {
         case .weekly: return .weekly
         case .monthly: return .monthly
         case .yearly: return .yearly
+        case .bimonthly: return .none
+        case .biweekly: return .none
         }
     }
     
@@ -165,6 +171,8 @@ enum PlotRecurrenceFrequency: String, Codable {
         case .weekly: return "Weekly"
         case .monthly: return "Monthly"
         case .yearly: return "Yearly"
+        case .bimonthly: return "Bimonthly"
+        case .biweekly: return "Biweekly"
         }
     }
 }

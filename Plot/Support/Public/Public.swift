@@ -572,6 +572,37 @@ extension Date {
     func yearNumber() -> Int {
         return Calendar.current.dateComponents([.year], from: self).year!
     }
+    
+    static func -(recent: Date, previous: Date) -> (year: Int?, month: Int?, day: Int?, hour: Int?, minute: Int?, second: Int?) {
+        let year = Calendar.current.dateComponents([.year], from: previous, to: recent).year
+        let month = Calendar.current.dateComponents([.month], from: previous, to: recent).month
+        let day = Calendar.current.dateComponents([.day], from: previous, to: recent).day
+        let hour = Calendar.current.dateComponents([.hour], from: previous, to: recent).hour
+        let minute = Calendar.current.dateComponents([.minute], from: previous, to: recent).minute
+        let second = Calendar.current.dateComponents([.second], from: previous, to: recent).second
+        return (year: year, month: month, day: day, hour: hour, minute: minute, second: second)
+    }
+}
+
+protocol Numeric {
+    var asDouble: Double { get }
+    init(_: Double)
+}
+
+extension Array where Element: FloatingPoint {
+    func sum() -> Element {
+        return self.reduce(0, +)
+    }
+
+    func avg() -> Element {
+        return self.sum() / Element(self.count)
+    }
+
+    func std() -> Element {
+        let mean = self.avg()
+        let v = self.reduce(0, { $0 + ($1-mean)*($1-mean) })
+        return sqrt(v / (Element(self.count) - 1))
+    }
 }
 
 func timestampOfLastMessage(_ date: Date) -> String {

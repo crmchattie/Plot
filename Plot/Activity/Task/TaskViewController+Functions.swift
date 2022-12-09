@@ -416,6 +416,131 @@ extension TaskViewController {
         }
     }
     
+    func updateGoal(selectedGoalProperty: SelectedGoalProperty, value: String?) {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : PushRow<String> = self.form.rowBy(tag: "Option") {
+            switch selectedGoalProperty {
+            case .metric:
+                if let value = value, let updatedValue = GoalMetric(rawValue: value) {
+                    if let goal = task.goal, goal.targetNumber != 0 {
+                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: goal.targetNumber, currentNumber: nil)
+                    } else {
+                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+                    }
+                    
+                    //units
+                    if updatedValue.units.count > 0 {
+                        task.goal!.unit = updatedValue.units[0]
+                        unitRow.value = updatedValue.units[0].rawValue
+                        unitRow.options = updatedValue.allValuesUnits
+                    } else {
+                        task.goal!.unit = nil
+                        unitRow.value = nil
+                    }
+                    
+                    //submetric
+                    if updatedValue.submetrics.count > 0 {
+                        submetricRow.hidden = false
+                        submetricRow.evaluateHidden()
+                        task.goal!.submetric = updatedValue.submetrics[0]
+                        submetricRow.value = updatedValue.submetrics[0].rawValue
+                        submetricRow.options = updatedValue.allValuesSubmetrics
+                    } else {
+                        task.goal!.submetric = nil
+                        submetricRow.hidden = true
+                        submetricRow.evaluateHidden()
+                        submetricRow.value = nil
+                    }
+                }
+            case .submetric:
+                if let value = value, let updatedValue = GoalSubMetric(rawValue: value) {
+                    if let _ = task.goal {
+                        task.goal!.submetric = updatedValue
+                    } else {
+                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+                    }
+                    if let option = task.goal!.option, let options = task.goal!.options(), options.contains(option) {
+                        optionRow.options = options
+                        optionRow.hidden = false
+                        optionRow.evaluateHidden()
+                    } else if let options = task.goal!.options() {
+                        optionRow.value = options[0]
+                        optionRow.options = options
+                        optionRow.hidden = false
+                        optionRow.evaluateHidden()
+                    } else {
+                        task.goal!.option = nil
+                        optionRow.hidden = true
+                        optionRow.evaluateHidden()
+                        optionRow.value = nil
+                    }
+                } else {
+                    task.goal!.option = nil
+                    optionRow.hidden = true
+                    optionRow.evaluateHidden()
+                    optionRow.value = nil
+
+                }
+            case .unit, .option:
+                break
+            }
+            updateDescriptionRow()
+        }
+    }
+    
+    func updateDescriptionRow() {
+        if let descriptionRow: LabelRow = self.form.rowBy(tag: "Description") {
+            if let goal = task.goal, let description = goal.description {
+                descriptionRow.title = description
+                descriptionRow.updateCell()
+                descriptionRow.hidden = false
+                descriptionRow.evaluateHidden()
+            } else {
+                descriptionRow.hidden = true
+                descriptionRow.evaluateHidden()
+            }
+        }
+    }
+    
+    func updateNumberRows() {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.maximumFractionDigits = 0        
+        if let goal = task.goal, let unit = goal.unit {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+            case .days:
+                numberFormatter.numberStyle = .decimal
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            if let targetRow : DecimalRow = self.form.rowBy(tag: "Target") {
+                targetRow.formatter = numberFormatter
+                if let value = goal.targetNumber {
+                    targetRow.value = value
+                }
+                if let currentRow : DecimalRow = self.form.rowBy(tag: "Current") {
+                    currentRow.formatter = numberFormatter
+                    if let value = goal.currentNumber {
+                        currentRow.value = value
+                    }
+                }
+            }
+        }
+    }
+    
     func openLevel(value: String, level: String) {
         let destination = ActivityLevelViewController()
         destination.delegate = self

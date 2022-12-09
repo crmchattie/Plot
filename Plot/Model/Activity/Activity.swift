@@ -104,7 +104,40 @@ class Activity: NSObject, NSCopying, Codable {
     var goalUnit: String?
     var goalTargetNumber: NSNumber?
     var goalCurrentNumber: NSNumber?
-    var goal: Goal?
+    private var _goal: Goal?
+    var goal: Goal? {
+        get {
+            if let _goal = _goal {
+                return _goal
+            } else {
+                var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+                
+                if let value = goalMetric {
+                    goal.metric = GoalMetric(rawValue: value)
+                }
+                if let value = goalSubmetric {
+                    goal.submetric = GoalSubMetric(rawValue: value)
+                }
+                if let value = goalOption {
+                    goal.option = value
+                }
+                if let value = goalUnit {
+                    goal.unit = GoalUnit(rawValue: value)
+                }
+                if let value = goalTargetNumber {
+                    goal.targetNumber = Double(truncating: value)
+                }
+                if let value = goalCurrentNumber {
+                    goal.currentNumber = Double(truncating: value)
+                }
+                
+                return goal
+            }
+        }
+        set {
+            _goal = newValue
+        }
+    }
     
     enum CodingKeys: String, CodingKey {
         case activityID
@@ -200,7 +233,6 @@ class Activity: NSObject, NSCopying, Codable {
     
     init(dictionary: [String: AnyObject]?) {
         super.init()
-        
         activityID = dictionary?["activityID"] as? String
         externalActivityID = dictionary?["externalActivityID"] as? String
         name = dictionary?["name"] as? String
@@ -611,27 +643,27 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["directAssociationObjectID"] = value
         }
         
-        if let value = self.goalMetric as AnyObject? {
+        if let goal = self.goal, let value = goal.metric?.rawValue as AnyObject? {
             dictionary["goalMetric"] = value
         }
         
-        if let value = self.goalSubmetric as AnyObject? {
+        if let goal = self.goal, let value = goal.submetric?.rawValue as AnyObject? {
             dictionary["goalSubmetric"] = value
         }
         
-        if let value = self.goalOption as AnyObject? {
+        if let goal = self.goal, let value = goal.option as AnyObject? {
             dictionary["goalOption"] = value
         }
         
-        if let value = self.goalUnit as AnyObject? {
+        if let goal = self.goal, let value = goal.unit?.rawValue as AnyObject? {
             dictionary["goalUnit"] = value
         }
         
-        if let value = self.goalTargetNumber as AnyObject? {
+        if let goal = self.goal, let value = goal.targetNumber as AnyObject? {
             dictionary["goalTargetNumber"] = value
         }
         
-        if let value = self.goalCurrentNumber as AnyObject? {
+        if let goal = self.goal, let value = goal.currentNumber as AnyObject? {
             dictionary["goalCurrentNumber"] = value
         }
                 

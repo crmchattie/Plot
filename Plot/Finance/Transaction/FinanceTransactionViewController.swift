@@ -73,9 +73,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
         
         numberFormatter.numberStyle = .currency
         dateFormatterPrint.dateFormat = "E, MMM dd, yyyy"
-        
-        status = transaction.status == .posted
-
+                
         setupVariables()
         configureTableView()
         initializeForm()
@@ -109,6 +107,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
     
     fileprivate func setupVariables() {
         if let _ = transaction {
+            status = transaction.status == .posted
             print("transaction.guid")
             print(transaction.guid)
             
@@ -123,6 +122,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
             }
             setupLists()
         } else if let currentUser = Auth.auth().currentUser?.uid {
+            status = true
             title = "New Transaction"
             let ID = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).childByAutoId().key ?? ""
             let date = isodateFormatter.string(from: Date())
