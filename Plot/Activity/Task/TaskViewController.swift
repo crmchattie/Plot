@@ -281,8 +281,188 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             }).onChange() { [unowned self] row in
                 self.task.activityDescription = row.value
             }
+            
+            <<< CheckRow("Completed") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.tintColor = FalconPalette.defaultBlue
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.cell.accessoryType = .checkmark
+                $0.cell.isUserInteractionEnabled = !(self.task.isGoal ?? false)
+                $0.title = $0.tag
+                $0.value = task.isCompleted ?? false
+                if $0.value ?? false {
+                    $0.cell.tintAdjustmentMode = .automatic
+                } else {
+                    $0.cell.tintAdjustmentMode = .dimmed
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.tintColor = FalconPalette.defaultBlue
+                cell.accessoryType = .checkmark
+                if row.value == false {
+                    cell.tintAdjustmentMode = .dimmed
+                } else {
+                    cell.tintAdjustmentMode = .automatic
+                }
+            }.onChange { row in
+                self.task.isCompleted = row.value
+                if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+                    row.cell.tintAdjustmentMode = .automatic
+                    
+                    let original = Date()
+                    let updateDate = Date(timeIntervalSinceReferenceDate:
+                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    completedRow.value = updateDate
+                    completedRow.updateCell()
+                    completedRow.hidden = false
+                    completedRow.evaluateHidden()
+                    self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false)
+                } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+                    row.cell.tintAdjustmentMode = .dimmed
+                    completedRow.value = nil
+                    completedRow.updateCell()
+                    completedRow.hidden = true
+                    completedRow.evaluateHidden()
+                    self.task.completedDate = nil
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false)
+                }
+            }
+            
+            <<< DateTimeInlineRow("Completed On") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.title = $0.tag
+                $0.minuteInterval = 5
+                $0.dateFormatter?.dateStyle = .medium
+                $0.dateFormatter?.timeStyle = .short
+                if let task = task, task.isCompleted ?? false, let date = task.completedDate {
+                    $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
+                    $0.updateCell()
+                } else {
+                    $0.hidden = true
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value {
+                    self?.task.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
+                    let updateTask = ActivityActions(activity: self!.task, active: self!.active, selectedFalconUsers: self!.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: self!.task.isCompleted ?? false)
+                }
+            }.onExpandInlineRow { cell, row, inlineRow in
+                inlineRow.cellUpdate { (cell, row) in
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.tintColor = .secondarySystemGroupedBackground
+                    if #available(iOS 14.0, *) {
+                        cell.datePicker.preferredDatePickerStyle = .inline
+                        cell.datePicker.tintColor = .systemBlue
+                    }
+                    else {
+                        cell.datePicker.datePickerMode = .dateAndTime
+                    }
+                }
+                cell.detailTextLabel?.textColor = cell.tintColor
+            }.onCollapseInlineRow { cell, _, _ in
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+            }
         } else {
             form.last!
+            
+            <<< CheckRow("Completed") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.tintColor = FalconPalette.defaultBlue
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.cell.accessoryType = .checkmark
+                $0.cell.isUserInteractionEnabled = !(self.task.isGoal ?? false)
+                $0.title = $0.tag
+                $0.value = task.isCompleted ?? false
+                if $0.value ?? false {
+                    $0.cell.tintAdjustmentMode = .automatic
+                } else {
+                    $0.cell.tintAdjustmentMode = .dimmed
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.tintColor = FalconPalette.defaultBlue
+                cell.accessoryType = .checkmark
+                if row.value == false {
+                    cell.tintAdjustmentMode = .dimmed
+                } else {
+                    cell.tintAdjustmentMode = .automatic
+                }
+            }.onChange { row in
+                self.task.isCompleted = row.value
+                if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+                    row.cell.tintAdjustmentMode = .automatic
+                    
+                    let original = Date()
+                    let updateDate = Date(timeIntervalSinceReferenceDate:
+                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    completedRow.value = updateDate
+                    completedRow.updateCell()
+                    completedRow.hidden = false
+                    completedRow.evaluateHidden()
+                    self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false)
+                } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+                    row.cell.tintAdjustmentMode = .dimmed
+                    completedRow.value = nil
+                    completedRow.updateCell()
+                    completedRow.hidden = true
+                    completedRow.evaluateHidden()
+                    self.task.completedDate = nil
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false)
+                }
+            }
+            
+            <<< DateTimeInlineRow("Completed On") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.title = $0.tag
+                $0.minuteInterval = 5
+                $0.dateFormatter?.dateStyle = .medium
+                $0.dateFormatter?.timeStyle = .short
+                if let task = task, task.isCompleted ?? false, let date = task.completedDate {
+                    $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
+                    $0.updateCell()
+                } else {
+                    $0.hidden = true
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value {
+                    self?.task.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
+                    let updateTask = ActivityActions(activity: self!.task, active: self!.active, selectedFalconUsers: self!.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: self!.task.isCompleted ?? false)
+                }
+            }.onExpandInlineRow { cell, row, inlineRow in
+                inlineRow.cellUpdate { (cell, row) in
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.tintColor = .secondarySystemGroupedBackground
+                    if #available(iOS 14.0, *) {
+                        cell.datePicker.preferredDatePickerStyle = .inline
+                        cell.datePicker.tintColor = .systemBlue
+                    }
+                    else {
+                        cell.datePicker.datePickerMode = .dateAndTime
+                    }
+                }
+                cell.detailTextLabel?.textColor = cell.tintColor
+            }.onCollapseInlineRow { cell, _, _ in
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+            }
             
             <<< LabelRow("Description") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -340,104 +520,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 self.updateGoal(selectedGoalProperty: .metric, value: row.value)
             }
             
-            <<< PushRow<String>("Unit") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textLabel?.textColor = .label
-                row.cell.detailTextLabel?.textColor = .secondaryLabel
-                row.title = row.tag
-                row.options = []
-                if let task = task, let goal = task.goal, let metric = goal.metric {
-                    row.options = metric.allValuesUnits
-                    if let value = goal.unit {
-                        row.value = value.rawValue
-                    } else if metric.allValuesUnits.count > 0 {
-                        row.value = metric.allValuesUnits[0]
-                    }
-                }
-            }.onPresent { from, to in
-                to.title = "Units"
-                to.extendedLayoutIncludesOpaqueBars = true
-                to.tableViewStyle = .insetGrouped
-                to.dismissOnSelection = true
-                to.dismissOnChange = true
-                to.enableDeselection = false
-                to.selectableRowCellUpdate = { cell, row in
-                    to.tableView.separatorStyle = .none
-                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                    to.tableView.backgroundColor = .systemGroupedBackground
-                    cell.backgroundColor = .secondarySystemGroupedBackground
-                    cell.textLabel?.textColor = .label
-                    cell.detailTextLabel?.textColor = .secondaryLabel
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-                if let options = row.options, !options.isEmpty {
-                    cell.isUserInteractionEnabled = true
-                } else {
-                    cell.isUserInteractionEnabled = false
-                }
-            }.onChange { row in
-                if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
-                    if let _ = self.task.goal {
-                        if updatedValue == .percent, let number = self.task.goal!.targetNumber {
-                            self.task.goal!.targetNumber = number / 100
-                        }
-                        self.task.goal!.unit = updatedValue
-                    } else {
-                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, targetNumber: nil, currentNumber: nil)
-                    }
-                    self.updateNumberRows()
-                    self.updateDescriptionRow()
-                }
-            }
-            
-            <<< DecimalRow("Target") {
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.cell.textField?.textColor = .secondaryLabel
-                $0.title = $0.tag
-                if let task = task, let goal = task.goal, let number = goal.targetNumber {
-                    $0.value = number
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textField?.textColor = .secondaryLabel
-            }.onChange { row in
-                if let value = row.value {
-                    if let _ = self.task.goal {
-                        self.task.goal!.targetNumber = value
-                    } else {
-                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: value, currentNumber: nil)
-                    }
-                }
-                self.updateDescriptionRow()
-            }
-            
-            if active {
-                form.last!
-                <<< DecimalRow("Current") { row in
-                    row.cell.backgroundColor = .secondarySystemGroupedBackground
-                    row.cell.textLabel?.textColor = .label
-                    row.cell.detailTextLabel?.textColor = .secondaryLabel
-                    row.cell.accessoryType = .none
-                    row.cell.selectionStyle = .none
-                    row.cell.textLabel?.numberOfLines = 0
-                    row.cell.isUserInteractionEnabled = false
-                    row.title = row.tag
-                    if let task = task, let goal = task.goal, let number = goal.currentNumber {
-                        row.value = number
-                    }
-                }.cellUpdate { cell, row in
-                    cell.textLabel?.textAlignment = .left
-                    cell.backgroundColor = .secondarySystemGroupedBackground
-                    cell.textLabel?.textColor = .label
-                    cell.detailTextLabel?.textColor = .secondaryLabel
-                    cell.accessoryType = .none
-                }
-            }
-            
-            form.last!
             <<< PushRow<String>("Submetric") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textColor = .label
@@ -530,97 +612,104 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 }
                 self.updateDescriptionRow()
             }
-        }
-        
-        form.last!
-        <<< CheckRow("Completed") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.tintColor = FalconPalette.defaultBlue
-            $0.cell.textLabel?.textColor = .label
-            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-            $0.cell.accessoryType = .checkmark
-            $0.cell.isUserInteractionEnabled = !(self.task.isGoal ?? false)
-            $0.title = $0.tag
-            $0.value = task.isCompleted ?? false
-            if $0.value ?? false {
-                $0.cell.tintAdjustmentMode = .automatic
-            } else {
-                $0.cell.tintAdjustmentMode = .dimmed
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.tintColor = FalconPalette.defaultBlue
-            cell.accessoryType = .checkmark
-            if row.value == false {
-                cell.tintAdjustmentMode = .dimmed
-            } else {
-                cell.tintAdjustmentMode = .automatic
-            }
-        }.onChange { row in
-            self.task.isCompleted = row.value
-            if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
-                row.cell.tintAdjustmentMode = .automatic
-                
-                let original = Date()
-                let updateDate = Date(timeIntervalSinceReferenceDate:
-                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                completedRow.value = updateDate
-                completedRow.updateCell()
-                completedRow.hidden = false
-                completedRow.evaluateHidden()
-                self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
-                let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false)
-            } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
-                row.cell.tintAdjustmentMode = .dimmed
-                completedRow.value = nil
-                completedRow.updateCell()
-                completedRow.hidden = true
-                completedRow.evaluateHidden()
-                self.task.completedDate = nil
-                let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false)
-            }
-        }
-        
-        <<< DateTimeInlineRow("Completed On") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textLabel?.textColor = .label
-            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-            $0.title = $0.tag
-            $0.minuteInterval = 5
-            $0.dateFormatter?.dateStyle = .medium
-            $0.dateFormatter?.timeStyle = .short
-            if let task = task, task.isCompleted ?? false, let date = task.completedDate {
-                $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
-                $0.updateCell()
-            } else {
-                $0.hidden = true
-            }
-        }.onChange { [weak self] row in
-            if let value = row.value {
-                self?.task.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
-                let updateTask = ActivityActions(activity: self!.task, active: self!.active, selectedFalconUsers: self!.selectedFalconUsers)
-                updateTask.updateCompletion(isComplete: self!.task.isCompleted ?? false)
-            }
-        }.onExpandInlineRow { cell, row, inlineRow in
-            inlineRow.cellUpdate { (cell, row) in
+            
+            <<< PushRow<String>("Unit") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.tintColor = .secondarySystemGroupedBackground
-                if #available(iOS 14.0, *) {
-                    cell.datePicker.preferredDatePickerStyle = .inline
-                    cell.datePicker.tintColor = .systemBlue
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.title = row.tag
+                row.options = []
+                if let task = task, let goal = task.goal, let metric = goal.metric {
+                    row.options = metric.allValuesUnits
+                    if let value = goal.unit {
+                        row.value = value.rawValue
+                    } else if metric.allValuesUnits.count > 0 {
+                        self.task.goal!.unit = GoalUnit(rawValue: metric.allValuesUnits[0])
+                        row.value = metric.allValuesUnits[0]
+                    }
                 }
-                else {
-                    cell.datePicker.datePickerMode = .dateAndTime
+            }.onPresent { from, to in
+                to.title = "Units"
+                to.extendedLayoutIncludesOpaqueBars = true
+                to.tableViewStyle = .insetGrouped
+                to.dismissOnSelection = true
+                to.dismissOnChange = true
+                to.enableDeselection = false
+                to.selectableRowCellUpdate = { cell, row in
+                    to.tableView.separatorStyle = .none
+                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                    to.tableView.backgroundColor = .systemGroupedBackground
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                if let options = row.options, !options.isEmpty {
+                    cell.isUserInteractionEnabled = true
+                } else {
+                    cell.isUserInteractionEnabled = false
+                }
+            }.onChange { row in
+                if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
+                    if let _ = self.task.goal {
+                        if updatedValue == .percent, let number = self.task.goal!.targetNumber {
+                            self.task.goal!.targetNumber = number / 100
+                        }
+                        self.task.goal!.unit = updatedValue
+                    } else {
+                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, targetNumber: nil, currentNumber: nil)
+                    }
+                    self.updateNumberRows()
+                    self.updateDescriptionRow()
                 }
             }
-            cell.detailTextLabel?.textColor = cell.tintColor
-        }.onCollapseInlineRow { cell, _, _ in
-            cell.detailTextLabel?.textColor = .secondaryLabel
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
+            
+            <<< DecimalRow("Target") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textField?.textColor = .secondaryLabel
+                $0.title = $0.tag
+                if let task = task, let goal = task.goal, let number = goal.targetNumber {
+                    $0.value = number
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textField?.textColor = .secondaryLabel
+            }.onChange { row in
+                if let value = row.value {
+                    if let _ = self.task.goal {
+                        self.task.goal!.targetNumber = value
+                    } else {
+                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: value, currentNumber: nil)
+                    }
+                }
+                self.updateDescriptionRow()
+            }
+            
+            if active {
+                form.last!
+                <<< DecimalRow("Current") { row in
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.textLabel?.textColor = .label
+                    row.cell.detailTextLabel?.textColor = .secondaryLabel
+                    row.cell.accessoryType = .none
+                    row.cell.selectionStyle = .none
+                    row.cell.textLabel?.numberOfLines = 0
+                    row.cell.isUserInteractionEnabled = false
+                    row.title = row.tag
+                    if let task = task, let goal = task.goal, let number = goal.currentNumber {
+                        row.value = number
+                    }
+                }.cellUpdate { cell, row in
+                    cell.textLabel?.textAlignment = .left
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                    cell.accessoryType = .none
+                }
+            }
         }
         
         
@@ -804,6 +893,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         //            cell.backgroundColor = .secondarySystemGroupedBackground
         //            cell.textLabel?.textColor = .label
         //        }
+        
+        form.last!
         
         <<< SwitchRow("deadlineDateSwitch") {
             $0.cell.backgroundColor = .secondarySystemGroupedBackground

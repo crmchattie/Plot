@@ -378,7 +378,10 @@ class ActivityService {
                     self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
                     self?.activitiesWithRepeats.append(activity)
                 } else {
-                    self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesWithRepeatsInitialAdd.first?.activityID })
+                    let activityIDs = Array(Set(activitiesWithRepeatsInitialAdd.compactMap({ $0.activityID })))
+                    for activityID in activityIDs {
+                        self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activityID })
+                    }
                     self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsInitialAdd)
                 }
             } else {
@@ -398,7 +401,10 @@ class ActivityService {
                 self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
                 self?.activitiesWithRepeats.append(activity)
             } else {
-                self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesWithRepeatsAdded.first?.activityID })
+                let activityIDs = Array(Set(activitiesWithRepeatsAdded.compactMap({ $0.activityID })))
+                for activityID in activityIDs {
+                    self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activityID })
+                }
                 self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsAdded)
             }
         }, activitiesRemoved: { [weak self] activitiesRemoved in
@@ -417,7 +423,10 @@ class ActivityService {
                 self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
                 self?.activitiesWithRepeats.append(activity)
             } else {
-                self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesWithRepeatsChanged.first?.activityID })
+                let activityIDs = Array(Set(activitiesWithRepeatsChanged.compactMap({ $0.activityID })))
+                for activityID in activityIDs {
+                    self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activityID })
+                }
                 self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsChanged)
             }
         })

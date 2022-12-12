@@ -628,23 +628,21 @@ class FinanceService {
         
         userReference.observeSingleEvent(of: .value) { dataSnapshot in
             if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: String] {
-                categorizeTransactionsIntoTasks(transactions: transactions) { [self] transactionsActivities in
-                    for (transaction, activity) in transactionsActivities {
-                        if dataSnapshotValue[transaction.guid] == nil, let activityID = activity.activityID {
-                            userReference.child(transaction.guid).setValue(activityID)
-                            reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
-                            self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
-                        }
+                categorizeTransactionsIntoTasks(transactions: transactions) { [self] transaction, activity, frequency in
+                    if dataSnapshotValue[transaction.guid] == nil, let activityID = activity.activityID {
+                        userReference.child(transaction.guid).setValue(activityID)
+                        reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
+                        reference.child(transaction.guid).child("plot_recurrence_frequency").setValue(frequency.rawValue)
+                        self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                     }
                 }
             } else {
-                categorizeTransactionsIntoTasks(transactions: transactions) { transactionsActivities in
-                    for (transaction, activity) in transactionsActivities {
-                        if let activityID = activity.activityID {
-                            userReference.child(transaction.guid).setValue(activityID)
-                            reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
-                            self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
-                        }
+                categorizeTransactionsIntoTasks(transactions: transactions) { transaction, activity, frequency in
+                    if let activityID = activity.activityID {
+                        userReference.child(transaction.guid).setValue(activityID)
+                        reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
+                        reference.child(transaction.guid).child("plot_recurrence_frequency").setValue(frequency.rawValue)
+                        self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
                     }
                 }
             }
@@ -703,14 +701,6 @@ class FinanceService {
                     let filteredTransactions = recurringTransactions.filter({ $0.description == description && $0.merchant_guid ?? "" == merchant }).sorted(by: {
                         return isodateFormatter.date(from: $0.transacted_at) ?? Date() > isodateFormatter.date(from: $1.transacted_at) ?? Date()
                     })
-                    
-                    let daysArray = getMostDaysArrayBetweenRecurringTransactions(transactions: filteredTransactions)
-                    print("description")
-                    print(description)
-                    print(daysArray)
-                    print(daysArray.avg())
-                    print(daysArray.std())
-    
 
                     //make sure first && second transactions are not plot_created, if not create new transaction/task
                     //if most recent is plot_created && transacted_date is more than 7 days past, then delete transaction and activity given recurrances may have stopped, otherwise do nothing

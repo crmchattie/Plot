@@ -369,6 +369,11 @@ extension Calendar {
         let numberOfDays = dateComponents([.day], from: fromDate, to: toDate) // <3>
         return numberOfDays.day!
     }
+    
+    func dateBetween(_ from: DateComponents, and to: DateComponents) -> DateComponents {
+        let numberOfDays = dateComponents([.year, .month, .day], from: from, to: to) // <3>
+        return numberOfDays
+    }
 }
 
 extension Date {
@@ -603,6 +608,46 @@ extension Array where Element: FloatingPoint {
         let v = self.reduce(0, { $0 + ($1-mean)*($1-mean) })
         return sqrt(v / (Element(self.count) - 1))
     }
+}
+
+func getFrequency(int: Int) -> PlotRecurrenceFrequency? {
+    if int == PlotRecurrenceFrequency.daily.dayInterval {
+        return .daily
+    } else if int > PlotRecurrenceFrequency.weekly.dayInterval - PlotRecurrenceFrequency.weekly.errorDayInterval &&
+                int < PlotRecurrenceFrequency.weekly.dayInterval + PlotRecurrenceFrequency.weekly.errorDayInterval {
+        return .weekly
+    } else if int > PlotRecurrenceFrequency.biweekly.dayInterval - PlotRecurrenceFrequency.biweekly.errorDayInterval &&
+                int < PlotRecurrenceFrequency.biweekly.dayInterval + PlotRecurrenceFrequency.biweekly.errorDayInterval {
+        return .biweekly
+    } else if int > PlotRecurrenceFrequency.bimonthly.dayInterval - PlotRecurrenceFrequency.bimonthly.errorDayInterval &&
+                int < PlotRecurrenceFrequency.bimonthly.dayInterval + PlotRecurrenceFrequency.bimonthly.errorDayInterval {
+        return .bimonthly
+    } else if int > PlotRecurrenceFrequency.monthly.dayInterval - PlotRecurrenceFrequency.monthly.errorDayInterval &&
+                int < PlotRecurrenceFrequency.monthly.dayInterval + PlotRecurrenceFrequency.monthly.errorDayInterval {
+        return .monthly
+    } else if int > PlotRecurrenceFrequency.yearly.dayInterval - PlotRecurrenceFrequency.yearly.errorDayInterval &&
+                int < PlotRecurrenceFrequency.yearly.dayInterval + PlotRecurrenceFrequency.yearly.errorDayInterval {
+        return .yearly
+    }
+    return nil
+}
+
+func getMostFrequentDaysBetweenDates(dates: [Date]) -> Int? {
+    var counts = [Int: Int]()
+    for index in 0...dates.count - 1 {
+        if dates.indices.contains(index), dates.indices.contains(index + 1) {
+            let first = dates[index]
+            let second = dates[index + 1]
+            let days = Calendar.current.numberOfDaysBetween(second, and: first)
+            counts[days] = (counts[days] ?? 0) + 1
+        }
+    }
+    
+    if let (value, _) = counts.max(by: {$0.1 < $1.1}) {
+        return value
+    }
+    
+    return nil
 }
 
 func timestampOfLastMessage(_ date: Date) -> String {

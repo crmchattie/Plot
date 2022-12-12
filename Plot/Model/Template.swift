@@ -175,6 +175,29 @@ enum PlotRecurrenceFrequency: String, Codable {
         case .biweekly: return "Biweekly"
         }
     }
+    
+    var dayInterval: Int {
+        switch self {
+        case .secondly, .minutely, .hourly: return 0
+        case .daily: return 1
+        case .weekly: return 7
+        case .bimonthly: return 15
+        case .biweekly: return 14
+        case .monthly: return 30
+        case .yearly: return 365
+        }
+    }
+    
+    var errorDayInterval: Int {
+        switch self {
+        case .secondly, .minutely, .hourly, .daily: return 0
+        case .weekly, .bimonthly, .biweekly: return 1
+        case .monthly: return 2
+        case .yearly: return 5
+        }
+    }
+    
+    
 }
 
 enum DateType: String, Codable, CaseIterable {

@@ -982,35 +982,42 @@ var financialTransactionDescriptionsToSkip = ["aplpay"]
 
 var subscriptionProviders = ["spotify", "netflix", "amazon prime", "disney plus", "hulu", "crunchyroll", "espn plus", "apple music", "hbo", "amazon music", "dashpass", "apple tv plus", "audible"]
 
-func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @escaping ([Transaction: Activity]) -> Void) {
+func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @escaping (Transaction, Activity, PlotRecurrenceFrequency) -> Void) {
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
         guard !(transaction.plot_is_recurring ?? false) && !(transaction.plot_created ?? false) else { continue }
         //amount period to period differs
         if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), abs(transaction.amount) > 0 {
-            TaskBuilder.createActivityWithList(from: transaction) { task in
-                if let task = task {
-                    completion([transaction:task])
+            let filteredTransactions = transactions.filter({ $0.description == transaction.description && $0.category == transaction.category }).sorted(by: {
+                return isodateFormatter.date(from: $0.transacted_at) ?? Date() > isodateFormatter.date(from: $1.transacted_at) ?? Date()
+            })
+            if let mostFrequentDayInterval = getMostFrequentDaysBetweenDates(dates: filteredTransactions.map({ isodateFormatter.date(from: $0.transacted_at) ?? Date() })), let frequency = getFrequency(int: mostFrequentDayInterval) {
+                TaskBuilder.createActivityWithList(from: transaction) { task in
+                    if let task = task {
+                        completion(transaction, task, frequency)
+                    }
                 }
             }
         } else {
             
             //amount period to period is the same
-            let filteredTransactions = transactions.filter({ $0.description == transaction.description && $0.amount == transaction.amount && isodateFormatter.date(from: $0.transacted_at)?.getShortMonthAndYear() != isodateFormatter.date(from: transaction.transacted_at)?.getShortMonthAndYear() }).sorted(by: {
+            let filteredTransactions = transactions.filter({ $0.description == transaction.description && $0.category == transaction.category && $0.amount == transaction.amount }).sorted(by: {
                 return isodateFormatter.date(from: $0.transacted_at) ?? Date() > isodateFormatter.date(from: $1.transacted_at) ?? Date()
             })
+            
                         
             if filteredTransactions.count > 1, abs(transaction.amount) > 0, !financialTransactionCategoriesToSkip.contains(transaction.category), !containsWord(str: transaction.description.lowercased(), wordGroups: financialTransactionDescriptionsToSkip) {
-                TaskBuilder.createActivityWithList(from: transaction) { task in
-                    if let task = task {
-                        completion([transaction:task])
+                if let mostFrequentDayInterval = getMostFrequentDaysBetweenDates(dates: filteredTransactions.map({ isodateFormatter.date(from: $0.transacted_at) ?? Date() })), let frequency = getFrequency(int: mostFrequentDayInterval) {
+                    TaskBuilder.createActivityWithList(from: transaction) { task in
+                        if let task = task {
+                            completion(transaction, task, frequency)
+                        }
                     }
                 }
             }
             
         }
     }
-    completion([:])
 }
 
 func categorizeTransactionsIntoEvents(transactions: [Transaction], completion: @escaping ([Transaction: Activity]) -> Void) {
@@ -1022,7 +1029,7 @@ func categorizeTransactionsIntoEvents(transactions: [Transaction], completion: @
     }
 }
 
-func getMostDaysArrayBetweenRecurringTransactions(transactions: [Transaction]) -> [Double] {
+func getDaysArrayBetweenRecurringTransactions(transactions: [Transaction]) -> [Double] {
     let isodateFormatter = ISO8601DateFormatter()
     var counts = [Double]()
     for index in 0...transactions.count - 1 {
@@ -1032,6 +1039,18 @@ func getMostDaysArrayBetweenRecurringTransactions(transactions: [Transaction]) -
         }
     }
     return counts
+}
+
+func getDateComponentsArrayBetweenRecurringTransactions(transactions: [Transaction]) -> [DateComponents] {
+    let isodateFormatter = ISO8601DateFormatter()
+    var dates = [DateComponents]()
+    for transaction in transactions {
+        if let first = isodateFormatter.date(from: transaction.transacted_at) {
+            let date = Calendar.current.dateComponents([.year, .month, .day], from: first)
+            dates.append(date)
+        }
+    }
+    return dates
 }
 
 func getMostFrequentDaysBetweenRecurringTransactions(transactions: [Transaction]) -> Int? {
