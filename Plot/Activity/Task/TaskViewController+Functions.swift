@@ -484,6 +484,7 @@ extension TaskViewController {
                 break
             }
             updateDescriptionRow()
+            updateCategorySubCategoryRows()
         }
     }
     
@@ -498,6 +499,21 @@ extension TaskViewController {
                 descriptionRow.hidden = true
                 descriptionRow.evaluateHidden()
             }
+        }
+    }
+    
+    func updateCategorySubCategoryRows() {
+        if let categoryRow: LabelRow = self.form.rowBy(tag: "Category"), let subcategoryRow: LabelRow = self.form.rowBy(tag: "Subcategory"), let goal = task.goal {
+            let category = goal.category
+            let subcategory = goal.subcategory
+            
+            categoryRow.value = category.rawValue
+            categoryRow.updateCell()
+            subcategoryRow.value = subcategory.rawValue
+            subcategoryRow.updateCell()
+            
+            task.category = category.rawValue
+            task.category = subcategory.rawValue
         }
     }
     

@@ -371,6 +371,494 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
             }
+            
+            //        <<< SwitchRow("startDateSwitch") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.title = "Start Date"
+            //            if let task = task, let startDate = task.startDate {
+            //                $0.value = true
+            //                $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //            } else {
+            //                $0.value = false
+            //                $0.cell.detailTextLabel?.text = nil
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
+            //                if value, let startTime = self?.form.rowBy(tag: "StartTime") {
+            //                    if let task = self?.task, let startDate = task.startDate {
+            //                        row.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //                        startDateRow.value = startDate
+            //                    } else {
+            //                        let startDateTime = Date()
+            //                        startDateRow.value = startDateTime
+            //                        row.cell.detailTextLabel?.text = startDateTime.getMonthAndDateAndYear()
+            //
+            //                    }
+            //                    startTime.hidden = true
+            //                    startTime.evaluateHidden()
+            //                } else if let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "startTimeSwitch") {
+            //                    row.cell.detailTextLabel?.text = nil
+            //                    startDateSwitchRow.updateCell()
+            //                    startDateSwitchRow.cell.detailTextLabel?.text = nil
+            //                }
+            //                self!.updateStartDate()
+            //                let condition: Condition = value ? false : true
+            //                row.disabled = condition
+            //                startDateRow.hidden = condition
+            //                startDateRow.evaluateHidden()
+            //            }
+            //        }.onCellSelection({ [weak self] _, row in
+            //            if row.value ?? false {
+            //                if let startDate = self?.form.rowBy(tag: "StartDate"), let startTime = self?.form.rowBy(tag: "StartTime") {
+            //                    startDate.hidden = startDate.isHidden ? false : true
+            //                    startDate.evaluateHidden()
+            //                    if !startDate.isHidden {
+            //                        startTime.hidden = true
+            //                        startTime.evaluateHidden()
+            //                    }
+            //                }
+            //            }
+            //        }).cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //            cell.detailTextLabel?.textColor = .secondaryLabel
+            //            if let task = self.task, let startDate = task.startDate {
+            //                cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //            }
+            //        }
+            //
+            //        <<< DatePickerRow("StartDate") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.tintColor = .secondarySystemGroupedBackground
+            //            $0.hidden = true
+            //            $0.minuteInterval = 5
+            //            if #available(iOS 14.0, *) {
+            //                $0.cell.datePicker.preferredDatePickerStyle = .inline
+            //                $0.cell.datePicker.tintColor = .systemBlue
+            //            }
+            //            else {
+            //                $0.cell.datePicker.datePickerMode = .date
+            //            }
+            //            if let task = task, let startDate = task.startDate {
+            //                $0.value = startDate
+            //                $0.updateCell()
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "startDateSwitch") {
+            //                switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
+            //            }
+            //            self!.updateStartDate()
+            //        }.cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //        }
+            //
+            //        <<< SwitchRow("startTimeSwitch") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.title = "Start Time"
+            //            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                $0.value = true
+            //                $0.cell.detailTextLabel?.text = startDate.getTimeString()
+            //            } else {
+            //                $0.value = false
+            //                $0.cell.detailTextLabel?.text = nil
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let startTimeRow: TimePickerRow = self?.form.rowBy(tag: "StartTime") {
+            //                if value, let startDateDateRow = self?.form.rowBy(tag: "StartDate"), let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "startDateSwitch") {
+            //                    if let task = self?.task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                        row.cell.detailTextLabel?.text = startDate.getTimeString()
+            //                        startTimeRow.value = startDate
+            //                        if !(startDateSwitchRow.value ?? false) {
+            //                            startDateSwitchRow.value = value
+            //                            startDateSwitchRow.updateCell()
+            //                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //                        }
+            //                    } else {
+            //                        let original = Date()
+            //                        let startDate = Date(timeIntervalSinceReferenceDate:
+            //                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+            //                        startTimeRow.value = startDate
+            //                        row.cell.detailTextLabel?.text = startDate.getTimeString()
+            //                        if !(startDateSwitchRow.value ?? false) {
+            //                            startDateSwitchRow.value = value
+            //                            startDateSwitchRow.updateCell()
+            //                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //                        }
+            //                    }
+            //                    startDateDateRow.hidden = true
+            //                    startDateDateRow.evaluateHidden()
+            //                } else {
+            //                    row.cell.detailTextLabel?.text = nil
+            //                }
+            //                self!.updateStartDate()
+            //                let condition: Condition = value ? false : true
+            //                row.disabled = condition
+            //                startTimeRow.hidden = condition
+            //                startTimeRow.evaluateHidden()
+            //            }
+            //        }.onCellSelection({ [weak self] _, row in
+            //            if row.value ?? false {
+            //                if let startTime = self?.form.rowBy(tag: "StartTime"), let startDate = self?.form.rowBy(tag: "StartDate") {
+            //                    startTime.hidden = startTime.isHidden ? false : true
+            //                    startTime.evaluateHidden()
+            //                    if !startTime.isHidden {
+            //                        startDate.hidden = true
+            //                        startDate.evaluateHidden()
+            //                    }
+            //                }
+            //            }
+            //        }).cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //            cell.detailTextLabel?.textColor = .secondaryLabel
+            //            if let task = self.task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                cell.detailTextLabel?.text = startDate.getTimeString()
+            //            }
+            //        }
+            //
+            //        <<< TimePickerRow("StartTime") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.tintColor = .secondarySystemGroupedBackground
+            //            $0.hidden = true
+            //            $0.minuteInterval = 5
+            //            if #available(iOS 13.4, *) {
+            //                $0.cell.datePicker.preferredDatePickerStyle = .wheels
+            //            }
+            //            else {
+            //                $0.cell.datePicker.datePickerMode = .time
+            //            }
+            //            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                $0.value = startDate
+            //                $0.updateCell()
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "startTimeSwitch") {
+            //                self?.task.startDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
+            //                switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
+            //            }
+            //            self!.updateStartDate()
+            //        }.cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //        }
+                    
+            <<< SwitchRow("deadlineDateSwitch") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.title = "Deadline Date"
+                if self.task.isGoal ?? false {
+                    $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
+                }
+                if let task = task, let endDate = task.endDate {
+                    $0.value = true
+                    $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                } else {
+                    $0.value = false
+                    $0.cell.detailTextLabel?.text = nil
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                    if value, let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
+                        row.cell.detailTextLabel?.textColor = .systemBlue
+                        if let task = self?.task, let endDate = task.endDate {
+                            row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                            endDateRow.value = endDate
+                        } else {
+                            let endDateTime = Date()
+                            endDateRow.value = endDateTime
+                            row.cell.detailTextLabel?.text = endDateTime.getMonthAndDateAndYear()
+                            
+                        }
+                        endTimeSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                        endTimeSwitchRow.updateCell()
+                        endTime.hidden = true
+                        endTime.evaluateHidden()
+                    } else {
+                        row.cell.detailTextLabel?.text = nil
+                        endTimeSwitchRow.cell.detailTextLabel?.text = nil
+                        endTimeSwitchRow.value = false
+                        endTimeSwitchRow.updateCell()
+                    }
+                    self!.updateDeadlineDate()
+                    
+                    let condition: Condition = value ? false : true
+                    row.disabled = condition
+                    endDateRow.hidden = condition
+                    endDateRow.evaluateHidden()
+                    
+                }
+            }.onCellSelection({ [weak self] _, row in
+                if row.value ?? false {
+                    if let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                        endDate.hidden = endDate.isHidden ? false : true
+                        endDate.evaluateHidden()
+                        if !endDate.isHidden {
+                            row.cell.detailTextLabel?.textColor = .systemBlue
+                            endTimeSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                            endTimeSwitchRow.updateCell()
+                            endTime.hidden = true
+                            endTime.evaluateHidden()
+                        } else {
+                            row.cell.detailTextLabel?.textColor = .secondaryLabel
+                        }
+                    }
+                }
+            }).cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                if let task = self.task, let endDate = task.endDate {
+                    cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                } else {
+                    cell.detailTextLabel?.text = nil
+                }
+                if self.task.isGoal ?? false {
+                    row.hidden = "$Repeat != 'Never'"
+                }
+            }
+            
+            <<< DatePickerRow("DeadlineDate") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.tintColor = .secondarySystemGroupedBackground
+                $0.hidden = true
+                $0.minuteInterval = 5
+                if #available(iOS 14.0, *) {
+                    $0.cell.datePicker.preferredDatePickerStyle = .inline
+                    $0.cell.datePicker.tintColor = .systemBlue
+                }
+                else {
+                    $0.cell.datePicker.datePickerMode = .date
+                }
+                if let task = task, let endDate = task.endDate {
+                    $0.value = endDate
+                    $0.updateCell()
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                    switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
+                }
+                self!.updateDeadlineDate()
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+            }
+            
+            <<< SwitchRow("deadlineTimeSwitch") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.title = "Deadline Time"
+                if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                    $0.value = true
+                    $0.cell.detailTextLabel?.text = endDate.getTimeString()
+                } else {
+                    $0.value = false
+                    $0.cell.detailTextLabel?.text = nil
+                }
+                if self.task.isGoal ?? false {
+                    $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
+                    if value, let endDateDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                        row.cell.detailTextLabel?.textColor = .systemBlue
+                        if let task = self?.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                            row.cell.detailTextLabel?.text = endDate.getTimeString()
+                            endTimeRow.value = endDate
+                            if !(endDateSwitchRow.value ?? false) {
+                                endDateSwitchRow.value = value
+                                endDateSwitchRow.updateCell()
+                                endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                            }
+                        } else {
+                            let original = Date()
+                            let endDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                            endTimeRow.value = endDate
+                            row.cell.detailTextLabel?.text = endDate.getTimeString()
+                            if !(endDateSwitchRow.value ?? false) {
+                                endDateSwitchRow.value = value
+                                endDateSwitchRow.updateCell()
+                                endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                            }
+                        }
+                        endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                        endDateSwitchRow.updateCell()
+                        endDateDateRow.hidden = true
+                        endDateDateRow.evaluateHidden()
+                    } else {
+                        row.cell.detailTextLabel?.text = nil
+                    }
+                    self!.updateDeadlineDate()
+                    
+                    let condition: Condition = value ? false : true
+                    row.disabled = condition
+                    endTimeRow.hidden = condition
+                    endTimeRow.evaluateHidden()
+                    
+                }
+            }.onCellSelection({ [weak self] _, row in
+                if row.value ?? false {
+                    if let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                        endTime.hidden = endTime.isHidden ? false : true
+                        endTime.evaluateHidden()
+                        if !endTime.isHidden {
+                            row.cell.detailTextLabel?.textColor = .systemBlue
+                            endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                            endDateSwitchRow.updateCell()
+                            endDate.hidden = true
+                            endDate.evaluateHidden()
+                        } else {
+                            row.cell.detailTextLabel?.textColor = .secondaryLabel
+                        }
+                    }
+                }
+            }).cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                if let task = self.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                    cell.detailTextLabel?.text = endDate.getTimeString()
+                } else {
+                    cell.detailTextLabel?.text = nil
+                }
+                if self.task.isGoal ?? false {
+                    row.hidden = "$Repeat != 'Never'"
+                }
+            }
+            
+            <<< TimePickerRow("DeadlineTime") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.tintColor = .secondarySystemGroupedBackground
+                $0.hidden = true
+                $0.minuteInterval = 5
+                if #available(iOS 13.4, *) {
+                    $0.cell.datePicker.preferredDatePickerStyle = .wheels
+                }
+                else {
+                    $0.cell.datePicker.datePickerMode = .time
+                }
+                if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                    $0.value = endDate
+                    $0.updateCell()
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                    switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
+                }
+                self!.updateDeadlineDate()
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+            }
+            
+            if !(task.isGoal ?? false) {
+                form.last!
+                <<< SwitchRow("Flag") { row in
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.textLabel?.textColor = .label
+                    row.title = row.tag
+                    if let flagged = task.flagged {
+                        row.value = flagged
+                    } else {
+                        row.value = false
+                        self.task.flagged = false
+                    }
+                }.onChange { [weak self] row in
+                    self?.task.flagged = row.value
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                }
+                
+                <<< PushRow<TaskPriority>("Priority") { row in
+                    row.cell.backgroundColor = .secondarySystemGroupedBackground
+                    row.cell.textLabel?.textColor = .label
+                    row.cell.detailTextLabel?.textColor = .secondaryLabel
+                    row.title = row.tag
+                    if let task = task, let value = task.priority {
+                        row.value = TaskPriority(rawValue: value)
+                    } else {
+                        row.value = TaskPriority.None
+                        if let priority = row.value?.rawValue {
+                            self.task.priority = priority
+                        }
+                    }
+                    row.options = TaskPriority.allCases
+                }.onPresent { from, to in
+                    to.extendedLayoutIncludesOpaqueBars = true
+                    to.title = "Priority"
+                    to.extendedLayoutIncludesOpaqueBars = true
+                    to.tableViewStyle = .insetGrouped
+                    to.selectableRowCellUpdate = { cell, row in
+                        to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                        to.tableView.backgroundColor = .systemGroupedBackground
+                        to.tableView.separatorStyle = .none
+                        cell.backgroundColor = .secondarySystemGroupedBackground
+                        cell.textLabel?.textColor = .label
+                        cell.detailTextLabel?.textColor = .secondaryLabel
+                    }
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textLabel?.textColor = .label
+                    cell.detailTextLabel?.textColor = .secondaryLabel
+                }.onChange() { [unowned self] row in
+                    if let priority = row.value?.rawValue {
+                        self.task.priority = priority
+                    }
+                }
+            }
+            
+            form.last!
+            
+            <<< LabelRow("Repeat") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if self.task.isGoal ?? false {
+                    row.hidden = "$deadlineDateSwitch == true"
+                } else {
+                    row.hidden = "$deadlineDateSwitch == false"
+                }
+                if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
+                    if let endDate = self.task.instanceOriginalStartDate {
+                        row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                    } else if let endDate = self.task.endDate {
+                        row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                    }
+                } else {
+                    row.value = "Never"
+                }
+            }.onCellSelection({ _, row in
+                self.openRepeat()
+            }).cellUpdate { cell, row in
+                cell.textLabel?.textAlignment = .left
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                cell.accessoryType = .disclosureIndicator
+            }
         } else {
             form.last!
             
@@ -532,6 +1020,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                         row.value = value.rawValue
                     } else if metric.allValuesSubmetrics.count > 0 {
                         row.value = metric.allValuesSubmetrics[0]
+                        self.task.goal?.submetric = GoalSubMetric(rawValue: metric.allValuesSubmetrics[0])
                     } else {
                         row.hidden = true
                     }
@@ -710,496 +1199,440 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     cell.accessoryType = .none
                 }
             }
-        }
-        
-        
-        //        <<< SwitchRow("startDateSwitch") {
-        //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-        //            $0.cell.textLabel?.textColor = .label
-        //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-        //            $0.title = "Start Date"
-        //            if let task = task, let startDate = task.startDate {
-        //                $0.value = true
-        //                $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
-        //            } else {
-        //                $0.value = false
-        //                $0.cell.detailTextLabel?.text = nil
-        //            }
-        //        }.onChange { [weak self] row in
-        //            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
-        //                if value, let startTime = self?.form.rowBy(tag: "StartTime") {
-        //                    if let task = self?.task, let startDate = task.startDate {
-        //                        row.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
-        //                        startDateRow.value = startDate
-        //                    } else {
-        //                        let startDateTime = Date()
-        //                        startDateRow.value = startDateTime
-        //                        row.cell.detailTextLabel?.text = startDateTime.getMonthAndDateAndYear()
-        //
-        //                    }
-        //                    startTime.hidden = true
-        //                    startTime.evaluateHidden()
-        //                } else if let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "startTimeSwitch") {
-        //                    row.cell.detailTextLabel?.text = nil
-        //                    startDateSwitchRow.updateCell()
-        //                    startDateSwitchRow.cell.detailTextLabel?.text = nil
-        //                }
-        //                self!.updateStartDate()
-        //                let condition: Condition = value ? false : true
-        //                row.disabled = condition
-        //                startDateRow.hidden = condition
-        //                startDateRow.evaluateHidden()
-        //            }
-        //        }.onCellSelection({ [weak self] _, row in
-        //            if row.value ?? false {
-        //                if let startDate = self?.form.rowBy(tag: "StartDate"), let startTime = self?.form.rowBy(tag: "StartTime") {
-        //                    startDate.hidden = startDate.isHidden ? false : true
-        //                    startDate.evaluateHidden()
-        //                    if !startDate.isHidden {
-        //                        startTime.hidden = true
-        //                        startTime.evaluateHidden()
-        //                    }
-        //                }
-        //            }
-        //        }).cellUpdate { cell, row in
-        //            cell.backgroundColor = .secondarySystemGroupedBackground
-        //            cell.textLabel?.textColor = .label
-        //            cell.detailTextLabel?.textColor = .secondaryLabel
-        //            if let task = self.task, let startDate = task.startDate {
-        //                cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
-        //            }
-        //        }
-        //
-        //        <<< DatePickerRow("StartDate") {
-        //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-        //            $0.cell.textLabel?.textColor = .label
-        //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-        //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-        //            $0.cell.tintColor = .secondarySystemGroupedBackground
-        //            $0.hidden = true
-        //            $0.minuteInterval = 5
-        //            if #available(iOS 14.0, *) {
-        //                $0.cell.datePicker.preferredDatePickerStyle = .inline
-        //                $0.cell.datePicker.tintColor = .systemBlue
-        //            }
-        //            else {
-        //                $0.cell.datePicker.datePickerMode = .date
-        //            }
-        //            if let task = task, let startDate = task.startDate {
-        //                $0.value = startDate
-        //                $0.updateCell()
-        //            }
-        //        }.onChange { [weak self] row in
-        //            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "startDateSwitch") {
-        //                switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
-        //            }
-        //            self!.updateStartDate()
-        //        }.cellUpdate { cell, row in
-        //            cell.backgroundColor = .secondarySystemGroupedBackground
-        //            cell.textLabel?.textColor = .label
-        //        }
-        //
-        //        <<< SwitchRow("startTimeSwitch") {
-        //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-        //            $0.cell.textLabel?.textColor = .label
-        //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-        //            $0.title = "Start Time"
-        //            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
-        //                $0.value = true
-        //                $0.cell.detailTextLabel?.text = startDate.getTimeString()
-        //            } else {
-        //                $0.value = false
-        //                $0.cell.detailTextLabel?.text = nil
-        //            }
-        //        }.onChange { [weak self] row in
-        //            if let value = row.value, let startTimeRow: TimePickerRow = self?.form.rowBy(tag: "StartTime") {
-        //                if value, let startDateDateRow = self?.form.rowBy(tag: "StartDate"), let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "startDateSwitch") {
-        //                    if let task = self?.task, task.hasStartTime ?? false, let startDate = task.startDate {
-        //                        row.cell.detailTextLabel?.text = startDate.getTimeString()
-        //                        startTimeRow.value = startDate
-        //                        if !(startDateSwitchRow.value ?? false) {
-        //                            startDateSwitchRow.value = value
-        //                            startDateSwitchRow.updateCell()
-        //                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
-        //                        }
-        //                    } else {
-        //                        let original = Date()
-        //                        let startDate = Date(timeIntervalSinceReferenceDate:
-        //                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-        //                        startTimeRow.value = startDate
-        //                        row.cell.detailTextLabel?.text = startDate.getTimeString()
-        //                        if !(startDateSwitchRow.value ?? false) {
-        //                            startDateSwitchRow.value = value
-        //                            startDateSwitchRow.updateCell()
-        //                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
-        //                        }
-        //                    }
-        //                    startDateDateRow.hidden = true
-        //                    startDateDateRow.evaluateHidden()
-        //                } else {
-        //                    row.cell.detailTextLabel?.text = nil
-        //                }
-        //                self!.updateStartDate()
-        //                let condition: Condition = value ? false : true
-        //                row.disabled = condition
-        //                startTimeRow.hidden = condition
-        //                startTimeRow.evaluateHidden()
-        //            }
-        //        }.onCellSelection({ [weak self] _, row in
-        //            if row.value ?? false {
-        //                if let startTime = self?.form.rowBy(tag: "StartTime"), let startDate = self?.form.rowBy(tag: "StartDate") {
-        //                    startTime.hidden = startTime.isHidden ? false : true
-        //                    startTime.evaluateHidden()
-        //                    if !startTime.isHidden {
-        //                        startDate.hidden = true
-        //                        startDate.evaluateHidden()
-        //                    }
-        //                }
-        //            }
-        //        }).cellUpdate { cell, row in
-        //            cell.backgroundColor = .secondarySystemGroupedBackground
-        //            cell.textLabel?.textColor = .label
-        //            cell.detailTextLabel?.textColor = .secondaryLabel
-        //            if let task = self.task, task.hasStartTime ?? false, let startDate = task.startDate {
-        //                cell.detailTextLabel?.text = startDate.getTimeString()
-        //            }
-        //        }
-        //
-        //        <<< TimePickerRow("StartTime") {
-        //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-        //            $0.cell.textLabel?.textColor = .label
-        //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-        //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-        //            $0.cell.tintColor = .secondarySystemGroupedBackground
-        //            $0.hidden = true
-        //            $0.minuteInterval = 5
-        //            if #available(iOS 13.4, *) {
-        //                $0.cell.datePicker.preferredDatePickerStyle = .wheels
-        //            }
-        //            else {
-        //                $0.cell.datePicker.datePickerMode = .time
-        //            }
-        //            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
-        //                $0.value = startDate
-        //                $0.updateCell()
-        //            }
-        //        }.onChange { [weak self] row in
-        //            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "startTimeSwitch") {
-        //                self?.task.startDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
-        //                switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
-        //            }
-        //            self!.updateStartDate()
-        //        }.cellUpdate { cell, row in
-        //            cell.backgroundColor = .secondarySystemGroupedBackground
-        //            cell.textLabel?.textColor = .label
-        //        }
-        
-        form.last!
-        
-        <<< SwitchRow("deadlineDateSwitch") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textLabel?.textColor = .label
-            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-            $0.title = "Deadline Date"
-            if self.task.isGoal ?? false {
-                $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
-            }
-            if let task = task, let endDate = task.endDate {
-                $0.value = true
-                $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
-            } else {
-                $0.value = false
-                $0.cell.detailTextLabel?.text = nil
-            }
-        }.onChange { [weak self] row in
-            if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
-                if value, let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
-                    row.cell.detailTextLabel?.textColor = .systemBlue
-                    if let task = self?.task, let endDate = task.endDate {
-                        row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
-                        endDateRow.value = endDate
-                    } else {
-                        let endDateTime = Date()
-                        endDateRow.value = endDateTime
-                        row.cell.detailTextLabel?.text = endDateTime.getMonthAndDateAndYear()
-                        
+            
+            form.last!
+            
+            <<< LabelRow("Repeat") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.cell.detailTextLabel?.textColor = .secondaryLabel
+                row.cell.accessoryType = .disclosureIndicator
+                row.cell.selectionStyle = .default
+                row.title = row.tag
+                if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
+                    if let endDate = self.task.instanceOriginalStartDate {
+                        row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                    } else if let endDate = self.task.endDate {
+                        row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
                     }
-                    endTimeSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
-                    endTimeSwitchRow.updateCell()
-                    endTime.hidden = true
-                    endTime.evaluateHidden()
                 } else {
-                    row.cell.detailTextLabel?.text = nil
-                    endTimeSwitchRow.cell.detailTextLabel?.text = nil
-                    endTimeSwitchRow.value = false
-                    endTimeSwitchRow.updateCell()
+                    row.value = "Never"
                 }
-                self!.updateDeadlineDate()
-                
-                let condition: Condition = value ? false : true
-                row.disabled = condition
-                endDateRow.hidden = condition
-                endDateRow.evaluateHidden()
-                
+                if self.task.isGoal ?? false, self.active {
+                    row.hidden = Condition(booleanLiteral: self.task.recurrences == nil)
+                }
+            }.onCellSelection({ _, row in
+                self.openRepeat()
+            }).cellUpdate { cell, row in
+                cell.textLabel?.textAlignment = .left
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                cell.accessoryType = .disclosureIndicator
+                if self.task.isGoal ?? false {
+                    row.hidden = "$deadlineDateSwitch == true"
+                } else {
+                    row.hidden = "$deadlineDateSwitch == false"
+                }
             }
-        }.onCellSelection({ [weak self] _, row in
-            if row.value ?? false {
-                if let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
-                    endDate.hidden = endDate.isHidden ? false : true
-                    endDate.evaluateHidden()
-                    if !endDate.isHidden {
+            
+            //        <<< SwitchRow("startDateSwitch") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.title = "Start Date"
+            //            if let task = task, let startDate = task.startDate {
+            //                $0.value = true
+            //                $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //            } else {
+            //                $0.value = false
+            //                $0.cell.detailTextLabel?.text = nil
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
+            //                if value, let startTime = self?.form.rowBy(tag: "StartTime") {
+            //                    if let task = self?.task, let startDate = task.startDate {
+            //                        row.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //                        startDateRow.value = startDate
+            //                    } else {
+            //                        let startDateTime = Date()
+            //                        startDateRow.value = startDateTime
+            //                        row.cell.detailTextLabel?.text = startDateTime.getMonthAndDateAndYear()
+            //
+            //                    }
+            //                    startTime.hidden = true
+            //                    startTime.evaluateHidden()
+            //                } else if let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "startTimeSwitch") {
+            //                    row.cell.detailTextLabel?.text = nil
+            //                    startDateSwitchRow.updateCell()
+            //                    startDateSwitchRow.cell.detailTextLabel?.text = nil
+            //                }
+            //                self!.updateStartDate()
+            //                let condition: Condition = value ? false : true
+            //                row.disabled = condition
+            //                startDateRow.hidden = condition
+            //                startDateRow.evaluateHidden()
+            //            }
+            //        }.onCellSelection({ [weak self] _, row in
+            //            if row.value ?? false {
+            //                if let startDate = self?.form.rowBy(tag: "StartDate"), let startTime = self?.form.rowBy(tag: "StartTime") {
+            //                    startDate.hidden = startDate.isHidden ? false : true
+            //                    startDate.evaluateHidden()
+            //                    if !startDate.isHidden {
+            //                        startTime.hidden = true
+            //                        startTime.evaluateHidden()
+            //                    }
+            //                }
+            //            }
+            //        }).cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //            cell.detailTextLabel?.textColor = .secondaryLabel
+            //            if let task = self.task, let startDate = task.startDate {
+            //                cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //            }
+            //        }
+            //
+            //        <<< DatePickerRow("StartDate") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.tintColor = .secondarySystemGroupedBackground
+            //            $0.hidden = true
+            //            $0.minuteInterval = 5
+            //            if #available(iOS 14.0, *) {
+            //                $0.cell.datePicker.preferredDatePickerStyle = .inline
+            //                $0.cell.datePicker.tintColor = .systemBlue
+            //            }
+            //            else {
+            //                $0.cell.datePicker.datePickerMode = .date
+            //            }
+            //            if let task = task, let startDate = task.startDate {
+            //                $0.value = startDate
+            //                $0.updateCell()
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "startDateSwitch") {
+            //                switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
+            //            }
+            //            self!.updateStartDate()
+            //        }.cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //        }
+            //
+            //        <<< SwitchRow("startTimeSwitch") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.title = "Start Time"
+            //            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                $0.value = true
+            //                $0.cell.detailTextLabel?.text = startDate.getTimeString()
+            //            } else {
+            //                $0.value = false
+            //                $0.cell.detailTextLabel?.text = nil
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let startTimeRow: TimePickerRow = self?.form.rowBy(tag: "StartTime") {
+            //                if value, let startDateDateRow = self?.form.rowBy(tag: "StartDate"), let startDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "startDateSwitch") {
+            //                    if let task = self?.task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                        row.cell.detailTextLabel?.text = startDate.getTimeString()
+            //                        startTimeRow.value = startDate
+            //                        if !(startDateSwitchRow.value ?? false) {
+            //                            startDateSwitchRow.value = value
+            //                            startDateSwitchRow.updateCell()
+            //                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //                        }
+            //                    } else {
+            //                        let original = Date()
+            //                        let startDate = Date(timeIntervalSinceReferenceDate:
+            //                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+            //                        startTimeRow.value = startDate
+            //                        row.cell.detailTextLabel?.text = startDate.getTimeString()
+            //                        if !(startDateSwitchRow.value ?? false) {
+            //                            startDateSwitchRow.value = value
+            //                            startDateSwitchRow.updateCell()
+            //                            startDateSwitchRow.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+            //                        }
+            //                    }
+            //                    startDateDateRow.hidden = true
+            //                    startDateDateRow.evaluateHidden()
+            //                } else {
+            //                    row.cell.detailTextLabel?.text = nil
+            //                }
+            //                self!.updateStartDate()
+            //                let condition: Condition = value ? false : true
+            //                row.disabled = condition
+            //                startTimeRow.hidden = condition
+            //                startTimeRow.evaluateHidden()
+            //            }
+            //        }.onCellSelection({ [weak self] _, row in
+            //            if row.value ?? false {
+            //                if let startTime = self?.form.rowBy(tag: "StartTime"), let startDate = self?.form.rowBy(tag: "StartDate") {
+            //                    startTime.hidden = startTime.isHidden ? false : true
+            //                    startTime.evaluateHidden()
+            //                    if !startTime.isHidden {
+            //                        startDate.hidden = true
+            //                        startDate.evaluateHidden()
+            //                    }
+            //                }
+            //            }
+            //        }).cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //            cell.detailTextLabel?.textColor = .secondaryLabel
+            //            if let task = self.task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                cell.detailTextLabel?.text = startDate.getTimeString()
+            //            }
+            //        }
+            //
+            //        <<< TimePickerRow("StartTime") {
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.textLabel?.textColor = .label
+            //            $0.cell.detailTextLabel?.textColor = .secondaryLabel
+            //            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            //            $0.cell.tintColor = .secondarySystemGroupedBackground
+            //            $0.hidden = true
+            //            $0.minuteInterval = 5
+            //            if #available(iOS 13.4, *) {
+            //                $0.cell.datePicker.preferredDatePickerStyle = .wheels
+            //            }
+            //            else {
+            //                $0.cell.datePicker.datePickerMode = .time
+            //            }
+            //            if let task = task, task.hasStartTime ?? false, let startDate = task.startDate {
+            //                $0.value = startDate
+            //                $0.updateCell()
+            //            }
+            //        }.onChange { [weak self] row in
+            //            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "startTimeSwitch") {
+            //                self?.task.startDateTime = NSNumber(value: Int((value).timeIntervalSince1970))
+            //                switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
+            //            }
+            //            self!.updateStartDate()
+            //        }.cellUpdate { cell, row in
+            //            cell.backgroundColor = .secondarySystemGroupedBackground
+            //            cell.textLabel?.textColor = .label
+            //        }
+                        
+            <<< SwitchRow("deadlineDateSwitch") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.title = "Deadline Date"
+                if self.task.isGoal ?? false {
+                    $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
+                }
+                if let task = task, let endDate = task.endDate {
+                    $0.value = true
+                    $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                } else {
+                    $0.value = false
+                    $0.cell.detailTextLabel?.text = nil
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                    if value, let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
                         row.cell.detailTextLabel?.textColor = .systemBlue
+                        if let task = self?.task, let endDate = task.endDate {
+                            row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                            endDateRow.value = endDate
+                        } else {
+                            let endDateTime = Date()
+                            endDateRow.value = endDateTime
+                            row.cell.detailTextLabel?.text = endDateTime.getMonthAndDateAndYear()
+                            
+                        }
                         endTimeSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
                         endTimeSwitchRow.updateCell()
                         endTime.hidden = true
                         endTime.evaluateHidden()
                     } else {
-                        row.cell.detailTextLabel?.textColor = .secondaryLabel
+                        row.cell.detailTextLabel?.text = nil
+                        endTimeSwitchRow.cell.detailTextLabel?.text = nil
+                        endTimeSwitchRow.value = false
+                        endTimeSwitchRow.updateCell()
                     }
+                    self!.updateDeadlineDate()
+                    
+                    let condition: Condition = value ? false : true
+                    row.disabled = condition
+                    endDateRow.hidden = condition
+                    endDateRow.evaluateHidden()
+                    
                 }
-            }
-        }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let task = self.task, let endDate = task.endDate {
-                cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
-            } else {
-                cell.detailTextLabel?.text = nil
-            }
-            if self.task.isGoal ?? false {
-                row.hidden = "$Repeat != 'Never'"
-            }
-        }
-        
-        <<< DatePickerRow("DeadlineDate") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textLabel?.textColor = .label
-            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.tintColor = .secondarySystemGroupedBackground
-            $0.hidden = true
-            $0.minuteInterval = 5
-            if #available(iOS 14.0, *) {
-                $0.cell.datePicker.preferredDatePickerStyle = .inline
-                $0.cell.datePicker.tintColor = .systemBlue
-            }
-            else {
-                $0.cell.datePicker.datePickerMode = .date
-            }
-            if let task = task, let endDate = task.endDate {
-                $0.value = endDate
-                $0.updateCell()
-            }
-        }.onChange { [weak self] row in
-            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
-                switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
-            }
-            self!.updateDeadlineDate()
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-        }
-        
-        <<< SwitchRow("deadlineTimeSwitch") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textLabel?.textColor = .label
-            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-            $0.title = "Deadline Time"
-            if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
-                $0.value = true
-                $0.cell.detailTextLabel?.text = endDate.getTimeString()
-            } else {
-                $0.value = false
-                $0.cell.detailTextLabel?.text = nil
-            }
-            if self.task.isGoal ?? false {
-                $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
-            }
-        }.onChange { [weak self] row in
-            if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
-                if value, let endDateDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
-                    row.cell.detailTextLabel?.textColor = .systemBlue
-                    if let task = self?.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
-                        row.cell.detailTextLabel?.text = endDate.getTimeString()
-                        endTimeRow.value = endDate
-                        if !(endDateSwitchRow.value ?? false) {
-                            endDateSwitchRow.value = value
-                            endDateSwitchRow.updateCell()
-                            endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
-                        }
-                    } else {
-                        let original = Date()
-                        let endDate = Date(timeIntervalSinceReferenceDate:
-                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                        endTimeRow.value = endDate
-                        row.cell.detailTextLabel?.text = endDate.getTimeString()
-                        if !(endDateSwitchRow.value ?? false) {
-                            endDateSwitchRow.value = value
-                            endDateSwitchRow.updateCell()
-                            endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
-                        }
-                    }
-                    endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
-                    endDateSwitchRow.updateCell()
-                    endDateDateRow.hidden = true
-                    endDateDateRow.evaluateHidden()
-                } else {
-                    row.cell.detailTextLabel?.text = nil
-                }
-                self!.updateDeadlineDate()
-                
-                let condition: Condition = value ? false : true
-                row.disabled = condition
-                endTimeRow.hidden = condition
-                endTimeRow.evaluateHidden()
-                
-            }
-        }.onCellSelection({ [weak self] _, row in
-            if row.value ?? false {
-                if let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
-                    endTime.hidden = endTime.isHidden ? false : true
-                    endTime.evaluateHidden()
-                    if !endTime.isHidden {
-                        row.cell.detailTextLabel?.textColor = .systemBlue
-                        endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
-                        endDateSwitchRow.updateCell()
-                        endDate.hidden = true
+            }.onCellSelection({ [weak self] _, row in
+                if row.value ?? false {
+                    if let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endTimeSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                        endDate.hidden = endDate.isHidden ? false : true
                         endDate.evaluateHidden()
-                    } else {
-                        row.cell.detailTextLabel?.textColor = .secondaryLabel
+                        if !endDate.isHidden {
+                            row.cell.detailTextLabel?.textColor = .systemBlue
+                            endTimeSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                            endTimeSwitchRow.updateCell()
+                            endTime.hidden = true
+                            endTime.evaluateHidden()
+                        } else {
+                            row.cell.detailTextLabel?.textColor = .secondaryLabel
+                        }
                     }
                 }
-            }
-        }).cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let task = self.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
-                cell.detailTextLabel?.text = endDate.getTimeString()
-            } else {
-                cell.detailTextLabel?.text = nil
-            }
-            if self.task.isGoal ?? false {
-                row.hidden = "$Repeat != 'Never'"
-            }
-        }
-        
-        <<< TimePickerRow("DeadlineTime") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textLabel?.textColor = .label
-            $0.cell.detailTextLabel?.textColor = .secondaryLabel
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.tintColor = .secondarySystemGroupedBackground
-            $0.hidden = true
-            $0.minuteInterval = 5
-            if #available(iOS 13.4, *) {
-                $0.cell.datePicker.preferredDatePickerStyle = .wheels
-            }
-            else {
-                $0.cell.datePicker.datePickerMode = .time
-            }
-            if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
-                $0.value = endDate
-                $0.updateCell()
-            }
-        }.onChange { [weak self] row in
-            if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
-                switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
-            }
-            self!.updateDeadlineDate()
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-        }
-        
-        if !(task.isGoal ?? false) {
-            form.last!
-            <<< SwitchRow("Flag") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textLabel?.textColor = .label
-                row.title = row.tag
-                if let flagged = task.flagged {
-                    row.value = flagged
+            }).cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                if let task = self.task, let endDate = task.endDate {
+                    cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                 } else {
-                    row.value = false
-                    self.task.flagged = false
+                    cell.detailTextLabel?.text = nil
+                }
+                if self.task.isGoal ?? false {
+                    row.hidden = "$Repeat != 'Never'"
+                }
+            }
+            
+            <<< DatePickerRow("DeadlineDate") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.tintColor = .secondarySystemGroupedBackground
+                $0.hidden = true
+                $0.minuteInterval = 5
+                if #available(iOS 14.0, *) {
+                    $0.cell.datePicker.preferredDatePickerStyle = .inline
+                    $0.cell.datePicker.tintColor = .systemBlue
+                }
+                else {
+                    $0.cell.datePicker.datePickerMode = .date
+                }
+                if let task = task, let endDate = task.endDate {
+                    $0.value = endDate
+                    $0.updateCell()
                 }
             }.onChange { [weak self] row in
-                self?.task.flagged = row.value
+                if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                    switchDateRow.cell.detailTextLabel?.text = value.getMonthAndDateAndYear()
+                }
+                self!.updateDeadlineDate()
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
             }
             
-            <<< PushRow<TaskPriority>("Priority") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textLabel?.textColor = .label
-                row.cell.detailTextLabel?.textColor = .secondaryLabel
-                row.title = row.tag
-                if let task = task, let value = task.priority {
-                    row.value = TaskPriority(rawValue: value)
+            <<< SwitchRow("deadlineTimeSwitch") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.title = "Deadline Time"
+                if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                    $0.value = true
+                    $0.cell.detailTextLabel?.text = endDate.getTimeString()
                 } else {
-                    row.value = TaskPriority.None
-                    if let priority = row.value?.rawValue {
-                        self.task.priority = priority
+                    $0.value = false
+                    $0.cell.detailTextLabel?.text = nil
+                }
+                if self.task.isGoal ?? false {
+                    $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
+                    if value, let endDateDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                        row.cell.detailTextLabel?.textColor = .systemBlue
+                        if let task = self?.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                            row.cell.detailTextLabel?.text = endDate.getTimeString()
+                            endTimeRow.value = endDate
+                            if !(endDateSwitchRow.value ?? false) {
+                                endDateSwitchRow.value = value
+                                endDateSwitchRow.updateCell()
+                                endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                            }
+                        } else {
+                            let original = Date()
+                            let endDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                            endTimeRow.value = endDate
+                            row.cell.detailTextLabel?.text = endDate.getTimeString()
+                            if !(endDateSwitchRow.value ?? false) {
+                                endDateSwitchRow.value = value
+                                endDateSwitchRow.updateCell()
+                                endDateSwitchRow.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                            }
+                        }
+                        endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                        endDateSwitchRow.updateCell()
+                        endDateDateRow.hidden = true
+                        endDateDateRow.evaluateHidden()
+                    } else {
+                        row.cell.detailTextLabel?.text = nil
+                    }
+                    self!.updateDeadlineDate()
+                    
+                    let condition: Condition = value ? false : true
+                    row.disabled = condition
+                    endTimeRow.hidden = condition
+                    endTimeRow.evaluateHidden()
+                    
+                }
+            }.onCellSelection({ [weak self] _, row in
+                if row.value ?? false {
+                    if let endTime: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime"), let endDate: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), let endDateSwitchRow: SwitchRow = self?.form.rowBy(tag: "deadlineDateSwitch") {
+                        endTime.hidden = endTime.isHidden ? false : true
+                        endTime.evaluateHidden()
+                        if !endTime.isHidden {
+                            row.cell.detailTextLabel?.textColor = .systemBlue
+                            endDateSwitchRow.cell.detailTextLabel?.textColor = .secondaryLabel
+                            endDateSwitchRow.updateCell()
+                            endDate.hidden = true
+                            endDate.evaluateHidden()
+                        } else {
+                            row.cell.detailTextLabel?.textColor = .secondaryLabel
+                        }
                     }
                 }
-                row.options = TaskPriority.allCases
-            }.onPresent { from, to in
-                to.extendedLayoutIncludesOpaqueBars = true
-                to.title = "Priority"
-                to.extendedLayoutIncludesOpaqueBars = true
-                to.tableViewStyle = .insetGrouped
-                to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                    to.tableView.backgroundColor = .systemGroupedBackground
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = .secondarySystemGroupedBackground
-                    cell.textLabel?.textColor = .label
-                    cell.detailTextLabel?.textColor = .secondaryLabel
-                }
-            }.cellUpdate { cell, row in
+            }).cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
                 cell.detailTextLabel?.textColor = .secondaryLabel
-            }.onChange() { [unowned self] row in
-                if let priority = row.value?.rawValue {
-                    self.task.priority = priority
+                if let task = self.task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                    cell.detailTextLabel?.text = endDate.getTimeString()
+                } else {
+                    cell.detailTextLabel?.text = nil
+                }
+                if self.task.isGoal ?? false {
+                    row.hidden = "$Repeat != 'Never'"
                 }
             }
-        }
-        
-        form.last!
-        <<< LabelRow("Repeat") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if self.task.isGoal ?? false {
-                row.hidden = "$deadlineDateSwitch == true"
-            } else {
-                row.hidden = "$deadlineDateSwitch == false"
-            }
-            if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
-                if let endDate = self.task.instanceOriginalStartDate {
-                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
-                } else if let endDate = self.task.endDate {
-                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+            
+            <<< TimePickerRow("DeadlineTime") {
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.textLabel?.textColor = .label
+                $0.cell.detailTextLabel?.textColor = .secondaryLabel
+                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                $0.cell.tintColor = .secondarySystemGroupedBackground
+                $0.hidden = true
+                $0.minuteInterval = 5
+                if #available(iOS 13.4, *) {
+                    $0.cell.datePicker.preferredDatePickerStyle = .wheels
                 }
-            } else {
-                row.value = "Never"
+                else {
+                    $0.cell.datePicker.datePickerMode = .time
+                }
+                if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
+                    $0.value = endDate
+                    $0.updateCell()
+                }
+            }.onChange { [weak self] row in
+                if let value = row.value, let switchDateRow: SwitchRow = self?.form.rowBy(tag: "deadlineTimeSwitch") {
+                    switchDateRow.cell.detailTextLabel?.text = value.getTimeString()
+                }
+                self!.updateDeadlineDate()
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
             }
-        }.onCellSelection({ _, row in
-            self.openRepeat()
-        }).cellUpdate { cell, row in
-            cell.textLabel?.textAlignment = .left
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.accessoryType = .disclosureIndicator
         }
         
         if delegate == nil && !(task.isGoal ?? false) {
@@ -1297,6 +1730,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             row.title = row.tag
             if let task = task, task.category != nil {
                 row.value = task.category
+            } else if task.isGoal ?? false,let task = task, let goal = task.goal {
+                row.value = goal.category.rawValue
             } else {
                 row.value = "Uncategorized"
             }
@@ -1319,6 +1754,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             row.title = row.tag
             if let task = task, task.subcategory != nil {
                 row.value = task.subcategory
+            } else if task.isGoal ?? false,let task = task, let goal = task.goal {
+                row.value = goal.subcategory.rawValue
             } else {
                 row.value = "Uncategorized"
             }

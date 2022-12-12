@@ -114,6 +114,79 @@ enum ActivityCategory: String, Codable, CaseIterable {
         return .uncategorized
     }
     
+    static func categorize(_ subcategory: ActivitySubcategory) -> ActivityCategory {
+        switch subcategory {
+        case .bills:
+            return .finances
+        case .car:
+            return .todo
+        case .chores:
+            return .todo
+        case .doctor:
+            return .health
+        case .entertainment:
+            return .leisure
+        case .errand:
+            return .todo
+        case .family:
+            return .family
+        case .finances:
+            return .finances
+        case .health:
+            return .health
+        case .home:
+            return .todo
+        case .hygiene:
+            return .health
+        case .investments:
+            return .finances
+        case .kids:
+            return .family
+        case .leisure:
+            return .leisure
+        case .meal:
+            return .meal
+        case .mindfulness:
+            return .health
+        case .moving:
+            return .todo
+        case .personal:
+            return .personal
+        case .pets:
+            return .family
+        case .savings:
+            return .finances
+        case .school:
+            return .school
+        case .shopping:
+            return .leisure
+        case .skill:
+            return .personal
+        case .sleep:
+            return .health
+        case .social:
+            return .social
+        case .spending:
+            return .finances
+        case .timeOff:
+            return .leisure
+        case .todo:
+            return .todo
+        case .travel:
+            return .leisure
+        case .wedding:
+            return .social
+        case .work:
+            return .work
+        case .workout:
+            return .health
+        case .uncategorized:
+            return .uncategorized
+        case .notApplicable:
+            return .notApplicable
+        }
+    }
+    
     static func categorize(_ transaction: Transaction) -> ActivityCategory {
         if transaction.category == "Amusement" || transaction.category == "Arts" || transaction.category == "Alcohol & Bars" || transaction.category == "Coffee Shops" {
             return .social

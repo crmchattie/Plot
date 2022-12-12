@@ -195,26 +195,40 @@ extension RecurrencePicker {
             selectedIndexPath = IndexPath(row: 0, section: 0)
             return
         }
-        if recurrenceRule.isDailyRecurrence() {
-            selectedIndexPath = IndexPath(row: 1, section: 0)
-        } else if recurrenceRule.isWeekdayRecurrence() {
-            selectedIndexPath = IndexPath(row: 2, section: 0)
-        } else if recurrenceRule.isWeekendRecurrence() {
-            selectedIndexPath = IndexPath(row: 3, section: 0)
-        } else if recurrenceRule.isWeeklyRecurrence(occurrence: occurrenceDate) {
-            selectedIndexPath = IndexPath(row: 4, section: 0)
-        } else if recurrenceRule.isBiWeeklyRecurrence(occurrence: occurrenceDate) {
-            selectedIndexPath = IndexPath(row: 5, section: 0)
-        } else if recurrenceRule.isMonthlyRecurrence(occurrence: occurrenceDate) {
-            selectedIndexPath = IndexPath(row: 6, section: 0)
-        } else if recurrenceRule.isQuarterlyRecurrence(occurrence: occurrenceDate) {
-            selectedIndexPath = IndexPath(row: 7, section: 0)
-        } else if recurrenceRule.isSemiannualRecurrence(occurrence: occurrenceDate) {
-            selectedIndexPath = IndexPath(row: 8, section: 0)
-        } else if recurrenceRule.isYearlyRecurrence(occurrence: occurrenceDate) {
-            selectedIndexPath = IndexPath(row: 9, section: 0)
+        if !isGoal {
+            if recurrenceRule.isDailyRecurrence() {
+                selectedIndexPath = IndexPath(row: 1, section: 0)
+            } else if recurrenceRule.isWeekdayRecurrence() {
+                selectedIndexPath = IndexPath(row: 2, section: 0)
+            } else if recurrenceRule.isWeekendRecurrence() {
+                selectedIndexPath = IndexPath(row: 3, section: 0)
+            } else if recurrenceRule.isWeeklyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 4, section: 0)
+            } else if recurrenceRule.isBiWeeklyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 5, section: 0)
+            } else if recurrenceRule.isMonthlyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 6, section: 0)
+            } else if recurrenceRule.isQuarterlyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 7, section: 0)
+            } else if recurrenceRule.isSemiannualRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 8, section: 0)
+            } else if recurrenceRule.isYearlyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 9, section: 0)
+            } else {
+                selectedIndexPath = IndexPath(row: 0, section: 1)
+            }
         } else {
-            selectedIndexPath = IndexPath(row: 0, section: 1)
+            if recurrenceRule.isDailyRecurrence() {
+                selectedIndexPath = IndexPath(row: 1, section: 0)
+            } else if recurrenceRule.isWeeklyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 2, section: 0)
+            } else if recurrenceRule.isMonthlyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 3, section: 0)
+            } else if recurrenceRule.isYearlyRecurrence(occurrence: occurrenceDate) {
+                selectedIndexPath = IndexPath(row: 4, section: 0)
+            } else {
+                selectedIndexPath = IndexPath(row: 0, section: 1)
+            }
         }
     }
 
@@ -222,36 +236,56 @@ extension RecurrencePicker {
         guard indexPath.section == 0 else {
             return
         }
-
-        switch indexPath.row {
-        case 0:
-            recurrenceRule = nil
-        case 1:
-            recurrenceRule = RecurrenceRule.dailyRecurrence()
-        case 2:
-            recurrenceRule = RecurrenceRule.weekdayRecurrence()
-        case 3:
-            recurrenceRule = RecurrenceRule.weekendRecurrence()
-        case 4:
-            let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
-            recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
-        case 5:
-            let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
-            recurrenceRule = RecurrenceRule.biWeeklyRecurrence(withWeekday: weekday)
-        case 6:
-            let monthday = calendar.component(.day, from: occurrenceDate)
-            recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-        case 7:
-            let monthday = calendar.component(.day, from: occurrenceDate)
-            recurrenceRule = RecurrenceRule.quarterlyRecurrence(withMonthday: monthday)
-        case 8:
-            let monthday = calendar.component(.day, from: occurrenceDate)
-            recurrenceRule = RecurrenceRule.semiannualRecurrence(withMonthday: monthday)
-        case 9:
-            let month = calendar.component(.month, from: occurrenceDate)
-            recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
-        default:
-            break
+        
+        if !isGoal {
+            switch indexPath.row {
+            case 0:
+                recurrenceRule = nil
+            case 1:
+                recurrenceRule = RecurrenceRule.dailyRecurrence()
+            case 2:
+                recurrenceRule = RecurrenceRule.weekdayRecurrence()
+            case 3:
+                recurrenceRule = RecurrenceRule.weekendRecurrence()
+            case 4:
+                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
+                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+            case 5:
+                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
+                recurrenceRule = RecurrenceRule.biWeeklyRecurrence(withWeekday: weekday)
+            case 6:
+                let monthday = calendar.component(.day, from: occurrenceDate)
+                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+            case 7:
+                let monthday = calendar.component(.day, from: occurrenceDate)
+                recurrenceRule = RecurrenceRule.quarterlyRecurrence(withMonthday: monthday)
+            case 8:
+                let monthday = calendar.component(.day, from: occurrenceDate)
+                recurrenceRule = RecurrenceRule.semiannualRecurrence(withMonthday: monthday)
+            case 9:
+                let month = calendar.component(.month, from: occurrenceDate)
+                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+            default:
+                break
+            }
+        } else {
+            switch indexPath.row {
+            case 0:
+                recurrenceRule = nil
+            case 1:
+                recurrenceRule = RecurrenceRule.dailyRecurrence()
+            case 2:
+                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
+                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+            case 3:
+                let monthday = calendar.component(.day, from: occurrenceDate)
+                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+            case 4:
+                let month = calendar.component(.month, from: occurrenceDate)
+                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+            default:
+                break
+            }
         }
     }
 

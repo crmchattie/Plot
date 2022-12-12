@@ -35,8 +35,90 @@ struct Goal: Codable, Equatable, Hashable {
         self.currentNumber = goal.currentNumber
     }
     
-    var build: Bool {
+    var built: Bool {
         return metric != nil && targetNumber != nil
+    }
+    
+    var category: ActivityCategory {
+        switch self.metric {
+        case .events:
+            switch self.submetric {
+            case .group:
+                return .uncategorized
+            case .category:
+                return ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+            case .subcategory:
+                return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+            case .some(.none):
+                return .uncategorized
+            case nil:
+                return .uncategorized
+            }
+        case .tasks:
+            switch self.submetric {
+            case .group:
+                return .uncategorized
+            case .category:
+                return ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+            case .subcategory:
+                return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+            case .some(.none):
+                return .uncategorized
+            case nil:
+                return .uncategorized
+            }
+        case .savings, .spending, .balances:
+            return .finances
+        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
+            return .health
+        case .none:
+            return .uncategorized
+        }
+    }
+    
+    var subcategory: ActivitySubcategory {
+        switch self.metric {
+        case .events:
+            switch self.submetric {
+            case .group:
+                return .uncategorized
+            case .category:
+                return ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+            case .subcategory:
+                return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+            case .some(.none):
+                return .uncategorized
+            case nil:
+                return .uncategorized
+            }
+        case .tasks:
+            switch self.submetric {
+            case .group:
+                return .uncategorized
+            case .category:
+                return ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+            case .subcategory:
+                return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+            case .some(.none):
+                return .uncategorized
+            case nil:
+                return .uncategorized
+            }
+        case .savings:
+            return .savings
+        case .spending:
+            return .spending
+        case .balances:
+            return .finances
+        case .mindfulness:
+            return .mindfulness
+        case .sleep:
+            return .sleep
+        case .workout, .steps, .flightsClimbed, .activeCalories:
+            return .workout
+        case .none:
+            return .uncategorized
+        }
     }
     
     var description: String? {

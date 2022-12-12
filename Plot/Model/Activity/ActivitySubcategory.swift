@@ -164,6 +164,35 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         return .uncategorized
     }
     
+    static func categorize(_ category: ActivityCategory) -> ActivitySubcategory {
+        switch category {
+        case .family:
+            return .family
+        case .finances:
+            return .finances
+        case .health:
+            return .health
+        case .leisure:
+            return .leisure
+        case .meal:
+            return .meal
+        case .personal:
+            return .personal
+        case .school:
+            return .school
+        case .social:
+            return .social
+        case .todo:
+            return .todo
+        case .work:
+            return .work
+        case .uncategorized:
+            return .uncategorized
+        case .notApplicable:
+            return .notApplicable
+        }
+    }
+    
     static func categorize(_ transaction: Transaction) -> ActivitySubcategory {
         if transaction.category == "Amusement" || transaction.category == "Arts" || transaction.category == "Alcohol & Bars" || transaction.category == "Coffee Shops" {
             return .social

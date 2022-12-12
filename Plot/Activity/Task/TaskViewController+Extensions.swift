@@ -348,7 +348,18 @@ extension TaskViewController: RecurrencePickerDelegate {
                 row.value = rowText
                 row.updateCell()
                 task.recurrences = [recurrenceRule.toRRuleString()]
+                if task.isGoal ?? false {
+                    let original = Date()
+                    let rounded = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    self.task.endDateTime = NSNumber(value: Int((rounded).timeIntervalSince1970))
+                    self.task.hasDeadlineTime = false
+                }
             } else {
+                if task.isGoal ?? false {
+                    self.task.endDateTime = nil
+                    self.task.hasDeadlineTime = nil
+                }
                 row.value = "Never"
                 row.updateCell()
                 if !active {

@@ -649,7 +649,6 @@ class FinanceService {
     }
     
     private func createFutureTransaction(oldTransaction: Transaction, newDateString: String, averageAmount: Double) {
-        print("createFutureTransaction")
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -683,7 +682,6 @@ class FinanceService {
     
     private func addFrequencyToTransaction(transactions: [Transaction], frequency: PlotRecurrenceFrequency) {
         let reference = Database.database().reference().child(financialTransactionsEntity)
-        
         for transaction in transactions {
             reference.child(transaction.guid).child("plot_recurrence_frequency").setValue(frequency.rawValue)
         }
@@ -747,7 +745,6 @@ class FinanceService {
                             }
                             else if let secondDate = isodateFormatter.date(from: secondTransaction.transacted_at) {
                                 let diff = Calendar.current.dateComponents([.year, .month, .day], from: secondDate, to: firstDate)
-                                print(diff.description)
 
                                 let difference = Calendar.current.dateComponents([.day], from: secondDate, to: firstDate)
                                 //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
