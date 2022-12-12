@@ -688,10 +688,10 @@ func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZon
     let now = Date()
     let startEarliest = now < startDate ? now : startDate
     let startLatest = (startEarliest == now) ? startDate : now
-    var startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
+    let startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
     let endEarliest = now < endDate ? now : endDate
     let endLatest = (endDate == now) ? endDate : now
-    var endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
+    let endComponents =  calendar.dateComponents(unitFlags, from: endEarliest,  to: endLatest)
     if now.getShortDateStringForActivity() != startDate.getShortDateStringForActivity() {  // not today
         if startComponents.weekOfYear! >= 1 || startComponents.weekOfYear! <= -1 { // start date is next week
             if allDay {

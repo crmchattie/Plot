@@ -112,7 +112,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var transactionIDs: [String]?
     var containerID: String?
     var plot_is_recurring: Bool?
-    var plot_recurrence_frequency: PlotRecurrenceFrequency?
+    var plot_recurrence_frequency: String?
     var plot_created: Bool?
     var transfer_between_accounts: Bool?
     var cash_flow_type: String? {
@@ -988,7 +988,7 @@ func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @e
         guard !(transaction.plot_is_recurring ?? false) && !(transaction.plot_created ?? false) else { continue }
         //amount period to period differs
         if financialTransactionCategoriesAssociatedWithRecurringCosts.contains(transaction.category), abs(transaction.amount) > 0 {
-            let filteredTransactions = transactions.filter({ $0.description == transaction.description && $0.category == transaction.category }).sorted(by: {
+            let filteredTransactions = transactions.filter({ $0.description == transaction.description && $0.category == transaction.category && abs($0.amount) > 0 }).sorted(by: {
                 return isodateFormatter.date(from: $0.transacted_at) ?? Date() > isodateFormatter.date(from: $1.transacted_at) ?? Date()
             })
             if let mostFrequentDayInterval = getMostFrequentDaysBetweenDates(dates: filteredTransactions.map({ isodateFormatter.date(from: $0.transacted_at) ?? Date() })), let frequency = getFrequency(int: mostFrequentDayInterval) {
@@ -1015,7 +1015,6 @@ func categorizeTransactionsIntoTasks(transactions: [Transaction], completion: @e
                     }
                 }
             }
-            
         }
     }
 }

@@ -617,6 +617,7 @@ class TaskBuilder {
         }
         
         class func createActivityWithList(from transaction: Transaction, completion: @escaping (Activity?) -> Void) {
+            print("createActivityWithList")
             let isodateFormatter = ISO8601DateFormatter()
             guard let currentUserID = Auth.auth().currentUser?.uid, let date = isodateFormatter.date(from: transaction.transacted_at) else {
                 completion(nil)
@@ -658,6 +659,8 @@ class TaskBuilder {
                     activity.hasDeadlineTime = false
                     activity.participantsIDs = transaction.participantsIDs
                     activity.containerID = transaction.containerID
+                    print(end)
+                    print(end.timeIntervalSinceNow.sign)
                     if end.timeIntervalSinceNow.sign == .minus {
                         activity.isCompleted = true
                         activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
