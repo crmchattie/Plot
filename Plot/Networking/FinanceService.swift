@@ -120,7 +120,7 @@ class FinanceService {
                 self.flagTransfersBetweenAccounts()
                 if self.isRunning {
                     self.isRunning = false
-                    self.createFutureTasksFromRecurringTransactions(transactions: self.transactions)
+                    self.createFutureTasksFromRecurringTransactions()
                     completion()
                 }
             }
@@ -663,9 +663,6 @@ class FinanceService {
         newTransaction.amount = averageAmount
         newTransaction.transacted_at = newDateString
         newTransaction.containerID = nil
-        print(newTransaction.description)
-        print(newTransaction.transacted_at)
-        print(newTransaction.amount)
         
         TaskBuilder.createActivityWithList(from: newTransaction) { task in
             if let task = task, let activityID = task.activityID {
@@ -692,7 +689,7 @@ class FinanceService {
         }
     }
     
-    private func createFutureTasksFromRecurringTransactions(transactions: [Transaction]) {
+    private func createFutureTasksFromRecurringTransactions() {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -703,7 +700,7 @@ class FinanceService {
             if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: String] {
                 let isodateFormatter = ISO8601DateFormatter()
                 
-                let plotCreatedTransactions = transactions.filter({$0.plot_created ?? false && $0.plot_recurrence_frequency == nil})
+                let plotCreatedTransactions = self.transactions.filter({$0.plot_created ?? false && $0.plot_recurrence_frequency == nil})
                 
                 if !plotCreatedTransactions.isEmpty {
                     for transaction in plotCreatedTransactions {
@@ -722,7 +719,7 @@ class FinanceService {
                         }
                     }
                 } else {
-                    let recurringTransactions = transactions.filter({$0.plot_is_recurring ?? false && !($0.plot_created ?? false)})
+                    let recurringTransactions = self.transactions.filter({ $0.plot_is_recurring ?? false })
                     
                     let descriptionsMerchants = recurringTransactions.reduce(into: [String: String]()) {
                         $0[$1.description] = $1.merchant_guid ?? ""
@@ -741,70 +738,55 @@ class FinanceService {
                             let firstTransaction = filteredTransactions[0]
                             let secondTransaction = filteredTransactions[1]
                             let firstDate = isodateFormatter.date(from: firstTransaction.transacted_at) ?? Date() //should never be nil
-                            
                             //both first and second transactions are not plot created aka they are real
                             if !(firstTransaction.plot_created ?? false), !(secondTransaction.plot_created ?? false) {
-                                let newDate = firstDate.addDays(frequency.dayInterval)
+                                var newDate = firstDate.addDays(frequency.dayInterval)
                                 if newDate > Date() {
                                     self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                                 }
                             }
                             else if let secondDate = isodateFormatter.date(from: secondTransaction.transacted_at) {
-                                switch frequency {
-                                case .yearly:
-                                    let difference = Calendar.current.dateComponents([.year], from: firstDate, to: secondDate)
-                                    //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
-                                    if difference.year == 0 {
-                                        if firstTransaction.plot_created ?? false && !(secondTransaction.plot_created ?? false) {
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
+                                let diff = Calendar.current.dateComponents([.year, .month, .day], from: secondDate, to: firstDate)
+                                print(diff.description)
+
+                                let difference = Calendar.current.dateComponents([.day], from: secondDate, to: firstDate)
+                                //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
+                                if difference.day ?? 0 < (frequency.errorDayInterval * 2) {
+                                    if firstTransaction.plot_created ?? false && !(secondTransaction.plot_created ?? false) {
+                                        if let activityID = dataSnapshotValue[firstTransaction.guid] {
+                                            ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
+                                                let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
+                                                transactionAction.deleteTransaction()
                                             }
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        } else if !(firstTransaction.plot_created ?? false) && secondTransaction.plot_created ?? false {
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: secondTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: secondTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
+                                            
+                                            ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                                    activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
                                                 }
                                             }
                                         }
-                                    //if first transaction is not plot_created, create future transaction
-                                    } else if !(firstTransaction.plot_created ?? false) {
-                                        let newDate = firstDate.addDays(frequency.dayInterval)
-                                        if newDate > Date() {
-                                            self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
+                                        if let activityID = dataSnapshotValue[secondTransaction.guid] {
+                                            ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                                    activityAction.updateCompletion(isComplete: true)
+                                                }
+                                            }
+                                        }
+                                    } else if !(firstTransaction.plot_created ?? false) && secondTransaction.plot_created ?? false {
+                                        if let activityID = dataSnapshotValue[secondTransaction.guid] {
+                                            ParticipantsFetcher.getParticipants(forTransaction: secondTransaction) { users in
+                                                let transactionAction = TransactionActions(transaction: secondTransaction, active: true, selectedFalconUsers: users)
+                                                transactionAction.deleteTransaction()
+                                            }
+                                            
+                                            ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                                    activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
+                                                }
+                                            }
                                         }
                                         if let activityID = dataSnapshotValue[firstTransaction.guid] {
                                             ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
@@ -814,370 +796,41 @@ class FinanceService {
                                                 }
                                             }
                                         }
-                                    //if first transaction is plot_created, see if it should be deleted
-                                    } else if firstTransaction.plot_created ?? false {
-                                        let days = Calendar.current.numberOfDaysBetween(firstDate, and: Date())
-                                        if days > 3 {
-                                            //delete transaction and activity
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first {
-                                                        ParticipantsFetcher.getParticipants(forActivity: activity) { users in
-                                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
-                                                            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
                                     }
-                                case .monthly:
-                                    let difference = Calendar.current.dateComponents([.month], from: firstDate, to: secondDate)
-                                    //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
-                                    if difference.month == 0 {
-                                        if firstTransaction.plot_created ?? false && !(secondTransaction.plot_created ?? false) {
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        } else if !(firstTransaction.plot_created ?? false) && secondTransaction.plot_created ?? false {
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: secondTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: secondTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
+                                //if first transaction is not plot_created, create future transaction
+                                } else if !(firstTransaction.plot_created ?? false) {
+                                    let newDate = firstDate.addDays(frequency.dayInterval)
+                                    if newDate > Date() {
+                                        self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
+                                    }
+                                    if let activityID = dataSnapshotValue[firstTransaction.guid] {
+                                        ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
+                                            if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
+                                                activityAction.updateCompletion(isComplete: true)
                                             }
                                         }
-                                    //if first transaction is not plot_created, create future transaction
-                                    } else if !(firstTransaction.plot_created ?? false) {
-                                        let newDate = firstDate.addDays(frequency.dayInterval)
-                                        if newDate > Date() {
-                                            self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
-                                        }
+                                    }
+                                //if first transaction is plot_created, see if it should be deleted
+                                } else if firstTransaction.plot_created ?? false {
+                                    let days = Calendar.current.numberOfDaysBetween(firstDate, and: Date())
+                                    if days > 3 {
+                                        //delete transaction and activity
                                         if let activityID = dataSnapshotValue[firstTransaction.guid] {
+                                            ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
+                                                let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
+                                                transactionAction.deleteTransaction()
+                                            }
                                             ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                    activityAction.updateCompletion(isComplete: true)
-                                                }
-                                            }
-                                        }
-                                    //if first transaction is plot_created, see if it should be deleted
-                                    } else if firstTransaction.plot_created ?? false {
-                                        let days = Calendar.current.numberOfDaysBetween(firstDate, and: Date())
-                                        if days > 3 {
-                                            //delete transaction and activity
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first {
-                                                        ParticipantsFetcher.getParticipants(forActivity: activity) { users in
-                                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
-                                                            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                        }
+                                                if let activity = activities.first {
+                                                    ParticipantsFetcher.getParticipants(forActivity: activity) { users in
+                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
+                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
                                                     }
                                                 }
                                             }
                                         }
-                                        
                                     }
-                                case .bimonthly:
-                                    let difference = Calendar.current.dateComponents([.day], from: firstDate, to: secondDate)
-                                    //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
-                                    if difference.day ?? 0 < frequency.errorDayInterval {
-                                        if firstTransaction.plot_created ?? false && !(secondTransaction.plot_created ?? false) {
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        } else if !(firstTransaction.plot_created ?? false) && secondTransaction.plot_created ?? false {
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: secondTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: secondTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    //if first transaction is not plot_created, create future transaction
-                                    } else if !(firstTransaction.plot_created ?? false) {
-                                        let newDate = firstDate.addDays(frequency.dayInterval)
-                                        if newDate > Date() {
-                                            self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
-                                        }
-                                        if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                            ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                    activityAction.updateCompletion(isComplete: true)
-                                                }
-                                            }
-                                        }
-                                    //if first transaction is plot_created, see if it should be deleted
-                                    } else if firstTransaction.plot_created ?? false {
-                                        let days = Calendar.current.numberOfDaysBetween(firstDate, and: Date())
-                                        if days > 3 {
-                                            //delete transaction and activity
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first {
-                                                        ParticipantsFetcher.getParticipants(forActivity: activity) { users in
-                                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
-                                                            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                    }
-                                case .weekly:
-                                    let difference = Calendar.current.dateComponents([.weekOfYear], from: firstDate, to: secondDate)
-                                    //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
-                                    if difference.weekOfYear == 0 {
-                                        if firstTransaction.plot_created ?? false && !(secondTransaction.plot_created ?? false) {
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        } else if !(firstTransaction.plot_created ?? false) && secondTransaction.plot_created ?? false {
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: secondTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: secondTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    //if first transaction is not plot_created, create future transaction
-                                    } else if !(firstTransaction.plot_created ?? false) {
-                                        let newDate = firstDate.addDays(frequency.dayInterval)
-                                        if newDate > Date() {
-                                            self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
-                                        }
-                                        if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                            ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                    activityAction.updateCompletion(isComplete: true)
-                                                }
-                                            }
-                                        }
-                                    //if first transaction is plot_created, see if it should be deleted
-                                    } else if firstTransaction.plot_created ?? false {
-                                        let days = Calendar.current.numberOfDaysBetween(firstDate, and: Date())
-                                        if days > 3 {
-                                            //delete transaction and activity
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first {
-                                                        ParticipantsFetcher.getParticipants(forActivity: activity) { users in
-                                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
-                                                            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                    }
-                                case .biweekly:
-                                    let difference = Calendar.current.dateComponents([.day], from: firstDate, to: secondDate)
-                                    //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
-                                    if difference.day ?? 0 < frequency.errorDayInterval {
-                                        if firstTransaction.plot_created ?? false && !(secondTransaction.plot_created ?? false) {
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        } else if !(firstTransaction.plot_created ?? false) && secondTransaction.plot_created ?? false {
-                                            if let activityID = dataSnapshotValue[secondTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: secondTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: secondTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                    }
-                                                }
-                                            }
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                        let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                        activityAction.updateCompletion(isComplete: true)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    //if first transaction is not plot_created, create future transaction
-                                    } else if !(firstTransaction.plot_created ?? false) {
-                                        let newDate = firstDate.addDays(frequency.dayInterval)
-                                        if newDate > Date() {
-                                            self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
-                                        }
-                                        if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                            ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
-                                                    let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                    activityAction.updateCompletion(isComplete: true)
-                                                }
-                                            }
-                                        }
-                                    //if first transaction is plot_created, see if it should be deleted
-                                    } else if firstTransaction.plot_created ?? false {
-                                        let days = Calendar.current.numberOfDaysBetween(firstDate, and: Date())
-                                        if days > 3 {
-                                            //delete transaction and activity
-                                            if let activityID = dataSnapshotValue[firstTransaction.guid] {
-                                                ParticipantsFetcher.getParticipants(forTransaction: firstTransaction) { users in
-                                                    let transactionAction = TransactionActions(transaction: firstTransaction, active: true, selectedFalconUsers: users)
-                                                    transactionAction.deleteTransaction()
-                                                }
-                                                ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                    if let activity = activities.first {
-                                                        ParticipantsFetcher.getParticipants(forActivity: activity) { users in
-                                                            let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: users)
-                                                            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                    }
-                                case .daily, .hourly, .minutely, .secondly:
-                                    return
                                 }
                             }
                         }
