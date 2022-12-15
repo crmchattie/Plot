@@ -28,7 +28,10 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
     case bills = "Bills"
     case car = "Car"
     case chores = "Chores"
+    case dentist = "Dentist"
     case doctor = "Doctor"
+    case doctorEye = "Eye Doctor"
+    case doctorSkin = "Skin Doctor"
     case entertainment = "Entertainment"
     case errand = "Errand"
     case family = "Family"
@@ -44,7 +47,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
     case moving = "Moving"
     case personal = "Personal"
     case pets = "Pets"
-    case savings = "Savings"
+    case income = "Income"
     case school = "School"
     case shopping = "Shopping"
     case skill = "Skill"
@@ -54,6 +57,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
     case timeOff = "Time Off"
     case todo = "To-do"
     case travel = "Travel"
+    case therapy = "Therapy"
     case wedding = "Wedding"
     case work = "Work"
     case workout = "Workout"
@@ -98,7 +102,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .mindfulness: return UIImage(named: "mindfulness")!
         case .moving: return UIImage(named: "moving")!
         case .pets: return UIImage(named: "pets")!
-        case .savings: return UIImage(named: "transaction")!
+        case .income: return UIImage(named: "transaction")!
         case .shopping: return UIImage(named: "shopping")!
         case .skill: return UIImage(named: "school")!
         case .sleep: return UIImage(named: "sleep")!
@@ -107,6 +111,10 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .wedding: return UIImage(named: "wedding")!
         case .workout: return UIImage(named: "workout")!
         case .notApplicable: return UIImage(named: "event")!
+        case .dentist: return UIImage(named: "doctor")!
+        case .doctorEye: return UIImage(named: "doctor")!
+        case .doctorSkin: return UIImage(named: "doctor")!
+        case .therapy: return UIImage(named: "personal")!
         }
     }
     
@@ -137,7 +145,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .mindfulness: return "mindfulness"
         case .moving: return "moving"
         case .pets: return "pets"
-        case .savings: return "transaction"
+        case .income: return "transaction"
         case .shopping: return "shopping"
         case .skill: return "school"
         case .sleep: return "sleep"
@@ -146,6 +154,10 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .wedding: return "wedding"
         case .workout: return "workout"
         case .notApplicable: return "event"
+        case .dentist: return "doctor"
+        case .doctorEye: return "doctor"
+        case .doctorSkin: return "doctor"
+        case .therapy: return "personal"
         }
     }
         

@@ -154,7 +154,7 @@ enum ActivityCategory: String, Codable, CaseIterable {
             return .personal
         case .pets:
             return .family
-        case .savings:
+        case .income:
             return .finances
         case .school:
             return .school
@@ -184,6 +184,14 @@ enum ActivityCategory: String, Codable, CaseIterable {
             return .uncategorized
         case .notApplicable:
             return .notApplicable
+        case .dentist:
+            return .health
+        case .doctorEye:
+            return .health
+        case .doctorSkin:
+            return .health
+        case .therapy:
+            return .health
         }
     }
     

@@ -633,6 +633,7 @@ class FinanceService {
                         reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
                         reference.child(transaction.guid).child("plot_recurrence_frequency").setValue(frequency.rawValue)
                         self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
+//                        self.createFutureTasksFromRecurringTransactions()
                     }
                 }
             } else {
@@ -642,6 +643,7 @@ class FinanceService {
                         reference.child(transaction.guid).child("plot_is_recurring").setValue(true)
                         reference.child(transaction.guid).child("plot_recurrence_frequency").setValue(frequency.rawValue)
                         self.updateTransactionCreateContainer(transaction: transaction, activity: activity)
+//                        self.createFutureTasksFromRecurringTransactions()
                     }
                 }
             }
@@ -738,14 +740,12 @@ class FinanceService {
                             let firstDate = isodateFormatter.date(from: firstTransaction.transacted_at) ?? Date() //should never be nil
                             //both first and second transactions are not plot created aka they are real
                             if !(firstTransaction.plot_created ?? false), !(secondTransaction.plot_created ?? false) {
-                                var newDate = firstDate.addDays(frequency.dayInterval)
+                                let newDate = firstDate.addDays(frequency.dayInterval)
                                 if newDate > Date() {
                                     self.createFutureTransaction(oldTransaction: firstTransaction, newDateString: isodateFormatter.string(from: newDate), averageAmount: filteredTransactions.reduce(0.0, {$0 + $1.amount}) / Double(filteredTransactions.count))
                                 }
                             }
                             else if let secondDate = isodateFormatter.date(from: secondTransaction.transacted_at) {
-                                let diff = Calendar.current.dateComponents([.year, .month, .day], from: secondDate, to: firstDate)
-
                                 let difference = Calendar.current.dateComponents([.day], from: secondDate, to: firstDate)
                                 //both first and second transactions take place in the same date component relevant to frequency; delete plot_created transaction make sure non-plot created transaction is complete
                                 if difference.day ?? 0 < (frequency.errorDayInterval * 2) {
@@ -757,15 +757,17 @@ class FinanceService {
                                             }
                                             
                                             ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                if let activity = activities.first {
                                                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                                     activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
                                                 }
                                             }
                                         }
+                                        
                                         if let activityID = dataSnapshotValue[secondTransaction.guid] {
                                             ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                                 if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                    activity.completedDate = NSNumber(value: Int((secondDate.UTCTime).timeIntervalSince1970))
                                                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                                     activityAction.updateCompletion(isComplete: true)
                                                 }
@@ -779,7 +781,7 @@ class FinanceService {
                                             }
                                             
                                             ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
-                                                if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                if let activity = activities.first {
                                                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                                     activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
                                                 }
@@ -788,6 +790,7 @@ class FinanceService {
                                         if let activityID = dataSnapshotValue[firstTransaction.guid] {
                                             ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                                 if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                    activity.completedDate = NSNumber(value: Int((firstDate.UTCTime).timeIntervalSince1970))
                                                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                                     activityAction.updateCompletion(isComplete: true)
                                                 }
@@ -803,6 +806,7 @@ class FinanceService {
                                     if let activityID = dataSnapshotValue[firstTransaction.guid] {
                                         ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                             if let activity = activities.first, !(activity.isCompleted ?? false) {
+                                                activity.completedDate = NSNumber(value: Int((firstDate.UTCTime).timeIntervalSince1970))
                                                 let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
                                                 activityAction.updateCompletion(isComplete: true)
                                             }

@@ -73,6 +73,7 @@ class GeneralTabBarController: UITabBarController {
         if isNewUser && Auth.auth().currentUser != nil {
             //has to be here given currentUserID = nil on app start
             GeneralTabBarController.networkController.setupFirebase()
+            GeneralTabBarController.networkController.setupGoals()
             GeneralTabBarController.networkController.setupOtherVariables()
             discoverController.fetchTemplates()
             analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
@@ -93,13 +94,19 @@ class GeneralTabBarController: UITabBarController {
         homeController.addObservers()
         GeneralTabBarController.networkController.askPermissionToTrack()
         let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-//        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
         if !isNewUser {
             UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
             GeneralTabBarController.networkController.setupKeyVariables {
                 self.analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
+                GeneralTabBarController.networkController.setupGoals()
+//                if let previousVersion = previousVersion, previousVersion.compare("1.3.7") == .orderedAscending {
+//                    GeneralTabBarController.networkController.setupGoals()
+//                } else {
+//                    GeneralTabBarController.networkController.updateGoals()
+//                }
                 GeneralTabBarController.networkController.setupOtherVariables()
                 self.homeController.removeLaunchScreenView(animated: true) {
                     self.homeController.openNotification()

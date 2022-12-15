@@ -100,7 +100,7 @@ class Activity: NSObject, NSCopying, Codable {
     var directAssociationType: ObjectType?
     var goalMetric: String?
     var goalSubmetric: String?
-    var goalOption: String?
+    var goalOption: [String]?
     var goalUnit: String?
     var goalTargetNumber: NSNumber?
     var goalCurrentNumber: NSNumber?
@@ -111,7 +111,7 @@ class Activity: NSObject, NSCopying, Codable {
                 return _goal
             } else {
                 var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
-                
+                goal.activityID = self.activityID
                 if let value = goalMetric {
                     goal.metric = GoalMetric(rawValue: value)
                 }
@@ -130,7 +130,6 @@ class Activity: NSObject, NSCopying, Codable {
                 if let value = goalCurrentNumber {
                     goal.currentNumber = Double(truncating: value)
                 }
-                
                 return goal
             }
         }
@@ -201,7 +200,7 @@ class Activity: NSObject, NSCopying, Codable {
         case goalUnit
     }
     
-    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, isEvent: Bool, createdDate: NSNumber) {
+    init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, createdDate: NSNumber) {
         self.activityID = activityID
         self.admin = admin
         self.calendarID = calendarID
@@ -213,20 +212,56 @@ class Activity: NSObject, NSCopying, Codable {
         self.startTimeZone = startTimeZone
         self.endDateTime = endDateTime
         self.endTimeZone = endTimeZone
-        self.isEvent = isEvent
+        self.isEvent = true
         self.createdDate = createdDate
         self.lastModifiedDate = createdDate
     }
     
-    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, isTask: Bool, isCompleted: Bool, createdDate: NSNumber) {
+    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, isCompleted: Bool, createdDate: NSNumber) {
         self.activityID = activityID
         self.admin = admin
-        self.isTask = isTask
+        self.isTask = true
         self.isCompleted = isCompleted
         self.listID = listID
         self.listName = listName
         self.listColor = listColor
         self.listSource = listSource
+        self.createdDate = createdDate
+        self.lastModifiedDate = createdDate
+    }
+    
+    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, goal: Goal, recurrences: [String]?, endDateTime: NSNumber?, createdDate: NSNumber) {
+        self.activityID = activityID
+        self.admin = admin
+        self.isTask = true
+        self.isGoal = true
+        self.listID = listID
+        self.listName = listName
+        self.listColor = listColor
+        self.listSource = listSource
+        if let value = goal.name {
+            self.name = value
+        }
+        if let value = goal.metric {
+            self.goalMetric = value.rawValue
+        }
+        if let value = goal.submetric {
+            self.goalSubmetric = value.rawValue
+        }
+        if let value = goal.option {
+            self.goalOption = value
+        }
+        if let value = goal.unit {
+            self.goalUnit = value.rawValue
+        }
+        if let value = goal.targetNumber as? NSNumber {
+            self.goalTargetNumber = value
+        }
+        if let value = goal.currentNumber as? NSNumber {
+            self.goalCurrentNumber = value
+        }
+        self.recurrences = recurrences
+        self.endDateTime = endDateTime
         self.createdDate = createdDate
         self.lastModifiedDate = createdDate
     }
@@ -318,7 +353,7 @@ class Activity: NSObject, NSCopying, Codable {
         }
         goalMetric = dictionary?["goalMetric"] as? String
         goalSubmetric = dictionary?["goalSubmetric"] as? String
-        goalOption = dictionary?["goalOption"] as? String
+        goalOption = dictionary?["goalOption"] as? [String]
         goalUnit = dictionary?["goalUnit"] as? String
         goalTargetNumber = dictionary?["goalTargetNumber"] as? NSNumber
         goalCurrentNumber = dictionary?["goalCurrentNumber"] as? NSNumber
@@ -449,6 +484,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.recurrences as AnyObject? {
             dictionary["recurrences"] = value
+        } else {
+            dictionary["recurrences"] = NSNull()
         }
         
         if let value = self.notes as AnyObject? {
@@ -613,6 +650,8 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = self.instanceIDs as AnyObject? {
             dictionary["instanceIDs"] = value
+        } else {
+            dictionary["instanceIDs"] = NSNull()
         }
         
         if let value = self.badge as AnyObject? {

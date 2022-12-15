@@ -416,8 +416,24 @@ extension TaskViewController {
         }
     }
     
+    func updateRightBarButton() {
+        if !(task.isGoal ?? false) {
+            if let _ = task.name {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            } else {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
+            }
+        } else {
+            if let _ = task.name, let goal = task.goal, let _ = goal.description, (task.recurrences != nil || task.endDateTime != nil) {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            } else {
+                self.navigationItem.rightBarButtonItem?.isEnabled = false
+            }
+        }
+    }
+    
     func updateGoal(selectedGoalProperty: SelectedGoalProperty, value: String?) {
-        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : PushRow<String> = self.form.rowBy(tag: "Option") {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Option") {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
@@ -458,12 +474,8 @@ extension TaskViewController {
                     } else {
                         task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
                     }
-                    if let option = task.goal!.option, let options = task.goal!.options(), options.contains(option) {
-                        optionRow.options = options
-                        optionRow.hidden = false
-                        optionRow.evaluateHidden()
-                    } else if let options = task.goal!.options() {
-                        optionRow.value = options[0]
+                    if let options = task.goal!.options() {
+                        optionRow.value = Set(arrayLiteral: options[0])
                         optionRow.options = options
                         optionRow.hidden = false
                         optionRow.evaluateHidden()
@@ -491,7 +503,17 @@ extension TaskViewController {
     func updateDescriptionRow() {
         if let descriptionRow: LabelRow = self.form.rowBy(tag: "Description") {
             if let goal = task.goal, let description = goal.description {
-                descriptionRow.title = description
+                var updatedDescription = description
+                if let repeatRow: LabelRow = self.form.rowBy(tag: "Repeat"), let value = repeatRow.value, value != "Never" {
+                    updatedDescription += " " + value.lowercased()
+                } else if let endDate = self.task.endDate {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateStyle = .medium
+                    dateFormatter.timeStyle = task.hasDeadlineTime ?? false ? .short : .none
+                    updatedDescription += " by " + dateFormatter.string(from: endDate)
+                }
+                
+                descriptionRow.title = updatedDescription
                 descriptionRow.updateCell()
                 descriptionRow.hidden = false
                 descriptionRow.evaluateHidden()
@@ -499,6 +521,7 @@ extension TaskViewController {
                 descriptionRow.hidden = true
                 descriptionRow.evaluateHidden()
             }
+            updateRightBarButton()
         }
     }
     
@@ -514,6 +537,32 @@ extension TaskViewController {
             
             task.category = category.rawValue
             task.category = subcategory.rawValue
+            
+            if let listRow: LabelRow = self.form.rowBy(tag: "List"), let lists = self.lists[ListSourceOptions.plot.name] {
+                var list: ListType?
+                if category == .finances, let newList = lists.first(where: { $0.financeList ?? false }) {
+                    list = newList
+                } else if category == .health, let newList = lists.first(where: { $0.healthList ?? false }) {
+                    list = newList
+                } else if let newList = lists.first(where: { $0.defaultList ?? false }) {
+                    list = newList
+                }
+                
+                if let list = list, let ID = list.id {
+                    listRow.value = list.name
+                    listRow.updateCell()
+                    
+                    task.listID = ID
+                    task.listName = list.name
+                    task.listColor = list.color
+                    task.listSource = list.source
+                    
+                    if active, let source = list.source, source == ListSourceOptions.plot.name {
+                        let listReference = Database.database().reference().child(listEntity).child(ID).child(listTasksEntity)
+                        listReference.child(self.activityID).setValue(true)
+                    }
+                }
+            }
         }
     }
     
@@ -787,90 +836,85 @@ extension TaskViewController {
     
     @objc func createNewActivity() {              
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
-            let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
-                if self.task.instanceID == nil {
-                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                    self.task.instanceID = instanceID
+            if self.task.recurrences == nil {
+                self.deleteRecurrences()
+            } else {
+                let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
+                    if self.task.instanceID == nil {
+                        let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                        self.task.instanceID = instanceID
+                        
+                        var instanceIDs = self.task.instanceIDs ?? []
+                        instanceIDs.append(instanceID)
+                        self.task.instanceIDs = instanceIDs
+                    }
                     
-                    var instanceIDs = self.task.instanceIDs ?? []
-                    instanceIDs.append(instanceID)
-                    self.task.instanceIDs = instanceIDs
-                }
-                
-                self.updateListsFirebase(id: self.task.instanceID!)
-                
-                let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
-                var instanceValues = newActivity.toAnyObject()
-                
-                if self.task.instanceOriginalStartDateTime == nil {
-                    instanceValues["instanceOriginalStartDateTime"] = self.taskOld.finalDateTime
-                    self.task.instanceOriginalStartDateTime = self.taskOld.finalDateTime
-                }
-                
-                let createActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
-                self.closeController(title: taskUpdatedMessage)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Save For Future Tasks", style: .default, handler: { (_) in
-                print("Save for future events")
-                //update task's recurrence to stop repeating just before this event
-                if let dateIndex = self.task.instanceIndex {
-                    if dateIndex == 0 {
-                        //update all instances of task
-                        if self.task.recurrences == nil {
-                            self.deleteRecurrences()
-                        }
-                        self.createActivity(title: tasksUpdatedMessage)
-                    } else if let newRecurrences = self.task.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
-                        var oldActivityRule = oldRecurrenceRule
-                        //update only future instances of task
-                        var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
-                        newActivityRule!.startDate = self.task.endDate ?? Date()
-                        
-                        var newRecurrences = oldRecurrences
-                        newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
-                        
-                        //duplicate task w/ new ID and same recurrence rule starting from this event's date
-                        self.duplicateActivity(recurrenceRule: newRecurrences)
-                        
-                        //update existing task with end date equaling ocurrence before this date
-                        oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
-                        
-                        self.taskOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
-                        self.updateRecurrences(recurrences: self.taskOld.recurrences!, title: tasksUpdatedMessage)
+                    self.updateListsFirebase(id: self.task.instanceID!)
+                    
+                    let newActivity = self.task.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.taskOld)
+                    var instanceValues = newActivity.toAnyObject()
+                    
+                    if self.task.instanceOriginalStartDateTime == nil {
+                        instanceValues["instanceOriginalStartDateTime"] = self.taskOld.finalDateTime
+                        self.task.instanceOriginalStartDateTime = self.taskOld.finalDateTime
                     }
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Save For All Tasks", style: .default, handler: { (_) in
-                //update all instances of activity
-                if let dateIndex = self.task.instanceIndex {
-                    if dateIndex == 0 {
-                        //update all instances of task
-                        if self.task.recurrences == nil {
-                            self.deleteRecurrences()
+                    
+                    let createActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
+                    self.closeController(title: taskUpdatedMessage)
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Save For Future Tasks", style: .default, handler: { (_) in
+                    print("Save for future events")
+                    //update task's recurrence to stop repeating just before this event
+                    if let dateIndex = self.task.instanceIndex {
+                        if dateIndex == 0 {
+                            //update all instances of task
+                            self.createActivity(title: tasksUpdatedMessage)
+                        } else if let newRecurrences = self.task.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+                            var oldActivityRule = oldRecurrenceRule
+                            //update only future instances of task
+                            var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
+                            newActivityRule!.startDate = self.task.endDate ?? Date()
+                            
+                            var newRecurrences = oldRecurrences
+                            newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
+                            
+                            //duplicate task w/ new ID and same recurrence rule starting from this event's date
+                            self.duplicateActivity(recurrenceRule: newRecurrences)
+                            
+                            //update existing task with end date equaling ocurrence before this date
+                            oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
+                            
+                            self.taskOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
+                            self.updateRecurrences(recurrences: self.taskOld.recurrences!, title: tasksUpdatedMessage)
                         }
-                        self.createActivity(title: tasksUpdatedMessage)
-                    } else if let date = self.task.recurrenceStartDate {
-                        //update all instances of activity
-                        self.task.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
-                        if self.task.recurrences == nil {
-                            self.deleteRecurrences()
-                        }
-                        self.createActivity(title: tasksUpdatedMessage)
                     }
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Save For All Tasks", style: .default, handler: { (_) in
+                    //update all instances of activity
+                    if let dateIndex = self.task.instanceIndex {
+                        if dateIndex == 0 {
+                            //update all instances of task
+                            self.createActivity(title: tasksUpdatedMessage)
+                        } else if let date = self.task.recurrenceStartDateTime {
+                            //update all instances of activity
+                            self.task.endDateTime = date
+                            self.createActivity(title: tasksUpdatedMessage)
+                        }
+                    }
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                    print("User click Dismiss button")
+                }))
+                
+                self.present(alert, animated: true, completion: {
+                    print("completion block")
+                })
+            }
         } else {
             if !active {
                 self.createActivity(title: taskCreatedMessage)
@@ -1027,6 +1071,7 @@ extension TaskViewController {
                 self.task.endDateTime = nil
                 self.task.hasDeadlineTime = false
             }
+            self.updateDescriptionRow()
             self.updateRepeatReminder()
         }
     }

@@ -16,6 +16,8 @@ extension NSNotification.Name {
     static let eventsNoRepeatsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".eventsNoRepeatsUpdated")
     static let tasksUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".tasksUpdated")
     static let tasksNoRepeatsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".tasksNoRepeatsUpdated")
+    static let goalsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".goalsUpdated")
+    static let goalsNoRepeatsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".goalsNoRepeatsUpdated")
     static let invitationsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".invitationsUpdated")
     static let calendarsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarsUpdated")
     static let listsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".listsUpdated")
@@ -40,6 +42,7 @@ class ActivityService {
                 print("oldValue != activities")
                 eventsNoRepeats = activities.filter { $0.isTask == nil }
                 tasksNoRepeats = activities.filter { $0.isTask ?? false }
+                tasksNoRepeats = activities.filter { $0.isGoal ?? false }
             }
         }
     }
@@ -51,6 +54,7 @@ class ActivityService {
                 print("oldValue != activitiesWithRepeats")
                 self.events = activitiesWithRepeats.filter { $0.isTask == nil }
                 self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
+                self.goals = activitiesWithRepeats.filter { $0.isGoal ?? false }
                 self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil }
             }
         }
@@ -138,6 +142,50 @@ class ActivityService {
         }
     }
     
+    var goals = [Activity]() {
+        didSet {
+            if oldValue != goals {
+                goals.sort { task1, task2 in
+                    if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                    } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                        if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                    }
+                    return !(task1.isCompleted ?? false)
+                }
+                NotificationCenter.default.post(name: .tasksUpdated, object: nil)
+            }
+        }
+    }
+    //for Apple/Google Task functions
+    var goalsNoRepeats = [Activity]() {
+        didSet {
+            if oldValue != goalsNoRepeats {
+                goalsNoRepeats.sort { task1, task2 in
+                    if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
+                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                    } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
+                        if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
+                            return task1.name ?? "" < task2.name ?? ""
+                        }
+                        return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                    }
+                    return !(task1.isCompleted ?? false)
+                }
+                NotificationCenter.default.post(name: .goalsNoRepeatsUpdated, object: nil)
+            }
+        }
+    }
+    
     var calendarActivities = [Activity]() {
         didSet {
             let currentDate = Date().localTime
@@ -195,7 +243,6 @@ class ActivityService {
     }
     var lists = [String: [ListType]]() {
         didSet {
-            print("didSet lists")
             if oldValue != lists {
                 for (_, listList) in lists {
                     for list in listList {

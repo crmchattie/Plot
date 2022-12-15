@@ -816,91 +816,85 @@ extension EventViewController {
     
     @objc func createNewActivity() {        
         if active, let oldRecurrences = self.activityOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let startDate = activityOld.startDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
-            let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
-                print("Save for this event only")
-                if self.activity.instanceID == nil {
-                    let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-                    self.activity.instanceID = instanceID
+            if self.activity.recurrences == nil {
+                self.deleteRecurrences()
+            } else {
+                let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "Save For This Event Only", style: .default, handler: { (_) in
+                    print("Save for this event only")
+                    if self.activity.instanceID == nil {
+                        let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                        self.activity.instanceID = instanceID
+                        
+                        var instanceIDs = self.activity.instanceIDs ?? []
+                        instanceIDs.append(instanceID)
+                        self.activity.instanceIDs = instanceIDs
+                    }
+                    self.updateListsFirebase(id: self.activity.instanceID!)
                     
-                    var instanceIDs = self.activity.instanceIDs ?? []
-                    instanceIDs.append(instanceID)
-                    self.activity.instanceIDs = instanceIDs
-                }
-                self.updateListsFirebase(id: self.activity.instanceID!)
-                
-                let newActivity = self.activity.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.activityOld)
-                var instanceValues = newActivity.toAnyObject()
-                
-                if self.activity.instanceOriginalStartDateTime == nil {
-                    instanceValues["instanceOriginalStartDateTime"] = self.activityOld.finalDateTime
-                    self.activity.instanceOriginalStartDateTime = self.activityOld.finalDateTime
-                }
-                
-                let createActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
-                self.closeController(title: eventUpdatedMessage)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
-                //update activity's recurrence to stop repeating just before this event
-                if let dateIndex = self.activity.instanceIndex {
-                    if dateIndex == 0 {
-                        //update all instances of activity
-                        if self.activity.recurrences == nil {
-                            self.deleteRecurrences()
-                        }
-                        self.createActivity(title: eventsUpdatedMessage)
-                    } else if let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
-                        var oldActivityRule = oldRecurrenceRule
-                        //update only future instances of activity
-                        var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
-                        newActivityRule!.startDate = self.activity.startDate ?? Date()
-                        
-                        var newRecurrences = oldRecurrences
-                        newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
-                        
-                        //duplicate activity w/ new ID and same recurrence rule starting from this event's date
-                        self.duplicateActivity(recurrenceRule: newRecurrences)
-                        
-                        //update existing activity with end date equaling ocurrence before this date
-                        oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
-                        
-                        self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
-                        self.updateRecurrences(recurrences: self.activityOld.recurrences!, title: eventsUpdatedMessage)
+                    let newActivity = self.activity.getDifferenceBetweenActivitiesNewInstance(otherActivity: self.activityOld)
+                    var instanceValues = newActivity.toAnyObject()
+                    
+                    if self.activity.instanceOriginalStartDateTime == nil {
+                        instanceValues["instanceOriginalStartDateTime"] = self.activityOld.finalDateTime
+                        self.activity.instanceOriginalStartDateTime = self.activityOld.finalDateTime
                     }
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Save For All Events", style: .default, handler: { (_) in
-                //update all instances of activity
-                if let dateIndex = self.activity.instanceIndex {
-                    if dateIndex == 0 {
-                        //update all instances of activity
-                        if self.activity.recurrences == nil {
-                            self.deleteRecurrences()
+                    
+                    let createActivity = ActivityActions(activity: self.activity, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    createActivity.updateInstance(instanceValues: instanceValues, updateExternal: true)
+                    self.closeController(title: eventUpdatedMessage)
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Save For Future Events", style: .default, handler: { (_) in
+                    //update activity's recurrence to stop repeating just before this event
+                    if let dateIndex = self.activity.instanceIndex {
+                        if dateIndex == 0 {
+                            //update all instances of activity
+                            self.createActivity(title: eventsUpdatedMessage)
+                        } else if let newRecurrences = self.activity.recurrences, let newRecurranceIndex = newRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }) {
+                            var oldActivityRule = oldRecurrenceRule
+                            //update only future instances of activity
+                            var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
+                            newActivityRule!.startDate = self.activity.startDate ?? Date()
+                            
+                            var newRecurrences = oldRecurrences
+                            newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
+                            
+                            //duplicate activity w/ new ID and same recurrence rule starting from this event's date
+                            self.duplicateActivity(recurrenceRule: newRecurrences)
+                            
+                            //update existing activity with end date equaling ocurrence before this date
+                            oldActivityRule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: dateIndex)
+                            
+                            self.activityOld.recurrences![oldRecurranceIndex] = oldActivityRule.toRRuleString()
+                            self.updateRecurrences(recurrences: self.activityOld.recurrences!, title: eventsUpdatedMessage)
                         }
-                        self.createActivity(title: eventsUpdatedMessage)
-                    } else if let date = self.activity.recurrenceStartDate, let startDate = self.activity.startDate, let endDate = self.activity.endDate {
-                        //update all instances of activity
-                        let duration = endDate.timeIntervalSince(startDate)
-                        self.activity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
-                        self.activity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
-                        if self.activity.recurrences == nil {
-                            self.deleteRecurrences()
-                        }
-                        self.createActivity(title: eventsUpdatedMessage)
                     }
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Save For All Events", style: .default, handler: { (_) in
+                    //update all instances of activity
+                    if let dateIndex = self.activity.instanceIndex {
+                        if dateIndex == 0 {
+                            self.createActivity(title: eventsUpdatedMessage)
+                        } else if let date = self.activity.recurrenceStartDate, let startDate = self.activity.startDate, let endDate = self.activity.endDate {
+                            //update all instances of activity
+                            let duration = endDate.timeIntervalSince(startDate)
+                            self.activity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
+                            self.activity.endDateTime = NSNumber(value: Int(date.timeIntervalSince1970 + duration))
+                            self.createActivity(title: eventsUpdatedMessage)
+                        }
+                    }
+                }))
+                
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                    print("User click Dismiss button")
+                }))
+                
+                self.present(alert, animated: true, completion: {
+                    print("completion block")
+                })
+            }
         }
         // do not want to have in duplicate functionality
         else {

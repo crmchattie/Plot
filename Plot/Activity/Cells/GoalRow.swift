@@ -222,17 +222,14 @@ final class GoalPickerInlineCell<T: Equatable> : Cell<T>, CellType {
             goal!.submetric = nil
         }
         
-        if let value = goal!.option, let options = goal!.options(), options.contains(value) {
-            optionView.isHidden = false
-            optionLabel.text = value
-        } else if let options = goal!.options() {
+        if let options = goal!.options() {
             optionView.isHidden = false
             optionLabel.text = options[0]
-            goal!.option = options[0]
+            goal!.option = options
         } else if let metric = goal!.metric, metric.submetrics.count > 0, let options = goal!.options(submetric: metric.submetrics[0]) {
             optionView.isHidden = false
             optionLabel.text = options[0]
-            goal!.option = options[0]
+            goal!.option = options
         } else {
             optionView.isHidden = true
             goal!.option = nil
@@ -342,9 +339,9 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
             case .option:
                 if let updatedValue = row.value {
                     if let _ = row.cell.goal {
-                        row.cell.goal!.option = updatedValue
+                        row.cell.goal!.option = [updatedValue]
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: updatedValue, unit: nil, targetNumber: nil, currentNumber: nil)
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: [updatedValue], unit: nil, targetNumber: nil, currentNumber: nil)
                     }
                 }
             }
@@ -440,11 +437,12 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
             return
         }
         self.options = options
-        if let option = goal.option {
-            self.value = option
-        } else {
-            self.value = options[0]
-        }
+        //need to fix
+//        if let option = goal.option {
+//            self.value = option
+//        } else {
+//            self.value = options[0]
+//        }
         if isExpanded, self.selectedGoalProperty != .option {
             toggleInlineRow()
             toggleInlineRow()

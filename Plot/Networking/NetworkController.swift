@@ -122,9 +122,20 @@ class NetworkController {
 }
 
 extension NetworkController {
+    func updateGoals() {
+        
+    }
+    
+    func setupGoals() {
+        print("setupGoals")
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+            let list = activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false })
+            let task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list?.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+        }
+    }
+    
     func createNewUserActivities() {
-        repeat {} while Auth.auth().currentUser?.uid == nil
-                
         let currentUserID = Auth.auth().currentUser?.uid
         
         let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID!).childByAutoId().key ?? ""
@@ -155,7 +166,6 @@ extension NetworkController {
                 // Create date from components
                 let userCalendar = Calendar.current
                 let someDateTime = userCalendar.date(from: dateComponents)!
-                
                 
                 let timezone = TimeZone.current
                 let seconds = TimeInterval(timezone.secondsFromGMT(for: someDateTime))

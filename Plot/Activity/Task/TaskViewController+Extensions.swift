@@ -89,7 +89,7 @@ extension TaskViewController: UpdateListDelegate {
             task.listColor = list.color
             task.listSource = list.source
             
-            if let source = list.source, source == ListSourceOptions.plot.name {
+            if active, let source = list.source, source == ListSourceOptions.plot.name {
                 let listReference = Database.database().reference().child(listEntity).child(listID).child(listTasksEntity)
                 listReference.child(self.activityID).setValue(true)
             }
@@ -348,7 +348,7 @@ extension TaskViewController: RecurrencePickerDelegate {
                 row.value = rowText
                 row.updateCell()
                 task.recurrences = [recurrenceRule.toRRuleString()]
-                if task.isGoal ?? false {
+                if task.isGoal ?? false, task.endDateTime == nil {
                     let original = Date()
                     let rounded = Date(timeIntervalSinceReferenceDate:
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
@@ -362,12 +362,9 @@ extension TaskViewController: RecurrencePickerDelegate {
                 }
                 row.value = "Never"
                 row.updateCell()
-                if !active {
-                    task.recurrences = nil
-                } else {
-                    self.deleteRecurrences()
-                }
+                self.task.recurrences = nil
             }
+            self.updateDescriptionRow()
         }
     }
 }

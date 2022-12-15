@@ -10,12 +10,13 @@ struct Goal: Codable, Equatable, Hashable {
     var name: String?
     var metric: GoalMetric?
     var submetric: GoalSubMetric?
-    var option: String?
+    var option: [String]?
     var unit: GoalUnit?
     var targetNumber: Double?
     var currentNumber: Double?
+    var activityID: String?
     
-    init(name: String?, metric: GoalMetric?, submetric: GoalSubMetric?, option: String?, unit: GoalUnit?, targetNumber: Double?, currentNumber: Double?) {
+    init(name: String?, metric: GoalMetric?, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit?, targetNumber: Double?, currentNumber: Double?) {
         self.name = name
         self.metric = metric
         self.submetric = submetric
@@ -33,6 +34,7 @@ struct Goal: Codable, Equatable, Hashable {
         self.unit = goal.unit
         self.targetNumber = goal.targetNumber
         self.currentNumber = goal.currentNumber
+        self.activityID = goal.activityID
     }
     
     var built: Bool {
@@ -46,9 +48,9 @@ struct Goal: Codable, Equatable, Hashable {
             case .group:
                 return .uncategorized
             case .category:
-                return ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+                return ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
             case .subcategory:
-                return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+                return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
             case .some(.none):
                 return .uncategorized
             case nil:
@@ -59,15 +61,15 @@ struct Goal: Codable, Equatable, Hashable {
             case .group:
                 return .uncategorized
             case .category:
-                return ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+                return ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
             case .subcategory:
-                return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+                return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
             case .some(.none):
                 return .uncategorized
             case nil:
                 return .uncategorized
             }
-        case .savings, .spending, .balances:
+        case .financialTransactions, .financialAccounts:
             return .finances
         case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return .health
@@ -83,9 +85,9 @@ struct Goal: Codable, Equatable, Hashable {
             case .group:
                 return .uncategorized
             case .category:
-                return ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+                return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
             case .subcategory:
-                return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+                return ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
             case .some(.none):
                 return .uncategorized
             case nil:
@@ -96,19 +98,17 @@ struct Goal: Codable, Equatable, Hashable {
             case .group:
                 return .uncategorized
             case .category:
-                return ActivitySubcategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized
+                return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
             case .subcategory:
-                return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.submetric?.rawValue ?? "Uncategorized") ?? .uncategorized)
+                return ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
             case .some(.none):
                 return .uncategorized
             case nil:
                 return .uncategorized
             }
-        case .savings:
-            return .savings
-        case .spending:
-            return .spending
-        case .balances:
+        case .financialTransactions:
+            return .finances
+        case .financialAccounts:
             return .finances
         case .mindfulness:
             return .mindfulness
@@ -125,7 +125,7 @@ struct Goal: Codable, Equatable, Hashable {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
         numberFormatter.maximumFractionDigits = 0
-        var description = "Goal is Complete when"
+        var description = "Goal is complete when"
         if let unit = unit, let metric = metric, let submetric = submetric, let option = option, let targetNumber = targetNumber as? NSNumber {
             switch unit {
             case .calories:
@@ -150,13 +150,48 @@ struct Goal: Codable, Equatable, Hashable {
                 numberFormatter.numberStyle = .decimal
             }
             
-            description += " " + unit.rawValue + " of"
+            description += " " + unit.rawValue.lowercased() + " of "
 
             if let string = numberFormatter.string(from: targetNumber), metric == .tasks || metric == .events {
-                description += " " + metric.rawValue + " in the " + option + " " + submetric.rawValue + " hits " + string
+                description += metric.rawValue.lowercased() + " in the "
+                if option.count > 0 {
+                    for index in 0...option.count - 1 {
+                        if index == option.count - 1 {
+                            description += option[index].lowercased()
+                        } else {
+                            if option.count == 2 || index == option.count - 2 {
+                                description += option[index].lowercased() + " and "
+                            } else {
+                                description += option[index].lowercased() + ", "
+                            }
+                        }
+                    }
+                    if option.count > 1 {
+                        description += " " + submetric.pluralName.lowercased() + " hits " + string
+                    } else {
+                        description += " " + submetric.singlularName.lowercased() + " hits " + string
+                    }
+                } else if submetric != .none {
+                    return nil
+                }
                 return description
             } else if let string = numberFormatter.string(from: targetNumber) {
-                description += " " + option + " hits " + string
+                if option.count > 0 {
+                    for index in 0...option.count - 1 {
+                        if index == option.count - 1 {
+                            description += option[index].lowercased()
+                        } else {
+                            if option.count == 2 || index == option.count - 2 {
+                                description += option[index].lowercased() + " and "
+                            } else {
+                                description += option[index].lowercased() + ", "
+                            }
+                        }
+                    }
+                } else if submetric != .none {
+                    return nil
+                }
+                description += " hits " + string
                 return description
             }
         } else if let unit = unit, let metric = metric, let targetNumber = targetNumber as? NSNumber {
@@ -184,11 +219,11 @@ struct Goal: Codable, Equatable, Hashable {
             }
             
             if let string = numberFormatter.string(from: targetNumber), metric == .activeCalories || metric == .steps || metric == .flightsClimbed {
-                description += " " + metric.rawValue + " hits " + string
+                description += " " + metric.rawValue.lowercased() + " hits " + string
                 return description
             } else if let string = numberFormatter.string(from: targetNumber) {
-                description += " " + unit.rawValue + " of"
-                description += " " + metric.rawValue + " hits " + string
+                description += " " + unit.rawValue.lowercased() + " of"
+                description += " " + metric.rawValue.lowercased() + " hits " + string
                 return description
             }
         }
@@ -224,33 +259,20 @@ struct Goal: Codable, Equatable, Hashable {
             case nil:
                 return nil
             }
-        case .savings:
+        case .financialTransactions:
             switch self.submetric {
             case .group:
-                return nil
+                return financialTransactionsGroupsWExpense
             case .category:
-                return nil
+                return financialTransactionsTopLevelCategoriesStaticWOUncategorized.sorted()
             case .subcategory:
-                return financialTransactionsCategoriesStaticWOUncategorizedIncome.sorted()
+                return financialTransactionsCategoriesStaticWOUncategorized.sorted()
             case .some(.none):
                 return nil
             case nil:
                 return nil
             }
-        case .spending:
-            switch self.submetric {
-            case .group:
-                return financialTransactionsGroupsWExpenseStatic.sorted()
-            case .category:
-                return financialTransactionsTopLevelCategoriesStaticWOUncategorizedExpense.sorted()
-            case .subcategory:
-                return financialTransactionsCategoriesStaticWOUncategorizedExpense.sorted()
-            case .some(.none):
-                return nil
-            case nil:
-                return nil
-            }
-        case .balances:
+        case .financialAccounts:
             switch self.submetric {
             case .group:
                 return BalanceSheetType.allValues
@@ -294,29 +316,18 @@ struct Goal: Codable, Equatable, Hashable {
             case .none:
                 return nil
             }
-        case .savings:
+        case .financialTransactions:
             switch submetric {
             case .group:
-                return nil
+                return financialTransactionsGroupsWExpense
             case .category:
-                return nil
+                return financialTransactionsTopLevelCategoriesStaticWOUncategorized.sorted()
             case .subcategory:
-                return financialTransactionsCategoriesStaticWOUncategorizedIncome.sorted()
+                return financialTransactionsCategoriesStaticWOUncategorized.sorted()
             case .none:
                 return nil
             }
-        case .spending:
-            switch submetric {
-            case .group:
-                return financialTransactionsGroupsWExpenseStatic.sorted()
-            case .category:
-                return financialTransactionsTopLevelCategoriesStaticWOUncategorizedExpense.sorted()
-            case .subcategory:
-                return financialTransactionsCategoriesStaticWOUncategorizedExpense.sorted()
-            case .none:
-                return nil
-            }
-        case .balances:
+        case .financialAccounts:
             switch submetric {
             case .group:
                 return BalanceSheetType.allValues
@@ -335,11 +346,27 @@ struct Goal: Codable, Equatable, Hashable {
     }
 }
 
+let prebuiltGoals = [mindfulnessGoal, sleepGoal, workoutsGoal, savingsGoal, dentistGoal, timeOffGoal, generalCheckUpGoal, eyeCheckUpGoal, skinCheckUpGoal, socialGoal]
+
+let mindfulnessGoal = Goal(name: "Mindfulness", metric: GoalMetric.mindfulness, submetric: nil, option: nil, unit: GoalUnit.minutes, targetNumber: 30, currentNumber: nil)
+let sleepGoal = Goal(name: "Sleep", metric: GoalMetric.sleep, submetric: nil, option: nil, unit: GoalUnit.hours, targetNumber: 7, currentNumber: nil)
+let workoutsGoal = Goal(name: "Workout", metric: GoalMetric.workout, submetric: nil, option: nil, unit: GoalUnit.minutes, targetNumber: 30, currentNumber: nil)
+let savingsGoal = Goal(name: "Savings", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.percent, targetNumber: 0.2, currentNumber: nil)
+let debtGoal = Goal(name: "Pay Down Debt Other Than Credit Card", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Mortgage", "Loan", "Line of Credit"], unit: GoalUnit.percent, targetNumber: 0.2, currentNumber: nil)
+let creditCardGoal = Goal(name: "Pay Off Credit Card", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Credit Card"], unit: GoalUnit.percent, targetNumber: 0.2, currentNumber: nil)
+let emergencyFundGoal = Goal(name: "Emergency Fund", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Cash", "Checking", "Savings"], unit: GoalUnit.percent, targetNumber: 0.2, currentNumber: nil)
+let dentistGoal = Goal(name: "Dentist", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Dentist"], unit: GoalUnit.count, targetNumber: 2, currentNumber: nil)
+let timeOffGoal = Goal(name: "Time Off", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Time Off"], unit: GoalUnit.count, targetNumber: 10, currentNumber: nil)
+let generalCheckUpGoal = Goal(name: "General Check-up", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor"], unit: GoalUnit.count, targetNumber: 1, currentNumber: nil)
+let eyeCheckUpGoal = Goal(name: "Eye Check-up", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Eye Doctor"], unit: GoalUnit.count, targetNumber: 1, currentNumber: nil)
+let skinCheckUpGoal = Goal(name: "Skin Check-up", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Skin Doctor"], unit: GoalUnit.count, targetNumber: 1, currentNumber: nil)
+let socialGoal = Goal(name: "Reach out to Somone", metric: GoalMetric.events, submetric: GoalSubMetric.category, option: ["Social"], unit: GoalUnit.count, targetNumber: 1, currentNumber: nil)
+
 enum GoalMetric: String, Codable, CaseIterable {
 //    case time = "Time"
 //    case tasks = "Completed Tasks"
 //    case spending = "Spending"
-//    case savings = "Savings"
+//    case income = "Savings"
 //    case cash = "Cash"
 //    case investments = "Investments"
 //    case assets = "Assets"
@@ -357,9 +384,8 @@ enum GoalMetric: String, Codable, CaseIterable {
     
     case events = "Events"
     case tasks = "Completed Tasks"
-    case savings = "Savings"
-    case spending = "Spending"
-    case balances = "Balances"
+    case financialTransactions = "Financial Transactions"
+    case financialAccounts = "Financial Accounts"
     case workout = "Workouts"
     case mindfulness = "Mindfulness"
     case sleep = "Sleep"
@@ -398,11 +424,9 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.none, .category, .subcategory]
         case .tasks:
             return [.none, .category, .subcategory]
-        case .savings:
-            return [.none, .subcategory]
-        case .spending:
+        case .financialTransactions:
             return [.none, .group, .category, .subcategory]
-        case .balances:
+        case .financialAccounts:
             return [.none, .group, .category, .subcategory]
         case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return []
@@ -415,12 +439,10 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.count, .minutes, .hours, .days]
         case .tasks:
             return [.count]
-        case .savings:
+        case .financialTransactions:
             return [.amount, .percent]
-        case .spending:
+        case .financialAccounts:
             return [.amount]
-        case .balances:
-            return [.amount, .percent]
         case .workout:
             return [.count, .calories, .minutes]
         case .mindfulness:
@@ -449,6 +471,23 @@ enum GoalSubMetric: String, Codable, CaseIterable {
     //    case steps = "Steps"
     //    case flightsClimbed = "Flights Climbed"
     //    case activeCalories = "Active Calories"
+    
+    var singlularName: String {
+        return self.rawValue
+    }
+    
+    var pluralName: String {
+        switch self {
+        case .none:
+            return self.rawValue
+        case .group:
+            return "Groups"
+        case .category:
+            return "Categories"
+        case .subcategory:
+            return "Subcategories"
+        }
+    }
 }
 
 enum GoalUnit: String, Codable, CaseIterable {

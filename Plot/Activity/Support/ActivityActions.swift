@@ -269,6 +269,10 @@ class ActivityActions: NSObject {
         }
                 
         if activity.isTask ?? false {
+            if let source = activity.listSource, source == ListSourceOptions.plot.name, let listID = activity.listID {
+                let listReference = Database.database().reference().child(listEntity).child(listID).child(listTasksEntity)
+                listReference.child(activityID).setValue(true)
+            }
             var reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists(), let value = snapshot.value as? String {

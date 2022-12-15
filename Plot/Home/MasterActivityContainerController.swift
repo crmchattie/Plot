@@ -375,7 +375,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         
         let connectedReference = Database.database().reference(withPath: ".info/connected")
         connectedReference.observe(.value, with: { (snapshot) in
-            
             if self.currentReachabilityStatus != .notReachable {
                 self.navigationItemActivityIndicator.hideActivityIndicator(for: self.navigationItem, activityPriority: .crazy)
             } else {
@@ -485,9 +484,9 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Cash Flow" {
-                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime, level: transactionLevel, accounts: nil) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.dayAfter, level: transactionLevel, accounts: nil) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
-                            categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.monthBefore, level: .group, accounts: nil) { (transactionsListPrior, _) in
+                            categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.dayAfter.monthBefore, level: .group, accounts: nil) { (transactionsListPrior, _) in
                                 if !transactionsListPrior.isEmpty {
                                     addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
                                         sections.append(section)

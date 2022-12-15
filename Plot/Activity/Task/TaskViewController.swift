@@ -154,10 +154,10 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     //create new activityID for auto updating items (schedule, purchases, checklist)
                     activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                     if let list = list {
-                        task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+                        task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                     } else {
                         list = lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false })
-                        task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list?.source ?? "", isTask: true, isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+                        task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list?.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                         task.category = list?.category
                         if let endDateTime = endDateTime {
                             task.endDateTime = NSNumber(value: Int((endDateTime).timeIntervalSince1970))
@@ -245,18 +245,11 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             $0.placeholder = $0.tag
             if let task = task, let name = task.name {
                 $0.value = name
-                self.navigationItem.rightBarButtonItem?.isEnabled = true
-            } else {
-                self.navigationItem.rightBarButtonItem?.isEnabled = false
-                //$0.cell.textField.becomeFirstResponder()
             }
+            self.updateRightBarButton()
         }.onChange() { [unowned self] row in
             self.task.name = row.value
-            if row.value == nil {
-                self.navigationItem.rightBarButtonItem?.isEnabled = false
-            } else {
-                self.navigationItem.rightBarButtonItem?.isEnabled = true
-            }
+            self.updateRightBarButton()
         }.cellUpdate { cell, row in
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textField?.textColor = .label
@@ -981,10 +974,11 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 row.options = GoalMetric.allValues
                 if let task = task, let goal = task.goal, let value = goal.metric {
                     row.value = value.rawValue
-                } else {
-                    row.value = GoalMetric.allValues[0]
-                    self.task.goal = Goal(name: nil, metric: GoalMetric(rawValue: GoalMetric.allValues[0]), submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
                 }
+//                else {
+//                    row.value = GoalMetric.allValues[0]
+//                    self.task.goal = Goal(name: nil, metric: GoalMetric(rawValue: GoalMetric.allValues[0]), submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+//                }
             }.onPresent { from, to in
                 to.title = "Metrics"
                 to.extendedLayoutIncludesOpaqueBars = true
@@ -1014,13 +1008,10 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 row.cell.detailTextLabel?.textColor = .secondaryLabel
                 row.title = row.tag
                 row.options = []
-                if let task = task, let goal = task.goal, let metric = goal.metric {
-                    row.options = metric.allValuesSubmetrics
-                    if let value = goal.submetric {
+                if let task = task, let goal = task.goal {
+                    if let value = goal.submetric, let metric = goal.metric, metric.allValuesSubmetrics.count > 0 {
                         row.value = value.rawValue
-                    } else if metric.allValuesSubmetrics.count > 0 {
-                        row.value = metric.allValuesSubmetrics[0]
-                        self.task.goal?.submetric = GoalSubMetric(rawValue: metric.allValuesSubmetrics[0])
+                        row.options = metric.allValuesSubmetrics
                     } else {
                         row.hidden = true
                     }
@@ -1053,7 +1044,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 self.updateGoal(selectedGoalProperty: .submetric, value: row.value)
             }
             
-            <<< PushRow<String>("Option") { row in
+            <<< MultipleSelectorRow<String>("Option") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textColor = .label
                 row.cell.detailTextLabel?.textColor = .secondaryLabel
@@ -1062,7 +1053,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 if let task = task, let goal = task.goal, let _ = goal.metric, let options = goal.options() {
                     row.options = options
                     if let value = goal.option {
-                        row.value = value
+                        row.value = Set(value)
                     }
                 } else {
                     row.hidden = true
@@ -1071,9 +1062,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 to.title = "Options"
                 to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
-                to.dismissOnSelection = true
-                to.dismissOnChange = true
-                to.enableDeselection = false
                 to.selectableRowCellUpdate = { cell, row in
                     to.tableView.separatorStyle = .none
                     to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
@@ -1092,14 +1080,17 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     cell.isUserInteractionEnabled = false
                 }
             }.onChange { row in
-                if let value = row.value {
+                if let value = row.value, value.isEmpty, let options = row.options {
+                    row.value = Set(arrayLiteral: options[0])
+                } else if let value = row.value {
                     if let _ = self.task.goal {
-                        self.task.goal!.option = value
+                        self.task.goal!.option = Array(value)
                     } else {
-                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: value, unit: nil, targetNumber: nil, currentNumber: nil)
+                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: Array(value), unit: nil, targetNumber: nil, currentNumber: nil)
                     }
+                    self.updateDescriptionRow()
+                    self.updateCategorySubCategoryRows()
                 }
-                self.updateDescriptionRow()
             }
             
             <<< PushRow<String>("Unit") { row in
@@ -1167,12 +1158,10 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textField?.textColor = .secondaryLabel
             }.onChange { row in
-                if let value = row.value {
-                    if let _ = self.task.goal {
-                        self.task.goal!.targetNumber = value
-                    } else {
-                        self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: value, currentNumber: nil)
-                    }
+                if let _ = self.task.goal {
+                    self.task.goal!.targetNumber = row.value
+                } else {
+                    self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: row.value, currentNumber: nil)
                 }
                 self.updateDescriptionRow()
             }
