@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import RRuleSwift
 
 extension NSNotification.Name {
     static let variablesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".variablesUpdated")
@@ -123,15 +124,80 @@ class NetworkController {
 
 extension NetworkController {
     func updateGoals() {
-        
+        for task in activityService.goals {
+            if let goal = task.goal, let endDate = task.endDate {
+                if let recurrences = task.recurrences {
+                    
+                } else {
+                    
+                }
+            }
+        }
     }
     
     func setupGoals() {
-        print("setupGoals")
-        if let currentUserID = Auth.auth().currentUser?.uid {
-            let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
-            let list = activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false })
-            let task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list?.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+            for goal in prebuiltGoals {
+                let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                let category = goal.category
+                let subcategory = goal.subcategory
+                
+                var list: ListType?
+                if category == .finances, let newList = lists.first(where: { $0.financeList ?? false }) {
+                    list = newList
+                } else if category == .health, let newList = lists.first(where: { $0.healthList ?? false }) {
+                    list = newList
+                } else if let newList = lists.first(where: { $0.defaultList ?? false }) {
+                    list = newList
+                }
+                
+                if let list = list {
+                    let date = NSNumber(value: Int((Date()).timeIntervalSince1970))
+                    let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: date)
+                    task.name = goal.name
+                    task.isGoal = true
+                    task.goal = goal
+                    task.category = category.rawValue
+                    task.subcategory = subcategory.rawValue
+                    if let frequency = goal.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
+                        var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
+                        var date = Date()
+                        switch recurrenceRule.frequency {
+                        case .yearly:
+                            date = date.localTime.endOfYear
+                        case .monthly:
+                            date = date.localTime.endOfMonth
+                        case .weekly:
+                            date = date.localTime.endOfWeek
+                        case .daily:
+                            date = date.localTime.endOfDay
+                        case .hourly, .minutely, .secondly:
+                            break
+                        }
+                        task.endDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                        recurrenceRule.startDate = date
+                        recurrenceRule.interval = goal.name != "Dentist" ? 1 : 2
+                        task.recurrences = [recurrenceRule.toRRuleString()]
+                    } else {
+                        task.endDateTime = date
+                    }
+                    
+//                    print(task.name)
+//                    print(task.category)
+//                    print(task.subcategory)
+//                    print(task.endDate)
+//                    print(task.recurrences)
+                    let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
+                    activityAction.createNewActivity(updateDirectAssociation: false)
+                }
+            }
+        }
+    }
+    
+    func deleteGoals() {
+        for task in activityService.goalsNoRepeats {
+            let activityAction = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+            activityAction.deleteActivity(updateExternal: true, updateDirectAssociation: false)
         }
     }
     

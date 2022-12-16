@@ -122,7 +122,7 @@ enum ActivityCategory: String, Codable, CaseIterable {
             return .todo
         case .chores:
             return .todo
-        case .doctor:
+        case .doctorGeneral:
             return .health
         case .entertainment:
             return .leisure
@@ -184,7 +184,7 @@ enum ActivityCategory: String, Codable, CaseIterable {
             return .uncategorized
         case .notApplicable:
             return .notApplicable
-        case .dentist:
+        case .doctorDentist:
             return .health
         case .doctorEye:
             return .health

@@ -37,8 +37,9 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     var defaultList: Bool?
     var financeList: Bool?
     var healthList: Bool?
+    var goalList: Bool?
     
-    init(id: String, name: String?, color: String?, source: String, admin: String?, defaultList: Bool?, financeList: Bool?, healthList: Bool?) {
+    init(id: String, name: String?, color: String?, source: String, admin: String?, defaultList: Bool?, financeList: Bool?, healthList: Bool?, goalList: Bool?) {
         self.id = id
         self.name = name
         self.color = color
@@ -47,14 +48,15 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
         self.defaultList = defaultList
         self.financeList = financeList
         self.healthList = healthList
+        self.goalList = goalList
     }
 }
 
 let prebuiltLists: [ListType] = [defaultList, financeList, healthList]
 
-let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[5]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: true, financeList: false, healthList: false)
-let financeList = ListType(id: UUID().uuidString, name: "Finances", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: true, healthList: false)
-let healthList = ListType(id: UUID().uuidString, name: "Health", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: false, healthList: true)
+let defaultList = ListType(id: UUID().uuidString, name: ListOptions.defaultList.rawValue, color: CIColor(color: ChartColors.palette()[5]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: true, financeList: false, healthList: false, goalList: false)
+let financeList = ListType(id: UUID().uuidString, name: "Finances", color: CIColor(color: ChartColors.palette()[1]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: true, healthList: false, goalList: false)
+let healthList = ListType(id: UUID().uuidString, name: "Health", color: CIColor(color: ChartColors.palette()[2]).stringRepresentation, source: ListSourceOptions.plot.name, admin: nil, defaultList: false, financeList: false, healthList: true, goalList: false)
 
 enum ListSourceOptions: String, CaseIterable {
     case plot = "Plot"
@@ -84,4 +86,5 @@ enum ListOptions: String, CaseIterable {
     case scheduledList = "Scheduled"
     case flaggedList = "Flagged"
     case allList = "All"
+    case goalList = "Goal"
 }

@@ -117,6 +117,14 @@ class ListViewController: UIViewController, ObjectDetailShowing {
                 return false
             }
             filteredTasks = dailyTasks
+        case .goalList:
+            let goalTasks = tasks.filter {
+                if $0.isGoal ?? false {
+                    return true
+                }
+                return false
+            }
+            filteredTasks = goalTasks
         default:
             filteredTasks = tasks.filter { $0.listID == list.id }
         }
@@ -519,6 +527,14 @@ extension ListViewController: UpdateFilter {
                 return false
             }
             filteredTasks = dailyTasks
+        case .goalList:
+            let goalTasks = tasks.filter {
+                if $0.isGoal ?? false {
+                    return true
+                }
+                return false
+            }
+            filteredTasks = goalTasks
         default:
             filteredTasks = filteredTasks.filter { $0.listID == list.id }
         }

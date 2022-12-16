@@ -101,15 +101,16 @@ class GeneralTabBarController: UITabBarController {
             UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
             GeneralTabBarController.networkController.setupKeyVariables {
                 self.analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
-                GeneralTabBarController.networkController.setupGoals()
+                GeneralTabBarController.networkController.setupOtherVariables()
+                self.homeController.removeLaunchScreenView(animated: true) {
+                    self.homeController.openNotification()
+//                    GeneralTabBarController.networkController.setupGoals()
+//                    GeneralTabBarController.networkController.deleteGoals()
 //                if let previousVersion = previousVersion, previousVersion.compare("1.3.7") == .orderedAscending {
 //                    GeneralTabBarController.networkController.setupGoals()
 //                } else {
 //                    GeneralTabBarController.networkController.updateGoals()
 //                }
-                GeneralTabBarController.networkController.setupOtherVariables()
-                self.homeController.removeLaunchScreenView(animated: true) {
-                    self.homeController.openNotification()
                 }
             }
         } else {

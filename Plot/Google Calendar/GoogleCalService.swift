@@ -502,7 +502,7 @@ class GoogleCalService {
     func convertListsToPlot(lists: [GTLRTasks_TaskList]) -> [ListType] {
         var listTypes = [ListType]()
         for list in lists {
-            let listType = ListType(id: list.identifier ?? UUID().uuidString, name: list.title ?? "Google", color:  CIColor(color: UIColor("#007AFF")).stringRepresentation, source: ListSourceOptions.google.name, admin: nil, defaultList: false, financeList: false, healthList: false)
+            let listType = ListType(id: list.identifier ?? UUID().uuidString, name: list.title ?? "Google", color:  CIColor(color: UIColor("#007AFF")).stringRepresentation, source: ListSourceOptions.google.name, admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
             listTypes.append(listType)
         }
         return listTypes

@@ -433,15 +433,18 @@ extension TaskViewController {
     }
     
     func updateGoal(selectedGoalProperty: SelectedGoalProperty, value: String?) {
-        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Option") {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Option"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship") {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
                     if let goal = task.goal, goal.targetNumber != 0 {
-                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: goal.targetNumber, currentNumber: nil)
+                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: goal.targetNumber, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
                     } else {
-                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
                     }
+                    
+                    metricsRelationshipRow.hidden = false
+                    metricsRelationshipRow.evaluateHidden()
                     
                     //units
                     if updatedValue.units.count > 0 {
@@ -472,7 +475,7 @@ extension TaskViewController {
                     if let _ = task.goal {
                         task.goal!.submetric = updatedValue
                     } else {
-                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
                     }
                     if let options = task.goal!.options() {
                         optionRow.value = Set(arrayLiteral: options[0])
@@ -500,11 +503,82 @@ extension TaskViewController {
         }
     }
     
+    func updateGoalSeconday(selectedGoalProperty: SelectedGoalProperty, value: String?) {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Second Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let _ = task.goal {
+            switch selectedGoalProperty {
+            case .metric:
+                if let value = value, let updatedValue = GoalMetric(rawValue: value) {
+                    task.goal!.metricSecond = updatedValue
+                    
+                    //units
+                    if updatedValue.units.count > 0 {
+                        task.goal!.unitSecond = updatedValue.units[0]
+                        unitRow.value = updatedValue.units[0].rawValue
+                        unitRow.options = updatedValue.allValuesUnits
+                    } else {
+                        task.goal!.unit = nil
+                        unitRow.value = nil
+                    }
+                                                            
+                    //submetric
+                    if value != "None", updatedValue.submetrics.count > 0 {
+                        submetricRow.hidden = false
+                        submetricRow.evaluateHidden()
+                        task.goal!.submetricSecond = updatedValue.submetrics[0]
+                        submetricRow.value = updatedValue.submetrics[0].rawValue
+                        submetricRow.options = updatedValue.allValuesSubmetrics
+                    } else {
+                        task.goal!.submetricSecond = nil
+                        submetricRow.hidden = true
+                        submetricRow.evaluateHidden()
+                        submetricRow.value = nil
+                    }
+                } else {
+                    task.goal!.metricSecond = nil
+                    task.goal!.submetricSecond = nil
+                    submetricRow.hidden = true
+                    submetricRow.evaluateHidden()
+                    submetricRow.value = nil
+                }
+            case .submetric:
+                if let value = value, let updatedValue = GoalSubMetric(rawValue: value) {
+                    task.goal!.submetricSecond = updatedValue
+                    if let options = task.goal!.optionsSecond() {
+                        optionRow.value = Set(arrayLiteral: options[0])
+                        optionRow.options = options
+                        optionRow.hidden = false
+                        optionRow.evaluateHidden()
+                    } else {
+                        task.goal!.optionSecond = nil
+                        optionRow.hidden = true
+                        optionRow.evaluateHidden()
+                        optionRow.value = nil
+                    }
+                } else {
+                    task.goal!.optionSecond = nil
+                    optionRow.hidden = true
+                    optionRow.evaluateHidden()
+                    optionRow.value = nil
+
+                }
+            case .unit, .option:
+                break
+            }
+            updateDescriptionRow()
+        }
+    }
+    
     func updateDescriptionRow() {
         if let descriptionRow: LabelRow = self.form.rowBy(tag: "Description") {
             if let goal = task.goal, let description = goal.description {
                 var updatedDescription = description
-                if let repeatRow: LabelRow = self.form.rowBy(tag: "Repeat"), let value = repeatRow.value, value != "Never" {
+                if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
+                    var value = String()
+                    if let endDate = self.task.instanceOriginalStartDate {
+                        value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                    } else if let endDate = self.task.endDate {
+                        value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                    }
                     updatedDescription += " " + value.lowercased()
                 } else if let endDate = self.task.endDate {
                     let dateFormatter = DateFormatter()
@@ -599,6 +673,46 @@ extension TaskViewController {
                 if let currentRow : DecimalRow = self.form.rowBy(tag: "Current") {
                     currentRow.formatter = numberFormatter
                     if let value = goal.currentNumber {
+                        currentRow.value = value
+                    }
+                }
+            }
+        }
+    }
+    
+    func updateNumberRowsSecond() {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.maximumFractionDigits = 0
+        if let goal = task.goal, let unit = goal.unitSecond {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+            case .days:
+                numberFormatter.numberStyle = .decimal
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            if let targetRow : DecimalRow = self.form.rowBy(tag: "Second Target") {
+                targetRow.formatter = numberFormatter
+                if let value = goal.targetNumberSecond {
+                    targetRow.value = value
+                }
+                if let currentRow : DecimalRow = self.form.rowBy(tag: "Second Current") {
+                    currentRow.formatter = numberFormatter
+                    if let value = goal.currentNumberSecond {
                         currentRow.value = value
                     }
                 }

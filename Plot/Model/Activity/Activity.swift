@@ -104,13 +104,20 @@ class Activity: NSObject, NSCopying, Codable {
     var goalUnit: String?
     var goalTargetNumber: NSNumber?
     var goalCurrentNumber: NSNumber?
+    var goalMetricSecond: String?
+    var goalSubmetricSecond: String?
+    var goalOptionSecond: [String]?
+    var goalUnitSecond: String?
+    var goalTargetNumberSecond: NSNumber?
+    var goalCurrentNumberSecond: NSNumber?
+    var goalSecondMetricType: String?
     private var _goal: Goal?
     var goal: Goal? {
         get {
             if let _goal = _goal {
                 return _goal
             } else {
-                var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
+                var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
                 goal.activityID = self.activityID
                 if let value = goalMetric {
                     goal.metric = GoalMetric(rawValue: value)
@@ -129,6 +136,27 @@ class Activity: NSObject, NSCopying, Codable {
                 }
                 if let value = goalCurrentNumber {
                     goal.currentNumber = Double(truncating: value)
+                }
+                if let value = goalMetricSecond {
+                    goal.metricSecond = GoalMetric(rawValue: value)
+                }
+                if let value = goalSubmetricSecond {
+                    goal.submetricSecond = GoalSubMetric(rawValue: value)
+                }
+                if let value = goalOptionSecond {
+                    goal.optionSecond = value
+                }
+                if let value = goalUnitSecond {
+                    goal.unitSecond = GoalUnit(rawValue: value)
+                }
+                if let value = goalTargetNumberSecond {
+                    goal.targetNumberSecond = Double(truncating: value)
+                }
+                if let value = goalCurrentNumberSecond {
+                    goal.currentNumberSecond = Double(truncating: value)
+                }
+                if let value = goalSecondMetricType {
+                    goal.secondMetricType = SecondMetricType(rawValue: value)
                 }
                 return goal
             }
@@ -198,6 +226,11 @@ class Activity: NSObject, NSCopying, Codable {
         case goalSubmetric
         case goalOption
         case goalUnit
+        case goalMetricSecond
+        case goalSubmetricSecond
+        case goalOptionSecond
+        case goalUnitSecond
+        case goalSecondMetricType
     }
     
     init(activityID: String, admin: String, calendarID: String, calendarName: String, calendarColor: String, calendarSource: String, allDay: Bool, startDateTime: NSNumber, startTimeZone: String, endDateTime: NSNumber, endTimeZone: String, createdDate: NSNumber) {
@@ -259,6 +292,27 @@ class Activity: NSObject, NSCopying, Codable {
         }
         if let value = goal.currentNumber as? NSNumber {
             self.goalCurrentNumber = value
+        }
+        if let value = goal.metricSecond {
+            self.goalMetricSecond = value.rawValue
+        }
+        if let value = goal.submetricSecond {
+            self.goalSubmetricSecond = value.rawValue
+        }
+        if let value = goal.optionSecond {
+            self.goalOptionSecond = value
+        }
+        if let value = goal.unitSecond {
+            self.goalUnitSecond = value.rawValue
+        }
+        if let value = goal.targetNumberSecond as? NSNumber {
+            self.goalTargetNumberSecond = value
+        }
+        if let value = goal.currentNumberSecond as? NSNumber {
+            self.goalCurrentNumberSecond = value
+        }
+        if let value = goal.secondMetricType {
+            self.goalSecondMetricType = value.rawValue
         }
         self.recurrences = recurrences
         self.endDateTime = endDateTime
@@ -357,6 +411,13 @@ class Activity: NSObject, NSCopying, Codable {
         goalUnit = dictionary?["goalUnit"] as? String
         goalTargetNumber = dictionary?["goalTargetNumber"] as? NSNumber
         goalCurrentNumber = dictionary?["goalCurrentNumber"] as? NSNumber
+        goalMetricSecond = dictionary?["goalMetricSecond"] as? String
+        goalSubmetricSecond = dictionary?["goalSubmetricSecond"] as? String
+        goalOptionSecond = dictionary?["goalOptionSecond"] as? [String]
+        goalUnitSecond = dictionary?["goalUnitSecond"] as? String
+        goalTargetNumberSecond = dictionary?["goalTargetNumberSecond"] as? NSNumber
+        goalCurrentNumberSecond = dictionary?["goalCurrentNumberSecond"] as? NSNumber
+        goalSecondMetricType = dictionary?["goalSecondMetricType"] as? String
     }
     
     func copy(with zone: NSZone? = nil) -> Any {
@@ -705,6 +766,34 @@ class Activity: NSObject, NSCopying, Codable {
         if let goal = self.goal, let value = goal.currentNumber as AnyObject? {
             dictionary["goalCurrentNumber"] = value
         }
+        
+        if let goal = self.goal, let value = goal.metricSecond?.rawValue as AnyObject? {
+            dictionary["goalMetricSecond"] = value
+        }
+        
+        if let goal = self.goal, let value = goal.submetricSecond?.rawValue as AnyObject? {
+            dictionary["goalSubmetricSecond"] = value
+        }
+        
+        if let goal = self.goal, let value = goal.optionSecond as AnyObject? {
+            dictionary["goalOptionSecond"] = value
+        }
+        
+        if let goal = self.goal, let value = goal.unitSecond?.rawValue as AnyObject? {
+            dictionary["goalUnitSecond"] = value
+        }
+        
+        if let goal = self.goal, let value = goal.targetNumberSecond as AnyObject? {
+            dictionary["goalTargetNumberSecond"] = value
+        }
+        
+        if let goal = self.goal, let value = goal.currentNumberSecond as AnyObject? {
+            dictionary["goalCurrentNumberSecond"] = value
+        }
+        
+        if let goal = self.goal, let value = goal.secondMetricType?.rawValue as AnyObject? {
+            dictionary["secondMetricType"] = value
+        }
                 
         return dictionary
     }
@@ -977,6 +1066,18 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.goalOption = value
         }
         
+        if let value = updatingActivity.goalMetricSecond {
+            newActivity.goalMetricSecond = value
+        }
+        
+        if let value = updatingActivity.goalSubmetricSecond {
+            newActivity.goalSubmetricSecond = value
+        }
+        
+        if let value = updatingActivity.goalOptionSecond {
+            newActivity.goalOptionSecond = value
+        }
+        
         if let value = updatingActivity.goalUnit {
             newActivity.goalUnit = value
         }
@@ -987,6 +1088,22 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.goalCurrentNumber {
             newActivity.goalCurrentNumber = value
+        }
+        
+        if let value = updatingActivity.goalUnitSecond {
+            newActivity.goalUnitSecond = value
+        }
+        
+        if let value = updatingActivity.goalTargetNumberSecond {
+            newActivity.goalTargetNumberSecond = value
+        }
+        
+        if let value = updatingActivity.goalCurrentNumberSecond {
+            newActivity.goalCurrentNumberSecond = value
+        }
+        
+        if let value = updatingActivity.goalSecondMetricType {
+            newActivity.goalSecondMetricType = value
         }
         
         return newActivity
@@ -1258,6 +1375,18 @@ class Activity: NSObject, NSCopying, Codable {
             self.goalOption = value
         }
         
+        if let value = updatingActivity.goalMetricSecond {
+            self.goalMetricSecond = value
+        }
+        
+        if let value = updatingActivity.goalSubmetricSecond {
+            self.goalSubmetricSecond = value
+        }
+        
+        if let value = updatingActivity.goalOptionSecond {
+            self.goalOptionSecond = value
+        }
+        
         if let value = updatingActivity.goalUnit {
             self.goalUnit = value
         }
@@ -1268,6 +1397,22 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.goalCurrentNumber {
             self.goalCurrentNumber = value
+        }
+        
+        if let value = updatingActivity.goalUnitSecond {
+            self.goalUnitSecond = value
+        }
+        
+        if let value = updatingActivity.goalTargetNumberSecond {
+            self.goalTargetNumberSecond = value
+        }
+        
+        if let value = updatingActivity.goalCurrentNumberSecond {
+            self.goalCurrentNumberSecond = value
+        }
+        
+        if let value = updatingActivity.goalSecondMetricType {
+            self.goalSecondMetricType = value
         }
     }
     
@@ -1526,6 +1671,18 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.goalOption = self.goalOption
         }
         
+        if self.goalMetricSecond != otherActivity.goalMetricSecond {
+            newActivity.goalMetricSecond = self.goalMetricSecond
+        }
+        
+        if self.goalSubmetricSecond != otherActivity.goalSubmetricSecond {
+            newActivity.goalSubmetricSecond = self.goalSubmetricSecond
+        }
+        
+        if self.goalOptionSecond != otherActivity.goalOptionSecond {
+            newActivity.goalOptionSecond = self.goalOptionSecond
+        }
+        
         if self.goalUnit != otherActivity.goalUnit {
             newActivity.goalUnit = self.goalUnit
         }
@@ -1536,6 +1693,22 @@ class Activity: NSObject, NSCopying, Codable {
         
         if self.goalCurrentNumber != otherActivity.goalCurrentNumber {
             newActivity.goalCurrentNumber = self.goalCurrentNumber
+        }
+        
+        if self.goalUnitSecond != otherActivity.goalUnitSecond {
+            newActivity.goalUnitSecond = self.goalUnitSecond
+        }
+        
+        if self.goalTargetNumberSecond != otherActivity.goalTargetNumberSecond {
+            newActivity.goalTargetNumberSecond = self.goalTargetNumberSecond
+        }
+        
+        if self.goalCurrentNumberSecond != otherActivity.goalCurrentNumberSecond {
+            newActivity.goalCurrentNumberSecond = self.goalCurrentNumberSecond
+        }
+        
+        if self.goalSecondMetricType != otherActivity.goalSecondMetricType {
+            newActivity.goalSecondMetricType = self.goalSecondMetricType
         }
         
         return newActivity

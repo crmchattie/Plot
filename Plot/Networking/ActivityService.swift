@@ -42,7 +42,7 @@ class ActivityService {
                 print("oldValue != activities")
                 eventsNoRepeats = activities.filter { $0.isTask == nil }
                 tasksNoRepeats = activities.filter { $0.isTask ?? false }
-                tasksNoRepeats = activities.filter { $0.isGoal ?? false }
+                goalsNoRepeats = activities.filter { $0.isGoal ?? false }
             }
         }
     }
@@ -55,7 +55,7 @@ class ActivityService {
                 self.events = activitiesWithRepeats.filter { $0.isTask == nil }
                 self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
                 self.goals = activitiesWithRepeats.filter { $0.isGoal ?? false }
-                self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil }
+                self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil && !($0.isGoal ?? false) }
             }
         }
     }

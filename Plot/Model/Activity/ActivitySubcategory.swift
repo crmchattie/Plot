@@ -28,10 +28,10 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
     case bills = "Bills"
     case car = "Car"
     case chores = "Chores"
-    case dentist = "Dentist"
-    case doctor = "Doctor"
-    case doctorEye = "Eye Doctor"
-    case doctorSkin = "Skin Doctor"
+    case doctorGeneral = "Doctor - General"
+    case doctorDentist = "Doctor - Dentist"
+    case doctorEye = "Doctor - Eye"
+    case doctorSkin = "Doctor - Dermatologist"
     case entertainment = "Entertainment"
     case errand = "Errand"
     case family = "Family"
@@ -93,7 +93,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .bills: return UIImage(named: "transaction")!
         case .car: return UIImage(named: "car")!
         case .chores: return UIImage(named: "todo")!
-        case .doctor: return UIImage(named: "doctor")!
+        case .doctorGeneral: return UIImage(named: "doctor")!
         case .entertainment: return UIImage(named: "nightlife")!
         case .errand: return UIImage(named: "todo")!
         case .home: return UIImage(named: "home")!
@@ -111,7 +111,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .wedding: return UIImage(named: "wedding")!
         case .workout: return UIImage(named: "workout")!
         case .notApplicable: return UIImage(named: "event")!
-        case .dentist: return UIImage(named: "doctor")!
+        case .doctorDentist: return UIImage(named: "doctor")!
         case .doctorEye: return UIImage(named: "doctor")!
         case .doctorSkin: return UIImage(named: "doctor")!
         case .therapy: return UIImage(named: "personal")!
@@ -136,7 +136,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .bills: return "transaction"
         case .car: return "car"
         case .chores: return "todo"
-        case .doctor: return "doctor"
+        case .doctorGeneral: return "doctor"
         case .entertainment: return "nightlife"
         case .errand: return "todo"
         case .home: return "home"
@@ -154,7 +154,7 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .wedding: return "wedding"
         case .workout: return "workout"
         case .notApplicable: return "event"
-        case .dentist: return "doctor"
+        case .doctorDentist: return "doctor"
         case .doctorEye: return "doctor"
         case .doctorSkin: return "doctor"
         case .therapy: return "personal"
@@ -210,8 +210,14 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
             return .social
         } else if transaction.category == "Fast Food" || transaction.category == "Restaurants" || transaction.category == "Food & Dining" {
             return .meal
-        } else if transaction.category == "Dentist" || transaction.category == "Doctor" {
-            return .doctor
+        } else if transaction.category == "Doctor" {
+            return .doctorGeneral
+        } else if transaction.category == "Dentist" {
+            return .doctorDentist
+        } else if transaction.category == "Eye Doctor" {
+            return .doctorEye
+        } else if transaction.category == "Dermatologist" {
+            return .doctorSkin
         } else if transaction.category == "Hair" || transaction.category == "Spa & Massage" || transaction.category == "Personal Care" {
             return .personal
         } else if transaction.category == "Pet Grooming" || transaction.category == "Veterinary" {

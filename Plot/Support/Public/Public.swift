@@ -2218,7 +2218,7 @@ extension Date {
     }
     
     var startOfHour: Date {
-        var cal = Calendar(identifier: .gregorian)
+        var cal = Calendar.current
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         let components = cal.dateComponents([.year, .month, .day, .hour], from: self)
         return cal.date(from: components)!
@@ -2227,11 +2227,11 @@ extension Date {
     var endOfHour: Date {
         var components = DateComponents()
         components.hour = 1
-        return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfHour)!
+        return Calendar.current.date(byAdding: components, to: startOfHour)!
     }
     
     var startOfDay: Date {
-        var cal = Calendar(identifier: .gregorian)
+        var cal = Calendar.current
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         return cal.startOfDay(for: self)
     }
@@ -2243,19 +2243,19 @@ extension Date {
     }
     
     var startOfWeek: Date {
-        var cal = Calendar(identifier: .gregorian)
+        var cal = Calendar.current
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         return cal.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
     }
     
     var endOfWeek: Date {
-        var cal = Calendar(identifier: .gregorian)
+        var cal = Calendar.current
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         return cal.date(byAdding: .day, value: 7, to: startOfWeek)!
     }
     
     var startOfMonth: Date {
-        var cal = Calendar(identifier: .gregorian)
+        var cal = Calendar.current
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         let components = cal.dateComponents([.year, .month], from: self)
         return cal.date(from: components)!
@@ -2264,26 +2264,26 @@ extension Date {
     var endOfMonth: Date {
         var components = DateComponents()
         components.month = 1
-        return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfMonth)!
+        return Calendar.current.date(byAdding: components, to: startOfMonth)!
     }
     
     var startOfYear: Date {
-        var cal = Calendar(identifier: .gregorian)
+        var cal = Calendar.current
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
         let components = cal.dateComponents([.year], from: self)
-        return  cal.date(from: components)!
+        return cal.date(from: components)!
     }
     
     var endOfYear: Date {
         var components = DateComponents()
         components.year = 1
-        return Calendar(identifier: .gregorian).date(byAdding: components, to: startOfYear)!
+        return Calendar.current.date(byAdding: components, to: startOfYear)!
     }
     
     var nextYear: Date {
         var components = DateComponents()
         components.year = 1
-        return Calendar(identifier: .gregorian).date(byAdding: components, to: Date())!
+        return Calendar.current.date(byAdding: components, to: Date())!
     }
     
     func isMonday() -> Bool {
