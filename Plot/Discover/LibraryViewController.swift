@@ -28,7 +28,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     var sections: [SectionType] = [.custom, .templates, .allTemplates]
     var groups = [SectionType: [AnyHashable]]()
-    var customTypes: [CustomType] = [.event, .task, .goal, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
+    var customTypes: [CustomType] = [.event, .task, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()
     var templates = [Template]()

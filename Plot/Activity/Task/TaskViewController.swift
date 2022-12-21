@@ -1191,20 +1191,45 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             
             form.last!
             
+            <<< SwitchRow("addSecondMetric") { row in
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .label
+                row.title = "Add Second Metric"
+                if let task = task, let goal = task.goal, let _ = goal.metricSecond {
+                    row.value = true
+                } else {
+                    row.value = false
+                }
+            }.cellUpdate { cell, row in
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+            }.onChange({ row in
+                if !(row.value ?? false), let secondMetricRow : PushRow<String> = self.form.rowBy(tag: "secondMetric"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship") {
+                    if self.task.goal != nil {
+                        self.task.goal!.secondMetricType = nil
+                        self.task.goal!.metricSecond = nil
+                        self.task.goal!.submetricSecond = nil
+                        self.task.goal!.unitSecond = nil
+                        self.task.goal!.optionSecond = nil
+                        self.task.goal!.targetNumberSecond = nil
+                    }
+                    secondMetricRow.value = nil
+                    metricsRelationshipRow.value = nil
+                }
+            })
+            
             <<< PushRow<String>("metricsRelationship") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textColor = .label
                 row.cell.detailTextLabel?.textColor = .secondaryLabel
-                row.title = "Second Metric Relationship"
+                row.title = "Second Metric Connection"
                 row.options = SecondMetricType.allValues
                 if let task = task, let goal = task.goal, let value = goal.secondMetricType {
                     row.value = value.rawValue
-                } else {
-                    row.value = "None"
                 }
-                row.hidden = Condition(booleanLiteral: self.task.goal?.metric == nil)
+                row.hidden = "$addSecondMetric == false"
             }.onPresent { from, to in
-                to.title = "Second Metric Relationship"
+                to.title = "Second Metric Connection"
                 to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = true
@@ -1217,10 +1242,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     cell.backgroundColor = .secondarySystemGroupedBackground
                     cell.textLabel?.textColor = .label
                     cell.detailTextLabel?.textColor = .secondaryLabel
-                    let footer = "If OR is selected, goal will be marked as complete if the first OR the second metric is hit \nIf AND is selected, goal will be marked as complete when the first AND the second metric are hit \nIf EQUAL is selected, goal is complete when the first metric EQUALS the second metric"
+                    let footer = "If OR is selected, goal will be marked as complete if the first OR the second metric is hit \nIf AND is selected, goal will be marked as complete when the first AND the second metric are hit \nIf EQUAL is selected, goal is complete when the first metric EQUALS the second metric \nIf MORE is selected, goal is complete when the first metric is MORE than the second metric \nIf LESS is selected, goal is complete when the first metric is LESS than the second metric"
                     to.form.last?.footer = HeaderFooterView(title: footer)
                 }
-                
             }.cellUpdate { cell, row in
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
@@ -1232,16 +1256,16 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 }
             }
             
-            <<< PushRow<String>("Second Metric") { row in
+            <<< PushRow<String>("secondMetric") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textColor = .label
                 row.cell.detailTextLabel?.textColor = .secondaryLabel
-                row.title = row.tag
+                row.title = "Second Metric"
                 row.options = GoalMetric.allValues
                 if let task = task, let goal = task.goal, let value = goal.metricSecond {
                     row.value = value.rawValue
                 }
-                row.hidden = "$metricsRelationship == 'None'"
+                row.hidden = "$addSecondMetric == false"
             }.onPresent { from, to in
                 to.title = "Metrics"
                 to.extendedLayoutIncludesOpaqueBars = true
@@ -1261,7 +1285,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
                 cell.detailTextLabel?.textColor = .secondaryLabel
-                row.hidden = "$metricsRelationship == 'None'"
             }.onChange { row in
                 self.updateGoalSeconday(selectedGoalProperty: .metric, value: row.value)
             }
@@ -1369,7 +1392,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                         row.value = metric.allValuesUnits[0]
                     }
                 }
-                row.hidden = "$metricsRelationship == 'None'"
+                row.hidden = "$addSecondMetric == false"
             }.onPresent { from, to in
                 to.title = "Units"
                 to.extendedLayoutIncludesOpaqueBars = true
@@ -1386,7 +1409,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     cell.detailTextLabel?.textColor = .secondaryLabel
                 }
             }.cellUpdate { cell, row in
-                row.hidden = "$metricsRelationship == 'None'"
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textLabel?.textColor = .label
                 cell.detailTextLabel?.textColor = .secondaryLabel
@@ -1415,9 +1437,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 if let task = task, let goal = task.goal, let number = goal.targetNumberSecond {
                     $0.value = number
                 }
-                $0.hidden = "!($metricsRelationship != 'None' && $metricsRelationship != 'Equal' && $metricsRelationship != 'More' && $metricsRelationship != 'Less')"
+                $0.hidden = "!($addSecondMetric != false && $metricsRelationship != 'Equal' && $metricsRelationship != 'More' && $metricsRelationship != 'Less')"
             }.cellUpdate { cell, row in
-                row.hidden = "!($metricsRelationship != 'None' && $metricsRelationship != 'Equal' && $metricsRelationship != 'More' && $metricsRelationship != 'Less')"
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.textField?.textColor = .secondaryLabel
             }.onChange { row in
@@ -1441,9 +1462,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     if let task = task, let goal = task.goal, let number = goal.currentNumberSecond {
                         row.value = number
                     }
-                    row.hidden = "!($metricsRelationship != 'None' && $metricsRelationship != 'Equal' && $metricsRelationship != 'More' && $metricsRelationship != 'Less')"
+                    row.hidden = "!($addSecondMetric != false && $metricsRelationship != 'Equal' && $metricsRelationship != 'More' && $metricsRelationship != 'Less')"
                 }.cellUpdate { cell, row in
-                    row.hidden = "!($metricsRelationship != 'None' && $metricsRelationship != 'Equal' && $metricsRelationship != 'More' && $metricsRelationship != 'Less')"
                     cell.textLabel?.textAlignment = .left
                     cell.backgroundColor = .secondarySystemGroupedBackground
                     cell.textLabel?.textColor = .label

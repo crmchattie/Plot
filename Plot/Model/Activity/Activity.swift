@@ -769,30 +769,44 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let goal = self.goal, let value = goal.metricSecond?.rawValue as AnyObject? {
             dictionary["goalMetricSecond"] = value
+        } else {
+            dictionary["goalMetricSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.submetricSecond?.rawValue as AnyObject? {
             dictionary["goalSubmetricSecond"] = value
+        } else {
+            dictionary["goalSubmetricSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.optionSecond as AnyObject? {
             dictionary["goalOptionSecond"] = value
+        } else {
+            dictionary["goalOptionSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.unitSecond?.rawValue as AnyObject? {
             dictionary["goalUnitSecond"] = value
+        } else {
+            dictionary["goalUnitSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.targetNumberSecond as AnyObject? {
             dictionary["goalTargetNumberSecond"] = value
+        } else {
+            dictionary["goalTargetNumberSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.currentNumberSecond as AnyObject? {
             dictionary["goalCurrentNumberSecond"] = value
+        } else {
+            dictionary["goalCurrentNumberSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.secondMetricType?.rawValue as AnyObject? {
             dictionary["secondMetricType"] = value
+        } else {
+            dictionary["secondMetricType"] = NSNull()
         }
                 
         return dictionary

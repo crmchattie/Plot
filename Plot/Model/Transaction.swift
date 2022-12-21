@@ -299,7 +299,6 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
                 continue
             }
         }
-        
 
         switch transaction.type {
         case .debit:

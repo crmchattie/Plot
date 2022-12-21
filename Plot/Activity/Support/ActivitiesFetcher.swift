@@ -33,7 +33,7 @@ class ActivitiesFetcher: NSObject {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-        
+                
         let ref = Database.database().reference()
         userActivitiesDatabaseRef = ref.child(userActivitiesEntity).child(currentUserID)
         
@@ -83,6 +83,7 @@ class ActivitiesFetcher: NSObject {
                                 activity.badgeDate = userActivity.badgeDate
                                 activity.muted = userActivity.muted
                                 activity.pinned = userActivity.pinned
+                                
                                 if let rules = activity.recurrences, !rules.isEmpty {
                                     if counter == 0 {
                                         activities = [activity]

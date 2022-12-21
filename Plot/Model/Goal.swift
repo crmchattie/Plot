@@ -325,257 +325,258 @@ struct Goal: Codable, Equatable, Hashable {
         numberFormatter.currencyCode = "USD"
         numberFormatter.maximumFractionDigits = 0
         var description = "Goal is complete when"
-        if let secondMetricType = secondMetricType, secondMetricType == .equal || secondMetricType == .more || secondMetricType == .less {
-            if let unit = unit, let metric = metric, let submetric = submetric, let option = option, let targetNumber = targetNumber as? NSNumber {
-                switch unit {
-                case .calories:
-                    numberFormatter.numberStyle = .decimal
-                case .count:
-                    numberFormatter.numberStyle = .decimal
-                case .amount:
-                    numberFormatter.numberStyle = .currency
-                case .percent:
-                    numberFormatter.numberStyle = .percent
-                case .multiple:
-                    numberFormatter.numberStyle = .decimal
-                case .minutes:
-                    numberFormatter.numberStyle = .decimal
-                case .hours:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .days:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .level:
-                    numberFormatter.numberStyle = .decimal
-                }
-                
-                if unit == .multiple {
-                    description += " "
-                    if let string = numberFormatter.string(from: targetNumber) {
-                        if option.count > 0 {
-                            description += string + "x the " + GoalUnit.amount.rawValue.lowercased() + " of "
-                            for index in 0...option.count - 1 {
-                                if index == option.count - 1 {
-                                    description += option[index].lowercased()
-                                } else {
-                                    if option.count == 2 || index == option.count - 2 {
-                                        description += option[index].lowercased() + " and "
-                                    } else {
-                                        description += option[index].lowercased() + ", "
-                                    }
-                                }
-                            }
-                        } else if submetric != .none {
-                            return nil
-                        }
-                        return description
-
-                    }
-                } else {
-                    description += " " + unit.rawValue.lowercased() + " of "
-                    if let string = numberFormatter.string(from: targetNumber), metric == .tasks || metric == .events {
-                        description += metric.rawValue.lowercased() + " in the "
-                        if option.count > 0 {
-                            for index in 0...option.count - 1 {
-                                if index == option.count - 1 {
-                                    description += option[index].lowercased()
-                                } else {
-                                    if option.count == 2 || index == option.count - 2 {
-                                        description += option[index].lowercased() + " and "
-                                    } else {
-                                        description += option[index].lowercased() + ", "
-                                    }
-                                }
-                            }
-                            if option.count > 1 {
-                                description += " " + submetric.pluralName.lowercased() + " hits " + string
-                            } else {
-                                description += " " + submetric.pluralName.lowercased() + " hits " + string
-                            }
-                        } else if submetric != .none {
-                            return nil
-                        }
-                        return description
-
-                    } else if let string = numberFormatter.string(from: targetNumber) {
-                        if option.count > 0 {
-                            for index in 0...option.count - 1 {
-                                if index == option.count - 1 {
-                                    description += option[index].lowercased()
-                                } else {
-                                    if option.count == 2 || index == option.count - 2 {
-                                        description += option[index].lowercased() + " and "
-                                    } else {
-                                        description += option[index].lowercased() + ", "
-                                    }
-                                }
-                            }
-                        } else if submetric != .none {
-                            return nil
-                        }
-                        description += " hits " + string
-                        return description
-
-                    }
-                }
-            } else if let unit = unit, let metric = metric, let targetNumber = targetNumber as? NSNumber {
-                switch unit {
-                case .calories:
-                    numberFormatter.numberStyle = .decimal
-                case .count:
-                    numberFormatter.numberStyle = .decimal
-                case .amount:
-                    numberFormatter.numberStyle = .currency
-                case .percent:
-                    numberFormatter.numberStyle = .percent
-                case .multiple:
-                    numberFormatter.numberStyle = .decimal
-                case .minutes:
-                    numberFormatter.numberStyle = .decimal
-                case .hours:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .days:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .level:
-                    numberFormatter.numberStyle = .decimal
-                }
-                
-                if let string = numberFormatter.string(from: targetNumber), metric == .activeCalories || metric == .steps || metric == .flightsClimbed {
-                    description += " " + metric.rawValue.lowercased() + " hits " + string
-                } else if let string = numberFormatter.string(from: targetNumber) {
-                    if unit == .multiple {
-                        description += " " + string + "x the " + GoalUnit.amount.rawValue.lowercased() + " of " + metric.rawValue.lowercased()
-                    } else {
-                        description += " " + unit.rawValue.lowercased() + " of " + metric.rawValue.lowercased() + " hits " + string
-                    }
-                }
-                return description
+        if let unit = unit, let metric = metric, let submetric = submetric, let option = option, let targetNumber = targetNumber as? NSNumber {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
             }
-        } else {
-            if let unit = unit, let metric = metric, let submetric = submetric, let option = option, let targetNumber = targetNumber as? NSNumber {
-                switch unit {
-                case .calories:
-                    numberFormatter.numberStyle = .decimal
-                case .count:
-                    numberFormatter.numberStyle = .decimal
-                case .amount:
-                    numberFormatter.numberStyle = .currency
-                case .percent:
-                    numberFormatter.numberStyle = .percent
-                case .multiple:
-                    numberFormatter.numberStyle = .decimal
-                case .minutes:
-                    numberFormatter.numberStyle = .decimal
-                case .hours:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .days:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .level:
-                    numberFormatter.numberStyle = .decimal
-                }
-                
-                if unit == .multiple {
-                    description += " " + GoalUnit.amount.rawValue.lowercased() + " of "
-                } else {
-                    description += " " + unit.rawValue.lowercased() + " of "
-                }
+            
+            if unit == .multiple {
+                description += " " + GoalUnit.amount.rawValue.lowercased() + " of "
+            } else {
+                description += " " + unit.rawValue.lowercased() + " of "
+            }
 
-                if let string = numberFormatter.string(from: targetNumber), metric == .tasks || metric == .events {
-                    description += metric.rawValue.lowercased() + " in the "
-                    if option.count > 0 {
-                        for index in 0...option.count - 1 {
-                            if index == option.count - 1 {
-                                description += option[index].lowercased()
-                            } else {
-                                if option.count == 2 || index == option.count - 2 {
-                                    description += option[index].lowercased() + " and "
-                                } else {
-                                    description += option[index].lowercased() + ", "
-                                }
-                            }
-                        }
-                        if option.count > 1 {
-                            if unit == .multiple {
-                                description += " " + submetric.pluralName.lowercased() + " hits " + string + "x"
-                            } else {
-                                description += " " + submetric.pluralName.lowercased() + " hits " + string
-                            }
+            if let string = numberFormatter.string(from: targetNumber), metric == .tasks || metric == .events {
+                description += metric.rawValue.lowercased() + " in the "
+                if option.count > 0 {
+                    for index in 0...option.count - 1 {
+                        if index == option.count - 1 {
+                            description += option[index].lowercased()
                         } else {
-                            if unit == .multiple {
-                                description += " " + submetric.pluralName.lowercased() + " hits " + string + "x"
+                            if option.count == 2 || index == option.count - 2 {
+                                description += option[index].lowercased() + " and "
                             } else {
-                                description += " " + submetric.pluralName.lowercased() + " hits " + string
+                                description += option[index].lowercased() + ", "
                             }
                         }
-                    } else if submetric != .none {
-                        return nil
                     }
-                    return description
-                } else if let string = numberFormatter.string(from: targetNumber) {
-                    if option.count > 0 {
-                        for index in 0...option.count - 1 {
-                            if index == option.count - 1 {
-                                description += option[index].lowercased()
+                    if option.count > 1 {
+                        if unit == .multiple {
+                            description += " " + submetric.pluralName.lowercased() + " hits " + string + "x"
+                        } else {
+                            description += " " + submetric.pluralName.lowercased() + " hits " + string
+                        }
+                    } else {
+                        if unit == .multiple {
+                            description += " " + submetric.singlularName.lowercased() + " hits " + string + "x"
+                        } else {
+                            description += " " + submetric.singlularName.lowercased() + " hits " + string
+                        }
+                    }
+                } else if submetric != .none {
+                    return nil
+                }
+                return description
+            } else if let string = numberFormatter.string(from: targetNumber) {
+                if option.count > 0 {
+                    for index in 0...option.count - 1 {
+                        if index == option.count - 1 {
+                            description += option[index].lowercased()
+                        } else {
+                            if option.count == 2 || index == option.count - 2 {
+                                description += option[index].lowercased() + " and "
                             } else {
-                                if option.count == 2 || index == option.count - 2 {
-                                    description += option[index].lowercased() + " and "
-                                } else {
-                                    description += option[index].lowercased() + ", "
-                                }
+                                description += option[index].lowercased() + ", "
                             }
                         }
-                    } else if submetric != .none {
-                        return nil
                     }
-                    if unit == .multiple {
-                        description += " hits " + string + "x"
-                    } else {
-                        description += " hits " + string
-                    }
-                    return description
+                } else if submetric != .none {
+                    return nil
                 }
-            } else if let unit = unit, let metric = metric, let targetNumber = targetNumber as? NSNumber {
-                switch unit {
-                case .calories:
-                    numberFormatter.numberStyle = .decimal
-                case .count:
-                    numberFormatter.numberStyle = .decimal
-                case .amount:
-                    numberFormatter.numberStyle = .currency
-                case .percent:
-                    numberFormatter.numberStyle = .percent
-                case .multiple:
-                    numberFormatter.numberStyle = .decimal
-                case .minutes:
-                    numberFormatter.numberStyle = .decimal
-                case .hours:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .days:
-                    numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
-                case .level:
-                    numberFormatter.numberStyle = .decimal
-                }
-                
-                if let string = numberFormatter.string(from: targetNumber), metric == .activeCalories || metric == .steps || metric == .flightsClimbed {
-                    description += " " + metric.rawValue.lowercased() + " hits " + string
-                } else if let string = numberFormatter.string(from: targetNumber) {
-                    if unit == .multiple {
-                        description += " " + GoalUnit.amount.rawValue.lowercased() + " of"
-                        description += " " + metric.rawValue.lowercased() + " hits " + string + "x"
-                    } else {
-                        description += " " + unit.rawValue.lowercased() + " of"
-                        description += " " + metric.rawValue.lowercased() + " hits " + string
-                    }
+                if unit == .multiple {
+                    description += " hits " + string + "x"
+                } else {
+                    description += " hits " + string
                 }
                 return description
             }
+        } else if let unit = unit, let metric = metric, let targetNumber = targetNumber as? NSNumber {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            if let string = numberFormatter.string(from: targetNumber), metric == .activeCalories || metric == .steps || metric == .flightsClimbed {
+                description += " " + metric.rawValue.lowercased() + " hits " + string
+            } else if let string = numberFormatter.string(from: targetNumber) {
+                if unit == .multiple {
+                    description += " " + GoalUnit.amount.rawValue.lowercased() + " of"
+                    description += " " + metric.rawValue.lowercased() + " hits " + string + "x"
+                } else {
+                    description += " " + unit.rawValue.lowercased() + " of"
+                    description += " " + metric.rawValue.lowercased() + " hits " + string
+                }
+            }
+            return description
+        }            
+        
+        return nil
+    }
+    
+    var descriptionSecondary: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.maximumFractionDigits = 0
+        var description = " "
+        guard let type = secondMetricType else { return nil }
+        description += type.descriptionText
+        if let unit = unitSecond, let metric = metricSecond, let submetric = submetricSecond, let option = optionSecond, let targetNumber = targetNumberSecond as? NSNumber {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            if unit == .multiple {
+                description += " " + GoalUnit.amount.rawValue.lowercased() + " of "
+            } else {
+                description += " " + unit.rawValue.lowercased() + " of "
+            }
+
+            if let string = numberFormatter.string(from: targetNumber), metric == .tasks || metric == .events {
+                description += metric.rawValue.lowercased() + " in the "
+                if option.count > 0 {
+                    for index in 0...option.count - 1 {
+                        if index == option.count - 1 {
+                            description += option[index].lowercased()
+                        } else {
+                            if option.count == 2 || index == option.count - 2 {
+                                description += option[index].lowercased() + " and "
+                            } else {
+                                description += option[index].lowercased() + ", "
+                            }
+                        }
+                    }
+                    if option.count > 1 {
+                        if unit == .multiple {
+                            description += " " + submetric.pluralName.lowercased() + " hits " + string + "x"
+                        } else {
+                            description += " " + submetric.pluralName.lowercased() + " hits " + string
+                        }
+                    } else {
+                        if unit == .multiple {
+                            description += " " + submetric.singlularName.lowercased() + " hits " + string + "x"
+                        } else {
+                            description += " " + submetric.singlularName.lowercased() + " hits " + string
+                        }
+                    }
+                } else if submetric != .none {
+                    return nil
+                }
+                return description
+            } else if let string = numberFormatter.string(from: targetNumber) {
+                if option.count > 0 {
+                    for index in 0...option.count - 1 {
+                        if index == option.count - 1 {
+                            description += option[index].lowercased()
+                        } else {
+                            if option.count == 2 || index == option.count - 2 {
+                                description += option[index].lowercased() + " and "
+                            } else {
+                                description += option[index].lowercased() + ", "
+                            }
+                        }
+                    }
+                } else if submetric != .none {
+                    return nil
+                }
+                if unit == .multiple {
+                    description += " hits " + string + "x"
+                } else {
+                    description += " hits " + string
+                }
+                return description
+            }
+        } else if let unit = unitSecond, let metric = metricSecond, let targetNumber = targetNumberSecond as? NSNumber {
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            if let string = numberFormatter.string(from: targetNumber), metric == .activeCalories || metric == .steps || metric == .flightsClimbed {
+                description += " " + metric.rawValue.lowercased() + " hits " + string
+            } else if let string = numberFormatter.string(from: targetNumber) {
+                if unit == .multiple {
+                    description += " " + GoalUnit.amount.rawValue.lowercased() + " of"
+                    description += " " + metric.rawValue.lowercased() + " hits " + string + "x"
+                } else {
+                    description += " " + unit.rawValue.lowercased() + " of"
+                    description += " " + metric.rawValue.lowercased() + " hits " + string
+                }
+            }
+            return description
         }
         
         return nil
@@ -635,6 +636,16 @@ enum GoalMetric: String, Codable, CaseIterable {
             array.append(metric.rawValue)
         }
         return array.sorted()
+    }
+    
+    static var allValuesWNone: [String] {
+        var array = [String]()
+        GoalMetric.allCases.forEach { metric in
+            array.append(metric.rawValue)
+        }
+        array = array.sorted()
+        array.insert("None", at: 0)
+        return array
     }
     
     var allValuesSubmetrics: [String] {
@@ -744,7 +755,6 @@ enum FormatterType: String {
 }
 
 enum SecondMetricType: String, Codable, CaseIterable {
-    case none = "None"
     case or = "Or"
     case and = "And"
     case equal = "Equal"
@@ -757,5 +767,20 @@ enum SecondMetricType: String, Codable, CaseIterable {
             array.append(value.rawValue)
         }
         return array
+    }
+    
+    var descriptionText: String {
+        switch self {
+        case .or:
+            return "or"
+        case .and:
+            return "and"
+        case .equal:
+            return "equal to"
+        case .more:
+            return "more than"
+        case .less:
+            return "less than"
+        }
     }
 }

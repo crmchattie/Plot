@@ -433,7 +433,7 @@ extension TaskViewController {
     }
     
     func updateGoal(selectedGoalProperty: SelectedGoalProperty, value: String?) {
-        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Option"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship") {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Option") {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
@@ -442,9 +442,6 @@ extension TaskViewController {
                     } else {
                         task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
                     }
-                    
-                    metricsRelationshipRow.hidden = false
-                    metricsRelationshipRow.evaluateHidden()
                     
                     //units
                     if updatedValue.units.count > 0 {
@@ -572,6 +569,9 @@ extension TaskViewController {
         if let descriptionRow: LabelRow = self.form.rowBy(tag: "Description") {
             if let goal = task.goal, let description = goal.description {
                 var updatedDescription = description
+                if let secondaryDescription = goal.descriptionSecondary {
+                    updatedDescription += secondaryDescription
+                }
                 if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
                     var value = String()
                     if let endDate = self.task.instanceOriginalStartDate {
