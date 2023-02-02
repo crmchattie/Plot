@@ -20,6 +20,7 @@ open class RecurrencePicker: UITableViewController {
     open var tintColor = FalconPalette.defaultBlue
     open var calendar = Calendar.current
     open var occurrenceDate: Date!
+    fileprivate var occurrenceDateStatic: Date!
     open var backgroundColor: UIColor?
     open var separatorColor: UIColor?
     open var supportedCustomRecurrenceFrequencies = Constant.frequencies
@@ -187,6 +188,7 @@ extension RecurrencePicker {
         tableView.separatorStyle = .none
         tableView.tintColor = tintColor
         tableView.backgroundColor = .systemGroupedBackground
+        occurrenceDateStatic = occurrenceDate
         updateSelectedIndexPath(withRule: recurrenceRule)
     }
 
@@ -273,14 +275,18 @@ extension RecurrencePicker {
             case 0:
                 recurrenceRule = nil
             case 1:
+                occurrenceDate = occurrenceDateStatic.localTime.startOfDay
                 recurrenceRule = RecurrenceRule.dailyRecurrence()
             case 2:
+                occurrenceDate = occurrenceDateStatic.localTime.startOfWeek
                 let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
                 recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
             case 3:
+                occurrenceDate = occurrenceDateStatic.localTime.startOfMonth
                 let monthday = calendar.component(.day, from: occurrenceDate)
                 recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
             case 4:
+                occurrenceDate = occurrenceDateStatic.localTime.startOfYear
                 let month = calendar.component(.month, from: occurrenceDate)
                 recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
             default:
@@ -325,7 +331,6 @@ extension RecurrencePicker {
             }
         }
         recurrenceRule?.startDate = occurrenceDate
-
         delegate?.recurrencePicker(self, didPickRecurrence: recurrenceRule)
     }
 }

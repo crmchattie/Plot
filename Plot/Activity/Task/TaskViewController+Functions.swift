@@ -437,10 +437,10 @@ extension TaskViewController {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
-                    if let goal = task.goal, goal.targetNumber != 0 {
-                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: goal.targetNumber, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
+                    if let _ = task.goal {
+                        task.goal!.metric = updatedValue
                     } else {
-                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
+                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                     
                     //units
@@ -472,7 +472,7 @@ extension TaskViewController {
                     if let _ = task.goal {
                         task.goal!.submetric = updatedValue
                     } else {
-                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, secondMetricType: nil)
+                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                     if let options = task.goal!.options() {
                         optionRow.value = Set(arrayLiteral: options[0])
@@ -501,7 +501,7 @@ extension TaskViewController {
     }
     
     func updateGoalSeconday(selectedGoalProperty: SelectedGoalProperty, value: String?) {
-        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Second Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let _ = task.goal {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "secondUnit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let _ = task.goal {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
@@ -513,7 +513,7 @@ extension TaskViewController {
                         unitRow.value = updatedValue.units[0].rawValue
                         unitRow.options = updatedValue.allValuesUnits
                     } else {
-                        task.goal!.unit = nil
+                        task.goal!.unitSecond = nil
                         unitRow.value = nil
                     }
                                                             
@@ -533,9 +533,11 @@ extension TaskViewController {
                 } else {
                     task.goal!.metricSecond = nil
                     task.goal!.submetricSecond = nil
+                    task.goal!.unitSecond = nil
                     submetricRow.hidden = true
                     submetricRow.evaluateHidden()
                     submetricRow.value = nil
+                    unitRow.value = nil
                 }
             case .submetric:
                 if let value = value, let updatedValue = GoalSubMetric(rawValue: value) {
@@ -596,6 +598,30 @@ extension TaskViewController {
                 descriptionRow.evaluateHidden()
             }
             updateRightBarButton()
+        }
+    }
+    
+    func updateSecondTargetRow() {
+        if let secondTargetRow : DecimalRow = self.form.rowBy(tag: "Second Target"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship"), let metricsRelationshipValue = metricsRelationshipRow.value, let targetRow : DecimalRow = self.form.rowBy(tag: "Target") {
+            if targetRow.value == nil, secondTargetRow.value == nil {
+                targetRow.hidden = false
+                targetRow.evaluateHidden()
+                secondTargetRow.hidden = false
+                secondTargetRow.evaluateHidden()
+            } else if metricsRelationshipValue == "Equal" || metricsRelationshipValue == "More" || metricsRelationshipValue == "Less" {
+                if targetRow.value != nil {
+                    secondTargetRow.hidden = true
+                    secondTargetRow.evaluateHidden()
+                } else if secondTargetRow.value != nil {
+                    targetRow.hidden = true
+                    targetRow.evaluateHidden()
+                }
+            } else {
+                targetRow.hidden = false
+                targetRow.evaluateHidden()
+                secondTargetRow.hidden = false
+                secondTargetRow.evaluateHidden()
+            }
         }
     }
     
@@ -684,28 +710,28 @@ extension TaskViewController {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
         numberFormatter.maximumFractionDigits = 0
-        if let goal = task.goal, let unit = goal.unitSecond {
-            switch unit {
-            case .calories:
-                numberFormatter.numberStyle = .decimal
-            case .count:
-                numberFormatter.numberStyle = .decimal
-            case .amount:
-                numberFormatter.numberStyle = .currency
-            case .percent:
-                numberFormatter.numberStyle = .percent
-            case .multiple:
-                numberFormatter.numberStyle = .decimal
-            case .minutes:
-                numberFormatter.numberStyle = .decimal
-            case .hours:
-                numberFormatter.numberStyle = .decimal
-            case .days:
-                numberFormatter.numberStyle = .decimal
-            case .level:
-                numberFormatter.numberStyle = .decimal
-            }
-            if let targetRow : DecimalRow = self.form.rowBy(tag: "Second Target") {
+        if let targetRow : DecimalRow = self.form.rowBy(tag: "Second Target") {
+            if let goal = task.goal, let unit = goal.unitSecond {
+                switch unit {
+                case .calories:
+                    numberFormatter.numberStyle = .decimal
+                case .count:
+                    numberFormatter.numberStyle = .decimal
+                case .amount:
+                    numberFormatter.numberStyle = .currency
+                case .percent:
+                    numberFormatter.numberStyle = .percent
+                case .multiple:
+                    numberFormatter.numberStyle = .decimal
+                case .minutes:
+                    numberFormatter.numberStyle = .decimal
+                case .hours:
+                    numberFormatter.numberStyle = .decimal
+                case .days:
+                    numberFormatter.numberStyle = .decimal
+                case .level:
+                    numberFormatter.numberStyle = .decimal
+                }
                 targetRow.formatter = numberFormatter
                 if let value = goal.targetNumberSecond {
                     targetRow.value = value
@@ -716,6 +742,8 @@ extension TaskViewController {
                         currentRow.value = value
                     }
                 }
+            } else {
+                targetRow.value = nil
             }
         }
     }
