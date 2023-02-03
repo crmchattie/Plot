@@ -123,19 +123,68 @@ class NetworkController {
 }
 
 extension NetworkController {
-    func updateGoals() {
+    func checkGoalsForCompletion() {
+        //create loop of existing goals
+        //check if goal has frequency
+        //if so, grab start date (= endDate - frequency day interval)
+        //grab goal details and check against relevant metric(s)
+        //if goal metric is met, update goal to completion; if not, do nothing and move to next goal
+        //add check to see if endDate is in the past - maybe add buffer like a month? If so, skip and move to next goal?
+        let monthAgo = Date().monthBefore
         for task in activityService.goals {
-            if let goal = task.goal, let endDate = task.endDate {
-                if let recurrences = task.recurrences {
-                    
+            if let endDate = task.endDate, endDate > monthAgo, let goal = task.goal, let metric = goal.metric {
+                if let _ = goal.frequency, let startDate = task.startDateGivenEndDateFrequency {
+                    switch metric {
+                    case .events:
+                        <#code#>
+                    case .tasks:
+                        <#code#>
+                    case .financialTransactions:
+                        <#code#>
+                    case .financialAccounts:
+                        <#code#>
+                    case .workout:
+                        <#code#>
+                    case .mindfulness:
+                        <#code#>
+                    case .sleep:
+                        <#code#>
+                    case .steps:
+                        <#code#>
+                    case .flightsClimbed:
+                        <#code#>
+                    case .activeCalories:
+                        <#code#>
+                    }
                 } else {
-                    
+                    switch metric {
+                    case .events:
+                        <#code#>
+                    case .tasks:
+                        <#code#>
+                    case .financialTransactions:
+                        <#code#>
+                    case .financialAccounts:
+                        <#code#>
+                    case .workout:
+                        <#code#>
+                    case .mindfulness:
+                        <#code#>
+                    case .sleep:
+                        <#code#>
+                    case .steps:
+                        <#code#>
+                    case .flightsClimbed:
+                        <#code#>
+                    case .activeCalories:
+                        <#code#>
+                    }
                 }
             }
         }
     }
     
-    func setupGoals() {
+    func setupInitialGoals() {
         if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
             for goal in prebuiltGoals {
                 let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -152,8 +201,8 @@ extension NetworkController {
                 }
                 
                 if let list = list {
-                    let date = NSNumber(value: Int((Date()).timeIntervalSince1970))
-                    let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: date)
+                    var date = Date()
+                    let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
                     task.name = goal.name
                     task.isGoal = true
                     task.goal = goal
@@ -161,7 +210,6 @@ extension NetworkController {
                     task.subcategory = subcategory.rawValue
                     if let frequency = goal.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
                         var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
-                        var date = Date()
                         switch recurrenceRule.frequency {
                         case .yearly:
                             date = date.localTime.endOfYear
@@ -179,14 +227,9 @@ extension NetworkController {
                         recurrenceRule.interval = goal.name != "Dentist" ? 1 : 2
                         task.recurrences = [recurrenceRule.toRRuleString()]
                     } else {
-                        task.endDateTime = date
+                        task.endDateTime = NSNumber(value: Int((date.addDays(365)).timeIntervalSince1970))
                     }
                     
-//                    print(task.name)
-//                    print(task.category)
-//                    print(task.subcategory)
-//                    print(task.endDate)
-//                    print(task.recurrences)
                     let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
                     activityAction.createNewActivity(updateDirectAssociation: false)
                 }

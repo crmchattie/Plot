@@ -1896,6 +1896,13 @@ extension Activity {
         return nil
     }
     
+    var startDateGivenEndDateFrequency: Date? {
+        if let endDate = endDate, let goal = goal, let frequency = goal.frequency {
+            return endDate.addDays(frequency.dayInterval * -1)
+        }
+        return nil
+    }
+    
     var endDate: Date? {
         if let endDateTime = endDateTime?.doubleValue {
             return Date(timeIntervalSince1970: endDateTime)

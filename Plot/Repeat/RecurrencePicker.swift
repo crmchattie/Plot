@@ -275,18 +275,18 @@ extension RecurrencePicker {
             case 0:
                 recurrenceRule = nil
             case 1:
-                occurrenceDate = occurrenceDateStatic.localTime.startOfDay
+                occurrenceDate = occurrenceDateStatic.localTime.endOfDay
                 recurrenceRule = RecurrenceRule.dailyRecurrence()
             case 2:
-                occurrenceDate = occurrenceDateStatic.localTime.startOfWeek
+                occurrenceDate = occurrenceDateStatic.localTime.endOfWeek
                 let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
                 recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
             case 3:
-                occurrenceDate = occurrenceDateStatic.localTime.startOfMonth
+                occurrenceDate = occurrenceDateStatic.localTime.endOfMonth
                 let monthday = calendar.component(.day, from: occurrenceDate)
                 recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
             case 4:
-                occurrenceDate = occurrenceDateStatic.localTime.startOfYear
+                occurrenceDate = occurrenceDateStatic.localTime.endOfYear
                 let month = calendar.component(.month, from: occurrenceDate)
                 recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
             default:
