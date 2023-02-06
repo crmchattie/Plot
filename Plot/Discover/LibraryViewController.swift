@@ -28,7 +28,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     var sections: [SectionType] = [.custom, .templates, .allTemplates]
     var groups = [SectionType: [AnyHashable]]()
-    var customTypes: [CustomType] = [.event, .task, .goal, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
+    var customTypes: [CustomType] = [.event, .goal, .task, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()
     var templates = [Template]()
@@ -321,9 +321,9 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
             case .event:
                 showEventDetailPresent(event: nil, updateDiscoverDelegate: self, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
             case .task:
-                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: false)
             case .goal:
-                showGoalDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: true)
             case .calendar:
                 showCalendarDetailPresent(calendar: nil, updateDiscoverDelegate: self)
             case .lists:
@@ -366,9 +366,9 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
             case .event:
                 showEventDetailPresent(event: nil, updateDiscoverDelegate: self, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
             case .task:
-                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: false)
             case .goal:
-                showGoalDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                showTaskDetailPresent(task: nil, updateDiscoverDelegate: self, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: true)
             case .workout:
                 showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: self, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
             case .mindfulness:

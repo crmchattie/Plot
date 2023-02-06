@@ -22,7 +22,7 @@ class NewTaskCell: UITableViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.text = "New Task"
+        label.text = "New Item"
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false

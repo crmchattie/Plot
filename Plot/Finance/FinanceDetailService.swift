@@ -31,7 +31,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
     func getSamples(for range: DateRange, segment: TimeSegmentType, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
         getStatisticalSamples(accountDetails: accountDetails,
                               transactionDetails: transactionDetails,
-                              segmentType: .week,
+                              segmentType: segment,
                               range: range,
                               accounts: accounts,
                               transactions: transactions,

@@ -146,7 +146,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     
     fileprivate func setupMainView() {
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = "Tasks"
+        navigationItem.title = list.name
         view.backgroundColor = .systemGroupedBackground
         
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
@@ -219,10 +219,34 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func newItem() {
-        if let id = list.id, id != "" {
-            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: list, startDateTime: nil, endDateTime: nil)
+        if list.name == "Goals" {
+            self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
         } else {
-            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "Goal", style: .default, handler: { (_) in
+                if let id = self.list.id, id != "" {
+                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil, isGoal: false)
+                } else {
+                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: false)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
+                if let id = self.list.id, id != "" {
+                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil, isGoal: false)
+                } else {
+                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: false)
+                }
+            }))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                print("User click Dismiss button")
+            }))
+            
+            self.present(alert, animated: true, completion: {
+                print("completion block")
+            })
         }
     }
     
@@ -422,14 +446,14 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
                 newItem()
             } else if filteredTasks.indices.contains(indexPath.row - 1) {
                 let task = filteredTasks[indexPath.row - 1]
-                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: task.isGoal ?? false)
             } else {
                 newItem()
             }
         } else {
             if filteredTasks.indices.contains(indexPath.row) {
                 let task = filteredTasks[indexPath.row]
-                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: task.isGoal ?? false)
             } else {
                 newItem()
             }

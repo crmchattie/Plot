@@ -45,6 +45,8 @@ struct DateRangeFormatter {
 //                return currentYear
 //            }
 //            return "\(Calendar.current.component(.year, from: range.startDate))"
+        case .none:
+            return ""
         }
     }
 }

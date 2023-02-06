@@ -86,5 +86,5 @@ enum ListOptions: String, CaseIterable {
     case scheduledList = "Scheduled"
     case flaggedList = "Flagged"
     case allList = "All"
-    case goalList = "Goal"
+    case goalList = "Goals"
 }

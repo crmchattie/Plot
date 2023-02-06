@@ -303,6 +303,7 @@
 		10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5424BE43B600F6EE18 /* VerticalStackView.swift */; };
 		10E93D5924BE43B700F6EE18 /* BetterSnappingLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5524BE43B600F6EE18 /* BetterSnappingLayout.swift */; };
 		10E93D5A24BE43B700F6EE18 /* UIView+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E93D5624BE43B700F6EE18 /* UIView+Layout.swift */; };
+		10ED65F4298EF6CF00CBCCA5 /* GoalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10ED65F3298EF6CF00CBCCA5 /* GoalService.swift */; };
 		10ED76C426403CA7002838F5 /* TrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10ED76C326403CA7002838F5 /* TrackingService.swift */; };
 		10EE27ED245B7C7800C80AAF /* ChecklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */; };
 		10EE27EF245C5B8000C80AAF /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EE27EE245C5B8000C80AAF /* Checklist.swift */; };
@@ -904,6 +905,7 @@
 		10E93D5524BE43B600F6EE18 /* BetterSnappingLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BetterSnappingLayout.swift; sourceTree = "<group>"; };
 		10E93D5624BE43B700F6EE18 /* UIView+Layout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Layout.swift"; sourceTree = "<group>"; };
 		10ED542C22CAEA41003797CF /* Plot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Plot.entitlements; sourceTree = "<group>"; };
+		10ED65F3298EF6CF00CBCCA5 /* GoalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalService.swift; sourceTree = "<group>"; };
 		10ED76C326403CA7002838F5 /* TrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingService.swift; sourceTree = "<group>"; };
 		10EE27EC245B7C7800C80AAF /* ChecklistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistViewController.swift; sourceTree = "<group>"; };
 		10EE27EE245C5B8000C80AAF /* Checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checklist.swift; sourceTree = "<group>"; };
@@ -2014,6 +2016,7 @@
 			children = (
 				102076CB23C2D3B5009AEAA4 /* Service.swift */,
 				10E0D7A22594D0AA00B0F83C /* NetworkController.swift */,
+				10ED65F3298EF6CF00CBCCA5 /* GoalService.swift */,
 				10E0D7BA25959C9000B0F83C /* ActivityService.swift */,
 				10E0D7C825959EF600B0F83C /* HealthService.swift */,
 				10E0D7C425959DC000B0F83C /* FinanceService.swift */,
@@ -3371,6 +3374,7 @@
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
 				100FE70C28931D2100D3124C /* CalendarActions.swift in Sources */,
 				103038EC2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift in Sources */,
+				10ED65F4298EF6CF00CBCCA5 /* GoalService.swift in Sources */,
 				10F7241828E39C7A003C13A0 /* SubLibraryViewController.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
 				4BAEE4EA21272D890045AB10 /* InformationMessageSender.swift in Sources */,
@@ -3813,7 +3817,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 99;
+				CURRENT_PROJECT_VERSION = 101;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3824,7 +3828,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.4.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
@@ -3845,7 +3849,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 99;
+				CURRENT_PROJECT_VERSION = 101;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3855,7 +3859,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.4.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4006,7 +4010,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 99;
+				CURRENT_PROJECT_VERSION = 101;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4022,7 +4026,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4049,7 +4053,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 99;
+				CURRENT_PROJECT_VERSION = 101;
 				DEVELOPMENT_TEAM = G226F98322;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4065,7 +4069,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";

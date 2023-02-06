@@ -73,7 +73,7 @@ class GeneralTabBarController: UITabBarController {
         if isNewUser && Auth.auth().currentUser != nil {
             //has to be here given currentUserID = nil on app start
             GeneralTabBarController.networkController.setupFirebase()
-            GeneralTabBarController.networkController.setupGoals()
+            GeneralTabBarController.networkController.setupInitialGoals()
             GeneralTabBarController.networkController.setupOtherVariables()
             discoverController.fetchTemplates()
             analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
@@ -89,12 +89,13 @@ class GeneralTabBarController: UITabBarController {
     }
     
     fileprivate func loadVariables() {
+        print("loadVariables")
         isNewUser = Auth.auth().currentUser == nil
         homeController.isNewUser = isNewUser
         homeController.addObservers()
         GeneralTabBarController.networkController.askPermissionToTrack()
         let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-        let previousVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+        let previousAppVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
         if !isNewUser {
@@ -104,13 +105,14 @@ class GeneralTabBarController: UITabBarController {
                 GeneralTabBarController.networkController.setupOtherVariables()
                 self.homeController.removeLaunchScreenView(animated: true) {
                     self.homeController.openNotification()
-//                    GeneralTabBarController.networkController.setupGoals()
+//                    GeneralTabBarController.networkController.setupInitialGoals()
 //                    GeneralTabBarController.networkController.deleteGoals()
-//                if let previousVersion = previousVersion, previousVersion.compare("1.3.7") == .orderedAscending {
-//                    GeneralTabBarController.networkController.setupGoals()
-//                } else {
-//                    GeneralTabBarController.networkController.updateGoals()
-//                }
+                    
+                    if let currentAppVersion = currentAppVersion, let previousAppVersion = previousAppVersion, previousAppVersion.compare(currentAppVersion) == .orderedAscending {
+                        GeneralTabBarController.networkController.setupInitialGoals()
+                    } else {
+                        GeneralTabBarController.networkController.checkGoalsForCompletion()
+                    }
                 }
             }
         } else {

@@ -32,10 +32,12 @@ enum DateRangeType: CaseIterable {
 
 struct DateRange {
     
-    var type: DateRangeType {
+    var type: DateRangeType? {
         didSet {
-            filterOff = true
-            (startDate, endDate) = type.initial
+            if let type = type {
+                filterOff = true
+                (startDate, endDate) = type.initial
+            }
         }
     }
     
@@ -49,6 +51,11 @@ struct DateRange {
     init(type: DateRangeType) {
         self.type = type
         (startDate, endDate) = type.initial
+    }
+    
+    init(startDate: Date, endDate: Date) {
+        self.startDate = startDate
+        self.endDate = endDate
     }
     
     mutating func next() {
@@ -67,6 +74,8 @@ struct DateRange {
 //        case .year:
 //            startDate = Calendar.current.date(byAdding: .year, value: 1, to: startDate)!
 //            endDate = Calendar.current.date(byAdding: .year, value: 1, to: endDate)!
+        case .none:
+            break
         }
     }
     
@@ -86,6 +95,8 @@ struct DateRange {
 //        case .year:
 //            startDate = Calendar.current.date(byAdding: .year, value: -1, to: startDate)!
 //            endDate = Calendar.current.date(byAdding: .year, value: -1, to: endDate)!
+        case .none:
+            break
         }
     }
     
@@ -114,6 +125,7 @@ struct DateRange {
         case .week: return .week
         case .month: return .month
 //        case .year: return .year
+        case .none: return .week
         }
     }
 }

@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import CodableFirebase
+import RRuleSwift
 
 let activitiesEntity = "activities"
 let userActivitiesEntity = "user-activities"
@@ -157,6 +158,24 @@ class Activity: NSObject, NSCopying, Codable {
                 }
                 if let value = goalMetricsRelationshipType {
                     goal.metricsRelationshipType = MetricsRelationshipType(rawValue: value)
+                }
+                if let recurrences = recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
+                    switch recurrenceRule.frequency {
+                    case .yearly:
+                        goal.frequency = .yearly
+                    case .monthly:
+                        goal.frequency = .monthly
+                    case .weekly:
+                        goal.frequency = .weekly
+                    case .daily:
+                        goal.frequency = .daily
+                    case .hourly:
+                        goal.frequency = .hourly
+                    case .minutely:
+                        goal.frequency = .minutely
+                    case .secondly:
+                        goal.frequency = .secondly
+                    }
                 }
                 return goal
             }
@@ -804,9 +823,9 @@ class Activity: NSObject, NSCopying, Codable {
         }
         
         if let goal = self.goal, let value = goal.metricsRelationshipType?.rawValue as AnyObject? {
-            dictionary["metricsRelationshipType"] = value
+            dictionary["goalMetricsRelationshipType"] = value
         } else {
-            dictionary["metricsRelationshipType"] = NSNull()
+            dictionary["goalMetricsRelationshipType"] = NSNull()
         }
                 
         return dictionary
@@ -1768,6 +1787,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
                 activitiesList.append(activity)
             }
         } else {
+            print("else")
             totalValue -= duration
             let type = "No Category"
             if categoryDict[type] == nil {
@@ -1780,6 +1800,7 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
             }
         }
     }
+    
     categoryDict["No Events"] = totalValue
             
     completion(categoryDict, activitiesList)
@@ -1806,7 +1827,7 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
             if activityCategory == "No Events" {
                 continue
             }
-            activityListStats(activities: activities, activityCategory: activityCategory, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
+            activityListStats(activities: activities, activityCategory: activityCategory, activitySubcategory: nil, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
                 if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                     var acStats = statistics[activityCategory]
                     var acActivityList = activityDict[activityCategory]
@@ -1838,7 +1859,8 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
 ///   - completion: list of statistical elements and activities.
 func activityListStats(
     activities: [Activity],
-    activityCategory: String,
+    activityCategory: String?,
+    activitySubcategory: String?,
     chunkStart: Date,
     chunkEnd: Date,
     completion: @escaping ([Statistic], [Activity]) -> ()
@@ -1866,6 +1888,23 @@ func activityListStats(
         }
         
         if let type = activity.category, type == activityCategory {
+            var duration: Double = 0
+            if activity.allDay ?? false {
+                duration = 1440
+            } else {
+                duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
+            }
+            if statistics.isEmpty {
+                let stat = Statistic(date: chunkStart, value: duration)
+                statistics.append(stat)
+                activityList.append(activity)
+            } else {
+                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
+                    statistics[index].value += duration
+                    activityList.append(activity)
+                }
+            }
+        } else if let type = activity.subcategory, type == activitySubcategory {
             var duration: Double = 0
             if activity.allDay ?? false {
                 duration = 1440

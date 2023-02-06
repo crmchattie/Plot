@@ -11,6 +11,7 @@ import HealthKit
 
 protocol HealthDetailServiceInterface {
     func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
 }
 
 class HealthDetailService: HealthDetailServiceInterface {
@@ -19,10 +20,14 @@ class HealthDetailService: HealthDetailServiceInterface {
     var mindfulnesses = [HKCategorySample]()
     
     func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
-        getStatisticalSamples(for: healthMetric, segmentType: segmentType, anchorDate: anchorDate, completion: completion)
+        getStatisticalSamples(for: healthMetric, segmentType: segmentType, range: nil, anchorDate: anchorDate, completion: completion)
     }
     
-    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
+        getStatisticalSamples(for: healthMetric, segmentType: segmentType, range: range, anchorDate: anchorDate, completion: completion)
+    }
+    
+    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
         let healthMetricType = healthMetric.type
         var interval = DateComponents()
         var quantityType: HKQuantityType?
@@ -392,17 +397,27 @@ class HealthDetailService: HealthDetailServiceInterface {
             return
         }
         
-        var typeOfSleep: HKCategoryValueSleepAnalysis = .inBed
+        var typeOfSleep: PlotSleepAnalysis = .inBed
         
         if segmentType == .day {
             let sleepValues = samples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
-            if sleepValues.contains(.asleep) {
-                typeOfSleep = .asleep
+            if #available(iOS 16.0, *) {
+                if sleepValues.contains(.asleepCore) || sleepValues.contains(.asleepREM) || sleepValues.contains(.asleepDeep) || sleepValues.contains(.asleepUnspecified) || sleepValues.contains(.awake) {
+                    typeOfSleep = .asleep
+                }
             } else {
-                typeOfSleep = .inBed
+                // Fallback on earlier versions
+                if sleepValues.contains(.asleep) {
+                    typeOfSleep = .asleep
+                }
             }
             for sample in samples {
-                if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
+                guard let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value) else {
+                    continue
+                }
+                if typeOfSleep == .inBed, sleepValue != .inBed {
+                    continue
+                } else if sleepValue == .inBed {
                     continue
                 }
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
@@ -410,7 +425,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 let stat = Statistic(date: sample.startDate, value: hours)
                 customStats.append(stat)
                 
-                let customSample = HKCategorySample(type: sample.categoryType, value: typeOfSleep.rawValue, start: sample.startDate, end: sample.endDate)
+                let customSample = HKCategorySample(type: sample.categoryType, value: sleepValue.rawValue, start: sample.startDate, end: sample.endDate)
                 customSamples.append(customSample)
 
             }
@@ -422,26 +437,29 @@ class HealthDetailService: HealthDetailServiceInterface {
             var map: [Date: Double] = [:]
             var sum: Double = 0
             
-            let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
-            let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
-            if sleepValues.contains(.asleep) {
-                typeOfSleep = .asleep
-            } else {
-                typeOfSleep = .inBed
-            }
             for sample in samples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
                     midDay = midDay.advanced(by: 86400)
                     interval = NSDateInterval(start: midDay, duration: 86400)
                     let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
                     let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
-                    if sleepValues.contains(.asleep) {
-                        typeOfSleep = .asleep
+                    if #available(iOS 16.0, *) {
+                        if sleepValues.contains(.asleepCore) || sleepValues.contains(.asleepREM) || sleepValues.contains(.asleepDeep) || sleepValues.contains(.asleepUnspecified) || sleepValues.contains(.awake) {
+                            typeOfSleep = .asleep
+                        }
                     } else {
-                        typeOfSleep = .inBed
+                        // Fallback on earlier versions
+                        if sleepValues.contains(.asleep) {
+                            typeOfSleep = .asleep
+                        }
                     }
                 }
-                if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
+                guard let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value) else {
+                    continue
+                }
+                if typeOfSleep == .inBed, sleepValue != .inBed {
+                    continue
+                } else if sleepValue == .inBed {
                     continue
                 }
                 
@@ -463,7 +481,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     group.append(statistic)
                     monthMap[key] = group
                     
-                    let customSample = HKCategorySample(type: HKCategoryType.categoryType(forIdentifier: .sleepAnalysis)!, value: typeOfSleep.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
+                    let customSample = HKCategorySample(type: HKCategoryType.categoryType(forIdentifier: .sleepAnalysis)!, value: typeOfSleep.hkValue.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
                     customSamples.append(customSample)
 
                 }
@@ -494,7 +512,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     let stat = Statistic(date: item.key, value: hours)
                     customStats.append(stat)
                     
-                    let customSample = HKCategorySample(type: HKCategoryType.categoryType(forIdentifier: .sleepAnalysis)!, value: typeOfSleep.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
+                    let customSample = HKCategorySample(type: HKCategoryType.categoryType(forIdentifier: .sleepAnalysis)!, value: typeOfSleep.hkValue.rawValue, start: item.key.addingTimeInterval(-item.value), end: item.key)
                     customSamples.append(customSample)
                 }
             }

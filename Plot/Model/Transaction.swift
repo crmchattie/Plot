@@ -979,7 +979,7 @@ var financialTransactionCategoriesAssociatedWithRecurringCosts = ["Auto Insuranc
 
 var financialTransactionCategoriesToSkip = ["Cash", "Check", "Uncategorized", "Transfer", "Public Transportation", "Rental Car & Taxi", "Alcohol & Bars", "Coffee Shops", "Fast Food", "Groceries", "Restaurants", "Food & Dining"]
 
-var financialTransactionDescriptionsToSkip = ["aplpay"]
+var financialTransactionDescriptionsToSkip = ["aplpay", "mtamnr"]
 
 var subscriptionProviders = ["spotify", "netflix", "amazon prime", "disney plus", "hulu", "crunchyroll", "espn plus", "apple music", "hbo", "amazon music", "dashpass", "apple tv plus", "audible"]
 

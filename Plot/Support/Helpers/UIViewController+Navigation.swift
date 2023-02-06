@@ -17,7 +17,7 @@ protocol ObjectDetailShowing: UIViewController {
 
 extension ObjectDetailShowing {
     
-    func showTaskDetailPush(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
+    func showTaskDetailPush(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?, isGoal: Bool?) {
         let destination = TaskViewController(networkController: networkController)
         destination.task = task
         destination.updateDiscoverDelegate = updateDiscoverDelegate
@@ -31,6 +31,7 @@ extension ObjectDetailShowing {
         destination.list = list
         destination.startDateTime = startDateTime
         destination.endDateTime = endDateTime
+        destination.isGoal = isGoal ?? false
         if let users = users {
             destination.users = users
             destination.filteredUsers = users
@@ -285,7 +286,7 @@ extension ObjectDetailShowing {
         navigationController?.pushViewController(financeDetailViewController, animated: true)
     }
     
-    func showTaskDetailPresent(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
+    func showTaskDetailPresent(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?, isGoal: Bool?) {
         let destination = TaskViewController(networkController: networkController)
         destination.task = task
         destination.updateDiscoverDelegate = updateDiscoverDelegate
@@ -299,6 +300,7 @@ extension ObjectDetailShowing {
         destination.list = list
         destination.startDateTime = startDateTime
         destination.endDateTime = endDateTime
+        destination.isGoal = isGoal ?? false
         if let users = users {
             destination.users = users
             destination.filteredUsers = users
@@ -633,9 +635,9 @@ extension ObjectDetailShowing {
                 }
             } else if category == Identifiers.taskCategory {
                 if let date = aps.date, let activity = networkController.activityService.tasks.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
-                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: activity.isGoal ?? false)
                 } else if let activity = networkController.activityService.tasksNoRepeats.first(where: {$0.activityID == ID }) {
-                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: activity.isGoal ?? false)
                 }
             } else if category == Identifiers.workoutCategory {
                 if let workout = networkController.healthService.workouts.first(where: {$0.id == ID }) {

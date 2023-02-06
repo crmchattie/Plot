@@ -216,18 +216,6 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             listOfLists.insert(scheduledList, at: 0)
         }
         
-        let goalTasks = tasks.filter {
-            if $0.isGoal ?? false {
-                return true
-            }
-            return false
-        }
-        if !goalTasks.isEmpty {
-            let goalList = ListType(id: "", name: ListOptions.goalList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: true)
-            taskList[goalList] = goalTasks
-            listOfLists.insert(goalList, at: 0)
-        }
-        
         let dailyTasks = tasks.filter {
             if let endDate = $0.endDate {
                 return NSCalendar.current.isDateInToday(endDate)
@@ -238,6 +226,18 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
             let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
             taskList[dailyList] = dailyTasks
             listOfLists.insert(dailyList, at: 0)
+        }
+        
+        let goalTasks = tasks.filter {
+            if $0.isGoal ?? false {
+                return true
+            }
+            return false
+        }
+        if !goalTasks.isEmpty {
+            let goalList = ListType(id: "", name: ListOptions.goalList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: true)
+            taskList[goalList] = goalTasks
+            listOfLists.insert(goalList, at: 0)
         }
         
         if !listOfLists.isEmpty {
@@ -288,8 +288,12 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     @objc fileprivate func newItem() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        alert.addAction(UIAlertAction(title: "Goal", style: .default, handler: { (_) in
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: true)
+        }))
+        
         alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: false)
         }))
         
         alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
@@ -482,7 +486,7 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             openList(list: list)
         } else {
             let task = filteredTasks[indexPath.row]
-            showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: task.isGoal ?? false)
         }
     }
     

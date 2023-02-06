@@ -102,6 +102,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         setupMainView()
         
         if task != nil {
+            print(isGoal)
             title = !isGoal ? "Task":"Goal"
             active = true
             taskOld = task.copy() as? Activity
@@ -173,6 +174,15 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         
         setupRightBarButton()
         initializeForm()
+        updateRightBarButton()
+        
+        if isGoal, let goal = task.goal, let _ = goal.metric {
+            self.updateNumberRows()
+            if let _ = goal.metricSecond {
+                self.updateNumberRowsSecond()
+                self.updateSecondTargetRow()
+            }
+        }
         
         purchaseUsers = self.selectedFalconUsers
         
@@ -246,7 +256,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             if let task = task, let name = task.name {
                 $0.value = name
             }
-            self.updateRightBarButton()
         }.onChange() { [unowned self] row in
             self.task.name = row.value
             self.updateRightBarButton()
@@ -1164,7 +1173,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: row.value, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                 }
                 self.updateSecondTargetRow()
-                self.updateDescriptionRow()
             }
             
             if active {
@@ -1250,7 +1258,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 cell.textLabel?.textColor = .label
                 cell.detailTextLabel?.textColor = .secondaryLabel
             }.onChange { row in
-                self.updateGoalSeconday(selectedGoalProperty: .metric, value: row.value)
+                self.updateGoalSecondary(selectedGoalProperty: .metric, value: row.value)
             }
             
             <<< PushRow<String>("Second Submetric") { row in
@@ -1292,7 +1300,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     cell.isUserInteractionEnabled = false
                 }
             }.onChange { row in
-                self.updateGoalSeconday(selectedGoalProperty: .submetric, value: row.value)
+                self.updateGoalSecondary(selectedGoalProperty: .submetric, value: row.value)
             }
             
             <<< MultipleSelectorRow<String>("Second Option") { row in
@@ -1410,7 +1418,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     self.task.goal!.targetNumberSecond = row.value
                 }
                 self.updateSecondTargetRow()
-                self.updateDescriptionRow()
             }
             
             if active {
@@ -1427,13 +1434,15 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     if let task = task, let goal = task.goal, let number = goal.currentNumberSecond {
                         row.value = number
                     }
-                    row.hidden = "!($addSecondMetric != false && $metricsRelationship != 'Equal' && $metricsRelationship != 'More' && $metricsRelationship != 'Less')"
                 }.cellUpdate { cell, row in
                     cell.textLabel?.textAlignment = .left
                     cell.backgroundColor = .secondarySystemGroupedBackground
                     cell.textLabel?.textColor = .label
                     cell.detailTextLabel?.textColor = .secondaryLabel
                     cell.accessoryType = .none
+                    if let secondTargetRow : DecimalRow = self.form.rowBy(tag: "Second Target") {
+                        row.hidden = Condition(booleanLiteral: secondTargetRow.isHidden)
+                    }
                 }
             }
             
@@ -1443,7 +1452,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.textLabel?.textColor = .label
                 row.cell.detailTextLabel?.textColor = .secondaryLabel
-                row.title = "Second Metric Connection"
+                row.title = "Metrics Relationship"
                 row.hidden = "!($addSecondMetric != false && $secondUnit != nil && $Unit != nil)"
                 if let task = self.task, let goal = task.goal {
                     if let value = goal.metricsRelationshipType {
@@ -1451,7 +1460,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     }
                 }
             }.onPresent { from, to in
-                to.title = "Second Metric Connection"
+                to.title = "Metrics Relationship"
                 to.extendedLayoutIncludesOpaqueBars = true
                 to.tableViewStyle = .insetGrouped
                 to.dismissOnSelection = true
@@ -1483,7 +1492,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 if let value = row.value, let type = MetricsRelationshipType(rawValue: value), let _ = self.task.goal {
                     self.task.goal?.metricsRelationshipType = type
                     self.updateSecondTargetRow()
-                    self.updateDescriptionRow()
                 }
             }
             
@@ -1494,7 +1502,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 row.cell.accessoryType = .disclosureIndicator
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                if let task = task, let recurrences = task.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
+                if let task = task, let recurrences = task.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
                     if let endDate = self.task.instanceOriginalStartDate {
                         row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
                     } else if let endDate = self.task.endDate {

@@ -424,7 +424,7 @@ extension TaskViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         } else {
-            if let _ = task.name, let goal = task.goal, let _ = goal.description, (task.recurrences != nil || task.endDateTime != nil) {
+            if let _ = task.name, let goal = task.goal, let _ = goal.description {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -500,7 +500,7 @@ extension TaskViewController {
         }
     }
     
-    func updateGoalSeconday(selectedGoalProperty: SelectedGoalProperty, value: String?) {
+    func updateGoalSecondary(selectedGoalProperty: SelectedGoalProperty, value: String?) {
         if let unitRow : PushRow<String> = self.form.rowBy(tag: "secondUnit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let _ = task.goal {
             switch selectedGoalProperty {
             case .metric:
@@ -622,6 +622,18 @@ extension TaskViewController {
                 secondTargetRow.hidden = false
                 secondTargetRow.evaluateHidden()
             }
+            
+            if let currentRow : DecimalRow = self.form.rowBy(tag: "Current") {
+                currentRow.hidden = Condition(booleanLiteral: targetRow.isHidden)
+                currentRow.evaluateHidden()
+            }
+            
+            if let secondCurrentRow : DecimalRow = self.form.rowBy(tag: "Second Current") {
+                secondCurrentRow.hidden = Condition(booleanLiteral: secondTargetRow.isHidden)
+                secondCurrentRow.evaluateHidden()
+            }
+            
+            self.updateDescriptionRow()
         }
     }
     

@@ -532,7 +532,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             row.cell.accessoryType = .disclosureIndicator
             row.cell.selectionStyle = .default
             row.title = row.tag
-            if let activity = activity, let recurrences = activity.recurrences, let recurrenceRule = RecurrenceRule(rruleString: recurrences[0]) {
+            if let activity = activity, let recurrences = activity.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
                 if let startDate = activity.instanceOriginalStartDate {
                     row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
                 } else if let startDate = activity.startDate {

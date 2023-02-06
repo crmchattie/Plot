@@ -252,12 +252,20 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             self.showEventDetailPresent(event: nil, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: calendar.date(from: dateComponents), endDateTime: calendar.date(from: dateComponents))
         }))
         
+        alert.addAction(UIAlertAction(title: "Goal", style: .default, handler: { (_) in
+            let calendar = Calendar.current
+            var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.selectedDate)
+            dateComponents.hour = calendar.component(.hour, from: Date())
+            dateComponents.minute = calendar.component(.minute, from: Date())
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: calendar.date(from: dateComponents), isGoal: true)
+        }))
+        
         alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
             let calendar = Calendar.current
             var dateComponents = calendar.dateComponents([.day, .month, .year], from: self.selectedDate)
             dateComponents.hour = calendar.component(.hour, from: Date())
             dateComponents.minute = calendar.component(.minute, from: Date())
-            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: calendar.date(from: dateComponents))
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: calendar.date(from: dateComponents), isGoal: false)
         }))
         
         alert.addAction(UIAlertAction(title: "Calendar", style: .default, handler: { (_) in
@@ -738,7 +746,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func loadActivity(activity: Activity) {
         if activity.isTask ?? false {
-            showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: activity.isGoal)
         } else {
             showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
         }

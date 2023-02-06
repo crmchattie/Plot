@@ -58,9 +58,8 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
-        activityDetailService.getEventCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { stats, activityList in
-            let categoryStats = stats[.calendarSummary] ?? [:]
-            
+        activityDetailService.getEventCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events) { categoryStats, activityList in
+                        
             guard !categoryStats.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []

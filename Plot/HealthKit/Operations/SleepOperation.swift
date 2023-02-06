@@ -30,7 +30,7 @@ class SleepOperation: AsyncOperation {
                 return
             }
             
-            var typeOfSleep: HKCategoryValueSleepAnalysis = .inBed
+            var typeOfSleep: PlotSleepAnalysis = .inBed
             
             // 12 hours = 43200 seconds
             var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)
@@ -38,28 +38,29 @@ class SleepOperation: AsyncOperation {
             var map: [Date: Double] = [:]
             var sum: Double = 0
             
-            let relevantSamples = sleepSamples.filter({interval.contains($0.endDate.localTime)})
-            let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
-            if sleepValues.contains(.asleep) {
-                typeOfSleep = .asleep
-            } else {
-                typeOfSleep = .inBed
-            }
-            
             for sample in sleepSamples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
                     midDay = midDay.advanced(by: 86400)
                     interval = NSDateInterval(start: midDay, duration: 86400)
                     let relevantSamples = sleepSamples.filter({interval.contains($0.endDate.localTime)})
                     let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
-                    if sleepValues.contains(.asleep) {
-                        typeOfSleep = .asleep
+                    if #available(iOS 16.0, *) {
+                        if sleepValues.contains(.asleepCore) || sleepValues.contains(.asleepREM) || sleepValues.contains(.asleepDeep) || sleepValues.contains(.asleepUnspecified) || sleepValues.contains(.awake) {
+                            typeOfSleep = .asleep
+                        }
                     } else {
-                        typeOfSleep = .inBed
+                        // Fallback on earlier versions
+                        if sleepValues.contains(.asleep) {
+                            typeOfSleep = .asleep
+                        }
                     }
                 }
-                if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value), sleepValue != typeOfSleep {
-                    continue
+                if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value) {
+                    if typeOfSleep == .inBed, sleepValue != .inBed {
+                        continue
+                    } else if sleepValue == .inBed {
+                        continue
+                    }
                 }
                 
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
@@ -77,6 +78,20 @@ class SleepOperation: AsyncOperation {
             }
 
             self?.finish()
+        }
+    }
+}
+
+enum PlotSleepAnalysis {
+    case inBed
+    case asleep
+    
+    var hkValue: HKCategoryValueSleepAnalysis {
+        switch self {
+        case .inBed:
+            return .inBed
+        case .asleep:
+            return .asleep
         }
     }
 }
