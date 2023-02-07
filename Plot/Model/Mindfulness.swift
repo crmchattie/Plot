@@ -83,3 +83,59 @@ struct UserMindfulness: Codable, Equatable, Hashable {
         self.hkSampleID = mindfulness.hkSampleID
     }
 }
+
+func mindfulnessData(mindfulnesses: [Mindfulness], start: Date, end: Date, completion: @escaping ([Statistic], [Mindfulness]) -> ()) {
+    mindfulnessListStats(mindfulnesses: mindfulnesses, chunkStart: start, chunkEnd: end) { (stats, mindfulnesses) in
+        completion(stats, mindfulnesses)
+    }    
+}
+
+/// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]
+/// - Parameters:
+///   - activities: A list of activities to analize.
+///   - activityCategory: no idea what this is.
+///   - chunkStart: Start date in which the activities are split and categorized.
+///   - chunkEnd: End date in which the activities are split and categorized.
+///   - completion: list of statistical elements and activities.
+func mindfulnessListStats(
+    mindfulnesses: [Mindfulness],
+    chunkStart: Date,
+    chunkEnd: Date,
+    completion: @escaping ([Statistic], [Mindfulness]) -> ()
+) {
+    var statistics = [Statistic]()
+    var mindfulnessList = [Mindfulness]()
+    for mindfulness in mindfulnesses {
+        guard var startDate = mindfulness.startDateTime,
+              var endDate = mindfulness.endDateTime else {
+            return
+        }
+        
+        // Skipping activities that are outside of the interest range.
+        if startDate >= chunkEnd || endDate <= chunkStart {
+            continue
+        }
+                
+        // Truncate events that out of the [chunkStart, chunkEnd] range.
+        // Multi-day events, chunked into single day `Statistic`s are the best example.
+        if startDate < chunkStart {
+            startDate = chunkStart
+        }
+        if endDate > chunkEnd {
+            endDate = chunkEnd
+        }
+        
+        var duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+        if statistics.isEmpty {
+            let stat = Statistic(date: chunkStart, value: duration)
+            statistics.append(stat)
+            mindfulnessList.append(mindfulness)
+        } else {
+            if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
+                statistics[index].value += duration
+                mindfulnessList.append(mindfulness)
+            }
+        }
+    }
+    completion(statistics, mindfulnessList)
+}

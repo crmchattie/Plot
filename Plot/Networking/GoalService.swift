@@ -39,36 +39,271 @@ extension NetworkController {
                 print(task.startDateGivenEndDateFrequency)
                 print(goal.frequency)
                 
-                if let endDate = task.endDate, endDate > monthPast {
-                    if let _ = goal.frequency, let startDate = task.startDateGivenEndDateFrequency, startDate < now {
-                        var range = DateRange(startDate: startDate, endDate: endDate)
-                        switch metric {
-                        case .events:
-                            print("events")
-                        case .tasks:
-                            print("tasks")
-                        case .financialTransactions:
-                            print("financialTransactions")
-                        case .financialAccounts:
-                            print("financialAccounts")
-                        case .workout:
-                            print("workout")
-                        case .mindfulness:
-                            print("mindfulness")
-                        case .sleep:
-                            print("sleep")
-                        case .steps:
-                            print("steps")
-                        case .flightsClimbed:
-                            print("flightsClimbed")
-                        case .activeCalories:
-                            print("activeCalories")
-                        }
-                    } else {
-                        
+                var startDate: Date?
+                var endDate: Date?
+                
+                if let endDateTemp = task.endDate, endDateTemp > monthPast {
+                    endDate = endDateTemp
+                    if let startDateTemp = task.startDate {
+                        startDate = startDateTemp
+                    } else if let _ = goal.frequency, let startDateTemp = task.startDateGivenEndDateFrequency, startDateTemp < now {
+                        startDate = startDateTemp
+                    }
+                }
+                
+                if let metricsRelationship = goal.metricsRelationshipType, metricsRelationship != .or {
+                    
+                }
+            }
+        }
+    }
+    
+    func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, targetNumber: Double, range: DateRange) {
+        switch metric {
+        case .events:
+            print("events")
+
+            switch submetric {
+            case nil:
+                print("nil")
+                break
+            case .some(.none):
+                print("none")
+                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: nil, range: range) { statsDict, activities in
+                    for (cat, stats) in statsDict ?? [:] {
+                        print(cat, stats)
+                    }
+                    for activity in activities ?? [] {
+                        print(activity.name ?? "")
+                        print(activity.category ?? "")
+                        print(activity.startDate ?? "")
+                        print(activity.endDate ?? "")
+                    }
+                }
+            case .some(.group):
+                print("group")
+                break
+            case .some(.category):
+                print("category")
+                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: option, activitySubcategories: nil, range: range) { statsDict, activities in
+                    for (cat, stats) in statsDict ?? [:] {
+                        print(cat, stats)
+                    }
+                    for activity in activities ?? [] {
+                        print(activity.name ?? "")
+                        print(activity.category ?? "")
+                        print(activity.startDate ?? "")
+                        print(activity.endDate ?? "")
+                    }
+                }
+            case .some(.subcategory):
+                print("subcategory")
+                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: option, range: range) { statsDict, activities in
+                    for (cat, stats) in statsDict ?? [:] {
+                        print(cat, stats)
+                    }
+                    for activity in activities ?? [] {
+                        print(activity.name ?? "")
+                        print(activity.category ?? "")
+                        print(activity.startDate ?? "")
+                        print(activity.endDate ?? "")
                     }
                 }
             }
+        case .tasks:
+            print("tasks")
+
+            switch submetric {
+            case nil:
+                print("nil")
+                break
+            case .some(.none):
+                print("none")
+                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: nil, range: range) { statsDict, activities in
+                    for (cat, stats) in statsDict ?? [:] {
+                        print(cat, stats)
+                    }
+                    for activity in activities ?? [] {
+                        print(activity.name ?? "")
+                        print(activity.category ?? "")
+                        print(activity.startDate ?? "")
+                        print(activity.endDate ?? "")
+                    }
+                }
+            case .some(.group):
+                print("group")
+                break
+            case .some(.category):
+                print("category")
+                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: option, activitySubcategories: nil, range: range) { statsDict, activities in
+                    for (cat, stats) in statsDict ?? [:] {
+                        print(cat, stats)
+                    }
+                    for activity in activities ?? [] {
+                        print(activity.name ?? "")
+                        print(activity.category ?? "")
+                        print(activity.startDate ?? "")
+                        print(activity.endDate ?? "")
+                    }
+                }
+            case .some(.subcategory):
+                print("subcategory")
+                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: option, range: range) { statsDict, activities in
+                    for (cat, stats) in statsDict ?? [:] {
+                        print(cat, stats)
+                    }
+                    for activity in activities ?? [] {
+                        print(activity.name ?? "")
+                        print(activity.category ?? "")
+                        print(activity.startDate ?? "")
+                        print(activity.endDate ?? "")
+                    }
+                }
+            }
+        case .financialTransactions:
+            var transactionDetails = [TransactionDetails]()
+            switch submetric {
+            case nil:
+                print("nil")
+                break
+            case .some(.none):
+                print("none")
+                break
+                
+            case .some(.group):
+                print("group")
+                for opt in option ?? [] {
+                    let transactionDetail = TransactionDetails(name: opt, amount: 0, level: submetric?.transcationCatLevel ?? .group, group: opt)
+                    transactionDetails.append(transactionDetail)
+                }
+                financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil) { statsList, _, transactions, err in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for transaction in transactions ?? [] {
+                        print(transaction.description)
+                        print(transaction.group)
+                        print(transaction.transacted_at)
+                    }
+                }
+                
+            case .some(.category):
+                print("category")
+                
+                for opt in option ?? [] {
+                    let transactionDetail = TransactionDetails(name: opt, amount: 0, level: submetric?.transcationCatLevel ?? .group, topLevelCategory: opt)
+                    transactionDetails.append(transactionDetail)
+                }
+                financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil) { statsList, _, transactions, err in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for transaction in transactions ?? [] {
+                        print(transaction.description)
+                        print(transaction.top_level_category)
+                        print(transaction.transacted_at)
+                    }
+                }
+                
+            case .some(.subcategory):
+                print("subcategory")
+                
+                for opt in option ?? [] {
+                    let transactionDetail = TransactionDetails(name: opt, amount: 0, level: submetric?.transcationCatLevel ?? .group, category: opt)
+                    transactionDetails.append(transactionDetail)
+                }
+                financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil) { statsList, _, transactions, err in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for transaction in transactions ?? [] {
+                        print(transaction.description)
+                        print(transaction.category)
+                        print(transaction.transacted_at)
+                    }
+                }
+                
+            }
+        case .financialAccounts:
+            print("financialAccounts")
+            
+            var accountDetails = [AccountDetails]()
+            
+            switch submetric {
+            case nil:
+                print("nil")
+                break
+            case .some(.none):
+                print("none")
+                break
+                
+            case .some(.group):
+                print("group")
+                for opt in option ?? [] {
+                    let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, bs_type: BalanceSheetType(rawValue: opt))
+                    accountDetails.append(accountDetail)
+                }
+                financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil) { statsList, accounts, _, err in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for account in accounts ?? [] {
+                        print(account.name)
+                        print(account.bs_type)
+                        print(account.updated_at)
+                    }
+                }
+                
+            case .some(.category):
+                print("category")
+                
+                for opt in option ?? [] {
+                    let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, type: MXAccountType(rawValue: opt))
+                    accountDetails.append(accountDetail)
+                }
+                financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil) { statsList, accounts, _, err in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for account in accounts ?? [] {
+                        print(account.name)
+                        print(account.type)
+                        print(account.updated_at)
+                    }
+                }
+                
+            case .some(.subcategory):
+                print("subcategory")
+                
+                for opt in option ?? [] {
+                    let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, subtype: MXAccountSubType(rawValue: opt))
+                    accountDetails.append(accountDetail)
+                }
+                financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil) { statsList, accounts, _, err in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for account in accounts ?? [] {
+                        print(account.name)
+                        print(account.subtype)
+                        print(account.updated_at)
+                    }
+                }
+                
+            }
+            
+        case .workout:
+            print("workout")
+        case .mindfulness:
+            print("mindfulness")
+        case .sleep:
+            print("sleep")
+        case .steps:
+            print("steps")
+        case .flightsClimbed:
+            print("flightsClimbed")
+        case .activeCalories:
+            print("activeCalories")
         }
     }
     

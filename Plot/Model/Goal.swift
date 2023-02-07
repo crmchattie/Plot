@@ -6,6 +6,8 @@
 //  Copyright © 2022 Immature Creations. All rights reserved.
 //
 
+import HealthKit
+
 struct Goal: Codable, Equatable, Hashable {
     var name: String?
     var metric: GoalMetric?
@@ -199,7 +201,34 @@ struct Goal: Codable, Equatable, Hashable {
             case nil:
                 return nil
             }
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
+        case .workout:
+            switch self.submetric {
+            case .group:
+                return nil
+            case .category:
+                var array = [String]()
+                if #available(iOS 16.0, *) {
+                    HKWorkoutActivityType.allCases.forEach {
+                        array.append($0.name)
+                    }
+                } else if #available(iOS 14.0, *) {
+                    HKWorkoutActivityType.oldAllCases.forEach {
+                        array.append($0.name)
+                    }
+                } else {
+                    HKWorkoutActivityType.oldOldAllCases.forEach {
+                        array.append($0.name)
+                    }
+                }
+                return array
+            case .subcategory:
+                return nil
+            case .some(.none):
+                return nil
+            case nil:
+                return nil
+            }
+        case .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return nil
         case .none:
             return nil
@@ -413,7 +442,7 @@ struct Goal: Codable, Equatable, Hashable {
                         }
                         return description
                     }
-                } else if let unit = unit, let metric = metric, let targetNumber = targetNumber as? NSNumber {
+                } else if let unit = unit, let metric = metric {
                     switch unit {
                     case .calories:
                         numberFormatter.numberStyle = .decimal
@@ -1073,7 +1102,7 @@ let sleepGoal = Goal(name: "Daily Sleep", metric: GoalMetric.sleep, submetric: n
 let workoutsGoal = Goal(name: "Daily Workout", metric: GoalMetric.workout, submetric: nil, option: nil, unit: GoalUnit.minutes, targetNumber: 30, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.steps, submetricSecond: nil, optionSecond: nil, unitSecond: GoalUnit.count, targetNumberSecond: 10000, currentNumberSecond: nil, metricsRelationshipType: MetricsRelationshipType.or)
 let savingsGoal = Goal(name: "Monthly Savings", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Net Savings"], unit: GoalUnit.amount, targetNumber: nil, currentNumber: nil, frequency: PlotRecurrenceFrequency.monthly, metricSecond: GoalMetric.financialTransactions, submetricSecond: GoalSubMetric.group, optionSecond: ["Income"], unitSecond: GoalUnit.percent, targetNumberSecond: 0.2, currentNumberSecond: nil, metricsRelationshipType: MetricsRelationshipType.more)
 let creditCardGoal = Goal(name: "Pay Off Credit Card(s)", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Credit Card"], unit: GoalUnit.amount, targetNumber: 0, currentNumber: nil, frequency: PlotRecurrenceFrequency.monthly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
-let emergencyFundGoal = Goal(name: "Save Emergency Fund", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Cash", "Checking", "Savings"], unit: GoalUnit.amount, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: GoalMetric.financialTransactions, submetricSecond: GoalSubMetric.group, optionSecond: ["Expense"], unitSecond: GoalUnit.multiple, targetNumberSecond: 3, currentNumberSecond: nil, metricsRelationshipType: nil)
+let emergencyFundGoal = Goal(name: "Save Emergency Fund", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Cash", "Checking", "Savings"], unit: GoalUnit.amount, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: GoalMetric.financialTransactions, submetricSecond: GoalSubMetric.group, optionSecond: ["Expense"], unitSecond: GoalUnit.multiple, targetNumberSecond: 3, currentNumberSecond: nil, metricsRelationshipType: MetricsRelationshipType.more)
 let debtGoal = Goal(name: "Pay Off Debt", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Mortgage", "Loan", "Line of Credit"], unit: GoalUnit.amount, targetNumber: 0, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
 let timeOffGoal = Goal(name: "Annual Time Off", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Time Off"], unit: GoalUnit.count, targetNumber: 5, currentNumber: nil, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
 let generalCheckUpGoal = Goal(name: "Annual Physical", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - General"], unit: GoalUnit.count, targetNumber: 1, currentNumber: nil, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
@@ -1158,7 +1187,9 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.group, .category, .subcategory]
         case .financialAccounts:
             return [.group, .category, .subcategory]
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
+        case .workout:
+            return [.none, .category]
+        case .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return []
         }
     }
@@ -1216,6 +1247,32 @@ enum GoalSubMetric: String, Codable, CaseIterable {
             return "Categories"
         case .subcategory:
             return "Subcategories"
+        }
+    }
+    
+    var transcationCatLevel: TransactionCatLevel {
+        switch self {
+        case .none:
+            return .group
+        case .group:
+            return .group
+        case .category:
+            return .top
+        case .subcategory:
+            return .category
+        }
+    }
+    
+    var accountCatLevel: AccountCatLevel {
+        switch self {
+        case .none:
+            return .bs_type
+        case .group:
+            return .bs_type
+        case .category:
+            return .type
+        case .subcategory:
+            return .subtype
         }
     }
 }

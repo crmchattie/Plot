@@ -149,7 +149,7 @@ struct AccountDetails: Codable, Equatable, Hashable {
     var level: AccountCatLevel
     var subtype: MXAccountSubType?
     var type: MXAccountType?
-    var bs_type: BalanceSheetType
+    var bs_type: BalanceSheetType?
     var currencyCode: String?
 }
 
@@ -886,7 +886,7 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for accountDetail in accountDetails {
-                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                accountListStats(accounts: accounts, accountDetail: accountDetail, date: date, nextDate: nextDate) { (stats, accounts) in
                     if accountDict[accountDetail] != nil {
                         var tdStats = statistics[accountDetail]
                         var tdAccountList = accountDict[accountDetail]
@@ -913,7 +913,7 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for accountDetail in accountDetails {
-                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                accountListStats(accounts: accounts, accountDetail: accountDetail, date: date, nextDate: nextDate) { (stats, accounts) in
                     if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
                         var tdStats = statistics[accountDetail]
                         var tdAccountList = accountDict[accountDetail]
@@ -940,7 +940,7 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for accountDetail in accountDetails {
-                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                accountListStats(accounts: accounts, accountDetail: accountDetail, date: date, nextDate: nextDate) { (stats, accounts) in
                     if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
                         var tdStats = statistics[accountDetail]
                         var tdAccountList = accountDict[accountDetail]
@@ -968,7 +968,7 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for accountDetail in accountDetails {
-                accountListStats(accounts: accounts, accountDetail: accountDetail, start: start, end: end, date: date, nextDate: nextDate) { (stats, accounts) in
+                accountListStats(accounts: accounts, accountDetail: accountDetail, date: date, nextDate: nextDate) { (stats, accounts) in
                     if accountDict[accountDetail] != nil, accountDict[accountDetail] != nil {
                         var tdStats = statistics[accountDetail]
                         var tdAccountList = accountDict[accountDetail]
@@ -994,7 +994,7 @@ func accountDetailsOverTimeChartData(accounts: [MXAccount], accountDetails: [Acc
     completion(statistics, accountDict)
 }
 
-func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, start: Date, end: Date, date: Date, nextDate: Date, completion: @escaping ([Statistic], [MXAccount]) -> ()) {
+func accountListStats(accounts: [MXAccount], accountDetail: AccountDetails, date: Date, nextDate: Date, completion: @escaping ([Statistic], [MXAccount]) -> ()) {
     var statistics = [Statistic]()
     var accountList = [MXAccount]()
     let isodateFormatter = ISO8601DateFormatter()

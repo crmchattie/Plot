@@ -12,12 +12,13 @@ protocol FinanceDetailServiceInterface {
     func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
     
     func getSamples(for range: DateRange, segment: TimeSegmentType, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
+    
+    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
 }
 
 class FinanceDetailService: FinanceDetailServiceInterface {
     
     func getSamples(accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, segmentType: TimeSegmentType, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Swift.Void) {
-
         getStatisticalSamples(accountDetails: accountDetails,
                               transactionDetails: transactionDetails,
                               segmentType: segmentType,
@@ -36,6 +37,16 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                               accounts: accounts,
                               transactions: transactions,
                               filterAccounts: nil,
+                              completion: completion)
+    }
+    
+    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
+        getStatisticalSamples(accountDetails: accountDetails,
+                              transactionDetails: transactionDetails,
+                              range: range,
+                              accounts: accounts,
+                              transactions: transactions,
+                              filterAccounts: filterAccounts,
                               completion: completion)
     }
 
@@ -100,7 +111,44 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                 }
             }
         }
+    }
+    
+    private func getStatisticalSamples(
+        accountDetails: [AccountDetails]?,
+        transactionDetails: [TransactionDetails]?,
+        range: DateRange,
+        accounts: [MXAccount]?,
+        transactions: [Transaction]?,
+        filterAccounts: [String]?,
+        completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void
+    ) {
+
+        let startDate = range.startDate.startOfDay.dayBefore
+        let endDate = range.endDate
         
+        var finalStats = [Statistic]()
+        
+        DispatchQueue.global(qos: .background).async {
+            if let accountDetails = accountDetails, let accounts = accounts {
+                var accts = [MXAccount]()
+                for accountDetail in accountDetails {
+                    accountListStats(accounts: accounts, accountDetail: accountDetail, date: startDate, nextDate: endDate) { (stats, accounts) in
+                        finalStats.append(contentsOf: stats)
+                        accts.append(contentsOf: accounts)
+                    }
+                }
+                completion(finalStats, accounts, nil, nil)
+            } else if let transactionDetails = transactionDetails, let transactions = transactions {
+                var trans = [Transaction]()
+                for transactionDetail in transactionDetails {
+                    transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: startDate, nextDate: endDate, accounts: filterAccounts) { stats, transactions in
+                        finalStats.append(contentsOf: stats)
+                        trans.append(contentsOf: transactions)
+                    }
+                }
+                completion(finalStats, nil, transactions, nil)
+            }
+        }
     }
 }
 

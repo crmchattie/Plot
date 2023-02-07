@@ -1787,7 +1787,6 @@ func categorizeActivities(activities: [Activity], start: Date, end: Date, comple
                 activitiesList.append(activity)
             }
         } else {
-            print("else")
             totalValue -= duration
             let type = "No Category"
             if categoryDict[type] == nil {
@@ -1850,6 +1849,58 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
     completion(statistics, activityDict)
 }
 
+func activitiesData(activities: [Activity], activityCategories: [String]?, activitySubcategories: [String]?, start: Date, end: Date, completion: @escaping ([String: [Statistic]], [Activity]) -> ()) {
+    var statistics = [String: [Statistic]]()
+    var activityList = [Activity]()
+    
+    if activityCategories == nil, activitySubcategories == nil {
+        activityListStats(activities: activities, activityCategory: nil, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (stats, activities) in
+            if statistics["none"] != nil {
+                var acStats = statistics["none"]
+                acStats!.append(contentsOf: stats)
+                statistics["none"] = acStats
+            } else {
+                statistics["none"] = stats
+            }
+            activityList.append(contentsOf: activities)
+        }
+    } else {
+        for activityCategory in activityCategories ?? [] {
+            if activityCategory == "No Events" {
+                continue
+            }
+            activityListStats(activities: activities, activityCategory: activityCategory, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (stats, activities) in
+                if statistics[activityCategory] != nil {
+                    var acStats = statistics[activityCategory]
+                    acStats!.append(contentsOf: stats)
+                    statistics[activityCategory] = acStats
+                } else {
+                    statistics[activityCategory] = stats
+                }
+                activityList.append(contentsOf: activities)
+            }
+        }
+        
+        for activitySubcategory in activitySubcategories ?? [] {
+            if activitySubcategory == "No Events" {
+                continue
+            }
+            activityListStats(activities: activities, activityCategory: nil, activitySubcategory: activitySubcategory, chunkStart: start, chunkEnd: end) { (stats, activities) in
+                if statistics[activitySubcategory] != nil {
+                    var acStats = statistics[activitySubcategory]
+                    acStats!.append(contentsOf: stats)
+                    statistics[activitySubcategory] = acStats
+                } else {
+                    statistics[activitySubcategory] = stats
+                }
+                activityList.append(contentsOf: activities)
+            }
+        }
+    }
+    
+    completion(statistics, activityList)
+}
+
 /// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]
 /// - Parameters:
 ///   - activities: A list of activities to analize.
@@ -1877,6 +1928,11 @@ func activityListStats(
         if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
             continue
         }
+        
+        // Skipping tasks that not completed
+        if activity.isTask ?? false, !(activity.isCompleted ?? false) {
+            continue
+        }
                 
         // Truncate events that out of the [chunkStart, chunkEnd] range.
         // Multi-day events, chunked into single day `Statistic`s are the best example.
@@ -1887,7 +1943,7 @@ func activityListStats(
             activityEndDate = chunkEnd
         }
         
-        if let type = activity.category, type == activityCategory {
+        if let activityCategory = activityCategory, let type = activity.category, type == activityCategory {
             var duration: Double = 0
             if activity.allDay ?? false {
                 duration = 1440
@@ -1904,7 +1960,24 @@ func activityListStats(
                     activityList.append(activity)
                 }
             }
-        } else if let type = activity.subcategory, type == activitySubcategory {
+        } else if let activitySubcategory = activitySubcategory, let type = activity.subcategory, type == activitySubcategory {
+            var duration: Double = 0
+            if activity.allDay ?? false {
+                duration = 1440
+            } else {
+                duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
+            }
+            if statistics.isEmpty {
+                let stat = Statistic(date: chunkStart, value: duration)
+                statistics.append(stat)
+                activityList.append(activity)
+            } else {
+                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
+                    statistics[index].value += duration
+                    activityList.append(activity)
+                }
+            }
+        } else if activityCategory == nil, activitySubcategory == nil {
             var duration: Double = 0
             if activity.allDay ?? false {
                 duration = 1440

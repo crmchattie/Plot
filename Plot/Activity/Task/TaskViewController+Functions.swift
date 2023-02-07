@@ -424,7 +424,7 @@ extension TaskViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         } else {
-            if let _ = task.name, let goal = task.goal, let _ = goal.description {
+            if let _ = task.name, let goal = task.goal, let _ = goal.description, (task.recurrences != nil || ((task.startDateTime != nil) && (task.endDateTime != nil))) {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -582,6 +582,11 @@ extension TaskViewController {
                         value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
                     }
                     updatedDescription += " " + value.lowercased()
+                } else if let startDate = self.task.startDate, let endDate = self.task.endDate {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateStyle = .medium
+                    dateFormatter.timeStyle = task.hasDeadlineTime ?? false ? .short : .none
+                    updatedDescription += " from " + dateFormatter.string(from: startDate) + " to " + dateFormatter.string(from: endDate)
                 } else if let endDate = self.task.endDate {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateStyle = .medium
@@ -1233,7 +1238,8 @@ extension TaskViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Delete Task", style: .default, handler: { (_) in
+        let title = task.isGoal ?? false ? "Delete Goal" : "Delete Task"
+        alert.addAction(UIAlertAction(title: title, style: .default, handler: { (_) in
             self.deleteActivity()
         }))
         

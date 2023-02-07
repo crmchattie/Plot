@@ -242,7 +242,7 @@ struct TransactionDetails: Codable, Equatable, Hashable {
     var level: TransactionCatLevel
     var category: String?
     var topLevelCategory: String?
-    var group: String
+    var group: String?
     var currencyCode: String?
 }
 
@@ -589,7 +589,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -612,7 +612,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -636,7 +636,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -660,7 +660,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, start: start, end: end, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -683,7 +683,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
     completion(statistics, transactionDict)
 }
 
-func transactionListStats(transactions: [Transaction], transactionDetail: TransactionDetails, start: Date, end: Date, date: Date, nextDate: Date, accounts: [String]?, completion: @escaping ([Statistic], [Transaction]) -> ()) {
+func transactionListStats(transactions: [Transaction], transactionDetail: TransactionDetails, date: Date, nextDate: Date, accounts: [String]?, completion: @escaping ([Statistic], [Transaction]) -> ()) {
     var statistics = [Statistic]()
     var transactionList = [Transaction]()
     let isodateFormatter = ISO8601DateFormatter()
@@ -692,15 +692,6 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
         guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
         if accounts != nil {
             guard accounts!.contains(transaction.account_guid ?? "") else { continue }
-        }
-        if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
-            if transactionDate.localTime < start || end < transactionDate.localTime {
-                continue
-            }
-        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
-            if transactionDate.localTime < start || end < transactionDate.localTime {
-                continue
-            }
         }
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
             if transactionDate.localTime < date || nextDate < transactionDate.localTime {

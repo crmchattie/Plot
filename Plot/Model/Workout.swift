@@ -93,6 +93,104 @@ struct UserWorkout: Codable, Equatable, Hashable {
     }
 }
 
+func workoutData(workouts: [Workout], categories: [String]?, start: Date, end: Date, completion: @escaping ([String: [Statistic]], [Workout]) -> ()) {
+    var statistics = [String: [Statistic]]()
+    var workoutList = [Workout]()
+    
+    if categories == nil {
+        workoutListStats(workouts: workouts, category: nil, chunkStart: start, chunkEnd: end) { (stats, workouts) in
+            if statistics["none"] != nil {
+                var acStats = statistics["none"]
+                acStats!.append(contentsOf: stats)
+                statistics["none"] = acStats
+            } else {
+                statistics["none"] = stats
+            }
+            workoutList.append(contentsOf: workouts)
+        }
+    } else {
+        for category in categories ?? [] {
+            workoutListStats(workouts: workouts, category: category, chunkStart: start, chunkEnd: end) { (stats, workouts) in
+                if statistics[category] != nil {
+                    var acStats = statistics[category]
+                    acStats!.append(contentsOf: stats)
+                    statistics[category] = acStats
+                } else {
+                    statistics[category] = stats
+                }
+                workoutList.append(contentsOf: workouts)
+            }
+        }
+    }
+    
+    completion(statistics, workoutList)
+}
+
+/// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]
+/// - Parameters:
+///   - activities: A list of activities to analize.
+///   - activityCategory: no idea what this is.
+///   - chunkStart: Start date in which the activities are split and categorized.
+///   - chunkEnd: End date in which the activities are split and categorized.
+///   - completion: list of statistical elements and activities.
+func workoutListStats(
+    workouts: [Workout],
+    category: String?,
+    chunkStart: Date,
+    chunkEnd: Date,
+    completion: @escaping ([Statistic], [Workout]) -> ()
+) {
+    var statistics = [Statistic]()
+    var workoutList = [Workout]()
+    for workout in workouts {
+        guard var startDate = workout.startDateTime,
+              var endDate = workout.endDateTime else {
+            return
+        }
+        
+        // Skipping activities that are outside of the interest range.
+        if startDate >= chunkEnd || endDate <= chunkStart {
+            continue
+        }
+                
+        // Truncate events that out of the [chunkStart, chunkEnd] range.
+        // Multi-day events, chunked into single day `Statistic`s are the best example.
+        if startDate < chunkStart {
+            startDate = chunkStart
+        }
+        if endDate > chunkEnd {
+            endDate = chunkEnd
+        }
+        
+        if let type = workout.type, type == category {
+            var duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+            if statistics.isEmpty {
+                let stat = Statistic(date: chunkStart, value: duration)
+                statistics.append(stat)
+                workoutList.append(workout)
+            } else {
+                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
+                    statistics[index].value += duration
+                    workoutList.append(workout)
+                }
+            }
+        } else if category == nil {
+            var duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+            if statistics.isEmpty {
+                let stat = Statistic(date: chunkStart, value: duration)
+                statistics.append(stat)
+                workoutList.append(workout)
+            } else {
+                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
+                    statistics[index].value += duration
+                    workoutList.append(workout)
+                }
+            }
+        }
+    }
+    completion(statistics, workoutList)
+}
+
 extension Workout {
     var hkWorkoutActivityType: HKWorkoutActivityType {
         guard let type = self.type else {
