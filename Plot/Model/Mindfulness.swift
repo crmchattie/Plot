@@ -125,7 +125,7 @@ func mindfulnessListStats(
             endDate = chunkEnd
         }
         
-        var duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+        let duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
         if statistics.isEmpty {
             let stat = Statistic(date: chunkStart, value: duration)
             statistics.append(stat)

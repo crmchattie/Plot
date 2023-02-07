@@ -25,30 +25,36 @@ extension NetworkController {
         let monthPast = Date().monthBefore
         let now = Date()
         for task in activityService.goals {
-            print("--------------------------")
-            if let goal = task.goal, let metric = goal.metric, !(task.isCompleted ?? false) {
+//            print("--------------------------")
+            if let goal = task.goal, let metric = goal.metric, let unit = goal.unit, !(task.isCompleted ?? false) {
                 var updatedDescription = goal.description ?? ""
                 if let secondaryDescription = goal.descriptionSecondary {
                     updatedDescription += secondaryDescription
                 }
-                print(goal.name)
-                print(updatedDescription)
-                print(monthPast)
-                print(now)
-                print(task.endDate)
-                print(task.startDateGivenEndDateFrequency)
-                print(goal.frequency)
+//                print(goal.name)
+//                print(updatedDescription)
+//                print(monthPast)
+//                print(now)
+//                print(task.endDate)
+//                print(task.startDateGivenEndDateFrequency)
+//                print(goal.frequency)
                 
-                var startDate: Date?
-                var endDate: Date?
+                var startDate = Date()
+                var endDate = Date()
                 
-                if let endDateTemp = task.endDate, endDateTemp > monthPast {
+                if let endDateTemp = task.endDate {
                     endDate = endDateTemp
                     if let startDateTemp = task.startDate {
                         startDate = startDateTemp
-                    } else if let _ = goal.frequency, let startDateTemp = task.startDateGivenEndDateFrequency, startDateTemp < now {
+                    } else if let _ = goal.frequency, let startDateTemp = task.startDateGivenEndDateFrequency {
                         startDate = startDateTemp
                     }
+                }
+                
+                let range = DateRange(startDate: startDate, endDate: endDate)
+                
+                if range.endDate > monthPast, range.startDate < now {
+                    checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, targetNumber: goal.targetNumber ?? 0, range: range)
                 }
                 
                 if let metricsRelationship = goal.metricsRelationshipType, metricsRelationship != .or {
@@ -59,9 +65,14 @@ extension NetworkController {
     }
     
     func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, targetNumber: Double, range: DateRange) {
+        print("checkGoal")
+        print(metric.rawValue)
+        print(submetric?.rawValue)
+        print(option)
+        print(range.startDate)
+        print(range.endDate)
         switch metric {
         case .events:
-            print("events")
 
             switch submetric {
             case nil:
@@ -69,7 +80,7 @@ extension NetworkController {
                 break
             case .some(.none):
                 print("none")
-                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: nil, range: range) { statsDict, activities in
+                activityDetailService.getActivityCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: nil, range: range) { statsDict, activities in
                     for (cat, stats) in statsDict ?? [:] {
                         print(cat, stats)
                     }
@@ -85,7 +96,7 @@ extension NetworkController {
                 break
             case .some(.category):
                 print("category")
-                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: option, activitySubcategories: nil, range: range) { statsDict, activities in
+                activityDetailService.getActivityCategoriesSamples(activities: activityService.events, activityCategories: option, activitySubcategories: nil, range: range) { statsDict, activities in
                     for (cat, stats) in statsDict ?? [:] {
                         print(cat, stats)
                     }
@@ -98,7 +109,7 @@ extension NetworkController {
                 }
             case .some(.subcategory):
                 print("subcategory")
-                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: option, range: range) { statsDict, activities in
+                activityDetailService.getActivityCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: option, range: range) { statsDict, activities in
                     for (cat, stats) in statsDict ?? [:] {
                         print(cat, stats)
                     }
@@ -111,15 +122,13 @@ extension NetworkController {
                 }
             }
         case .tasks:
-            print("tasks")
-
             switch submetric {
             case nil:
                 print("nil")
                 break
             case .some(.none):
                 print("none")
-                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: nil, range: range) { statsDict, activities in
+                activityDetailService.getActivityCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: nil, range: range) { statsDict, activities in
                     for (cat, stats) in statsDict ?? [:] {
                         print(cat, stats)
                     }
@@ -135,7 +144,7 @@ extension NetworkController {
                 break
             case .some(.category):
                 print("category")
-                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: option, activitySubcategories: nil, range: range) { statsDict, activities in
+                activityDetailService.getActivityCategoriesSamples(activities: activityService.events, activityCategories: option, activitySubcategories: nil, range: range) { statsDict, activities in
                     for (cat, stats) in statsDict ?? [:] {
                         print(cat, stats)
                     }
@@ -148,7 +157,7 @@ extension NetworkController {
                 }
             case .some(.subcategory):
                 print("subcategory")
-                activityDetailService.getEventCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: option, range: range) { statsDict, activities in
+                activityDetailService.getActivityCategoriesSamples(activities: activityService.events, activityCategories: nil, activitySubcategories: option, range: range) { statsDict, activities in
                     for (cat, stats) in statsDict ?? [:] {
                         print(cat, stats)
                     }
@@ -225,8 +234,6 @@ extension NetworkController {
                 
             }
         case .financialAccounts:
-            print("financialAccounts")
-            
             var accountDetails = [AccountDetails]()
             
             switch submetric {
@@ -285,7 +292,7 @@ extension NetworkController {
                     }
                     for account in accounts ?? [] {
                         print(account.name)
-                        print(account.subtype)
+                        print(account.subtype ?? "")
                         print(account.updated_at)
                     }
                 }
@@ -293,17 +300,82 @@ extension NetworkController {
             }
             
         case .workout:
-            print("workout")
+            healthDetailService.getSamples(for: healthService.workouts, measure: unit.workoutMeasure ?? .duration, categories: option, range: range) {statsDict, workouts,_ in
+                for (cat, stats) in statsDict ?? [:] {
+                    print(cat, stats)
+                }
+                for workout in workouts ?? [] {
+                    print(workout.name)
+                    print(workout.type ?? "")
+                    print(workout.startDateTime ?? "")
+                    print(workout.endDateTime ?? "")
+                }
+            }
+            
         case .mindfulness:
-            print("mindfulness")
+            healthDetailService.getSamples(for: healthService.mindfulnesses, range: range) {statsList, mindfulnesses,_ in
+                for stats in statsList ?? [] {
+                    print(stats)
+                }
+                for mindfulness in mindfulnesses ?? [] {
+                    print(mindfulness.name)
+                    print(mindfulness.startDateTime ?? "")
+                    print(mindfulness.endDateTime ?? "")
+                }
+            }
+            
         case .sleep:
-            print("sleep")
+            if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
+                healthDetailService.getSamples(for: healthMetric, range: range) { statsList, samples, _ in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for sample in samples ?? [] {
+                        print(sample.sampleType)
+                        print(sample.startDate)
+                        print(sample.endDate)
+                    }
+                }
+            }
         case .steps:
-            print("steps")
+            if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .steps}) {
+                healthDetailService.getSamples(for: healthMetric, range: range) { statsList, samples, _ in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for sample in samples ?? [] {
+                        print(sample.sampleType)
+                        print(sample.startDate)
+                        print(sample.endDate)
+                    }
+                }
+            }
         case .flightsClimbed:
-            print("flightsClimbed")
+            if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .flightsClimbed}) {
+                healthDetailService.getSamples(for: healthMetric, range: range) { statsList, samples, _ in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for sample in samples ?? [] {
+                        print(sample.sampleType)
+                        print(sample.startDate)
+                        print(sample.endDate)
+                    }
+                }
+            }
         case .activeCalories:
-            print("activeCalories")
+            if let workoutsMetrics = healthService.healthMetrics[.workouts], let healthMetric = workoutsMetrics.first(where: {$0.type == .activeEnergy}) {
+                healthDetailService.getSamples(for: healthMetric, range: range) { statsList, samples, _ in
+                    for stats in statsList ?? [] {
+                        print(stats)
+                    }
+                    for sample in samples ?? [] {
+                        print(sample.sampleType)
+                        print(sample.startDate)
+                        print(sample.endDate)
+                    }
+                }
+            }
         }
     }
     

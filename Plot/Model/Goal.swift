@@ -1250,10 +1250,10 @@ enum GoalSubMetric: String, Codable, CaseIterable {
         }
     }
     
-    var transcationCatLevel: TransactionCatLevel {
+    var transcationCatLevel: TransactionCatLevel? {
         switch self {
         case .none:
-            return .group
+            return nil
         case .group:
             return .group
         case .category:
@@ -1263,10 +1263,10 @@ enum GoalSubMetric: String, Codable, CaseIterable {
         }
     }
     
-    var accountCatLevel: AccountCatLevel {
+    var accountCatLevel: AccountCatLevel? {
         switch self {
         case .none:
-            return .bs_type
+            return nil
         case .group:
             return .bs_type
         case .category:
@@ -1287,6 +1287,18 @@ enum GoalUnit: String, Codable, CaseIterable {
     case hours = "Hours"
     case days = "Days"
     case level = "Level"
+    
+    
+    var workoutMeasure: WorkoutMeasure? {
+        switch self {
+        case .calories:
+            return .calories
+        case .count, .amount, .percent, .multiple, .hours, .days, .level:
+            return nil
+        case .minutes:
+            return .duration
+        }
+    }
     
 }
 

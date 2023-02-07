@@ -12,6 +12,9 @@ import HealthKit
 protocol HealthDetailServiceInterface {
     func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
     func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
+    func getSamples(for healthMetric: HealthMetric, range: DateRange, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
+    func getSamples(for workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping ([String: [Statistic]]?, [Workout]?, Error?) -> Swift.Void)
+    func getSamples(for mindfulnesses: [Mindfulness], range: DateRange, completion: @escaping ([Statistic]?, [Mindfulness]?, Error?) -> Swift.Void)
 }
 
 class HealthDetailService: HealthDetailServiceInterface {
@@ -25,6 +28,32 @@ class HealthDetailService: HealthDetailServiceInterface {
     
     func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
         getStatisticalSamples(for: healthMetric, segmentType: segmentType, range: range, anchorDate: anchorDate, completion: completion)
+    }
+    
+    func getSamples(for healthMetric: HealthMetric, range: DateRange, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
+        getStatisticalSamples(for: healthMetric, range: range, completion: completion)
+    }
+    
+    func getSamples(for workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping ([String: [Statistic]]?, [Workout]?, Error?) -> Swift.Void) {
+        print("getSamples")
+        print(workouts.count)
+        getWorkoutCategoriesStatisticalSamples(workouts: workouts, measure: measure, categories: categories, range: range, completion: completion)
+    }
+    
+    func getSamples(for mindfulnesses: [Mindfulness], range: DateRange, completion: @escaping ([Statistic]?, [Mindfulness]?, Error?) -> Swift.Void) {
+        getMindfulnessStatisticalSamples(mindfulnesses: mindfulnesses, range: range, completion: completion)
+    }
+    
+    private func getWorkoutCategoriesStatisticalSamples(workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping ([String: [Statistic]]?, [Workout]?, Error?) -> Void) {
+        workoutData(workouts: workouts, measure: measure, categories: categories, start: range.startDate, end: range.endDate) { statsDict, workouts in
+            completion(statsDict, workouts, nil)
+        }
+    }
+    
+    private func getMindfulnessStatisticalSamples(mindfulnesses: [Mindfulness], range: DateRange, completion: @escaping ([Statistic]?, [Mindfulness]?, Error?) -> Void) {
+        mindfulnessData(mindfulnesses: mindfulnesses, start: range.startDate, end: range.endDate) { statsDict, mindfulnesses in
+            completion(statsDict, mindfulnesses, nil)
+        }
     }
     
     private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
@@ -256,6 +285,160 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
     }
     
+    private func getStatisticalSamples(for healthMetric: HealthMetric, range: DateRange, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
+        let healthMetricType = healthMetric.type
+        var interval = DateComponents()
+        interval.day = 1
+        var quantityType: HKQuantityType?
+        var statisticsOptions: HKStatisticsOptions = .discreteAverage
+        
+        var unit: HKUnit = HKUnit.count()
+        if case .steps = healthMetricType {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
+                print("*** Unable to create a step count type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            statisticsOptions = .cumulativeSum
+            quantityType = type
+        }
+        else if case .flightsClimbed = healthMetricType {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.flightsClimbed) else {
+                print("*** Unable to create a flight climbed count type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            statisticsOptions = .cumulativeSum
+            quantityType = type
+        }
+        else if case .weight = healthMetricType {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass) else {
+                print("*** Unable to create a bodyMass count type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            unit = HKUnit.pound()
+            quantityType = type
+        }
+        else if case .heartRate = healthMetricType {
+            guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate) else {
+                print("*** Unable to create a heartRate count type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            unit = HKUnit.count().unitDivided(by: HKUnit.minute())
+            quantityType = type
+        }
+        else if case .nutrition(_) = healthMetricType {
+            guard let quantityTypeIdentifier = healthMetric.quantityTypeIdentifier, let type = HKObjectType.quantityType(forIdentifier: quantityTypeIdentifier), let healthMetricUnit = healthMetric.unit else {
+                print("*** Unable to create a nutrition type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            statisticsOptions = .cumulativeSum
+            unit = healthMetricUnit
+            quantityType = type
+        }
+        else if case .activeEnergy = healthMetricType {
+            guard let type = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned), let healthMetricUnit = healthMetric.unit else {
+                print("*** Unable to create a activeEnergy count type ***")
+                completion(nil, nil, nil)
+                return
+            }
+            
+            statisticsOptions = .cumulativeSum
+            unit = healthMetricUnit
+            quantityType = type
+        }
+        
+        //https://developer.apple.com/documentation/healthkit/hkstatisticscollectionquery/1615241-anchordate?language=objc
+        // The date used to anchor the collection’s time intervals.
+        // Use the anchor date to set the start time for your time intervals. For example, if you are using a day interval, you might create a date object with a time of 2:00 a.m. This value sets the start of each day for all of your time intervals.
+        // Use start of the day in local time
+        let timezone = TimeZone.current
+        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
+        let anchorDate = range.startDate // ?? Date().localTime.startOfDay.addingTimeInterval(-seconds)
+        var startDate = anchorDate
+        let endDate = anchorDate.advanced(by: 86399)
+        
+        if case .sleep = healthMetricType {
+            startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
+        }
+        
+        if HealthKitService.authorized {
+            if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+                let workoutActivityType = hkWorkout.workoutActivityType
+                HealthKitService.getWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
+                    var stats: [Statistic]?
+                    stats = self?.perpareCustomStatsForHourlyWorkouts(from: workouts)
+                    completion(stats, workouts, nil)
+                }
+            }
+            else if case .workoutMinutes = healthMetricType {
+                HealthKitService.getAllWorkouts(startDate: startDate, endDate: endDate) { [weak self] workouts, errorList  in
+                    var stats: [Statistic]?
+                    stats = self?.perpareCustomStatsForHourlyWorkoutMinutes(from: workouts)
+                    completion(stats, workouts, nil)
+                }
+            }
+            else if case .sleep = healthMetricType {
+                HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
+                    self?.perpareCustomStatsForSleepSamples(from: samples, startDate: startDate, endDate: endDate, segmentType: nil, type: healthMetricType) { stats, samples in
+                        completion(stats, samples, nil)
+                    }
+                }
+            }
+            else if case .mindfulness = healthMetricType {
+                HealthKitService.getAllCategoryTypeSamples(forIdentifier:.mindfulSession, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
+                    let stats = self?.perpareCustomStatsForCategorySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: nil, type: healthMetricType)
+                    completion(stats, samples, nil)
+                }
+            }
+            else {
+                guard let quantityTypeValue = quantityType else {
+                    completion(nil, nil, nil)
+                    return
+                }
+                
+                HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { [weak self] (results, error) in
+                    if case .steps = healthMetricType {
+                        HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
+                            self?.perpareCustomStats(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stats, samples in
+                                completion(stats, samples, nil)
+                            })
+                        }
+                    }
+                    else if case .flightsClimbed = healthMetricType {
+                        HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
+                            self?.perpareCustomStats(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stats, samples in
+                                completion(stats, samples, nil)
+                            })
+                        }
+                    }
+                    else if case .activeEnergy = healthMetricType {
+                        HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
+                            self?.perpareCustomStats(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stats, samples in
+                                completion(stats, samples, nil)
+                            })
+                        }
+                    }
+                    else {
+                        HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
+                            self?.perpareCustomStats(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stats, samples in
+                                completion(stats, samples, nil)
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private func grabNutrition(forNutritionType: String, startDate: Date, endDate: Date, completion: @escaping ([HKQuantitySample]?) -> Void) {
         var list = [HKQuantitySample]()
         if let samples = nutrition[forNutritionType] {
@@ -345,7 +528,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         return customStats
     }
     
-    private func perpareCustomStatsForCategorySamples(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType) -> [Statistic]? {
+    private func perpareCustomStatsForCategorySamples(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType?, type: HealthMetricType) -> [Statistic]? {
         var customStats: [Statistic] = []
         
         guard let samples = samples else {
@@ -388,7 +571,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         return customStats
     }
     
-    private func perpareCustomStatsForSleepSamples(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType, completion: @escaping ([Statistic]?, [HKCategorySample]?) -> Void) {
+    private func perpareCustomStatsForSleepSamples(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType?, type: HealthMetricType, completion: @escaping ([Statistic]?, [HKCategorySample]?) -> Void) {
         var customStats: [Statistic] = []
         var customSamples: [HKCategorySample] = []
         
@@ -417,7 +600,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
                 if typeOfSleep == .inBed, sleepValue != .inBed {
                     continue
-                } else if sleepValue == .inBed {
+                } else if sleepValue == .inBed || sleepValue == .awake {
                     continue
                 }
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
@@ -459,7 +642,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
                 if typeOfSleep == .inBed, sleepValue != .inBed {
                     continue
-                } else if sleepValue == .inBed {
+                } else if sleepValue == .inBed || sleepValue == .awake {
                     continue
                 }
                 

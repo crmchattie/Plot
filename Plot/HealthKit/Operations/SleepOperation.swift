@@ -58,7 +58,7 @@ class SleepOperation: AsyncOperation {
                 if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value) {
                     if typeOfSleep == .inBed, sleepValue != .inBed {
                         continue
-                    } else if sleepValue == .inBed {
+                    } else if sleepValue == .inBed || sleepValue == .awake {
                         continue
                     }
                 }

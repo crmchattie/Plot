@@ -93,12 +93,16 @@ struct UserWorkout: Codable, Equatable, Hashable {
     }
 }
 
-func workoutData(workouts: [Workout], categories: [String]?, start: Date, end: Date, completion: @escaping ([String: [Statistic]], [Workout]) -> ()) {
+enum WorkoutMeasure {
+    case duration, calories
+}
+
+func workoutData(workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, start: Date, end: Date, completion: @escaping ([String: [Statistic]], [Workout]) -> ()) {
     var statistics = [String: [Statistic]]()
     var workoutList = [Workout]()
     
     if categories == nil {
-        workoutListStats(workouts: workouts, category: nil, chunkStart: start, chunkEnd: end) { (stats, workouts) in
+        workoutListStats(workouts: workouts, measure: measure, category: nil, chunkStart: start, chunkEnd: end) { (stats, workouts) in
             if statistics["none"] != nil {
                 var acStats = statistics["none"]
                 acStats!.append(contentsOf: stats)
@@ -110,7 +114,7 @@ func workoutData(workouts: [Workout], categories: [String]?, start: Date, end: D
         }
     } else {
         for category in categories ?? [] {
-            workoutListStats(workouts: workouts, category: category, chunkStart: start, chunkEnd: end) { (stats, workouts) in
+            workoutListStats(workouts: workouts, measure: measure, category: category, chunkStart: start, chunkEnd: end) { (stats, workouts) in
                 if statistics[category] != nil {
                     var acStats = statistics[category]
                     acStats!.append(contentsOf: stats)
@@ -135,6 +139,7 @@ func workoutData(workouts: [Workout], categories: [String]?, start: Date, end: D
 ///   - completion: list of statistical elements and activities.
 func workoutListStats(
     workouts: [Workout],
+    measure: WorkoutMeasure,
     category: String?,
     chunkStart: Date,
     chunkEnd: Date,
@@ -143,6 +148,8 @@ func workoutListStats(
     var statistics = [Statistic]()
     var workoutList = [Workout]()
     for workout in workouts {
+        print(chunkStart)
+        print(chunkEnd)
         guard var startDate = workout.startDateTime,
               var endDate = workout.endDateTime else {
             return
@@ -163,26 +170,26 @@ func workoutListStats(
         }
         
         if let type = workout.type, type == category {
-            var duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+            let measureDouble = measure == .duration ? (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60 : workout.totalEnergyBurned ?? 0
             if statistics.isEmpty {
-                let stat = Statistic(date: chunkStart, value: duration)
+                let stat = Statistic(date: chunkStart, value: measureDouble)
                 statistics.append(stat)
                 workoutList.append(workout)
             } else {
                 if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                    statistics[index].value += duration
+                    statistics[index].value += measureDouble
                     workoutList.append(workout)
                 }
             }
         } else if category == nil {
-            var duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+            let measureDouble = measure == .duration ? (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60 : workout.totalEnergyBurned ?? 0
             if statistics.isEmpty {
-                let stat = Statistic(date: chunkStart, value: duration)
+                let stat = Statistic(date: chunkStart, value: measureDouble)
                 statistics.append(stat)
                 workoutList.append(workout)
             } else {
                 if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                    statistics[index].value += duration
+                    statistics[index].value += measureDouble
                     workoutList.append(workout)
                 }
             }
