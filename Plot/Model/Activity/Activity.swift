@@ -103,12 +103,14 @@ class Activity: NSObject, NSCopying, Codable {
     var goalSubmetric: String?
     var goalOption: [String]?
     var goalUnit: String?
+    var goalPeriod: String?
     var goalTargetNumber: NSNumber?
     var goalCurrentNumber: NSNumber?
     var goalMetricSecond: String?
     var goalSubmetricSecond: String?
     var goalOptionSecond: [String]?
     var goalUnitSecond: String?
+    var goalPeriodSecond: String?
     var goalTargetNumberSecond: NSNumber?
     var goalCurrentNumberSecond: NSNumber?
     var goalMetricsRelationshipType: String?
@@ -118,7 +120,7 @@ class Activity: NSObject, NSCopying, Codable {
             if let _goal = _goal {
                 return _goal
             } else {
-                var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                 goal.activityID = self.activityID
                 if let value = goalMetric {
                     goal.metric = GoalMetric(rawValue: value)
@@ -131,6 +133,9 @@ class Activity: NSObject, NSCopying, Codable {
                 }
                 if let value = goalUnit {
                     goal.unit = GoalUnit(rawValue: value)
+                }
+                if let value = goalPeriod {
+                    goal.period = GoalPeriod(rawValue: value)
                 }
                 if let value = goalTargetNumber {
                     goal.targetNumber = Double(truncating: value)
@@ -149,6 +154,9 @@ class Activity: NSObject, NSCopying, Codable {
                 }
                 if let value = goalUnitSecond {
                     goal.unitSecond = GoalUnit(rawValue: value)
+                }
+                if let value = goalPeriodSecond {
+                    goal.periodSecond = GoalPeriod(rawValue: value)
                 }
                 if let value = goalTargetNumberSecond {
                     goal.targetNumberSecond = Double(truncating: value)
@@ -245,10 +253,12 @@ class Activity: NSObject, NSCopying, Codable {
         case goalSubmetric
         case goalOption
         case goalUnit
+        case goalPeriod
         case goalMetricSecond
         case goalSubmetricSecond
         case goalOptionSecond
         case goalUnitSecond
+        case goalPeriodSecond
         case goalMetricsRelationshipType
     }
     
@@ -306,6 +316,9 @@ class Activity: NSObject, NSCopying, Codable {
         if let value = goal.unit {
             self.goalUnit = value.rawValue
         }
+        if let value = goal.period {
+            self.goalPeriod = value.rawValue
+        }
         if let value = goal.targetNumber as? NSNumber {
             self.goalTargetNumber = value
         }
@@ -323,6 +336,9 @@ class Activity: NSObject, NSCopying, Codable {
         }
         if let value = goal.unitSecond {
             self.goalUnitSecond = value.rawValue
+        }
+        if let value = goal.periodSecond {
+            self.goalPeriodSecond = value.rawValue
         }
         if let value = goal.targetNumberSecond as? NSNumber {
             self.goalTargetNumberSecond = value
@@ -428,12 +444,14 @@ class Activity: NSObject, NSCopying, Codable {
         goalSubmetric = dictionary?["goalSubmetric"] as? String
         goalOption = dictionary?["goalOption"] as? [String]
         goalUnit = dictionary?["goalUnit"] as? String
+        goalPeriod = dictionary?["goalPeriod"] as? String
         goalTargetNumber = dictionary?["goalTargetNumber"] as? NSNumber
         goalCurrentNumber = dictionary?["goalCurrentNumber"] as? NSNumber
         goalMetricSecond = dictionary?["goalMetricSecond"] as? String
         goalSubmetricSecond = dictionary?["goalSubmetricSecond"] as? String
         goalOptionSecond = dictionary?["goalOptionSecond"] as? [String]
         goalUnitSecond = dictionary?["goalUnitSecond"] as? String
+        goalPeriodSecond = dictionary?["goalPeriodSecond"] as? String
         goalTargetNumberSecond = dictionary?["goalTargetNumberSecond"] as? NSNumber
         goalCurrentNumberSecond = dictionary?["goalCurrentNumberSecond"] as? NSNumber
         goalMetricsRelationshipType = dictionary?["goalMetricsRelationshipType"] as? String
@@ -614,15 +632,18 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["showExtras"] = value
         }
         
-//        if let value = self.isCompleted as AnyObject? {
-//            dictionary["isCompleted"] = value
-//        }
-//        
-//        if let value = self.completedDate as AnyObject? {
-//            dictionary["completedDate"] = value
-//        } else {
-//            dictionary["completedDate"] = NSNull()
-//        }
+        //instance variables
+        if self.recurrences == nil {
+            if let value = self.isCompleted as AnyObject? {
+                dictionary["isCompleted"] = value
+            }
+
+            if let value = self.completedDate as AnyObject? {
+                dictionary["completedDate"] = value
+            } else {
+                dictionary["completedDate"] = NSNull()
+            }
+        }
         
         if let value = self.userIsCompleted as AnyObject? {
             dictionary["userIsCompleted"] = value
@@ -778,6 +799,10 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["goalUnit"] = value
         }
         
+        if let goal = self.goal, let value = goal.period?.rawValue as AnyObject? {
+            dictionary["goalPeriod"] = value
+        }
+        
         if let goal = self.goal, let value = goal.targetNumber as AnyObject? {
             dictionary["goalTargetNumber"] = value
         }
@@ -808,6 +833,12 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["goalUnitSecond"] = value
         } else {
             dictionary["goalUnitSecond"] = NSNull()
+        }
+        
+        if let goal = self.goal, let value = goal.periodSecond?.rawValue as AnyObject? {
+            dictionary["goalPeriodSecond"] = value
+        } else {
+            dictionary["goalPeriodSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.targetNumberSecond as AnyObject? {
@@ -1115,6 +1146,10 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.goalUnit = value
         }
         
+        if let value = updatingActivity.goalPeriod {
+            newActivity.goalPeriod = value
+        }
+        
         if let value = updatingActivity.goalTargetNumber {
             newActivity.goalTargetNumber = value
         }
@@ -1125,6 +1160,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.goalUnitSecond {
             newActivity.goalUnitSecond = value
+        }
+        
+        if let value = updatingActivity.goalPeriodSecond {
+            newActivity.goalPeriodSecond = value
         }
         
         if let value = updatingActivity.goalTargetNumberSecond {
@@ -1424,6 +1463,10 @@ class Activity: NSObject, NSCopying, Codable {
             self.goalUnit = value
         }
         
+        if let value = updatingActivity.goalPeriod {
+            self.goalPeriod = value
+        }
+        
         if let value = updatingActivity.goalTargetNumber {
             self.goalTargetNumber = value
         }
@@ -1434,6 +1477,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.goalUnitSecond {
             self.goalUnitSecond = value
+        }
+        
+        if let value = updatingActivity.goalPeriodSecond {
+            self.goalPeriodSecond = value
         }
         
         if let value = updatingActivity.goalTargetNumberSecond {
@@ -1720,6 +1767,10 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.goalUnit = self.goalUnit
         }
         
+        if self.goalPeriod != otherActivity.goalPeriod {
+            newActivity.goalPeriod = self.goalPeriod
+        }
+        
         if self.goalTargetNumber != otherActivity.goalTargetNumber {
             newActivity.goalTargetNumber = self.goalTargetNumber
         }
@@ -1730,6 +1781,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if self.goalUnitSecond != otherActivity.goalUnitSecond {
             newActivity.goalUnitSecond = self.goalUnitSecond
+        }
+        
+        if self.goalPeriodSecond != otherActivity.goalPeriodSecond {
+            newActivity.goalPeriodSecond = self.goalPeriodSecond
         }
         
         if self.goalTargetNumberSecond != otherActivity.goalTargetNumberSecond {
@@ -1849,56 +1904,46 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
     completion(statistics, activityDict)
 }
 
-func activitiesData(activities: [Activity], activityCategories: [String]?, activitySubcategories: [String]?, start: Date, end: Date, completion: @escaping ([String: [Statistic]], [Activity]) -> ()) {
-    var statistics = [String: [Statistic]]()
-    var activityList = [Activity]()
-    
-    if activityCategories == nil, activitySubcategories == nil {
-        activityListStats(activities: activities, activityCategory: nil, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (stats, activities) in
-            if statistics["none"] != nil {
-                var acStats = statistics["none"]
-                acStats!.append(contentsOf: stats)
-                statistics["none"] = acStats
-            } else {
-                statistics["none"] = stats
+enum ActivityLevel: String {
+    case none, category, subcategory
+}
+
+func activitiesData(activities: [Activity], level: ActivityLevel, options: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Activity]) -> ()) {
+    switch level {
+    case .none:
+        activityListStats(activities: activities, activityCategory: nil, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (statistics, activities) in
+            var stat = Statistic(date: activities.first?.startDate ?? Date(), value: 0)
+            for statistic in statistics {
+                stat.value += statistic.value
             }
-            activityList.append(contentsOf: activities)
+            completion(stat, activities)
         }
-    } else {
-        for activityCategory in activityCategories ?? [] {
-            if activityCategory == "No Events" {
-                continue
-            }
-            activityListStats(activities: activities, activityCategory: activityCategory, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (stats, activities) in
-                if statistics[activityCategory] != nil {
-                    var acStats = statistics[activityCategory]
-                    acStats!.append(contentsOf: stats)
-                    statistics[activityCategory] = acStats
-                } else {
-                    statistics[activityCategory] = stats
+    case .category:
+        var activityList = [Activity]()
+        var stat = Statistic(date: activities.first?.startDate ?? Date(), value: 0)
+        for option in options ?? [] {
+            activityListStats(activities: activities, activityCategory: option, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (statistics, activities) in
+                for statistic in statistics {
+                    stat.value += statistic.value
                 }
                 activityList.append(contentsOf: activities)
             }
         }
-        
-        for activitySubcategory in activitySubcategories ?? [] {
-            if activitySubcategory == "No Events" {
-                continue
-            }
-            activityListStats(activities: activities, activityCategory: nil, activitySubcategory: activitySubcategory, chunkStart: start, chunkEnd: end) { (stats, activities) in
-                if statistics[activitySubcategory] != nil {
-                    var acStats = statistics[activitySubcategory]
-                    acStats!.append(contentsOf: stats)
-                    statistics[activitySubcategory] = acStats
-                } else {
-                    statistics[activitySubcategory] = stats
+        completion(stat, activityList)
+    case .subcategory:
+        var activityList = [Activity]()
+        var stat = Statistic(date: activities.first?.startDate ?? Date(), value: 0)
+        for option in options ?? [] {
+            activityListStats(activities: activities, activityCategory: nil, activitySubcategory: option, chunkStart: start, chunkEnd: end) { (statistics, activities) in
+                for statistic in statistics {
+                    stat.value += statistic.value
                 }
                 activityList.append(contentsOf: activities)
             }
         }
+        completion(stat, activityList)
     }
     
-    completion(statistics, activityList)
 }
 
 /// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]

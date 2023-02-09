@@ -49,13 +49,11 @@ class ActivityService {
     
     var activitiesWithRepeats = [Activity]() {
         didSet {
-            print("activitiesWithRepeats didSet")
             if oldValue != activitiesWithRepeats {
-                print("oldValue != activitiesWithRepeats")
                 self.events = activitiesWithRepeats.filter { $0.isTask == nil }
                 self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
                 self.goals = activitiesWithRepeats.filter { $0.isGoal ?? false }
-                self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil && !($0.isGoal ?? false) }
+                self.calendarActivities = activitiesWithRepeats.filter { $0.finalDate != nil }
             }
         }
     }

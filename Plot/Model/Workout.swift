@@ -97,37 +97,22 @@ enum WorkoutMeasure {
     case duration, calories
 }
 
-func workoutData(workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, start: Date, end: Date, completion: @escaping ([String: [Statistic]], [Workout]) -> ()) {
-    var statistics = [String: [Statistic]]()
-    var workoutList = [Workout]()
-    
+func workoutData(workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Workout]) -> ()) {
     if categories == nil {
-        workoutListStats(workouts: workouts, measure: measure, category: nil, chunkStart: start, chunkEnd: end) { (stats, workouts) in
-            if statistics["none"] != nil {
-                var acStats = statistics["none"]
-                acStats!.append(contentsOf: stats)
-                statistics["none"] = acStats
-            } else {
-                statistics["none"] = stats
-            }
-            workoutList.append(contentsOf: workouts)
+        workoutListStats(workouts: workouts, measure: measure, category: nil, chunkStart: start, chunkEnd: end) { (stat, workouts) in
+            completion(stat, workouts)
         }
     } else {
+        var stat = Statistic(date: workouts.first?.startDateTime ?? Date(), value: 0)
+        var workoutList = [Workout]()
         for category in categories ?? [] {
             workoutListStats(workouts: workouts, measure: measure, category: category, chunkStart: start, chunkEnd: end) { (stats, workouts) in
-                if statistics[category] != nil {
-                    var acStats = statistics[category]
-                    acStats!.append(contentsOf: stats)
-                    statistics[category] = acStats
-                } else {
-                    statistics[category] = stats
-                }
+                stat.value += stats.value
                 workoutList.append(contentsOf: workouts)
             }
         }
+        completion(stat, workoutList)
     }
-    
-    completion(statistics, workoutList)
 }
 
 /// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]
@@ -143,13 +128,11 @@ func workoutListStats(
     category: String?,
     chunkStart: Date,
     chunkEnd: Date,
-    completion: @escaping ([Statistic], [Workout]) -> ()
+    completion: @escaping (Statistic, [Workout]) -> ()
 ) {
-    var statistics = [Statistic]()
+    var stat = Statistic(date: workouts.first?.startDateTime ?? Date(), value: 0)
     var workoutList = [Workout]()
     for workout in workouts {
-        print(chunkStart)
-        print(chunkEnd)
         guard var startDate = workout.startDateTime,
               var endDate = workout.endDateTime else {
             return
@@ -171,31 +154,15 @@ func workoutListStats(
         
         if let type = workout.type, type == category {
             let measureDouble = measure == .duration ? (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60 : workout.totalEnergyBurned ?? 0
-            if statistics.isEmpty {
-                let stat = Statistic(date: chunkStart, value: measureDouble)
-                statistics.append(stat)
-                workoutList.append(workout)
-            } else {
-                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                    statistics[index].value += measureDouble
-                    workoutList.append(workout)
-                }
-            }
+            stat.value += measureDouble
+            workoutList.append(workout)
         } else if category == nil {
             let measureDouble = measure == .duration ? (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60 : workout.totalEnergyBurned ?? 0
-            if statistics.isEmpty {
-                let stat = Statistic(date: chunkStart, value: measureDouble)
-                statistics.append(stat)
-                workoutList.append(workout)
-            } else {
-                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                    statistics[index].value += measureDouble
-                    workoutList.append(workout)
-                }
-            }
+            stat.value += measureDouble
+            workoutList.append(workout)
         }
     }
-    completion(statistics, workoutList)
+    completion(stat, workoutList)
 }
 
 extension Workout {

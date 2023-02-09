@@ -56,6 +56,8 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
     
     var networkController: NetworkController
     
+    var timer: Timer?
+    
     init(networkController: NetworkController) {
         self.networkController = networkController
         super.init(style: .insetGrouped)
@@ -215,11 +217,15 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                 row.placeholderColor = .secondaryLabel
             }.onChange { row in
                 if let value = row.value {
-                    self.transaction.description = value
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("description")
-                        reference.setValue(value)
-                    }
+                    self.timer?.invalidate()
+                    
+                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+                        self.transaction.description = value
+                        if let currentUser = Auth.auth().currentUser?.uid {
+                            let reference = Database.database().reference().child(userFinancialTransactionsEntity).child(currentUser).child(self.transaction.guid).child("description")
+                            reference.setValue(value)
+                        }
+                    })
                 }
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false

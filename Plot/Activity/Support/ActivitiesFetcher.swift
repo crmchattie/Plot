@@ -277,11 +277,11 @@ class ActivitiesFetcher: NSObject {
     }
     
     func addRepeatingActivities(activity: Activity, completion: @escaping ([Activity])->()) {
-        let futureDate = Calendar.current.date(byAdding: .month, value: 3, to: Date())
         var newActivities = [Activity]()
         let group = DispatchGroup()
         var counter = 0
         if let rules = activity.recurrences, !rules.isEmpty {
+            let futureDate = Calendar.current.date(byAdding: .month, value: 3, to: Date())
             group.enter()
             counter += 1
             if activity.isTask ?? false {

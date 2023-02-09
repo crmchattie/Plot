@@ -435,7 +435,7 @@ extension MindfulnessViewController: UpdateTaskCellDelegate {
             }
             
             let updateTask = ActivityActions(activity: taskList[index], active: true, selectedFalconUsers: [])
-            updateTask.updateCompletion(isComplete: taskList[index].isCompleted ?? false)
+            updateTask.updateCompletion(isComplete: taskList[index].isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
         }
     }
 }

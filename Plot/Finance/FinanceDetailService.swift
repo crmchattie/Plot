@@ -13,7 +13,7 @@ protocol FinanceDetailServiceInterface {
     
     func getSamples(for range: DateRange, segment: TimeSegmentType, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
     
-    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
+    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void)
 }
 
 class FinanceDetailService: FinanceDetailServiceInterface {
@@ -40,7 +40,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                               completion: completion)
     }
     
-    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
+    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
         getStatisticalSamples(accountDetails: accountDetails,
                               transactionDetails: transactionDetails,
                               range: range,
@@ -120,33 +120,37 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         accounts: [MXAccount]?,
         transactions: [Transaction]?,
         filterAccounts: [String]?,
-        completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void
+        completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void
     ) {
 
         let startDate = range.startDate.startOfDay.dayBefore
         let endDate = range.endDate
         
-        var finalStats = [Statistic]()
-        
+        var finalStat = Statistic(date: startDate, value: 0)
+                
         DispatchQueue.global(qos: .background).async {
             if let accountDetails = accountDetails, let accounts = accounts {
                 var accts = [MXAccount]()
                 for accountDetail in accountDetails {
                     accountListStats(accounts: accounts, accountDetail: accountDetail, date: startDate, nextDate: endDate) { (stats, accounts) in
-                        finalStats.append(contentsOf: stats)
+                        for stat in stats {
+                            finalStat.value += stat.value
+                        }
                         accts.append(contentsOf: accounts)
                     }
                 }
-                completion(finalStats, accounts, nil, nil)
+                completion(finalStat, accounts, nil, nil)
             } else if let transactionDetails = transactionDetails, let transactions = transactions {
                 var trans = [Transaction]()
                 for transactionDetail in transactionDetails {
                     transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: startDate, nextDate: endDate, accounts: filterAccounts) { stats, transactions in
-                        finalStats.append(contentsOf: stats)
+                        for stat in stats {
+                            finalStat.value += stat.value
+                        }
                         trans.append(contentsOf: transactions)
                     }
                 }
-                completion(finalStats, nil, transactions, nil)
+                completion(finalStat, nil, transactions, nil)
             }
         }
     }

@@ -36,6 +36,8 @@ class FinanceAccountViewController: FormViewController {
     
     var networkController: NetworkController
     
+    var timer: Timer?
+    
     init(networkController: NetworkController) {
         self.networkController = networkController
         super.init(style: .insetGrouped)
@@ -190,10 +192,14 @@ class FinanceAccountViewController: FormViewController {
                 row.placeholderColor = .secondaryLabel
             }.onChange { row in
                 if let value = row.value {
-                    if let currentUser = Auth.auth().currentUser?.uid {
-                        let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("name")
-                        reference.setValue(value)
-                    }
+                    self.timer?.invalidate()
+                    
+                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+                        if let currentUser = Auth.auth().currentUser?.uid {
+                            let reference = Database.database().reference().child(userFinancialAccountsEntity).child(currentUser).child(self.account.guid).child("name")
+                            reference.setValue(value)
+                        }
+                    })
                 }
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false

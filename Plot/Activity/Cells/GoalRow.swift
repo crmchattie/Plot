@@ -312,9 +312,9 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
             case .metric:
                 if let value = row.value, let updatedValue = GoalMetric(rawValue: value) {
                     if let goal = row.cell.goal, goal.targetNumber != 0 {
-                        row.cell.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: goal.targetNumber, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        row.cell.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: goal.targetNumber, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        row.cell.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                 }
             case .unit:
@@ -325,7 +325,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
                         }
                         row.cell.goal!.unit = updatedValue
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: updatedValue, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                 }
             case .submetric:
@@ -333,7 +333,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
                     if let _ = row.cell.goal {
                         row.cell.goal!.submetric = updatedValue
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                 }
             case .option:
@@ -341,7 +341,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
                     if let _ = row.cell.goal {
                         row.cell.goal!.option = [updatedValue]
                     } else {
-                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: [updatedValue], unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        row.cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: [updatedValue], unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                 }
             }
@@ -371,7 +371,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
             self.value = metric.rawValue
         } else {
             self.value = GoalMetric.allValues[0]
-            cell.goal = Goal(name: nil, metric: GoalMetric(rawValue: GoalMetric.allValues[0]), submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+            cell.goal = Goal(name: nil, metric: GoalMetric(rawValue: GoalMetric.allValues[0]), submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
             cell.update()
         }
         if isExpanded, self.selectedGoalProperty != .metric {
@@ -467,7 +467,7 @@ final class GoalPickerInlineRow<T> : _GoalPickerInlineRow, RowType, InlineRowTyp
                 cell.goal!.targetNumber = Double(text.filteredNumbers)
             }
         } else {
-            cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, targetNumber: Double(text.filteredNumbers), currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+            cell.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: Double(text.filteredNumbers), currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
         }
         
         cell.timer?.invalidate()

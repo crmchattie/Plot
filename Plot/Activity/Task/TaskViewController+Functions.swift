@@ -424,8 +424,16 @@ extension TaskViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
         } else {
-            if let _ = task.name, let goal = task.goal, let _ = goal.description, (task.recurrences != nil || ((task.startDateTime != nil) && (task.endDateTime != nil))) {
-                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            if let _ = task.name, let goal = task.goal, let _ = goal.description {
+                if self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts) {
+                    if task.recurrences != nil || task.endDateTime != nil {
+                        self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    } else {
+                        self.navigationItem.rightBarButtonItem?.isEnabled = false
+                    }
+                } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                }
             } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             }
@@ -440,7 +448,7 @@ extension TaskViewController {
                     if let _ = task.goal {
                         task.goal!.metric = updatedValue
                     } else {
-                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                     
                     //units
@@ -458,7 +466,21 @@ extension TaskViewController {
                         submetricRow.hidden = false
                         submetricRow.evaluateHidden()
                         task.goal!.submetric = updatedValue.submetrics[0]
-                        submetricRow.value = updatedValue.submetrics[0].rawValue
+                        if submetricRow.value == updatedValue.submetrics[0].rawValue {
+                            if let options = task.goal!.options() {
+                                optionRow.value = Set(arrayLiteral: options[0])
+                                optionRow.options = options
+                                optionRow.hidden = false
+                                optionRow.evaluateHidden()
+                            } else {
+                                task.goal!.option = nil
+                                optionRow.hidden = true
+                                optionRow.evaluateHidden()
+                                optionRow.value = nil
+                            }
+                        } else {
+                            submetricRow.value = updatedValue.submetrics[0].rawValue
+                        }
                         submetricRow.options = updatedValue.allValuesSubmetrics
                     } else {
                         task.goal!.submetric = nil
@@ -466,13 +488,24 @@ extension TaskViewController {
                         submetricRow.evaluateHidden()
                         submetricRow.value = nil
                     }
+                    
+                    //period
+//                    if updatedValue == .financialAccounts, (task.goal?.metricSecond == nil || task.goal?.metricSecond == .financialAccounts) {
+//                        task.goal!.period = nil
+//                        periodRow.hidden = true
+//                        periodRow.evaluateHidden()
+//                        periodRow.value = nil
+//                    } else {
+//                        periodRow.hidden = false
+//                        periodRow.evaluateHidden()
+//                    }
                 }
             case .submetric:
                 if let value = value, let updatedValue = GoalSubMetric(rawValue: value) {
                     if let _ = task.goal {
                         task.goal!.submetric = updatedValue
                     } else {
-                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
                     }
                     if let options = task.goal!.options() {
                         optionRow.value = Set(arrayLiteral: options[0])
@@ -501,7 +534,7 @@ extension TaskViewController {
     }
     
     func updateGoalSecondary(selectedGoalProperty: SelectedGoalProperty, value: String?) {
-        if let unitRow : PushRow<String> = self.form.rowBy(tag: "secondUnit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let _ = task.goal {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "secondUnit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let goal = task.goal {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
@@ -522,7 +555,21 @@ extension TaskViewController {
                         submetricRow.hidden = false
                         submetricRow.evaluateHidden()
                         task.goal!.submetricSecond = updatedValue.submetrics[0]
-                        submetricRow.value = updatedValue.submetrics[0].rawValue
+                        if submetricRow.value == updatedValue.submetrics[0].rawValue {
+                            if let options = task.goal!.options() {
+                                optionRow.value = Set(arrayLiteral: options[0])
+                                optionRow.options = options
+                                optionRow.hidden = false
+                                optionRow.evaluateHidden()
+                            } else {
+                                task.goal!.option = nil
+                                optionRow.hidden = true
+                                optionRow.evaluateHidden()
+                                optionRow.value = nil
+                            }
+                        } else {
+                            submetricRow.value = updatedValue.submetrics[0].rawValue
+                        }
                         submetricRow.options = updatedValue.allValuesSubmetrics
                     } else {
                         task.goal!.submetricSecond = nil
@@ -530,10 +577,22 @@ extension TaskViewController {
                         submetricRow.evaluateHidden()
                         submetricRow.value = nil
                     }
+                    
+                    //period
+//                    if updatedValue == .financialAccounts, let metric = goal.metric, metric == .financialAccounts {
+//                        task.goal!.periodSecond = nil
+//                        periodRow.hidden = true
+//                        periodRow.evaluateHidden()
+//                        periodRow.value = nil
+//                    } else {
+//                        periodRow.hidden = false
+//                        periodRow.evaluateHidden()
+//                    }
                 } else {
                     task.goal!.metricSecond = nil
                     task.goal!.submetricSecond = nil
                     task.goal!.unitSecond = nil
+                    task.goal!.periodSecond = nil
                     submetricRow.hidden = true
                     submetricRow.evaluateHidden()
                     submetricRow.value = nil
@@ -607,38 +666,52 @@ extension TaskViewController {
     }
     
     func updateSecondTargetRow() {
-        if let secondTargetRow : DecimalRow = self.form.rowBy(tag: "Second Target"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship"), let metricsRelationshipValue = metricsRelationshipRow.value, let targetRow : DecimalRow = self.form.rowBy(tag: "Target") {
-            if targetRow.value == nil, secondTargetRow.value == nil {
-                targetRow.hidden = false
-                targetRow.evaluateHidden()
-                secondTargetRow.hidden = false
-                secondTargetRow.evaluateHidden()
-            } else if metricsRelationshipValue == "Equal" || metricsRelationshipValue == "More" || metricsRelationshipValue == "Less" {
-                if targetRow.value != nil {
-                    secondTargetRow.hidden = true
-                    secondTargetRow.evaluateHidden()
-                } else if secondTargetRow.value != nil {
-                    targetRow.hidden = true
+        if let secondTargetRow : DecimalRow = self.form.rowBy(tag: "Second Target"), let targetRow : DecimalRow = self.form.rowBy(tag: "Target"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship") {
+            if let metricsRelationshipValue = metricsRelationshipRow.value {
+                if targetRow.value == nil, secondTargetRow.value == nil {
+                    targetRow.hidden = false
                     targetRow.evaluateHidden()
+                    secondTargetRow.hidden = false
+                    secondTargetRow.evaluateHidden()
+                } else if metricsRelationshipValue == "Equal" || metricsRelationshipValue == "More" || metricsRelationshipValue == "Less" {
+                    if targetRow.value != nil {
+                        secondTargetRow.hidden = true
+                        secondTargetRow.evaluateHidden()
+                    } else if secondTargetRow.value != nil {
+                        targetRow.hidden = true
+                        targetRow.evaluateHidden()
+                    }
+                } else {
+                    targetRow.hidden = false
+                    targetRow.evaluateHidden()
+                    secondTargetRow.hidden = false
+                    secondTargetRow.evaluateHidden()
                 }
-            } else {
-                targetRow.hidden = false
-                targetRow.evaluateHidden()
-                secondTargetRow.hidden = false
+                
+                if let currentRow : DecimalRow = self.form.rowBy(tag: "Current") {
+                    currentRow.hidden = Condition(booleanLiteral: targetRow.isHidden)
+                    currentRow.evaluateHidden()
+                }
+                
+                if let secondCurrentRow : DecimalRow = self.form.rowBy(tag: "Second Current") {
+                    secondCurrentRow.hidden = Condition(booleanLiteral: secondTargetRow.isHidden)
+                    secondCurrentRow.evaluateHidden()
+                }
+                
+                self.updateDescriptionRow()
+                
+                //hide second target and current row given metricsRelationship value is nil
+            } else if !secondTargetRow.isHidden {
+                secondTargetRow.value = nil
+                secondTargetRow.hidden = true
                 secondTargetRow.evaluateHidden()
+                
+                if let secondCurrentRow : DecimalRow = self.form.rowBy(tag: "Second Current") {
+                    secondCurrentRow.value = nil
+                    secondCurrentRow.hidden = true
+                    secondCurrentRow.evaluateHidden()
+                }
             }
-            
-            if let currentRow : DecimalRow = self.form.rowBy(tag: "Current") {
-                currentRow.hidden = Condition(booleanLiteral: targetRow.isHidden)
-                currentRow.evaluateHidden()
-            }
-            
-            if let secondCurrentRow : DecimalRow = self.form.rowBy(tag: "Second Current") {
-                secondCurrentRow.hidden = Condition(booleanLiteral: secondTargetRow.isHidden)
-                secondCurrentRow.evaluateHidden()
-            }
-            
-            self.updateDescriptionRow()
         }
     }
     
@@ -1219,6 +1292,43 @@ extension TaskViewController {
                 self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
                 self.task.hasDeadlineTime = true
             } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.task.hasDeadlineTime = false
+            } else {
+                self.task.endDateTime = nil
+                self.task.hasDeadlineTime = false
+            }
+            self.updateDescriptionRow()
+            self.updateRepeatReminder()
+        }
+    }
+    
+    func updateStartDateGoal() {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate") {
+            if dateSwitchRowValue, let dateRowValue = dateRow.value {
+                var dateComponents = DateComponents()
+                dateComponents.year = dateRowValue.yearNumber()
+                dateComponents.month = dateRowValue.monthNumber()
+                dateComponents.day = dateRowValue.dayNumber()
+                let date = Calendar.current.date(from: dateComponents)
+                self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                self.task.hasStartTime = false
+            } else {
+                self.task.startDateTime = nil
+                self.task.hasStartTime = false
+            }
+            self.updateRepeatReminder()
+        }
+    }
+    
+    func updateDeadlineDateGoal() {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate") {
+            if dateSwitchRowValue, let dateRowValue = dateRow.value {
                 var dateComponents = DateComponents()
                 dateComponents.year = dateRowValue.yearNumber()
                 dateComponents.month = dateRowValue.monthNumber()

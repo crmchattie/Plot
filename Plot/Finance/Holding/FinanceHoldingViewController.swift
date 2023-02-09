@@ -44,6 +44,8 @@ class FinanceHoldingViewController: FormViewController {
     
     var networkController: NetworkController
     
+    var timer: Timer?
+    
     init(networkController: NetworkController) {
         self.networkController = networkController
         super.init(style: .insetGrouped)
@@ -58,7 +60,6 @@ class FinanceHoldingViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        
         
         
         numberFormatter.numberStyle = .currency
@@ -175,11 +176,16 @@ class FinanceHoldingViewController: FormViewController {
                 row.placeholderColor = .secondaryLabel
             }.onChange { row in
                 if let value = row.value {
-                    self.holding.description = value
-                    if let currentUser = Auth.auth().currentUser?.uid, self.active {
-                        let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("description")
-                        reference.setValue(value)
-                    }
+                    self.timer?.invalidate()
+                    
+                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { (_) in
+                        self.holding.description = value
+                        if let currentUser = Auth.auth().currentUser?.uid, self.active {
+                            let reference = Database.database().reference().child(userFinancialHoldingsEntity).child(currentUser).child(self.holding.guid).child("description")
+                            reference.setValue(value)
+                        }
+                    })
+                    
                 }
                 if row.value == nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false

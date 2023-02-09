@@ -297,9 +297,8 @@ extension SubtaskListViewController: UpdateTaskCellDelegate {
                 subtaskList[index].parentID = self.task.instanceID
             }
             
-            
             let updateTask = ActivityActions(activity: subtaskList[index], active: true, selectedFalconUsers: [])
-            updateTask.updateCompletion(isComplete: subtaskList[index].isCompleted ?? false)
+            updateTask.updateCompletion(isComplete: subtaskList[index].isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
         }
     }
 }

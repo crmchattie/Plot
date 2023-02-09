@@ -20,6 +20,15 @@ struct iCalUtility {
         if let ruleString = rules.first(where: { $0.starts(with: "RRULE") }), let rule = RecurrenceRule(rruleString: ruleString) {
             var totalRule = rule
             totalRule.startDate = ruleStartDate
+            
+            var finalEndDate = endDate
+            
+            switch totalRule.frequency {
+            case .yearly:
+                finalEndDate = finalEndDate.nextYear
+            case .monthly, .weekly, .daily, .hourly, .minutely, .secondly:
+                break
+            }
             for rule in rules {
                 if rule.starts(with: "RRULE") {
 
@@ -37,7 +46,7 @@ struct iCalUtility {
                     print("Invalid recurrence rule found: \(rule)")
                 }
             }
-            return totalRule.occurrences(between: startDate, and: endDate)
+            return totalRule.occurrences(between: startDate, and: finalEndDate)
         }
         return []
     }

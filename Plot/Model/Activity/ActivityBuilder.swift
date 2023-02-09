@@ -662,6 +662,7 @@ class TaskBuilder {
                     print(end)
                     print(end.timeIntervalSinceNow.sign)
                     if end.timeIntervalSinceNow.sign == .minus {
+                        print("task isCompleted via transaction")
                         activity.isCompleted = true
                         activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
                     }

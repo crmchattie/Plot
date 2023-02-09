@@ -16,7 +16,7 @@ protocol ActivityDetailServiceInterface {
     
     func getActivityCategoriesSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([String: [Statistic]], [Activity]) -> Void)
     
-    func getActivityCategoriesSamples(activities: [Activity], activityCategories: [String]?, activitySubcategories: [String]?, range: DateRange, completion: @escaping ([String: [Statistic]]?, [Activity]?) -> Void)
+    func getActivityCategoriesSamples(activities: [Activity], level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?) -> Void)
 }
 
 class ActivityDetailService: ActivityDetailServiceInterface {
@@ -30,9 +30,9 @@ class ActivityDetailService: ActivityDetailServiceInterface {
         }
     }
     
-    func getActivityCategoriesSamples(activities: [Activity], activityCategories: [String]?, activitySubcategories: [String]?, range: DateRange, completion: @escaping ([String: [Statistic]]?, [Activity]?) -> Void) {
-        getActivityCategoriesStatisticalSamples(activities: activities, activityCategories: activityCategories, activitySubcategories: activitySubcategories, range: range) { (stats, activities, _) in
-            completion(stats ?? [:], activities ?? [])
+    func getActivityCategoriesSamples(activities: [Activity], level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?) -> Void) {
+        getActivityCategoriesStatisticalSamples(activities: activities, level: level, options: options, range: range) { (stat, activities, _) in
+            completion(stat, activities ?? [])
         }
     }
 
@@ -66,9 +66,9 @@ class ActivityDetailService: ActivityDetailServiceInterface {
         }
     }
     
-    private func getActivityCategoriesStatisticalSamples(activities: [Activity], activityCategories: [String]?, activitySubcategories: [String]?, range: DateRange, completion: @escaping ([String: [Statistic]]?, [Activity]?, Error?) -> Void) {
-        activitiesData(activities: activities, activityCategories: activityCategories, activitySubcategories: activitySubcategories, start: range.startDate, end: range.endDate) { stats, activitiesList in
-            completion(stats, activitiesList, nil)
+    private func getActivityCategoriesStatisticalSamples(activities: [Activity], level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?, Error?) -> Void) {
+        activitiesData(activities: activities, level: level, options: options, start: range.startDate, end: range.endDate) { stat, activitiesList in
+            completion(stat, activitiesList, nil)
         }
     }
 }

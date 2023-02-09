@@ -225,7 +225,7 @@ class TaskCell: UITableViewCell {
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false))
+        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: task.goalCurrentNumber, goalCurrentNumberSecond: task.goalCurrentNumberSecond)
         
     }
 }
@@ -459,6 +459,6 @@ class TaskCollectionCell: UICollectionViewCell {
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false))
+        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: task.goalCurrentNumber, goalCurrentNumberSecond: task.goalCurrentNumberSecond)
     }
 }

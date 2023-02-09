@@ -84,9 +84,9 @@ struct UserMindfulness: Codable, Equatable, Hashable {
     }
 }
 
-func mindfulnessData(mindfulnesses: [Mindfulness], start: Date, end: Date, completion: @escaping ([Statistic], [Mindfulness]) -> ()) {
-    mindfulnessListStats(mindfulnesses: mindfulnesses, chunkStart: start, chunkEnd: end) { (stats, mindfulnesses) in
-        completion(stats, mindfulnesses)
+func mindfulnessData(mindfulnesses: [Mindfulness], start: Date, end: Date, completion: @escaping (Statistic, [Mindfulness]) -> ()) {
+    mindfulnessListStats(mindfulnesses: mindfulnesses, chunkStart: start, chunkEnd: end) { (stat, mindfulnesses) in
+        completion(stat, mindfulnesses)
     }    
 }
 
@@ -101,9 +101,9 @@ func mindfulnessListStats(
     mindfulnesses: [Mindfulness],
     chunkStart: Date,
     chunkEnd: Date,
-    completion: @escaping ([Statistic], [Mindfulness]) -> ()
+    completion: @escaping (Statistic, [Mindfulness]) -> ()
 ) {
-    var statistics = [Statistic]()
+    var stat = Statistic(date: mindfulnesses.first?.startDateTime ?? Date(), value: 0)
     var mindfulnessList = [Mindfulness]()
     for mindfulness in mindfulnesses {
         guard var startDate = mindfulness.startDateTime,
@@ -126,16 +126,8 @@ func mindfulnessListStats(
         }
         
         let duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
-        if statistics.isEmpty {
-            let stat = Statistic(date: chunkStart, value: duration)
-            statistics.append(stat)
-            mindfulnessList.append(mindfulness)
-        } else {
-            if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                statistics[index].value += duration
-                mindfulnessList.append(mindfulness)
-            }
-        }
+        stat.value += duration
+        mindfulnessList.append(mindfulness)
     }
-    completion(statistics, mindfulnessList)
+    completion(stat, mindfulnessList)
 }
