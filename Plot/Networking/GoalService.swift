@@ -53,18 +53,29 @@ extension NetworkController {
                 
                 let range = DateRange(startDate: startDate, endDate: endDate)
                 if range.endDate > monthPast, range.startDate <= tomorrow {
+                    var doubleFirst = Double()
                     checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { double in
+                        doubleFirst = double
                         print("done checking first metric")
                         print(goal.name)
                         print(metric.rawValue)
                         print(double)
                     }
-                    if let _ = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond {
-                        checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { double in
+                    if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond {
+                        checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { doubleSecond in
                             print("done checking second metric")
                             print(goal.name)
                             print(metricSecond.rawValue)
-                            print(double)
+                            
+                            switch metricsRelationshipType {
+                            case .or:
+                                print("or")
+                            case .and:
+                                print("and")
+                            case .equal, .more, .less:
+                                print("other")
+                                break
+                            }
                         }
                     }
                 }
