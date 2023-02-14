@@ -26,7 +26,7 @@ extension NetworkController {
         let tomorrow = Date().dayAfter
         for task in activityService.goals {
 //            print("--------------------------")
-            if let goal = task.goal, let metric = goal.metric, let unit = goal.unit, !(task.isCompleted ?? false) {
+            if let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber {
                 var updatedDescription = goal.description ?? ""
                 if let secondaryDescription = goal.descriptionSecondary {
                     updatedDescription += secondaryDescription
@@ -53,28 +53,63 @@ extension NetworkController {
                 
                 let range = DateRange(startDate: startDate, endDate: endDate)
                 if range.endDate > monthPast, range.startDate <= tomorrow {
-                    var doubleFirst = Double()
                     checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { double in
-                        doubleFirst = double
                         print("done checking first metric")
                         print(goal.name)
                         print(metric.rawValue)
                         print(double)
-                    }
-                    if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond {
-                        checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { doubleSecond in
-                            print("done checking second metric")
-                            print(goal.name)
-                            print(metricSecond.rawValue)
-                            
-                            switch metricsRelationshipType {
-                            case .or:
-                                print("or")
-                            case .and:
-                                print("and")
-                            case .equal, .more, .less:
-                                print("other")
-                                break
+                        print(goal.targetNumber)
+                        
+                        if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
+                            self.checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { doubleSecond in
+                                print("done checking second metric")
+                                print(goal.name)
+                                print(metricSecond.rawValue)
+                                print(doubleSecond)
+                                print(goal.targetNumberSecond)
+                                
+                                switch metricsRelationshipType {
+                                case .or:
+                                    print("or")
+                                    if (double >= target && (goal.currentNumber ?? 0 != double || !(task.isCompleted ?? false))) || (doubleSecond >= targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || !(task.isCompleted ?? false))) {
+                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                        updateTask.updateCompletion(isComplete: true, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
+                                    } else if (double < target && (goal.currentNumber ?? 0 != double || task.isCompleted ?? false)) && (doubleSecond < targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || task.isCompleted ?? false)) {
+                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                        updateTask.updateCompletion(isComplete: false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
+                                    } else if goal.currentNumber ?? 0 != double || goal.currentNumberSecond ?? 0 != doubleSecond {
+                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                        updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
+                                    }
+
+                                case .and:
+                                    print("and")
+                                    if (double >= target && (goal.currentNumber ?? 0 != double || !(task.isCompleted ?? false))) && (doubleSecond >= targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || !(task.isCompleted ?? false))) {
+                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                        updateTask.updateCompletion(isComplete: true, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
+                                    } else if (double < target && (goal.currentNumber ?? 0 != double || task.isCompleted ?? false)) || (doubleSecond < targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || task.isCompleted ?? false)) {
+                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                        updateTask.updateCompletion(isComplete: false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
+                                    } else if goal.currentNumber ?? 0 != double || goal.currentNumberSecond ?? 0 != doubleSecond {
+                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                        updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
+                                    }
+
+                                case .equal, .more, .less:
+                                    //not in use yet
+                                    break
+                                }
+                            }
+                        } else {
+                            if double >= target && (goal.currentNumber ?? 0 != double || !(task.isCompleted ?? false)) {
+                                let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                updateTask.updateCompletion(isComplete: true, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: nil)
+                            } else if double < target && (goal.currentNumber ?? 0 != double || task.isCompleted ?? false) {
+                                let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                updateTask.updateCompletion(isComplete: false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: nil)
+                            } else if goal.currentNumber ?? 0 != double {
+                                let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: nil)
                             }
                         }
                     }

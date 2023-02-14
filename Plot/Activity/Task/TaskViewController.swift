@@ -1189,22 +1189,16 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 form.last!
                 <<< DecimalRow("Current") { row in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
-                    row.cell.textLabel?.textColor = .label
-                    row.cell.detailTextLabel?.textColor = .secondaryLabel
-                    row.cell.accessoryType = .none
+                    row.cell.textField?.textColor = .secondaryLabel
                     row.cell.selectionStyle = .none
-                    row.cell.textLabel?.numberOfLines = 0
                     row.cell.isUserInteractionEnabled = false
                     row.title = row.tag
                     if let task = task, let goal = task.goal, let number = goal.currentNumber {
                         row.value = number
                     }
                 }.cellUpdate { cell, row in
-                    cell.textLabel?.textAlignment = .left
                     cell.backgroundColor = .secondarySystemGroupedBackground
-                    cell.textLabel?.textColor = .label
-                    cell.detailTextLabel?.textColor = .secondaryLabel
-                    cell.accessoryType = .none
+                    cell.textField?.textColor = .secondaryLabel
                 }
             }
             
@@ -1480,11 +1474,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 form.last!
                 <<< DecimalRow("Second Current") { row in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
-                    row.cell.textLabel?.textColor = .label
-                    row.cell.detailTextLabel?.textColor = .secondaryLabel
-                    row.cell.accessoryType = .none
+                    row.cell.textField?.textColor = .secondaryLabel
                     row.cell.selectionStyle = .none
-                    row.cell.textLabel?.numberOfLines = 0
                     row.cell.isUserInteractionEnabled = false
                     row.title = row.tag
                     if let task = task, let goal = task.goal, let number = goal.currentNumberSecond {
@@ -1492,11 +1483,8 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     }
                     row.hidden = "$addSecondMetric == false"
                 }.cellUpdate { cell, row in
-                    cell.textLabel?.textAlignment = .left
                     cell.backgroundColor = .secondarySystemGroupedBackground
-                    cell.textLabel?.textColor = .label
-                    cell.detailTextLabel?.textColor = .secondaryLabel
-                    cell.accessoryType = .none
+                    cell.textField?.textColor = .secondaryLabel
                 }
             }
             

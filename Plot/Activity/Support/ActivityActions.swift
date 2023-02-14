@@ -368,7 +368,7 @@ class ActivityActions: NSObject {
                 values = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 updateInstance(instanceValues: values, updateExternal: true)
             } else {
-                values = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "goalCurrentNumber": NSNull() as Any, "goalCurrentNumberSecond": NSNull() as Any]
+                values = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 updateInstance(instanceValues: values, updateExternal: true)
             }
         } else if let currentUserID = Auth.auth().currentUser?.uid {
@@ -387,7 +387,7 @@ class ActivityActions: NSObject {
                 let values:[String : Any] = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 groupActivityReference.updateChildValues(values)
             } else {
-                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "goalCurrentNumber": NSNull() as Any, "goalCurrentNumberSecond": NSNull() as Any]
+                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 groupActivityReference.updateChildValues(values)
             }
             incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])

@@ -61,12 +61,6 @@ class HealthDetailService: HealthDetailServiceInterface {
         var quantityType: HKQuantityType?
         var statisticsOptions: HKStatisticsOptions = .discreteAverage
         
-        if case .sleep = healthMetricType {
-            print("getStatisticalSamples w/ segmentType")
-            print(healthMetricType)
-
-        }
-        
         var unit: HKUnit = HKUnit.count()
         if case .steps = healthMetricType {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
@@ -140,13 +134,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         let anchorDate = anchorDate ?? Date().localTime.startOfDay.addingTimeInterval(-seconds)
         var startDate = anchorDate
         let endDate = anchorDate.advanced(by: 86399)
-        
-        if case .sleep = healthMetricType {
-            print(startDate)
-            print(endDate)
-
-        }
-                        
+                                
         if segmentType == .day {
             interval.hour = 1
         }
@@ -172,14 +160,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         
         if case .sleep = healthMetricType {
-            print(startDate)
-            print(endDate)
-
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
-            
-            print(startDate)
-            print(endDate)
-
         }
 
         
@@ -311,9 +292,6 @@ class HealthDetailService: HealthDetailServiceInterface {
         var quantityType: HKQuantityType?
         var statisticsOptions: HKStatisticsOptions = .discreteAverage
         
-        print("getStatisticalSamples w/o segmentType")
-        print(healthMetricType)
-        
         var unit: HKUnit = HKUnit.count()
         if case .steps = healthMetricType {
             guard let type = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount) else {
@@ -388,15 +366,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         var startDate = anchorDate
         let endDate = anchorDate.advanced(by: 86399)
         
-        print(startDate)
-        print(endDate)
-        
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
         }
-        
-        print(startDate)
-        print(endDate)
         
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
