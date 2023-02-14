@@ -1,9 +1,9 @@
 //
-//  TaskViewController+Extensions.swift
+//  GoalViewController+Extensions.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/16/22.
-//  Copyright © 2022 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 2/14/23.
+//  Copyright © 2023 Immature Creations. All rights reserved.
 //
 
 import UIKit
@@ -16,7 +16,7 @@ import EventKit
 import CodableFirebase
 import RRuleSwift
 
-extension TaskViewController: UITextFieldDelegate {
+extension GoalViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -32,7 +32,7 @@ extension TaskViewController: UITextFieldDelegate {
 }
 
 
-//extension TaskViewController: UITextViewDelegate {
+//extension GoalViewController: UITextViewDelegate {
 //
 //    func textViewDidBeginEditing(_ textView: UITextView) {
 //        //        createActivityView.activityDescriptionPlaceholderLabel.isHidden = true
@@ -58,7 +58,7 @@ extension TaskViewController: UITextFieldDelegate {
 //
 //}
 
-extension TaskViewController: UpdateActivityLevelDelegate {
+extension GoalViewController: UpdateActivityLevelDelegate {
     func update(value: String, level: String) {
         if let row: LabelRow = form.rowBy(tag: level) {
             row.value = value
@@ -72,7 +72,7 @@ extension TaskViewController: UpdateActivityLevelDelegate {
     }
 }
 
-extension TaskViewController: UpdateListDelegate {
+extension GoalViewController: UpdateListDelegate {
     func update(list: ListType) {
         if let row: LabelRow = form.rowBy(tag: "List"), let listID = list.id {
             //remove old list if updated
@@ -97,7 +97,7 @@ extension TaskViewController: UpdateListDelegate {
     }
 }
 
-extension TaskViewController: UpdateSubtaskListDelegate {
+extension GoalViewController: UpdateSubtaskListDelegate {
     func updateSubtaskList(subtaskList: [Activity]) {
         if let row: LabelRow = form.rowBy(tag: "Sub-Tasks") {
             if !subtaskList.isEmpty {
@@ -113,7 +113,7 @@ extension TaskViewController: UpdateSubtaskListDelegate {
     }
 }
 
-extension TaskViewController: UpdateActivityDelegate {
+extension GoalViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
         if let _ = activity.name {
             if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
@@ -149,7 +149,7 @@ extension TaskViewController: UpdateActivityDelegate {
     }
 }
 
-extension TaskViewController: ChooseActivityDelegate {
+extension GoalViewController: ChooseActivityDelegate {
     func chosenActivity(mergeActivity: Activity) {
         if let _: ScheduleRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
             mvs.remove(at: mvs.count - 2)
@@ -181,7 +181,7 @@ extension TaskViewController: ChooseActivityDelegate {
     }
 }
 
-extension TaskViewController: UpdateTransactionDelegate {
+extension GoalViewController: UpdateTransactionDelegate {
     func updateTransaction(transaction: Transaction) {
         var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
         if transaction.description != "Name" {
@@ -212,7 +212,7 @@ extension TaskViewController: UpdateTransactionDelegate {
     }
 }
 
-extension TaskViewController: ChooseTransactionDelegate {
+extension GoalViewController: ChooseTransactionDelegate {
     func chosenTransaction(transaction: Transaction) {
         var mvs = self.form.sectionBy(tag: "Transactions") as! MultivaluedSection
         if transaction.description != "Name" {
@@ -243,7 +243,7 @@ extension TaskViewController: ChooseTransactionDelegate {
     }
 }
 
-extension TaskViewController: UpdateWorkoutDelegate {
+extension GoalViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
         var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
         if workout.name != "Name" {
@@ -275,7 +275,7 @@ extension TaskViewController: UpdateWorkoutDelegate {
     }
 }
 
-extension TaskViewController: UpdateMindfulnessDelegate {
+extension GoalViewController: UpdateMindfulnessDelegate {
     func updateMindfulness(mindfulness: Mindfulness) {
         var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
         if mindfulness.name != "Name" {
@@ -307,7 +307,7 @@ extension TaskViewController: UpdateMindfulnessDelegate {
     }
 }
 
-extension TaskViewController: UpdateMediaDelegate {
+extension GoalViewController: UpdateMediaDelegate {
     func updateMedia(imageURLs: [String], fileURLs: [String]) {
         task.activityPhotos = imageURLs
         task.activityFiles = fileURLs
@@ -325,7 +325,7 @@ extension TaskViewController: UpdateMediaDelegate {
     }
 }
 
-extension TaskViewController: UpdateActivityListDelegate {
+extension GoalViewController: UpdateActivityListDelegate {
     func updateActivityList(listList: [ListContainer]) {
         if let row: LabelRow = form.rowBy(tag: "Checklist") {
             if listList.isEmpty {
@@ -340,16 +340,32 @@ extension TaskViewController: UpdateActivityListDelegate {
     }
 }
 
-extension TaskViewController: RecurrencePickerDelegate {
+extension GoalViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         if let row: LabelRow = form.rowBy(tag: "Repeat") {
             if let recurrenceRule = recurrenceRule {
-                
+                switch recurrenceRule.frequency {
+                case .yearly:
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfYear).timeIntervalSince1970))
+                case .monthly:
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfMonth).timeIntervalSince1970))
+                case .weekly:
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfWeek).timeIntervalSince1970))
+                case .daily:
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfDay).timeIntervalSince1970))
+                case .hourly, .minutely, .secondly:
+                    break
+                }
+                self.task.startDateTime = NSNumber(value: Int((recurrenceRule.startDate).timeIntervalSince1970))
+                self.task.hasStartTime = false
+                self.task.hasDeadlineTime = false
                 task.recurrences = [recurrenceRule.toRRuleString()]
                 let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: task.endDate ?? Date())
                 row.value = rowText
                 row.updateCell()
             } else {
+                self.task.endDateTime = nil
+                self.task.hasDeadlineTime = nil
                 row.value = "Never"
                 row.updateCell()
                 self.task.recurrences = nil
@@ -359,7 +375,7 @@ extension TaskViewController: RecurrencePickerDelegate {
     }
 }
 
-extension TaskViewController: UpdateTagsDelegate {
+extension GoalViewController: UpdateTagsDelegate {
     func updateTags(tags: [String]?) {
         task.tags = tags
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)

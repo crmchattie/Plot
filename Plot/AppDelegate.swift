@@ -15,6 +15,7 @@ import GoogleSignIn
 enum Identifiers {
     static let eventCategory = "EVENT_CATEGORY"
     static let taskCategory = "TASK_CATEGORY"
+    static let goalCategory = "GOAL_CATEGORY"
     static let workoutCategory = "WORKOUT_CATEGORY"
     static let mindfulnessCategory = "MINDFULNESS_CATEGORY"
     static let transactionCategory = "TRANSACTION_CATEGORY"
@@ -108,6 +109,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: Identifiers.taskCategory, actions: [],
                 intentIdentifiers: [], options: [])
             
+            let goalCategory = UNNotificationCategory(
+                identifier: Identifiers.goalCategory, actions: [],
+                intentIdentifiers: [], options: [])
+            
             let workoutCategory = UNNotificationCategory(
                 identifier: Identifiers.workoutCategory, actions: [],
                 intentIdentifiers: [], options: [])
@@ -154,7 +159,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             
             // 3
-            UNUserNotificationCenter.current().setNotificationCategories([eventCategory, taskCategory, workoutCategory, mindfulnessCategory, transactionCategory, accountCategory, listCategory, calendarCategory])
+            UNUserNotificationCenter.current().setNotificationCategories([eventCategory, taskCategory, goalCategory, workoutCategory, mindfulnessCategory, transactionCategory, accountCategory, listCategory, calendarCategory])
             
             //get application instance ID
             Messaging.messaging().token { (token, error) in

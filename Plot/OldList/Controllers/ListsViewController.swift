@@ -289,11 +289,11 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Goal", style: .default, handler: { (_) in
-            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: true)
+            self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: false)
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
         }))
         
         alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
@@ -486,7 +486,11 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
             openList(list: list)
         } else {
             let task = filteredTasks[indexPath.row]
-            showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: task.isGoal ?? false)
+            if task.isGoal ?? false {
+                showGoalDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            } else {
+                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            }
         }
     }
     

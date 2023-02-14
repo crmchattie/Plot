@@ -1,9 +1,9 @@
 //
-//  TaskViewController+Functions.swift
+//  GoalViewController+Functions.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/16/22.
-//  Copyright © 2022 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 2/14/23.
+//  Copyright © 2023 Immature Creations. All rights reserved.
 //
 
 import UIKit
@@ -17,7 +17,7 @@ import CodableFirebase
 import RRuleSwift
 import HealthKit
 
-extension TaskViewController {
+extension GoalViewController {
     
     func decimalRowFunc() {
         var mvs = form.sectionBy(tag: "Balances")
@@ -155,7 +155,7 @@ extension TaskViewController {
 
     
     func listRow() {
-        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) {
+        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) && !(task?.isGoal ?? false) {
             for activity in eventList {
                 var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
                 mvs.insert(ScheduleRow() {
@@ -417,8 +417,16 @@ extension TaskViewController {
     }
     
     func updateRightBarButton() {
-        if let _ = task.name {
-            self.navigationItem.rightBarButtonItem?.isEnabled = true
+        if let _ = task.name, let goal = task.goal, let _ = goal.description {
+            if self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts) {
+                if task.recurrences != nil || task.endDateTime != nil {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                } else {
+                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                }
+            } else {
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            }
         } else {
             self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
@@ -743,7 +751,7 @@ extension TaskViewController {
     func updateNumberRows() {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
-        numberFormatter.maximumFractionDigits = 0        
+        numberFormatter.maximumFractionDigits = 0
         if let goal = task.goal, let unit = goal.unit {
             switch unit {
             case .calories:
@@ -859,6 +867,7 @@ extension TaskViewController {
         recurrencePicker.calendar = Calendar.current
         recurrencePicker.tintColor = FalconPalette.defaultBlue
         recurrencePicker.occurrenceDate = task.endDate ?? Date()
+        recurrencePicker.isGoal = true
 
         // assign delegate
         recurrencePicker.delegate = self
@@ -1049,7 +1058,7 @@ extension TaskViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc func createNewActivity() {              
+    @objc func createNewActivity() {
         if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
             if self.task.recurrences == nil {
                 self.deleteRecurrences()
@@ -1331,7 +1340,7 @@ extension TaskViewController {
     @objc func goToExtras() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let title = "Delete Task"
+        let title = "Delete Goal"
         alert.addAction(UIAlertAction(title: title, style: .default, handler: { (_) in
             self.deleteActivity()
         }))

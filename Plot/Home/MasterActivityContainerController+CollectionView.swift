@@ -280,8 +280,10 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         } else {
             let object = groups[indexPath.section]
             if let activity = object as? Activity {
-                if activity.isTask ?? false {
-                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil, isGoal: activity.isGoal ?? false)
+                if activity.isGoal ?? false {
+                    showGoalDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+                } else if !(activity.isGoal ?? false), activity.isTask ?? false {
+                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
                 } else {
                     showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
                 }

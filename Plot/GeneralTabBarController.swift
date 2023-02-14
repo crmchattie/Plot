@@ -110,8 +110,6 @@ class GeneralTabBarController: UITabBarController {
                     
                     if let currentAppVersion = currentAppVersion, let previousAppVersion = previousAppVersion, previousAppVersion.compare(currentAppVersion) == .orderedAscending {
                         GeneralTabBarController.networkController.setupInitialGoals()
-                    } else {
-                        GeneralTabBarController.networkController.checkGoalsForCompletion()
                     }
                 }
             }

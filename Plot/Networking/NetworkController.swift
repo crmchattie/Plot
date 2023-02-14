@@ -62,6 +62,7 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
+            self.checkGoalsForCompletion()
             self.isRunning = false
             completion()
         }
@@ -107,6 +108,7 @@ class NetworkController {
         
         dispatchGroup.notify(queue: .main) {
             self.isRunning = false
+            self.checkGoalsForCompletion()
             completion()
         }
     }
