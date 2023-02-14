@@ -345,7 +345,20 @@ extension TaskViewController: RecurrencePickerDelegate {
         if let row: LabelRow = form.rowBy(tag: "Repeat") {
             if let recurrenceRule = recurrenceRule {
                 if task.isGoal ?? false {
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate).timeIntervalSince1970))
+                    switch recurrenceRule.frequency {
+                    case .yearly:
+                        self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfYear).timeIntervalSince1970))
+                    case .monthly:
+                        self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfMonth).timeIntervalSince1970))
+                    case .weekly:
+                        self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfWeek).timeIntervalSince1970))
+                    case .daily:
+                        self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfDay).timeIntervalSince1970))
+                    case .hourly, .minutely, .secondly:
+                        break
+                    }
+                    self.task.startDateTime = NSNumber(value: Int((recurrenceRule.startDate).timeIntervalSince1970))
+                    self.task.hasStartTime = false
                     self.task.hasDeadlineTime = false
                 }
                 task.recurrences = [recurrenceRule.toRRuleString()]

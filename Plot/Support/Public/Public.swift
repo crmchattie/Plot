@@ -779,7 +779,7 @@ func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, has
     var numberOfLines = 1
     var endString: String = "Due: "
     let now = Date()
-    if let startDate = startDate {
+    if let startDate = startDate, false {
         numberOfLines = 2
         var startString: String = "Starts: "
 //        let startEarliest = now < startDate ? now : startDate
@@ -926,7 +926,8 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
         dateFormatter.dateFormat = "E, MMM"
         value += "\(dateFormatter.string(from: date)) \(day)"
         
-    } else if let startDate = task.startDate, let endDate = task.endDate {
+    }
+    else if let startDate = task.startDate, let endDate = task.endDate, false {
         value += "Starts: "
         numberOfLines = 2
         let startAllDay = !(task.hasStartTime ?? false)
@@ -973,7 +974,8 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             value += " \(endDateFormatter.string(from: endDate))"
         }
         
-    } else if let date = task.startDate {
+    }
+    else if let date = task.startDate, false {
         value += "Starts: "
         let allDay = !(task.hasStartTime ?? false)
         let dateFormatter = DateFormatter()
@@ -997,7 +999,8 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             value += " \(dateFormatter.string(from: date))"
         }
         
-    } else if let date = task.endDate {
+    }
+    else if let date = task.endDate {
         value += "Due: "
         let allDay = !(task.hasDeadlineTime ?? false)
         let dateFormatter = DateFormatter()

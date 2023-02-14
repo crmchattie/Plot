@@ -55,7 +55,6 @@ class HealthDetailService: HealthDetailServiceInterface {
     }
     
     private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
-        
         let healthMetricType = healthMetric.type
         var interval = DateComponents()
         var quantityType: HKQuantityType?
@@ -162,7 +161,6 @@ class HealthDetailService: HealthDetailServiceInterface {
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
         }
-
         
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
@@ -370,17 +368,24 @@ class HealthDetailService: HealthDetailServiceInterface {
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
         }
         
+        print("getStatisticalSamples w/o segment")
+        print(healthMetricType.name)
+        print(anchorDate)
+        print(startDate)
+        print(endDate)
+
+        
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
                 let workoutActivityType = hkWorkout.workoutActivityType
                 HealthKitService.getWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate, endDate: endDate) { [weak self] workouts, error  in
-                    let stat = self?.perpareCustomStatsForWorkoutsForGoal(from: workouts)
+                    let stat = self?.perpareCustomStatsForWorkoutsForGoal(from: workouts, startDate: startDate)
                     completion(stat, workouts, nil)
                 }
             }
             else if case .workoutMinutes = healthMetricType {
                 HealthKitService.getAllWorkouts(startDate: startDate, endDate: endDate) { [weak self] workouts, errorList  in
-                    let stat = self?.perpareCustomStatsForWorkoutMinutesForGoal(from: workouts)
+                    let stat = self?.perpareCustomStatsForWorkoutMinutesForGoal(from: workouts, startDate: startDate)
                     completion(stat, workouts, nil)
                 }
             }
@@ -406,28 +411,28 @@ class HealthDetailService: HealthDetailServiceInterface {
                 HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { [weak self] (results, error) in
                     if case .steps = healthMetricType {
                         HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
-                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stat, samples in
+                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, startDate: startDate, completion: { stat, samples in
                                 completion(stat, samples, nil)
                             })
                         }
                     }
                     else if case .flightsClimbed = healthMetricType {
                         HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
-                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stat, samples in
+                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, startDate: startDate, completion: { stat, samples in
                                 completion(stat, samples, nil)
                             })
                         }
                     }
                     else if case .activeEnergy = healthMetricType {
                         HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
-                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stat, samples in
+                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, startDate: startDate, completion: { stat, samples in
                                 completion(stat, samples, nil)
                             })
                         }
                     }
                     else {
                         HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
-                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, completion: { stat, samples in
+                            self?.perpareCustomStatsForGoal(from: samples, quantityType: quantityTypeValue,hkStatistics: results, unit: unit, statisticsOptions: statisticsOptions, startDate: startDate, completion: { stat, samples in
                                 completion(stat, samples, nil)
                             })
                         }
@@ -527,7 +532,7 @@ class HealthDetailService: HealthDetailServiceInterface {
     }
     
     private func perpareCustomStatsForQuantitySamplesForGoal(from samples: [HKQuantitySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType) -> Statistic? {
-        var stat = Statistic(date: samples?.first?.startDate ?? Date(), value: 0)
+        var stat = Statistic(date: startDate, value: 0)
         
         guard let samples = samples else {
             return stat
@@ -590,7 +595,7 @@ class HealthDetailService: HealthDetailServiceInterface {
     }
     
     private func perpareCustomStatsForCategorySamplesForGoal(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, type: HealthMetricType) -> Statistic? {
-        var stat = Statistic(date: samples?.first?.startDate ?? Date(), value: 0)
+        var stat = Statistic(date: startDate, value: 0)
         
         guard let samples = samples else {
             return stat
@@ -742,7 +747,7 @@ class HealthDetailService: HealthDetailServiceInterface {
     
     private func perpareCustomStatsForSleepSamplesForGoal(from samples: [HKCategorySample]?, startDate: Date, endDate: Date, type: HealthMetricType, completion: @escaping (Statistic?, [HKCategorySample]?) -> Void) {
         var customSamples: [HKCategorySample] = []
-        var stat = Statistic(date: samples?.first?.startDate ?? Date(), value: 0)
+        var stat = Statistic(date: startDate, value: 0)
                 
         guard let samples = samples else {
             completion(stat, customSamples)
@@ -800,12 +805,12 @@ class HealthDetailService: HealthDetailServiceInterface {
         return customStats
     }
     
-    private func perpareCustomStatsForWorkoutsForGoal(from hkWorkouts: [HKWorkout]?) -> Statistic? {
+    private func perpareCustomStatsForWorkoutsForGoal(from hkWorkouts: [HKWorkout]?, startDate: Date) -> Statistic? {
         guard let hkWorkouts = hkWorkouts else {
             return nil
         }
         
-        var stat = Statistic(date: hkWorkouts.first?.startDate ?? Date(), value: 0)
+        var stat = Statistic(date: startDate, value: 0)
         for workout in hkWorkouts {
             if let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) {
                 stat.value += totalEnergyBurned
@@ -872,12 +877,12 @@ class HealthDetailService: HealthDetailServiceInterface {
         return customStats
     }
     
-    private func perpareCustomStatsForWorkoutMinutesForGoal(from hkWorkouts: [HKWorkout]?) -> Statistic? {
+    private func perpareCustomStatsForWorkoutMinutesForGoal(from hkWorkouts: [HKWorkout]?, startDate: Date) -> Statistic? {
         guard let hkWorkouts = hkWorkouts else {
             return nil
         }
         
-        var stat = Statistic(date: hkWorkouts.first?.startDate ?? Date(), value: 0)
+        var stat = Statistic(date: startDate, value: 0)
         for workout in hkWorkouts {
             stat.value += workout.endDate.timeIntervalSince(workout.startDate) / 60
         }
@@ -958,13 +963,13 @@ class HealthDetailService: HealthDetailServiceInterface {
         completion(customStats, customSamples)
     }
     
-    private func perpareCustomStatsForGoal(from samples: [HKSample]?, quantityType: HKQuantityType, hkStatistics: [HKStatistics]?, unit: HKUnit, statisticsOptions: HKStatisticsOptions, completion: @escaping (Statistic?, [HKQuantitySample]?) -> Void) {
+    private func perpareCustomStatsForGoal(from samples: [HKSample]?, quantityType: HKQuantityType, hkStatistics: [HKStatistics]?, unit: HKUnit, statisticsOptions: HKStatisticsOptions, startDate: Date, completion: @escaping (Statistic?, [HKQuantitySample]?) -> Void) {
         guard let statsCollection = hkStatistics else {
             completion(nil, nil)
             return
         }
         
-        var stat = Statistic(date: samples?.first?.startDate ?? Date(), value: 0)
+        var stat = Statistic(date: startDate, value: 0)
         var customSamples: [HKQuantitySample] = []
         for statistics in statsCollection {
             var value: Double?

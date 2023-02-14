@@ -103,7 +103,7 @@ func mindfulnessListStats(
     chunkEnd: Date,
     completion: @escaping (Statistic, [Mindfulness]) -> ()
 ) {
-    var stat = Statistic(date: mindfulnesses.first?.startDateTime ?? Date(), value: 0)
+    var stat = Statistic(date: chunkStart, value: 0)
     var mindfulnessList = [Mindfulness]()
     for mindfulness in mindfulnesses {
         guard var startDate = mindfulness.startDateTime,

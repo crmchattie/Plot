@@ -8,6 +8,7 @@
 
 import Foundation
 import Firebase
+import EventKit
 import RRuleSwift
 
 extension NetworkController {    
@@ -32,13 +33,6 @@ extension NetworkController {
                     updatedDescription += secondaryDescription
                 }
 //
-//                print(updatedDescription)
-//                print(monthPast)
-//                print(now)
-//                print(task.endDate)
-//                print(task.startDateGivenEndDateFrequency)
-//                print(goal.frequency)
-                
                 var startDate = Date()
                 var endDate = Date()
                 
@@ -50,67 +44,102 @@ extension NetworkController {
                         startDate = startDateTemp
                     }
                 }
+                print("metricCheck")
+                print(metric)
+                print(updatedDescription)
+                print(startDate)
+                print(endDate)
                 
                 let range = DateRange(startDate: startDate, endDate: endDate)
-                if range.endDate > monthPast, range.startDate <= tomorrow {
-                    checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { double in
-                        print("done checking first metric")
-                        print(goal.name)
-                        print(metric.rawValue)
-                        print(double)
-                        print(goal.targetNumber)
-                        
-                        if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
-                            self.checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { doubleSecond in
-                                print("done checking second metric")
-                                print(goal.name)
-                                print(metricSecond.rawValue)
-                                print(doubleSecond)
-                                print(goal.targetNumberSecond)
-                                
-                                switch metricsRelationshipType {
-                                case .or:
-                                    print("or")
-                                    if (double >= target && (goal.currentNumber ?? 0 != double || !(task.isCompleted ?? false))) || (doubleSecond >= targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || !(task.isCompleted ?? false))) {
-                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                        updateTask.updateCompletion(isComplete: true, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
-                                    } else if (double < target && (goal.currentNumber ?? 0 != double || task.isCompleted ?? false)) && (doubleSecond < targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || task.isCompleted ?? false)) {
-                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                        updateTask.updateCompletion(isComplete: false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
-                                    } else if goal.currentNumber ?? 0 != double || goal.currentNumberSecond ?? 0 != doubleSecond {
-                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                        updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
-                                    }
+                guard range.endDate > monthPast, range.startDate <= tomorrow else {
+                    continue
+                }
+                
+                print("continuing")
+                
+                checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
+                    var finalStat = Statistic(date: range.startDate, value: 0)
+                    if let stat = stat {
+                        finalStat = stat
+                    }
 
-                                case .and:
-                                    print("and")
-                                    if (double >= target && (goal.currentNumber ?? 0 != double || !(task.isCompleted ?? false))) && (doubleSecond >= targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || !(task.isCompleted ?? false))) {
-                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                        updateTask.updateCompletion(isComplete: true, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
-                                    } else if (double < target && (goal.currentNumber ?? 0 != double || task.isCompleted ?? false)) || (doubleSecond < targetSecond && (goal.currentNumberSecond ?? 0 != doubleSecond || task.isCompleted ?? false)) {
-                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                        updateTask.updateCompletion(isComplete: false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
-                                    } else if goal.currentNumber ?? 0 != double || goal.currentNumberSecond ?? 0 != doubleSecond {
-                                        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                        updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: doubleSecond as NSNumber)
-                                    }
+                    if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
+                        self.checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { statSecond in
+                            var finalStatSecond = Statistic(date: range.startDate, value: 0)
+                            if let statSecond = statSecond {
+                                finalStatSecond = statSecond
+                            }
+                            
+                            print("finished checking")
+                            print(range.startDate)
+                            print(range.endDate)
+                            
+                            print("metricCheck First")
+                            print(metric)
+                            print(finalStat.date)
+                            print(finalStat.value)
+                            print(target)
+                            
+                            print("metricCheck Second")
+                            print(metricSecond)
+                            print(finalStatSecond.date)
+                            print(finalStatSecond.value)
+                            print(targetSecond)
 
-                                case .equal, .more, .less:
-                                    //not in use yet
-                                    break
+                            switch metricsRelationshipType {
+                            case .or:
+                                if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
+                                    task.completedDate = NSNumber(value: Int((range.startDate).timeIntervalSince1970))
+                                    let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                    updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) && (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
+                                    let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                    updateTask.updateCompletion(isComplete: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                } else if goal.currentNumber != finalStat.value || goal.currentNumberSecond != finalStatSecond.value {
+                                    let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                    updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                                 }
+
+                            case .and:
+                                if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
+                                    task.completedDate = NSNumber(value: Int((range.startDate).timeIntervalSince1970))
+//                                    task.completedDate = finalStat.date > finalStatSecond.date ? NSNumber(value: Int((finalStat.date).timeIntervalSince1970)) : NSNumber(value: Int((finalStatSecond.date).timeIntervalSince1970))
+                                    let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                    updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) || (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
+                                    let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                    updateTask.updateCompletion(isComplete: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                } else if goal.currentNumber != finalStat.value || goal.currentNumberSecond != finalStatSecond.value {
+                                    let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                                    updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                }
+
+                            //not in use yet
+                            case .equal, .more, .less:
+                                break
                             }
-                        } else {
-                            if double >= target && (goal.currentNumber ?? 0 != double || !(task.isCompleted ?? false)) {
-                                let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: true, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: nil)
-                            } else if double < target && (goal.currentNumber ?? 0 != double || task.isCompleted ?? false) {
-                                let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: nil)
-                            } else if goal.currentNumber ?? 0 != double {
-                                let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: double as NSNumber, goalCurrentNumberSecond: nil)
-                            }
+                        }
+                    } else {
+                        print("finished checking")
+                        print(range.startDate)
+                        print(range.endDate)
+                        
+                        print("metricCheck First")
+                        print(metric)
+                        print(finalStat.date)
+                        print(finalStat.value)
+                        print(target)
+                        
+                        if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
+                            task.completedDate = NSNumber(value: Int((range.startDate).timeIntervalSince1970))
+                            let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                            updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
+                        } else if finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false) {
+                            let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                            updateTask.updateCompletion(isComplete: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
+                        } else if goal.currentNumber != finalStat.value {
+                            let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+                            updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                         }
                     }
                 }
@@ -118,38 +147,16 @@ extension NetworkController {
         }
     }
     
-    func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, range: DateRange, completion: @escaping (Double) -> Void) {
-        print("checkGoal")
-        print(metric.rawValue)
-        print(submetric?.rawValue)
-        print(option)
-        print(range.startDate)
-        print(range.endDate)
-        
+    func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, range: DateRange, completion: @escaping (Statistic?) -> Void) {
+
         switch metric {
         case .events:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.events, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
-                print("events stats")
-                print(stat)
-                for activity in activities ?? [] {
-                    print(activity.name ?? "")
-                    print(activity.category ?? "")
-                    print(activity.startDate ?? "")
-                    print(activity.endDate ?? "")
-                }
-                completion(stat?.value ?? 0)
+                completion(stat)
             }
         case .tasks:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.events, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
-                print("tasks stats")
-                print(stat)
-                for activity in activities ?? [] {
-                    print(activity.name ?? "")
-                    print(activity.category ?? "")
-                    print(activity.startDate ?? "")
-                    print(activity.endDate ?? "")
-                }
-                completion(stat?.value ?? 0)
+                completion(stat)
             }
         case .financialTransactions:
             var transactionDetails = [TransactionDetails]()
@@ -174,18 +181,27 @@ extension NetworkController {
             }
             
             financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil) { stat, _, transactions, err in
-                print("financialTransactions stats")
-                print(stat)
-                for transaction in transactions ?? [] {
-                    print(transaction.description)
-                    print(transaction.group)
-                    print(transaction.transacted_at)
-                }
-                completion(stat?.value ?? 0)
+                
+//                print("financialTransactions stats")
+//                print(metric)
+//                print(submetric)
+//                print(option)
+//                print(stat)
+//                for transaction in transactions ?? [] {
+//                    print(transaction.description)
+//                    print(transaction.group)
+//                    print(transaction.transacted_at)
+//                }
+                completion(stat)
             }
         case .financialAccounts:
             var accountDetails = [AccountDetails]()
             
+            print("financialAccounts stats")
+            print(metric)
+            print(submetric)
+            print(option)
+
             switch submetric {
             case nil, .some(.none):
                 break
@@ -210,97 +226,57 @@ extension NetworkController {
             
             financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil) { stat, accounts, _, err in
                 print("financialAccounts stats")
+                print(metric)
+                print(submetric)
+                print(option)
                 print(stat)
                 for account in accounts ?? [] {
                     print(account.name)
                     print(account.bs_type)
                     print(account.updated_at)
                 }
-                completion(stat?.value ?? 0)
+                
+                completion(stat)
             }
             
         case .workout:
             healthDetailService.getSamples(for: healthService.workouts, measure: unit.workoutMeasure ?? .duration, categories: option, range: range) {stat, workouts,_ in
-                print("workout stats")
-                print(stat)
-                for workout in workouts ?? [] {
-                    print(workout.name)
-                    print(workout.type ?? "")
-                    print(workout.startDateTime ?? "")
-                    print(workout.endDateTime ?? "")
-                }
-                completion(stat?.value ?? 0)
+                completion(stat)
             }
             
         case .mindfulness:
             healthDetailService.getSamples(for: healthService.mindfulnesses, range: range) {stat, mindfulnesses,_ in
-                print("mindfulness stats")
-                print(stat)
-                for mindfulness in mindfulnesses ?? [] {
-                    print(mindfulness.name)
-                    print(mindfulness.startDateTime ?? "")
-                    print(mindfulness.endDateTime ?? "")
-                }
-                completion(stat?.value ?? 0)
+                completion(stat)
             }
             
         case .sleep:
             if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
                 healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    print("sleep stats")
-                    print(stat)
-                    for sample in samples ?? [] {
-                        print(sample.sampleType)
-                        print(sample.startDate)
-                        print(sample.endDate)
-                    }
-                    completion(stat?.value ?? 0)
+                    completion(stat)
                 }
             }
         case .steps:
             if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .steps}) {
                 healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    print("steps stats")
-                    print(stat)
-                    for sample in samples ?? [] {
-                        print(sample.sampleType)
-                        print(sample.startDate)
-                        print(sample.endDate)
-                    }
-                    completion(stat?.value ?? 0)
+                    completion(stat)
                 }
             }
         case .flightsClimbed:
             if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .flightsClimbed}) {
                 healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    print("flightsClimbed stats")
-                    print(stat)
-                    for sample in samples ?? [] {
-                        print(sample.sampleType)
-                        print(sample.startDate)
-                        print(sample.endDate)
-                    }
-                    completion(stat?.value ?? 0)
+                    completion(stat)
                 }
             }
         case .activeCalories:
             if let workoutsMetrics = healthService.healthMetrics[.workouts], let healthMetric = workoutsMetrics.first(where: {$0.type == .activeEnergy}) {
                 healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    print("activeCalories stats")
-                    print(stat)
-                    for sample in samples ?? [] {
-                        print(sample.sampleType)
-                        print(sample.startDate)
-                        print(sample.endDate)
-                    }
-                    completion(stat?.value ?? 0)
+                    completion(stat)
                 }
             }
         }
     }
     
     func setupInitialGoals() {
-        print("setupInitialGoals")
         if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
             for g in prebuiltGoals {
                 var goal = g
@@ -318,7 +294,7 @@ extension NetworkController {
                 }
                 
                 if let list = list {
-                    var date = Date()
+                    var date = Date().weekBefore
                     let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
                     task.name = goal.name
                     task.isGoal = true
@@ -327,13 +303,13 @@ extension NetworkController {
                     if goal.targetNumber == nil {
                         group.enter()
                         if goal.name == "Save Emergency Fund" {
-                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, range: DateRange(startDate: Date().startOfMonth.monthBefore.monthBefore.monthBefore, endDate: Date().endOfMonth.monthBefore)) { double in
-                                goal.targetNumber = round(double)
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, range: DateRange(startDate: Date().startOfMonth.monthBefore.monthBefore.monthBefore, endDate: Date().endOfMonth.monthBefore)) { stat in
+                                goal.targetNumber = round(stat?.value ?? 0)
                                 group.leave()
                             }
                         } else if goal.name == "Monthly Savings" {
-                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: Date().startOfMonth.monthBefore.monthBefore.monthBefore, endDate: Date().endOfMonth.monthBefore)) { double in
-                                goal.targetNumber = round(double / 3 * 0.2)
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: Date().startOfMonth.monthBefore.monthBefore.monthBefore, endDate: Date().endOfMonth.monthBefore)) { stat in
+                                goal.targetNumber = round(stat?.value ?? 0 / 3 * 0.2)
                                 group.leave()
                             }
                         }
@@ -345,20 +321,41 @@ extension NetworkController {
                         task.subcategory = subcategory.rawValue
                         if let frequency = goal.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
                             var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
+                            let calendar = Calendar.current
+                            
                             switch recurrenceRule.frequency {
                             case .yearly:
-                                date = date.localTime.endOfYear
+                                date = date.startOfYear.UTCTime
+                                let month = calendar.component(.month, from: date)
+                                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfYear).timeIntervalSince1970))
                             case .monthly:
-                                date = date.localTime.endOfMonth
+                                date = date.startOfMonth.UTCTime
+                                let monthday = calendar.component(.day, from: date)
+                                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfMonth).timeIntervalSince1970))
+                                recurrenceRule.bymonthday = [1]
                             case .weekly:
-                                date = date.localTime.endOfWeek
+                                date = date.startOfWeek.UTCTime
+                                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: date))!
+                                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfWeek).timeIntervalSince1970))
                             case .daily:
-                                date = date.localTime.endOfDay
+                                date = date.startOfDay.UTCTime
+                                recurrenceRule = RecurrenceRule.dailyRecurrence()
+                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfDay).timeIntervalSince1970))
                             case .hourly, .minutely, .secondly:
                                 break
                             }
-                            task.endDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
-                            recurrenceRule.startDate = date
+                            
+                            task.hasStartTime = false
+                            task.hasDeadlineTime = false
+                            
+                            recurrenceRule.startDate = task.startDate ?? date
                             recurrenceRule.interval = goal.name != "Dentist" ? 1 : 2
                             task.recurrences = [recurrenceRule.toRRuleString()]
                         }

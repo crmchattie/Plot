@@ -103,7 +103,7 @@ func workoutData(workouts: [Workout], measure: WorkoutMeasure, categories: [Stri
             completion(stat, workouts)
         }
     } else {
-        var stat = Statistic(date: workouts.first?.startDateTime ?? Date(), value: 0)
+        var stat = Statistic(date: start, value: 0)
         var workoutList = [Workout]()
         for category in categories ?? [] {
             workoutListStats(workouts: workouts, measure: measure, category: category, chunkStart: start, chunkEnd: end) { (stats, workouts) in

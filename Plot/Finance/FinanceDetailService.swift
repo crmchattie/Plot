@@ -132,6 +132,12 @@ class FinanceDetailService: FinanceDetailServiceInterface {
             if let accountDetails = accountDetails, let accounts = accounts {
                 var accts = [MXAccount]()
                 for accountDetail in accountDetails {
+                    print("getStatisticalSamples")
+                    print(accountDetail.name)
+                    print("startDate")
+                    print(startDate)
+                    print("endDate")
+                    print(endDate)
                     accountListStats(accounts: accounts, accountDetail: accountDetail, date: startDate, nextDate: endDate) { (stats, accounts) in
                         for stat in stats {
                             finalStat.value += stat.value

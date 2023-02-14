@@ -20,9 +20,7 @@ struct iCalUtility {
         if let ruleString = rules.first(where: { $0.starts(with: "RRULE") }), let rule = RecurrenceRule(rruleString: ruleString) {
             var totalRule = rule
             totalRule.startDate = ruleStartDate
-            
             var finalEndDate = endDate
-            
             switch totalRule.frequency {
             case .yearly:
                 finalEndDate = finalEndDate.nextYear

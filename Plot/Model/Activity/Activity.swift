@@ -2055,7 +2055,26 @@ extension Activity {
     
     var startDateGivenEndDateFrequency: Date? {
         if let endDate = endDate, let goal = goal, let frequency = goal.frequency {
-            return endDate.addDays(frequency.dayInterval * -1)
+            switch frequency {
+            case .yearly:
+                return endDate.startOfYear
+            case .monthly:
+                return endDate.startOfMonth
+            case .bimonthly:
+                return endDate.addDays(frequency.dayInterval * -1)
+            case .weekly:
+                return endDate.startOfWeek
+            case .biweekly:
+                return endDate.addDays(frequency.dayInterval * -1)
+            case .daily:
+                return endDate.startOfDay
+            case .hourly:
+                return endDate.startOfHour
+            case .minutely:
+                return endDate
+            case .secondly:
+                return endDate
+            }
         }
         return nil
     }
@@ -2068,6 +2087,14 @@ extension Activity {
     }
     
     var finalDate: Date? {
+        if isTask ?? false, !(isGoal ?? false) {
+            return endDate
+        } else {
+            return startDate
+        }
+    }
+    
+    var finalDateForDisplay: Date? {
         if isTask ?? false {
             if isCompleted ?? false {
                 return completedDateDate
@@ -2094,7 +2121,7 @@ extension Activity {
     
     //for tasks where deadline date is more likely to be set than start date
     var finalDateTime: NSNumber? {
-        if isTask ?? false {
+        if isTask ?? false, !(isGoal ?? false) {
             //do not add in completed date; this is used for recurrences
             return endDateTime
         } else {

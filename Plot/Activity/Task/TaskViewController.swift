@@ -976,7 +976,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 row.cell.accessoryType = .none
                 row.cell.selectionStyle = .none
                 row.cell.textLabel?.numberOfLines = 0
-                if let task = task, let _ = task.goal {
+                if let task = task, let goal = task.goal, let _ = goal.description {
                     row.hidden = false
                 } else {
                     row.hidden = true

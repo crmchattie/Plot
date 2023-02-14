@@ -484,7 +484,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     func handleReloadTableAfterSearch() {
         let currentDate = Date().localTime
         filteredPinnedActivities.sort { (activity1, activity2) -> Bool in
-            if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+            if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity1.isGoal ?? false), !(activity2.isGoal ?? false) {
                 if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
                     return startDate1 < startDate2
                 } else if currentDate.isBetween(startDate1, and: endDate1) {
@@ -492,25 +492,25 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 } else if currentDate.isBetween(startDate2, and: endDate2) {
                     return startDate1 < currentDate
                 }
-            } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let finalDate2 = activity2.finalDate {
+            } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, !(activity1.isGoal ?? false), let finalDate2 = activity2.finalDateForDisplay {
                 if currentDate.isBetween(startDate1, and: endDate1) {
                     return currentDate < finalDate2
                 }
                 return startDate1 < finalDate2
-            } else if let finalDate1 = activity1.finalDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+            } else if let finalDate1 = activity1.finalDateForDisplay, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity2.isGoal ?? false) {
                 if currentDate.isBetween(startDate2, and: endDate2) {
                     return finalDate1 < currentDate
                 }
                 return finalDate1 < startDate2
             }
-            if activity1.finalDate == activity2.finalDate {
+            if activity1.finalDateForDisplay == activity2.finalDateForDisplay {
                 return activity1.name ?? "" < activity2.name ?? ""
             }
-            return activity1.finalDate ?? Date.distantPast < activity2.finalDate ?? Date.distantPast
+            return activity1.finalDateForDisplay ?? Date.distantPast < activity2.finalDateForDisplay ?? Date.distantPast
         }
         
         filteredActivities.sort { (activity1, activity2) -> Bool in
-            if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+            if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity1.isGoal ?? false), !(activity2.isGoal ?? false) {
                 if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
                     return startDate1 < startDate2
                 } else if currentDate.isBetween(startDate1, and: endDate1) {
@@ -518,21 +518,21 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 } else if currentDate.isBetween(startDate2, and: endDate2) {
                     return startDate1 < currentDate
                 }
-            } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let finalDate2 = activity2.finalDate {
+            } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, !(activity1.isGoal ?? false), let finalDate2 = activity2.finalDateForDisplay {
                 if currentDate.isBetween(startDate1, and: endDate1) {
                     return currentDate < finalDate2
                 }
                 return startDate1 < finalDate2
-            } else if let finalDate1 = activity1.finalDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate {
+            } else if let finalDate1 = activity1.finalDateForDisplay, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity2.isGoal ?? false) {
                 if currentDate.isBetween(startDate2, and: endDate2) {
                     return finalDate1 < currentDate
                 }
                 return finalDate1 < startDate2
             }
-            if activity1.finalDate == activity2.finalDate {
+            if activity1.finalDateForDisplay == activity2.finalDateForDisplay {
                 return activity1.name ?? "" < activity2.name ?? ""
             }
-            return activity1.finalDate ?? Date.distantPast < activity2.finalDate ?? Date.distantPast
+            return activity1.finalDateForDisplay ?? Date.distantPast < activity2.finalDateForDisplay ?? Date.distantPast
         }
         
         self.activityView.tableView.reloadData()

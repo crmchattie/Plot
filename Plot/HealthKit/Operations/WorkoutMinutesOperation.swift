@@ -29,8 +29,9 @@ class WorkoutMinutesOperation: AsyncOperation {
             }
             
             var workout: HKWorkout = workouts.last!
-                            
+                        
             var averageWorkoutTime: Double = 0
+            var totalWorkoutTime: Double = 0
             
             workouts.forEach { currentWorkout in
                 let interval = currentWorkout.endDate.timeIntervalSince(currentWorkout.startDate)

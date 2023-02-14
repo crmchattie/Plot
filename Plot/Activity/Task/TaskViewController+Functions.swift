@@ -1503,7 +1503,6 @@ extension TaskViewController {
                 if value == nil, let finalDateTime = self.task.finalDateTime {
                     value = [String(describing: Int(truncating: finalDateTime)): 0 as AnyObject]
                 } else if let finalDateTime = self.task.finalDateTime {
-                    print(finalDateTime)
                     value![String(describing: Int(truncating: finalDateTime))] = 0 as AnyObject
                 }
                 mutableData.value = value
