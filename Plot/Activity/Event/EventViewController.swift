@@ -614,6 +614,90 @@ class EventViewController: FormViewController, ObjectDetailShowing {
         
         form.last!
         
+        <<< LabelRow("Sub-Events") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.cell.textLabel?.textColor = .label
+            row.title = row.tag
+            if let activity = activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String(self.activity.scheduleIDs?.count ?? 0)
+            }
+//            row.hidden = "$showExtras == false"
+        }.onCellSelection({ _,_ in
+            self.openSchedule()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textAlignment = .left
+            cell.textLabel?.textColor = .label
+            if let activity = self.activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String(self.activity.scheduleIDs?.count ?? 0)
+            }
+        }
+        
+//        <<< LabelRow("Checklists") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.cell.textLabel?.textColor = .label
+//            row.title = row.tag
+//            if let activity = activity, let checklistIDs = activity.checklistIDs {
+//                row.value = String(checklistIDs.count)
+//            } else {
+//                row.value = "0"
+//            }
+//            row.hidden = "$showExtras == false"
+//        }.onCellSelection({ _,_ in
+//            self.openList()
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//            cell.textLabel?.textAlignment = .left
+//            cell.textLabel?.textColor = .label
+//            if let checklistIDs = self.activity.checklistIDs {
+//                row.value = String(checklistIDs.count)
+//            } else {
+//                row.value = "0"
+//            }
+//        }
+        
+        <<< LabelRow("Media") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+//            row.hidden = "$showExtras == false"
+            if let activity = activity, let photos = activity.activityPhotos, let files = activity.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
+            }
+        }.onCellSelection({ _,_ in
+            self.openMedia()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textAlignment = .left
+            cell.textLabel?.textColor = .label
+            if let photos = self.activity.activityPhotos, let files = self.activity.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
+            }
+        }
+        
         <<< LabelRow("Calendar") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
@@ -707,116 +791,32 @@ class EventViewController: FormViewController, ObjectDetailShowing {
         //            }
         //        }
         
-        <<< SwitchRow("showExtras") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.title = "Show Extras"
-            if let activity = activity, let showExtras = activity.showExtras {
-                row.value = showExtras
-            } else {
-                row.value = true
-                self.activity.showExtras = true
-            }
-        }.onChange { [weak self] row in
-            if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
-                self?.segmentRowValue = segmentRow.value ?? "Health"
-                segmentRow.value = "Hidden"
-            } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
-                segmentRow.value = self?.segmentRowValue
-            }
-            self?.activity.showExtras = row.value
-            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["showExtras": row.value ?? false]
-            userReference.updateChildValues(values)
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-        }
-        
-        <<< LabelRow("Sub-Events") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.cell.textLabel?.textColor = .label
-            row.title = row.tag
-            if let activity = activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String(self.activity.scheduleIDs?.count ?? 0)
-            }
-            row.hidden = "$showExtras == false"
-        }.onCellSelection({ _,_ in
-            self.openSchedule()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-            cell.textLabel?.textColor = .label
-            if let activity = self.activity, let scheduleIDs = activity.scheduleIDs, scheduleIDs.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String(self.activity.scheduleIDs?.count ?? 0)
-            }
-        }
-        
-//        <<< LabelRow("Checklists") { row in
+//        <<< SwitchRow("showExtras") { row in
 //            row.cell.backgroundColor = .secondarySystemGroupedBackground
-//            row.cell.detailTextLabel?.textColor = .secondaryLabel
-//            row.cell.accessoryType = .disclosureIndicator
-//            row.cell.selectionStyle = .default
 //            row.cell.textLabel?.textColor = .label
-//            row.title = row.tag
-//            if let activity = activity, let checklistIDs = activity.checklistIDs {
-//                row.value = String(checklistIDs.count)
+//            row.title = "Show Extras"
+//            if let activity = activity, let showExtras = activity.showExtras {
+//                row.value = showExtras
 //            } else {
-//                row.value = "0"
+//                row.value = true
+//                self.activity.showExtras = true
 //            }
-//            row.hidden = "$showExtras == false"
-//        }.onCellSelection({ _,_ in
-//            self.openList()
-//        }).cellUpdate { cell, row in
-//            cell.accessoryType = .disclosureIndicator
+//        }.onChange { [weak self] row in
+//            if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+//                self?.segmentRowValue = segmentRow.value ?? "Health"
+//                segmentRow.value = "Hidden"
+//            } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
+//                segmentRow.value = self?.segmentRowValue
+//            }
+//            self?.activity.showExtras = row.value
+//            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+//            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
+//            let values:[String : Any] = ["showExtras": row.value ?? false]
+//            userReference.updateChildValues(values)
+//        }.cellUpdate { cell, row in
 //            cell.backgroundColor = .secondarySystemGroupedBackground
-//            cell.detailTextLabel?.textColor = .secondaryLabel
-//            cell.textLabel?.textAlignment = .left
 //            cell.textLabel?.textColor = .label
-//            if let checklistIDs = self.activity.checklistIDs {
-//                row.value = String(checklistIDs.count)
-//            } else {
-//                row.value = "0"
-//            }
 //        }
-        
-        <<< LabelRow("Media") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            row.hidden = "$showExtras == false"
-            if let activity = activity, let photos = activity.activityPhotos, let files = activity.activityFiles, photos.isEmpty, files.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
-            }
-        }.onCellSelection({ _,_ in
-            self.openMedia()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-            cell.textLabel?.textColor = .label
-            if let photos = self.activity.activityPhotos, let files = self.activity.activityFiles, photos.isEmpty, files.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String((self.activity.activityPhotos?.count ?? 0) + (self.activity.activityFiles?.count ?? 0))
-            }
-        }
         
 //        <<< LabelRow("Tags") { row in
 //            row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -864,108 +864,108 @@ class EventViewController: FormViewController, ObjectDetailShowing {
         //                    self.activity.notes = row.value
         //                }
         
-        if delegate == nil && (!active || ((activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || activity?.admin == Auth.auth().currentUser?.uid))) {
-            form.last!
-            <<< SegmentedRow<String>("sections"){
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.hidden = "$showExtras == false"
-                $0.options = ["Tasks", "Health", "Transactions"]
-                if !(activity.showExtras ?? true) {
-                    $0.value = "Hidden"
-                } else {
-                    $0.value = "Tasks"
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-            }.onChange({ _ in
-                self.sectionChanged = true
-            })
-            
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Tasks",
-                                   footer: "Connect an task") {
-                                    $0.tag = "Tasks"
-                                    $0.hidden = "!$sections == 'Tasks'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow("taskButton"){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.title = "Connect Task"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                            }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        return SubtaskRow("label"){ _ in
-                                            self.taskIndex = index
-                                            self.openTask()
-                                        }
-                                    }
-
-                                }
-            
-            form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Health",
-                               footer: "Connect a workout and/or mindfulness session") {
-                $0.tag = "Health"
-                $0.hidden = "$sections != 'Health'"
-                $0.addButtonProvider = { section in
-                    return ButtonRow(){
-                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                        $0.title = "Connect Health"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = .secondarySystemGroupedBackground
-                        cell.textLabel?.textAlignment = .left
-                        cell.height = { 60 }
-                    }
-                }
-                $0.multivaluedRowToInsertAt = { index in
-                    self.healthIndex = index
-                    self.openHealth()
-                    return HealthRow()
-                        .onCellSelection() { cell, row in
-                            self.healthIndex = index
-                            self.openHealth()
-                            cell.cellResignFirstResponder()
-                        }
-                    
-                }
-                
-            }
-            
-            form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Transactions",
-                               footer: "Connect a transaction") {
-                $0.tag = "Transactions"
-                $0.hidden = "$sections != 'Transactions'"
-                $0.addButtonProvider = { section in
-                    return ButtonRow(){
-                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                        $0.title = "Connect Transaction"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = .secondarySystemGroupedBackground
-                        cell.textLabel?.textAlignment = .left
-                        cell.height = { 60 }
-                    }
-                }
-                $0.multivaluedRowToInsertAt = { index in
-                    self.purchaseIndex = index
-                    self.openPurchases()
-                    return PurchaseRow()
-                        .onCellSelection() { cell, row in
-                            self.purchaseIndex = index
-                            self.openPurchases()
-                            cell.cellResignFirstResponder()
-                        }
-                    
-                }
-            }
-        }
+//        if delegate == nil && (!active || ((activity?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || activity?.admin == Auth.auth().currentUser?.uid))) {
+//            form.last!
+//            <<< SegmentedRow<String>("sections"){
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.hidden = "$showExtras == false"
+//                $0.options = ["Tasks", "Health", "Transactions"]
+//                if !(activity.showExtras ?? true) {
+//                    $0.value = "Hidden"
+//                } else {
+//                    $0.value = "Tasks"
+//                }
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textLabel?.textColor = .label
+//            }.onChange({ _ in
+//                self.sectionChanged = true
+//            })
+//
+//            form +++
+//                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                                   header: "Tasks",
+//                                   footer: "Connect an task") {
+//                                    $0.tag = "Tasks"
+//                                    $0.hidden = "!$sections == 'Tasks'"
+//                                    $0.addButtonProvider = { section in
+//                                        return ButtonRow("taskButton"){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.title = "Connect Task"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textLabel?.textAlignment = .left
+//                                                cell.height = { 60 }
+//                                            }
+//                                    }
+//                                    $0.multivaluedRowToInsertAt = { index in
+//                                        return SubtaskRow("label"){ _ in
+//                                            self.taskIndex = index
+//                                            self.openTask()
+//                                        }
+//                                    }
+//
+//                                }
+//
+//            form +++
+//            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                               header: "Health",
+//                               footer: "Connect a workout and/or mindfulness session") {
+//                $0.tag = "Health"
+//                $0.hidden = "$sections != 'Health'"
+//                $0.addButtonProvider = { section in
+//                    return ButtonRow(){
+//                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                        $0.title = "Connect Health"
+//                    }.cellUpdate { cell, row in
+//                        cell.backgroundColor = .secondarySystemGroupedBackground
+//                        cell.textLabel?.textAlignment = .left
+//                        cell.height = { 60 }
+//                    }
+//                }
+//                $0.multivaluedRowToInsertAt = { index in
+//                    self.healthIndex = index
+//                    self.openHealth()
+//                    return HealthRow()
+//                        .onCellSelection() { cell, row in
+//                            self.healthIndex = index
+//                            self.openHealth()
+//                            cell.cellResignFirstResponder()
+//                        }
+//
+//                }
+//
+//            }
+//
+//            form +++
+//            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                               header: "Transactions",
+//                               footer: "Connect a transaction") {
+//                $0.tag = "Transactions"
+//                $0.hidden = "$sections != 'Transactions'"
+//                $0.addButtonProvider = { section in
+//                    return ButtonRow(){
+//                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                        $0.title = "Connect Transaction"
+//                    }.cellUpdate { cell, row in
+//                        cell.backgroundColor = .secondarySystemGroupedBackground
+//                        cell.textLabel?.textAlignment = .left
+//                        cell.height = { 60 }
+//                    }
+//                }
+//                $0.multivaluedRowToInsertAt = { index in
+//                    self.purchaseIndex = index
+//                    self.openPurchases()
+//                    return PurchaseRow()
+//                        .onCellSelection() { cell, row in
+//                            self.purchaseIndex = index
+//                            self.openPurchases()
+//                            cell.cellResignFirstResponder()
+//                        }
+//
+//                }
+//            }
+//        }
         
         //                                    form +++
         //                                        Section(header: "Balances",

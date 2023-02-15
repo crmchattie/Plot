@@ -911,6 +911,63 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         }
         
         form.last!
+        
+        <<< LabelRow("Sub-Tasks") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if let task = task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String(self.task.subtaskIDs?.count ?? 0)
+            }
+//            row.hidden = "$showExtras == false"
+        }.onCellSelection({ _,_ in
+            self.openSubtasks()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textAlignment = .left
+            cell.textLabel?.textColor = .label
+            if let task = self.task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String(self.task.subtaskIDs?.count ?? 0)
+            }
+        }
+        
+        <<< LabelRow("Media") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+//            row.hidden = "$showExtras == false"
+            if let task = task, let photos = task.activityPhotos, let files = task.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
+            }
+        }.onCellSelection({ _,_ in
+            self.openMedia()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textAlignment = .left
+            cell.textLabel?.textColor = .label
+            if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
+                row.value = "0"
+            } else {
+                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
+            }
+        }
+        
         <<< LabelRow("List") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
@@ -1004,88 +1061,32 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         //        }
         
         
-        <<< SwitchRow("showExtras") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.title = "Show Extras"
-            if let showExtras = task.showExtras {
-                row.value = showExtras
-            } else {
-                row.value = true
-                self.task.showExtras = true
-            }
-        }.onChange { [weak self] row in
-            if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
-                self?.segmentRowValue = segmentRow.value ?? "Health"
-                segmentRow.value = "Hidden"
-            } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
-                segmentRow.value = self?.segmentRowValue
-            }
-            self?.task.showExtras = row.value
-            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
-            let values:[String : Any] = ["showExtras": row.value ?? false]
-            userReference.updateChildValues(values)
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-        }
-        
-        <<< LabelRow("Sub-Tasks") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if let task = task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String(self.task.subtaskIDs?.count ?? 0)
-            }
-            row.hidden = "$showExtras == false"
-        }.onCellSelection({ _,_ in
-            self.openSubtasks()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-            cell.textLabel?.textColor = .label
-            if let task = self.task, let subtaskIDs = task.subtaskIDs, subtaskIDs.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String(self.task.subtaskIDs?.count ?? 0)
-            }
-        }
-        
-        <<< LabelRow("Media") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            row.hidden = "$showExtras == false"
-            if let task = task, let photos = task.activityPhotos, let files = task.activityFiles, photos.isEmpty, files.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
-            }
-        }.onCellSelection({ _,_ in
-            self.openMedia()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-            cell.textLabel?.textColor = .label
-            if let photos = self.task.activityPhotos, let files = self.task.activityFiles, photos.isEmpty, files.isEmpty {
-                row.value = "0"
-            } else {
-                row.value = String((self.task.activityPhotos?.count ?? 0) + (self.task.activityFiles?.count ?? 0))
-            }
-        }
+//        <<< SwitchRow("showExtras") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.textLabel?.textColor = .label
+//            row.title = "Show Extras"
+//            if let showExtras = task.showExtras {
+//                row.value = showExtras
+//            } else {
+//                row.value = true
+//                self.task.showExtras = true
+//            }
+//        }.onChange { [weak self] row in
+//            if !(row.value ?? false), let segmentRow : SegmentedRow<String> = self!.form.rowBy(tag: "sections") {
+//                self?.segmentRowValue = segmentRow.value ?? "Health"
+//                segmentRow.value = "Hidden"
+//            } else if let segmentRow : SegmentedRow<String> = self?.form.rowBy(tag: "sections") {
+//                segmentRow.value = self?.segmentRowValue
+//            }
+//            self?.task.showExtras = row.value
+//            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+//            let userReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(self!.activityID).child(messageMetaDataFirebaseFolder)
+//            let values:[String : Any] = ["showExtras": row.value ?? false]
+//            userReference.updateChildValues(values)
+//        }.cellUpdate { cell, row in
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.textLabel?.textColor = .label
+//        }
         
         //        <<< LabelRow("Checklists") { row in
         //            row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -1144,109 +1145,109 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         //            }
         //        }
         
-        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) && !(task?.isGoal ?? false) {
-            form.last!
-            <<< SegmentedRow<String>("sections"){
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.hidden = "$showExtras == false"
-                $0.options = ["Events", "Health", "Transactions"]
-                if !(task.showExtras ?? true) {
-                    $0.value = "Hidden"
-                } else {
-                    $0.value = "Events"
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-            }.onChange({ _ in
-                self.sectionChanged = true
-            })
-            
-            form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Events",
-                               footer: "Connect an event") {
-                $0.tag = "Events"
-                $0.hidden = "!$sections == 'Events'"
-                $0.addButtonProvider = { section in
-                    return ButtonRow("scheduleButton"){
-                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                        $0.title = "Connect Event"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = .secondarySystemGroupedBackground
-                        cell.textLabel?.textAlignment = .left
-                        cell.height = { 60 }
-                    }
-                }
-                $0.multivaluedRowToInsertAt = { index in
-                    self.eventIndex = index
-                    self.openEvent()
-                    return ScheduleRow("label"){ _ in
-                        
-                    }
-                }
-                
-            }
-            
-            form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Health",
-                               footer: "Connect a workout and/or mindfulness session") {
-                $0.tag = "Health"
-                $0.hidden = "$sections != 'Health'"
-                $0.addButtonProvider = { section in
-                    return ButtonRow(){
-                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                        $0.title = "Connect Health"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = .secondarySystemGroupedBackground
-                        cell.textLabel?.textAlignment = .left
-                        cell.height = { 60 }
-                    }
-                }
-                $0.multivaluedRowToInsertAt = { index in
-                    self.healthIndex = index
-                    self.openHealth()
-                    return HealthRow()
-                        .onCellSelection() { cell, row in
-                            self.healthIndex = index
-                            self.openHealth()
-                            cell.cellResignFirstResponder()
-                        }
-                    
-                }
-                
-            }
-            
-            form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: "Transactions",
-                               footer: "Connect a transaction") {
-                $0.tag = "Transactions"
-                $0.hidden = "$sections != 'Transactions'"
-                $0.addButtonProvider = { section in
-                    return ButtonRow(){
-                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                        $0.title = "Connect Transaction"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = .secondarySystemGroupedBackground
-                        cell.textLabel?.textAlignment = .left
-                        cell.height = { 60 }
-                    }
-                }
-                $0.multivaluedRowToInsertAt = { index in
-                    self.purchaseIndex = index
-                    self.openPurchases()
-                    return PurchaseRow()
-                        .onCellSelection() { cell, row in
-                            self.purchaseIndex = index
-                            self.openPurchases()
-                            cell.cellResignFirstResponder()
-                        }
-                    
-                }
-            }
-        }
+//        if delegate == nil && (!active || ((task?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || task?.admin == Auth.auth().currentUser?.uid))) && !(task?.isGoal ?? false) {
+//            form.last!
+//            <<< SegmentedRow<String>("sections"){
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.hidden = "$showExtras == false"
+//                $0.options = ["Events", "Health", "Transactions"]
+//                if !(task.showExtras ?? true) {
+//                    $0.value = "Hidden"
+//                } else {
+//                    $0.value = "Events"
+//                }
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textLabel?.textColor = .label
+//            }.onChange({ _ in
+//                self.sectionChanged = true
+//            })
+//            
+//            form +++
+//            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                               header: "Events",
+//                               footer: "Connect an event") {
+//                $0.tag = "Events"
+//                $0.hidden = "!$sections == 'Events'"
+//                $0.addButtonProvider = { section in
+//                    return ButtonRow("scheduleButton"){
+//                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                        $0.title = "Connect Event"
+//                    }.cellUpdate { cell, row in
+//                        cell.backgroundColor = .secondarySystemGroupedBackground
+//                        cell.textLabel?.textAlignment = .left
+//                        cell.height = { 60 }
+//                    }
+//                }
+//                $0.multivaluedRowToInsertAt = { index in
+//                    self.eventIndex = index
+//                    self.openEvent()
+//                    return ScheduleRow("label"){ _ in
+//                        
+//                    }
+//                }
+//                
+//            }
+//            
+//            form +++
+//            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                               header: "Health",
+//                               footer: "Connect a workout and/or mindfulness session") {
+//                $0.tag = "Health"
+//                $0.hidden = "$sections != 'Health'"
+//                $0.addButtonProvider = { section in
+//                    return ButtonRow(){
+//                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                        $0.title = "Connect Health"
+//                    }.cellUpdate { cell, row in
+//                        cell.backgroundColor = .secondarySystemGroupedBackground
+//                        cell.textLabel?.textAlignment = .left
+//                        cell.height = { 60 }
+//                    }
+//                }
+//                $0.multivaluedRowToInsertAt = { index in
+//                    self.healthIndex = index
+//                    self.openHealth()
+//                    return HealthRow()
+//                        .onCellSelection() { cell, row in
+//                            self.healthIndex = index
+//                            self.openHealth()
+//                            cell.cellResignFirstResponder()
+//                        }
+//                    
+//                }
+//                
+//            }
+//            
+//            form +++
+//            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                               header: "Transactions",
+//                               footer: "Connect a transaction") {
+//                $0.tag = "Transactions"
+//                $0.hidden = "$sections != 'Transactions'"
+//                $0.addButtonProvider = { section in
+//                    return ButtonRow(){
+//                        $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                        $0.title = "Connect Transaction"
+//                    }.cellUpdate { cell, row in
+//                        cell.backgroundColor = .secondarySystemGroupedBackground
+//                        cell.textLabel?.textAlignment = .left
+//                        cell.height = { 60 }
+//                    }
+//                }
+//                $0.multivaluedRowToInsertAt = { index in
+//                    self.purchaseIndex = index
+//                    self.openPurchases()
+//                    return PurchaseRow()
+//                        .onCellSelection() { cell, row in
+//                            self.purchaseIndex = index
+//                            self.openPurchases()
+//                            cell.cellResignFirstResponder()
+//                        }
+//                    
+//                }
+//            }
+//        }
         
         //                                    form +++
         //                                        Section(header: "Balances",

@@ -127,12 +127,13 @@ class WorkoutActions: NSObject {
         if !active {
             Analytics.logEvent("new_workout", parameters: [String: Any]())
             dispatchGroup.enter()
-            if let containerID = workout.containerID {
-                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
-                dispatchGroup.leave()
-            } else {
-                connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
-            }
+//            if let containerID = workout.containerID {
+//                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+//                dispatchGroup.leave()
+//            } else {
+//                connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
+//            }
+            connectMembersToGroupWorkout(memberIDs: membersIDs.0, ID: ID)
         } else {
             Analytics.logEvent("update_workout", parameters: [String: Any]())
         }

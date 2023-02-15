@@ -27,7 +27,7 @@ extension MindfulnessViewController {
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.listRow()
+//            self.listRow()
         }
     }
     
@@ -204,9 +204,9 @@ extension MindfulnessViewController {
     func updateListsFirebase() {
         guard let container = container else { return }
         ContainerFunctions.updateContainerAndStuffInside(container: container)
-        if active {
-            ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
-        }
+//        if active {
+//            ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+//        }
     }
     
     func sortSchedule() {

@@ -211,7 +211,7 @@ extension EventViewController {
             }
         }
         dispatchGroup.notify(queue: .main) {
-            self.listRow()
+//            self.listRow()
 //            self.decimalRowFunc()
 //            self.purchaseBreakdown()
         }
@@ -424,9 +424,9 @@ extension EventViewController {
         // container
         if let container = container {
             ContainerFunctions.updateContainerAndStuffInside(container: container)
-            if active {
-                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
-            }
+//            if active {
+//                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+//            }
         }
         
         //lists

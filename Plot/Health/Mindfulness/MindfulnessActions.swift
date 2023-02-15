@@ -127,12 +127,13 @@ class MindfulnessActions: NSObject {
         if !active {
             Analytics.logEvent("new_mindfulness", parameters: [String: Any]())
             dispatchGroup.enter()
-            if let containerID = mindfulness.containerID {
-                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
-                dispatchGroup.leave()
-            } else {
-                connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
-            }
+//            if let containerID = mindfulness.containerID {
+//                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+//                dispatchGroup.leave()
+//            } else {
+//                connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
+//            }
+            connectMembersToGroupMindfulness(memberIDs: membersIDs.0, ID: ID)
         } else {
             
             Analytics.logEvent("update_mindfulness", parameters: [String: Any]())

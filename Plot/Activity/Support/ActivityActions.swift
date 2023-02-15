@@ -256,17 +256,24 @@ class ActivityActions: NSObject {
         self.dispatchGroup.enter()
         
         createGroupActivityNode(reference: groupActivityReference, childValues: firebaseDictionary)
-        if let containerID = activity.containerID {
-            ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
-            self.dispatchGroup.leave()
-        } else {
-            connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
-            self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
-                if !(activity.isTask ?? false) {
-                    InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {}
-                }
-            })
-        }
+//        if let containerID = activity.containerID {
+//            ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+//            self.dispatchGroup.leave()
+//        } else {
+//            connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
+//            self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+//                if !(activity.isTask ?? false) {
+//                    InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {}
+//                }
+//            })
+//        }
+        
+        connectMembersToGroupActivity(memberIDs: membersIDs.0, activityID: activityID)
+        self.dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            if !(activity.isTask ?? false) {
+                InvitationsFetcher.updateInvitations(forActivity: activity, selectedParticipants: selectedFalconUsers) {}
+            }
+        })
                 
         if activity.isTask ?? false {
             if let source = activity.listSource, source == ListSourceOptions.plot.name, let listID = activity.listID {

@@ -546,100 +546,100 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
             }
         }
         
-        if delegate == nil && (!active || ((workout?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || workout?.admin == Auth.auth().currentUser?.uid))) {
-            form.last!
-            <<< SegmentedRow<String>("sections"){
-                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                    $0.options = ["Tasks", "Events", "Transactions"]
-                    $0.value = "Tasks"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = .secondarySystemGroupedBackground
-                        cell.textLabel?.textColor = .label
-                    }.onChange({ _ in
-                        self.sectionChanged = true
-                    })
-            
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Tasks",
-                                   footer: "Connect an task") {
-                                    $0.tag = "Tasks"
-                                    $0.hidden = "!$sections == 'Tasks'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow("taskButton"){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.title = "Connect Task"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                            }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.taskIndex = index
-                                        self.openTask()
-                                        return SubtaskRow("label"){ _ in
-                                            
-                                        }
-                                    }
-
-                                }
-
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Events",
-                                   footer: "Connect an event") {
-                                    $0.tag = "Events"
-                                    $0.hidden = "!$sections == 'Events'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow("scheduleButton"){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.title = "Connect Event"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                            }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.eventIndex = index
-                                        self.openEvent()
-                                        return ScheduleRow("label"){ _ in
-                                            
-                                        }
-                                    }
-
-                }
-
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Transactions",
-                                   footer: "Connect a transaction") {
-                                    $0.tag = "Transactions"
-                                    $0.hidden = "$sections != 'Transactions'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow("transactionButton"){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.title = "Connect Transaction"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                        }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.purchaseIndex = index
-                                        self.openPurchases()
-                                        return PurchaseRow()
-                                            .onCellSelection() { cell, row in
-                                                self.purchaseIndex = index
-                                                self.openPurchases()
-                                                cell.cellResignFirstResponder()
-                                        }
-
-                                    }
-                }
-        }
+//        if delegate == nil && (!active || ((workout?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || workout?.admin == Auth.auth().currentUser?.uid))) {
+//            form.last!
+//            <<< SegmentedRow<String>("sections"){
+//                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                    $0.options = ["Tasks", "Events", "Transactions"]
+//                    $0.value = "Tasks"
+//                    }.cellUpdate { cell, row in
+//                        cell.backgroundColor = .secondarySystemGroupedBackground
+//                        cell.textLabel?.textColor = .label
+//                    }.onChange({ _ in
+//                        self.sectionChanged = true
+//                    })
+//            
+//            form +++
+//                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                                   header: "Tasks",
+//                                   footer: "Connect an task") {
+//                                    $0.tag = "Tasks"
+//                                    $0.hidden = "!$sections == 'Tasks'"
+//                                    $0.addButtonProvider = { section in
+//                                        return ButtonRow("taskButton"){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.title = "Connect Task"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textLabel?.textAlignment = .left
+//                                                cell.height = { 60 }
+//                                            }
+//                                    }
+//                                    $0.multivaluedRowToInsertAt = { index in
+//                                        self.taskIndex = index
+//                                        self.openTask()
+//                                        return SubtaskRow("label"){ _ in
+//                                            
+//                                        }
+//                                    }
+//
+//                                }
+//
+//            form +++
+//                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                                   header: "Events",
+//                                   footer: "Connect an event") {
+//                                    $0.tag = "Events"
+//                                    $0.hidden = "!$sections == 'Events'"
+//                                    $0.addButtonProvider = { section in
+//                                        return ButtonRow("scheduleButton"){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.title = "Connect Event"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textLabel?.textAlignment = .left
+//                                                cell.height = { 60 }
+//                                            }
+//                                    }
+//                                    $0.multivaluedRowToInsertAt = { index in
+//                                        self.eventIndex = index
+//                                        self.openEvent()
+//                                        return ScheduleRow("label"){ _ in
+//                                            
+//                                        }
+//                                    }
+//
+//                }
+//
+//            form +++
+//                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                                   header: "Transactions",
+//                                   footer: "Connect a transaction") {
+//                                    $0.tag = "Transactions"
+//                                    $0.hidden = "$sections != 'Transactions'"
+//                                    $0.addButtonProvider = { section in
+//                                        return ButtonRow("transactionButton"){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.title = "Connect Transaction"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textLabel?.textAlignment = .left
+//                                                cell.height = { 60 }
+//                                        }
+//                                    }
+//                                    $0.multivaluedRowToInsertAt = { index in
+//                                        self.purchaseIndex = index
+//                                        self.openPurchases()
+//                                        return PurchaseRow()
+//                                            .onCellSelection() { cell, row in
+//                                                self.purchaseIndex = index
+//                                                self.openPurchases()
+//                                                cell.cellResignFirstResponder()
+//                                        }
+//
+//                                    }
+//                }
+//        }
     }
     
     fileprivate func updateLength() {
@@ -811,12 +811,14 @@ extension WorkoutViewController: UpdateInvitees {
             
             if active {
                 showActivityIndicator()
-                if let container = container {
-                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
-                } else {
-                    let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
-                    createWorkout.updateWorkoutParticipants()
-                }
+//                if let container = container {
+//                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+//                } else {
+//                    let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
+//                    createWorkout.updateWorkoutParticipants()
+//                }
+                let createWorkout = WorkoutActions(workout: workout, active: active, selectedFalconUsers: selectedFalconUsers)
+                createWorkout.updateWorkoutParticipants()
                 hideActivityIndicator()
             }
             

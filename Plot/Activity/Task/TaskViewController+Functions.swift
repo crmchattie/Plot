@@ -147,7 +147,7 @@ extension TaskViewController {
             }
         }
         dispatchGroup.notify(queue: .main) {
-            self.listRow()
+//            self.listRow()
 //                self.decimalRowFunc()
 //                self.purchaseBreakdown()
         }
@@ -171,7 +171,7 @@ extension TaskViewController {
                     cell.cellResignFirstResponder()
                 }, at: mvs.count - 1)
             }
-            
+
             for health in healthList {
                 var mvs = (form.sectionBy(tag: "Health") as! MultivaluedSection)
                 mvs.insert(HealthRow() {
@@ -182,7 +182,7 @@ extension TaskViewController {
                         cell.cellResignFirstResponder()
                 }, at: mvs.count - 1)
             }
-            
+
             for purchase in purchaseList {
                 var mvs = (form.sectionBy(tag: "Transactions") as! MultivaluedSection)
                 mvs.insert(PurchaseRow() {
@@ -192,7 +192,7 @@ extension TaskViewController {
                     self.openPurchases()
                     cell.cellResignFirstResponder()
                 }, at: mvs.count - 1)
-                
+
             }
         }
     }
@@ -313,9 +313,9 @@ extension TaskViewController {
         //container
         if let container = container {
             ContainerFunctions.updateContainerAndStuffInside(container: container)
-            if active {
-                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
-            }
+//            if active {
+//                ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+//            }
         }
         
         //lists

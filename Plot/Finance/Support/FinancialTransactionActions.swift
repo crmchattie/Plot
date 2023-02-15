@@ -98,12 +98,13 @@ class TransactionActions: NSObject {
                 "connected_to_activity": transaction.activityID ?? "none" as NSObject
             ])
             dispatchGroup.enter()
-            if let containerID = transaction.containerID {
-                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
-                dispatchGroup.leave()
-            } else {
-                connectMembersToGroupTransaction(memberIDs: membersIDs.0, ID: ID)
-            }
+//            if let containerID = transaction.containerID {
+//                ContainerFunctions.updateParticipants(containerID: containerID, selectedFalconUsers: selectedFalconUsers)
+//                dispatchGroup.leave()
+//            } else {
+//                connectMembersToGroupTransaction(memberIDs: membersIDs.0, ID: ID)
+//            }
+            connectMembersToGroupTransaction(memberIDs: membersIDs.0, ID: ID)
         } else {
             Analytics.logEvent("update_transaction", parameters: [
                 "connected_to_activity": transaction.activityID ?? "none" as NSObject

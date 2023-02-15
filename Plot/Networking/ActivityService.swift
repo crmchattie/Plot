@@ -53,7 +53,7 @@ class ActivityService {
                 self.events = activitiesWithRepeats.filter { $0.isTask == nil }
                 self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
                 self.goals = activitiesWithRepeats.filter { $0.isGoal ?? false }
-                self.calendarActivities = activitiesWithRepeats.filter { $0.finalDateForDisplay != nil }
+                self.calendarActivities = activitiesWithRepeats.filter { $0.finalDateForDisplay != nil && !($0.isGoal ?? false) }
             }
         }
     }

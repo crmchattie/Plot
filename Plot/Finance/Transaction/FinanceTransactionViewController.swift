@@ -608,101 +608,101 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
 //            }
 //        }
         
-        if delegate == nil && status && (!active || ((transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || transaction?.admin == Auth.auth().currentUser?.uid))) {
-            form.last!
-            <<< SegmentedRow<String>("sections"){
-                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                    $0.options = ["Tasks", "Events", "Health"]
-                    $0.value = "Tasks"
-                    }.cellUpdate { cell, row in
-                        cell.backgroundColor = .secondarySystemGroupedBackground
-                        cell.textLabel?.textColor = .label
-                    }.onChange({ _ in
-                        self.sectionChanged = true
-                    })
-            
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Tasks",
-                                   footer: "Connect an task") {
-                                    $0.tag = "Tasks"
-                                    $0.hidden = "!$sections == 'Tasks'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow("taskButton"){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.title = "Connect Task"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                            }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.taskIndex = index
-                                        self.openTask()
-                                        return SubtaskRow("label"){ _ in
-                                            
-                                        }
-                                    }
-
-                                }
-
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Events",
-                                   footer: "Connect an event") {
-                                    $0.tag = "Events"
-                                    $0.hidden = "!$sections == 'Events'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow("scheduleButton"){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.title = "Connect Event"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                            }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.eventIndex = index
-                                        self.openEvent()
-                                        return ScheduleRow("label"){ _ in
-                                            
-                                        }
-                                    }
-
-                                }
-
-            form +++
-                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                                   header: "Health",
-                                   footer: "Connect a workout and/or mindfulness session") {
-                                    $0.tag = "Health"
-                                    $0.hidden = "$sections != 'Health'"
-                                    $0.addButtonProvider = { section in
-                                        return ButtonRow(){
-                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                                            $0.title = "Connect Health"
-                                            }.cellUpdate { cell, row in
-                                                cell.backgroundColor = .secondarySystemGroupedBackground
-                                                cell.textLabel?.textAlignment = .left
-                                                cell.height = { 60 }
-                                            }
-                                    }
-                                    $0.multivaluedRowToInsertAt = { index in
-                                        self.healthIndex = index
-                                        self.openHealth()
-                                        return HealthRow()
-                                            .onCellSelection() { cell, row in
-                                                self.healthIndex = index
-                                                self.openHealth()
-                                                cell.cellResignFirstResponder()
-                                        }
-
-                                    }
-
-            }
-        }
+//        if delegate == nil && status && (!active || ((transaction?.participantsIDs?.contains(Auth.auth().currentUser?.uid ?? "") ?? false || transaction?.admin == Auth.auth().currentUser?.uid))) {
+//            form.last!
+//            <<< SegmentedRow<String>("sections"){
+//                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                    $0.options = ["Tasks", "Events", "Health"]
+//                    $0.value = "Tasks"
+//                    }.cellUpdate { cell, row in
+//                        cell.backgroundColor = .secondarySystemGroupedBackground
+//                        cell.textLabel?.textColor = .label
+//                    }.onChange({ _ in
+//                        self.sectionChanged = true
+//                    })
+//            
+//            form +++
+//                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                                   header: "Tasks",
+//                                   footer: "Connect an task") {
+//                                    $0.tag = "Tasks"
+//                                    $0.hidden = "!$sections == 'Tasks'"
+//                                    $0.addButtonProvider = { section in
+//                                        return ButtonRow("taskButton"){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.title = "Connect Task"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textLabel?.textAlignment = .left
+//                                                cell.height = { 60 }
+//                                            }
+//                                    }
+//                                    $0.multivaluedRowToInsertAt = { index in
+//                                        self.taskIndex = index
+//                                        self.openTask()
+//                                        return SubtaskRow("label"){ _ in
+//                                            
+//                                        }
+//                                    }
+//
+//                                }
+//
+//            form +++
+//                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                                   header: "Events",
+//                                   footer: "Connect an event") {
+//                                    $0.tag = "Events"
+//                                    $0.hidden = "!$sections == 'Events'"
+//                                    $0.addButtonProvider = { section in
+//                                        return ButtonRow("scheduleButton"){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.title = "Connect Event"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textLabel?.textAlignment = .left
+//                                                cell.height = { 60 }
+//                                            }
+//                                    }
+//                                    $0.multivaluedRowToInsertAt = { index in
+//                                        self.eventIndex = index
+//                                        self.openEvent()
+//                                        return ScheduleRow("label"){ _ in
+//                                            
+//                                        }
+//                                    }
+//
+//                                }
+//
+//            form +++
+//                MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+//                                   header: "Health",
+//                                   footer: "Connect a workout and/or mindfulness session") {
+//                                    $0.tag = "Health"
+//                                    $0.hidden = "$sections != 'Health'"
+//                                    $0.addButtonProvider = { section in
+//                                        return ButtonRow(){
+//                                            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                                            $0.title = "Connect Health"
+//                                            }.cellUpdate { cell, row in
+//                                                cell.backgroundColor = .secondarySystemGroupedBackground
+//                                                cell.textLabel?.textAlignment = .left
+//                                                cell.height = { 60 }
+//                                            }
+//                                    }
+//                                    $0.multivaluedRowToInsertAt = { index in
+//                                        self.healthIndex = index
+//                                        self.openHealth()
+//                                        return HealthRow()
+//                                            .onCellSelection() { cell, row in
+//                                                self.healthIndex = index
+//                                                self.openHealth()
+//                                                cell.cellResignFirstResponder()
+//                                        }
+//
+//                                    }
+//
+//            }
+//        }
         
     }
     
@@ -917,12 +917,14 @@ extension FinanceTransactionViewController: UpdateInvitees {
             
             if active {
                 self.showActivityIndicator()
-                if let container = container {
-                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
-                } else {
-                    let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    createTransaction.updateTransactionParticipants()
-                }
+//                if let container = container {
+//                    ContainerFunctions.updateParticipants(containerID: container.id, selectedFalconUsers: selectedFalconUsers)
+//                } else {
+//                    let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+//                    createTransaction.updateTransactionParticipants()
+//                }
+                let createTransaction = TransactionActions(transaction: self.transaction, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                createTransaction.updateTransactionParticipants()
                 self.hideActivityIndicator()
             }
         }

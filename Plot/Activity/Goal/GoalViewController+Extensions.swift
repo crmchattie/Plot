@@ -356,9 +356,9 @@ extension GoalViewController: RecurrencePickerDelegate {
                 case .hourly, .minutely, .secondly:
                     break
                 }
-                self.task.startDateTime = NSNumber(value: Int((recurrenceRule.startDate).timeIntervalSince1970))
-                self.task.hasStartTime = false
-                self.task.hasDeadlineTime = false
+                task.startDateTime = NSNumber(value: Int((recurrenceRule.startDate).timeIntervalSince1970))
+                task.hasStartTime = false
+                task.hasDeadlineTime = false
                 task.recurrences = [recurrenceRule.toRRuleString()]
                 let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: task.endDate ?? Date())
                 row.value = rowText
