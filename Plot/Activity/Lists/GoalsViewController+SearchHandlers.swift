@@ -13,7 +13,7 @@ extension GoalsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
     func updateSearchResults(for searchController: UISearchController) {}
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        tableView.tableHeaderView = nil
+        activityView.tableView.tableHeaderView = nil
         searchBar.setShowsCancelButton(false, animated: true)
         searchBar.resignFirstResponder()
         sortandreload()
@@ -32,7 +32,7 @@ extension GoalsViewController: UISearchBarDelegate, UISearchControllerDelegate, 
                 }
                 return ("").lowercased().contains(searchText.lowercased())
             })
-            tableView.reloadData()
+            activityView.tableView.reloadData()
         }
     }
     

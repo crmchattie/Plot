@@ -11,6 +11,8 @@ import FSCalendar
 
 let kCalendarScope = "CalendarScope"
 let kCalendarView = "CalendarView"
+let kGoalsScope = "GoalsScope"
+let kGoalsView = "GoalView"
 
 enum CalendarViewFilter: String {
     case list

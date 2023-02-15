@@ -519,7 +519,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         
         if metricsSections.contains(.workouts) {
             healthMetricSections.append(.workouts)
-            var filteredWorkouts = networkController.healthService.workouts
+            let filteredWorkouts = networkController.healthService.workouts
             if filteredWorkouts.count < 3 {
                 healthMetrics[.workouts] = filteredWorkouts
             } else {
@@ -532,7 +532,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         }
         if let generalMetrics = metrics[.general], generalMetrics.contains(where: {$0.type == HealthMetricType.mindfulness }) {
             healthMetricSections.append(.mindfulness)
-            var filteredMindfulness = networkController.healthService.mindfulnesses
+            let filteredMindfulness = networkController.healthService.mindfulnesses
             if filteredMindfulness.count < 3 {
                 healthMetrics[.mindfulness] = filteredMindfulness
             } else {

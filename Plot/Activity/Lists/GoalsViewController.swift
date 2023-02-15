@@ -9,12 +9,13 @@
 import UIKit
 import Firebase
 import GoogleSignIn
+import FSCalendar
 
 let kShowCompletedGoals = "showCompletedGoals"
 let kShowRecurringGoals = "showRecurringGoals"
 let kGoalSort = "goalSort"
 
-class GoalsViewController: UIViewController, ObjectDetailShowing {
+class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecognizerDelegate {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -25,9 +26,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-            
-    let tableView = UITableView(frame: .zero, style: .insetGrouped)
-    
+                
     let headerCellID = "headerCellID"
     let listCellID = "listCellID"
     
@@ -57,14 +56,48 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
     var showCompletedGoals: Bool = true
     var showRecurringGoals: Bool = true
     var goalSort: String = "Due Date"
-    var filters: [filter] = [.search, .taskSort, .showCompletedGoals, .showRecurringGoals, .goalCategory]
+    var filters: [filter] = [.search, .showCompletedGoals, .goalCategory]
     var filterDictionary = [String: [String]]()
     
     let refreshControl = UIRefreshControl()
     
+    let activityView = CalendarView()
+    
+    var calendarViewFilter: CalendarViewFilter = .list
+    
+    var selectedDate = Date()
+    
+    var activityDates = [String: Int]()
+    
+    fileprivate lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd"
+        return formatter
+    }()
+    
+    let selectedDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter
+    }()
+    
+    fileprivate lazy var scopeGesture: UIPanGestureRecognizer = {
+        [unowned self] in
+        let panGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)))
+        panGesture.delegate = self
+        panGesture.minimumNumberOfTouches = 1
+        panGesture.maximumNumberOfTouches = 2
+        return panGesture
+    }()
+    
+    var canTransitionToLarge = false
+    var canTransitionToSmall = true
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
+        compileActivityDates(activities: networkGoals)
         setupMainView()
         setupTableView()
         addObservers()
@@ -85,7 +118,6 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(goalsUpdated), name: .goalsUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
 
     }
     
@@ -93,8 +125,25 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
         sortandreload()
     }
     
-    @objc fileprivate func listsUpdated() {
-        sortandreload()
+    fileprivate func applyCalendarTheme() {
+        activityView.calendar.backgroundColor = .systemGroupedBackground
+        activityView.calendar.appearance.weekdayTextColor = .label
+        activityView.calendar.appearance.headerTitleColor = .label
+        activityView.calendar.appearance.eventDefaultColor = FalconPalette.defaultBlue
+        activityView.calendar.appearance.eventSelectionColor = FalconPalette.defaultBlue
+        activityView.calendar.appearance.titleDefaultColor = .label
+        activityView.calendar.appearance.titleSelectionColor = .systemGroupedBackground
+        activityView.calendar.appearance.selectionColor = .label
+        activityView.calendar.appearance.todayColor = FalconPalette.defaultBlue
+        activityView.calendar.appearance.todaySelectionColor = FalconPalette.defaultBlue
+        activityView.arrowButton.tintColor = .label
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        guard activityView.tableView.isEditing else { return }
+        activityView.tableView.endEditing(true)
+        activityView.tableView.reloadData()
     }
     
     fileprivate func setupMainView() {
@@ -102,50 +151,71 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         extendedLayoutIncludesOpaqueBars = true
-        
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = "Goals"
         view.backgroundColor = .systemGroupedBackground
+        edgesForExtendedLayout = UIRectEdge.top
         
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
         
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
-        tableView.refreshControl = refreshControl
+        activityView.tableView.refreshControl = refreshControl
+        
+        let dateString = selectedDateFormatter.string(from: selectedDate)
+        title = dateString
+                
     }
     
     fileprivate func setupTableView() {
         
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        view.addSubview(activityView)
         
-        if #available(iOS 11.0, *) {
-            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
-            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-        } else {
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-        }
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.indicatorStyle = .default
-        tableView.register(TableViewHeader.self,
+        activityView.translatesAutoresizingMaskIntoConstraints = false
+        activityView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        activityView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        activityView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        activityView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        activityView.arrowButton.addTarget(self, action: #selector(arrowButtonTapped), for: .touchUpInside)
+        
+        activityView.tableView.separatorStyle = .none
+        
+        activityView.addGestureRecognizer(self.scopeGesture)
+        
+        activityView.calendar.dataSource = self
+        activityView.calendar.delegate = self
+        activityView.calendar.select(Date().localTime)
+        activityView.calendar.register(FSCalendarCell.self, forCellReuseIdentifier: "cell")
+        activityView.calendar.scope = getCalendarScope()
+        activityView.calendar.swipeToChooseGesture.isEnabled = true // Swipe-To-Choose
+        activityView.calendar.calendarHeaderView.isHidden = true
+        activityView.calendar.headerHeight = 0
+        activityView.calendar.appearance.headerMinimumDissolvedAlpha = 0.0
+        
+        let scopeGesture = UIPanGestureRecognizer(target: activityView.calendar, action: #selector(activityView.calendar.handleScopeGesture(_:)));
+        activityView.calendar.addGestureRecognizer(scopeGesture)
+        
+        calendarViewFilter = getCalendarView()
+        
+        activityView.tableView.dataSource = self
+        activityView.tableView.delegate = self
+        activityView.tableView.register(TableViewHeader.self,
                            forHeaderFooterViewReuseIdentifier: headerCellID)
-        tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
-        tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
+        activityView.tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
+        activityView.tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
+        activityView.tableView.allowsMultipleSelectionDuringEditing = false
+        activityView.tableView.indicatorStyle = .default
+        activityView.tableView.backgroundColor = view.backgroundColor
+        activityView.tableView.rowHeight = UITableView.automaticDimension
         
-        tableView.backgroundColor = .systemGroupedBackground
-        tableView.separatorStyle = .none
-        tableView.keyboardDismissMode = .onDrag
+        // apply theme
+        applyCalendarTheme()
         
     }
     
     func setupSearchController() {
-        tableView.setContentOffset(.zero, animated: false)
+        activityView.tableView.setContentOffset(.zero, animated: false)
         searchBar = UISearchBar()
         searchBar?.delegate = self
         searchBar?.placeholder = "Search"
@@ -153,23 +223,62 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
         searchBar?.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         searchBar?.becomeFirstResponder()
         searchBar?.showsCancelButton = true
-        tableView.tableHeaderView = searchBar
+        activityView.tableView.tableHeaderView = searchBar
     }
     
     func checkIfThereAreAnyResults(isEmpty: Bool) {
         guard isEmpty else {
-            viewPlaceholder.remove(from: tableView, priority: .medium)
+            viewPlaceholder.remove(from: activityView.tableView, priority: .medium)
             return
         }
-        viewPlaceholder.add(for: tableView, title: .emptyGoals, subtitle: .emptyTasksEvents, priority: .medium, position: .top)
+        viewPlaceholder.add(for: activityView.tableView, title: .emptyGoals, subtitle: .emptyTasksEvents, priority: .medium, position: .top)
     }
     
     @objc func refreshControlAction(_ refreshControl: UIRefreshControl) {
-        networkController.activityService.regrabLists {
+        networkController.checkGoalsForCompletion {
             DispatchQueue.main.async {
                 self.sortandreload()
                 self.refreshControl.endRefreshing()
             }
+        }
+    }
+    
+    @objc fileprivate func arrowButtonTapped() {
+        if activityView.calendar.scope == .month {
+            weekView()
+        } else {
+            monthView()
+        }
+    }
+    
+    @objc fileprivate func monthView() {
+        activityView.calendar.setScope(.month, animated: true)
+        if activityView.calendar.isHidden {
+            activityView.calendar.isHidden = false
+            UIView.animate(withDuration: 0.25, animations:{
+                self.activityView.calendarHeightConstraint?.constant = 300
+                self.activityView.layoutIfNeeded()
+            })
+        }
+    }
+    
+    @objc fileprivate func weekView() {
+        activityView.calendar.setScope(.week, animated: true)
+        if activityView.calendar.isHidden {
+            activityView.calendar.isHidden = false
+            UIView.animate(withDuration: 0.25, animations:{
+                self.activityView.calendarHeightConstraint?.constant = 112
+                self.activityView.layoutIfNeeded()
+            })
+        }
+    }
+    
+    @objc fileprivate func listView() {
+        UIView.animate(withDuration: 0.35, animations: {
+            self.activityView.calendarHeightConstraint?.constant = 0
+            self.activityView.layoutIfNeeded()
+        }) { result in
+            self.activityView.calendar.isHidden = true
         }
     }
     
@@ -181,7 +290,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
         
         if showRecurringGoals {
             goals = networkGoals.filter({
-                if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
+                if $0.goalEndDate >= selectedDate, $0.goalStartDate <= selectedDate {
                     return true
                 }
                 return false
@@ -190,73 +299,16 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
             goals = []
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                    if goal.goalEndDate >= Date(), goal.goalStartDate <= Date() {
+                    if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
+                        print(goal.name)
+                        print(goal.goalStartDate)
+                        print(goal.goalEndDate)
+                        print(selectedDate.startOfDay)
+                        print(selectedDate.endOfDay)
                         goals.append(goal)
                     }
                 }
             }
-        }
-        
-        var listOfLists = [ListType]()
-        
-        let flaggedGoals = goals.filter {
-            if $0.flagged ?? false {
-                return true
-            }
-            return false
-        }
-        if !flaggedGoals.isEmpty {
-            let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
-            goalList[flaggedList] = flaggedGoals
-            listOfLists.insert(flaggedList, at: 0)
-        }
-        
-        let scheduledGoals = goals.filter {
-            if let _ = $0.endDate {
-                return true
-            }
-            return false
-        }
-        if !scheduledGoals.isEmpty {
-            let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
-            goalList[scheduledList] = scheduledGoals
-            listOfLists.insert(scheduledList, at: 0)
-        }
-        
-        let dailyGoals = goals.filter {
-            if let endDate = $0.endDate {
-                return NSCalendar.current.isDateInToday(endDate)
-            }
-            return false
-        }
-        if !dailyGoals.isEmpty {
-            let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
-            goalList[dailyList] = dailyGoals
-            listOfLists.insert(dailyList, at: 0)
-        }
-        
-        if !listOfLists.isEmpty {
-            sections.append(.presetLists)
-            lists[.presetLists, default: []].append(contentsOf: listOfLists)
-        }
-        
-        listOfLists = []
-        
-        for (id, list) in networkController.activityService.listIDs {
-            let currentGoalList = goals.filter { $0.listID == id }
-            if !currentGoalList.isEmpty {
-                listOfLists.append(list)
-                goalList[list] = currentGoalList
-            }
-        }
-        
-        if !listOfLists.isEmpty {
-            if sections.count > 0 {
-                sections.insert(.myLists, at: 1)
-            } else {
-                sections.append(.myLists)
-            }
-            lists[.myLists, default: []].append(contentsOf: listOfLists.sorted(by: {$0.name ?? "" < $1.name ?? "" }))
         }
         
         if !showCompletedGoals {
@@ -265,14 +317,23 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
             filteredGoals = goals
         }
         
+        if let value = filterDictionary["search"] {
+            let searchText = value[0]
+            filteredGoals = filteredGoals.filter({ (task) -> Bool in
+                if let name = task.name {
+                    return name.lowercased().contains(searchText.lowercased())
+                }
+                return ("").lowercased().contains(searchText.lowercased())
+            })
+        }
+        
         sortGoals()
         
         if !filteredGoals.isEmpty {
             sections.append(.goals)
         }
                 
-        filteredLists = lists
-        tableView.reloadData()
+        activityView.tableView.reloadData()
     }
     
     func openList(list: ListType) {
@@ -282,23 +343,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func newItem() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Goal", style: .default, handler: { (_) in
-            self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "List", style: .default, handler: { (_) in
-            self.showListDetailPresent(list: nil, updateDiscoverDelegate: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-            print("User click Dismiss button")
-        }))
-        
-        self.present(alert, animated: true, completion: {
-            print("completion block")
-        })
+        self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
     }
     
     @objc fileprivate func filter() {
@@ -348,59 +393,118 @@ class GoalsViewController: UIViewController, ObjectDetailShowing {
     }
     
     func sortGoals() {
-        if goalSort == "Due Date" {
-            filteredGoals.sort { goal1, goal2 in
-                if !(goal1.isCompleted ?? false) && !(goal2.isCompleted ?? false) {
-                    if goal1.endDate ?? Date.distantFuture == goal2.endDate ?? Date.distantFuture {
-                        if goal1.priority == goal2.priority {
-                            return goal1.name ?? "" < goal2.name ?? ""
-                        }
-                        return TaskPriority(rawValue: goal1.priority ?? "None")! > TaskPriority(rawValue: goal2.priority ?? "None")!
-                    }
-                    return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
-                } else if goal1.isCompleted ?? false && goal2.isCompleted ?? false {
-                    if goal1.completedDate ?? 0 == goal2.completedDate ?? 0 {
-                        return goal1.name ?? "" < goal2.name ?? ""
-                    }
-                    return Int(truncating: goal1.completedDate ?? 0) > Int(truncating: goal2.completedDate ?? 0)
-                }
-                return !(goal1.isCompleted ?? false)
+        filteredGoals.sort { goal1, goal2 in
+            if goal1.goalEndDate == goal2.goalEndDate {
+                return goal1.name ?? "" < goal2.name ?? ""
             }
-        } else if goalSort == "Priority" {
-            filteredGoals.sort { goal1, goal2 in
-                if !(goal1.isCompleted ?? false) && !(goal2.isCompleted ?? false) {
-                    if goal1.priority == goal2.priority {
-                        if goal1.endDate ?? Date.distantFuture == goal2.endDate ?? Date.distantFuture {
-                            return goal1.name ?? "" < goal2.name ?? ""
-                        }
-                        return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
-                    }
-                    return TaskPriority(rawValue: goal1.priority ?? "None")! > TaskPriority(rawValue: goal2.priority ?? "None")!
-                } else if goal1.isCompleted ?? false && goal2.isCompleted ?? false {
-                    if goal1.completedDate ?? 0 == goal2.completedDate ?? 0 {
-                        return goal1.name ?? "" < goal2.name ?? ""
-                    }
-                    return Int(truncating: goal1.completedDate ?? 0) > Int(truncating: goal2.completedDate ?? 0)
-                }
-                return !(goal1.isCompleted ?? false)
+            return goal1.goalEndDate < goal2.goalEndDate
+        }
+    }
+}
+
+extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance {
+    // MARK:- UIGestureRecognizerDelegate
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let shouldBegin = self.activityView.tableView.contentOffset.y <= -self.activityView.tableView.contentInset.top
+        if shouldBegin {
+            let velocity = self.scopeGesture.velocity(in: self.activityView)
+            switch activityView.calendar.scope {
+            case .month:
+                return velocity.y <= 0
+            case .week:
+                return velocity.y > 0
+            @unknown default:
+                print("unknown default on calendar")
             }
-        } else if goalSort == "Title" {
-            filteredGoals.sort { goal1, goal2 in
-                if !(goal1.isCompleted ?? false) && !(goal2.isCompleted ?? false) {
-                    if goal1.name ?? "" == goal2.name ?? "" {
-                        if goal1.priority == goal2.priority {
-                            return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
-                        }
-                    }
-                    return goal1.name ?? "" < goal2.name ?? ""
-                } else if goal1.isCompleted ?? false && goal2.isCompleted ?? false {
-                    if goal1.completedDate ?? 0 == goal2.completedDate ?? 0 {
-                        return goal1.name ?? "" < goal2.name ?? ""
-                    }
-                    return Int(truncating: goal1.completedDate ?? 0) > Int(truncating: goal2.completedDate ?? 0)
-                }
-                return !(goal1.isCompleted ?? false)
+        }
+        activityView.layoutIfNeeded()
+        return shouldBegin
+    }
+    
+    // MARK: - UIScrollViewDelegate
+    func scrollViewDidScroll(_ scrollView: UIScrollView)
+    {
+        if canTransitionToLarge && scrollView.contentOffset.y <= 0 {
+            canTransitionToLarge = false
+            canTransitionToSmall = true
+        }
+        else if canTransitionToSmall && scrollView.contentOffset.y > 0 {
+            canTransitionToLarge = true
+            canTransitionToSmall = false
+        }
+        activityView.layoutIfNeeded()
+    }
+    
+    // MARK: - FSCalendarDelegate
+    func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
+        activityView.calendarHeightConstraint?.constant = bounds.height
+        activityView.updateArrowDirection(down: calendar.scope == .week)
+        activityView.layoutIfNeeded()
+        saveCalendarScope(scope: calendar.scope)
+    }
+    
+    func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        self.selectedDate = date
+        let dateString = selectedDateFormatter.string(from: self.selectedDate)
+        title = dateString
+        sortandreload()
+    }
+    
+    func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        self.selectedDate = calendar.currentPage
+        let dateString = selectedDateFormatter.string(from: self.selectedDate)
+        title = dateString
+        sortandreload()
+    }
+    
+    func saveCalendarScope(scope: FSCalendarScope) {
+        UserDefaults.standard.setValue(scope.rawValue, forKey: kGoalsScope)
+    }
+    
+    func getCalendarScope() -> FSCalendarScope {
+        if let value = UserDefaults.standard.value(forKey: kGoalsScope) as? UInt, let scope = FSCalendarScope(rawValue: value) {
+            return scope
+        } else {
+            return .week
+        }
+    }
+    
+    func saveCalendarView() {
+        UserDefaults.standard.setValue(calendarViewFilter.rawValue, forKey: kGoalsView)
+    }
+    
+    func getCalendarView() -> CalendarViewFilter {
+        if let value = UserDefaults.standard.value(forKey: kGoalsView) as? String, let view = CalendarViewFilter(rawValue: value) {
+            return view
+        } else {
+            return .list
+        }
+    }
+    
+    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        let dateString = dateFormatter.string(from: date)
+        if let value = activityDates[dateString] {
+            return value
+        }
+        return 0
+    }
+    
+    fileprivate func compileActivityDates(activities: [Activity]) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        let dispatchGroup = DispatchGroup()
+        for activity in activities {
+            dispatchGroup.enter()
+            dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
+            if let completedDate = activity.completedDateDate {
+                activityDates[dateFormatter.string(from: completedDate), default: 0] += 1
             }
+            dispatchGroup.leave()
+        }
+        dispatchGroup.notify(queue: .main) {
+            self.activityView.calendar.reloadData()
         }
     }
 }
@@ -416,19 +520,13 @@ extension GoalsViewController: UITableViewDataSource, UITableViewDelegate {
 //    }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier:
-                                                                headerCellID) as? TableViewHeader ?? TableViewHeader()
-        let section = sections[section]
-        header.backgroundColor = .systemGroupedBackground
-        header.titleLabel.text = section.name
-        header.subTitleLabel.isHidden = true
-        header.sectionType = section
-        return header
+        return UIView()
+        
 
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40
+        return 0
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -506,7 +604,7 @@ extension GoalsViewController: UpdateFilter {
                 let bool = value[0].lowercased()
                 if bool == "yes" {
                     goals = networkGoals.filter({
-                        if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
+                        if $0.goalEndDate >= selectedDate.startOfDay, $0.goalStartDate <= selectedDate.endOfDay {
                             return true
                         }
                         return false
@@ -516,7 +614,7 @@ extension GoalsViewController: UpdateFilter {
                     goals = []
                     for goal in networkGoals {
                         if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                            if goal.goalEndDate >= Date(), goal.goalStartDate <= Date() {
+                            if goal.goalEndDate >= selectedDate.startOfDay, goal.goalStartDate <= selectedDate.endOfDay {
                                 goals.append(goal)
                             }
                         }
@@ -565,8 +663,8 @@ extension GoalsViewController: UpdateFilter {
             
             dispatchGroup.notify(queue: .main) {
                 self.sortGoals()
-                self.tableView.reloadData()
-                self.tableView.layoutIfNeeded()
+                self.activityView.tableView.reloadData()
+                self.activityView.tableView.layoutIfNeeded()
                 self.saveUserDefaults()
             }
         }

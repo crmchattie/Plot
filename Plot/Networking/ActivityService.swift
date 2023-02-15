@@ -143,19 +143,11 @@ class ActivityService {
     var goals = [Activity]() {
         didSet {
             if oldValue != goals {
-                goals.sort { task1, task2 in
-                    if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
-                            return task1.name ?? "" < task2.name ?? ""
-                        }
-                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
-                    } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
-                        if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
-                            return task1.name ?? "" < task2.name ?? ""
-                        }
-                        return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                goals.sort { goal1, goal2 in
+                    if goal1.goalEndDate == goal2.goalEndDate {
+                        return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return !(task1.isCompleted ?? false)
+                    return goal1.goalEndDate < goal2.goalEndDate
                 }
                 NotificationCenter.default.post(name: .goalsUpdated, object: nil)
             }
@@ -165,19 +157,11 @@ class ActivityService {
     var goalsNoRepeats = [Activity]() {
         didSet {
             if oldValue != goalsNoRepeats {
-                goalsNoRepeats.sort { task1, task2 in
-                    if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
-                            return task1.name ?? "" < task2.name ?? ""
-                        }
-                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
-                    } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
-                        if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
-                            return task1.name ?? "" < task2.name ?? ""
-                        }
-                        return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                goalsNoRepeats.sort { goal1, goal2 in
+                    if goal1.goalEndDate == goal2.goalEndDate {
+                        return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return !(task1.isCompleted ?? false)
+                    return goal1.goalEndDate < goal2.goalEndDate
                 }
                 NotificationCenter.default.post(name: .goalsNoRepeatsUpdated, object: nil)
             }

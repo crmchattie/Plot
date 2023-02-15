@@ -755,7 +755,6 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func compileActivityDates(activities: [Activity]) {
-        activityDates = [String: Int]()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
         let dispatchGroup = DispatchGroup()
@@ -766,8 +765,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                 if activity.allDay ?? false && endDate.timeIntervalSince(startDate) < 86399 {
                     activityDates[dateFormatter.string(from: startDate), default: 0] += 1
                 } else {
-                    let dayDurationInSeconds: TimeInterval = 86399
-                    for activityDate in stride(from: startDate, to: endDate, by: dayDurationInSeconds) {
+                    for activityDate in stride(from: startDate, to: endDate, by: 86399) {
                         activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
                     }
                 }

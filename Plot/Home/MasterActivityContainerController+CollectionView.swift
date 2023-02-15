@@ -100,25 +100,31 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     }
                 } else if item == .health {
                     if !healthMetricSections.isEmpty {
-                        if updatingHealth {
-                            cell.spinnerView.startAnimating()
-                        } else {
+                        if healthMetricSections.count > 1 {
                             cell.spinnerView.stopAnimating()
+                            cell.subTitleLabel.isHidden = true
+                        } else {
+                            if updatingHealth {
+                                cell.spinnerView.startAnimating()
+                            } else {
+                                cell.spinnerView.stopAnimating()
+                            }
+                            cell.subTitleLabel.isHidden = false
                         }
-                        cell.subTitleLabel.isHidden = false
-                    } else {
-                        cell.subTitleLabel.isHidden = true
                     }
                 } else {
                     if !financeSections.isEmpty {
-                        if updatingFinances {
-                            cell.spinnerView.startAnimating()
-                        } else {
+                        if financeSections.count > 1 {
                             cell.spinnerView.stopAnimating()
+                            cell.subTitleLabel.isHidden = true
+                        } else {
+                            if updatingFinances {
+                                cell.spinnerView.startAnimating()
+                            } else {
+                                cell.spinnerView.stopAnimating()
+                            }
+                            cell.subTitleLabel.isHidden = false
                         }
-                        cell.subTitleLabel.isHidden = false
-                    } else {
-                        cell.subTitleLabel.isHidden = true
                     }
                 }
                 return cell
@@ -148,6 +154,12 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     } else {
                         cell.spinnerView.stopAnimating()
                     }
+                    cell.view.isUserInteractionEnabled = true
+                    cell.subTitleLabel.isHidden = false
+                } else if item == .cashFlow {
+                    cell.view.isUserInteractionEnabled = true
+                    cell.subTitleLabel.isHidden = false
+                } else if item == .balancesFinances {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
                 } else if item == .transactions, networkController.financeService.transactions.count > 3 {
@@ -358,6 +370,14 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         navigationController?.pushViewController(destination, animated: true)
                     } else if section == .calendar, !sortedEvents.isEmpty {
                         let destination = CalendarViewController(networkController: networkController)
+                        destination.hidesBottomBarWhenPushed = true
+                        navigationController?.pushViewController(destination, animated: true)
+                    } else if section == .cashFlow {
+                        let destination = FinanceViewController(networkController: networkController)
+                        destination.hidesBottomBarWhenPushed = true
+                        navigationController?.pushViewController(destination, animated: true)
+                    } else if section == .balancesFinances {
+                        let destination = FinanceViewController(networkController: networkController)
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
                     } else if section == .transactions, networkController.financeService.transactions.count > 3 {

@@ -123,8 +123,8 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void
     ) {
 
-        let startDate = range.startDate.startOfDay.dayBefore
-        let endDate = range.endDate
+        let startDate = range.startDate.startOfDay
+        let endDate = Date().localTime.dayAfter
         
         var finalStat = Statistic(date: startDate, value: 0)
                 
@@ -132,7 +132,7 @@ class FinanceDetailService: FinanceDetailServiceInterface {
             if let accountDetails = accountDetails, let accounts = accounts {
                 var accts = [MXAccount]()
                 for accountDetail in accountDetails {
-                    print("getStatisticalSamples")
+                    print("getStatisticalSamplesFinancialAccounts")
                     print(accountDetail.name)
                     print("startDate")
                     print(startDate)
@@ -149,8 +149,17 @@ class FinanceDetailService: FinanceDetailServiceInterface {
             } else if let transactionDetails = transactionDetails, let transactions = transactions {
                 var trans = [Transaction]()
                 for transactionDetail in transactionDetails {
+                    print("getStatisticalSamplesFinancialTransactions")
+                    print(transactionDetail.name)
+                    print("startDate")
+                    print(startDate)
+                    print("endDate")
+                    print(endDate)
+                    
                     transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: startDate, nextDate: endDate, accounts: filterAccounts) { stats, transactions in
                         for stat in stats {
+                            print(stat.date)
+                            print(stat.value)
                             finalStat.value += stat.value
                         }
                         trans.append(contentsOf: transactions)
