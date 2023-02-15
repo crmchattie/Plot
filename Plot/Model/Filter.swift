@@ -27,6 +27,8 @@ enum filter: String {
     case financeAccount, financeLevel, showPendingTransactions
     //task
     case taskCategory, showCompletedTasks, showRecurringTasks, taskSort
+    //goal
+    case goalCategory, showCompletedGoals, showRecurringGoals, goalSort
     
     var activity: String {
         switch self {
@@ -64,6 +66,10 @@ enum filter: String {
         case .showCompletedTasks: return "Tasks"
         case .showRecurringTasks: return "Tasks"
         case .taskSort: return "Tasks"
+        case .goalCategory: return "Goals"
+        case .showCompletedGoals: return "Goals"
+        case .showRecurringGoals: return "Goals"
+        case .goalSort: return "Goals"
         }
     }
     
@@ -103,6 +109,10 @@ enum filter: String {
         case .showCompletedTasks: return "single"
         case .showRecurringTasks: return "single"
         case .taskSort: return "single"
+        case .goalCategory: return "multiple"
+        case .showCompletedGoals: return "single"
+        case .showRecurringGoals: return "single"
+        case .goalSort: return "single"
         }
     }
     
@@ -138,6 +148,10 @@ enum filter: String {
         case .showCompletedTasks: return "Show"
         case .showRecurringTasks: return "Show"
         case .taskSort: return "Sort"
+        case .goalCategory: return "Categories"
+        case .showCompletedGoals: return "Show"
+        case .showRecurringGoals: return "Show"
+        case .goalSort: return "Sort"
         }
     }
     
@@ -173,6 +187,10 @@ enum filter: String {
         case .showCompletedTasks: return "Show Completed Tasks or Not"
         case .showRecurringTasks: return "Show Recurring Tasks or Not"
         case .taskSort: return "Sort Tasks"
+        case .goalCategory: return "Filter based on categories"
+        case .showCompletedGoals: return "Show Completed Goals or Not"
+        case .showRecurringGoals: return "Show Recurring Goals or Not"
+        case .goalSort: return "Sort Goals"
         }
     }
     
@@ -219,6 +237,10 @@ enum filter: String {
         case .financeLevel: return ["All", "Top"]
         case .showPendingTransactions: return ["Yes", "No"]
         case .taskSort: return ["Due Date", "Priority", "Title"]
+        case .goalCategory: return []
+        case .showCompletedGoals: return ["Yes", "No"]
+        case .showRecurringGoals: return ["Yes", "No"]
+        case .goalSort: return ["Due Date", "Priority", "Title"]
         }
     }
     

@@ -82,7 +82,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                             cell.spinnerView.stopAnimating()
                             cell.subTitleLabel.isHidden = true
                         } else {
-                            if updatingTasks && updatingEvents {
+                            if updatingTasks && updatingEvents && updatingGoals {
                                 cell.spinnerView.startAnimating()
                             } else {
                                 cell.spinnerView.stopAnimating()
@@ -118,7 +118,15 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kHeaderCell, for: indexPath) as! InterSectionHeader
                 cell.backgroundColor = .systemGroupedBackground
                 cell.titleLabel.text = item.name
-                if item == .tasks && activities[.tasks] != nil {
+                if item == .goals && activities[.goals] != nil {
+                    if updatingGoals {
+                        cell.spinnerView.startAnimating()
+                    } else {
+                        cell.spinnerView.stopAnimating()
+                    }
+                    cell.view.isUserInteractionEnabled = true
+                    cell.subTitleLabel.isHidden = false
+                } else if item == .tasks && activities[.tasks] != nil {
                     if updatingTasks {
                         cell.spinnerView.startAnimating()
                     } else {
@@ -303,7 +311,11 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 if section == .time || section == .health || section == .finances {
                     goToVC(section: section)
                 } else {
-                    if section == .tasks, !sortedTasks.isEmpty {
+                    if section == .goals, !sortedGoals.isEmpty {
+                        let destination = GoalsViewController(networkController: networkController)
+                        destination.hidesBottomBarWhenPushed = true
+                        navigationController?.pushViewController(destination, animated: true)
+                    } else if section == .tasks, !sortedTasks.isEmpty {
                         let destination = ListsViewController(networkController: networkController)
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)

@@ -59,10 +59,12 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var activities = [SectionType: [Activity]]()
     var sortedEvents = [Activity]()
     var sortedTasks = [Activity]()
+    var sortedGoals = [Activity]()
     var invitations: [String: Invitation] {
         return networkController.activityService.invitations
     }
     
+    var updatingGoals = true
     var updatingTasks = true
     var updatingEvents = true
     var updatingHealth = true
@@ -179,6 +181,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(goalsUpdated), name: .goalsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(calendarActivitiesUpdated), name: .calendarActivitiesUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
@@ -188,6 +191,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedCalendarEventActivities), name: .hasLoadedCalendarEventActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListTaskActivities), name: .hasLoadedListTaskActivities, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListGoalActivities), name: .hasLoadedListGoalActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedHealth), name: .hasLoadedHealth, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
     }
@@ -234,13 +238,39 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         }
     }
     
+    @objc fileprivate func goalsUpdated() {
+        scrollToFirstGoal({ (goals) in
+            if self.sortedGoals != goals {
+                self.sortedGoals = goals
+                if !goals.isEmpty {
+                    if self.activitiesSections.firstIndex(of: .goals) == nil {
+                        self.activitiesSections.insert(.goals, at: 0)
+                    }
+                    self.activities[.goals] = goals
+                } else {
+                    if let index = self.activitiesSections.firstIndex(of: .goals) {
+                        self.activitiesSections.remove(at: index)
+                    }
+                    self.activities[.goals] = nil
+                }
+                DispatchQueue.main.async {
+                    self.setupData()
+                }
+            }
+        })
+    }
+    
     @objc fileprivate func tasksUpdated() {
         scrollToFirstTask({ (tasks) in
             if self.sortedTasks != tasks {
                 self.sortedTasks = tasks
                 if !tasks.isEmpty {
                     if self.activitiesSections.firstIndex(of: .tasks) == nil {
-                        self.activitiesSections.insert(.tasks, at: 0)
+                        if let index = self.activitiesSections.firstIndex(of: .goals) {
+                            self.activitiesSections.insert(.tasks, at: index + 1)
+                        } else {
+                            self.activitiesSections.insert(.tasks, at: 0)
+                        }
                     }
                     self.activities[.tasks] = tasks
                 } else {
@@ -314,6 +344,13 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         }
     }
     
+    @objc fileprivate func hasLoadedListGoalActivities() {
+        self.updatingGoals = !networkController.hasLoadedListGoalActivities
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
     @objc fileprivate func hasLoadedCalendarEventActivities() {
         self.updatingEvents = !networkController.activityService.hasLoadedCalendarEventActivities
         DispatchQueue.main.async {
@@ -381,6 +418,32 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 self.navigationItemActivityIndicator.showActivityIndicator(for: self.navigationItem, with: .noInternet, activityPriority: .crazy, color: .label)
             }
         })
+    }
+    
+    func scrollToFirstGoal(_ completion: @escaping ([Activity]) -> Void) {
+        let allGoals = networkController.activityService.goals
+        let numberOfActivities = 3
+        if allGoals.count < numberOfActivities {
+            completion(allGoals)
+            return
+        } else {
+            var index = 0
+            var goals = [Activity]()
+            for goal in allGoals {
+                if index < numberOfActivities {
+                    //add check for goals; if deadline date is in the past, show next
+                    if !goals.contains(where: {$0.activityID == goal.activityID}) && !(goal.isCompleted ?? false) {
+                        if goal.goalEndDate >= Date(), goal.goalStartDate <= Date() {
+                            goals.append(goal)
+                            index += 1
+                        }
+                    }
+                } else {
+                    break
+                }
+            }
+            completion(goals)
+        }
     }
     
     func scrollToFirstTask(_ completion: @escaping ([Activity]) -> Void) {

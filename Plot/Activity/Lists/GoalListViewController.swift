@@ -1,15 +1,15 @@
 //
-//  ListViewController.swift
+//  GoalListViewController.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/23/22.
-//  Copyright © 2022 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 2/15/23.
+//  Copyright © 2023 Immature Creations. All rights reserved.
 //
 
 import UIKit
 import Firebase
 
-class ListViewController: UIViewController, ObjectDetailShowing {
+class GoalListViewController: UIViewController, ObjectDetailShowing {
     var networkController: NetworkController
     
     init(networkController: NetworkController) {
@@ -26,11 +26,11 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     let newTaskCellID = "newTaskCellID"
     
     var list: ListType!
-    var networkTasks: [Activity] {
-        return networkController.activityService.tasks
+    var networkGoals: [Activity] {
+        return networkController.activityService.goals
     }
-    var tasks = [Activity]()
-    var filteredTasks = [Activity]()
+    var goals = [Activity]()
+    var filteredGoals = [Activity]()
 
     lazy var users: [User] = networkController.userService.users
     lazy var filteredUsers: [User] = networkController.userService.users
@@ -43,10 +43,10 @@ class ListViewController: UIViewController, ObjectDetailShowing {
             
     var participants: [String: [User]] = [:]
     
-    var showCompletedTasks: Bool = true
-    var showRecurringTasks: Bool = true
-    var taskSort: String = "Due Date"
-    var filters: [filter] = [.search, .taskSort, .showCompletedTasks, .showRecurringTasks, .taskCategory]
+    var showCompletedGoals: Bool = true
+    var showRecurringGoals: Bool = true
+    var goalSort: String = "Due Date"
+    var filters: [filter] = [.search, .goalSort, .showCompletedGoals, .showRecurringGoals, .goalCategory]
     var filterDictionary = [String: [String]]()
     
     override func viewDidLoad() {
@@ -54,9 +54,9 @@ class ListViewController: UIViewController, ObjectDetailShowing {
                 
         view.backgroundColor = .systemBackground
         
-        showRecurringTasks = getShowRecurringTasksBool()
-        showCompletedTasks = getShowCompletedTasksBool()
-        taskSort = getSortTasks()
+        showRecurringGoals = getShowRecurringGoalsBool()
+        showCompletedGoals = getShowCompletedGoalsBool()
+        goalSort = getSortGoals()
         
         setupMainView()
         setupTableView()
@@ -70,22 +70,29 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(goalsUpdated), name: .goalsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
     }
     
-    @objc fileprivate func tasksUpdated() {
+    @objc fileprivate func goalsUpdated() {
         sortandreload()
     }
     
     func sortandreload() {
-        if showRecurringTasks {
-            tasks = networkTasks
+        if showRecurringGoals {
+            goals = networkGoals.filter({
+                if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
+                    return true
+                }
+                return false
+            })
         } else {
-            tasks = []
-            for task in networkTasks {
-                if !tasks.contains(where: {$0.activityID == task.activityID}) {
-                    tasks.append(task)
+            goals = []
+            for goal in networkGoals {
+                if !goals.contains(where: {$0.activityID == goal.activityID}) {
+                    if goal.goalEndDate >= Date(), goal.goalStartDate <= Date() {
+                        goals.append(goal)
+                    }
                 }
             }
         }
@@ -94,46 +101,46 @@ class ListViewController: UIViewController, ObjectDetailShowing {
         case .allList:
             break
         case .flaggedList:
-            let flaggedTasks = tasks.filter {
+            let flaggedGoals = goals.filter {
                 if $0.flagged ?? false {
                     return true
                 }
                 return false
             }
-            filteredTasks = flaggedTasks
+            filteredGoals = flaggedGoals
         case .scheduledList:
-            let scheduledTasks = tasks.filter {
+            let scheduledGoals = goals.filter {
                 if let _ = $0.endDate {
                     return true
                 }
                 return false
             }
-            filteredTasks = scheduledTasks
+            filteredGoals = scheduledGoals
         case .todayList:
-            let dailyTasks = tasks.filter {
+            let dailyGoals = goals.filter {
                 if let endDate = $0.endDate {
                     return NSCalendar.current.isDateInToday(endDate)
                 }
                 return false
             }
-            filteredTasks = dailyTasks
+            filteredGoals = dailyGoals
         case .goalList:
-            let goalTasks = tasks.filter {
+            let goalGoals = goals.filter {
                 if $0.isGoal ?? false {
                     return true
                 }
                 return false
             }
-            filteredTasks = goalTasks
+            filteredGoals = goalGoals
         default:
-            filteredTasks = tasks.filter { $0.listID == list.id }
+            filteredGoals = goals.filter { $0.listID == list.id }
         }
         
-        if !showCompletedTasks {
-            filteredTasks = filteredTasks.filter({ !($0.isCompleted ?? false) })
+        if !showCompletedGoals {
+            filteredGoals = filteredGoals.filter({ !($0.isCompleted ?? false) })
         }
         
-        sortTasks()
+        sortGoals()
         
         tableView.reloadData()
     }
@@ -205,50 +212,36 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
 
     func handleReloadTableAftersearchBarCancelButtonClicked() {
-        if !showCompletedTasks {
-            filteredTasks = tasks.filter({ !($0.isCompleted ?? false)  })
+        if !showCompletedGoals {
+            filteredGoals = goals.filter({ !($0.isCompleted ?? false)  })
         } else {
-            filteredTasks = tasks
+            filteredGoals = goals
         }
-        sortTasks()
+        sortGoals()
         tableView.reloadData()
     }
     
     func handleReloadTableAfterSearch() {
-        sortTasks()
+        sortGoals()
         tableView.reloadData()
     }
     
     @objc fileprivate func newItem() {
-        if list.name == "Goals" {
-            self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        if let id = self.list.id, id != "" {
+            self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil)
         } else {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "Goal", style: .default, handler: { (_) in
-                if let id = self.list.id, id != "" {
-                    self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil)
-                } else {
-                    self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-                if let id = self.list.id, id != "" {
-                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil)
-                } else {
-                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
+            self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
         }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     @objc fileprivate func listInfo() {
@@ -256,9 +249,9 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func filter() {
-        filterDictionary["showRecurringTasks"] = showRecurringTasks ? ["Yes"] : ["No"]
-        filterDictionary["showCompletedTasks"] = showCompletedTasks ? ["Yes"] : ["No"]
-        filterDictionary["taskSort"] = [taskSort]
+        filterDictionary["showRecurringGoals"] = showRecurringGoals ? ["Yes"] : ["No"]
+        filterDictionary["showCompletedGoals"] = showCompletedGoals ? ["Yes"] : ["No"]
+        filterDictionary["goalSort"] = [goalSort]
         let destination = FilterViewController(networkController: networkController)
         let navigationViewController = UINavigationController(rootViewController: destination)
         destination.delegate = self
@@ -272,94 +265,94 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     func saveUserDefaults() {
-        UserDefaults.standard.setValue(taskSort, forKey: kTaskSort)
-        UserDefaults.standard.setValue(showCompletedTasks, forKey: kShowCompletedTasks)
-        UserDefaults.standard.setValue(showRecurringTasks, forKey: kShowRecurringTasks)
+        UserDefaults.standard.setValue(goalSort, forKey: kGoalSort)
+        UserDefaults.standard.setValue(showCompletedGoals, forKey: kShowCompletedGoals)
+        UserDefaults.standard.setValue(showRecurringGoals, forKey: kShowRecurringGoals)
     }
     
-    func getShowCompletedTasksBool() -> Bool {
-        if let value = UserDefaults.standard.value(forKey: kShowCompletedTasks) as? Bool {
+    func getShowCompletedGoalsBool() -> Bool {
+        if let value = UserDefaults.standard.value(forKey: kShowCompletedGoals) as? Bool {
             return value
         } else {
             return true
         }
     }
     
-    func getShowRecurringTasksBool() -> Bool {
-        if let value = UserDefaults.standard.value(forKey: kShowRecurringTasks) as? Bool {
+    func getShowRecurringGoalsBool() -> Bool {
+        if let value = UserDefaults.standard.value(forKey: kShowRecurringGoals) as? Bool {
             return value
         } else {
             return false
         }
     }
     
-    func getSortTasks() -> String {
-        if let value = UserDefaults.standard.value(forKey: kTaskSort) as? String {
+    func getSortGoals() -> String {
+        if let value = UserDefaults.standard.value(forKey: kGoalSort) as? String {
             return value
         } else {
             return "Due Date"
         }
     }
     
-    func sortTasks() {
-        if taskSort == "Due Date" {
-            filteredTasks.sort { task1, task2 in
-                if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                    if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
-                        if task1.priority == task2.priority {
-                            return task1.name ?? "" < task2.name ?? ""
+    func sortGoals() {
+        if goalSort == "Due Date" {
+            filteredGoals.sort { goal1, goal2 in
+                if !(goal1.isCompleted ?? false) && !(goal2.isCompleted ?? false) {
+                    if goal1.endDate ?? Date.distantFuture == goal2.endDate ?? Date.distantFuture {
+                        if goal1.priority == goal2.priority {
+                            return goal1.name ?? "" < goal2.name ?? ""
                         }
-                        return TaskPriority(rawValue: task1.priority ?? "None")! > TaskPriority(rawValue: task2.priority ?? "None")!
+                        return TaskPriority(rawValue: goal1.priority ?? "None")! > TaskPriority(rawValue: goal2.priority ?? "None")!
                     }
-                    return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
-                } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
-                    if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
-                        return task1.name ?? "" < task2.name ?? ""
+                    return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
+                } else if goal1.isCompleted ?? false && goal2.isCompleted ?? false {
+                    if goal1.completedDate ?? 0 == goal2.completedDate ?? 0 {
+                        return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                    return Int(truncating: goal1.completedDate ?? 0) > Int(truncating: goal2.completedDate ?? 0)
                 }
-                return !(task1.isCompleted ?? false)
+                return !(goal1.isCompleted ?? false)
             }
-        } else if taskSort == "Priority" {
-            filteredTasks.sort { task1, task2 in
-                if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                    if task1.priority == task2.priority {
-                        if task1.endDate ?? Date.distantFuture == task2.endDate ?? Date.distantFuture {
-                            return task1.name ?? "" < task2.name ?? ""
+        } else if goalSort == "Priority" {
+            filteredGoals.sort { goal1, goal2 in
+                if !(goal1.isCompleted ?? false) && !(goal2.isCompleted ?? false) {
+                    if goal1.priority == goal2.priority {
+                        if goal1.endDate ?? Date.distantFuture == goal2.endDate ?? Date.distantFuture {
+                            return goal1.name ?? "" < goal2.name ?? ""
                         }
-                        return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+                        return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
                     }
-                    return TaskPriority(rawValue: task1.priority ?? "None")! > TaskPriority(rawValue: task2.priority ?? "None")!
-                } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
-                    if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
-                        return task1.name ?? "" < task2.name ?? ""
+                    return TaskPriority(rawValue: goal1.priority ?? "None")! > TaskPriority(rawValue: goal2.priority ?? "None")!
+                } else if goal1.isCompleted ?? false && goal2.isCompleted ?? false {
+                    if goal1.completedDate ?? 0 == goal2.completedDate ?? 0 {
+                        return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                    return Int(truncating: goal1.completedDate ?? 0) > Int(truncating: goal2.completedDate ?? 0)
                 }
-                return !(task1.isCompleted ?? false)
+                return !(goal1.isCompleted ?? false)
             }
-        } else if taskSort == "Title" {
-            filteredTasks.sort { task1, task2 in
-                if !(task1.isCompleted ?? false) && !(task2.isCompleted ?? false) {
-                    if task1.name ?? "" == task2.name ?? "" {
-                        if task1.priority == task2.priority {
-                            return task1.endDate ?? Date.distantFuture < task2.endDate ?? Date.distantFuture
+        } else if goalSort == "Title" {
+            filteredGoals.sort { goal1, goal2 in
+                if !(goal1.isCompleted ?? false) && !(goal2.isCompleted ?? false) {
+                    if goal1.name ?? "" == goal2.name ?? "" {
+                        if goal1.priority == goal2.priority {
+                            return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
                         }
                     }
-                    return task1.name ?? "" < task2.name ?? ""
-                } else if task1.isCompleted ?? false && task2.isCompleted ?? false {
-                    if task1.completedDate ?? 0 == task2.completedDate ?? 0 {
-                        return task1.name ?? "" < task2.name ?? ""
+                    return goal1.name ?? "" < goal2.name ?? ""
+                } else if goal1.isCompleted ?? false && goal2.isCompleted ?? false {
+                    if goal1.completedDate ?? 0 == goal2.completedDate ?? 0 {
+                        return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return Int(truncating: task1.completedDate ?? 0) > Int(truncating: task2.completedDate ?? 0)
+                    return Int(truncating: goal1.completedDate ?? 0) > Int(truncating: goal2.completedDate ?? 0)
                 }
-                return !(task1.isCompleted ?? false)
+                return !(goal1.isCompleted ?? false)
             }
         }
     }
 }
 
-extension ListViewController: UITableViewDataSource, UITableViewDelegate {
+extension GoalListViewController: UITableViewDataSource, UITableViewDelegate {
     // MARK: - Table view data source
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -391,48 +384,48 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if filteredTasks.count == 0 {
-            viewPlaceholder.add(for: tableView, title: .emptyTasks, subtitle: .emptyTasksEvents, priority: .medium, position: .fill)
+        if filteredGoals.count == 0 {
+            viewPlaceholder.add(for: tableView, title: .emptyGoals, subtitle: .emptyTasksEvents, priority: .medium, position: .fill)
         } else {
             viewPlaceholder.remove(from: tableView, priority: .medium)
         }
-        if filteredTasks.count > 9 {
-            return filteredTasks.count + 2
+        if filteredGoals.count > 9 {
+            return filteredGoals.count + 2
         } else {
-            return filteredTasks.count + 1
+            return filteredGoals.count + 1
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if filteredTasks.count > 9 {
+        if filteredGoals.count > 9 {
             if indexPath.row == 0 {
                 let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
                 return cell
             }
-            if filteredTasks.indices.contains(indexPath.row - 1) {
+            if filteredGoals.indices.contains(indexPath.row - 1) {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-                let task = filteredTasks[indexPath.row - 1]
-                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                let goal = filteredGoals[indexPath.row - 1]
+                if let listID = goal.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
                 } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
                     cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
                 }
-                cell.configureCell(for: indexPath, task: task)
+                cell.configureCell(for: indexPath, task: goal)
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
                 return cell
             }
         } else {
-            if filteredTasks.indices.contains(indexPath.row) {
+            if filteredGoals.indices.contains(indexPath.row) {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-                let task = filteredTasks[indexPath.row]
-                if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                let goal = filteredGoals[indexPath.row]
+                if let listID = goal.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
                     cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
                 } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
                     cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
                 }
-                cell.configureCell(for: indexPath, task: task)
+                cell.configureCell(for: indexPath, task: goal)
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
@@ -442,20 +435,20 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if filteredTasks.count > 9 {
+        if filteredGoals.count > 9 {
             if indexPath.row == 0 {
                 newItem()
-            } else if filteredTasks.indices.contains(indexPath.row - 1) {
-                let task = filteredTasks[indexPath.row - 1]
-                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            } else if filteredGoals.indices.contains(indexPath.row - 1) {
+                let goal = filteredGoals[indexPath.row - 1]
+                showGoalDetailPresent(task: goal, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
 
             } else {
                 newItem()
             }
         } else {
-            if filteredTasks.indices.contains(indexPath.row) {
-                let task = filteredTasks[indexPath.row]
-                showTaskDetailPresent(task: task, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            if filteredGoals.indices.contains(indexPath.row) {
+                let goal = filteredGoals[indexPath.row]
+                showGoalDetailPresent(task: goal, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
 
             } else {
                 newItem()
@@ -464,7 +457,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-extension ListViewController: UpdateFilter {
+extension GoalListViewController: UpdateFilter {
     func updateFilter(filterDictionary : [String: [String]]) {
         self.filterDictionary = filterDictionary
         updateTableViewWFilters()
@@ -472,102 +465,116 @@ extension ListViewController: UpdateFilter {
     
     func updateTableViewWFilters() {
         let dispatchGroup = DispatchGroup()
-        if let value = filterDictionary["showRecurringTasks"] {
+        if let value = filterDictionary["showRecurringGoals"] {
             dispatchGroup.enter()
             let bool = value[0].lowercased()
             if bool == "yes" {
-                tasks = networkTasks
-                self.showRecurringTasks = true
+                goals = networkGoals.filter({
+                    if $0.isGoal ?? false {
+                        if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
+                            return true
+                        }
+                        return false
+                    }
+                    return true
+                })
+                self.showRecurringGoals = true
             } else {
-                tasks = []
-                for task in networkTasks {
-                    if !tasks.contains(where: {$0.activityID == task.activityID}) {
-                        tasks.append(task)
+                goals = []
+                for goal in networkGoals {
+                    if !goals.contains(where: {$0.activityID == goal.activityID}) {
+                        if goal.isGoal ?? false {
+                            if goal.goalEndDate >= Date(), goal.goalStartDate <= Date() {
+                                goals.append(goal)
+                            }
+                        } else {
+                            goals.append(goal)
+                        }
                     }
                 }
-                self.showRecurringTasks = false
+                self.showRecurringGoals = false
             }
             dispatchGroup.leave()
         }
-        if let value = filterDictionary["showCompletedTasks"] {
+        if let value = filterDictionary["showCompletedGoals"] {
             dispatchGroup.enter()
             let bool = value[0].lowercased()
             if bool == "yes" {
-                filteredTasks = tasks
-                self.showCompletedTasks = true
+                filteredGoals = goals
+                self.showCompletedGoals = true
             } else {
-                filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
-                self.showCompletedTasks = false
+                filteredGoals = goals.filter({ !($0.isCompleted ?? false) })
+                self.showCompletedGoals = false
             }
             dispatchGroup.leave()
         }
         if let value = filterDictionary["search"] {
             dispatchGroup.enter()
             let searchText = value[0]
-            filteredTasks = filteredTasks.filter({ (task) -> Bool in
-                if let name = task.name {
+            filteredGoals = filteredGoals.filter({ (goal) -> Bool in
+                if let name = goal.name {
                     return name.lowercased().contains(searchText.lowercased())
                 }
                 return ("").lowercased().contains(searchText.lowercased())
             })
             dispatchGroup.leave()
         }
-        if let categories = filterDictionary["taskCategory"] {
+        if let categories = filterDictionary["goalCategory"] {
             dispatchGroup.enter()
-            filteredTasks = filteredTasks.filter({ (task) -> Bool in
-                if let category = task.category {
+            filteredGoals = filteredGoals.filter({ (goal) -> Bool in
+                if let category = goal.category {
                     return categories.contains(category)
                 }
                 return false
             })
             dispatchGroup.leave()
         }
-        if let value = filterDictionary["taskSort"] {
+        if let value = filterDictionary["goalSort"] {
             let sort = value[0]
-            self.taskSort = sort
+            self.goalSort = sort
         }
         
         switch ListOptions(rawValue: list.name ?? "") {
         case .allList:
             break
         case .flaggedList:
-            let flaggedTasks = filteredTasks.filter {
+            let flaggedGoals = filteredGoals.filter {
                 if $0.flagged ?? false {
                     return true
                 }
                 return false
             }
-            filteredTasks = flaggedTasks
+            filteredGoals = flaggedGoals
         case .scheduledList:
-            let scheduledTasks = filteredTasks.filter {
+            let scheduledGoals = filteredGoals.filter {
                 if let _ = $0.endDate {
                     return true
                 }
                 return false
             }
-            filteredTasks = scheduledTasks
+            filteredGoals = scheduledGoals
         case .todayList:
-            let dailyTasks = filteredTasks.filter {
+            let dailyGoals = filteredGoals.filter {
                 if let endDate = $0.endDate {
                     return NSCalendar.current.isDateInToday(endDate)
                 }
                 return false
             }
-            filteredTasks = dailyTasks
+            filteredGoals = dailyGoals
         case .goalList:
-            let goalTasks = tasks.filter {
+            let goalGoals = goals.filter {
                 if $0.isGoal ?? false {
                     return true
                 }
                 return false
             }
-            filteredTasks = goalTasks
+            filteredGoals = goalGoals
         default:
-            filteredTasks = filteredTasks.filter { $0.listID == list.id }
+            filteredGoals = filteredGoals.filter { $0.listID == list.id }
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.sortTasks()
+            self.sortGoals()
             self.tableView.reloadData()
             self.tableView.layoutIfNeeded()
             self.saveUserDefaults()
@@ -575,7 +582,7 @@ extension ListViewController: UpdateFilter {
     }
 }
 
-extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+extension GoalListViewController: UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {}
     
@@ -588,8 +595,8 @@ extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, U
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        filteredTasks = searchText.isEmpty ? tasks :
-            tasks.filter({ (activity) -> Bool in
+        filteredGoals = searchText.isEmpty ? goals :
+            goals.filter({ (activity) -> Bool in
                 if let name = activity.name {
                     return name.lowercased().contains(searchText.lowercased())
                 }
@@ -605,7 +612,7 @@ extension ListViewController: UISearchBarDelegate, UISearchControllerDelegate, U
     }
 }
 
-extension ListViewController { /* hiding keyboard */
+extension GoalListViewController { /* hiding keyboard */
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.searchBar?.endEditing(true)

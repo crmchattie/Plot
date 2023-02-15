@@ -33,6 +33,7 @@ enum ViewPlaceholderTitle: String {
     case emptyFiles = "You don't have any docs yet"
     case emptyRecipes = "Could not find any recipes that match the filter(s) and/or keyword search"
     case emptyTasks = "Could not find any tasks that match the filter(s) and/or keyword search"
+    case emptyGoals = "Could not find any goals that match the filter(s) and/or keyword search"
     case emptySearch = "Could not find any items that match the filter(s)"
     case emptySearchTemplate = "Could not find any items that match the keyword search"
     case emptyPlaces = "Could not find any places that match the filter(s) and/or keyword search"

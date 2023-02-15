@@ -41,7 +41,7 @@ class ActivityService {
             if oldValue != activities {
                 print("oldValue != activities")
                 eventsNoRepeats = activities.filter { $0.isTask == nil }
-                tasksNoRepeats = activities.filter { $0.isTask ?? false }
+                tasksNoRepeats = activities.filter { $0.isTask ?? false && !($0.isGoal ?? false) }
                 goalsNoRepeats = activities.filter { $0.isGoal ?? false }
             }
         }
@@ -51,7 +51,7 @@ class ActivityService {
         didSet {
             if oldValue != activitiesWithRepeats {
                 self.events = activitiesWithRepeats.filter { $0.isTask == nil }
-                self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false }
+                self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false && !($0.isGoal ?? false) }
                 self.goals = activitiesWithRepeats.filter { $0.isGoal ?? false }
                 self.calendarActivities = activitiesWithRepeats.filter { $0.finalDateForDisplay != nil && !($0.isGoal ?? false) }
             }
@@ -157,7 +157,7 @@ class ActivityService {
                     }
                     return !(task1.isCompleted ?? false)
                 }
-                NotificationCenter.default.post(name: .tasksUpdated, object: nil)
+                NotificationCenter.default.post(name: .goalsUpdated, object: nil)
             }
         }
     }

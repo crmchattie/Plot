@@ -11,6 +11,7 @@ import Firebase
 
 extension NSNotification.Name {
     static let variablesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".variablesUpdated")
+    static let hasLoadedListGoalActivities = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedListGoalActivities")
 }
 
 class NetworkController {
@@ -27,7 +28,12 @@ class NetworkController {
     let activityDetailService = ActivityDetailService()
     let healthDetailService = HealthDetailService()
     let financeDetailService = FinanceDetailService()
-
+    
+    var hasLoadedListGoalActivities = false {
+        didSet {
+            NotificationCenter.default.post(name: .hasLoadedListGoalActivities, object: nil)
+        }
+    }
     
     init() {
         isRunning = false
@@ -62,7 +68,9 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
-            self.checkGoalsForCompletion()
+            self.checkGoalsForCompletion() {
+                self.hasLoadedListGoalActivities = true
+            }
             self.isRunning = false
             completion()
         }
@@ -107,8 +115,10 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
+            self.checkGoalsForCompletion() {
+                self.hasLoadedListGoalActivities = true
+            }
             self.isRunning = false
-            self.checkGoalsForCompletion()
             completion()
         }
     }

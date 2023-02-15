@@ -12,7 +12,7 @@ import EventKit
 import RRuleSwift
 
 extension NetworkController {    
-    func checkGoalsForCompletion() {
+    func checkGoalsForCompletion(_ completion: @escaping () -> Void) {
         print("checkGoalsForCompletion")
         //create loop of existing goals
         //check if goal is complete
@@ -25,6 +25,7 @@ extension NetworkController {
         
         let past = Date().monthBefore
         let tomorrow = Date().dayAfter
+        let group = DispatchGroup()
         for task in activityService.goals {
 //            print("--------------------------")
             if let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber {
@@ -44,6 +45,8 @@ extension NetworkController {
                 guard range.endDate > past, range.startDate <= tomorrow else {
                     continue
                 }
+                
+                group.enter()
                 
                 print("continuing")
                 
@@ -108,6 +111,7 @@ extension NetworkController {
                             case .equal, .more, .less:
                                 break
                             }
+                            group.leave()
                         }
                     } else {
                         print("finished checking")
@@ -131,7 +135,13 @@ extension NetworkController {
                             let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                             updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                         }
+                        group.leave()
                     }
+                }
+                
+                group.notify(queue: .main) {
+                    print("goals completion")
+                    completion()
                 }
             }
         }

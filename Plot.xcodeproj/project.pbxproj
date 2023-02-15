@@ -190,6 +190,9 @@
 		1093D2B4299C39D8003D77C5 /* GoalViewController+UpdateInvitees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2B3299C39D8003D77C5 /* GoalViewController+UpdateInvitees.swift */; };
 		1093D2B6299C39FF003D77C5 /* GoalViewController+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2B5299C39FF003D77C5 /* GoalViewController+Functions.swift */; };
 		1093D2B8299C3A0B003D77C5 /* GoalViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2B7299C3A0B003D77C5 /* GoalViewController+Extensions.swift */; };
+		1093D2BA299D3390003D77C5 /* GoalsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2B9299D3390003D77C5 /* GoalsViewController.swift */; };
+		1093D2BC299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BB299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift */; };
+		1093D2BE299D3860003D77C5 /* GoalListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BD299D3860003D77C5 /* GoalListViewController.swift */; };
 		1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */; };
 		10970B0E25803F450027A9EF /* Mindfulness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B0D25803F450027A9EF /* Mindfulness.swift */; };
 		10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B13258060860027A9EF /* MindfulnessViewController.swift */; };
@@ -796,6 +799,9 @@
 		1093D2B3299C39D8003D77C5 /* GoalViewController+UpdateInvitees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalViewController+UpdateInvitees.swift"; sourceTree = "<group>"; };
 		1093D2B5299C39FF003D77C5 /* GoalViewController+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalViewController+Functions.swift"; sourceTree = "<group>"; };
 		1093D2B7299C3A0B003D77C5 /* GoalViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalViewController+Extensions.swift"; sourceTree = "<group>"; };
+		1093D2B9299D3390003D77C5 /* GoalsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViewController.swift; sourceTree = "<group>"; };
+		1093D2BB299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
+		1093D2BD299D3860003D77C5 /* GoalListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListViewController.swift; sourceTree = "<group>"; };
 		1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectActivityTableViewController.swift; sourceTree = "<group>"; };
 		10970B0D25803F450027A9EF /* Mindfulness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mindfulness.swift; sourceTree = "<group>"; };
 		10970B13258060860027A9EF /* MindfulnessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessViewController.swift; sourceTree = "<group>"; };
@@ -1745,6 +1751,9 @@
 		10B3E51128B3B17600E1713D /* Lists */ = {
 			isa = PBXGroup;
 			children = (
+				1093D2BD299D3860003D77C5 /* GoalListViewController.swift */,
+				1093D2B9299D3390003D77C5 /* GoalsViewController.swift */,
+				1093D2BB299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift */,
 				10B3E51A28B5558D00E1713D /* ListViewController.swift */,
 				10B3E52728B6B42E00E1713D /* ListsViewController.swift */,
 				10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */,
@@ -3344,6 +3353,7 @@
 				4BAEE5D7212735E50045AB10 /* AnnouncementFactory.swift in Sources */,
 				10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */,
 				26836B51251338E800AFC2D7 /* HeartRateOperation.swift in Sources */,
+				1093D2BA299D3390003D77C5 /* GoalsViewController.swift in Sources */,
 				4BAEE5EF212735E50045AB10 /* RevealableCollectionViewCell.swift in Sources */,
 				10021A1624F1A480006A1B25 /* FinancialMemberCell.swift in Sources */,
 				10E93D5724BE43B700F6EE18 /* Extensions.swift in Sources */,
@@ -3576,6 +3586,7 @@
 				10B3E50328B10FC100E1713D /* SubtaskRow.swift in Sources */,
 				4BAEE47121272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift in Sources */,
 				105F34AD2885EF7A007531EB /* MonthOrDaySelectorCell.swift in Sources */,
+				1093D2BC299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift in Sources */,
 				10B6B31625410D37008037AD /* TagsViewController.swift in Sources */,
 				265D4313259D203C00755EC2 /* ActivityBuilder.swift in Sources */,
 				10F8C19024401FA80085ECB0 /* CalendarDetailCell.swift in Sources */,
@@ -3656,6 +3667,7 @@
 				10196F0524411B5600B6AFDF /* EventViewController.swift in Sources */,
 				108C37F328997CBF00DC4998 /* ActivityListViewController.swift in Sources */,
 				4BAEE5B8212735E50045AB10 /* INSPhotosInteractionAnimator.swift in Sources */,
+				1093D2BE299D3860003D77C5 /* GoalListViewController.swift in Sources */,
 				1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */,
 				10E8E4F725923B320076BE42 /* ActivitiesControllerCell.swift in Sources */,
 				4BAEE5EA212735E50045AB10 /* Country.swift in Sources */,
