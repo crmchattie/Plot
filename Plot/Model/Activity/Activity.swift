@@ -2119,6 +2119,22 @@ extension Activity {
         return nil
     }
     
+    var goalStartDate: Date {
+        if let startDateTemp = self.startDate {
+            return startDateTemp
+        } else if let goal = self.goal, let _ = goal.frequency, let startDateTemp = self.startDateGivenEndDateFrequency {
+            return startDateTemp
+        }
+        return Date()
+    }
+    
+    var goalEndDate: Date {
+        if let endDateTemp = self.endDate {
+            return endDateTemp
+        }
+        return Date()
+    }
+    
     //for tasks where deadline date is more likely to be set than start date
     var finalDateTime: NSNumber? {
         if isTask ?? false, !(isGoal ?? false) {

@@ -23,7 +23,7 @@ extension NetworkController {
         //if goal metric is met, update goal to completion; if not, do nothing and move to next goal
         //add check to see if endDate is in the past - maybe add buffer like a month? If so, skip and move to next goal?
         
-        let monthPast = Date().monthBefore
+        let past = Date().monthBefore
         let tomorrow = Date().dayAfter
         for task in activityService.goals {
 //            print("--------------------------")
@@ -33,25 +33,15 @@ extension NetworkController {
                     updatedDescription += secondaryDescription
                 }
 //
-                var startDate = Date()
-                var endDate = Date()
                 
-                if let endDateTemp = task.endDate {
-                    endDate = endDateTemp
-                    if let startDateTemp = task.startDate {
-                        startDate = startDateTemp
-                    } else if let _ = goal.frequency, let startDateTemp = task.startDateGivenEndDateFrequency {
-                        startDate = startDateTemp
-                    }
-                }
                 print("metricCheck")
                 print(metric)
                 print(updatedDescription)
-                print(startDate)
-                print(endDate)
+                print(task.goalStartDate)
+                print(task.goalEndDate)
                 
-                let range = DateRange(startDate: startDate, endDate: endDate)
-                guard range.endDate > monthPast, range.startDate <= tomorrow else {
+                let range = DateRange(startDate: task.goalStartDate, endDate: task.goalEndDate)
+                guard range.endDate > past, range.startDate <= tomorrow else {
                     continue
                 }
                 

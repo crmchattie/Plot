@@ -80,12 +80,26 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     
     func sortandreload() {
         if showRecurringTasks {
-            tasks = networkTasks
+            tasks = networkTasks.filter({
+                if $0.isGoal ?? false {
+                    if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
+                        return true
+                    }
+                    return false
+                }
+                return true
+            })
         } else {
             tasks = []
             for task in networkTasks {
                 if !tasks.contains(where: {$0.activityID == task.activityID}) {
-                    tasks.append(task)
+                    if task.isGoal ?? false {
+                        if task.goalEndDate >= Date(), task.goalStartDate <= Date() {
+                            tasks.append(task)
+                        }
+                    } else {
+                        tasks.append(task)
+                    }
                 }
             }
         }
@@ -132,6 +146,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
         if !showCompletedTasks {
             filteredTasks = filteredTasks.filter({ !($0.isCompleted ?? false) })
         }
+        
         sortTasks()
         
         tableView.reloadData()
@@ -205,7 +220,7 @@ class ListViewController: UIViewController, ObjectDetailShowing {
 
     func handleReloadTableAftersearchBarCancelButtonClicked() {
         if !showCompletedTasks {
-            filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
+            filteredTasks = tasks.filter({ !($0.isCompleted ?? false)  })
         } else {
             filteredTasks = tasks
         }
@@ -481,13 +496,27 @@ extension ListViewController: UpdateFilter {
             dispatchGroup.enter()
             let bool = value[0].lowercased()
             if bool == "yes" {
-                tasks = networkTasks
+                tasks = networkTasks.filter({
+                    if $0.isGoal ?? false {
+                        if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
+                            return true
+                        }
+                        return false
+                    }
+                    return true
+                })
                 self.showRecurringTasks = true
             } else {
                 tasks = []
                 for task in networkTasks {
                     if !tasks.contains(where: {$0.activityID == task.activityID}) {
-                        tasks.append(task)
+                        if task.isGoal ?? false {
+                            if task.goalEndDate >= Date(), task.goalStartDate <= Date() {
+                                tasks.append(task)
+                            }
+                        } else {
+                            tasks.append(task)
+                        }
                     }
                 }
                 self.showRecurringTasks = false
