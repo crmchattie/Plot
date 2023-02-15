@@ -70,31 +70,9 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var updatingHealth = true
     var updatingFinances = true
     
-    var healthMetricSections: [HealthMetricCategory] {
-        var healthMetricSections = Array(healthMetrics.keys)
-        healthMetricSections.sort(by: { (v1, v2) -> Bool in
-            return v1.rank < v2.rank
-        })
-        return healthMetricSections
-    }
-    var healthMetrics: [HealthMetricCategory: [HealthMetric]] {
-        var metrics = networkController.healthService.healthMetrics
-        if let generalMetrics = metrics[.general] {
-            metrics[.general] = generalMetrics.filter({ $0.type == .steps || $0.type == .sleep || $0.type == .flightsClimbed || $0.type == .mindfulness })
-        }
-        if let workoutMetrics = metrics[.workouts] {
-            metrics[.general]?.append(contentsOf: workoutMetrics.filter({ $0.type == .activeEnergy || $0.type == .workoutMinutes}))
-            metrics[.workouts] = nil
-        }
-        if let nutritionMetrics = metrics[.nutrition] {
-            metrics[.general]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name }))
-            metrics[.nutrition] = nil
-        }
-        if metrics[.general] == [] {
-            metrics[.general] = nil
-        }
-        return metrics
-    }
+    var healthMetricSections = [SectionType]()
+    var healthMetrics = [SectionType: [AnyHashable]]()
+    
     var financeSections = [SectionType]()
     var financeGroups = [SectionType: [AnyHashable]]()
     var transactionsDictionary = [TransactionDetails: [Transaction]]()
@@ -186,6 +164,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(invitationsUpdated), name: .invitationsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .workoutsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .mindfulnessUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
@@ -216,7 +196,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             list.append(CustomType.health)
         } else {
             for section in healthMetricSections {
-                list.append(SectionType.generalHealth)
+                list.append(section)
                 list.append(contentsOf: healthMetrics[section] ?? [])
             }
         }
@@ -315,8 +295,10 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func healthUpdated() {
-        DispatchQueue.main.async {
-            self.setupData()
+        self.grabHealthItems() {
+            DispatchQueue.main.async {
+                self.setupData()
+            }
         }
     }
     
@@ -515,6 +497,55 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         completion(events)
     }
     
+    func grabHealthItems(_ completion: @escaping () -> Void) {
+        var metrics = networkController.healthService.healthMetrics
+        var metricsSections = networkController.healthService.healthMetricSections
+        
+        healthMetricSections = []
+        healthMetrics = [:]
+        
+        if let generalMetrics = metrics[.general] {
+            healthMetricSections.append(.generalHealth)
+            healthMetrics[.generalHealth] = generalMetrics.filter({ $0.type == .steps || $0.type == .sleep })
+        }
+        
+        if let workoutMetrics = metrics[.workouts] {
+            healthMetrics[.generalHealth]?.append(contentsOf: workoutMetrics.filter({ $0.type == .activeEnergy }))
+        }
+        
+        if let nutritionMetrics = metrics[.nutrition] {
+            healthMetrics[.generalHealth]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name }))
+        }
+        
+        if metricsSections.contains(.workouts) {
+            healthMetricSections.append(.workouts)
+            var filteredWorkouts = networkController.healthService.workouts
+            if filteredWorkouts.count < 3 {
+                healthMetrics[.workouts] = filteredWorkouts
+            } else {
+                var finalWorkouts = [Workout]()
+                for index in 0...2 {
+                    finalWorkouts.append(filteredWorkouts[index])
+                }
+                healthMetrics[.workouts] = finalWorkouts
+            }
+        }
+        if let generalMetrics = metrics[.general], generalMetrics.contains(where: {$0.type == HealthMetricType.mindfulness }) {
+            healthMetricSections.append(.mindfulness)
+            var filteredMindfulness = networkController.healthService.mindfulnesses
+            if filteredMindfulness.count < 3 {
+                healthMetrics[.mindfulness] = filteredMindfulness
+            } else {
+                var finalMindfulness = [Mindfulness]()
+                for index in 0...2 {
+                    finalMindfulness.append(filteredMindfulness[index])
+                }
+                healthMetrics[.mindfulness] = finalMindfulness
+            }
+        }
+        completion()
+    }
+    
     func grabFinancialItems(_ completion: @escaping ([SectionType], [SectionType: [AnyHashable]]) -> Void) {
         var accountLevel: AccountCatLevel!
         var transactionLevel: TransactionCatLevel!
@@ -618,7 +649,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)
             }
-        } else if section == .health, !healthMetrics.isEmpty {
+        } else if section == .health, !healthMetricSections.isEmpty {
             let destination = HealthViewController(networkController: networkController)
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
@@ -633,6 +664,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
         }
+        
     }
 }
 

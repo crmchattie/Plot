@@ -49,6 +49,14 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
             cell.configure(item)
             return cell
+        } else if let item = object as? Workout {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+            cell.configure(item)
+            return cell
+        } else if let item = object as? Mindfulness {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+            cell.configure(item)
+            return cell
         } else if let item = object as? MXMember {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kFinanceCollectionViewMemberCell, for: indexPath) as! FinanceCollectionViewMemberCell
             cell.member = item
@@ -91,7 +99,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         }
                     }
                 } else if item == .health {
-                    if !healthMetrics.isEmpty {
+                    if !healthMetricSections.isEmpty {
                         if updatingHealth {
                             cell.spinnerView.startAnimating()
                         } else {
@@ -145,6 +153,15 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 } else if item == .transactions, networkController.financeService.transactions.count > 3 {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
+                } else if item == .generalHealth {
+                    cell.view.isUserInteractionEnabled = true
+                    cell.subTitleLabel.isHidden = false
+                } else if item == .workouts, networkController.healthService.workouts.count > 3 {
+                    cell.view.isUserInteractionEnabled = true
+                    cell.subTitleLabel.isHidden = false
+                } else if item == .mindfulness, networkController.healthService.mindfulnesses.count > 3 {
+                    cell.view.isUserInteractionEnabled = true
+                    cell.subTitleLabel.isHidden = false
                 } else {
                     cell.view.isUserInteractionEnabled = false
                     cell.subTitleLabel.isHidden = true
@@ -183,6 +200,18 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 height = estimatedSize.height
             }
         } else if let item = object as? HealthMetric {
+            let dummyCell = HealthMetricCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            dummyCell.configure(item)
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+            height = estimatedSize.height
+        } else if let item = object as? Workout {
+            let dummyCell = HealthMetricCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            dummyCell.configure(item)
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+            height = estimatedSize.height
+        } else if let item = object as? Mindfulness {
             let dummyCell = HealthMetricCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.configure(item)
             dummyCell.layoutIfNeeded()
@@ -256,6 +285,10 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? HealthMetric {
             return .init(top: 5, left: 0, bottom: 5, right: 0)
+        } else if let _ = object as? Workout {
+            return .init(top: 5, left: 0, bottom: 5, right: 0)
+        } else if let _ = object as? Mindfulness {
+            return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? MXMember {
             return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? TransactionDetails {
@@ -295,8 +328,12 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 } else {
                     showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
                 }
-            } else if let metric = object as? HealthMetric {
-                showHealthMetricDetailPush(healthMetric: metric)
+            } else if let healthMetric = object as? HealthMetric {
+                showHealthMetricDetailPush(healthMetric: healthMetric)
+            } else if let workout = object as? Workout {
+                showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+            } else if let mindfulness = object as? Mindfulness {
+                showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             } else if let member = object as? MXMember {
                 openMXConnect(current_member_guid: member.guid, delegate: self)
             } else if let transactionDetails = object as? TransactionDetails, let transactions = transactionsDictionary[transactionDetails] {
@@ -327,6 +364,22 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         let destination = FinanceDetailViewController(networkController: networkController)
                         destination.title = SectionType.transactions.name
                         destination.setSections = [.transactions]
+                        navigationController?.pushViewController(destination, animated: true)
+                    } else if section == .generalHealth {
+                        let destination = HealthViewController(networkController: networkController)
+                        destination.hidesBottomBarWhenPushed = true
+                        navigationController?.pushViewController(destination, animated: true)
+                    } else if section == .workouts, networkController.healthService.workouts.count > 3 {
+                        let destination = HealthListViewController(networkController: networkController)
+                        destination.title = HealthMetricCategory.workoutsList.name
+                        destination.healthMetricSections = [HealthMetricCategory.workoutsList]
+                        destination.healthMetrics = [HealthMetricCategory.workoutsList: networkController.healthService.workouts]
+                        navigationController?.pushViewController(destination, animated: true)
+                    } else if section == .mindfulness, networkController.healthService.mindfulnesses.count > 3 {
+                        let destination = HealthListViewController(networkController: networkController)
+                        destination.title = HealthMetricCategory.mindfulnessList.name
+                        destination.healthMetricSections = [HealthMetricCategory.mindfulnessList]
+                        destination.healthMetrics = [HealthMetricCategory.mindfulnessList: networkController.healthService.mindfulnesses]
                         navigationController?.pushViewController(destination, animated: true)
                     }
                 }
