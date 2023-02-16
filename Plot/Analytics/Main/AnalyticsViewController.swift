@@ -90,10 +90,17 @@ class AnalyticsViewController: UITableViewController {
     }
 
     func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(goalsUpdated), name: .goalsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+    }
+    
+    @objc fileprivate func goalsUpdated() {
+        viewModel?.loadData {
+            self.tableView.reloadData()
+        }
     }
     
     @objc fileprivate func tasksUpdated() {

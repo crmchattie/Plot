@@ -26,9 +26,9 @@ extension NetworkController {
         let past = Date().monthBefore
         let tomorrow = Date().dayAfter
         let group = DispatchGroup()
+        
         for task in activityService.goals {
             group.enter()
-//            print("--------------------------")
             guard let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber else {
                 group.leave()
                 continue
@@ -40,20 +40,18 @@ extension NetworkController {
             }
 //
             
-            print("metricCheck")
-            print(metric)
-            print(updatedDescription)
-            print(task.goalStartDate)
-            print(task.goalEndDate)
+//            print("metricCheck")
+//            print(metric)
+//            print(updatedDescription)
+//            print(task.goalStartDate)
+//            print(task.goalEndDate)
             
             let range = DateRange(startDate: task.goalStartDate, endDate: task.goalEndDate)
             guard range.endDate > past, range.startDate <= tomorrow else {
                 group.leave()
                 continue
             }
-                            
-            print("continuing")
-            
+                                        
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
                 if let stat = stat {
@@ -67,21 +65,21 @@ extension NetworkController {
                             finalStatSecond = statSecond
                         }
                         
-                        print("finished checking")
-                        print(range.startDate)
-                        print(range.endDate)
-                        
-                        print("metricCheck First")
-                        print(metric)
-                        print(finalStat.date)
-                        print(finalStat.value)
-                        print(target)
-                        
-                        print("metricCheck Second")
-                        print(metricSecond)
-                        print(finalStatSecond.date)
-                        print(finalStatSecond.value)
-                        print(targetSecond)
+//                        print("finished checking")
+//                        print(range.startDate)
+//                        print(range.endDate)
+//
+//                        print("metricCheck First")
+//                        print(metric)
+//                        print(finalStat.date)
+//                        print(finalStat.value)
+//                        print(target)
+//
+//                        print("metricCheck Second")
+//                        print(metricSecond)
+//                        print(finalStatSecond.date)
+//                        print(finalStatSecond.value)
+//                        print(targetSecond)
 
                         switch metricsRelationshipType {
                         case .or:
@@ -118,15 +116,15 @@ extension NetworkController {
                         group.leave()
                     }
                 } else {
-                    print("finished checking")
-                    print(range.startDate)
-                    print(range.endDate)
-                    
-                    print("metricCheck First")
-                    print(metric)
-                    print(finalStat.date)
-                    print(finalStat.value)
-                    print(target)
+//                    print("finished checking")
+//                    print(range.startDate)
+//                    print(range.endDate)
+//
+//                    print("metricCheck First")
+//                    print(metric)
+//                    print(finalStat.date)
+//                    print(finalStat.value)
+//                    print(target)
                     
                     if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
                         task.completedDate = NSNumber(value: Int((range.startDate).timeIntervalSince1970))
@@ -142,16 +140,14 @@ extension NetworkController {
                     group.leave()
                 }
             }
-            
-            
-            group.notify(queue: .main) {
-                completion()
-            }
+        }
+        
+        group.notify(queue: .main) {
+            completion()
         }
     }
     
     func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, range: DateRange, completion: @escaping (Statistic?) -> Void) {
-
         switch metric {
         case .events:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.events, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
@@ -184,26 +180,15 @@ extension NetworkController {
             }
             
             financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil) { stat, _, transactions, err in
-                
-//                print("financialTransactions stats")
-//                print(metric)
-//                print(submetric)
-//                print(option)
-//                print(stat)
-//                for transaction in transactions ?? [] {
-//                    print(transaction.description)
-//                    print(transaction.group)
-//                    print(transaction.transacted_at)
-//                }
                 completion(stat)
             }
         case .financialAccounts:
             var accountDetails = [AccountDetails]()
             
-            print("financialAccounts stats")
-            print(metric)
-            print(submetric)
-            print(option)
+//            print("financialAccounts stats")
+//            print(metric)
+//            print(submetric)
+//            print(option)
 
             switch submetric {
             case nil, .some(.none):
@@ -228,16 +213,16 @@ extension NetworkController {
             }
             
             financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil) { stat, accounts, _, err in
-                print("financialAccounts stats")
-                print(metric)
-                print(submetric)
-                print(option)
-                print(stat)
-                for account in accounts ?? [] {
-                    print(account.name)
-                    print(account.bs_type)
-                    print(account.updated_at)
-                }
+//                print("financialAccounts stats")
+//                print(metric)
+//                print(submetric)
+//                print(option)
+//                print(stat)
+//                for account in accounts ?? [] {
+//                    print(account.name)
+//                    print(account.bs_type)
+//                    print(account.updated_at)
+//                }
                 
                 completion(stat)
             }

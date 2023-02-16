@@ -74,17 +74,11 @@ open class RecurrencePicker: UITableViewController {
 extension RecurrencePicker {
     // MARK: - Table view data source and delegate
     open override func numberOfSections(in tableView: UITableView) -> Int {
-        if isGoal {
-            return 1
-        }
         return 2
     }
 
     open override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            if isGoal {
-                return Constant.goalRecurrenceStrings().count
-            }
             return Constant.basicRecurrenceStrings().count
         } else {
             return 1
@@ -107,11 +101,7 @@ extension RecurrencePicker {
         cell?.backgroundColor = .secondarySystemGroupedBackground
         if indexPath.section == 0 {
             cell?.accessoryType = .none
-            if isGoal {
-                cell?.textLabel?.text = Constant.goalRecurrenceStrings()[indexPath.row]
-            } else {
-                cell?.textLabel?.text = Constant.basicRecurrenceStrings()[indexPath.row]
-            }
+            cell?.textLabel?.text = Constant.basicRecurrenceStrings()[indexPath.row]
         } else {
             cell?.accessoryType = .disclosureIndicator
             cell?.textLabel?.text = LocalizedString("RecurrencePicker.textLabel.custom")
@@ -197,40 +187,26 @@ extension RecurrencePicker {
             selectedIndexPath = IndexPath(row: 0, section: 0)
             return
         }
-        if !isGoal {
-            if recurrenceRule.isDailyRecurrence() {
-                selectedIndexPath = IndexPath(row: 1, section: 0)
-            } else if recurrenceRule.isWeekdayRecurrence() {
-                selectedIndexPath = IndexPath(row: 2, section: 0)
-            } else if recurrenceRule.isWeekendRecurrence() {
-                selectedIndexPath = IndexPath(row: 3, section: 0)
-            } else if recurrenceRule.isWeeklyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 4, section: 0)
-            } else if recurrenceRule.isBiWeeklyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 5, section: 0)
-            } else if recurrenceRule.isMonthlyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 6, section: 0)
-            } else if recurrenceRule.isQuarterlyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 7, section: 0)
-            } else if recurrenceRule.isSemiannualRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 8, section: 0)
-            } else if recurrenceRule.isYearlyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 9, section: 0)
-            } else {
-                selectedIndexPath = IndexPath(row: 0, section: 1)
-            }
+        if recurrenceRule.isDailyRecurrence() {
+            selectedIndexPath = IndexPath(row: 1, section: 0)
+        } else if recurrenceRule.isWeekdayRecurrence() {
+            selectedIndexPath = IndexPath(row: 2, section: 0)
+        } else if recurrenceRule.isWeekendRecurrence() {
+            selectedIndexPath = IndexPath(row: 3, section: 0)
+        } else if recurrenceRule.isWeeklyRecurrence(occurrence: occurrenceDate) {
+            selectedIndexPath = IndexPath(row: 4, section: 0)
+        } else if recurrenceRule.isBiWeeklyRecurrence(occurrence: occurrenceDate) {
+            selectedIndexPath = IndexPath(row: 5, section: 0)
+        } else if recurrenceRule.isMonthlyRecurrence(occurrence: occurrenceDate) {
+            selectedIndexPath = IndexPath(row: 6, section: 0)
+        } else if recurrenceRule.isQuarterlyRecurrence(occurrence: occurrenceDate) {
+            selectedIndexPath = IndexPath(row: 7, section: 0)
+        } else if recurrenceRule.isSemiannualRecurrence(occurrence: occurrenceDate) {
+            selectedIndexPath = IndexPath(row: 8, section: 0)
+        } else if recurrenceRule.isYearlyRecurrence(occurrence: occurrenceDate) {
+            selectedIndexPath = IndexPath(row: 9, section: 0)
         } else {
-            if recurrenceRule.isDailyRecurrence() {
-                selectedIndexPath = IndexPath(row: 1, section: 0)
-            } else if recurrenceRule.isWeeklyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 2, section: 0)
-            } else if recurrenceRule.isMonthlyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 3, section: 0)
-            } else if recurrenceRule.isYearlyRecurrence(occurrence: occurrenceDate) {
-                selectedIndexPath = IndexPath(row: 4, section: 0)
-            } else {
-                selectedIndexPath = IndexPath(row: 0, section: 1)
-            }
+            selectedIndexPath = IndexPath(row: 0, section: 1)
         }
     }
 

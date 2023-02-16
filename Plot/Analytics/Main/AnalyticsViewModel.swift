@@ -32,6 +32,12 @@ class AnalyticsViewModel {
         let group = DispatchGroup()
         
         group.enter()
+        let goalDataSource = GoalAnalyticsDataSource(range: range, networkController: networkController)
+        goalDataSource.loadData {
+            group.leave()
+        }
+        
+        group.enter()
         let taskDataSource = TaskAnalyticsDataSource(range: range, networkController: networkController)
         taskDataSource.loadData {
             group.leave()
@@ -76,8 +82,12 @@ class AnalyticsViewModel {
         group.notify(queue: .main) {
             self.sections = []
             
+            if goalDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Goals", items: [goalDataSource.chartViewModel.value], dataSources: [goalDataSource]))
+            }
+            
             if taskDataSource.dataExists ?? false {
-                self.sections.append(Section(title: "Completed Tasks", items: [taskDataSource.chartViewModel.value], dataSources: [taskDataSource]))
+                self.sections.append(Section(title: "Tasks", items: [taskDataSource.chartViewModel.value], dataSources: [taskDataSource]))
             }
             
             if eventDataSource.dataExists ?? false {

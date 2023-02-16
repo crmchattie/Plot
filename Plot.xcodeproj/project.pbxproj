@@ -193,6 +193,7 @@
 		1093D2BA299D3390003D77C5 /* GoalsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2B9299D3390003D77C5 /* GoalsViewController.swift */; };
 		1093D2BC299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BB299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift */; };
 		1093D2BE299D3860003D77C5 /* GoalListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BD299D3860003D77C5 /* GoalListViewController.swift */; };
+		1093D2C0299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BF299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift */; };
 		1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */; };
 		10970B0E25803F450027A9EF /* Mindfulness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B0D25803F450027A9EF /* Mindfulness.swift */; };
 		10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B13258060860027A9EF /* MindfulnessViewController.swift */; };
@@ -802,6 +803,7 @@
 		1093D2B9299D3390003D77C5 /* GoalsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViewController.swift; sourceTree = "<group>"; };
 		1093D2BB299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		1093D2BD299D3860003D77C5 /* GoalListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListViewController.swift; sourceTree = "<group>"; };
+		1093D2BF299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectActivityTableViewController.swift; sourceTree = "<group>"; };
 		10970B0D25803F450027A9EF /* Mindfulness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mindfulness.swift; sourceTree = "<group>"; };
 		10970B13258060860027A9EF /* MindfulnessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessViewController.swift; sourceTree = "<group>"; };
@@ -2976,6 +2978,7 @@
 			isa = PBXGroup;
 			children = (
 				F9B82C8F25FAB1FE0072BE74 /* AnalyticsDataSource.swift */,
+				1093D2BF299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift */,
 				10A1865D291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift */,
 				F9773A592601339A00D1B204 /* EventAnalyticsDataSource.swift */,
 				10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */,
@@ -3528,6 +3531,7 @@
 				10FBC8B924BFECD500D0E6B5 /* ActivitylistViewController.swift in Sources */,
 				10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */,
 				10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */,
+				1093D2C0299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift in Sources */,
 				105F34B52885EF7A007531EB /* RecurrenceFrequency+Sequence.swift in Sources */,
 				10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */,
 				269105FA2549D66800A02C5F /* HealthDetailViewModel.swift in Sources */,

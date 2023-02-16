@@ -86,14 +86,30 @@ class HealthService {
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
                 if self?.isRunning ?? true {
-                    self?.observeWorkoutsForCurrentUser {}
-                    self?.observeMindfulnesssForCurrentUser {}
-                    self?.addObservers()
-                    self?.isRunning = false
-                    self?.hasLoadedHealth = true
-                    completion()
+                    self?.grabFirebase {
+                        self?.addObservers()
+                        self?.isRunning = false
+                        self?.hasLoadedHealth = true
+                        completion()
+                    }
                 }
             }
+        }
+    }
+    
+    func grabFirebase(_ completion: @escaping () -> Void) {
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        self.observeWorkoutsForCurrentUser {
+            dispatchGroup.leave()
+        }
+        dispatchGroup.enter()
+        self.observeMindfulnesssForCurrentUser {
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            completion()
         }
     }
     

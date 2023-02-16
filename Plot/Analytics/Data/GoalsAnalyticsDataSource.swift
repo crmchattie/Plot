@@ -1,9 +1,9 @@
 //
-//  TaskAnalyticsDataSource.swift
+//  GoalsAnalyticsDataSource.swift
 //  Plot
 //
-//  Created by Cory McHattie on 11/10/22.
-//  Copyright © 2022 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 2/15/23.
+//  Copyright © 2023 Immature Creations. All rights reserved.
 //
 
 import Foundation
@@ -15,7 +15,7 @@ private func getTitle(range: DateRange) -> String {
         .format(range: range)
 }
 
-class TaskAnalyticsDataSource: AnalyticsDataSource {
+class GoalAnalyticsDataSource: AnalyticsDataSource {
     func updateRange(_ newRange: DateRange) {
         
     }
@@ -27,9 +27,9 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
     
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
-    let title: String = "Tasks"
+    let title: String = "Goals"
     
-    private var tasks: [Activity] = []
+    private var goals: [Activity] = []
     
     var dataExists: Bool?
     
@@ -61,7 +61,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         
         let daysInRange = range.daysInRange
         
-        tasks = networkController.activityService.tasks
+        goals = networkController.activityService.goals
             .filter { $0.isCompleted ?? false }
             .filter { task -> Bool in
                 guard let date = task.completedDateDate else { return false }
@@ -73,12 +73,12 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         var categoryColors: [UIColor] = []
         var categories: [CategorySummaryViewModel] = []
         
-        tasks.grouped(by: \.category).forEach { (uncertainCategory, tasks) in
+        goals.grouped(by: \.category).forEach { (uncertainCategory, goals) in
             let category = uncertainCategory ?? "Uncategorized"
             var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
             var sum: Double = 0
-            tasks.forEach { task in
-                guard let day = task.completedDateDate else { return }
+            goals.forEach { goal in
+                guard let day = goal.completedDateDate else { return }
                 let daysInBetween = day.daysSince(range.startDate)
                 totalValue += 1
                 values[daysInBetween] += 1
@@ -94,9 +94,9 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
             
             var totalString = String()
             if sum == 1 {
-                totalString = "1 task"
+                totalString = "1 goal"
             } else {
-                totalString = "\(Int(sum)) tasks"
+                totalString = "\(Int(sum)) goals"
             }
             
             categories.append(CategorySummaryViewModel(title: category,
@@ -117,13 +117,13 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         
         newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
         if totalValue == 0 {
-            newChartViewModel.rangeAverageValue = "No tasks"
+            newChartViewModel.rangeAverageValue = "No goals"
         } else {
-            newChartViewModel.rangeAverageValue = "\(Int(totalValue)) tasks"
+            newChartViewModel.rangeAverageValue = "\(Int(totalValue)) goals"
             newChartViewModel.maxValue = maxValue + 1
         }
                 
-        if !tasks.isEmpty {
+        if !goals.isEmpty {
             dataExists = true
             let chartDataSet = BarChartDataSet(entries: dataEntries)
             chartDataSet.axisDependency = .right
@@ -146,15 +146,14 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         if range.filterOff {
-            completion(tasks.sorted(by: { $0.completedDateDate ?? Date() > $1.completedDateDate ?? Date() }).map { .activity($0) })
+            completion(goals.sorted(by: { $0.completedDateDate ?? Date() > $1.completedDateDate ?? Date() }).map { .activity($0) })
         } else {
-            let filteredTasks = tasks
-                .filter { task -> Bool in
-                    guard let date = task.completedDateDate?.localTime else { return false }
+            let filteredGoals = goals
+                .filter { goal -> Bool in
+                    guard let date = goal.completedDateDate?.localTime else { return false }
                     return range.startDate <= date && date <= range.endDate
                 }
-            completion(filteredTasks.map { .activity($0) })
+            completion(filteredGoals.map { .activity($0) })
         }
     }
 }
-

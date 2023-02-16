@@ -65,7 +65,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
     
     var calendarViewFilter: CalendarViewFilter = .list
     
-    var selectedDate = Date()
+    var selectedDate = Date().localTime
     
     var activityDates = [String: Int]()
     
@@ -299,12 +299,11 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             goals = []
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
+//                    print(goal.name)
+//                    print(goal.goalStartDate)
+//                    print(goal.goalEndDate)
+//                    print(selectedDate)
                     if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
-                        print(goal.name)
-                        print(goal.goalStartDate)
-                        print(goal.goalEndDate)
-                        print(selectedDate.startOfDay)
-                        print(selectedDate.endOfDay)
                         goals.append(goal)
                     }
                 }
@@ -604,7 +603,7 @@ extension GoalsViewController: UpdateFilter {
                 let bool = value[0].lowercased()
                 if bool == "yes" {
                     goals = networkGoals.filter({
-                        if $0.goalEndDate >= selectedDate.startOfDay, $0.goalStartDate <= selectedDate.endOfDay {
+                        if $0.goalEndDate >= selectedDate, $0.goalStartDate <= selectedDate {
                             return true
                         }
                         return false
@@ -614,7 +613,7 @@ extension GoalsViewController: UpdateFilter {
                     goals = []
                     for goal in networkGoals {
                         if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                            if goal.goalEndDate >= selectedDate.startOfDay, goal.goalStartDate <= selectedDate.endOfDay {
+                            if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
                                 goals.append(goal)
                             }
                         }
