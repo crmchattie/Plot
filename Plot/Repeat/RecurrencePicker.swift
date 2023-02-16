@@ -215,60 +215,59 @@ extension RecurrencePicker {
             return
         }
         
-        if !isGoal {
-            switch indexPath.row {
-            case 0:
-                recurrenceRule = nil
-            case 1:
-                recurrenceRule = RecurrenceRule.dailyRecurrence()
-            case 2:
-                recurrenceRule = RecurrenceRule.weekdayRecurrence()
-            case 3:
-                recurrenceRule = RecurrenceRule.weekendRecurrence()
-            case 4:
-                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
-                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
-            case 5:
-                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
-                recurrenceRule = RecurrenceRule.biWeeklyRecurrence(withWeekday: weekday)
-            case 6:
-                let monthday = calendar.component(.day, from: occurrenceDate)
-                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-            case 7:
-                let monthday = calendar.component(.day, from: occurrenceDate)
-                recurrenceRule = RecurrenceRule.quarterlyRecurrence(withMonthday: monthday)
-            case 8:
-                let monthday = calendar.component(.day, from: occurrenceDate)
-                recurrenceRule = RecurrenceRule.semiannualRecurrence(withMonthday: monthday)
-            case 9:
-                let month = calendar.component(.month, from: occurrenceDate)
-                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
-            default:
-                break
-            }
-        } else {
-            switch indexPath.row {
-            case 0:
-                recurrenceRule = nil
-            case 1:
-                occurrenceDate = occurrenceDateStatic.startOfDay.UTCTime
-                recurrenceRule = RecurrenceRule.dailyRecurrence()
-            case 2:
-                occurrenceDate = occurrenceDateStatic.startOfWeek.UTCTime
-                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
-                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
-            case 3:
-                occurrenceDate = occurrenceDateStatic.startOfMonth.UTCTime
-                let monthday = calendar.component(.day, from: occurrenceDate)
-                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-            case 4:
-                occurrenceDate = occurrenceDateStatic.startOfYear.UTCTime
-                let month = calendar.component(.month, from: occurrenceDate)
-                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
-            default:
-                break
-            }
+        switch indexPath.row {
+        case 0:
+            recurrenceRule = nil
+        case 1:
+            recurrenceRule = RecurrenceRule.dailyRecurrence()
+        case 2:
+            recurrenceRule = RecurrenceRule.weekdayRecurrence()
+        case 3:
+            recurrenceRule = RecurrenceRule.weekendRecurrence()
+        case 4:
+            let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
+            recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+        case 5:
+            let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
+            recurrenceRule = RecurrenceRule.biWeeklyRecurrence(withWeekday: weekday)
+        case 6:
+            let monthday = calendar.component(.day, from: occurrenceDate)
+            recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+        case 7:
+            let monthday = calendar.component(.day, from: occurrenceDate)
+            recurrenceRule = RecurrenceRule.quarterlyRecurrence(withMonthday: monthday)
+        case 8:
+            let monthday = calendar.component(.day, from: occurrenceDate)
+            recurrenceRule = RecurrenceRule.semiannualRecurrence(withMonthday: monthday)
+        case 9:
+            let month = calendar.component(.month, from: occurrenceDate)
+            recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+        default:
+            break
         }
+        
+        
+//        switch indexPath.row {
+//        case 0:
+//            recurrenceRule = nil
+//        case 1:
+//            occurrenceDate = occurrenceDateStatic.startOfDay.UTCTime
+//            recurrenceRule = RecurrenceRule.dailyRecurrence()
+//        case 2:
+//            occurrenceDate = occurrenceDateStatic.startOfWeek.UTCTime
+//            let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
+//            recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+//        case 3:
+//            occurrenceDate = occurrenceDateStatic.startOfMonth.UTCTime
+//            let monthday = calendar.component(.day, from: occurrenceDate)
+//            recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+//        case 4:
+//            occurrenceDate = occurrenceDateStatic.startOfYear.UTCTime
+//            let month = calendar.component(.month, from: occurrenceDate)
+//            recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+//        default:
+//            break
+//        }
     }
 
     fileprivate func recurrenceRuleText() -> String? {

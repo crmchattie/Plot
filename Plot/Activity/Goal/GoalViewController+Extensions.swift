@@ -344,6 +344,9 @@ extension GoalViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         if let row: LabelRow = form.rowBy(tag: "Repeat") {
             if let recurrenceRule = recurrenceRule {
+                print(recurrenceRule.toRRuleString())
+                print(recurrenceRule.startDate)
+                
                 switch recurrenceRule.frequency {
                 case .yearly:
                     self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfYear).timeIntervalSince1970))

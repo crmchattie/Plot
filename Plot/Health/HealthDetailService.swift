@@ -160,6 +160,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
+            print("getStatisticalSamples w/ Segment")
+            print(startDate)
+            print(endDate)
         }
         
         if HealthKitService.authorized {
@@ -360,12 +363,15 @@ class HealthDetailService: HealthDetailServiceInterface {
         // Use start of the day in local time
         let timezone = TimeZone.current
         let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-        let anchorDate = range.startDate.localTime.startOfDay.addingTimeInterval(-seconds)
+        let anchorDate = range.startDate.dayAfter.localTime.startOfDay.addingTimeInterval(-seconds)
         var startDate = anchorDate
         let endDate = anchorDate.advanced(by: 86399)
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.startOfDay.advanced(by: 86400)
+            print("getStatisticalSamples w/o Segment")
+            print(startDate)
+            print(endDate)
         }
         
         if HealthKitService.authorized {
@@ -619,11 +625,14 @@ class HealthDetailService: HealthDetailServiceInterface {
             if #available(iOS 16.0, *) {
                 if sleepValues.contains(.asleepCore) || sleepValues.contains(.asleepREM) || sleepValues.contains(.asleepDeep) || sleepValues.contains(.asleepUnspecified) || sleepValues.contains(.awake) {
                     typeOfSleep = .asleep
+                } else {
+                    typeOfSleep = .inBed
                 }
             } else {
-                // Fallback on earlier versions
                 if sleepValues.contains(.asleep) {
                     typeOfSleep = .asleep
+                } else {
+                    typeOfSleep = .inBed
                 }
             }
             for sample in samples {
@@ -632,7 +641,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
                 if typeOfSleep == .inBed, sleepValue != .inBed {
                     continue
-                } else if sleepValue == .inBed || sleepValue == .awake {
+                } else if typeOfSleep == .asleep, (sleepValue == .inBed || sleepValue == .awake) {
                     continue
                 }
 
@@ -662,11 +671,14 @@ class HealthDetailService: HealthDetailServiceInterface {
                     if #available(iOS 16.0, *) {
                         if sleepValues.contains(.asleepCore) || sleepValues.contains(.asleepREM) || sleepValues.contains(.asleepDeep) || sleepValues.contains(.asleepUnspecified) || sleepValues.contains(.awake) {
                             typeOfSleep = .asleep
+                        } else {
+                            typeOfSleep = .inBed
                         }
                     } else {
-                        // Fallback on earlier versions
                         if sleepValues.contains(.asleep) {
                             typeOfSleep = .asleep
+                        } else {
+                            typeOfSleep = .inBed
                         }
                     }
                 }
@@ -675,7 +687,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
                 if typeOfSleep == .inBed, sleepValue != .inBed {
                     continue
-                } else if sleepValue == .inBed || sleepValue == .awake {
+                } else if typeOfSleep == .asleep, (sleepValue == .inBed || sleepValue == .awake) {
                     continue
                 }
                 
@@ -753,24 +765,30 @@ class HealthDetailService: HealthDetailServiceInterface {
         if #available(iOS 16.0, *) {
             if sleepValues.contains(.asleepCore) || sleepValues.contains(.asleepREM) || sleepValues.contains(.asleepDeep) || sleepValues.contains(.asleepUnspecified) || sleepValues.contains(.awake) {
                 typeOfSleep = .asleep
+            } else {
+                typeOfSleep = .inBed
             }
         } else {
-            // Fallback on earlier versions
             if sleepValues.contains(.asleep) {
                 typeOfSleep = .asleep
+            } else {
+                typeOfSleep = .inBed
             }
         }
+                
         for sample in samples {
             guard let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value) else {
                 continue
             }
+                        
             if typeOfSleep == .inBed, sleepValue != .inBed {
                 continue
-            } else if sleepValue == .inBed || sleepValue == .awake {
+            } else if typeOfSleep == .asleep, (sleepValue == .inBed || sleepValue == .awake) {
                 continue
             }
-
+            
             let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
+                        
             stat.value += TimeInterval(timeSum).totalHours
             
             let customSample = HKCategorySample(type: sample.categoryType, value: sleepValue.rawValue, start: sample.startDate, end: sample.endDate)

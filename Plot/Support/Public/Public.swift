@@ -1044,112 +1044,121 @@ func timeAgoSinceDate(_ date:Date, numericDates:Bool = false) -> String {
     let relativeTime = now < date ? "future" : "past"
     let earliest = now < date ? now : date
     let latest = (earliest == now) ? date : now
-    let components = calendar.dateComponents(unitFlags, from: earliest, to: latest)
+    let componentsEarliest = calendar.dateComponents(unitFlags, from: earliest)
+    let componentsLatest = calendar.dateComponents(unitFlags, from: latest)
+    let year = componentsLatest.year! - componentsEarliest.year!
+    let month = componentsLatest.month! - componentsEarliest.month!
+    let week = componentsLatest.weekOfMonth! - componentsEarliest.weekOfMonth!
+    let day = componentsLatest.day! - componentsEarliest.day!
+    let hour = componentsLatest.hour! - componentsEarliest.hour!
+    let minute = componentsLatest.minute! - componentsEarliest.minute!
+    let second = componentsLatest.second! - componentsEarliest.second!
+    
     if relativeTime == "past" {
-        if (components.year! > 1) {
-            return "\(components.year!) years ago"
-        } else if (components.year! == 1){
-            if (numericDates){
+        if (year > 1) {
+            return "\(year) years ago"
+        } else if (year == 1) {
+            if (numericDates) {
                 return "1 year ago"
             } else {
                 return "last year"
             }
-        } else if (components.month! > 1) {
-            return "\(components.month!) months ago"
-        } else if (components.month! == 1){
-            if (numericDates){
+        } else if (month > 1) {
+            return "\(month) months ago"
+        } else if (month == 1) {
+            if (numericDates) {
                 return "1 month ago"
             } else {
                 return "last month"
             }
-        } else if (components.weekOfMonth! > 1) {
-            return "\(components.weekOfMonth!) weeks ago"
-        } else if (components.weekOfMonth! == 1){
-            if (numericDates){
+        } else if (week > 1) {
+            return "\(week) weeks ago"
+        } else if (week == 1) {
+            if (numericDates) {
                 return "1 week ago"
             } else {
                 return "last week"
             }
-        } else if (components.day! > 1) {
-            return "\(components.day!) days ago"
-        } else if (components.day! == 1){
-            if (numericDates){
+        } else if (day > 1) {
+            return "\(day) days ago"
+        } else if (day == 1) {
+            if (numericDates) {
                 return "1 day ago"
             } else {
                 return "yesterday at \(date.getTimeStringFromUTC())"
             }
-        } else if (components.hour! > 1) {
-            return "\(components.hour!) hours ago"
-        } else if (components.hour! == 1){
-            if (numericDates){
+        } else if (hour > 1) {
+            return "\(hour) hours ago"
+        } else if (hour == 1) {
+            if (numericDates) {
                 return "1 hour ago"
             } else {
                 return "an hour ago"
             }
-        } else if (components.minute! > 1) {
-            return "\(components.minute!) minutes ago"
-        } else if (components.minute! == 1){
-            if (numericDates){
+        } else if (minute > 1) {
+            return "\(minute) minutes ago"
+        } else if (minute == 1) {
+            if (numericDates) {
                 return "1 minute ago"
             } else {
                 return "a minute ago"
             }
-        } else if (components.second! == 3) {
-            return "\(components.second!) seconds ago"
+        } else if (second > 3) {
+            return "\(second) seconds ago"
         } else {
             return "just now"
         }
     } else {
-        if (components.year! > 1) {
-            return "\(components.year!) years from now"
-        } else if (components.year! == 1){
-            if (numericDates){
+        if (year > 1) {
+            return "\(year) years from now"
+        } else if (year == 1) {
+            if (numericDates) {
                 return "1 year from now"
             } else {
                 return "next year"
             }
-        } else if (components.month! > 1) {
-            return "\(components.month!) months from now"
-        } else if (components.month! == 1){
-            if (numericDates){
+        } else if (month > 1) {
+            return "\(month) months from now"
+        } else if (month == 1) {
+            if (numericDates) {
                 return "1 month from now"
             } else {
                 return "next month"
             }
-        } else if (components.weekOfMonth! > 1) {
-            return "\(components.weekOfMonth!) weeks from now"
-        } else if (components.weekOfMonth! == 1){
-            if (numericDates){
+        } else if (week > 1) {
+            return "\(week) weeks from now"
+        } else if (week == 1) {
+            if (numericDates) {
                 return "1 week from now"
             } else {
                 return "next week"
             }
-        } else if (components.day! > 1) {
-            return "\(components.day!) days from now"
-        } else if (components.day! == 1){
-            if (numericDates){
+        } else if (day > 1) {
+            return "\(day) days from now"
+        } else if (day == 1) {
+            if (numericDates) {
                 return "1 day from now"
             } else {
                 return "tomorrow at \(date.getTimeStringFromUTC())"
             }
-        } else if (components.hour! > 1) {
-            return "\(components.hour!) hours from now"
-        } else if (components.hour! == 1){
-            if (numericDates){
+        } else if (hour > 1) {
+            return "\(hour) hours from now"
+        } else if (hour == 1) {
+            if (numericDates) {
                 return "1 hour from now"
             } else {
                 return "an hour from now"
             }
-        } else if (components.minute! > 1) {
-            return "\(components.minute!) minutes from now"
-        } else if (components.minute! == 1){
-            if (numericDates){
+        } else if (minute > 1) {
+            return "\(minute) minutes from now"
+        } else if (minute == 1) {
+            if (numericDates) {
                 return "1 minute from now"
             } else {
                 return "a minute from now"
             }
-        } else if (components.second! == 3) {
-            return "\(components.second!) seconds from now"
+        } else if (second > 3) {
+            return "\(second) seconds from now"
         } else {
             return "just now"
         }

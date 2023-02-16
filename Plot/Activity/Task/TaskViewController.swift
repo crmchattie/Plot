@@ -547,15 +547,66 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
         //        }
         
         form.last!
+        
+        <<< SwitchRow("Flag") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.title = row.tag
+            if let flagged = task.flagged {
+                row.value = flagged
+            } else {
+                row.value = false
+                self.task.flagged = false
+            }
+        }.onChange { [weak self] row in
+            self?.task.flagged = row.value
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+        }
+        
+        <<< PushRow<TaskPriority>("Priority") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.title = row.tag
+            if let task = task, let value = task.priority {
+                row.value = TaskPriority(rawValue: value)
+            } else {
+                row.value = TaskPriority.None
+                if let priority = row.value?.rawValue {
+                    self.task.priority = priority
+                }
+            }
+            row.options = TaskPriority.allCases
+        }.onPresent { from, to in
+            to.extendedLayoutIncludesOpaqueBars = true
+            to.title = "Priority"
+            to.extendedLayoutIncludesOpaqueBars = true
+            to.tableViewStyle = .insetGrouped
+            to.selectableRowCellUpdate = { cell, row in
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
+                to.tableView.separatorStyle = .none
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+        }.onChange() { [unowned self] row in
+            if let priority = row.value?.rawValue {
+                self.task.priority = priority
+            }
+        }
                 
         <<< SwitchRow("deadlineDateSwitch") {
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.textLabel?.textColor = .label
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Deadline Date"
-            if self.task.isGoal ?? false {
-                $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
-            }
             if let task = task, let endDate = task.endDate {
                 $0.value = true
                 $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
@@ -619,9 +670,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.detailTextLabel?.text = nil
             }
-            if self.task.isGoal ?? false {
-                row.hidden = "$Repeat != 'Never'"
-            }
         }
         
         <<< DatePickerRow("DeadlineDate") {
@@ -664,9 +712,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             } else {
                 $0.value = false
                 $0.cell.detailTextLabel?.text = nil
-            }
-            if self.task.isGoal ?? false {
-                $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
             }
         }.onChange { [weak self] row in
             if let value = row.value, let endTimeRow: TimePickerRow = self?.form.rowBy(tag: "DeadlineTime") {
@@ -732,9 +777,6 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.detailTextLabel?.text = nil
             }
-            if self.task.isGoal ?? false {
-                row.hidden = "$Repeat != 'Never'"
-            }
         }
         
         <<< TimePickerRow("DeadlineTime") {
@@ -764,63 +806,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
         }
-        
-        <<< SwitchRow("Flag") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.title = row.tag
-            if let flagged = task.flagged {
-                row.value = flagged
-            } else {
-                row.value = false
-                self.task.flagged = false
-            }
-        }.onChange { [weak self] row in
-            self?.task.flagged = row.value
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-        }
-        
-        <<< PushRow<TaskPriority>("Priority") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            if let task = task, let value = task.priority {
-                row.value = TaskPriority(rawValue: value)
-            } else {
-                row.value = TaskPriority.None
-                if let priority = row.value?.rawValue {
-                    self.task.priority = priority
-                }
-            }
-            row.options = TaskPriority.allCases
-        }.onPresent { from, to in
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.title = "Priority"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                to.tableView.separatorStyle = .none
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange() { [unowned self] row in
-            if let priority = row.value?.rawValue {
-                self.task.priority = priority
-            }
-        }
-        
-        form.last!
-        
+                
         <<< LabelRow("Repeat") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label

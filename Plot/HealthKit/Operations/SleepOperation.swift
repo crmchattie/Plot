@@ -47,18 +47,22 @@ class SleepOperation: AsyncOperation {
                     if #available(iOS 16.0, *) {
                         if sleepValues.contains(.asleepCore) || sleepValues.contains(.asleepREM) || sleepValues.contains(.asleepDeep) || sleepValues.contains(.asleepUnspecified) || sleepValues.contains(.awake) {
                             typeOfSleep = .asleep
+                        } else {
+                            typeOfSleep = .inBed
                         }
                     } else {
-                        // Fallback on earlier versions
                         if sleepValues.contains(.asleep) {
                             typeOfSleep = .asleep
+                        } else {
+                            typeOfSleep = .inBed
                         }
                     }
                 }
+                
                 if let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value) {
                     if typeOfSleep == .inBed, sleepValue != .inBed {
                         continue
-                    } else if sleepValue == .inBed || sleepValue == .awake {
+                    } else if typeOfSleep == .asleep, (sleepValue == .inBed || sleepValue == .awake) {
                         continue
                     }
                 }
@@ -70,7 +74,7 @@ class SleepOperation: AsyncOperation {
             
             let sortedDates = Array(map.sorted(by: { $0.0 < $1.0 }))
             let average = sum / Double(map.count)
-                        
+                                    
             if let last = sortedDates.last?.key, let val = map[last] {
                 var metric = HealthMetric(type: .sleep, total: val, date: last, unitName: "hrs", rank: HealthMetricType.sleep.rank)
                 metric.average = average

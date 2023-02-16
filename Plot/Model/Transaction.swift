@@ -702,7 +702,7 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
                 continue
             }
         }
-                
+        
         if transactionDetail.name == "Net Savings" || transactionDetail.name == "Net Spending" {
             switch transaction.type {
             case .debit:

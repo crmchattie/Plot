@@ -299,10 +299,6 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             goals = []
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
-//                    print(goal.name)
-//                    print(goal.goalStartDate)
-//                    print(goal.goalEndDate)
-//                    print(selectedDate)
                     if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
                         goals.append(goal)
                     }

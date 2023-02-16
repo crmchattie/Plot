@@ -324,7 +324,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.title = $0.tag
                 $0.minuteInterval = 5
                 $0.dateFormatter?.dateStyle = .medium
-                $0.dateFormatter?.timeStyle = .short
+                $0.dateFormatter?.timeStyle = .none
                 if let task = task, task.isCompleted ?? false, let date = task.completedDate {
                     $0.value = Date(timeIntervalSince1970: date as! TimeInterval)
                     $0.updateCell()
@@ -930,81 +930,52 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             self.updateSecondTargetRow()
         }
         
-        <<< LabelRow("Repeat") { row in
+        <<< PushRow<String>("Period") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if let task = task, let recurrences = task.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
-                if let endDate = self.task.instanceOriginalStartDate {
-                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
-                } else if let endDate = self.task.endDate {
-                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
-                }
+            row.title = "Measurement Period"
+            row.options = GoalPeriod.allValues
+            if let task = task, let goal = task.goal, let value = goal.period {
+                row.value = value.rawValue
             } else {
-                row.value = "Never"
+                row.value = "None"
             }
-        }.onCellSelection({ _, row in
-            self.openRepeat()
-        }).cellUpdate { cell, row in
-            cell.textLabel?.textAlignment = .left
+            row.hidden = Condition(booleanLiteral: !(self.task.startDate == nil && (self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts))))
+        }.onPresent { from, to in
+            to.title = "Measurement Period"
+            to.extendedLayoutIncludesOpaqueBars = true
+            to.tableViewStyle = .insetGrouped
+            to.dismissOnSelection = true
+            to.dismissOnChange = true
+            to.enableDeselection = false
+            to.selectableRowCellUpdate = { cell, row in
+                to.tableView.separatorStyle = .none
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }
+        }.cellUpdate { cell, row in
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.accessoryType = .disclosureIndicator
-            row.hidden = "$deadlineDateSwitch == true || $startDateSwitch == true"
+            if let options = row.options, !options.isEmpty {
+                cell.isUserInteractionEnabled = true
+            } else {
+                cell.isUserInteractionEnabled = false
+            }
+            row.hidden = "!($startDateSwitch == false && ($Metric != 'Financial Accounts' || ($secondMetric != nil && $secondMetric != 'Financial Accounts')))"
+        }.onChange { row in
+            if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
+                self.task.goal!.period = updatedValue
+            } else {
+                self.task.goal!.period = nil
+                row.value = "None"
+            }
+            self.updateDescriptionRow()
         }
-        
-//            <<< PushRow<String>("Period") { row in
-//                row.cell.backgroundColor = .secondarySystemGroupedBackground
-//                row.cell.textLabel?.textColor = .label
-//                row.cell.detailTextLabel?.textColor = .secondaryLabel
-//                row.title = "Measurement Period"
-//                row.options = GoalPeriod.allValues
-//                if let task = task, let goal = task.goal, let value = goal.period {
-//                    row.value = value.rawValue
-//                } else {
-//                    row.value = "None"
-//                }
-//                row.hidden = Condition(booleanLiteral: !(self.task.recurrences == nil && self.task.startDate == nil))
-//            }.onPresent { from, to in
-//                to.title = "Measurement Period"
-//                to.extendedLayoutIncludesOpaqueBars = true
-//                to.tableViewStyle = .insetGrouped
-//                to.dismissOnSelection = true
-//                to.dismissOnChange = true
-//                to.enableDeselection = false
-//                to.selectableRowCellUpdate = { cell, row in
-//                    to.tableView.separatorStyle = .none
-//                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-//                    to.tableView.backgroundColor = .systemGroupedBackground
-//                    cell.backgroundColor = .secondarySystemGroupedBackground
-//                    cell.textLabel?.textColor = .label
-//                    cell.detailTextLabel?.textColor = .secondaryLabel
-//                }
-//            }.cellUpdate { cell, row in
-//                cell.backgroundColor = .secondarySystemGroupedBackground
-//                cell.textLabel?.textColor = .label
-//                cell.detailTextLabel?.textColor = .secondaryLabel
-//                if let options = row.options, !options.isEmpty {
-//                    cell.isUserInteractionEnabled = true
-//                } else {
-//                    cell.isUserInteractionEnabled = false
-//                }
-//                row.hidden = "!($Repeat == 'Never' && $startDateSwitch == false)"
-//            }.onChange { row in
-//                if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none {
-//                    if let _ = self.task.goal {
-//                        self.task.goal!.period = updatedValue
-//                    }
-//                    self.updateDescriptionRow()
-//                } else {
-//                    self.task.goal!.period = nil
-//                    row.value = "None"
-//                }
-//            }
         
         <<< SwitchRow("startDateSwitch") {
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -1018,9 +989,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.value = false
                 $0.cell.detailTextLabel?.text = nil
             }
-            $0.hidden = Condition(booleanLiteral: !(self.task.recurrences == nil && (self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts))))
-//                && !(self.task.goal?.metric != .financialAccounts || self.task.goal?.metricSecond != .financialAccounts)
-//                !(self.task.recurrences == nil)
+            $0.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil && (self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts))))
         }.onChange { [weak self] row in
             if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
                 if value {
@@ -1061,14 +1030,12 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-            if let task = self.task, let endDate = task.endDate {
-                cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+            if let task = self.task, let startDate = task.startDate {
+                cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
             } else {
                 cell.detailTextLabel?.text = nil
             }
-            row.hidden = "!($Repeat == 'Never' && ($Metric != 'Financial Accounts' || ($secondMetric != nil && $secondMetric != 'Financial Accounts')))"
-//                 && !($Metric != 'Financial Accounts' || $secondMetric != 'Financial Accounts')
-//                !($Repeat == 'Never')
+            row.hidden = "!($Period == 'None' && ($Metric != 'Financial Accounts' || ($secondMetric != nil && $secondMetric != 'Financial Accounts')))"
         }
 
         <<< DatePickerRow("StartDate") {
@@ -1099,7 +1066,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
         }
-
+        
         <<< SwitchRow("deadlineDateSwitch") {
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.textLabel?.textColor = .label
@@ -1112,7 +1079,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.value = false
                 $0.cell.detailTextLabel?.text = nil
             }
-            $0.hidden = Condition(booleanLiteral: self.task.recurrences != nil)
         }.onChange { [weak self] row in
             if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
                 if value {
@@ -1158,7 +1124,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.detailTextLabel?.text = nil
             }
-            row.hidden = "$Repeat != 'Never'"
         }
         
         <<< DatePickerRow("DeadlineDate") {
@@ -1189,49 +1154,77 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
         }
+        
+        <<< LabelRow("Repeat") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            row.hidden = "$deadlineDateSwitch == false"
+            if let task = task, let recurrences = task.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
+                if let endDate = self.task.instanceOriginalStartDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                } else if let endDate = self.task.endDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                }
+            } else {
+                row.value = "Never"
+            }
+        }.onCellSelection({ _, row in
+            self.openRepeat()
+        }).cellUpdate { cell, row in
+            cell.textLabel?.textAlignment = .left
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.accessoryType = .disclosureIndicator
+        }
+        
+        <<< PushRow<EventAlert>("Reminder") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.title = row.tag
+            row.hidden = "$deadlineDateSwitch == false"
+            if let task = task, let value = task.reminder {
+                row.value = EventAlert(rawValue: value)
+            } else {
+                row.value = EventAlert.None
+                if let reminder = row.value?.description {
+                    self.task.reminder = reminder
+                }
+            }
+            row.options = EventAlert.allCases
+        }.onPresent { from, to in
+            to.title = "Reminder"
+            to.extendedLayoutIncludesOpaqueBars = true
+            to.tableViewStyle = .insetGrouped
+            to.selectableRowCellUpdate = { cell, row in
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
+                to.tableView.separatorStyle = .none
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+        }.onChange() { [unowned self] row in
+            if let reminder = row.value?.description {
+                self.task.reminder = reminder
+                if self.active {
+                    self.scheduleReminder()
+                }
+            }
+        }
             
         
 //        if delegate == nil && !(task.isGoal ?? false) {
 //            form.last!
-//            <<< PushRow<EventAlert>("Reminder") { row in
-//                row.cell.backgroundColor = .secondarySystemGroupedBackground
-//                row.cell.textLabel?.textColor = .label
-//                row.cell.detailTextLabel?.textColor = .secondaryLabel
-//                row.title = row.tag
-//                row.hidden = "$deadlineDateSwitch == false"
-//                if let task = task, let value = task.reminder {
-//                    row.value = EventAlert(rawValue: value)
-//                } else {
-//                    row.value = EventAlert.None
-//                    if let reminder = row.value?.description {
-//                        self.task.reminder = reminder
-//                    }
-//                }
-//                row.options = EventAlert.allCases
-//            }.onPresent { from, to in
-//                to.title = "Reminder"
-//                to.extendedLayoutIncludesOpaqueBars = true
-//                to.tableViewStyle = .insetGrouped
-//                to.selectableRowCellUpdate = { cell, row in
-//                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-//                    to.tableView.backgroundColor = .systemGroupedBackground
-//                    to.tableView.separatorStyle = .none
-//                    cell.backgroundColor = .secondarySystemGroupedBackground
-//                    cell.textLabel?.textColor = .label
-//                    cell.detailTextLabel?.textColor = .secondaryLabel
-//                }
-//            }.cellUpdate { cell, row in
-//                cell.backgroundColor = .secondarySystemGroupedBackground
-//                cell.textLabel?.textColor = .label
-//                cell.detailTextLabel?.textColor = .secondaryLabel
-//            }.onChange() { [unowned self] row in
-//                if let reminder = row.value?.description {
-//                    self.task.reminder = reminder
-//                    if self.active {
-//                        self.scheduleReminder()
-//                    }
-//                }
-//            }
 //
 //            <<< LabelRow("Participants") { row in
 //                row.cell.backgroundColor = .secondarySystemGroupedBackground

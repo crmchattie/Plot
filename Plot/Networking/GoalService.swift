@@ -84,7 +84,7 @@ extension NetworkController {
                         switch metricsRelationshipType {
                         case .or:
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
-                                task.completedDate = NSNumber(value: Int((range.startDate).timeIntervalSince1970))
+                                task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                                 updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) && (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
@@ -97,7 +97,7 @@ extension NetworkController {
 
                         case .and:
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
-                                task.completedDate = NSNumber(value: Int((range.startDate).timeIntervalSince1970))
+                                task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
 //                                    task.completedDate = finalStat.date > finalStatSecond.date ? NSNumber(value: Int((finalStat.date).timeIntervalSince1970)) : NSNumber(value: Int((finalStatSecond.date).timeIntervalSince1970))
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                                 updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
@@ -127,7 +127,7 @@ extension NetworkController {
 //                    print(target)
                     
                     if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
-                        task.completedDate = NSNumber(value: Int((range.startDate).timeIntervalSince1970))
+                        task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
                         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                         updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                     } else if finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false) {
@@ -240,6 +240,11 @@ extension NetworkController {
         case .sleep:
             if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
                 healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
+                    print("finsihed checking sleep")
+                    print(range.startDate)
+                    print(range.endDate)
+                    print(stat?.date)
+                    print(stat?.value)
                     completion(stat)
                 }
             }
@@ -265,6 +270,7 @@ extension NetworkController {
     }
     
     func setupInitialGoals() {
+        print("setupInitialGoals")
         if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
             for g in prebuiltGoals {
                 var goal = g
@@ -313,28 +319,24 @@ extension NetworkController {
                             
                             switch recurrenceRule.frequency {
                             case .yearly:
-                                date = date.startOfYear.UTCTime
+                                date = date.startOfYear
                                 let month = calendar.component(.month, from: date)
                                 recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
-                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
                                 task.endDateTime = NSNumber(value: Int((date.endOfYear).timeIntervalSince1970))
                             case .monthly:
-                                date = date.startOfMonth.UTCTime
+                                date = date.startOfMonth
                                 let monthday = calendar.component(.day, from: date)
                                 recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
                                 task.endDateTime = NSNumber(value: Int((date.endOfMonth).timeIntervalSince1970))
                                 recurrenceRule.bymonthday = [1]
                             case .weekly:
-                                date = date.startOfWeek.UTCTime
+                                date = date.startOfWeek
                                 let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: date))!
                                 recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
-                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
                                 task.endDateTime = NSNumber(value: Int((date.endOfWeek).timeIntervalSince1970))
                             case .daily:
-                                date = date.startOfDay.UTCTime
+                                date = date.startOfDay
                                 recurrenceRule = RecurrenceRule.dailyRecurrence()
-                                task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
                                 task.endDateTime = NSNumber(value: Int((date.endOfDay).timeIntervalSince1970))
                             case .hourly, .minutely, .secondly:
                                 break
@@ -343,9 +345,14 @@ extension NetworkController {
                             task.hasStartTime = false
                             task.hasDeadlineTime = false
                             
-                            recurrenceRule.startDate = task.startDate ?? date
+                            recurrenceRule.startDate = date
                             recurrenceRule.interval = goal.name != "Dentist" ? 1 : 2
                             task.recurrences = [recurrenceRule.toRRuleString()]
+                            
+//                            print(goal.name)
+//                            print(date)
+//                            print(task.endDate)
+//                            print(recurrenceRule.toRRuleString())
                         }
                         
                         let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])

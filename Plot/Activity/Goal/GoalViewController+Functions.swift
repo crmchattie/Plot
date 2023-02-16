@@ -418,13 +418,20 @@ extension GoalViewController {
     
     func updateRightBarButton() {
         if let _ = task.name, let goal = task.goal, let _ = goal.description {
-            if self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts) {
-                if task.recurrences != nil || task.endDateTime != nil {
+            if goal.metric != .financialAccounts || (goal.metricSecond != nil && goal.metricSecond != .financialAccounts) {
+                if task.recurrences != nil && task.endDateTime != nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                 }
-            } else {
+            } else if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period") {
+                dateSwitchRow.value = false
+                dateRow.value = nil
+                periodRow.value = "None"
+
+                self.task.startDateTime = nil
+                self.task.hasStartTime = false
+                self.task.goal?.period = nil
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             }
         } else {
@@ -768,6 +775,7 @@ extension GoalViewController {
                 numberFormatter.numberStyle = .decimal
             case .hours:
                 numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
             case .days:
                 numberFormatter.numberStyle = .decimal
             case .level:
@@ -809,6 +817,7 @@ extension GoalViewController {
                     numberFormatter.numberStyle = .decimal
                 case .hours:
                     numberFormatter.numberStyle = .decimal
+                    numberFormatter.maximumFractionDigits = 1
                 case .days:
                     numberFormatter.numberStyle = .decimal
                 case .level:
@@ -1309,7 +1318,7 @@ extension GoalViewController {
                 dateComponents.day = dateRowValue.dayNumber()
                 let date = Calendar.current.date(from: dateComponents)
                 self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasStartTime = false
+                self.task.hasStartTime = false                
             } else {
                 self.task.startDateTime = nil
                 self.task.hasStartTime = false

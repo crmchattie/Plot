@@ -2053,32 +2053,6 @@ extension Activity {
         return nil
     }
     
-    var startDateGivenEndDateFrequency: Date? {
-        if let endDate = endDate, let goal = goal, let frequency = goal.frequency {
-            switch frequency {
-            case .yearly:
-                return endDate.startOfYear
-            case .monthly:
-                return endDate.startOfMonth
-            case .bimonthly:
-                return endDate.addDays(frequency.dayInterval * -1)
-            case .weekly:
-                return endDate.startOfWeek
-            case .biweekly:
-                return endDate.addDays(frequency.dayInterval * -1)
-            case .daily:
-                return endDate.startOfDay
-            case .hourly:
-                return endDate.startOfHour
-            case .minutely:
-                return endDate
-            case .secondly:
-                return endDate
-            }
-        }
-        return nil
-    }
-    
     var endDate: Date? {
         if let endDateTime = endDateTime?.doubleValue {
             return Date(timeIntervalSince1970: endDateTime)
@@ -2087,7 +2061,7 @@ extension Activity {
     }
     
     var finalDate: Date? {
-        if isTask ?? false, !(isGoal ?? false) {
+        if isTask ?? false {
             return endDate
         } else {
             return startDate
@@ -2122,7 +2096,7 @@ extension Activity {
     var goalStartDate: Date {
         if let startDateTemp = self.startDate {
             return startDateTemp
-        } else if let goal = self.goal, let _ = goal.frequency, let startDateTemp = self.startDateGivenEndDateFrequency {
+        } else if let startDateTemp = self.startDateGivenEndDatePeriod {
             return startDateTemp
         }
         return Date()
@@ -2135,9 +2109,27 @@ extension Activity {
         return Date()
     }
     
+    var startDateGivenEndDatePeriod: Date? {
+        if let endDate = endDate, let goal = goal, let period = goal.period {
+            switch period {
+            case .none:
+                return nil
+            case .day:
+                return endDate.dayBefore
+            case .week:
+                return endDate.weekBefore
+            case .month:
+                return endDate.monthBefore
+            case .year:
+                return endDate.lastYear
+            }
+        }
+        return nil
+    }
+    
     //for tasks where deadline date is more likely to be set than start date
     var finalDateTime: NSNumber? {
-        if isTask ?? false, !(isGoal ?? false) {
+        if isTask ?? false {
             //do not add in completed date; this is used for recurrences
             return endDateTime
         } else {
