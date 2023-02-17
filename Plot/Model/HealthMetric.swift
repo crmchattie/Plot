@@ -83,7 +83,7 @@ enum HealthMetricType: Hashable {
         get {
             switch self {
             case .steps:
-                return 2
+                return 1
             case .nutrition:
                 return 7
             case .workout:
@@ -91,11 +91,11 @@ enum HealthMetricType: Hashable {
             case .heartRate:
                 return 9
             case .weight:
-                return 1
+                return 2
             case .mindfulness:
-                return 3
-            case .sleep:
                 return 4
+            case .sleep:
+                return 3
             case .workoutMinutes:
                 return 6
             case .activeEnergy:

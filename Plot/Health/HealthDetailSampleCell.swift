@@ -149,7 +149,7 @@ class HealthDetailSampleCell: UITableViewCell {
         }
         else if case .weight = healthMetric.type, let quantitySample = sample as? HKQuantitySample {
             let unit = HKUnit.pound()
-            let count = quantitySample.quantity.doubleValue(for: unit)
+            let count = String(format: "%.0f", quantitySample.quantity.doubleValue(for: unit))
             let string = "\(count) lb"
             titleLabel.text = string
             

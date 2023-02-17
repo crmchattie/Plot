@@ -374,16 +374,21 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         navigationController?.pushViewController(destination, animated: true)
                     } else if section == .cashFlow {
                         let destination = FinanceViewController(networkController: networkController)
+                        destination.title = section.name
+                        destination.setSections = [.incomeStatement, .transactions]
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
                     } else if section == .balancesFinances {
                         let destination = FinanceViewController(networkController: networkController)
+                        destination.title = section.name
+                        destination.setSections = [.balanceSheet, .financialAccounts]
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
                     } else if section == .transactions, networkController.financeService.transactions.count > 3 {
                         let destination = FinanceDetailViewController(networkController: networkController)
-                        destination.title = SectionType.transactions.name
+                        destination.title = section.name
                         destination.setSections = [.transactions]
+                        destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
                     } else if section == .generalHealth {
                         let destination = HealthViewController(networkController: networkController)
@@ -394,12 +399,14 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         destination.title = HealthMetricCategory.workoutsList.name
                         destination.healthMetricSections = [HealthMetricCategory.workoutsList]
                         destination.healthMetrics = [HealthMetricCategory.workoutsList: networkController.healthService.workouts]
+                        destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
                     } else if section == .mindfulness, networkController.healthService.mindfulnesses.count > 3 {
                         let destination = HealthListViewController(networkController: networkController)
                         destination.title = HealthMetricCategory.mindfulnessList.name
                         destination.healthMetricSections = [HealthMetricCategory.mindfulnessList]
                         destination.healthMetrics = [HealthMetricCategory.mindfulnessList: networkController.healthService.mindfulnesses]
+                        destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
                     }
                 }

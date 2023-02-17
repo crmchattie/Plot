@@ -418,20 +418,13 @@ extension GoalViewController {
     
     func updateRightBarButton() {
         if let _ = task.name, let goal = task.goal, let _ = goal.description {
-            if goal.metric != .financialAccounts || (goal.metricSecond != nil && goal.metricSecond != .financialAccounts) {
+            if goal.metric?.type != .pointInTime || (goal.metricSecond != nil && goal.metricSecond?.type != .pointInTime) {
                 if task.recurrences != nil && task.endDateTime != nil {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
                 }
-            } else if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period") {
-                dateSwitchRow.value = false
-                dateRow.value = nil
-                periodRow.value = "None"
-
-                self.task.startDateTime = nil
-                self.task.hasStartTime = false
-                self.task.goal?.period = nil
+            } else {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             }
         } else {
@@ -488,16 +481,6 @@ extension GoalViewController {
                         submetricRow.value = nil
                     }
                     
-                    //period
-//                    if updatedValue == .financialAccounts, (task.goal?.metricSecond == nil || task.goal?.metricSecond == .financialAccounts) {
-//                        task.goal!.period = nil
-//                        periodRow.hidden = true
-//                        periodRow.evaluateHidden()
-//                        periodRow.value = nil
-//                    } else {
-//                        periodRow.hidden = false
-//                        periodRow.evaluateHidden()
-//                    }
                 }
             case .submetric:
                 if let value = value, let updatedValue = GoalSubMetric(rawValue: value) {
@@ -577,16 +560,6 @@ extension GoalViewController {
                         submetricRow.value = nil
                     }
                     
-                    //period
-//                    if updatedValue == .financialAccounts, let metric = goal.metric, metric == .financialAccounts {
-//                        task.goal!.periodSecond = nil
-//                        periodRow.hidden = true
-//                        periodRow.evaluateHidden()
-//                        periodRow.value = nil
-//                    } else {
-//                        periodRow.hidden = false
-//                        periodRow.evaluateHidden()
-//                    }
                 } else {
                     task.goal!.metricSecond = nil
                     task.goal!.submetricSecond = nil

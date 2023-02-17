@@ -1209,9 +1209,9 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.count]
         case .financialTransactions:
 //            return [.amount, .percent, .multiple]
-            return [.amount]
+            return [.count, .amount]
         case .financialAccounts:
-            return [.amount]
+            return [.count, .amount]
         case .workout:
             return [.count, .calories, .minutes]
         case .mindfulness:
@@ -1224,6 +1224,31 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.count]
         case .activeCalories:
             return [.calories]
+        }
+    }
+    
+    var type: MetricType {
+        switch self {
+        case .events:
+            return .periodOfTime
+        case .tasks:
+            return .periodOfTime
+        case .financialTransactions:
+            return .periodOfTime
+        case .financialAccounts:
+            return .pointInTime
+        case .workout:
+            return .periodOfTime
+        case .mindfulness:
+            return .periodOfTime
+        case .sleep:
+            return .periodOfTime
+        case .steps:
+            return .periodOfTime
+        case .flightsClimbed:
+            return .periodOfTime
+        case .activeCalories:
+            return .periodOfTime
         }
     }
 }
@@ -1342,6 +1367,11 @@ enum GoalPeriod: String, Codable, CaseIterable {
 enum FormatterType: String {
     case number = "Number"
     case date = "Date"
+}
+
+enum MetricType {
+    case pointInTime
+    case periodOfTime
 }
 
 enum MetricsRelationshipType: String, Codable, CaseIterable {

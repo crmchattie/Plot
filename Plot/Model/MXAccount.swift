@@ -251,6 +251,23 @@ enum MXAccountType: String, CaseIterable, Codable {
         case .any: return "Any"
         }
     }
+    
+    var bs_type: BalanceSheetType {
+        switch self {
+        case .checking: return .Asset
+        case .savings: return .Asset
+        case .investment: return .Asset
+        case .property: return .Asset
+        case .cash: return .Asset
+        case .insurance: return .Asset
+        case .prepaid: return .Asset
+        case .loan: return .Asset
+        case .creditCard: return .Asset
+        case .lineOfCredit: return .Asset
+        case .mortgage: return .Asset
+        case .any: return .None
+        }
+    }
 }
 
 enum MXAccountSubType: String, CaseIterable, Codable {
@@ -594,6 +611,10 @@ enum MXAccountSubType: String, CaseIterable, Codable {
         case .none: return .any
         case .any: return .any
         }
+    }
+    
+    var bs_type: BalanceSheetType {
+        return self.mxAccountType.bs_type
     }
 }
 

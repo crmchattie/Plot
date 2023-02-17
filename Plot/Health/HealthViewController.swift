@@ -82,18 +82,18 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
     @objc fileprivate func setupData() {
         filteredHealthMetricSections = healthMetricSections
         filteredHealthMetrics = healthMetrics
-        if healthMetricSections.contains(.workouts) {
-            filteredHealthMetricSections.append(.workoutsList)
-            filteredHealthMetrics[.workoutsList] = workouts
-            filters = [.search, .workoutCategory]
-        }
-        if let generalMetrics = healthMetrics[.general], generalMetrics.contains(where: {$0.type == HealthMetricType.mindfulness }) {
-            filteredHealthMetricSections.append(.mindfulnessList)
-            filteredHealthMetrics[.mindfulnessList] = mindfulness
-            if filters.isEmpty {
-                filters = [.search]
-            }
-        }
+//        if healthMetricSections.contains(.workouts) {
+//            filteredHealthMetricSections.append(.workoutsList)
+//            filteredHealthMetrics[.workoutsList] = workouts
+//            filters = [.search, .workoutCategory]
+//        }
+//        if let generalMetrics = healthMetrics[.general], generalMetrics.contains(where: {$0.type == HealthMetricType.mindfulness }) {
+//            filteredHealthMetricSections.append(.mindfulnessList)
+//            filteredHealthMetrics[.mindfulnessList] = mindfulness
+//            if filters.isEmpty {
+//                filters = [.search]
+//            }
+//        }
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }

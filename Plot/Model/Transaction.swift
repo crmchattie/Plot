@@ -589,7 +589,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts, ignore_plot_created: nil, ignore_transfer_between_accounts: nil) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -612,7 +612,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts, ignore_plot_created: nil, ignore_transfer_between_accounts: nil) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -636,7 +636,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts, ignore_plot_created: nil, ignore_transfer_between_accounts: nil) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -660,7 +660,7 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
         // While date <= endDate ...
         while nextDate.compare(end) != .orderedDescending {
             for transactionDetail in transactionDetails {
-                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts) { (stats, transactions) in
+                transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: date, nextDate: nextDate, accounts: accounts, ignore_plot_created: nil, ignore_transfer_between_accounts: nil) { (stats, transactions) in
                     if statistics[transactionDetail] != nil, transactionDict[transactionDetail] != nil {
                         var tdStats = statistics[transactionDetail]
                         var tdTransactionList = transactionDict[transactionDetail]
@@ -683,16 +683,23 @@ func transactionDetailsOverTimeChartData(transactions: [Transaction], transactio
     completion(statistics, transactionDict)
 }
 
-func transactionListStats(transactions: [Transaction], transactionDetail: TransactionDetails, date: Date, nextDate: Date, accounts: [String]?, completion: @escaping ([Statistic], [Transaction]) -> ()) {
+func transactionListStats(transactions: [Transaction], transactionDetail: TransactionDetails, date: Date, nextDate: Date, accounts: [String]?, ignore_plot_created: Bool?, ignore_transfer_between_accounts: Bool?, completion: @escaping ([Statistic], [Transaction]) -> ()) {
     var statistics = [Statistic]()
     var transactionList = [Transaction]()
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
-        guard transaction.should_link ?? true && !(transaction.plot_created ?? false) && !(transaction.transfer_between_accounts ?? false) else { continue }
+        guard transaction.should_link ?? true else { continue }
         guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
-        if accounts != nil {
-            guard accounts!.contains(transaction.account_guid ?? "") else { continue }
+        if ignore_plot_created ?? true {
+            guard !(transaction.plot_created ?? false) else { continue }
         }
+        if ignore_transfer_between_accounts ?? true {
+            guard !(transaction.transfer_between_accounts ?? false) else { continue }
+        }
+        if let accounts = accounts {
+            guard accounts.contains(transaction.account_guid ?? "") else { continue }
+        }
+        
         if let date_for_reports = transaction.date_for_reports, date_for_reports != "", let transactionDate = isodateFormatter.date(from: date_for_reports) {
             if transactionDate.localTime < date || nextDate < transactionDate.localTime {
                 continue

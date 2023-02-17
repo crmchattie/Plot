@@ -108,7 +108,9 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 activityID = task.activityID!
                 print(activityID)
                 print(task.instanceID as Any)
+                print(task.startDate)
                 print(task.goalStartDate)
+                print(task.endDate)
                 print(task.goalEndDate)
             }
             if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
@@ -274,6 +276,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.cell.textLabel?.textColor = .label
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.cell.accessoryType = .checkmark
+                $0.cell.isUserInteractionEnabled = false
                 $0.title = $0.tag
                 $0.value = task.isCompleted ?? false
                 if $0.value ?? false {
@@ -803,50 +806,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             self.updateDescriptionRow()
         }
         
-//            <<< PushRow<String>("Second Period") { row in
-//                row.cell.backgroundColor = .secondarySystemGroupedBackground
-//                row.cell.textLabel?.textColor = .label
-//                row.cell.detailTextLabel?.textColor = .secondaryLabel
-//                row.title = row.tag
-//                row.options = GoalPeriod.allValues
-//                if let task = task, let goal = task.goal, let metric = goal.metricSecond, metric != .financialAccounts, let value = goal.periodSecond {
-//                    row.value = value.rawValue
-//                } else {
-//                    row.hidden = true
-//                }
-//            }.onPresent { from, to in
-//                to.title = "Period"
-//                to.extendedLayoutIncludesOpaqueBars = true
-//                to.tableViewStyle = .insetGrouped
-//                to.dismissOnSelection = true
-//                to.dismissOnChange = true
-//                to.enableDeselection = false
-//                to.selectableRowCellUpdate = { cell, row in
-//                    to.tableView.separatorStyle = .none
-//                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-//                    to.tableView.backgroundColor = .systemGroupedBackground
-//                    cell.backgroundColor = .secondarySystemGroupedBackground
-//                    cell.textLabel?.textColor = .label
-//                    cell.detailTextLabel?.textColor = .secondaryLabel
-//                }
-//            }.cellUpdate { cell, row in
-//                cell.backgroundColor = .secondarySystemGroupedBackground
-//                cell.textLabel?.textColor = .label
-//                cell.detailTextLabel?.textColor = .secondaryLabel
-//                if let options = row.options, !options.isEmpty {
-//                    cell.isUserInteractionEnabled = true
-//                } else {
-//                    cell.isUserInteractionEnabled = false
-//                }
-//            }.onChange { row in
-//                if let value = row.value, let updatedValue = GoalPeriod(rawValue: value) {
-//                    if let _ = self.task.goal {
-//                        self.task.goal!.periodSecond = updatedValue
-//                    }
-//                    self.updateDescriptionRow()
-//                }
-//            }
-        
         <<< DecimalRow("Second Target") {
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.textField?.textColor = .secondaryLabel
@@ -943,7 +902,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 row.value = "None"
             }
-            row.hidden = Condition(booleanLiteral: !(self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts)))
+            row.hidden = Condition(booleanLiteral: !(self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime)))
         }.onPresent { from, to in
             to.title = "Measurement Period"
             to.extendedLayoutIncludesOpaqueBars = true
@@ -968,7 +927,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.isUserInteractionEnabled = false
             }
-            row.hidden = "!($Metric != 'Financial Accounts' || (($secondMetric != nil && $secondMetric != 'Financial Accounts')))"
+            row.hidden = Condition(booleanLiteral: !(self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime)))
         }.onChange { row in
             if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
                 self.task.goal!.period = updatedValue
@@ -994,7 +953,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.value = false
                 $0.cell.detailTextLabel?.text = nil
             }
-            $0.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil && (self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts))))
+            $0.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil && (self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime))))
         }.onChange { [weak self] row in
             if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
                 if value {
@@ -1040,7 +999,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.detailTextLabel?.text = nil
             }
-            row.hidden = "!($Period == 'None' && ($Metric != 'Financial Accounts' || ($secondMetric != nil && $secondMetric != 'Financial Accounts')))"
+            row.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil && (self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime))))
         }
 
         <<< DatePickerRow("StartDate") {

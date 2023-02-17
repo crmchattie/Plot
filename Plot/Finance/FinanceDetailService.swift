@@ -13,7 +13,7 @@ protocol FinanceDetailServiceInterface {
     
     func getSamples(for range: DateRange, segment: TimeSegmentType, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
     
-    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void)
+    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, ignore_plot_created: Bool?, ignore_transfer_between_accounts: Bool?, completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void)
 }
 
 class FinanceDetailService: FinanceDetailServiceInterface {
@@ -40,13 +40,15 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                               completion: completion)
     }
     
-    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
+    func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, ignore_plot_created: Bool?, ignore_transfer_between_accounts: Bool?, completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void) {
         getStatisticalSamples(accountDetails: accountDetails,
                               transactionDetails: transactionDetails,
                               range: range,
                               accounts: accounts,
                               transactions: transactions,
                               filterAccounts: filterAccounts,
+                              ignore_plot_created: ignore_plot_created,
+                              ignore_transfer_between_accounts: ignore_transfer_between_accounts,
                               completion: completion)
     }
 
@@ -120,6 +122,8 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         accounts: [MXAccount]?,
         transactions: [Transaction]?,
         filterAccounts: [String]?,
+        ignore_plot_created: Bool?,
+        ignore_transfer_between_accounts: Bool?,
         completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void
     ) {
 
@@ -127,30 +131,30 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         let endDate = Date().localTime.dayAfter
         
         var finalStat = Statistic(date: startDate, value: 0)
-                
+        
         DispatchQueue.global(qos: .background).async {
             if let accountDetails = accountDetails, let accounts = accounts {
                 var accts = [MXAccount]()
                 for accountDetail in accountDetails {
-                    accountListStats(accounts: accounts, accountDetail: accountDetail, date: startDate, nextDate: endDate) { (stats, accounts) in
+                    accountListStats(accounts: accounts, accountDetail: accountDetail, date: startDate, nextDate: endDate) { (stats, a) in
                         for stat in stats {
                             finalStat.value += stat.value
                         }
-                        accts.append(contentsOf: accounts)
+                        accts.append(contentsOf: a)
                     }
                 }
-                completion(finalStat, accounts, nil, nil)
+                completion(finalStat, accts, nil, nil)
             } else if let transactionDetails = transactionDetails, let transactions = transactions {
                 var trans = [Transaction]()
                 for transactionDetail in transactionDetails {
-                    transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: startDate, nextDate: endDate, accounts: filterAccounts) { stats, transactions in
+                    transactionListStats(transactions: transactions, transactionDetail: transactionDetail, date: startDate, nextDate: endDate, accounts: filterAccounts, ignore_plot_created: ignore_plot_created, ignore_transfer_between_accounts: ignore_transfer_between_accounts) { stats, t in
                         for stat in stats {
                             finalStat.value += stat.value
                         }
-                        trans.append(contentsOf: transactions)
+                        trans.append(contentsOf: t)
                     }
                 }
-                completion(finalStat, nil, transactions, nil)
+                completion(finalStat, nil, trans, nil)
             }
         }
     }

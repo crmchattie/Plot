@@ -57,26 +57,6 @@ extension NetworkController {
                             finalStatSecond = statSecond
                         }
                         
-                        print("finished checking")
-                        print(range.startDate)
-                        print(range.endDate)
-
-                        print("metricCheck First")
-                        print(metric)
-                        print(goal.submetric)
-                        print(goal.option)
-                        print(finalStat.date)
-                        print(finalStat.value)
-                        print(target)
-
-                        print("metricCheck Second")
-                        print(metricSecond)
-                        print(goal.submetricSecond)
-                        print(goal.optionSecond)
-                        print(finalStatSecond.date)
-                        print(finalStatSecond.value)
-                        print(targetSecond)
-
                         switch metricsRelationshipType {
                         case .or:
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
@@ -111,19 +91,6 @@ extension NetworkController {
                         group.leave()
                     }
                 } else {
-                    
-                    print("finished checking")
-                    print(range.startDate)
-                    print(range.endDate)
-
-                    print("metricCheck First")
-                    print(metric)
-                    print(goal.submetric)
-                    print(goal.option)
-                    print(finalStat.date)
-                    print(finalStat.value)
-                    print(target)
-                    
                     if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
                         task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
                         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
@@ -145,6 +112,40 @@ extension NetworkController {
         }
     }
     
+//                        print("finished checking")
+//                        print(range.startDate)
+//                        print(range.endDate)
+//
+//                        print("metricCheck First")
+//                        print(metric)
+//                        print(goal.submetric)
+//                        print(goal.option)
+//                        print(finalStat.date)
+//                        print(finalStat.value)
+//                        print(target)
+//
+//                        print("metricCheck Second")
+//                        print(metricSecond)
+//                        print(goal.submetricSecond)
+//                        print(goal.optionSecond)
+//                        print(finalStatSecond.date)
+//                        print(finalStatSecond.value)
+//                        print(targetSecond)
+
+    
+//                    print("finished checking")
+//                    print(range.startDate)
+//                    print(range.endDate)
+//
+//                    print("metricCheck First")
+//                    print(metric)
+//                    print(goal.submetric)
+//                    print(goal.option)
+//                    print(finalStat.date)
+//                    print(finalStat.value)
+//                    print(target)
+
+    
 // task.completedDate = finalStat.date > finalStatSecond.date ? NSNumber(value: Int((finalStat.date).timeIntervalSince1970)) : NSNumber(value: Int((finalStatSecond.date).timeIntervalSince1970))
 
     
@@ -152,6 +153,7 @@ extension NetworkController {
         switch metric {
         case .events:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.events, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
+                
                 completion(stat)
             }
         case .tasks:
@@ -180,55 +182,56 @@ extension NetworkController {
                 }
             }
             
-            financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil) { stat, _, transactions, err in
+            financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil, ignore_plot_created: nil, ignore_transfer_between_accounts: true) { stat, _, transactions, err in
                 completion(stat)
             }
         case .financialAccounts:
-            var accountDetails = [AccountDetails]()
+            if let option = option, option.count == 1, option.first == "Credit Card" {
+                let transactionDetails = [TransactionDetails(name: "Credit Card Payment", amount: 0, level: TransactionCatLevel.category, category: "Credit Card Payment")]
+                let accounts = financeService.accounts.filter({ $0.type == .creditCard})
+                let filterAccounts = accounts.map({ $0.guid })
+                financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: filterAccounts, ignore_plot_created: nil, ignore_transfer_between_accounts: false) { stat, _, transactions, err in
+                    if let stat = stat, let transactions = transactions {
+                        var finalStat = stat
+                        let transactionAccounts = Set(transactions.map({ $0.account_guid ?? "" }))
+                        let difference = transactionAccounts.symmetricDifference(Set(filterAccounts))
+                        let accts = self.financeService.accounts.filter({ difference.contains($0.guid) && $0.balance > 0 })
+                        finalStat.value = accts.map({$0.balance}).reduce(0, +)
+                        completion(finalStat)
+                    } else {
+                        completion(stat)
+                    }
+                }
+            } else {
+                var accountDetails = [AccountDetails]()
 
-            switch submetric {
-            case nil, .some(.none):
-                break
-            case .some(.group):
-                for opt in option ?? [] {
-                    let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, bs_type: BalanceSheetType(rawValue: opt))
-                    accountDetails.append(accountDetail)
+                switch submetric {
+                case nil, .some(.none):
+                    break
+                case .some(.group):
+                    for opt in option ?? [] {
+                        let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, bs_type: BalanceSheetType(rawValue: opt))
+                        accountDetails.append(accountDetail)
+                    }
+                    
+                case .some(.category):
+                    for opt in option ?? [] {
+                        let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, type: MXAccountType(rawValue: opt))
+                        accountDetails.append(accountDetail)
+                    }
+                    
+                case .some(.subcategory):
+                    for opt in option ?? [] {
+                        let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, subtype: MXAccountSubType(rawValue: opt))
+                        accountDetails.append(accountDetail)
+                    }
                 }
                 
-            case .some(.category):
-                for opt in option ?? [] {
-                    let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, type: MXAccountType(rawValue: opt))
-                    accountDetails.append(accountDetail)
-                }
-                
-            case .some(.subcategory):
-                for opt in option ?? [] {
-                    let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, subtype: MXAccountSubType(rawValue: opt))
-                    accountDetails.append(accountDetail)
+                financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil, ignore_plot_created: nil, ignore_transfer_between_accounts: nil) { stat, accounts, _, err in
+                    completion(stat)
                 }
             }
             
-            print("accountDetails")
-            for accountDetail in accountDetails ?? [] {
-                print(accountDetail.name)
-                print(accountDetail.level)
-                print(accountDetail.bs_type)
-            }
-            
-            financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil) { stat, accounts, _, err in
-                print("financialAccounts stats")
-                print(metric)
-                print(submetric)
-                print(option)
-                print(stat)
-                for account in accounts ?? [] {
-                    print(account.name)
-                    print(account.bs_type)
-                    print(account.updated_at)
-                }
-                
-                completion(stat)
-            }
             
         case .workout:
             healthDetailService.getSamples(for: healthService.workouts, measure: unit.workoutMeasure ?? .duration, categories: option, range: range) {stat, workouts,_ in

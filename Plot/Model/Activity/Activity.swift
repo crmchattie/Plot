@@ -2107,6 +2107,8 @@ extension Activity {
     var goalEndDate: Date {
         if let endDateTemp = self.endDate {
             return endDateTemp
+        } else if let startDateTemp = self.endDateGivenStartDatePeriod {
+            return startDateTemp
         }
         return Date()
     }
@@ -2129,7 +2131,7 @@ extension Activity {
         return nil
     }
     
-    var endDateGivenEndDatePeriod: Date? {
+    var endDateGivenStartDatePeriod: Date? {
         if let startDate = startDate, let goal = goal, let period = goal.period {
             switch period {
             case .none:

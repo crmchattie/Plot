@@ -72,6 +72,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
     var transactionsDictionary = [TransactionDetails: [Transaction]]()
     var accountsDictionary = [AccountDetails: [MXAccount]]()
     
+    var setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
     var sections = [SectionType]()
     var groups = [SectionType: [AnyHashable]]()
     
@@ -97,7 +98,9 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        title = "Finances"
+        if title == nil {
+            title = "Finances"
+        }
         
         customSegmented.delegate = self
         collectionView.dataSource = self
@@ -251,9 +254,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
         }
         
         self.saveFinanceLevel()
-        
-        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
-        
+    
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
         

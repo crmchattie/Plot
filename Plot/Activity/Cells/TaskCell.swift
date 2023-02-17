@@ -217,7 +217,7 @@ class TaskCell: UITableViewCell {
     }
     
     @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
-        guard let task = task else {
+        guard let task = task, !(task.isGoal ?? false) else {
             return
         }
 
@@ -451,7 +451,7 @@ class TaskCollectionCell: UICollectionViewCell {
     }
     
     @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
-        guard let task = task else {
+        guard let task = task, !(task.isGoal ?? false) else {
             return
         }
 
