@@ -759,16 +759,18 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let dispatchGroup = DispatchGroup()
         for activity in activities {
             dispatchGroup.enter()
-            dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
             if let startDate = activity.startDate, let endDate = activity.endDate {
-                if activity.allDay ?? false && endDate.timeIntervalSince(startDate) < 86399 {
+                dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
+                if activity.allDay ?? false && endDate.timeIntervalSince(startDate) < 86400 {
                     activityDates[dateFormatter.string(from: startDate), default: 0] += 1
                 } else {
-                    for activityDate in stride(from: startDate, to: endDate, by: 86399) {
+                    for activityDate in stride(from: startDate, to: endDate, by: 86400) {
                         activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
                     }
                 }
                 dispatchGroup.leave()
+            } else if let completedDate = activity.completedDateDate {
+                activityDates[dateFormatter.string(from: completedDate), default: 0] += 1
             } else if let endDate = activity.endDate {
                 activityDates[dateFormatter.string(from: endDate), default: 0] += 1
             }

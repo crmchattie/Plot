@@ -108,6 +108,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 activityID = task.activityID!
                 print(activityID)
                 print(task.instanceID as Any)
+                print(task.goalStartDate)
+                print(task.goalEndDate)
             }
             if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 task.admin = currentUserID
@@ -941,7 +943,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 row.value = "None"
             }
-            row.hidden = Condition(booleanLiteral: !(self.task.startDate == nil && (self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts))))
+            row.hidden = Condition(booleanLiteral: !(self.task.goal?.metric != .financialAccounts || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond != .financialAccounts)))
         }.onPresent { from, to in
             to.title = "Measurement Period"
             to.extendedLayoutIncludesOpaqueBars = true
@@ -966,10 +968,13 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.isUserInteractionEnabled = false
             }
-            row.hidden = "!($startDateSwitch == false && ($Metric != 'Financial Accounts' || ($secondMetric != nil && $secondMetric != 'Financial Accounts')))"
+            row.hidden = "!($Metric != 'Financial Accounts' || (($secondMetric != nil && $secondMetric != 'Financial Accounts')))"
         }.onChange { row in
             if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
                 self.task.goal!.period = updatedValue
+                if let startDateTime = self.task.startDateGivenEndDatePeriod {
+                    self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
+                }
             } else {
                 self.task.goal!.period = nil
                 row.value = "None"

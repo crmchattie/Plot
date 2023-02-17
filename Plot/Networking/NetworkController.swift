@@ -93,6 +93,7 @@ class NetworkController {
         }
         
         isRunning = true
+        hasLoadedListGoalActivities = false
         
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()

@@ -95,6 +95,10 @@ extension Date {
         return Calendar.current.date(byAdding: .day, value: -7, to: self)!
     }
     
+    var weekAfter: Date {
+        return Calendar.current.date(byAdding: .day, value: 7, to: self)!
+    }
+    
     var monthBefore: Date {
         return Calendar.current.date(byAdding: .month, value: -1, to: self)!
     }

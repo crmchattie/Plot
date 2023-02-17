@@ -300,6 +300,10 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
                     if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
+                        print(goal.name)
+                        print(goal.goalStartDate)
+                        print(goal.goalEndDate)
+                        print(selectedDate)
                         goals.append(goal)
                     }
                 }
@@ -493,10 +497,17 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
         for activity in activities {
             dispatchGroup.enter()
             dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
-            if let completedDate = activity.completedDateDate {
-                activityDates[dateFormatter.string(from: completedDate), default: 0] += 1
+            if activity.isCompleted ?? false {
+                if let startDate = activity.startDate, let endDate = activity.endDate {
+                    for activityDate in stride(from: startDate, to: endDate, by: 86400) {
+                        activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
+                    }
+                    dispatchGroup.leave()
+                } else if let endDate = activity.endDate {
+                    activityDates[dateFormatter.string(from: endDate), default: 0] += 1
+                    dispatchGroup.leave()
+                }
             }
-            dispatchGroup.leave()
         }
         dispatchGroup.notify(queue: .main) {
             self.activityView.calendar.reloadData()

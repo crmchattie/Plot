@@ -2061,8 +2061,10 @@ extension Activity {
     }
     
     var finalDate: Date? {
-        if isTask ?? false {
+        if isTask ?? false, !(isGoal ?? false) {
             return endDate
+        } else if isGoal ?? false {
+            return startDate ?? endDate
         } else {
             return startDate
         }
@@ -2127,11 +2129,31 @@ extension Activity {
         return nil
     }
     
+    var endDateGivenEndDatePeriod: Date? {
+        if let startDate = startDate, let goal = goal, let period = goal.period {
+            switch period {
+            case .none:
+                return nil
+            case .day:
+                return startDate.endOfDay
+            case .week:
+                return startDate.endOfWeek
+            case .month:
+                return startDate.endOfMonth
+            case .year:
+                return startDate.endOfYear
+            }
+        }
+        return nil
+    }
+    
     //for tasks where deadline date is more likely to be set than start date
+    //do not add in completed date; this is used for recurrences
     var finalDateTime: NSNumber? {
-        if isTask ?? false {
-            //do not add in completed date; this is used for recurrences
+        if isTask ?? false, !(isGoal ?? false) {
             return endDateTime
+        } else if isGoal ?? false {
+            return startDateTime ?? endDateTime
         } else {
             return startDateTime
         }

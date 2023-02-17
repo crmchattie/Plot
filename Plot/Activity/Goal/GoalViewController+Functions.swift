@@ -1300,6 +1300,9 @@ extension GoalViewController {
                 let date = Calendar.current.date(from: dateComponents)
                 self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
                 self.task.hasDeadlineTime = false
+                if let startDateTime = self.task.startDateGivenEndDatePeriod {
+                    self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
+                }
             } else {
                 self.task.endDateTime = nil
                 self.task.hasDeadlineTime = false

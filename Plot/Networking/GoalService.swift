@@ -39,18 +39,18 @@ extension NetworkController {
                 updatedDescription += secondaryDescription
             }
 //
-            
-//            print("metricCheck")
-//            print(metric)
-//            print(updatedDescription)
-//            print(task.goalStartDate)
-//            print(task.goalEndDate)
-            
+                        
             let range = DateRange(startDate: task.goalStartDate, endDate: task.goalEndDate)
             guard range.endDate > past, range.startDate <= tomorrow else {
                 group.leave()
                 continue
             }
+            
+            print("metricCheck")
+            print(metric)
+            print(updatedDescription)
+            print(task.goalStartDate)
+            print(task.goalEndDate)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
@@ -65,21 +65,21 @@ extension NetworkController {
                             finalStatSecond = statSecond
                         }
                         
-//                        print("finished checking")
-//                        print(range.startDate)
-//                        print(range.endDate)
-//
-//                        print("metricCheck First")
-//                        print(metric)
-//                        print(finalStat.date)
-//                        print(finalStat.value)
-//                        print(target)
-//
-//                        print("metricCheck Second")
-//                        print(metricSecond)
-//                        print(finalStatSecond.date)
-//                        print(finalStatSecond.value)
-//                        print(targetSecond)
+                        print("finished checking")
+                        print(range.startDate)
+                        print(range.endDate)
+
+                        print("metricCheck First")
+                        print(metric)
+                        print(finalStat.date)
+                        print(finalStat.value)
+                        print(target)
+
+                        print("metricCheck Second")
+                        print(metricSecond)
+                        print(finalStatSecond.date)
+                        print(finalStatSecond.value)
+                        print(targetSecond)
 
                         switch metricsRelationshipType {
                         case .or:
@@ -116,15 +116,15 @@ extension NetworkController {
                         group.leave()
                     }
                 } else {
-//                    print("finished checking")
-//                    print(range.startDate)
-//                    print(range.endDate)
-//
-//                    print("metricCheck First")
-//                    print(metric)
-//                    print(finalStat.date)
-//                    print(finalStat.value)
-//                    print(target)
+                    print("finished checking")
+                    print(range.startDate)
+                    print(range.endDate)
+
+                    print("metricCheck First")
+                    print(metric)
+                    print(finalStat.date)
+                    print(finalStat.value)
+                    print(target)
                     
                     if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
                         task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -240,11 +240,6 @@ extension NetworkController {
         case .sleep:
             if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
                 healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    print("finsihed checking sleep")
-                    print(range.startDate)
-                    print(range.endDate)
-                    print(stat?.date)
-                    print(stat?.value)
                     completion(stat)
                 }
             }
@@ -344,15 +339,11 @@ extension NetworkController {
                             
                             task.hasStartTime = false
                             task.hasDeadlineTime = false
+                            task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
                             
                             recurrenceRule.startDate = date
                             recurrenceRule.interval = goal.name != "Dentist" ? 1 : 2
                             task.recurrences = [recurrenceRule.toRRuleString()]
-                            
-//                            print(goal.name)
-//                            print(date)
-//                            print(task.endDate)
-//                            print(recurrenceRule.toRRuleString())
                         }
                         
                         let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])

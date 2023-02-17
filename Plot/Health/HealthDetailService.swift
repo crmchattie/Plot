@@ -160,11 +160,6 @@ class HealthDetailService: HealthDetailServiceInterface {
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.advanced(by: 43200)
-            
-            print("getStatisticalSamples w/ Segment")
-            print(startDate)
-            print(endDate)
-
         }
         
         if HealthKitService.authorized {
@@ -371,11 +366,6 @@ class HealthDetailService: HealthDetailServiceInterface {
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.advanced(by: 43200)
-            
-            print("getStatisticalSamples w/o Segment")
-            print(startDate)
-            print(endDate)
-            
         }
         
         if HealthKitService.authorized {

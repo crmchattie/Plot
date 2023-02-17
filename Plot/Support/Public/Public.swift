@@ -2266,6 +2266,21 @@ extension Date {
         return cal.date(byAdding: .day, value: 7, to: startOfWeek)!
     }
     
+    func endDateGivenStartAndPeriod(period: GoalPeriod) -> Date {
+        switch period {
+        case .none:
+            return self
+        case .day:
+            return self.endOfDay
+        case .week:
+            return self.endOfWeek
+        case .month:
+            return self.endOfMonth
+        case .year:
+            return self.endOfYear
+        }
+    }
+    
     var startOfMonth: Date {
         var cal = Calendar.current
         cal.timeZone = TimeZone(secondsFromGMT: 0)!
