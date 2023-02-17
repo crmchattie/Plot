@@ -77,7 +77,7 @@ class ActivitiesFetcher: NSObject {
                                 activity.calendarSource = userActivity.calendarSource
                                 activity.calendarExport = userActivity.calendarExport
                                 activity.externalActivityID = userActivity.externalActivityID
-                                activity.userIsCompleted = userActivity.userIsCompleted
+                                activity.userCompleted = userActivity.userCompleted
                                 activity.userCompletedDate = userActivity.userCompletedDate
                                 activity.reminder = userActivity.reminder
                                 activity.badge = userActivity.badge
@@ -151,7 +151,7 @@ class ActivitiesFetcher: NSObject {
                                     activity.calendarSource = userActivity.calendarSource
                                     activity.calendarExport = userActivity.calendarExport
                                     activity.externalActivityID = userActivity.externalActivityID
-                                    activity.userIsCompleted = userActivity.userIsCompleted
+                                    activity.userCompleted = userActivity.userCompleted
                                     activity.userCompletedDate = userActivity.userCompletedDate
                                     activity.reminder = userActivity.reminder
                                     activity.badge = userActivity.badge
@@ -223,7 +223,7 @@ class ActivitiesFetcher: NSObject {
                         activity.calendarSource = userActivity.calendarSource
                         activity.calendarExport = userActivity.calendarExport
                         activity.externalActivityID = userActivity.externalActivityID
-                        activity.userIsCompleted = userActivity.userIsCompleted
+                        activity.userCompleted = userActivity.userCompleted
                         activity.userCompletedDate = userActivity.userCompletedDate
                         activity.reminder = userActivity.reminder
                         activity.badge = userActivity.badge
@@ -588,7 +588,7 @@ class ActivitiesFetcher: NSObject {
                         activity.calendarName = calendar.name
                         activity.calendarColor = calendar.color
                         activity.calendarSource = calendar.source
-                        activity.userIsCompleted = userActivity.userIsCompleted
+                        activity.userCompleted = userActivity.userCompleted
                         activity.userCompletedDate = userActivity.userCompletedDate
                         activity.calendarExport = true
                         activity.externalActivityID = nil
@@ -662,7 +662,7 @@ class ActivitiesFetcher: NSObject {
                         activity.calendarName = userActivity.calendarName
                         activity.calendarColor = userActivity.calendarColor
                         activity.calendarSource = userActivity.calendarSource
-                        activity.userIsCompleted = userActivity.userIsCompleted
+                        activity.userCompleted = userActivity.userCompleted
                         activity.userCompletedDate = userActivity.userCompletedDate
                         activity.calendarExport = true
                         activity.externalActivityID = nil

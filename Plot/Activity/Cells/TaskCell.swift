@@ -217,15 +217,28 @@ class TaskCell: UITableViewCell {
     }
     
     @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
-        guard let task = task, !(task.isGoal ?? false) else {
+        guard let task = task else {
             return
         }
 
         let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
+        var goalCurrentNumber: Double?
+        var goalCurrentNumberSecond: Double?
+        
+        if task.isGoal ?? false, let goal = task.goal {
+            if !(task.isCompleted ?? false) {
+                goalCurrentNumber = goal.currentNumber ?? 0 > goal.targetNumber ?? 0 ? goal.currentNumber ?? 0 : goal.targetNumber ?? 0
+                goalCurrentNumberSecond = goal.currentNumberSecond ?? 0 > goal.targetNumberSecond ?? 0 ? goal.currentNumberSecond ?? 0 : goal.targetNumberSecond ?? 0
+            } else {
+                goalCurrentNumber = 0
+                goalCurrentNumberSecond = 0
+            }
+        }
+        
         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: task.goalCurrentNumber, goalCurrentNumberSecond: task.goalCurrentNumberSecond)
+        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
         
     }
 }
@@ -451,14 +464,27 @@ class TaskCollectionCell: UICollectionViewCell {
     }
     
     @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
-        guard let task = task, !(task.isGoal ?? false) else {
+        guard let task = task else {
             return
         }
 
         let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
+        var goalCurrentNumber: Double?
+        var goalCurrentNumberSecond: Double?
+        
+        if task.isGoal ?? false, let goal = task.goal {
+            if !(task.isCompleted ?? false) {
+                goalCurrentNumber = goal.currentNumber ?? 0 > goal.targetNumber ?? 0 ? goal.currentNumber ?? 0 : goal.targetNumber ?? 0
+                goalCurrentNumberSecond = goal.currentNumberSecond ?? 0 > goal.targetNumberSecond ?? 0 ? goal.currentNumberSecond ?? 0 : goal.targetNumberSecond ?? 0
+            } else {
+                goalCurrentNumber = 0
+                goalCurrentNumberSecond = 0
+            }
+        }
+        
         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: task.goalCurrentNumber, goalCurrentNumberSecond: task.goalCurrentNumberSecond)
+        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
     }
 }

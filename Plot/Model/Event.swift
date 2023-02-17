@@ -26,7 +26,7 @@ let userEventsEntity = "user-events"
 //    var endDateTime: NSNumber?
 //    var endTimeZone: String?
 //    var isSchedule: Bool?
-//    var userIsCompleted: Bool?
+//    var userCompleted: Bool?
 //    var userCompletedDate: NSNumber?
 //    var scheduleIDs: [String]?
 //
@@ -61,7 +61,7 @@ let userEventsEntity = "user-events"
 //        case calendarExport
 //        case showExtras
 //        case isCompleted
-//        case userIsCompleted
+//        case userCompleted
 //        case isTask
 //        case isEvent
 //        case isSchedule
@@ -142,7 +142,7 @@ let userEventsEntity = "user-events"
 //        showExtras = dictionary?["showExtras"] as? Bool
 //        isCompleted = dictionary?["isCompleted"] as? Bool
 //        completedDate = dictionary?["completedDate"] as? NSNumber
-//        userIsCompleted = dictionary?["userIsCompleted"] as? Bool
+//        userCompleted = dictionary?["userCompleted"] as? Bool
 //        userCompletedDate = dictionary?["userCompletedDate"] as? NSNumber
 //        isTask = dictionary?["isTask"] as? Bool
 //        isEvent = dictionary?["isEvent"] as? Bool
@@ -297,7 +297,7 @@ let userEventsEntity = "user-events"
 //            dictionary["completedDate"] = value
 //        }
 //
-//        if let value = self.userIsCompleted as AnyObject? {
+//        if let value = self.userCompleted as AnyObject? {
 //            dictionary["isCompleted"] = value
 //        }
 //

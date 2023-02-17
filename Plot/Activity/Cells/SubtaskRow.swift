@@ -168,7 +168,7 @@ final class SubtaskCell: Cell<Activity>, CellType {
     }
     
     @objc func checkViewChanged(_ sender: UITapGestureRecognizer) {
-        guard let subtask = row.value, !(subtask.isGoal ?? false) else { return }
+        guard let subtask = row.value else { return }
         subtask.isCompleted = !(subtask.isCompleted ?? false)
         let image = subtask.isCompleted ?? false ? "checkmark.circle" : "circle"
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)

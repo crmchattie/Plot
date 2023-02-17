@@ -355,7 +355,7 @@ class ActivityActions: NSObject {
         }
     }
     
-    func updateCompletion(isComplete: Bool, goalCurrentNumber: NSNumber?, goalCurrentNumberSecond: NSNumber?) {
+    func updateCompletion(isComplete: Bool, userCompletion: Bool?, goalCurrentNumber: NSNumber?, goalCurrentNumberSecond: NSNumber?) {
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }

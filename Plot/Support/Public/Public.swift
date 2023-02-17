@@ -2388,8 +2388,16 @@ extension TimeInterval {
         return time
     }
     
+    var totalMinutes: Double {
+        return self / 60
+    }
+    
     var totalHours: Double {
         return self / 3600
+    }
+    
+    var totalDays: Double {
+        return self / 86400
     }
 }
 

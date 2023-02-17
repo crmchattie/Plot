@@ -54,7 +54,7 @@ let userTasksEntity = "user-tasks"
 //        case calendarExport
 //        case showExtras
 //        case isCompleted
-//        case userIsCompleted
+//        case userCompleted
 //        case isTask
 //        case isEvent
 //        case isSchedule
@@ -135,7 +135,7 @@ let userTasksEntity = "user-tasks"
 //        showExtras = dictionary?["showExtras"] as? Bool
 //        isCompleted = dictionary?["isCompleted"] as? Bool
 //        completedDate = dictionary?["completedDate"] as? NSNumber
-//        userIsCompleted = dictionary?["userIsCompleted"] as? Bool
+//        userCompleted = dictionary?["userCompleted"] as? Bool
 //        userCompletedDate = dictionary?["userCompletedDate"] as? NSNumber
 //        isTask = dictionary?["isTask"] as? Bool
 //        isEvent = dictionary?["isEvent"] as? Bool
@@ -290,7 +290,7 @@ let userTasksEntity = "user-tasks"
 //            dictionary["completedDate"] = value
 //        }
 //        
-//        if let value = self.userIsCompleted as AnyObject? {
+//        if let value = self.userCompleted as AnyObject? {
 //            dictionary["isCompleted"] = value
 //        }
 //        

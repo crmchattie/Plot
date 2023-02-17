@@ -76,7 +76,7 @@ class Activity: NSObject, NSCopying, Codable {
     var isCompleted: Bool?
     //instance variable
     var completedDate: NSNumber?
-    var userIsCompleted: Bool?
+    var userCompleted: Bool?
     var userCompletedDate: NSNumber?
     var scheduleIDs: [String]?
     var isSchedule: Bool?
@@ -225,7 +225,7 @@ class Activity: NSObject, NSCopying, Codable {
         case calendarExport
         case showExtras
         case isCompleted
-        case userIsCompleted
+        case userCompleted
         case isTask
         case isGoal
         case isEvent
@@ -409,7 +409,7 @@ class Activity: NSObject, NSCopying, Codable {
         showExtras = dictionary?["showExtras"] as? Bool
         isCompleted = dictionary?["isCompleted"] as? Bool
         completedDate = dictionary?["completedDate"] as? NSNumber
-        userIsCompleted = dictionary?["userIsCompleted"] as? Bool
+        userCompleted = dictionary?["userCompleted"] as? Bool
         userCompletedDate = dictionary?["userCompletedDate"] as? NSNumber
         isTask = dictionary?["isTask"] as? Bool
         isGoal = dictionary?["isGoal"] as? Bool
@@ -645,8 +645,8 @@ class Activity: NSObject, NSCopying, Codable {
             }
         }
         
-        if let value = self.userIsCompleted as AnyObject? {
-            dictionary["userIsCompleted"] = value
+        if let value = self.userCompleted as AnyObject? {
+            dictionary["userCompleted"] = value
         }
         
         if let value = self.userCompletedDate as AnyObject? {
@@ -1005,8 +1005,8 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.completedDate = value
         }
         
-        if let value = updatingActivity.userIsCompleted {
-            newActivity.userIsCompleted = value
+        if let value = updatingActivity.userCompleted {
+            newActivity.userCompleted = value
         }
         
         if let value = updatingActivity.userCompletedDate {
@@ -1322,8 +1322,8 @@ class Activity: NSObject, NSCopying, Codable {
             self.completedDate = value
         }
         
-        if let value = updatingActivity.userIsCompleted {
-            self.userIsCompleted = value
+        if let value = updatingActivity.userCompleted {
+            self.userCompleted = value
         }
         
         if let value = updatingActivity.userCompletedDate {
@@ -1626,8 +1626,8 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.completedDate = self.completedDate
         }
         
-        if self.userIsCompleted != otherActivity.userIsCompleted {
-            newActivity.userIsCompleted = self.userIsCompleted
+        if self.userCompleted != otherActivity.userCompleted {
+            newActivity.userCompleted = self.userCompleted
         }
         
         if self.userCompletedDate != otherActivity.userCompletedDate {

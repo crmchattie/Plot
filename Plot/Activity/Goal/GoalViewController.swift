@@ -276,7 +276,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.cell.textLabel?.textColor = .label
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.cell.accessoryType = .checkmark
-                $0.cell.isUserInteractionEnabled = false
                 $0.title = $0.tag
                 $0.value = task.isCompleted ?? false
                 if $0.value ?? false {
