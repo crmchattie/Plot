@@ -300,10 +300,6 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
                     if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
-                        print(goal.name)
-                        print(goal.goalStartDate)
-                        print(goal.goalEndDate)
-                        print(selectedDate)
                         goals.append(goal)
                     }
                 }
@@ -446,6 +442,11 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
         self.selectedDate = date
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        if let value = activityDates[dateString] {
+            print(value)
+        }
         sortandreload()
     }
     

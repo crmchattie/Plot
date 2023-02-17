@@ -13,7 +13,6 @@ import RRuleSwift
 
 extension NetworkController {    
     func checkGoalsForCompletion(_ completion: @escaping () -> Void) {
-        print("checkGoalsForCompletion")
         //create loop of existing goals
         //check if goal is complete
         //check if goal has end date
@@ -23,7 +22,7 @@ extension NetworkController {
         //if goal metric is met, update goal to completion; if not, do nothing and move to next goal
         //add check to see if endDate is in the past - maybe add buffer like a month? If so, skip and move to next goal?
         
-        let past = Date().monthBefore
+        let past = Date().weekBefore
         let tomorrow = Date().dayAfter
         let group = DispatchGroup()
         
@@ -33,12 +32,6 @@ extension NetworkController {
                 group.leave()
                 continue
             }
-            
-            var updatedDescription = goal.description ?? ""
-            if let secondaryDescription = goal.descriptionSecondary {
-                updatedDescription += secondaryDescription
-            }
-//
                         
             let range = DateRange(startDate: task.goalStartDate, endDate: task.goalEndDate)
             guard range.endDate > past, range.startDate <= tomorrow else {
@@ -46,11 +39,10 @@ extension NetworkController {
                 continue
             }
             
-            print("metricCheck")
-            print(metric)
-            print(updatedDescription)
-            print(task.goalStartDate)
-            print(task.goalEndDate)
+//            print("metricCheck")
+//            print(metric)
+//            print(task.goalStartDate)
+//            print(task.goalEndDate)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
@@ -71,12 +63,16 @@ extension NetworkController {
 
                         print("metricCheck First")
                         print(metric)
+                        print(goal.submetric)
+                        print(goal.option)
                         print(finalStat.date)
                         print(finalStat.value)
                         print(target)
 
                         print("metricCheck Second")
                         print(metricSecond)
+                        print(goal.submetricSecond)
+                        print(goal.optionSecond)
                         print(finalStatSecond.date)
                         print(finalStatSecond.value)
                         print(targetSecond)
@@ -98,7 +94,6 @@ extension NetworkController {
                         case .and:
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
-//                                    task.completedDate = finalStat.date > finalStatSecond.date ? NSNumber(value: Int((finalStat.date).timeIntervalSince1970)) : NSNumber(value: Int((finalStatSecond.date).timeIntervalSince1970))
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                                 updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) || (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
@@ -116,12 +111,15 @@ extension NetworkController {
                         group.leave()
                     }
                 } else {
+                    
                     print("finished checking")
                     print(range.startDate)
                     print(range.endDate)
 
                     print("metricCheck First")
                     print(metric)
+                    print(goal.submetric)
+                    print(goal.option)
                     print(finalStat.date)
                     print(finalStat.value)
                     print(target)
@@ -146,6 +144,9 @@ extension NetworkController {
             completion()
         }
     }
+    
+// task.completedDate = finalStat.date > finalStatSecond.date ? NSNumber(value: Int((finalStat.date).timeIntervalSince1970)) : NSNumber(value: Int((finalStatSecond.date).timeIntervalSince1970))
+
     
     func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, range: DateRange, completion: @escaping (Statistic?) -> Void) {
         switch metric {
@@ -184,11 +185,6 @@ extension NetworkController {
             }
         case .financialAccounts:
             var accountDetails = [AccountDetails]()
-            
-//            print("financialAccounts stats")
-//            print(metric)
-//            print(submetric)
-//            print(option)
 
             switch submetric {
             case nil, .some(.none):
@@ -212,17 +208,24 @@ extension NetworkController {
                 }
             }
             
+            print("accountDetails")
+            for accountDetail in accountDetails ?? [] {
+                print(accountDetail.name)
+                print(accountDetail.level)
+                print(accountDetail.bs_type)
+            }
+            
             financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil) { stat, accounts, _, err in
-//                print("financialAccounts stats")
-//                print(metric)
-//                print(submetric)
-//                print(option)
-//                print(stat)
-//                for account in accounts ?? [] {
-//                    print(account.name)
-//                    print(account.bs_type)
-//                    print(account.updated_at)
-//                }
+                print("financialAccounts stats")
+                print(metric)
+                print(submetric)
+                print(option)
+                print(stat)
+                for account in accounts ?? [] {
+                    print(account.name)
+                    print(account.bs_type)
+                    print(account.updated_at)
+                }
                 
                 completion(stat)
             }
@@ -319,10 +322,10 @@ extension NetworkController {
                                 recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
                                 task.endDateTime = NSNumber(value: Int((date.endOfYear).timeIntervalSince1970))
                             case .monthly:
-                                date = date.startOfMonth
+                                date = date.startOfMonth.UTCTime
                                 let monthday = calendar.component(.day, from: date)
                                 recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-                                task.endDateTime = NSNumber(value: Int((date.endOfMonth).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.UTCTime).timeIntervalSince1970))
                                 recurrenceRule.bymonthday = [1]
                             case .weekly:
                                 date = date.startOfWeek
@@ -344,6 +347,16 @@ extension NetworkController {
                             recurrenceRule.startDate = date
                             recurrenceRule.interval = goal.name != "Dentist" ? 1 : 2
                             task.recurrences = [recurrenceRule.toRRuleString()]
+                            
+//                            print(task.name)
+//                            print(task.startDate)
+//                            print(task.startDateTime)
+//                            print(task.endDate)
+//                            print(task.endDateTime)
+//
+//                            print(date)
+//                            print(recurrenceRule.toRRuleString())
+//                            print(recurrenceRule.occurrences(between: date.dayBefore, and: Date().nextYear))
                         }
                         
                         let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])

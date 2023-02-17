@@ -68,7 +68,9 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
+            print("checkGoalsForCompletion")
             self.checkGoalsForCompletion() {
+                print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
             }
             self.isRunning = false
@@ -116,7 +118,9 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
+            print("checkGoalsForCompletion")
             self.checkGoalsForCompletion() {
+                print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
             }
             self.isRunning = false

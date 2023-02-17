@@ -246,7 +246,6 @@ extension RecurrencePicker {
             break
         }
         
-        
 //        switch indexPath.row {
 //        case 0:
 //            recurrenceRule = nil

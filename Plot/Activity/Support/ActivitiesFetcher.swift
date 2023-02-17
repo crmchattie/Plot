@@ -285,7 +285,7 @@ class ActivitiesFetcher: NSObject {
             let futureDate = Calendar.current.date(byAdding: .month, value: 3, to: Date())
             group.enter()
             counter += 1
-            if let activityPeriod = activity.goalPeriod, let period = GoalPeriod(rawValue: activityPeriod), let endDate = activity.endDate, let startDate = activity.startDate {
+            if let activityPeriod = activity.goalPeriod, let period = GoalPeriod(rawValue: activityPeriod) {
                 if let instanceIDs = activity.instanceIDs {
                     ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities, _ in
                         guard counter > 0 else {
@@ -331,7 +331,6 @@ class ActivitiesFetcher: NSObject {
                     if let activityPeriod = activity.goalPeriod, let period = GoalPeriod(rawValue: activityPeriod) {
                         let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: activity.finalDate ?? Date())
                         let dates = iCalUtility().recurringDates(forRules: rules, ruleStartDate: activity.finalDate ?? Date(), startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
-                        let duration = endDate.timeIntervalSince(startDate)
                         for (index, date) in dates.enumerated() {
                             let newActivity = activity.copy() as! Activity
                             newActivity.recurrenceStartDateTime = activity.finalDateTime

@@ -188,7 +188,7 @@ class TransactionAnalyticsDataSource: AnalyticsDataSource {
             let filteredTransactions = transactions
                 .filter { transaction -> Bool in
                     guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
-                    return range.startDate <= date && date <= range.endDate
+                    return range.startDate.UTCTime <= date && date <= range.endDate.UTCTime
                 }
             completion(filteredTransactions.map { .transaction($0) })
         }
