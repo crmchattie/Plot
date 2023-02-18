@@ -28,7 +28,7 @@ extension NetworkController {
         
         for task in activityService.goals {
             group.enter()
-            guard let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber else {
+            guard !(task.completeUpdatedByUser ?? false), let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber else {
                 group.leave()
                 continue
             }
@@ -62,26 +62,26 @@ extension NetworkController {
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) && (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                updateTask.updateCompletion(isComplete: false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if goal.currentNumber != finalStat.value || goal.currentNumberSecond != finalStatSecond.value {
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                updateTask.updateCompletion(isComplete: task.isCompleted ?? false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             }
 
                         case .and:
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) || (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                updateTask.updateCompletion(isComplete: false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if goal.currentNumber != finalStat.value || goal.currentNumberSecond != finalStatSecond.value {
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                                updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
+                                updateTask.updateCompletion(isComplete: task.isCompleted ?? false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             }
 
                         //not in use yet
@@ -94,13 +94,13 @@ extension NetworkController {
                     if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
                         task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
                         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                        updateTask.updateCompletion(isComplete: true, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
+                        updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                     } else if finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false) {
                         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                        updateTask.updateCompletion(isComplete: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
+                        updateTask.updateCompletion(isComplete: false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                     } else if goal.currentNumber != finalStat.value {
                         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-                        updateTask.updateCompletion(isComplete: task.isCompleted ?? false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
+                        updateTask.updateCompletion(isComplete: task.isCompleted ?? false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                     }
                     group.leave()
                 }

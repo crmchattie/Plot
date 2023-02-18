@@ -238,7 +238,7 @@ class TaskCell: UITableViewCell {
         }
         
         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
+        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
         
     }
 }
@@ -485,6 +485,6 @@ class TaskCollectionCell: UICollectionViewCell {
         }
         
         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
+        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
     }
 }

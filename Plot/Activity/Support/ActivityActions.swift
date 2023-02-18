@@ -355,7 +355,7 @@ class ActivityActions: NSObject {
         }
     }
     
-    func updateCompletion(isComplete: Bool, userCompletion: Bool?, goalCurrentNumber: NSNumber?, goalCurrentNumberSecond: NSNumber?) {
+    func updateCompletion(isComplete: Bool, completeUpdatedByUser: Bool?, goalCurrentNumber: NSNumber?, goalCurrentNumberSecond: NSNumber?) {
         guard let activity = activity, let activityID = activityID, let _ = selectedFalconUsers else {
             return
         }
@@ -372,10 +372,10 @@ class ActivityActions: NSObject {
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     finalCompletedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
                 }
-                values = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
+                values = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any, "completeUpdatedByUser": completeUpdatedByUser as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 updateInstance(instanceValues: values, updateExternal: true)
             } else {
-                values = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
+                values = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "completeUpdatedByUser": completeUpdatedByUser as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 updateInstance(instanceValues: values, updateExternal: true)
             }
         } else if let currentUserID = Auth.auth().currentUser?.uid {
@@ -391,10 +391,10 @@ class ActivityActions: NSObject {
                                         (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
                     finalCompletedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
                 }
-                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
+                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": finalCompletedDate as Any, "completeUpdatedByUser": completeUpdatedByUser as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 groupActivityReference.updateChildValues(values)
             } else {
-                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
+                let values:[String : Any] = ["isCompleted": isComplete, "completedDate": NSNull() as Any, "completeUpdatedByUser": completeUpdatedByUser as Any, "goalCurrentNumber": goalCurrentNumber as Any, "goalCurrentNumberSecond": goalCurrentNumberSecond as Any]
                 groupActivityReference.updateChildValues(values)
             }
             incrementBadgeForReciever(activityID: activityID, participantsIDs: activity.participantsIDs ?? [])

@@ -22,8 +22,8 @@ class WeightOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let beatsPerMinuteUnit = HKUnit.pound()
-        HealthKitService.getLatestDiscreteDailyAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit) { [weak self] weight, date in
+        let unit = HKUnit.pound()
+        HealthKitService.getLatestDiscreteDailyAverageSample(forIdentifier: .bodyMass, unit: unit) { [weak self] weight, date in
             
             guard let weight = weight, let date = date, let _self = self else {
                 self?.finish()

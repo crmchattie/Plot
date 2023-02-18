@@ -311,7 +311,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     completedRow.evaluateHidden()
                     self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
                     let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+                    updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: true, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                 } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                     row.cell.tintAdjustmentMode = .dimmed
                     completedRow.value = nil
@@ -320,7 +320,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                     completedRow.evaluateHidden()
                     self.task.completedDate = nil
                     let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    updateTask.updateCompletion(isComplete: self.task.isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+                    updateTask.updateCompletion(isComplete: false, completeUpdatedByUser: false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                 }
             }
             
@@ -342,7 +342,7 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 if let value = row.value {
                     self?.task.completedDate = NSNumber(value: Int((value).timeIntervalSince1970))
                     let updateTask = ActivityActions(activity: self!.task, active: self!.active, selectedFalconUsers: self!.selectedFalconUsers)
-                    updateTask.updateCompletion(isComplete: self!.task.isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+                    updateTask.updateCompletion(isComplete: self!.task.isCompleted ?? false, completeUpdatedByUser: self!.task.completeUpdatedByUser ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                 }
             }.onExpandInlineRow { cell, row, inlineRow in
                 inlineRow.cellUpdate { (cell, row) in

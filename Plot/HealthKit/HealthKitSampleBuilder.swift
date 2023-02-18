@@ -16,8 +16,17 @@ class HealthKitSampleBuilder {
         }
         
         var totalEnergyBurned: HKQuantity?
-        if let cals = workout.totalEnergyBurned {
-            totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: cals)
+        if let val = workout.totalEnergyBurned {
+            totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: val)
+        }
+                
+        var totalDistance: HKQuantity?
+        if let val = workout.totalDistance {
+            if workout.hkWorkoutActivityType == .swimming {
+                totalDistance = HKQuantity(unit: HKUnit.yard(), doubleValue: val)
+            } else {
+                totalDistance = HKQuantity(unit: HKUnit.mile(), doubleValue: val)
+            }
         }
                 
         let hkWorkout = HKWorkout(
@@ -26,7 +35,7 @@ class HealthKitSampleBuilder {
             end: end,
             workoutEvents: nil,
             totalEnergyBurned: totalEnergyBurned,
-            totalDistance: nil,
+            totalDistance: totalDistance,
             device: nil,
             metadata: nil
         )
@@ -56,8 +65,17 @@ class HealthKitSampleBuilder {
         HealthKitService.deleteSample(sampleType: .workoutType(), uuid: uuid) { _,_ in }
         
         var totalEnergyBurned: HKQuantity?
-        if let cals = workout.totalEnergyBurned {
-            totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: cals)
+        if let val = workout.totalEnergyBurned {
+            totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: val)
+        }
+                
+        var totalDistance: HKQuantity?
+        if let val = workout.totalDistance {
+            if workout.hkWorkoutActivityType == .swimming {
+                totalDistance = HKQuantity(unit: HKUnit.yard(), doubleValue: val)
+            } else {
+                totalDistance = HKQuantity(unit: HKUnit.mile(), doubleValue: val)
+            }
         }
                 
         let hkWorkout = HKWorkout(
@@ -66,7 +84,7 @@ class HealthKitSampleBuilder {
             end: end,
             workoutEvents: nil,
             totalEnergyBurned: totalEnergyBurned,
-            totalDistance: nil,
+            totalDistance: totalDistance,
             device: nil,
             metadata: nil
         )

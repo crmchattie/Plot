@@ -24,6 +24,7 @@ struct Workout: Codable, Equatable, Hashable {
     var endDateTime: Date?
     var length: Double?
     var totalEnergyBurned: Double?
+    var totalDistance: Double?
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
@@ -36,7 +37,7 @@ struct Workout: Codable, Equatable, Hashable {
     var directAssociationObjectID: String?
     var directAssociationType: ObjectType?
     
-    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?, user_created: Bool?, directAssociation: Bool?, directAssociationType: ObjectType?) {
+    init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?, totalDistance: Double?, user_created: Bool?, directAssociation: Bool?, directAssociationType: ObjectType?) {
         self.id = id
         self.name = name
         self.admin = admin
@@ -47,6 +48,7 @@ struct Workout: Codable, Equatable, Hashable {
         self.endDateTime = endDateTime
         self.length = length
         self.totalEnergyBurned = totalEnergyBurned
+        self.totalDistance = totalDistance
         self.user_created = user_created
         self.directAssociation = directAssociation
         self.directAssociationType = directAssociationType
@@ -60,6 +62,16 @@ struct Workout: Codable, Equatable, Hashable {
         self.startDateTime = hkWorkout.startDate
         self.endDateTime = hkWorkout.endDate
         self.length = hkWorkout.duration
+        if let val = hkWorkout.totalEnergyBurned {
+            self.totalEnergyBurned = val.doubleValue(for: HKUnit.kilocalorie())
+        }
+        if let val = hkWorkout.totalDistance {
+            if hkWorkout.workoutActivityType == .swimming {
+                self.totalDistance = val.doubleValue(for: HKUnit.yard())
+            } else {
+                self.totalDistance = val.doubleValue(for: HKUnit.mile())
+            }
+        }
     }
     
     init(fromTemplate template: Template) {
@@ -166,11 +178,7 @@ func workoutListStats(
 }
 
 extension Workout {
-    var hkWorkoutActivityType: HKWorkoutActivityType {
-        guard let type = self.type else {
-            return .traditionalStrengthTraining
-        }
-        
+    var hkWorkoutActivityType: HKWorkoutActivityType {        
         switch type {
         case "American Football":           return .americanFootball
         case "Archery":                     return .archery

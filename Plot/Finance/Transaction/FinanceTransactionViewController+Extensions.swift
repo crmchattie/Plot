@@ -446,7 +446,7 @@ extension FinanceTransactionViewController: UpdateTaskCellDelegate {
             }
             
             let updateTask = ActivityActions(activity: taskList[index], active: true, selectedFalconUsers: [])
-            updateTask.updateCompletion(isComplete: taskList[index].isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+            updateTask.updateCompletion(isComplete: taskList[index].isCompleted ?? false, completeUpdatedByUser: taskList[index].isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
         }
     }
 }

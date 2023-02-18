@@ -83,7 +83,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
                     workout = Workout(fromTemplate: template)
                     workout.id = ID
                 } else {
-                    workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: nil, startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, user_created: true, directAssociation: true, directAssociationType: .event)
+                    workout = Workout(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), type: "Running", startDateTime: nil, endDateTime: nil, length: nil, totalEnergyBurned: nil, totalDistance: nil, user_created: true, directAssociation: true, directAssociationType: .event)
                     //need to fix; sloppy code that is used to stop an event from being created
                     if let container = container {
                         workout.containerID = container.id
@@ -102,7 +102,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
                     if row.tag != "sections" && row.tag != "Tasks" && row.tag != "Events" && row.tag != "Transactions" && row.tag != "taskButton" && row.tag != "scheduleButton" && row.tag != "transactionButton" && row.tag != "Participants" && row.tag != "Body Weight" && row.tag != "Name" {
                         row.baseCell.isUserInteractionEnabled = false
                     }
-                    if workout.hkSampleID == nil && row.tag == "Calories Burned"  {
+                    if workout.hkSampleID == nil && row.tag == "Calories"  {
                         row.baseCell.isUserInteractionEnabled = true
                     }
                 }
@@ -295,7 +295,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
     func initializeForm() {
         print("initializing form")
         form +++
-        Section(footer: "")
+        Section()
         //"Calories burned is based on estimates and subject to error as a result"
         
         <<< TextRow("Name") {
@@ -390,14 +390,21 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
         }.onChange({ row in
             self.workout.type = row.value
 //            self.updateCalories()
-            if row.value == nil {
-                self.navigationItem.rightBarButtonItem?.isEnabled = false
-            } else if self.workout.name != "Name" {
+            if let distanceRow : DecimalRow = self.form.rowBy(tag: "Distance") {
+                distanceRow.hidden = Condition(booleanLiteral: !(self.workout.hkWorkoutActivityType.hasDistance))
+                distanceRow.evaluateHidden()
+                if !(self.workout.hkWorkoutActivityType.hasDistance) {
+                    self.workout.totalDistance = nil
+                    distanceRow.value = nil
+                }
+                
+            }
+            if self.workout.name != "Name" {
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             }
         })
         
-        <<< DecimalRow("Calories Burned") {
+        <<< DecimalRow("Calories") {
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.textField?.textColor = .secondaryLabel
             $0.title = $0.tag
@@ -413,6 +420,28 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
                 self.workout.totalEnergyBurned = value
                 if let currentUser = Auth.auth().currentUser?.uid {
                     let reference = Database.database().reference().child(userWorkoutsEntity).child(currentUser).child(self.workout.id).child("totalEnergyBurned")
+                    reference.setValue(value)
+                }
+            }
+        })
+        
+        <<< DecimalRow("Distance") {
+            $0.cell.backgroundColor = .secondarySystemGroupedBackground
+            $0.cell.textField?.textColor = .secondaryLabel
+            $0.title = $0.tag
+            $0.formatter = numberFormatter
+            if let workout = workout, let distance = workout.totalDistance {
+                $0.value = distance
+            }
+            $0.hidden = Condition(booleanLiteral: !(self.workout.hkWorkoutActivityType.hasDistance))
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textField?.textColor = .secondaryLabel
+        }.onChange({ row in
+            if let value = row.value {
+                self.workout.totalDistance = value
+                if let currentUser = Auth.auth().currentUser?.uid {
+                    let reference = Database.database().reference().child(userWorkoutsEntity).child(currentUser).child(self.workout.id).child("totalDistance")
                     reference.setValue(value)
                 }
             }
@@ -668,7 +697,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
     }
     
     fileprivate func updateCalories() {
-        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories Burned"), let weightRow : IntRow = self.form.rowBy(tag: "Body Weight"), let weightValue = weightRow.value, let length = workout.length {
+        if let caloriesRow : DecimalRow = self.form.rowBy(tag: "Calories"), let weightRow : IntRow = self.form.rowBy(tag: "Body Weight"), let weightValue = weightRow.value, let length = workout.length {
             let workoutType = workout.hkWorkoutActivityType
             let totalEnergyBurned = Double(length / 60) * workoutType.calories * Double(weightValue)
             caloriesRow.value = totalEnergyBurned

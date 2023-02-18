@@ -559,7 +559,7 @@ class FinanceService {
                                 ActivitiesFetcher.getDataFromSnapshot(ID: activityID, parentID: nil) { activities in
                                     if let activity = activities.first, !(activity.isCompleted ?? false) {
                                         let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                        activityAction.updateCompletion(isComplete: true, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+                                        activityAction.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                                         let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
                                         let container = Container(id: containerID, activityIDs: nil, taskIDs: [activity.activityID ?? ""], workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: transactions.map({$0.guid}), participantsIDs: activity.participantsIDs)
                                         ContainerFunctions.updateContainerAndStuffInside(container: container)
@@ -769,7 +769,7 @@ class FinanceService {
                                                 if let activity = activities.first, !(activity.isCompleted ?? false) {
                                                     activity.completedDate = NSNumber(value: Int((secondDate.UTCTime).timeIntervalSince1970))
                                                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                    activityAction.updateCompletion(isComplete: true, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+                                                    activityAction.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                                                 }
                                             }
                                         }
@@ -792,7 +792,7 @@ class FinanceService {
                                                 if let activity = activities.first, !(activity.isCompleted ?? false) {
                                                     activity.completedDate = NSNumber(value: Int((firstDate.UTCTime).timeIntervalSince1970))
                                                     let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                    activityAction.updateCompletion(isComplete: true, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+                                                    activityAction.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                                                 }
                                             }
                                         }
@@ -808,7 +808,7 @@ class FinanceService {
                                             if let activity = activities.first, !(activity.isCompleted ?? false) {
                                                 activity.completedDate = NSNumber(value: Int((firstDate.UTCTime).timeIntervalSince1970))
                                                 let activityAction = ActivityActions(activity: activity, active: true, selectedFalconUsers: [])
-                                                activityAction.updateCompletion(isComplete: true, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+                                                activityAction.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                                             }
                                         }
                                     }
