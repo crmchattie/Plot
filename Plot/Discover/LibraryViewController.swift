@@ -28,7 +28,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     var sections: [SectionType] = [.custom, .templates, .allTemplates]
     var groups = [SectionType: [AnyHashable]]()
-    var customTypes: [CustomType] = [.goal, .task, .event, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
+    var customTypes: [CustomType] = [.goal, .task, .event, .mood, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()
     var templates = [Template]()
@@ -335,7 +335,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
             case .mindfulness:
                 showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: self, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             case .mood:
-                print("mood")
+                showMoodDetailPresent(mood: nil, updateDiscoverDelegate: self, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             case .sleep:
                 print("sleep")
             case .work:

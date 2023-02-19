@@ -122,6 +122,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
     }
     
     @objc fileprivate func goalsUpdated() {
+        compileActivityDates(activities: networkGoals)
         sortandreload()
     }
     
@@ -290,7 +291,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
         
         if showRecurringGoals {
             goals = networkGoals.filter({
-                if $0.goalEndDate >= selectedDate, $0.goalStartDate <= selectedDate {
+                if $0.goalEndDate ?? selectedDate >= selectedDate, $0.goalStartDate ?? selectedDate <= selectedDate {
                     return true
                 }
                 return false
@@ -299,7 +300,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             goals = []
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                    if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
+                    if goal.goalEndDate ?? selectedDate >= selectedDate, goal.goalStartDate ?? selectedDate <= selectedDate {
                         goals.append(goal)
                     }
                 }
@@ -392,7 +393,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             if goal1.goalEndDate == goal2.goalEndDate {
                 return goal1.name ?? "" < goal2.name ?? ""
             }
-            return goal1.goalEndDate < goal2.goalEndDate
+            return goal1.goalEndDate ?? Date.distantFuture < goal2.goalEndDate ?? Date.distantFuture
         }
     }
 }
@@ -611,7 +612,7 @@ extension GoalsViewController: UpdateFilter {
                 let bool = value[0].lowercased()
                 if bool == "yes" {
                     goals = networkGoals.filter({
-                        if $0.goalEndDate >= selectedDate, $0.goalStartDate <= selectedDate {
+                        if $0.goalEndDate ?? selectedDate >= selectedDate, $0.goalStartDate ?? selectedDate <= selectedDate {
                             return true
                         }
                         return false
@@ -621,7 +622,7 @@ extension GoalsViewController: UpdateFilter {
                     goals = []
                     for goal in networkGoals {
                         if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                            if goal.goalEndDate >= selectedDate, goal.goalStartDate <= selectedDate {
+                            if goal.goalEndDate ?? selectedDate >= selectedDate, goal.goalStartDate ?? selectedDate <= selectedDate {
                                 goals.append(goal)
                             }
                         }

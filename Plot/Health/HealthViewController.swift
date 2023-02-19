@@ -150,6 +150,10 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
             self.showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }))
         
+        alert.addAction(UIAlertAction(title: "Mood", style: .default, handler: { (_) in
+            self.showMoodDetailPresent(mood: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+        }))
+        
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")
         }))
@@ -184,6 +188,8 @@ class HealthViewController: UIViewController, ObjectDetailShowing {
             showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         } else if let mindfulness = metric as? Mindfulness {
             showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+        } else if let mood = metric as? Mood {
+            showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }
 }

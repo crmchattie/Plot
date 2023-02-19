@@ -304,6 +304,38 @@ class ParticipantsFetcher: NSObject {
         }
     }
     
+    class func getParticipants(forMood mood: Mood?, completion: @escaping ([User])->()) {
+        if let mood = mood, let participantsIDs = mood.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+            let group = DispatchGroup()
+            var participants: [User] = []
+            
+            for id in participantsIDs {
+                if id == currentUserID || id.isEmpty {
+                    continue
+                }
+                
+                group.enter()
+                let participantReference = Database.database().reference().child("users").child(id)
+                participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                        dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                        let user = User(dictionary: dictionary)
+                        participants.append(user)
+                    }
+                    
+                    group.leave()
+                })
+            }
+            
+            group.notify(queue: .main) {
+                completion(participants)
+            }
+        } else {
+            let participants: [User] = []
+            completion(participants)
+        }
+    }
+    
     class func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?, completion: @escaping ([User])->()) {
         if let grocerylist = grocerylist, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
             let group = DispatchGroup()

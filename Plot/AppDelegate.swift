@@ -18,6 +18,7 @@ enum Identifiers {
     static let goalCategory = "GOAL_CATEGORY"
     static let workoutCategory = "WORKOUT_CATEGORY"
     static let mindfulnessCategory = "MINDFULNESS_CATEGORY"
+    static let moodCategory = "MOOD_CATEGORY"
     static let transactionCategory = "TRANSACTION_CATEGORY"
     static let accountCategory = "ACCOUNT_CATEGORY"
     static let listCategory = "LIST_CATEGORY"

@@ -21,6 +21,7 @@ struct Template: Codable, Equatable, Hashable {
     var interval: Int?
     var description: String?
     var order: Int?
+    var mood: MoodType?
     var subtemplates: [Template]?
     var dateType: DateType?
     var startYearAbsolute: Int?

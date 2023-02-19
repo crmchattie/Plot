@@ -10,14 +10,39 @@ import UIKit
 import Eureka
 import Firebase
 
+protocol UpdateMoodDelegate: AnyObject {
+    func updateMood(mood: Mood)
+}
+
 class MoodViewController: FormViewController {
     var mood: Mood!
+    var container: Container!
     var oldValue = String()
     var value = String()
     
-    var active: Bool = true
+    lazy var users: [User] = networkController.userService.users
+    lazy var filteredUsers: [User] = networkController.userService.users
+    lazy var tasks: [Activity] = networkController.activityService.tasks
+    lazy var events: [Activity] = networkController.activityService.events
+    lazy var transactions: [Transaction] = networkController.financeService.transactions
     
-    init() {
+    var selectedFalconUsers = [User]()
+    var participants = [String : [User]]()
+    
+    //added for EventViewController
+    var movingBackwards: Bool = false
+    var active: Bool = false
+    var sectionChanged: Bool = false
+    
+    weak var delegate : UpdateMoodDelegate?
+    weak var updateDiscoverDelegate : UpdateDiscover?
+    
+    var template: Template!
+    
+    var networkController: NetworkController
+    
+    init(networkController: NetworkController) {
+        self.networkController = networkController
         super.init(style: .insetGrouped)
     }
     
@@ -31,28 +56,44 @@ class MoodViewController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         
-        setupVariables()
+        if mood != nil {
+            active = true
+            title = "Mood"
+            print(mood.id)
+        } else {
+            title = "New Mood"
+            active = false
+            if let currentUserID = Auth.auth().currentUser?.uid {
+                let ID = Database.database().reference().child(userMoodEntity).child(currentUserID).childByAutoId().key ?? ""
+                if let template = template {
+                    mood = Mood(fromTemplate: template)
+                    mood.id = ID
+                } else {
+                    mood = Mood(id: ID, lastModifiedDate: Date(), createdDate: Date(), moodDate: Date(), applicableTo: .specificTime)
+                    
+                    //need to fix; sloppy code that is used to stop an event from being created
+                    if let container = container {
+                        mood.containerID = container.id
+                    }
+                }
+            }
+        }
+        
         configureTableView()
         initializeForm()
         oldValue = value
     }
     
-    fileprivate func setupVariables() {
-        if mood == nil, let currentUser = Auth.auth().currentUser?.uid {
-            title = "New Mood"
-            active = false
-            let ID = Database.database().reference().child(userMoodsEntity).child(currentUser).childByAutoId().key ?? ""
-            let original = Date()
-            let rounded = Date(timeIntervalSinceReferenceDate:
-            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-            let timezone = TimeZone.current
-            let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-            let date = rounded.addingTimeInterval(seconds)
-            mood = Mood(id: ID, mood: nil, applicableTo: .specificTime, moodDate: date, lastModifiedDate: date, createdDate: date)
-        } else {
-            title = "Mood"
+    override func viewDidDisappear(_ animated: Bool) {
+        if movingBackwards {
+            self.delegate?.updateMood(mood: mood)
         }
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
+
     
     fileprivate func configureTableView() {
         view.backgroundColor = .systemGroupedBackground
@@ -64,12 +105,14 @@ class MoodViewController: FormViewController {
         tableView.separatorStyle = .none
         definesPresentationContext = true
         
-        if active {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
+        if !active {
+            let plusBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
+            navigationItem.rightBarButtonItem = plusBarButton
         } else {
-            let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(create))
-            navigationItem.rightBarButtonItem = addBarButton
+            let dotsImage = UIImage(named: "dots")
+            let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
+            let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))
+            navigationItem.rightBarButtonItems = [plusBarButton, dotsBarButton]
         }
         if navigationItem.leftBarButtonItem != nil {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
@@ -85,16 +128,75 @@ class MoodViewController: FormViewController {
     
     @IBAction func create(_ sender: AnyObject) {
         if let currentUser = Auth.auth().currentUser?.uid {
-            self.showActivityIndicator()
-            let createMood = MoodActions(mood: mood, active: active, currentUser: currentUser)
-            createMood.createNewMood()
+            showActivityIndicator()
+            let moodAction = MoodActions(mood: self.mood, active: self.active, currentUser: currentUser)
+            moodAction.createNewMood()
+            self.delegate?.updateMood(mood: mood)
             self.hideActivityIndicator()
-            if navigationItem.leftBarButtonItem != nil {
-                self.dismiss(animated: true, completion: nil)
+            if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+                updateDiscoverDelegate.itemCreated(title: moodCreatedMessage)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
             } else {
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
+                if !active {
+                    basicAlert(title: moodCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                } else {
+                    basicAlert(title: moodUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+                }
             }
         }
+    }
+    
+    @objc func goToExtras() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Delete Mood", style: .default, handler: { (_) in
+            self.delete()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
+        print("shareButtonTapped")
+        
+    }
+    
+    func delete() {
+        let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
+            if let currentUser = Auth.auth().currentUser?.uid {
+                self.showActivityIndicator()
+                let moodAction = MoodActions(mood: self.mood, active: self.active, currentUser: currentUser)
+                moodAction.deleteMood()
+                self.hideActivityIndicator()
+                if self.navigationItem.leftBarButtonItem != nil {
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
+                basicAlert(title: moodDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            print("User click Dismiss button")
+        }))
+        
+        self.present(alert, animated: true, completion: {
+            print("completion block")
+        })
     }
     
     func showActivityIndicator() {
@@ -119,7 +221,7 @@ class MoodViewController: FormViewController {
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
                 $0.title = $0.tag
                 $0.minuteInterval = 5
-                $0.dateFormatter?.dateStyle = .full
+                $0.dateFormatter?.dateStyle = .medium
                 $0.dateFormatter?.timeStyle = .short
                 $0.value = mood.moodDate
                 }.onChange { [weak self] row in

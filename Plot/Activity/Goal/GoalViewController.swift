@@ -901,8 +901,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 row.value = value.rawValue
             } else {
                 row.value = "None"
+                row.hidden = Condition(booleanLiteral: self.active)
             }
-            row.hidden = Condition(booleanLiteral: !(self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime)))
         }.onPresent { from, to in
             to.title = "Measurement Period"
             to.extendedLayoutIncludesOpaqueBars = true
@@ -927,18 +927,23 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.isUserInteractionEnabled = false
             }
-            row.hidden = Condition(booleanLiteral: !(self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime)))
         }.onChange { row in
-            if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
-                self.task.goal!.period = updatedValue
-                if let startDateTime = self.task.startDateGivenEndDatePeriod {
-                    self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
+            if let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
+                if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
+                    switchDateRow.hidden = true
+                    switchDateRow.evaluateHidden()
+                    self.task.goal!.period = updatedValue
+                    if let startDateTime = self.task.startDateGivenEndDatePeriod {
+                        self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
+                    }
+                } else {
+                    switchDateRow.hidden = false
+                    switchDateRow.evaluateHidden()
+                    self.task.goal!.period = nil
+                    row.value = "None"
                 }
-            } else {
-                self.task.goal!.period = nil
-                row.value = "None"
+                self.updateDescriptionRow()
             }
-            self.updateDescriptionRow()
         }
         
         <<< SwitchRow("startDateSwitch") {
@@ -953,7 +958,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.value = false
                 $0.cell.detailTextLabel?.text = nil
             }
-            $0.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil && (self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime))))
+            $0.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil))
         }.onChange { [weak self] row in
             if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
                 if value {
@@ -999,7 +1004,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             } else {
                 cell.detailTextLabel?.text = nil
             }
-            row.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil && (self.task.goal?.metric?.type != .pointInTime || (self.task.goal?.metricSecond != nil && self.task.goal?.metricSecond?.type != .pointInTime))))
         }
 
         <<< DatePickerRow("StartDate") {

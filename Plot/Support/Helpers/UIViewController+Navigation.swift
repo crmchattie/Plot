@@ -258,6 +258,25 @@ extension ObjectDetailShowing {
         }
     }
     
+    func showMoodDetailPush(mood: Mood?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateMoodDelegate?, template: Template?, users: [User]?, container: Container?, movingBackwards: Bool?) {
+        let destination = MoodViewController(networkController: self.networkController)
+        destination.mood = mood
+        destination.template = template
+        destination.updateDiscoverDelegate = updateDiscoverDelegate
+        destination.delegate = delegate
+        destination.container = container
+        destination.movingBackwards = movingBackwards ?? false
+        if let users = users {
+            destination.users = users
+            destination.filteredUsers = users
+        }
+        ParticipantsFetcher.getParticipants(forMood: mood) { (participants) in
+            destination.selectedFalconUsers = participants
+            destination.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(destination, animated: true)
+        }
+    }
+    
     func showHealthMetricDetailPush(healthMetric: HealthMetric) {
         let healthDetailService = HealthDetailService()
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: healthMetric, healthDetailService: healthDetailService)
@@ -573,6 +592,28 @@ extension ObjectDetailShowing {
         }
     }
     
+    func showMoodDetailPresent(mood: Mood?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateMoodDelegate?, template: Template?, users: [User]?, container: Container?, movingBackwards: Bool?) {
+        let destination = MoodViewController(networkController: self.networkController)
+        destination.mood = mood
+        destination.template = template
+        destination.updateDiscoverDelegate = updateDiscoverDelegate
+        destination.delegate = delegate
+        destination.container = container
+        destination.movingBackwards = movingBackwards ?? false
+        if let users = users {
+            destination.users = users
+            destination.filteredUsers = users
+        }
+        ParticipantsFetcher.getParticipants(forMood: mood) { (participants) in
+            destination.selectedFalconUsers = participants
+            let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+            destination.navigationItem.leftBarButtonItem = cancelBarButton
+            destination.hidesBottomBarWhenPushed = true
+            let navigationViewController = UINavigationController(rootViewController: destination)
+            self.present(navigationViewController, animated: true, completion: nil)
+        }
+    }
+    
     func showHealthMetricDetailPresent(healthMetric: HealthMetric) {
         let healthDetailService = HealthDetailService()
         let healthDetailViewModel = HealthDetailViewModel(healthMetric: healthMetric, healthDetailService: healthDetailService)
@@ -648,6 +689,10 @@ extension ObjectDetailShowing {
             } else if category == Identifiers.mindfulnessCategory {
                 if let mindfulness = networkController.healthService.mindfulnesses.first(where: {$0.id == ID }) {
                     showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+                }
+            } else if category == Identifiers.moodCategory {
+                if let mood = networkController.healthService.moods.first(where: {$0.id == ID }) {
+                    showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
                 }
             } else if category == Identifiers.transactionCategory {
                 if let transaction = networkController.financeService.transactions.first(where: {$0.guid == ID }) {

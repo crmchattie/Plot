@@ -22,6 +22,7 @@ class HealthService {
     let healhKitManager = HealthKitManager()
     let workoutFetcher = WorkoutFetcher()
     let mindfulnessFetcher = MindfulnessFetcher()
+    let moodFetcher = MoodFetcher()
     
     fileprivate var userHealthDatabaseRef: DatabaseReference!
     fileprivate var currentUserHealthAddHandle = DatabaseHandle()
@@ -67,6 +68,18 @@ class HealthService {
             }
         }
     }
+    
+    var moods: [Mood] = [] {
+        didSet {
+            if oldValue != moods {
+                moods.sort(by: {
+                    $0.moodDate ?? Date.distantPast > $1.moodDate ?? Date.distantPast
+                })
+                NotificationCenter.default.post(name: .mindfulnessUpdated, object: nil)
+            }
+        }
+    }
+    
     var hasLoadedHealth = false {
         didSet {
             NotificationCenter.default.post(name: .hasLoadedHealth, object: nil)
@@ -107,6 +120,10 @@ class HealthService {
         self.observeMindfulnesssForCurrentUser {
             dispatchGroup.leave()
         }
+        dispatchGroup.enter()
+        self.observeMoodForCurrentUser {
+            dispatchGroup.leave()
+        }
         
         dispatchGroup.notify(queue: .main) {
             completion()
@@ -116,6 +133,7 @@ class HealthService {
     func setupFirebase() {
         self.observeWorkoutsForCurrentUser {}
         self.observeMindfulnesssForCurrentUser {}
+        self.observeMoodForCurrentUser {}
         self.hasLoadedHealth = true
     }
     
@@ -213,6 +231,48 @@ class HealthService {
                     self?.mindfulnesses[index] = mindfulness
                 } else {
                     self?.mindfulnesses.append(mindfulness)
+                }
+            }
+        })
+    }
+    
+    func observeMoodForCurrentUser(_ completion: @escaping () -> Void) {
+        moodFetcher.observeMoodForCurrentUser(moodInitialAdd: { [weak self] moodInitialAdd in
+            if !moodInitialAdd.isEmpty {
+                if self!.moods.isEmpty {
+                    self?.moods = moodInitialAdd
+                }
+                for mood in moodInitialAdd {
+                    if let index = self?.moods.firstIndex(where: {$0.id == mood.id}) {
+                        self?.moods[index] = mood
+                    } else {
+                        self?.moods.append(mood)
+                    }
+                }
+                completion()
+            } else {
+                completion()
+            }
+        }, moodAdded: { [weak self] moodAdded in
+            for mood in moodAdded {
+                if let index = self?.moods.firstIndex(where: {$0.id == mood.id}) {
+                    self?.moods[index] = mood
+                } else {
+                    self?.moods.append(mood)
+                }
+            }
+        }, moodRemoved: { [weak self] moodRemoved in
+            for mood in moodRemoved {
+                if let index = self?.moods.firstIndex(where: {$0.id == mood.id}) {
+                    self?.moods.remove(at: index)
+                }
+            }
+        }, moodChanged: { [weak self] moodChanged in
+            for mood in moodChanged {
+                if let index = self?.moods.firstIndex(where: {$0.id == mood.id}) {
+                    self?.moods[index] = mood
+                } else {
+                    self?.moods.append(mood)
                 }
             }
         })

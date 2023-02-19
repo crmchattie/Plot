@@ -33,7 +33,7 @@ extension NetworkController {
                 continue
             }
                         
-            let range = DateRange(startDate: task.goalStartDate, endDate: task.goalEndDate)
+            let range = DateRange(startDate: task.goalStartDate ?? Date().localTime, endDate: task.goalEndDate ?? Date().localTime)
             guard range.endDate > past, range.startDate <= tomorrow else {
                 group.leave()
                 continue

@@ -176,7 +176,7 @@ class DiscoverViewController: UICollectionViewController, UICollectionViewDelega
             case .mindfulness:
                 showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: self, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             case .mood:
-                print("mood")
+                showMoodDetailPresent(mood: nil, updateDiscoverDelegate: self, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             case .sleep:
                 print("sleep")
             case .work:

@@ -128,6 +128,7 @@ enum HealthMetricCategory: String {
     case nutrition
     case workoutsList
     case mindfulnessList
+    case moodList
     
     var rank: Int {
         get {
@@ -142,6 +143,8 @@ enum HealthMetricCategory: String {
                 return 4
             case .mindfulnessList:
                 return 5
+            case .moodList:
+                return 6
             }
         }
     }
@@ -159,6 +162,8 @@ enum HealthMetricCategory: String {
                 return "Workouts"
             case .mindfulnessList:
                 return "Mindfulness Sessions"
+            case .moodList:
+                return "Moods"
             }
         }
     }

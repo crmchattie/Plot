@@ -118,6 +118,8 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
             self.showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         } else if filteredHealthMetricSections.contains(.mindfulnessList) {
             self.showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+        } else if filteredHealthMetricSections.contains(.moodList) {
+            self.showMoodDetailPresent(mood: nil, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }
     
@@ -135,6 +137,8 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
             showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         } else if let mindfulness = metric as? Mindfulness {
             showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+        } else if let mood = metric as? Mood {
+            showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }
 }

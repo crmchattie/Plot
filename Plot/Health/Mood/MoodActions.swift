@@ -37,8 +37,8 @@ class MoodActions: NSObject {
             return
         }
                           
-        Database.database().reference().child(userMoodsEntity).child(currentUser).child(ID).removeAllObservers()
-        Database.database().reference().child(userMoodsEntity).child(currentUser).child(ID).removeValue()
+        Database.database().reference().child(userMoodEntity).child(currentUser).child(ID).removeAllObservers()
+        Database.database().reference().child(userMoodEntity).child(currentUser).child(ID).removeValue()
                 
     }
     
@@ -52,7 +52,7 @@ class MoodActions: NSObject {
         }
         
         if !active {
-            let userReference = Database.database().reference().child(userMoodsEntity).child(currentUser).child(ID)
+            let userReference = Database.database().reference().child(userMoodEntity).child(currentUser).child(ID)
             let values:[String : Any] = ["isGroupMood": false]
             userReference.setValue(values)
             
@@ -63,7 +63,7 @@ class MoodActions: NSObject {
         
         mood.lastModifiedDate = Date()
         
-        let groupMoodReference = Database.database().reference().child(moodsEntity).child(ID)
+        let groupMoodReference = Database.database().reference().child(moodEntity).child(ID)
 
         do {
             let value = try FirebaseEncoder().encode(mood)

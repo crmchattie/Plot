@@ -2115,22 +2115,22 @@ extension Activity {
         return nil
     }
     
-    var goalStartDate: Date {
+    var goalStartDate: Date? {
         if let startDateTemp = self.startDate {
             return startDateTemp
         } else if let startDateTemp = self.startDateGivenEndDatePeriod {
             return startDateTemp
         }
-        return Date()
+        return nil
     }
     
-    var goalEndDate: Date {
+    var goalEndDate: Date? {
         if let endDateTemp = self.endDate {
             return endDateTemp
         } else if let startDateTemp = self.endDateGivenStartDatePeriod {
             return startDateTemp
         }
-        return Date()
+        return nil
     }
     
     var startDateGivenEndDatePeriod: Date? {

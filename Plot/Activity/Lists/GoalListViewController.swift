@@ -80,19 +80,12 @@ class GoalListViewController: UIViewController, ObjectDetailShowing {
     
     func sortandreload() {
         if showRecurringGoals {
-            goals = networkGoals.filter({
-                if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
-                    return true
-                }
-                return false
-            })
+            goals = networkGoals
         } else {
             goals = []
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                    if goal.goalEndDate >= Date(), goal.goalStartDate <= Date() {
-                        goals.append(goal)
-                    }
+                    goals.append(goal)
                 }
             }
         }
@@ -469,27 +462,13 @@ extension GoalListViewController: UpdateFilter {
             dispatchGroup.enter()
             let bool = value[0].lowercased()
             if bool == "yes" {
-                goals = networkGoals.filter({
-                    if $0.isGoal ?? false {
-                        if $0.goalEndDate >= Date(), $0.goalStartDate <= Date() {
-                            return true
-                        }
-                        return false
-                    }
-                    return true
-                })
+                goals = networkGoals
                 self.showRecurringGoals = true
             } else {
                 goals = []
                 for goal in networkGoals {
                     if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                        if goal.isGoal ?? false {
-                            if goal.goalEndDate >= Date(), goal.goalStartDate <= Date() {
-                                goals.append(goal)
-                            }
-                        } else {
-                            goals.append(goal)
-                        }
+                        goals.append(goal)
                     }
                 }
                 self.showRecurringGoals = false

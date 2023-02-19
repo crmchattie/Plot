@@ -415,7 +415,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 if index < numberOfActivities {
                     //add check for goals; if deadline date is in the past, show next
                     if !goals.contains(where: {$0.activityID == goal.activityID}) && !(goal.isCompleted ?? false) {
-                        if goal.goalEndDate >= Date().localTime {
+                        if goal.goalEndDate ?? Date.distantFuture >= Date().localTime {
                             goals.append(goal)
                             index += 1
                         }
@@ -442,7 +442,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     //add check for goals; if deadline date is in the past, show next
                     if !tasks.contains(where: {$0.activityID == task.activityID}) && !(task.isCompleted ?? false) {
                         if task.isGoal ?? false {
-                            if task.goalEndDate >= Date(), task.goalStartDate <= Date() {
+                            if task.goalEndDate ?? Date.distantFuture >= Date(), task.goalStartDate ?? Date.distantFuture <= Date() {
                                 tasks.append(task)
                                 index += 1
                             }

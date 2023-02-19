@@ -147,7 +147,7 @@ class ActivityService {
                     if goal1.goalEndDate == goal2.goalEndDate {
                         return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return goal1.goalEndDate < goal2.goalEndDate
+                    return goal1.goalEndDate ?? Date.distantFuture < goal2.goalEndDate ?? Date.distantFuture
                 }
                 NotificationCenter.default.post(name: .goalsUpdated, object: nil)
             }
@@ -161,7 +161,7 @@ class ActivityService {
                     if goal1.goalEndDate == goal2.goalEndDate {
                         return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return goal1.goalEndDate < goal2.goalEndDate
+                    return goal1.goalEndDate ?? Date.distantFuture < goal2.goalEndDate ?? Date.distantFuture
                 }
                 NotificationCenter.default.post(name: .goalsNoRepeatsUpdated, object: nil)
             }
