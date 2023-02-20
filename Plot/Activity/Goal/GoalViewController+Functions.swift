@@ -400,8 +400,7 @@ extension GoalViewController {
         var formattedDate: (Int, String, String) = (1, "", "")
         formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: task.hasDeadlineTime ?? false, startDate: task.startDate, hasStartTime: task.hasStartTime)
         content.subtitle = formattedDate.2
-        if let reminder = EventAlert(rawValue: activityReminder) {
-            let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)
+        if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
             let calendar = Calendar.current
             let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
@@ -484,18 +483,14 @@ extension GoalViewController {
                     
                     if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-                            periodRow.hidden = false
-                            periodRow.evaluateHidden()
-                            
-                            switchDateRow.hidden = false
-                            switchDateRow.evaluateHidden()
+                            periodRow.hidden = Condition(booleanLiteral: !(task.goal?.period != nil))
+                            switchDateRow.hidden = Condition(booleanLiteral: task.goal?.period != nil)
                         } else {
                             periodRow.hidden = true
-                            periodRow.evaluateHidden()
-                            
                             switchDateRow.hidden = true
-                            switchDateRow.evaluateHidden()
                         }
+                        periodRow.evaluateHidden()
+                        switchDateRow.evaluateHidden()
                     }
                     
                 }
@@ -578,19 +573,15 @@ extension GoalViewController {
                     }
                     
                     if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
-                        if updatedValue.type != .pointInTime || task.goal!.metric!.type != .pointInTime {
-                            periodRow.hidden = false
-                            periodRow.evaluateHidden()
-                            
-                            switchDateRow.hidden = false
-                            switchDateRow.evaluateHidden()
+                        if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
+                            periodRow.hidden = Condition(booleanLiteral: !(task.goal?.period != nil))
+                            switchDateRow.hidden = Condition(booleanLiteral: task.goal?.period != nil)
                         } else {
                             periodRow.hidden = true
-                            periodRow.evaluateHidden()
-                            
                             switchDateRow.hidden = true
-                            switchDateRow.evaluateHidden()
                         }
+                        periodRow.evaluateHidden()
+                        switchDateRow.evaluateHidden()
                     }
                     
                 } else {
@@ -605,18 +596,14 @@ extension GoalViewController {
                     
                     if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if task.goal!.metric!.type != .pointInTime {
-                            periodRow.hidden = false
-                            periodRow.evaluateHidden()
-                            
-                            switchDateRow.hidden = false
-                            switchDateRow.evaluateHidden()
+                            periodRow.hidden = Condition(booleanLiteral: !(task.goal?.period != nil))
+                            switchDateRow.hidden = Condition(booleanLiteral: task.goal?.period != nil)
                         } else {
                             periodRow.hidden = true
-                            periodRow.evaluateHidden()
-                            
                             switchDateRow.hidden = true
-                            switchDateRow.evaluateHidden()
                         }
+                        periodRow.evaluateHidden()
+                        switchDateRow.evaluateHidden()
                     }
                 }
                 
@@ -719,9 +706,7 @@ extension GoalViewController {
                     secondCurrentRow.hidden = Condition(booleanLiteral: secondTargetRow.isHidden)
                     secondCurrentRow.evaluateHidden()
                 }
-                
-                self.updateDescriptionRow()
-                
+                                
                 //hide second target and current row given metricsRelationship value is nil
             } else if !secondTargetRow.isHidden {
                 secondTargetRow.value = nil
@@ -734,6 +719,8 @@ extension GoalViewController {
                     secondCurrentRow.evaluateHidden()
                 }
             }
+            self.updateDescriptionRow()
+
         }
     }
     
@@ -1095,8 +1082,8 @@ extension GoalViewController {
             if self.task.recurrences == nil {
                 self.deleteRecurrences()
             } else {
-                let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
-                alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
+                let alert = UIAlertController(title: nil, message: "This is a repeating goal.", preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "Save For This Goal Only", style: .default, handler: { (_) in
                     if self.task.instanceID == nil {
                         let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                         self.task.instanceID = instanceID
@@ -1121,7 +1108,7 @@ extension GoalViewController {
                     self.closeController(title: taskUpdatedMessage)
                 }))
                 
-                alert.addAction(UIAlertAction(title: "Save For Future Tasks", style: .default, handler: { (_) in
+                alert.addAction(UIAlertAction(title: "Save For Future Goals", style: .default, handler: { (_) in
                     print("Save for future events")
                     //update task's recurrence to stop repeating just before this event
                     if let dateIndex = self.task.instanceIndex {
@@ -1149,7 +1136,7 @@ extension GoalViewController {
                     }
                 }))
                 
-                alert.addAction(UIAlertAction(title: "Save For All Tasks", style: .default, handler: { (_) in
+                alert.addAction(UIAlertAction(title: "Save For All Goals", style: .default, handler: { (_) in
                     //update all instances of activity
                     if let dateIndex = self.task.instanceIndex {
                         if dateIndex == 0 {
@@ -1429,9 +1416,9 @@ extension GoalViewController {
     func deleteActivity() {
         //need to look into equatable protocol for activities
         if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
-            let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
+            let alert = UIAlertController(title: nil, message: "This is a repeating goal.", preferredStyle: .actionSheet)
             
-            alert.addAction(UIAlertAction(title: "Delete This Task Only", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Delete This Goal Only", style: .default, handler: { (_) in
                 print("Save for this event only")
                 //update activity's recurrence to skip repeat on this date
                 var oldActivityRule = oldRecurrenceRule
@@ -1441,7 +1428,7 @@ extension GoalViewController {
                 self.updateRecurrences(recurrences: self.task.recurrences!, title: taskDeletedMessage)
             }))
             
-            alert.addAction(UIAlertAction(title: "Delete All Future Tasks", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Delete All Future Goals", style: .default, handler: { (_) in
                 //update activity's recurrence to stop repeating at this event
                 if let dateIndex = self.task.instanceIndex {
                     //will equal true if first instance of repeating event
@@ -1461,7 +1448,7 @@ extension GoalViewController {
                 }
             }))
             
-            alert.addAction(UIAlertAction(title: "Delete All Tasks", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Delete All Goals", style: .default, handler: { (_) in
                 self.showActivityIndicator()
                 let deleteActivity = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                 deleteActivity.deleteActivity(updateExternal: true, updateDirectAssociation: true)

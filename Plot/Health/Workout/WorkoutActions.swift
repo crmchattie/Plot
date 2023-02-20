@@ -83,7 +83,7 @@ class WorkoutActions: NSObject {
             return
         }
         
-        guard let active = active, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
+        guard let active = active, let ID = ID, let _ = selectedFalconUsers else {
             return
         }
         

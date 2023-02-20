@@ -62,7 +62,7 @@ struct Template: Codable, Equatable, Hashable {
             dateComponents.day = self.startDayAbsolute ?? date.dayNumber()
             dateComponents.hour = self.startHourAbsolute ?? date.hourNumber()
             dateComponents.minute = self.startMinuteRelative ?? date.minuteNumber()
-            dateComponents.minute = self.startSecondRelative ?? date.secondNumber()
+            dateComponents.second = self.startSecondRelative ?? date.secondNumber()
             let calendar = Calendar.current
             date = calendar.date(from: dateComponents) ?? Date()
         case .relative:
@@ -94,7 +94,7 @@ struct Template: Codable, Equatable, Hashable {
             dateComponents.day = self.endDayAbsolute ?? date.dayNumber()
             dateComponents.hour = self.endHourAbsolute ?? date.hourNumber()
             dateComponents.minute = self.endMinuteRelative ?? date.minuteNumber()
-            dateComponents.minute = self.endSecondRelative ?? date.secondNumber()
+            dateComponents.second = self.endSecondRelative ?? date.secondNumber()
             let calendar = Calendar.current
             date = calendar.date(from: dateComponents) ?? Date()
         case .relative:

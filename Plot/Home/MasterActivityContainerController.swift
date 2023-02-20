@@ -498,8 +498,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func grabHealthItems(_ completion: @escaping () -> Void) {
-        var metrics = networkController.healthService.healthMetrics
-        var metricsSections = networkController.healthService.healthMetricSections
+        let metrics = networkController.healthService.healthMetrics
+        let metricsSections = networkController.healthService.healthMetricSections
         
         healthMetricSections = []
         healthMetrics = [:]

@@ -1900,14 +1900,14 @@ extension String {
     }
 }
 
-// MARK: - Reminder Frequency
+// MARK: - Event Reminder Frequency
 enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
     static func < (lhs: EventAlert, rhs: EventAlert) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
     
     case None = "None"
-    case At_time_of_event = "At time of event or task"
+    case At_time_of_event = "At time of event"
     case Five_Minutes = "5 minutes before"
     case Fifteen_Minutes = "15 minutes before"
     case Half_Hour = "30 minutes before"
@@ -1943,31 +1943,81 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             return 0
         }
     }
-    
-    static func fromInterval(_ interval: TimeInterval) -> EventAlert {
-        switch interval {
-        case 0:
-            return .At_time_of_event
-        case 900:
-            return .Fifteen_Minutes
-        case 1800:
-            return .Half_Hour
-        case 3600:
-            return .One_Hour
-        case 7200:
-            return .Two_Hour
-        case 86400:
-            return .One_Day
-        case 172800:
-            return .Two_Day
-        case 604800:
-            return .One_Week
-        default:
-            return .None
-        }
+}
+
+// MARK: - Task Reminder Frequency
+enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
+    static func < (lhs: TaskAlert, rhs: TaskAlert) -> Bool {
+        return lhs.rawValue < rhs.rawValue
     }
     
+    case None = "None"
+    case NineAMOnDeadlineDate = "Day of at 9 AM"
+    case SixPMOnDeadlineDate = "Day of at 6 PM"
+    case NineAMOneDayOnDeadlineDate = "Day before at 9 AM"
+    case SixPMOneDayOnDeadlineDate = "Day before at 6 PM"
+    case NineAMOneWeekOnDeadlineDate = "Week before at 9 AM"
+    case SixPMOneWeekOnDeadlineDate = "Week before at 6 PM"
+
+    var description : String { return rawValue }
+        
+    func timeInterval(_ deadlineDate: Date) -> Date? {
+        let calendar = Calendar.current
+        var dateComponents = DateComponents()
+        dateComponents.timeZone = TimeZone.current
+        switch self {
+        case .None:
+            return deadlineDate
+        case .NineAMOnDeadlineDate:
+            dateComponents.year = deadlineDate.yearNumber()
+            dateComponents.month = deadlineDate.monthNumber()
+            dateComponents.day = deadlineDate.dayNumber()
+            dateComponents.hour = 9
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        case .SixPMOnDeadlineDate:
+            dateComponents.year = deadlineDate.yearNumber()
+            dateComponents.month = deadlineDate.monthNumber()
+            dateComponents.day = deadlineDate.dayNumber()
+            dateComponents.hour = 18
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        case .NineAMOneDayOnDeadlineDate:
+            let newDate = deadlineDate.dayBefore
+            dateComponents.year = newDate.yearNumber()
+            dateComponents.month = newDate.monthNumber()
+            dateComponents.day = newDate.dayNumber()
+            dateComponents.hour = 9
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        case .SixPMOneDayOnDeadlineDate:
+            let newDate = deadlineDate.dayBefore
+            dateComponents.year = newDate.yearNumber()
+            dateComponents.month = newDate.monthNumber()
+            dateComponents.day = newDate.dayNumber()
+            dateComponents.hour = 18
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        case .NineAMOneWeekOnDeadlineDate:
+            let newDate = deadlineDate.weekBefore
+            dateComponents.year = newDate.yearNumber()
+            dateComponents.month = newDate.monthNumber()
+            dateComponents.day = newDate.dayNumber()
+            dateComponents.hour = 9
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        case .SixPMOneWeekOnDeadlineDate:
+            let newDate = deadlineDate.weekBefore
+            dateComponents.year = newDate.yearNumber()
+            dateComponents.month = newDate.monthNumber()
+            dateComponents.day = newDate.dayNumber()
+            dateComponents.hour = 18
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        }
+    }
 }
+
 
 // MARK: - Repeat Frequency
 enum EventRepeat : String, Comparable, CustomStringConvertible, CaseIterable {

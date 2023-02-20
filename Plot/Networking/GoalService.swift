@@ -112,47 +112,11 @@ extension NetworkController {
         }
     }
     
-//                        print("finished checking")
-//                        print(range.startDate)
-//                        print(range.endDate)
-//
-//                        print("metricCheck First")
-//                        print(metric)
-//                        print(goal.submetric)
-//                        print(goal.option)
-//                        print(finalStat.date)
-//                        print(finalStat.value)
-//                        print(target)
-//
-//                        print("metricCheck Second")
-//                        print(metricSecond)
-//                        print(goal.submetricSecond)
-//                        print(goal.optionSecond)
-//                        print(finalStatSecond.date)
-//                        print(finalStatSecond.value)
-//                        print(targetSecond)
-
-    
-//                    print("finished checking")
-//                    print(range.startDate)
-//                    print(range.endDate)
-//
-//                    print("metricCheck First")
-//                    print(metric)
-//                    print(goal.submetric)
-//                    print(goal.option)
-//                    print(finalStat.date)
-//                    print(finalStat.value)
-//                    print(target)
-
-    
-// task.completedDate = finalStat.date > finalStatSecond.date ? NSNumber(value: Int((finalStat.date).timeIntervalSince1970)) : NSNumber(value: Int((finalStatSecond.date).timeIntervalSince1970))
-
-    
+  
     func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, range: DateRange, completion: @escaping (Statistic?) -> Void) {
         switch metric {
         case .events:
-            activityDetailService.getActivityCategoriesSamples(activities: activityService.events, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
+            activityDetailService.getActivityCategoriesSamples(activities: activityService.events, isEvent: true, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
                 if let stat = stat, let activities = activities {
                     var finalStat = stat
                     switch unit {
@@ -174,7 +138,7 @@ extension NetworkController {
                 }
             }
         case .tasks:
-            activityDetailService.getActivityCategoriesSamples(activities: activityService.tasks, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
+            activityDetailService.getActivityCategoriesSamples(activities: activityService.tasks, isEvent: false, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
                 if let stat = stat, let activities = activities {
                     var finalStat = stat
                     switch unit {
@@ -301,7 +265,19 @@ extension NetworkController {
                     }
                 }
             }
-            
+        case .mood:
+            healthDetailService.getSamples(for: healthService.moods, types: option, range: range) {stat, moods,_ in
+                if let stat = stat, let moods = moods {
+                    var finalStat = stat
+                    switch unit {
+                    case .count:
+                        finalStat.value = Double(moods.count)
+                        completion(finalStat)
+                    case .hours, .days, .calories, .amount, .percent, .multiple, .level, .minutes:
+                        completion(nil)
+                    }
+                }
+            }
         case .sleep:
             if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
                 healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
@@ -357,13 +333,25 @@ extension NetworkController {
                     if goal.targetNumber == nil {
                         group.enter()
                         if goal.name == "Save Emergency Fund" {
-                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, range: DateRange(startDate: Date().startOfMonth.monthBefore.monthBefore.monthBefore, endDate: Date().endOfMonth.monthBefore)) { stat in
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
                                 goal.targetNumber = round(stat?.value ?? 0)
                                 group.leave()
                             }
                         } else if goal.name == "Monthly Savings" {
-                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: Date().startOfMonth.monthBefore.monthBefore.monthBefore, endDate: Date().endOfMonth.monthBefore)) { stat in
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
                                 goal.targetNumber = round(stat?.value ?? 0 / 3 * 0.2)
+                                group.leave()
+                            }
+                        } else if goal.name == "Daily Spending" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            let daysBetween = Double(Calendar.current.numberOfDaysBetween(startOfThreeMonthsAgo, and: endOfLastMonth))
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round(stat?.value ?? 0 / daysBetween * 0.8)
                                 group.leave()
                             }
                         }
@@ -437,3 +425,41 @@ extension NetworkController {
         }
     }
 }
+
+//                        print("finished checking")
+//                        print(range.startDate)
+//                        print(range.endDate)
+//
+//                        print("metricCheck First")
+//                        print(metric)
+//                        print(goal.submetric)
+//                        print(goal.option)
+//                        print(finalStat.date)
+//                        print(finalStat.value)
+//                        print(target)
+//
+//                        print("metricCheck Second")
+//                        print(metricSecond)
+//                        print(goal.submetricSecond)
+//                        print(goal.optionSecond)
+//                        print(finalStatSecond.date)
+//                        print(finalStatSecond.value)
+//                        print(targetSecond)
+
+    
+//                    print("finished checking")
+//                    print(range.startDate)
+//                    print(range.endDate)
+//
+//                    print("metricCheck First")
+//                    print(metric)
+//                    print(goal.submetric)
+//                    print(goal.option)
+//                    print(finalStat.date)
+//                    print(finalStat.value)
+//                    print(target)
+
+    
+// task.completedDate = finalStat.date > finalStatSecond.date ? NSNumber(value: Int((finalStat.date).timeIntervalSince1970)) : NSNumber(value: Int((finalStatSecond.date).timeIntervalSince1970))
+
+  

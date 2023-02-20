@@ -12,31 +12,32 @@ protocol ActivityDetailServiceInterface {
     func getActivityCategoriesSamples(
         segmentType: TimeSegmentType,
         activities: [Activity],
+        isEvent: Bool,
         completion: @escaping ([String: [Statistic]]?, [Activity]?, Error?) -> Void)
     
-    func getActivityCategoriesSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([String: [Statistic]], [Activity]) -> Void)
+    func getActivityCategoriesSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], isEvent: Bool, completion: @escaping ([String: [Statistic]], [Activity]) -> Void)
     
-    func getActivityCategoriesSamples(activities: [Activity], level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?) -> Void)
+    func getActivityCategoriesSamples(activities: [Activity], isEvent: Bool, level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?) -> Void)
 }
 
 class ActivityDetailService: ActivityDetailServiceInterface {
-    func getActivityCategoriesSamples(segmentType: TimeSegmentType, activities: [Activity], completion: @escaping ([String: [Statistic]]?, [Activity]?, Error?) -> Swift.Void) {
-        getActivityCategoriesStatisticalSamples(segmentType: segmentType, range: nil, activities: activities, completion: completion)
+    func getActivityCategoriesSamples(segmentType: TimeSegmentType, activities: [Activity], isEvent: Bool, completion: @escaping ([String: [Statistic]]?, [Activity]?, Error?) -> Swift.Void) {
+        getActivityCategoriesStatisticalSamples(segmentType: segmentType, range: nil, activities: activities, isEvent: isEvent, completion: completion)
     }
     
-    func getActivityCategoriesSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], completion: @escaping ([String : [Statistic]], [Activity]) -> Void) {
-        getActivityCategoriesStatisticalSamples(segmentType: segment, range: range, activities: activities) { (stats, activities, _) in
+    func getActivityCategoriesSamples(for range: DateRange, segment: TimeSegmentType, activities: [Activity], isEvent: Bool, completion: @escaping ([String : [Statistic]], [Activity]) -> Void) {
+        getActivityCategoriesStatisticalSamples(segmentType: segment, range: range, activities: activities, isEvent: isEvent) { (stats, activities, _) in
             completion(stats ?? [:], activities ?? [])
         }
     }
     
-    func getActivityCategoriesSamples(activities: [Activity], level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?) -> Void) {
-        getActivityCategoriesStatisticalSamples(activities: activities, level: level, options: options, range: range) { (stat, activities, _) in
+    func getActivityCategoriesSamples(activities: [Activity], isEvent: Bool, level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?) -> Void) {
+        getActivityCategoriesStatisticalSamples(activities: activities, isEvent: isEvent, level: level, options: options, range: range) { (stat, activities, _) in
             completion(stat, activities ?? [])
         }
     }
 
-    private func getActivityCategoriesStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, activities: [Activity], completion: @escaping ([String: [Statistic]]?, [Activity]?, Error?) -> Void) {
+    private func getActivityCategoriesStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, activities: [Activity], isEvent: Bool, completion: @escaping ([String: [Statistic]]?, [Activity]?, Error?) -> Void) {
         
         let anchorDate = Date()
         var startDate = anchorDate
@@ -59,15 +60,15 @@ class ActivityDetailService: ActivityDetailServiceInterface {
             endDate = Date().localTime.endOfYear
         }
         
-        categorizeActivities(activities: activities, start: startDate, end: endDate) { (categoryDict, categorizedActivitiesList) in
-            activitiesOverTimeChartData(activities: categorizedActivitiesList, activityCategories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
+        categorizeActivities(activities: activities, isEvent: isEvent, start: startDate, end: endDate) { (categoryDict, categorizedActivitiesList) in
+            activitiesOverTimeChartData(activities: categorizedActivitiesList, isEvent: isEvent, activityCategories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
                 completion(statsDict, categorizedActivitiesList, nil)
             }
         }
     }
     
-    private func getActivityCategoriesStatisticalSamples(activities: [Activity], level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?, Error?) -> Void) {
-        activitiesData(activities: activities, level: level, options: options, start: range.startDate, end: range.endDate) { stat, activitiesList in
+    private func getActivityCategoriesStatisticalSamples(activities: [Activity], isEvent: Bool, level: ActivityLevel, options: [String]?, range: DateRange, completion: @escaping (Statistic?, [Activity]?, Error?) -> Void) {
+        activitiesData(activities: activities, isEvent: isEvent, level: level, options: options, start: range.startDate, end: range.endDate) { stat, activitiesList in
             completion(stat, activitiesList, nil)
         }
     }

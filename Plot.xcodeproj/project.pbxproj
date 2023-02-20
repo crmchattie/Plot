@@ -46,8 +46,6 @@
 		10217A7B23103661004CBA9E /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10217A7A23103661004CBA9E /* CalendarViewController.swift */; };
 		1024035E2586E92E00A54703 /* FinanceBarChartDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */; };
 		102523EB2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */; };
-		1026185025756B2400CF6F0A /* SummaryHKChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */; };
-		1026185425756B3300CF6F0A /* SummaryPieChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */; };
 		102618C925771FE300CF6F0A /* ActivityLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102618C825771FE300CF6F0A /* ActivityLevelViewController.swift */; };
 		102618CD257721D100CF6F0A /* ActivityNewLevelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102618CC257721D100CF6F0A /* ActivityNewLevelViewController.swift */; };
 		1028A104230D8F4200619907 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1028A103230D8F4200619907 /* Activity.swift */; };
@@ -73,8 +71,6 @@
 		103F492C286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */; };
 		103F492E286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */; };
 		1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1040E582242AA05D00304D05 /* MessageViewController.swift */; };
-		104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1046252F2571B4D40026C214 /* SummaryViewModel.swift */; };
-		104625362571B4FD0026C214 /* SummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104625352571B4FD0026C214 /* SummaryService.swift */; };
 		1051AC98244F8B3D0066761C /* MasterActivityContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */; };
 		1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */; };
 		1058E61D2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058E61C2538F16D00579EC3 /* FinancialTransactionRuleFetcher.swift */; };
@@ -109,9 +105,7 @@
 		10623B9428CA2CF800E05AF0 /* ParticipantsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */; };
 		10623B9628CF7C4500E05AF0 /* HealthListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */; };
 		10623B9828CF7D5F00E05AF0 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */; };
-		106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */; };
 		106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D4258C10FE00D02658 /* ChartValueFormatter.swift */; };
-		106431D9258C15B900D02658 /* SummaryTimeBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */; };
 		106618B124BA3C59003C3F36 /* PlaceDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */; };
 		106618B324BB655E003C3F36 /* PlaceExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */; };
 		106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */; };
@@ -132,8 +126,6 @@
 		10761AFE22AD8146007D1B06 /* ActivitiesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */; };
 		107BC99B258FB32B008E6DD5 /* ActiveDaysRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107BC99A258FB32B008E6DD5 /* ActiveDaysRow.swift */; };
 		107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */; };
-		108087172583E72300FB9BB0 /* SummaryValueBarChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */; };
-		1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */; };
 		1080871F2585057400FB9BB0 /* MoodActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1080871E2585057400FB9BB0 /* MoodActions.swift */; };
 		108087232585058100FB9BB0 /* MoodFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087222585058100FB9BB0 /* MoodFetcher.swift */; };
 		108087272585059E00FB9BB0 /* SleepActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108087262585059E00FB9BB0 /* SleepActions.swift */; };
@@ -146,7 +138,6 @@
 		1082C89524F0A8F500CF6491 /* FinanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082C89424F0A8F500CF6491 /* FinanceViewController.swift */; };
 		1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1082C89624F0A91500CF6491 /* HealthViewController.swift */; };
 		10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10868D6C246314C700D6BB4F /* Grocerylist.swift */; };
-		108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108841D1257004F10064C5F8 /* SummaryViewController.swift */; };
 		108BDBC028F5933200A2285B /* FinanceCollectionViewComparisonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDBBF28F5933200A2285B /* FinanceCollectionViewComparisonCell.swift */; };
 		108BDBC228F5F53300A2285B /* OnboardingCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108BDBC128F5F53300A2285B /* OnboardingCollectionViewCell.swift */; };
 		108C37EE2899708B00DC4998 /* TaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108C37ED2899708B00DC4998 /* TaskViewController.swift */; };
@@ -647,8 +638,6 @@
 		10217A7A23103661004CBA9E /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		1024035D2586E92E00A54703 /* FinanceBarChartDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceBarChartDetailViewController.swift; sourceTree = "<group>"; };
 		102523EA2389C96E00D49FAA /* ChatActivitiesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatActivitiesTableViewCell.swift; sourceTree = "<group>"; };
-		1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHKChartCell.swift; sourceTree = "<group>"; };
-		1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryPieChartCell.swift; sourceTree = "<group>"; };
 		102618C825771FE300CF6F0A /* ActivityLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityLevelViewController.swift; sourceTree = "<group>"; };
 		102618CC257721D100CF6F0A /* ActivityNewLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityNewLevelViewController.swift; sourceTree = "<group>"; };
 		1028A100230D76CD00619907 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtension.entitlements; sourceTree = "<group>"; };
@@ -677,8 +666,6 @@
 		103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MasterActivityContainerController+CollectionView.swift"; sourceTree = "<group>"; };
 		103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MasterActivityContainerController+StartupMethods.swift"; sourceTree = "<group>"; };
 		1040E582242AA05D00304D05 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
-		1046252F2571B4D40026C214 /* SummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewModel.swift; sourceTree = "<group>"; };
-		104625352571B4FD0026C214 /* SummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryService.swift; sourceTree = "<group>"; };
 		1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterActivityContainerController.swift; sourceTree = "<group>"; };
 		1051AC9C244FBF0A0066761C /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
 		1051FCFAA4E9CE7530600FAB /* Pods-Plot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plot.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plot/Pods-Plot.release.xcconfig"; sourceTree = "<group>"; };
@@ -719,9 +706,7 @@
 		10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantsFetcher.swift; sourceTree = "<group>"; };
 		10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthListViewController.swift; sourceTree = "<group>"; };
 		10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
-		106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHorizontalBarChart.swift; sourceTree = "<group>"; };
 		106431D4258C10FE00D02658 /* ChartValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartValueFormatter.swift; sourceTree = "<group>"; };
-		106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryTimeBarChartCell.swift; sourceTree = "<group>"; };
 		106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailCell.swift; sourceTree = "<group>"; };
 		106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceExpandedDetailCell.swift; sourceTree = "<group>"; };
 		106774C725D96757002F78E7 /* FinancialHoldingFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialHoldingFetcher.swift; sourceTree = "<group>"; };
@@ -742,8 +727,6 @@
 		10761AFD22AD8146007D1B06 /* ActivitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesFetcher.swift; sourceTree = "<group>"; };
 		107BC99A258FB32B008E6DD5 /* ActiveDaysRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveDaysRow.swift; sourceTree = "<group>"; };
 		107C94E1247C64F4004314BA /* ChatListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListTableViewCell.swift; sourceTree = "<group>"; };
-		108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryValueBarChartCell.swift; sourceTree = "<group>"; };
-		1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryLineChartCell.swift; sourceTree = "<group>"; };
 		1080871E2585057400FB9BB0 /* MoodActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodActions.swift; sourceTree = "<group>"; };
 		108087222585058100FB9BB0 /* MoodFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodFetcher.swift; sourceTree = "<group>"; };
 		108087262585059E00FB9BB0 /* SleepActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepActions.swift; sourceTree = "<group>"; };
@@ -756,7 +739,6 @@
 		1082C89424F0A8F500CF6491 /* FinanceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceViewController.swift; sourceTree = "<group>"; };
 		1082C89624F0A91500CF6491 /* HealthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthViewController.swift; sourceTree = "<group>"; };
 		10868D6C246314C700D6BB4F /* Grocerylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grocerylist.swift; sourceTree = "<group>"; };
-		108841D1257004F10064C5F8 /* SummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewController.swift; sourceTree = "<group>"; };
 		108BDBBF28F5933200A2285B /* FinanceCollectionViewComparisonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewComparisonCell.swift; sourceTree = "<group>"; };
 		108BDBC128F5F53300A2285B /* OnboardingCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCollectionViewCell.swift; sourceTree = "<group>"; };
 		108C37ED2899708B00DC4998 /* TaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewController.swift; sourceTree = "<group>"; };
@@ -1517,22 +1499,6 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
-		108841D0257003F70064C5F8 /* Summary */ = {
-			isa = PBXGroup;
-			children = (
-				104625352571B4FD0026C214 /* SummaryService.swift */,
-				1046252F2571B4D40026C214 /* SummaryViewModel.swift */,
-				108841D1257004F10064C5F8 /* SummaryViewController.swift */,
-				1026184F25756B2400CF6F0A /* SummaryHKChartCell.swift */,
-				1026185325756B3300CF6F0A /* SummaryPieChartCell.swift */,
-				108087162583E72300FB9BB0 /* SummaryValueBarChartCell.swift */,
-				106431D8258C15B900D02658 /* SummaryTimeBarChartCell.swift */,
-				1080871A2583E73D00FB9BB0 /* SummaryLineChartCell.swift */,
-				106431D0258AE41700D02658 /* SummaryHorizontalBarChart.swift */,
-			);
-			path = Summary;
-			sourceTree = "<group>";
-		};
 		108C37EA289951E400DC4998 /* Media */ = {
 			isa = PBXGroup;
 			children = (
@@ -2124,7 +2090,6 @@
 				26391FEA235EC3B3002BB4C0 /* Extensions */,
 				4BAEE47221272C4F0045AB10 /* Authentication */,
 				F9B82C8125FAB0B80072BE74 /* Analytics */,
-				108841D0257003F70064C5F8 /* Summary */,
 				1051AC94244F8AF80066761C /* Home */,
 				4BAEE44D21272B380045AB10 /* Settings */,
 				1024ABA523C1255900A5875D /* Discover */,
@@ -3478,7 +3443,6 @@
 				10196F0024411B5600B6AFDF /* PlacesAnnotation.swift in Sources */,
 				1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */,
 				4BAEE5DF212735E50045AB10 /* UIEdgeInsetsExtensions.swift in Sources */,
-				104625362571B4FD0026C214 /* SummaryService.swift in Sources */,
 				10E8E507259295260076BE42 /* HeaderContainerCell.swift in Sources */,
 				10A2AE9F2508131700D49A0C /* FinanceCollectionViewCell.swift in Sources */,
 				102BE8C6243E47F000722E7B /* AttractionDetailCell.swift in Sources */,
@@ -3527,7 +3491,6 @@
 				4BAEE49A21272C5E0045AB10 /* ContactsController.swift in Sources */,
 				4BAEE46A21272B380045AB10 /* StorageTableViewController.swift in Sources */,
 				26A29E9A2389FF90008F7351 /* ActivityAnnotation.swift in Sources */,
-				106431D9258C15B900D02658 /* SummaryTimeBarChartCell.swift in Sources */,
 				10FBC8B924BFECD500D0E6B5 /* ActivitylistViewController.swift in Sources */,
 				10CD68792486AEE400DC02E0 /* PLNotification.swift in Sources */,
 				10E93D4E24BE41B500F6EE18 /* MapViewController.swift in Sources */,
@@ -3535,7 +3498,6 @@
 				105F34B52885EF7A007531EB /* RecurrenceFrequency+Sequence.swift in Sources */,
 				10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */,
 				269105FA2549D66800A02C5F /* HealthDetailViewModel.swift in Sources */,
-				108841D2257004F10064C5F8 /* SummaryViewController.swift in Sources */,
 				1092E27A28B927BC0018FCAA /* TableViewObject.swift in Sources */,
 				4B6521FA219B3A4400FF655E /* GroupMembersManager.swift in Sources */,
 				10C83342249ACC8F0037F638 /* SygicToursSearchResult.swift in Sources */,
@@ -3545,7 +3507,6 @@
 				2623AA9224FB67BF0020A316 /* HealthKitService.swift in Sources */,
 				4BAEE51E21272D890045AB10 /* ChatLogController+VoiceRecordingHandlers.swift in Sources */,
 				F902FFC92613B55900EF5881 /* ColorHash.swift in Sources */,
-				104625302571B4D40026C214 /* SummaryViewModel.swift in Sources */,
 				10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */,
 				103F492E286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift in Sources */,
 				107C94E2247C64F4004314BA /* ChatListTableViewCell.swift in Sources */,
@@ -3649,9 +3610,7 @@
 				4BAEE4F121272D890045AB10 /* UserinfoHeaderTableViewCell.swift in Sources */,
 				1067754225E1B590002F78E7 /* ChooseEmailView.swift in Sources */,
 				F95D8EF4261B8C2F006DED56 /* Charts+Style.swift in Sources */,
-				106431D1258AE41800D02658 /* SummaryHorizontalBarChart.swift in Sources */,
 				1067753625E1AB19002F78E7 /* ChangeEmailController.swift in Sources */,
-				1026185425756B3300CF6F0A /* SummaryPieChartCell.swift in Sources */,
 				100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */,
 				106774F825DAF76E002F78E7 /* FinanceHoldingViewController.swift in Sources */,
 				4BAEE5E2212735E50045AB10 /* Public.swift in Sources */,
@@ -3755,7 +3714,6 @@
 				4BAEE4FD21272D890045AB10 /* BaseVoiceMessageCell.swift in Sources */,
 				106774C825D96757002F78E7 /* FinancialHoldingFetcher.swift in Sources */,
 				106774FC25DAFA8D002F78E7 /* FinancialHoldingActions.swift in Sources */,
-				1080871B2583E73D00FB9BB0 /* SummaryLineChartCell.swift in Sources */,
 				105F34AA2885EF7A007531EB /* PickerViewCell.swift in Sources */,
 				4BAEE5DB212735E50045AB10 /* ImageCell.swift in Sources */,
 				10F3032524EB746E00C04B8F /* AccountsTableViewController.swift in Sources */,
@@ -3771,7 +3729,6 @@
 				263508AA258D76B000F57ACB /* MindfulnessOperation.swift in Sources */,
 				4BAEE547212735200045AB10 /* SplashScreenContainer.swift in Sources */,
 				F9B82C9425FAB2690072BE74 /* ReusableView.swift in Sources */,
-				108087172583E72300FB9BB0 /* SummaryValueBarChartCell.swift in Sources */,
 				10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */,
 				10DFC3E7255CC3DA00565DAD /* WorkoutActions.swift in Sources */,
 				10E0D7A32594D0AA00B0F83C /* NetworkController.swift in Sources */,
@@ -3785,7 +3742,6 @@
 				105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */,
 				269105E6253D464300A02C5F /* HealthDetailViewController.swift in Sources */,
 				4BAEE48321272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift in Sources */,
-				1026185025756B2400CF6F0A /* SummaryHKChartCell.swift in Sources */,
 				F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */,
 				105F34AB2885EF7A007531EB /* String+Extension.swift in Sources */,
 				1080871F2585057400FB9BB0 /* MoodActions.swift in Sources */,

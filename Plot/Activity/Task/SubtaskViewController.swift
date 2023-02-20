@@ -659,21 +659,21 @@ class SubtaskViewController: FormViewController {
                 cell.textLabel?.textColor = .label
             }
         
-        <<< PushRow<EventAlert>("Reminder") { row in
+        <<< PushRow<TaskAlert>("Reminder") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
             if let subtask = subtask, let value = subtask.reminder {
-                row.value = EventAlert(rawValue: value)
+                row.value = TaskAlert(rawValue: value)
             } else {
-                row.value = EventAlert.None
+                row.value = TaskAlert.None
                 if let reminder = row.value?.description {
                     self.subtask.reminder = reminder
                 }
             }
-            row.options = EventAlert.allCases
+            row.options = TaskAlert.allCases
         }.onPresent { from, to in
             to.title = "Reminder"
             to.extendedLayoutIncludesOpaqueBars = true
@@ -1055,8 +1055,7 @@ class SubtaskViewController: FormViewController {
         var formattedDate: (Int, String, String) = (1, "", "")
         formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
         content.subtitle = formattedDate.2
-        if let reminder = EventAlert(rawValue: activityReminder) {
-            let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)
+        if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
             let calendar = Calendar.current
             let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,

@@ -28,20 +28,20 @@ class WorkoutMinutesOperation: AsyncOperation {
                 return
             }
             
-            var workout: HKWorkout = workouts.last!
+            let workout: HKWorkout = workouts.sorted(by: { $0.endDate < $1.endDate }).last!
                         
             var averageWorkoutTime: Double = 0
-            var totalWorkoutTime: Double = 0
+            var totalWorkoutTime: Double = workout.endDate.timeIntervalSince(workout.startDate)
             
             workouts.forEach { currentWorkout in
                 let interval = currentWorkout.endDate.timeIntervalSince(currentWorkout.startDate)
                 averageWorkoutTime += interval
-                if currentWorkout.startDate > workout.startDate {
-                    workout = currentWorkout
+                if currentWorkout.endDate.isSameDay(as: workout.endDate) {
+                    totalWorkoutTime += interval
                 }
             }
             
-            var metricMinutes = HealthMetric(type: HealthMetricType.workoutMinutes, total: workout.endDate.timeIntervalSince(workout.startDate), date: workout.endDate, unitName: "minutes", rank: -1)
+            var metricMinutes = HealthMetric(type: HealthMetricType.workoutMinutes, total: totalWorkoutTime, date: workout.endDate, unitName: "minutes", rank: -1)
             metricMinutes.hkSample = workout
                                 
             if averageWorkoutTime != 0 {

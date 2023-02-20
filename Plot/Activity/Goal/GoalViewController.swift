@@ -112,6 +112,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 print(task.goalStartDate)
                 print(task.endDate)
                 print(task.goalEndDate)
+
             }
             if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
                 task.admin = currentUserID
@@ -178,11 +179,12 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
         updateRightBarButton()
         
         if let goal = task.goal, let _ = goal.metric {
-            self.updateDescriptionRow()
             self.updateNumberRows()
             if let _ = goal.metricSecond {
                 self.updateNumberRowsSecond()
                 self.updateSecondTargetRow()
+            } else {
+                self.updateDescriptionRow()
             }
         }
         
@@ -1150,21 +1152,21 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.accessoryType = .disclosureIndicator
         }
         
-        <<< PushRow<EventAlert>("Reminder") { row in
+        <<< PushRow<TaskAlert>("Reminder") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
             if let task = task, let value = task.reminder {
-                row.value = EventAlert(rawValue: value)
+                row.value = TaskAlert(rawValue: value)
             } else {
-                row.value = EventAlert.None
+                row.value = TaskAlert.None
                 if let reminder = row.value?.description {
                     self.task.reminder = reminder
                 }
             }
-            row.options = EventAlert.allCases
+            row.options = TaskAlert.allCases
         }.onPresent { from, to in
             to.title = "Reminder"
             to.extendedLayoutIncludesOpaqueBars = true

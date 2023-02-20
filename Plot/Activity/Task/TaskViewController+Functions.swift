@@ -400,8 +400,7 @@ extension TaskViewController {
         var formattedDate: (Int, String, String) = (1, "", "")
         formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: task.hasDeadlineTime ?? false, startDate: task.startDate, hasStartTime: task.hasStartTime)
         content.subtitle = formattedDate.2
-        if let reminder = EventAlert(rawValue: activityReminder) {
-            let reminderDate = endDate.addingTimeInterval(reminder.timeInterval)
+        if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
             let calendar = Calendar.current
             let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
@@ -518,7 +517,7 @@ extension TaskViewController {
     }
     
     func updateGoalSecondary(selectedGoalProperty: SelectedGoalProperty, value: String?) {
-        if let unitRow : PushRow<String> = self.form.rowBy(tag: "secondUnit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let goal = task.goal {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "secondUnit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Second Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Second Option"), let _ = task.goal {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
@@ -1054,7 +1053,7 @@ extension TaskViewController {
             if self.task.recurrences == nil {
                 self.deleteRecurrences()
             } else {
-                let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
+                let alert = UIAlertController(title: nil, message: "This is a repeating task.", preferredStyle: .actionSheet)
                 alert.addAction(UIAlertAction(title: "Save For This Task Only", style: .default, handler: { (_) in
                     if self.task.instanceID == nil {
                         let instanceID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -1381,7 +1380,7 @@ extension TaskViewController {
     func deleteActivity() {
         //need to look into equatable protocol for activities
         if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
-            let alert = UIAlertController(title: nil, message: "This is a repeating event.", preferredStyle: .actionSheet)
+            let alert = UIAlertController(title: nil, message: "This is a repeating task.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Task Only", style: .default, handler: { (_) in
                 print("Save for this event only")

@@ -123,7 +123,7 @@ class MoodViewController: FormViewController {
     }
     
     @IBAction func cancel(_ sender: AnyObject) {
-        self.navigationController?.popViewController(animated: true)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func create(_ sender: AnyObject) {

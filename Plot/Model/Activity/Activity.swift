@@ -1827,60 +1827,83 @@ class Activity: NSObject, NSCopying, Codable {
     }
 }
 
-func categorizeActivities(activities: [Activity], start: Date, end: Date, completion: @escaping ([String: Double], [Activity]) -> ()) {
+func categorizeActivities(activities: [Activity], isEvent: Bool, start: Date, end: Date, completion: @escaping ([String: Double], [Activity]) -> ()) {
     var categoryDict = [String: Double]()
     var activitiesList = [Activity]()
-    var totalValue: Double = end.timeIntervalSince(start)
     // create dateFormatter with UTC time format
-    for activity in activities {
-        guard let activityStartDate = activity.startDate, let activityEndDate = activity.endDate else { continue }
-        
-        if activity.allDay ?? false {
-            continue
-        }
-        
-        // Skipping activities that are outside of the interest range.
-        if activityStartDate > end || activityEndDate <= start {
-            continue
-        }
-        
-        let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
-        
-        guard duration > 0 else {
-            continue
-        }
-
-        if let type = activity.category {
-            guard type != "Not Applicable" else { continue }
-            totalValue -= duration
-            if categoryDict[type] == nil {
-                categoryDict[type] = duration
-                activitiesList.append(activity)
-            } else {
-                let double = categoryDict[type]
-                categoryDict[type] = double! + duration
-                activitiesList.append(activity)
+    if isEvent {
+        for activity in activities {
+            guard let activityStartDate = activity.startDate, let activityEndDate = activity.endDate else { continue }
+            
+            if activity.allDay ?? false {
+                continue
             }
-        } else {
-            totalValue -= duration
-            let type = "No Category"
-            if categoryDict[type] == nil {
-                categoryDict[type] = duration
-                activitiesList.append(activity)
+            
+            // Skipping activities that are outside of the interest range.
+            if activityStartDate > end || activityEndDate <= start {
+                continue
+            }
+            
+            let duration = activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970
+            
+            guard duration > 0 else {
+                continue
+            }
+
+            if let type = activity.category {
+                guard type != "Not Applicable" else { continue }
+                if categoryDict[type] == nil {
+                    categoryDict[type] = duration
+                    activitiesList.append(activity)
+                } else {
+                    let double = categoryDict[type]
+                    categoryDict[type] = double! + duration
+                    activitiesList.append(activity)
+                }
             } else {
-                let double = categoryDict[type]
-                categoryDict[type] = double! + duration
-                activitiesList.append(activity)
+                let type = "No Category"
+                if categoryDict[type] == nil {
+                    categoryDict[type] = duration
+                    activitiesList.append(activity)
+                } else {
+                    let double = categoryDict[type]
+                    categoryDict[type] = double! + duration
+                    activitiesList.append(activity)
+                }
+            }
+        }
+    } else {
+        for activity in activities {
+            guard activity.isCompleted ?? false, let completedDate = activity.completedDateDate, completedDate < end, completedDate >= start else { continue }
+            
+            if let type = activity.category {
+                guard type != "Not Applicable" else { continue }
+                if categoryDict[type] == nil {
+                    categoryDict[type] = 1
+                    activitiesList.append(activity)
+                } else {
+                    let double = categoryDict[type]
+                    categoryDict[type]! += 1
+                    activitiesList.append(activity)
+                }
+            } else {
+                let type = "No Category"
+                if categoryDict[type] == nil {
+                    categoryDict[type] = 1
+                    activitiesList.append(activity)
+                } else {
+                    let double = categoryDict[type]
+                    categoryDict[type]! += 1
+                    activitiesList.append(activity)
+                }
             }
         }
     }
-    
-    categoryDict["No Events"] = totalValue
-            
+                
     completion(categoryDict, activitiesList)
 }
 
-func activitiesOverTimeChartData(activities: [Activity], activityCategories: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Activity]]) -> ()) {
+func activitiesOverTimeChartData(activities: [Activity], isEvent: Bool, activityCategories: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Activity]]) -> ()) {
     var statistics = [String: [Statistic]]()
     var activityDict = [String: [Activity]]()
     let calendar = Calendar.current
@@ -1901,16 +1924,16 @@ func activitiesOverTimeChartData(activities: [Activity], activityCategories: [St
             if activityCategory == "No Events" {
                 continue
             }
-            activityListStats(activities: activities, activityCategory: activityCategory, activitySubcategory: nil, chunkStart: date, chunkEnd: nextDate) { (stats, activities) in
+            activityListStats(activities: activities, isEvent: isEvent, activityCategory: activityCategory, activitySubcategory: nil, chunkStart: date, chunkEnd: nextDate) { (stat, activities) in
                 if statistics[activityCategory] != nil, activityDict[activityCategory] != nil {
                     var acStats = statistics[activityCategory]
                     var acActivityList = activityDict[activityCategory]
-                    acStats!.append(contentsOf: stats)
+                    acStats!.append(stat)
                     acActivityList!.append(contentsOf: activities)
                     statistics[activityCategory] = acStats
                     activityDict[activityCategory] = acActivityList
                 } else {
-                    statistics[activityCategory] = stats
+                    statistics[activityCategory] = [stat]
                     activityDict[activityCategory] = activities
                 }
             }
@@ -1928,24 +1951,18 @@ enum ActivityLevel: String {
     case none, category, subcategory
 }
 
-func activitiesData(activities: [Activity], level: ActivityLevel, options: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Activity]) -> ()) {
+func activitiesData(activities: [Activity], isEvent: Bool, level: ActivityLevel, options: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Activity]) -> ()) {
     switch level {
     case .none:
-        activityListStats(activities: activities, activityCategory: nil, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (statistics, activities) in
-            var stat = Statistic(date: activities.first?.startDate ?? Date(), value: 0)
-            for statistic in statistics {
-                stat.value += statistic.value
-            }
+        activityListStats(activities: activities, isEvent: isEvent, activityCategory: nil, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (stat, activities) in
             completion(stat, activities)
         }
     case .category:
         var activityList = [Activity]()
         var stat = Statistic(date: activities.first?.startDate ?? Date(), value: 0)
         for option in options ?? [] {
-            activityListStats(activities: activities, activityCategory: option, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (statistics, activities) in
-                for statistic in statistics {
-                    stat.value += statistic.value
-                }
+            activityListStats(activities: activities, isEvent: isEvent, activityCategory: option, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (statistic, activities) in
+                stat.value += statistic.value
                 activityList.append(contentsOf: activities)
             }
         }
@@ -1954,10 +1971,8 @@ func activitiesData(activities: [Activity], level: ActivityLevel, options: [Stri
         var activityList = [Activity]()
         var stat = Statistic(date: activities.first?.startDate ?? Date(), value: 0)
         for option in options ?? [] {
-            activityListStats(activities: activities, activityCategory: nil, activitySubcategory: option, chunkStart: start, chunkEnd: end) { (statistics, activities) in
-                for statistic in statistics {
-                    stat.value += statistic.value
-                }
+            activityListStats(activities: activities, isEvent: isEvent, activityCategory: nil, activitySubcategory: option, chunkStart: start, chunkEnd: end) { (statistic, activities) in
+                stat.value += statistic.value
                 activityList.append(contentsOf: activities)
             }
         }
@@ -1975,93 +1990,87 @@ func activitiesData(activities: [Activity], level: ActivityLevel, options: [Stri
 ///   - completion: list of statistical elements and activities.
 func activityListStats(
     activities: [Activity],
+    isEvent: Bool,
     activityCategory: String?,
     activitySubcategory: String?,
     chunkStart: Date,
     chunkEnd: Date,
-    completion: @escaping ([Statistic], [Activity]) -> ()
+    completion: @escaping (Statistic, [Activity]) -> ()
 ) {
-    var statistics = [Statistic]()
+    var stat = Statistic(date: chunkStart, value: 0)
     var activityList = [Activity]()
-    for activity in activities {
-        guard var activityStartDate = activity.startDate,
-              var activityEndDate = activity.endDate else {
-            return
-        }
-        
-        // Skipping activities that are outside of the interest range.
-        if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
-            continue
-        }
-        
-        // Skipping tasks that not completed
-        if activity.isTask ?? false, !(activity.isCompleted ?? false) {
-            continue
-        }
+    
+    if isEvent {
+        for activity in activities {
+            guard var activityStartDate = activity.startDate,
+                  var activityEndDate = activity.endDate else {
+                return
+            }
+            
+            // Skipping activities that are outside of the interest range.
+            if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
+                continue
+            }
+                    
+            // Truncate events that out of the [chunkStart, chunkEnd] range.
+            // Multi-day events, chunked into single day `Statistic`s are the best example.
+            if activityStartDate < chunkStart {
+                activityStartDate = chunkStart
+            }
+            if activityEndDate > chunkEnd {
+                activityEndDate = chunkEnd
+            }
+            
+            if let activityCategory = activityCategory, let type = activity.category, type == activityCategory {
+                var duration: Double = 0
+                if activity.allDay ?? false {
+                    duration = 1440
+                } else {
+                    duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
+                }
                 
-        // Truncate events that out of the [chunkStart, chunkEnd] range.
-        // Multi-day events, chunked into single day `Statistic`s are the best example.
-        if activityStartDate < chunkStart {
-            activityStartDate = chunkStart
+                stat.value += duration
+                activityList.append(activity)
+                
+            } else if let activitySubcategory = activitySubcategory, let type = activity.subcategory, type == activitySubcategory {
+                var duration: Double = 0
+                if activity.allDay ?? false {
+                    duration = 1440
+                } else {
+                    duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
+                }
+                
+                stat.value += duration
+                activityList.append(activity)
+                
+            } else if activityCategory == nil, activitySubcategory == nil {
+                var duration: Double = 0
+                if activity.allDay ?? false {
+                    duration = 1440
+                } else {
+                    duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
+                }
+                stat.value += duration
+                activityList.append(activity)
+            }
         }
-        if activityEndDate > chunkEnd {
-            activityEndDate = chunkEnd
-        }
-        
-        if let activityCategory = activityCategory, let type = activity.category, type == activityCategory {
-            var duration: Double = 0
-            if activity.allDay ?? false {
-                duration = 1440
-            } else {
-                duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
-            }
-            if statistics.isEmpty {
-                let stat = Statistic(date: chunkStart, value: duration)
-                statistics.append(stat)
+    } else {
+        for activity in activities {
+            guard activity.isCompleted ?? false, let completedDate = activity.completedDateDate, completedDate < chunkEnd, completedDate >= chunkStart else { continue }
+            if let activityCategory = activityCategory, let type = activity.category, type == activityCategory {
+                stat.value += 1
                 activityList.append(activity)
-            } else {
-                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                    statistics[index].value += duration
-                    activityList.append(activity)
-                }
-            }
-        } else if let activitySubcategory = activitySubcategory, let type = activity.subcategory, type == activitySubcategory {
-            var duration: Double = 0
-            if activity.allDay ?? false {
-                duration = 1440
-            } else {
-                duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
-            }
-            if statistics.isEmpty {
-                let stat = Statistic(date: chunkStart, value: duration)
-                statistics.append(stat)
+            } else if let activitySubcategory = activitySubcategory, let type = activity.subcategory, type == activitySubcategory {
+                stat.value += 1
                 activityList.append(activity)
-            } else {
-                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                    statistics[index].value += duration
-                    activityList.append(activity)
-                }
-            }
-        } else if activityCategory == nil, activitySubcategory == nil {
-            var duration: Double = 0
-            if activity.allDay ?? false {
-                duration = 1440
-            } else {
-                duration = (activityEndDate.timeIntervalSince1970 - activityStartDate.timeIntervalSince1970) / 60
-            }
-            if statistics.isEmpty {
-                let stat = Statistic(date: chunkStart, value: duration)
-                statistics.append(stat)
+            } else if activityCategory == nil, activitySubcategory == nil {
+                stat.value += 1
                 activityList.append(activity)
-            } else {
-                if let index = statistics.firstIndex(where: { $0.date == chunkStart }) {
-                    statistics[index].value += duration
-                    activityList.append(activity)
-                }
             }
         }
     }
-    completion(statistics, activityList)
+    
+    completion(stat, activityList)
 }
 
 

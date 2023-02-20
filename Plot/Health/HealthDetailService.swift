@@ -15,6 +15,7 @@ protocol HealthDetailServiceInterface {
     func getSamples(for healthMetric: HealthMetric, range: DateRange, completion: @escaping (Statistic?, [HKSample]?, Error?) -> Swift.Void)
     func getSamples(for workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping (Statistic?, [Workout]?, Error?) -> Swift.Void)
     func getSamples(for mindfulnesses: [Mindfulness], range: DateRange, completion: @escaping (Statistic?, [Mindfulness]?, Error?) -> Swift.Void)
+    func getSamples(for moods: [Mood], types: [String]?, range: DateRange, completion: @escaping (Statistic?, [Mood]?, Error?) -> Swift.Void)
 }
 
 class HealthDetailService: HealthDetailServiceInterface {
@@ -42,6 +43,10 @@ class HealthDetailService: HealthDetailServiceInterface {
         getMindfulnessStatisticalSamples(mindfulnesses: mindfulnesses, range: range, completion: completion)
     }
     
+    func getSamples(for moods: [Mood], types: [String]?, range: DateRange, completion: @escaping (Statistic?, [Mood]?, Error?) -> Swift.Void) {
+        getMoodStatisticalSamples(moods: moods, types: types, range: range, completion: completion)
+    }
+    
     private func getWorkoutCategoriesStatisticalSamples(workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping (Statistic?, [Workout]?, Error?) -> Void) {
         workoutData(workouts: workouts, measure: measure, categories: categories, start: range.startDate, end: range.endDate) { stat, workouts in
             completion(stat, workouts, nil)
@@ -51,6 +56,12 @@ class HealthDetailService: HealthDetailServiceInterface {
     private func getMindfulnessStatisticalSamples(mindfulnesses: [Mindfulness], range: DateRange, completion: @escaping (Statistic?, [Mindfulness]?, Error?) -> Void) {
         mindfulnessData(mindfulnesses: mindfulnesses, start: range.startDate, end: range.endDate) { stat, mindfulnesses in
             completion(stat, mindfulnesses, nil)
+        }
+    }
+    
+    private func getMoodStatisticalSamples(moods: [Mood], types: [String]?, range: DateRange, completion: @escaping (Statistic?, [Mood]?, Error?) -> Void) {
+        moodData(moods: moods, types: types, start: range.startDate, end: range.endDate) { stat, moods in
+            completion(stat, moods, nil)
         }
     }
     

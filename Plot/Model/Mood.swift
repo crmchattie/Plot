@@ -81,6 +81,14 @@ enum MoodType: String, CaseIterable, Codable {
         case .frustrated: return "faceFrustrated" //steam
         }
     }
+    
+    static var allValues: [String] {
+        var array = [String]()
+        MoodType.allCases.forEach { category in
+            array.append(category.rawValue)
+        }
+        return array
+    }
 }
 
 enum ApplicableTo: String, CaseIterable, Codable {
@@ -90,4 +98,54 @@ enum ApplicableTo: String, CaseIterable, Codable {
     case monthly
     case yearly
     case activity
+}
+
+func moodData(moods: [Mood], types: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Mood]) -> ()) {
+    if types == nil {
+        moodListStats(moods: moods, type: nil, chunkStart: start, chunkEnd: end) { (stat, moods) in
+            completion(stat, moods)
+        }
+    } else {
+        var stat = Statistic(date: start, value: 0)
+        var moodList = [Mood]()
+        for type in types ?? [] {
+            moodListStats(moods: moods, type: type, chunkStart: start, chunkEnd: end) { (stats, moods) in
+                stat.value += stats.value
+                moodList.append(contentsOf: moods)
+            }
+        }
+        completion(stat, moodList)
+    }
+}
+
+/// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]
+/// - Parameters:
+///   - activities: A list of activities to analize.
+///   - activityCategory: no idea what this is.
+///   - chunkStart: Start date in which the activities are split and categorized.
+///   - chunkEnd: End date in which the activities are split and categorized.
+///   - completion: list of statistical elements and activities.
+func moodListStats(
+    moods: [Mood],
+    type: String?,
+    chunkStart: Date,
+    chunkEnd: Date,
+    completion: @escaping (Statistic, [Mood]) -> ()
+) {
+    var stat = Statistic(date: chunkStart, value: 0)
+    var moodList = [Mood]()
+    for mood in moods {
+        guard let moodDate = mood.moodDate, moodDate < chunkEnd, moodDate >= chunkStart else {
+            return
+        }
+        
+        if let type = type, let moodType = mood.mood?.rawValue, moodType == type {
+            stat.value += 1
+            moodList.append(mood)
+        } else if type == nil {
+            stat.value += 1
+            moodList.append(mood)
+        }
+    }
+    completion(stat, moodList)
 }

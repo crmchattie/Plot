@@ -142,7 +142,7 @@ func workoutListStats(
     chunkEnd: Date,
     completion: @escaping (Statistic, [Workout]) -> ()
 ) {
-    var stat = Statistic(date: workouts.first?.startDateTime ?? Date(), value: 0)
+    var stat = Statistic(date: chunkStart, value: 0)
     var workoutList = [Workout]()
     for workout in workouts {
         guard var startDate = workout.startDateTime,
@@ -164,7 +164,7 @@ func workoutListStats(
             endDate = chunkEnd
         }
         
-        if let type = workout.type, type == category {
+        if let category = category, let type = workout.type, type == category {
             let measureDouble = measure == .duration ? (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60 : workout.totalEnergyBurned ?? 0
             stat.value += measureDouble
             workoutList.append(workout)

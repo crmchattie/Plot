@@ -103,7 +103,7 @@ struct Goal: Codable, Equatable, Hashable {
             }
         case .financialTransactions, .financialAccounts:
             return .finances
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
+        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories, .mood:
             return .health
         case .none:
             return .uncategorized
@@ -148,6 +148,8 @@ struct Goal: Codable, Equatable, Hashable {
             return .sleep
         case .workout, .steps, .flightsClimbed, .activeCalories:
             return .workout
+        case .mood:
+            return .health
         case .none:
             return .uncategorized
         }
@@ -234,6 +236,19 @@ struct Goal: Codable, Equatable, Hashable {
             case nil:
                 return nil
             }
+        case .mood:
+            switch self.submetric {
+            case .group:
+                return nil
+            case .category:
+                return MoodType.allValues
+            case .subcategory:
+                return nil
+            case .some(.none):
+                return nil
+            case nil:
+                return nil
+            }
         case .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return nil
         case .none:
@@ -295,7 +310,47 @@ struct Goal: Codable, Equatable, Hashable {
             case nil:
                 return nil
             }
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
+        case .workout:
+            switch self.submetric {
+            case .group:
+                return nil
+            case .category:
+                var array = [String]()
+                if #available(iOS 16.0, *) {
+                    HKWorkoutActivityType.allCases.forEach {
+                        array.append($0.name)
+                    }
+                } else if #available(iOS 14.0, *) {
+                    HKWorkoutActivityType.oldAllCases.forEach {
+                        array.append($0.name)
+                    }
+                } else {
+                    HKWorkoutActivityType.oldOldAllCases.forEach {
+                        array.append($0.name)
+                    }
+                }
+                return array
+            case .subcategory:
+                return nil
+            case .some(.none):
+                return nil
+            case nil:
+                return nil
+            }
+        case .mood:
+            switch self.submetric {
+            case .group:
+                return nil
+            case .category:
+                return MoodType.allValues
+            case .subcategory:
+                return nil
+            case .some(.none):
+                return nil
+            case nil:
+                return nil
+            }
+        case .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return nil
         case .none:
             return nil
@@ -348,7 +403,43 @@ struct Goal: Codable, Equatable, Hashable {
             case .none:
                 return nil
             }
-        case .workout, .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
+        case .workout:
+            switch submetric {
+            case .group:
+                return nil
+            case .category:
+                var array = [String]()
+                if #available(iOS 16.0, *) {
+                    HKWorkoutActivityType.allCases.forEach {
+                        array.append($0.name)
+                    }
+                } else if #available(iOS 14.0, *) {
+                    HKWorkoutActivityType.oldAllCases.forEach {
+                        array.append($0.name)
+                    }
+                } else {
+                    HKWorkoutActivityType.oldOldAllCases.forEach {
+                        array.append($0.name)
+                    }
+                }
+                return array
+            case .subcategory:
+                return nil
+            case .none:
+                return nil
+            }
+        case .mood:
+            switch submetric {
+            case .group:
+                return nil
+            case .category:
+                return MoodType.allValues
+            case .subcategory:
+                return nil
+            case .none:
+                return nil
+            }
+        case .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return nil
         case .none:
             return nil
@@ -1101,12 +1192,14 @@ struct Goal: Codable, Equatable, Hashable {
     }
 }
 
-let prebuiltGoals = [mindfulnessGoal, sleepGoal, workoutsGoal, savingsGoal, emergencyFundGoal, creditCardGoal, debtGoal, dentistGoal, timeOffGoal, generalCheckUpGoal, eyeCheckUpGoal, skinCheckUpGoal, socialGoal]
+let prebuiltGoals = [mindfulnessGoal, sleepGoal, workoutsGoal, moodGoal, spendingGoal, savingsGoal, spendingGoal, emergencyFundGoal, creditCardGoal, debtGoal, dentistGoal, timeOffGoal, generalCheckUpGoal, eyeCheckUpGoal, skinCheckUpGoal, socialGoal]
 
 let mindfulnessGoal = Goal(name: "Daily Mindfulness", metric: GoalMetric.mindfulness, submetric: nil, option: nil, unit: GoalUnit.minutes, period: GoalPeriod.day, targetNumber: 15, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.events, submetricSecond: GoalSubMetric.category, optionSecond: ["Personal"], unitSecond: GoalUnit.minutes, periodSecond: nil, targetNumberSecond: 15, currentNumberSecond: nil, metricsRelationshipType: MetricsRelationshipType.or)
 let sleepGoal = Goal(name: "Daily Sleep", metric: GoalMetric.sleep, submetric: nil, option: nil, unit: GoalUnit.hours, period: GoalPeriod.day, targetNumber: 7, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
 let workoutsGoal = Goal(name: "Daily Workout", metric: GoalMetric.workout, submetric: nil, option: nil, unit: GoalUnit.minutes, period: GoalPeriod.day, targetNumber: 15, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.steps, submetricSecond: nil, optionSecond: nil, unitSecond: GoalUnit.count, periodSecond: nil, targetNumberSecond: 5000, currentNumberSecond: nil, metricsRelationshipType: MetricsRelationshipType.or)
+let moodGoal = Goal(name: "Daily Mood", metric: GoalMetric.mood, submetric: nil, option: nil, unit: GoalUnit.count, period: GoalPeriod.day, targetNumber: 1, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
 let savingsGoal = Goal(name: "Monthly Savings", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Net Savings"], unit: GoalUnit.amount, period: GoalPeriod.month, targetNumber: nil, currentNumber: nil, frequency: PlotRecurrenceFrequency.monthly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+let spendingGoal = Goal(name: "Daily Spending", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, period: GoalPeriod.day, targetNumber: nil, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
 let creditCardGoal = Goal(name: "Pay Off Credit Card(s)", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Credit Card"], unit: GoalUnit.amount, period: GoalPeriod.month, targetNumber: 0, currentNumber: nil, frequency: PlotRecurrenceFrequency.monthly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
 let emergencyFundGoal = Goal(name: "Save Emergency Fund", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Cash", "Checking", "Savings"], unit: GoalUnit.amount, period: nil,  targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
 //let emergencyFundGoal = Goal(name: "Save Emergency Fund", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Cash", "Checking", "Savings"], unit: GoalUnit.amount, period: nil,  targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: GoalMetric.financialTransactions, submetricSecond: GoalSubMetric.group, optionSecond: ["Expense"], unitSecond: GoalUnit.multiple, periodSecond: nil, targetNumberSecond: 3, currentNumberSecond: nil, metricsRelationshipType: MetricsRelationshipType.more)
@@ -1148,6 +1241,7 @@ enum GoalMetric: String, Codable, CaseIterable {
     case steps = "Steps"
     case flightsClimbed = "Flights Climbed"
     case activeCalories = "Active Calories"
+    case mood = "Mood"
 //    case weight = "Weight"
     
     static var allValues: [String] {
@@ -1196,6 +1290,8 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.group, .category, .subcategory]
         case .workout:
             return [.none, .category]
+        case .mood:
+            return [.none, .category]
         case .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
             return []
         }
@@ -1224,6 +1320,8 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.count]
         case .activeCalories:
             return [.calories]
+        case .mood:
+            return [.count]
         }
     }
     
@@ -1248,6 +1346,8 @@ enum GoalMetric: String, Codable, CaseIterable {
         case .flightsClimbed:
             return .periodOfTime
         case .activeCalories:
+            return .periodOfTime
+        case .mood:
             return .periodOfTime
         }
     }
