@@ -59,7 +59,9 @@ class MoodViewController: FormViewController {
         if mood != nil {
             active = true
             title = "Mood"
-            print(mood.id)
+            if let type = mood.mood {
+                value = type.rawValue
+            }
         } else {
             title = "New Mood"
             active = false

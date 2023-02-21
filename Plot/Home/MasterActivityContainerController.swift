@@ -499,7 +499,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     
     func grabHealthItems(_ completion: @escaping () -> Void) {
         let metrics = networkController.healthService.healthMetrics
-        let metricsSections = networkController.healthService.healthMetricSections
         
         healthMetricSections = []
         healthMetrics = [:]
@@ -517,31 +516,17 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             healthMetrics[.generalHealth]?.append(contentsOf: nutritionMetrics.filter({ $0.type.name == HKQuantityTypeIdentifier.dietaryEnergyConsumed.name }))
         }
         
-        if metricsSections.contains(.workouts) {
-            healthMetricSections.append(.workouts)
-            let filteredWorkouts = networkController.healthService.workouts
-            if filteredWorkouts.count < 3 {
-                healthMetrics[.workouts] = filteredWorkouts
-            } else {
-                var finalWorkouts = [Workout]()
-                for index in 0...2 {
-                    finalWorkouts.append(filteredWorkouts[index])
-                }
-                healthMetrics[.workouts] = finalWorkouts
-            }
+        if !networkController.healthService.workouts.isEmpty {
+            healthMetricSections.append(.workout)
+            healthMetrics[.workout] = [networkController.healthService.workouts.first]
         }
-        if let generalMetrics = metrics[.general], generalMetrics.contains(where: {$0.type == HealthMetricType.mindfulness }) {
+        if !networkController.healthService.moods.isEmpty {
+            healthMetricSections.append(.mood)
+            healthMetrics[.mood] = [networkController.healthService.moods.first]
+        }
+        if !networkController.healthService.mindfulnesses.isEmpty {
             healthMetricSections.append(.mindfulness)
-            let filteredMindfulness = networkController.healthService.mindfulnesses
-            if filteredMindfulness.count < 3 {
-                healthMetrics[.mindfulness] = filteredMindfulness
-            } else {
-                var finalMindfulness = [Mindfulness]()
-                for index in 0...2 {
-                    finalMindfulness.append(filteredMindfulness[index])
-                }
-                healthMetrics[.mindfulness] = finalMindfulness
-            }
+            healthMetrics[.mindfulness] = [networkController.healthService.mindfulnesses.first]
         }
         completion()
     }

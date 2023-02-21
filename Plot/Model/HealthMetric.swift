@@ -51,6 +51,7 @@ enum HealthMetricType: Hashable {
     case activeEnergy
     case workoutMinutes
     case flightsClimbed
+    case mood
     
     var name: String {
         get {
@@ -75,6 +76,8 @@ enum HealthMetricType: Hashable {
                 return "Workout Minutes"
             case .flightsClimbed:
                 return "Flights Climbed"
+            case .mood:
+                return "Mood"
             }
         }
     }
@@ -102,6 +105,8 @@ enum HealthMetricType: Hashable {
                 return 7
             case .flightsClimbed:
                 return 8
+            case .mood:
+                return 9
             }
         }
     }
@@ -161,7 +166,7 @@ enum HealthMetricCategory: String {
             case .workoutsList:
                 return "Workouts"
             case .mindfulnessList:
-                return "Mindfulness Sessions"
+                return "Mindfulness"
             case .moodList:
                 return "Moods"
             }

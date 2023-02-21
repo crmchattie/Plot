@@ -25,7 +25,7 @@ class ActivityTypeViewController: UICollectionViewController, UICollectionViewDe
     var customTypes: [CustomType] = [.event]
     var favAct = [String: [String]]()
     
-    var sections: [SectionType] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workouts, .recipes]
+    var sections: [SectionType] = [.custom, .food, .nightlife, .events, .sightseeing, .recreation, .shopping, .workout, .recipes]
     var groups = [SectionType: [AnyHashable]]()
     
     var workoutIDs: [String] = ["ZB9Gina","E5YrL4F","lhNZOX1","LWampEt","5jbuzns","ltrgYTF","Z37OGjs","7GdJQBG","RKrXsHn","GwxLrim","nspLcIX","nHWkOhp","0ym6yNn","6VLf2M7","n8g5auz","CM5o2rv","ufiyRQc","N7aHlCw","gIeTbVT","lGaFbQK"]

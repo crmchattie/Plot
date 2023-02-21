@@ -223,6 +223,27 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             } else {
                 badgeLabel.isHidden = true
             }
+        } else if let mood = metric as? Mood {
+            print("configuring mood")
+            if let mood = mood.mood {
+                titleLabel.text = mood.rawValue
+            } else {
+                titleLabel.text = "Mood"
+            }
+            let timeAgo = NSCalendar.current.isDateInToday(mood.moodDate ?? Date()) ? "today" : timeAgoSinceDate(mood.moodDate ?? Date())
+            subtitleLabel.text = "\(timeAgo)"
+            detailLabel.text = nil
+            activityTypeButton.setImage(UIImage(named: "mood"), for: .normal)
+            
+            let badgeString = mood.badge?.toString()
+            let badgeInt = mood.badge ?? 0
+            
+            if badgeInt > 0 {
+                badgeLabel.text = badgeString
+                badgeLabel.isHidden = false
+            } else {
+                badgeLabel.isHidden = true
+            }
         } else if let mindfulness = metric as? Mindfulness {
             titleLabel.text = mindfulness.name
             let timeAgo = NSCalendar.current.isDateInToday(mindfulness.endDateTime ?? Date()) ? "today" : timeAgoSinceDate(mindfulness.endDateTime ?? Date())
@@ -276,6 +297,8 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
             imageName = "trending"
         case .workoutMinutes:
             imageName = "workout"
+        case .mood:
+            imageName = "mood"
         }
         
         activityTypeButton.setImage(UIImage(named: imageName), for: .normal)

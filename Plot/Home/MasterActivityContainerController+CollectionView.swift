@@ -53,6 +53,10 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
             cell.configure(item)
             return cell
+        } else if let item = object as? Mood {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+            cell.configure(item)
+            return cell
         } else if let item = object as? Mindfulness {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
             cell.configure(item)
@@ -168,10 +172,13 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 } else if item == .generalHealth {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
-                } else if item == .workouts, networkController.healthService.workouts.count > 3 {
+                } else if item == .workout, networkController.healthService.workouts.count > 1 {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
-                } else if item == .mindfulness, networkController.healthService.mindfulnesses.count > 3 {
+                } else if item == .mood, networkController.healthService.moods.count > 1 {
+                    cell.view.isUserInteractionEnabled = true
+                    cell.subTitleLabel.isHidden = false
+                } else if item == .mindfulness, networkController.healthService.mindfulnesses.count > 1 {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
                 } else {
@@ -218,6 +225,12 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
             height = estimatedSize.height
         } else if let item = object as? Workout {
+            let dummyCell = HealthMetricCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            dummyCell.configure(item)
+            dummyCell.layoutIfNeeded()
+            let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width - 30, height: 1000))
+            height = estimatedSize.height
+        } else if let item = object as? Mood {
             let dummyCell = HealthMetricCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.configure(item)
             dummyCell.layoutIfNeeded()
@@ -299,6 +312,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
             return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? Workout {
             return .init(top: 5, left: 0, bottom: 5, right: 0)
+        } else if let _ = object as? Mood {
+            return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? Mindfulness {
             return .init(top: 5, left: 0, bottom: 5, right: 0)
         } else if let _ = object as? MXMember {
@@ -344,6 +359,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 showHealthMetricDetailPush(healthMetric: healthMetric)
             } else if let workout = object as? Workout {
                 showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+            } else if let mood = object as? Mood {
+                showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             } else if let mindfulness = object as? Mindfulness {
                 showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             } else if let member = object as? MXMember {
@@ -394,14 +411,21 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         let destination = HealthViewController(networkController: networkController)
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
-                    } else if section == .workouts, networkController.healthService.workouts.count > 3 {
+                    } else if section == .workout, networkController.healthService.workouts.count > 1 {
                         let destination = HealthListViewController(networkController: networkController)
                         destination.title = HealthMetricCategory.workoutsList.name
                         destination.healthMetricSections = [HealthMetricCategory.workoutsList]
                         destination.healthMetrics = [HealthMetricCategory.workoutsList: networkController.healthService.workouts]
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
-                    } else if section == .mindfulness, networkController.healthService.mindfulnesses.count > 3 {
+                    } else if section == .mood, networkController.healthService.moods.count > 1 {
+                        let destination = HealthListViewController(networkController: networkController)
+                        destination.title = HealthMetricCategory.moodList.name
+                        destination.healthMetricSections = [HealthMetricCategory.moodList]
+                        destination.healthMetrics = [HealthMetricCategory.moodList: networkController.healthService.moods]
+                        destination.hidesBottomBarWhenPushed = true
+                        navigationController?.pushViewController(destination, animated: true)
+                    } else if section == .mindfulness, networkController.healthService.mindfulnesses.count > 1 {
                         let destination = HealthListViewController(networkController: networkController)
                         destination.title = HealthMetricCategory.mindfulnessList.name
                         destination.healthMetricSections = [HealthMetricCategory.mindfulnessList]
