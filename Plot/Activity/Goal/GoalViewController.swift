@@ -158,10 +158,10 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                     //create new activityID for auto updating items (schedule, purchases, checklist)
                     activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                     if let list = list {
-                        task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+                        task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", goal: nil, recurrences: nil, endDateTime: nil, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                     } else {
                         list = lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false })
-                        task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list?.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
+                        task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list?.source ?? "", goal: nil, recurrences: nil, endDateTime: nil, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                         task.category = list?.category
                         if let endDateTime = endDateTime {
                             task.endDateTime = NSNumber(value: Int((endDateTime).timeIntervalSince1970))
@@ -939,10 +939,11 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                         self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
                     }
                 } else {
+                    row.value = "None"
+                    self.task.goal!.period = nil
+                    self.task.startDateTime = nil
                     switchDateRow.hidden = false
                     switchDateRow.evaluateHidden()
-                    self.task.goal!.period = nil
-                    row.value = "None"
                 }
                 self.updateDescriptionRow()
             }

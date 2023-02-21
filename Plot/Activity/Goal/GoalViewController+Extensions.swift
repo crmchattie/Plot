@@ -364,8 +364,6 @@ extension GoalViewController: RecurrencePickerDelegate {
                 row.value = rowText
                 row.updateCell()
             } else {
-                self.task.endDateTime = nil
-                self.task.hasDeadlineTime = nil
                 row.value = "Never"
                 row.updateCell()
                 self.task.recurrences = nil

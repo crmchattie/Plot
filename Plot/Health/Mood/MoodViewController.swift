@@ -69,7 +69,7 @@ class MoodViewController: FormViewController {
                     mood = Mood(fromTemplate: template)
                     mood.id = ID
                 } else {
-                    mood = Mood(id: ID, lastModifiedDate: Date(), createdDate: Date(), moodDate: Date(), applicableTo: .specificTime)
+                    mood = Mood(id: ID, admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), moodDate: Date(), applicableTo: .specificTime)
                     
                     //need to fix; sloppy code that is used to stop an event from being created
                     if let container = container {
@@ -127,30 +127,28 @@ class MoodViewController: FormViewController {
     }
     
     @IBAction func create(_ sender: AnyObject) {
-        if let currentUser = Auth.auth().currentUser?.uid {
-            showActivityIndicator()
-            let moodAction = MoodActions(mood: self.mood, active: self.active, currentUser: currentUser)
-            moodAction.createNewMood()
-            self.delegate?.updateMood(mood: mood)
-            self.hideActivityIndicator()
-            if let updateDiscoverDelegate = self.updateDiscoverDelegate {
-                updateDiscoverDelegate.itemCreated(title: moodCreatedMessage)
-                if self.navigationItem.leftBarButtonItem != nil {
-                    self.dismiss(animated: true, completion: nil)
-                } else {
-                    self.navigationController?.popViewController(animated: true)
-                }
+        showActivityIndicator()
+        let moodAction = MoodActions(mood: self.mood, active: self.active, selectedFalconUsers: selectedFalconUsers)
+        moodAction.createNewMood()
+        self.delegate?.updateMood(mood: mood)
+        self.hideActivityIndicator()
+        if let updateDiscoverDelegate = self.updateDiscoverDelegate {
+            updateDiscoverDelegate.itemCreated(title: moodCreatedMessage)
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
             } else {
-                if self.navigationItem.leftBarButtonItem != nil {
-                    self.dismiss(animated: true, completion: nil)
-                } else {
-                    self.navigationController?.popViewController(animated: true)
-                }
-                if !active {
-                    basicAlert(title: moodCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
-                } else {
-                    basicAlert(title: moodUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
-                }
+                self.navigationController?.popViewController(animated: true)
+            }
+        } else {
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+            if !active {
+                basicAlert(title: moodCreatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+            } else {
+                basicAlert(title: moodUpdatedMessage, message: nil, controller: self.navigationController?.presentingViewController)
             }
         }
     }
@@ -177,18 +175,16 @@ class MoodViewController: FormViewController {
         let alert = UIAlertController(title: nil, message: "Are you sure?", preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (_) in
-            if let currentUser = Auth.auth().currentUser?.uid {
-                self.showActivityIndicator()
-                let moodAction = MoodActions(mood: self.mood, active: self.active, currentUser: currentUser)
-                moodAction.deleteMood()
-                self.hideActivityIndicator()
-                if self.navigationItem.leftBarButtonItem != nil {
-                    self.dismiss(animated: true, completion: nil)
-                } else {
-                    self.navigationController?.popViewController(animated: true)
-                }
-                basicAlert(title: moodDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
+            self.showActivityIndicator()
+            let moodAction = MoodActions(mood: self.mood, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            moodAction.deleteMood()
+            self.hideActivityIndicator()
+            if self.navigationItem.leftBarButtonItem != nil {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                self.navigationController?.popViewController(animated: true)
             }
+            basicAlert(title: moodDeletedMessage, message: nil, controller: self.navigationController?.presentingViewController)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
             print("User click Dismiss button")

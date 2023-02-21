@@ -108,7 +108,7 @@ func mindfulnessListStats(
     for mindfulness in mindfulnesses {
         guard var startDate = mindfulness.startDateTime,
               var endDate = mindfulness.endDateTime else {
-            return
+            continue
         }
         
         // Skipping activities that are outside of the interest range.

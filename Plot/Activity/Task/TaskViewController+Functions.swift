@@ -1257,7 +1257,6 @@ extension TaskViewController {
                 self.task.startDateTime = nil
                 self.task.hasStartTime = false
             }
-            self.updateRepeatReminder()
         }
     }
     
@@ -1274,43 +1273,6 @@ extension TaskViewController {
                 self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
                 self.task.hasDeadlineTime = true
             } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                let date = Calendar.current.date(from: dateComponents)
-                self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasDeadlineTime = false
-            } else {
-                self.task.endDateTime = nil
-                self.task.hasDeadlineTime = false
-            }
-            self.updateDescriptionRow()
-            self.updateRepeatReminder()
-        }
-    }
-    
-    func updateStartDateGoal() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate") {
-            if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                let date = Calendar.current.date(from: dateComponents)
-                self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasStartTime = false
-            } else {
-                self.task.startDateTime = nil
-                self.task.hasStartTime = false
-            }
-            self.updateRepeatReminder()
-        }
-    }
-    
-    func updateDeadlineDateGoal() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate") {
-            if dateSwitchRowValue, let dateRowValue = dateRow.value {
                 var dateComponents = DateComponents()
                 dateComponents.year = dateRowValue.yearNumber()
                 dateComponents.month = dateRowValue.monthNumber()

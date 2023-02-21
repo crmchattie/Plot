@@ -481,7 +481,6 @@ extension EventViewController {
         if let _ = activity.reminder {
             scheduleReminder()
         }
-        
     }
     
     func scheduleRecurrences() {

@@ -147,7 +147,7 @@ func workoutListStats(
     for workout in workouts {
         guard var startDate = workout.startDateTime,
               var endDate = workout.endDateTime else {
-            return
+            continue
         }
         
         // Skipping activities that are outside of the interest range.

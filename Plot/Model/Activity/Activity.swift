@@ -295,7 +295,7 @@ class Activity: NSObject, NSCopying, Codable {
         self.lastModifiedDate = createdDate
     }
     
-    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, goal: Goal, recurrences: [String]?, endDateTime: NSNumber?, createdDate: NSNumber) {
+    init(activityID: String, admin: String, listID: String, listName: String, listColor: String, listSource: String, goal: Goal?, recurrences: [String]?, endDateTime: NSNumber?, createdDate: NSNumber) {
         self.activityID = activityID
         self.admin = admin
         self.isTask = true
@@ -304,58 +304,60 @@ class Activity: NSObject, NSCopying, Codable {
         self.listName = listName
         self.listColor = listColor
         self.listSource = listSource
-        if let value = goal.name {
-            self.name = value
-        }
-        if let value = goal.metric {
-            self.goalMetric = value.rawValue
-        }
-        if let value = goal.submetric {
-            self.goalSubmetric = value.rawValue
-        }
-        if let value = goal.option {
-            self.goalOption = value
-        }
-        if let value = goal.unit {
-            self.goalUnit = value.rawValue
-        }
-        if let value = goal.period {
-            self.goalPeriod = value.rawValue
-        }
-        if let value = goal.targetNumber as? NSNumber {
-            self.goalTargetNumber = value
-        }
-        if let value = goal.currentNumber as? NSNumber {
-            self.goalCurrentNumber = value
-        }
-        if let value = goal.metricSecond {
-            self.goalMetricSecond = value.rawValue
-        }
-        if let value = goal.submetricSecond {
-            self.goalSubmetricSecond = value.rawValue
-        }
-        if let value = goal.optionSecond {
-            self.goalOptionSecond = value
-        }
-        if let value = goal.unitSecond {
-            self.goalUnitSecond = value.rawValue
-        }
-        if let value = goal.periodSecond {
-            self.goalPeriodSecond = value.rawValue
-        }
-        if let value = goal.targetNumberSecond as? NSNumber {
-            self.goalTargetNumberSecond = value
-        }
-        if let value = goal.currentNumberSecond as? NSNumber {
-            self.goalCurrentNumberSecond = value
-        }
-        if let value = goal.metricsRelationshipType {
-            self.goalMetricsRelationshipType = value.rawValue
-        }
         self.recurrences = recurrences
         self.endDateTime = endDateTime
         self.createdDate = createdDate
         self.lastModifiedDate = createdDate
+        if let goal = goal {
+            if let value = goal.name {
+                self.name = value
+            }
+            if let value = goal.metric {
+                self.goalMetric = value.rawValue
+            }
+            if let value = goal.submetric {
+                self.goalSubmetric = value.rawValue
+            }
+            if let value = goal.option {
+                self.goalOption = value
+            }
+            if let value = goal.unit {
+                self.goalUnit = value.rawValue
+            }
+            if let value = goal.period {
+                self.goalPeriod = value.rawValue
+            }
+            if let value = goal.targetNumber as? NSNumber {
+                self.goalTargetNumber = value
+            }
+            if let value = goal.currentNumber as? NSNumber {
+                self.goalCurrentNumber = value
+            }
+            if let value = goal.metricSecond {
+                self.goalMetricSecond = value.rawValue
+            }
+            if let value = goal.submetricSecond {
+                self.goalSubmetricSecond = value.rawValue
+            }
+            if let value = goal.optionSecond {
+                self.goalOptionSecond = value
+            }
+            if let value = goal.unitSecond {
+                self.goalUnitSecond = value.rawValue
+            }
+            if let value = goal.periodSecond {
+                self.goalPeriodSecond = value.rawValue
+            }
+            if let value = goal.targetNumberSecond as? NSNumber {
+                self.goalTargetNumberSecond = value
+            }
+            if let value = goal.currentNumberSecond as? NSNumber {
+                self.goalCurrentNumberSecond = value
+            }
+            if let value = goal.metricsRelationshipType {
+                self.goalMetricsRelationshipType = value.rawValue
+            }
+        }
     }
     
     init(dictionary: [String: AnyObject]?) {
@@ -1882,7 +1884,6 @@ func categorizeActivities(activities: [Activity], isEvent: Bool, start: Date, en
                     categoryDict[type] = 1
                     activitiesList.append(activity)
                 } else {
-                    let double = categoryDict[type]
                     categoryDict[type]! += 1
                     activitiesList.append(activity)
                 }
@@ -1892,7 +1893,6 @@ func categorizeActivities(activities: [Activity], isEvent: Bool, start: Date, en
                     categoryDict[type] = 1
                     activitiesList.append(activity)
                 } else {
-                    let double = categoryDict[type]
                     categoryDict[type]! += 1
                     activitiesList.append(activity)
                 }
@@ -2004,7 +2004,7 @@ func activityListStats(
         for activity in activities {
             guard var activityStartDate = activity.startDate,
                   var activityEndDate = activity.endDate else {
-                return
+                continue
             }
             
             // Skipping activities that are outside of the interest range.

@@ -24,9 +24,11 @@ struct Mood: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var admin: String?
     
-    init(id: String, lastModifiedDate: Date?, createdDate: Date?, moodDate: Date?, applicableTo: ApplicableTo?) {
+    init(id: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, moodDate: Date?, applicableTo: ApplicableTo?) {
         self.id = id
+        self.admin = admin
         self.lastModifiedDate = lastModifiedDate
         self.createdDate = createdDate
         self.moodDate = moodDate
@@ -136,7 +138,7 @@ func moodListStats(
     var moodList = [Mood]()
     for mood in moods {
         guard let moodDate = mood.moodDate, moodDate < chunkEnd, moodDate >= chunkStart else {
-            return
+            continue
         }
         
         if let type = type, let moodType = mood.mood?.rawValue, moodType == type {

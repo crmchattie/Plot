@@ -401,6 +401,7 @@ extension GoalViewController {
         formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: task.hasDeadlineTime ?? false, startDate: task.startDate, hasStartTime: task.hasStartTime)
         content.subtitle = formattedDate.2
         if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
+            print(reminderDate)
             let calendar = Calendar.current
             let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
@@ -418,7 +419,7 @@ extension GoalViewController {
     func updateRightBarButton() {
         if let _ = task.name, let goal = task.goal, let _ = goal.description {
             if goal.metric?.type != .pointInTime || (goal.metricSecond != nil && goal.metricSecond?.type != .pointInTime) {
-                if task.recurrences != nil && task.endDateTime != nil {
+                if task.endDateTime != nil && (goal.period != nil || task.startDateTime != nil) {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 } else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -483,7 +484,7 @@ extension GoalViewController {
                     
                     if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-                            periodRow.hidden = Condition(booleanLiteral: !(task.goal?.period != nil))
+                            periodRow.hidden = Condition(booleanLiteral: task.goal?.period == nil && task.startDate != nil)
                             switchDateRow.hidden = Condition(booleanLiteral: task.goal?.period != nil)
                         } else {
                             periodRow.hidden = true
@@ -574,7 +575,7 @@ extension GoalViewController {
                     
                     if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-                            periodRow.hidden = Condition(booleanLiteral: !(task.goal?.period != nil))
+                            periodRow.hidden = Condition(booleanLiteral: task.goal?.period == nil && task.startDate != nil)
                             switchDateRow.hidden = Condition(booleanLiteral: task.goal?.period != nil)
                         } else {
                             periodRow.hidden = true
@@ -596,7 +597,7 @@ extension GoalViewController {
                     
                     if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if task.goal!.metric!.type != .pointInTime {
-                            periodRow.hidden = Condition(booleanLiteral: !(task.goal?.period != nil))
+                            periodRow.hidden = Condition(booleanLiteral: task.goal?.period == nil && task.startDate != nil)
                             switchDateRow.hidden = Condition(booleanLiteral: task.goal?.period != nil)
                         } else {
                             periodRow.hidden = true
@@ -1262,66 +1263,6 @@ extension GoalViewController {
         self.removeSpinner()
     }
     
-    func updateStartDate() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "startTimeSwitch"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "StartTime") {
-            if dateSwitchRowValue, timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                dateComponents.hour = timeRowValue.hourNumber()
-                dateComponents.minute = timeRowValue.minuteNumber()
-                let date = Calendar.current.date(from: dateComponents)
-                self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasStartTime = true
-            } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                let date = Calendar.current.date(from: dateComponents)
-                self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasStartTime = false
-            } else {
-                self.task.startDateTime = nil
-                self.task.hasStartTime = false
-            }
-            self.updateRepeatReminder()
-        }
-    }
-    
-    func updateDeadlineDate() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate"), let timeSwitchRow: SwitchRow = form.rowBy(tag: "deadlineTimeSwitch"), let timeSwitchRowValue = timeSwitchRow.value, let timeRow: TimePickerRow = form.rowBy(tag: "DeadlineTime") {
-            if dateSwitchRowValue, timeSwitchRowValue, let dateRowValue = dateRow.value, let timeRowValue = timeRow.value {
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                dateComponents.hour = timeRowValue.hourNumber()
-                dateComponents.minute = timeRowValue.minuteNumber()
-                let date = Calendar.current.date(from: dateComponents)
-                self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasDeadlineTime = true
-            } else if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                let date = Calendar.current.date(from: dateComponents)
-                self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasDeadlineTime = false
-                if let startDateTime = self.task.startDateGivenEndDatePeriod {
-                    self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
-                }
-            } else {
-                self.task.endDateTime = nil
-                self.task.hasDeadlineTime = false
-            }
-            self.updateDescriptionRow()
-            self.updateRepeatReminder()
-        }
-    }
-    
     func updateStartDateGoal() {
         if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period") {
             if dateSwitchRowValue, let dateRowValue = dateRow.value {
@@ -1340,7 +1281,7 @@ extension GoalViewController {
                 self.task.startDateTime = nil
                 self.task.hasStartTime = false
             }
-            self.updateRepeatReminder()
+            self.updateDescriptionRow()
         }
     }
     
