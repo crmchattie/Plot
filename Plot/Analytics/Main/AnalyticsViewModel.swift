@@ -68,6 +68,12 @@ class AnalyticsViewModel {
         }
         
         group.enter()
+        let moodsDataSource = MoodAnalyticsDataSource(range: range, networkController: networkController)
+        moodsDataSource.loadData {
+            group.leave()
+        }
+        
+        group.enter()
         let financeDataSource = TransactionAnalyticsDataSource(range: range, networkController: networkController)
         financeDataSource.loadData {
             group.leave()
@@ -104,6 +110,10 @@ class AnalyticsViewModel {
             
             if activeEnergyDataSource.dataExists ?? false {
                 self.sections.append(Section(title: "Active Calories", items: [activeEnergyDataSource.chartViewModel.value], dataSources: [activeEnergyDataSource]))
+            }
+            
+            if moodsDataSource.dataExists ?? false {
+                self.sections.append(Section(title: "Moods", items: [moodsDataSource.chartViewModel.value], dataSources: [moodsDataSource]))
             }
             
             if financeDataSource.dataExists ?? false {

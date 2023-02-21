@@ -84,6 +84,36 @@ struct UserMindfulness: Codable, Equatable, Hashable {
     }
 }
 
+func mindfulnessesOverTimeChartData(mindfulnesses: [Mindfulness], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([Statistic], [Mindfulness]) -> ()) {
+    var statistics = [Statistic]()
+    var mindfulness = [Mindfulness]()
+    let calendar = Calendar.current
+    var date = start
+    
+    let component: Calendar.Component = {
+        switch segmentType {
+        case .day: return .hour
+        case .week: return .day
+        case .month: return .day
+        case .year: return .month
+        }
+    }()
+    
+    var nextDate = calendar.date(byAdding: component, value: 1, to: date)!
+    while date < end {
+        mindfulnessListStats(mindfulnesses: mindfulnesses, chunkStart: date, chunkEnd: nextDate) { (stat, mindfulnesses) in
+            statistics.append(stat)
+            mindfulness.append(contentsOf: mindfulnesses)
+        }
+        
+        // Advance by one day:
+        date = nextDate
+        nextDate = calendar.date(byAdding: component, value: 1, to: nextDate)!
+    }
+    
+    completion(statistics, mindfulnesses)
+}
+
 func mindfulnessData(mindfulnesses: [Mindfulness], start: Date, end: Date, completion: @escaping (Statistic, [Mindfulness]) -> ()) {
     mindfulnessListStats(mindfulnesses: mindfulnesses, chunkStart: start, chunkEnd: end) { (stat, mindfulnesses) in
         completion(stat, mindfulnesses)

@@ -41,4 +41,7 @@ enum AnalyticsBreakdownEntry {
     case transaction(Transaction)
     case account(MXAccount)
     case sample(HKSample)
+    case mood(Mood)
+    case workout(Workout)
+    case mindfuless(Mindfulness)
 }

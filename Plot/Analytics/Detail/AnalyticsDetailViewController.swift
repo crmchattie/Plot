@@ -44,6 +44,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         tableView.register(EventCell.self)
         tableView.register(FinanceTableViewCell.self)
         tableView.register(HealthDetailSampleCell.self)
+        tableView.register(HealthMetricTableCell.self)
         return tableView
     }()
     
@@ -280,6 +281,21 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                     cell.configure(sample, segmentType: segmentType ?? .week)
                 }
                 return cell
+            case .mood(let mood):
+                let cell = tableView.dequeueReusableCell(ofType: HealthMetricTableCell.self, for: indexPath)
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.configure(mood)
+                return cell
+            case .workout(let workout):
+                let cell = tableView.dequeueReusableCell(ofType: HealthMetricTableCell.self, for: indexPath)
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.configure(workout)
+                return cell
+            case .mindfuless(let mindfulness):
+                let cell = tableView.dequeueReusableCell(ofType: HealthMetricTableCell.self, for: indexPath)
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.configure(mindfulness)
+                return cell
             }
         }
     }
@@ -303,7 +319,6 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
         case .sample(let sample):
             if let hkWorkout = sample as? HKWorkout {
                 let hkSampleID = hkWorkout.uuid.uuidString
-                print(hkSampleID)
                 if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
                     showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
                 }
@@ -314,12 +329,12 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                     showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
                 }
             }
-            else if let hkWorkout = sample as? HKWorkout {
-                let hkSampleID = hkWorkout.uuid.uuidString
-                if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
-                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-                }
-            }
+        case .mood(let mood):
+            showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+        case .workout(let workout):
+            showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+        case .mindfuless(let mindfulness):
+            showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }
 }

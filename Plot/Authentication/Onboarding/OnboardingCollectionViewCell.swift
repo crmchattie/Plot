@@ -105,7 +105,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
                 
         collectionView.register(TaskCollectionCell.self, forCellWithReuseIdentifier: taskCellID)
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
-        collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
+        collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(FinanceCollectionViewComparisonCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewComparisonCell)
         
     }
@@ -177,7 +177,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
                 return cell
             }
         } else if let healthMetrics = healthMetrics {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCollectionCell
             let metric = healthMetrics[indexPath.item]
             cell.configure(metric)
             return cell
@@ -212,7 +212,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
                 height = estimatedSize.height
             }
         } else if let healthMetrics = healthMetrics {
-            let dummyCell = HealthMetricCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            let dummyCell = HealthMetricCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             let metric = healthMetrics[indexPath.item]
             dummyCell.configure(metric)
             dummyCell.layoutIfNeeded()

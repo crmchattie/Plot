@@ -14,6 +14,7 @@ extension NSNotification.Name {
     static let healthUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthUpdated")
     static let workoutsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".workoutsUpdated")
     static let mindfulnessUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".mindfulnessUpdated")
+    static let moodsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".moodsUpdated")
     static let healthKitUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthKitUpdated")
     static let hasLoadedHealth = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedHealth")
 }
@@ -75,7 +76,7 @@ class HealthService {
                 moods.sort(by: {
                     $0.moodDate ?? Date.distantPast > $1.moodDate ?? Date.distantPast
                 })
-                NotificationCenter.default.post(name: .mindfulnessUpdated, object: nil)
+                NotificationCenter.default.post(name: .moodsUpdated, object: nil)
             }
         }
     }

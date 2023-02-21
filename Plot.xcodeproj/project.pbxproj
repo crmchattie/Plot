@@ -185,6 +185,7 @@
 		1093D2BC299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BB299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift */; };
 		1093D2BE299D3860003D77C5 /* GoalListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BD299D3860003D77C5 /* GoalListViewController.swift */; };
 		1093D2C0299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BF299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift */; };
+		1093D2C229A54B16003D77C5 /* MoodAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2C129A54B16003D77C5 /* MoodAnalyticsDataSource.swift */; };
 		1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */; };
 		10970B0E25803F450027A9EF /* Mindfulness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B0D25803F450027A9EF /* Mindfulness.swift */; };
 		10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B13258060860027A9EF /* MindfulnessViewController.swift */; };
@@ -786,6 +787,7 @@
 		1093D2BB299D35A7003D77C5 /* GoalsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		1093D2BD299D3860003D77C5 /* GoalListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListViewController.swift; sourceTree = "<group>"; };
 		1093D2BF299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		1093D2C129A54B16003D77C5 /* MoodAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectActivityTableViewController.swift; sourceTree = "<group>"; };
 		10970B0D25803F450027A9EF /* Mindfulness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mindfulness.swift; sourceTree = "<group>"; };
 		10970B13258060860027A9EF /* MindfulnessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessViewController.swift; sourceTree = "<group>"; };
@@ -2949,6 +2951,7 @@
 				10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */,
 				10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */,
 				F983298B2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift */,
+				1093D2C129A54B16003D77C5 /* MoodAnalyticsDataSource.swift */,
 				F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */,
 				F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */,
 				F916C767260E793F0062F952 /* DateRangeFormatter.swift */,
@@ -3544,6 +3547,7 @@
 				4BAEE51D21272D890045AB10 /* BaseMessageCell.swift in Sources */,
 				108C380128A2A9C100DC4998 /* FinanceTransactionViewController+Extensions.swift in Sources */,
 				1093D2B2299C39BC003D77C5 /* GoalViewController.swift in Sources */,
+				1093D2C229A54B16003D77C5 /* MoodAnalyticsDataSource.swift in Sources */,
 				10217A7B23103661004CBA9E /* CalendarViewController.swift in Sources */,
 				4BAEE5D4212735E50045AB10 /* UIView+Extensions.swift in Sources */,
 				10323D5E2479A58500749706 /* GrocerylistActions.swift in Sources */,

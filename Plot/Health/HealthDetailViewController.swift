@@ -258,12 +258,6 @@ class HealthDetailViewController: UIViewController, ObjectDetailShowing {
                 showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
             }
         }
-        else if let hkWorkout = sample as? HKWorkout {
-            let hkSampleID = hkWorkout.uuid.uuidString
-            if let workout = self.networkController.healthService.workouts.first(where: {$0.hkSampleID == hkSampleID }) {
-                showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-            }
-        }
     }
 }
 

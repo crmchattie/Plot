@@ -109,6 +109,78 @@ enum WorkoutMeasure {
     case duration, calories
 }
 
+func categorizeWorkouts(workouts: [Workout], measure: WorkoutMeasure, start: Date, end: Date, completion: @escaping ([String: Double], [Workout]) -> ()) {
+    var categoryDict = [String: Double]()
+    var workoutsList = [Workout]()
+    // create dateFormatter with UTC time format
+    for workout in workouts {
+        guard var startDate = workout.startDateTime,
+              var endDate = workout.endDateTime else {
+            continue
+        }
+        
+        // Skipping activities that are outside of the interest range.
+        if startDate > end || endDate <= start {
+            continue
+        }
+        
+        if let type = workout.type {
+            if categoryDict[type] == nil {
+                let measureDouble = measure == .duration ? (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60 : workout.totalEnergyBurned ?? 0
+                categoryDict[type] = measureDouble
+                workoutsList.append(workout)
+            } else {
+                let measureDouble = measure == .duration ? (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60 : workout.totalEnergyBurned ?? 0
+                categoryDict[type]! += measureDouble
+                workoutsList.append(workout)
+            }
+        }
+    }
+                
+    completion(categoryDict, workoutsList)
+}
+
+func workoutsOverTimeChartData(workouts: [Workout], measure: WorkoutMeasure, categories: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Workout]]) -> ()) {
+    var statistics = [String: [Statistic]]()
+    var workoutDict = [String: [Workout]]()
+    let calendar = Calendar.current
+    var date = start
+    
+    let component: Calendar.Component = {
+        switch segmentType {
+        case .day: return .hour
+        case .week: return .day
+        case .month: return .day
+        case .year: return .month
+        }
+    }()
+    
+    var nextDate = calendar.date(byAdding: component, value: 1, to: date)!
+    while date < end {
+        for category in categories {
+            workoutListStats(workouts: workouts, measure: measure, category: category, chunkStart: date, chunkEnd: nextDate) { (stat, workouts) in
+                if statistics[category] != nil, workoutDict[category] != nil {
+                    var acStats = statistics[category]
+                    var acWorkoutList = workoutDict[category]
+                    acStats!.append(stat)
+                    acWorkoutList!.append(contentsOf: workouts)
+                    statistics[category] = acStats
+                    workoutDict[category] = acWorkoutList
+                } else {
+                    statistics[category] = [stat]
+                    workoutDict[category] = workouts
+                }
+            }
+        }
+        
+        // Advance by one day:
+        date = nextDate
+        nextDate = calendar.date(byAdding: component, value: 1, to: nextDate)!
+    }
+    
+    completion(statistics, workoutDict)
+}
+
 func workoutData(workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Workout]) -> ()) {
     if categories == nil {
         workoutListStats(workouts: workouts, measure: measure, category: nil, chunkStart: start, chunkEnd: end) { (stat, workouts) in

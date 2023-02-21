@@ -99,7 +99,68 @@ enum ApplicableTo: String, CaseIterable, Codable {
     case weekly
     case monthly
     case yearly
-    case activity
+    case mood
+}
+
+func categorizeMoods(moods: [Mood], start: Date, end: Date, completion: @escaping ([String: Double], [Mood]) -> ()) {
+    var categoryDict = [String: Double]()
+    var moodsList = [Mood]()
+    // create dateFormatter with UTC time format
+    for mood in moods {
+        guard let moodDate = mood.moodDate, moodDate < end, moodDate >= start else { continue }
+        if let type = mood.mood {
+            if categoryDict[type.rawValue] == nil {
+                categoryDict[type.rawValue] = 1
+                moodsList.append(mood)
+            } else {
+                categoryDict[type.rawValue]! += 1
+                moodsList.append(mood)
+            }
+        }
+    }
+                
+    completion(categoryDict, moodsList)
+}
+
+func moodsOverTimeChartData(moods: [Mood], types: [String], start: Date, end: Date, segmentType: TimeSegmentType, completion: @escaping ([String: [Statistic]], [String: [Mood]]) -> ()) {
+    var statistics = [String: [Statistic]]()
+    var moodDict = [String: [Mood]]()
+    let calendar = Calendar.current
+    var date = start
+    
+    let component: Calendar.Component = {
+        switch segmentType {
+        case .day: return .hour
+        case .week: return .day
+        case .month: return .day
+        case .year: return .month
+        }
+    }()
+    
+    var nextDate = calendar.date(byAdding: component, value: 1, to: date)!
+    while date < end {
+        for type in types {
+            moodListStats(moods: moods, type: type, chunkStart: date, chunkEnd: nextDate) { (stat, moods) in
+                if statistics[type] != nil, moodDict[type] != nil {
+                    var acStats = statistics[type]
+                    var acMoodList = moodDict[type]
+                    acStats!.append(stat)
+                    acMoodList!.append(contentsOf: moods)
+                    statistics[type] = acStats
+                    moodDict[type] = acMoodList
+                } else {
+                    statistics[type] = [stat]
+                    moodDict[type] = moods
+                }
+            }
+        }
+        
+        // Advance by one day:
+        date = nextDate
+        nextDate = calendar.date(byAdding: component, value: 1, to: nextDate)!
+    }
+    
+    completion(statistics, moodDict)
 }
 
 func moodData(moods: [Mood], types: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Mood]) -> ()) {
@@ -120,13 +181,13 @@ func moodData(moods: [Mood], types: [String]?, start: Date, end: Date, completio
     }
 }
 
-/// Categorize a list of activities, filtering down to a specific chunk [chunkStart, chunkEnd]
+/// Categorize a list of moods, filtering down to a specific chunk [chunkStart, chunkEnd]
 /// - Parameters:
-///   - activities: A list of activities to analize.
-///   - activityCategory: no idea what this is.
-///   - chunkStart: Start date in which the activities are split and categorized.
-///   - chunkEnd: End date in which the activities are split and categorized.
-///   - completion: list of statistical elements and activities.
+///   - moods: A list of moods to analize.
+///   - moodCategory: no idea what this is.
+///   - chunkStart: Start date in which the moods are split and categorized.
+///   - chunkEnd: End date in which the moods are split and categorized.
+///   - completion: list of statistical elements and moods.
 func moodListStats(
     moods: [Mood],
     type: String?,

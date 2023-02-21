@@ -16,6 +16,9 @@ protocol HealthDetailServiceInterface {
     func getSamples(for workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping (Statistic?, [Workout]?, Error?) -> Swift.Void)
     func getSamples(for mindfulnesses: [Mindfulness], range: DateRange, completion: @escaping (Statistic?, [Mindfulness]?, Error?) -> Swift.Void)
     func getSamples(for moods: [Mood], types: [String]?, range: DateRange, completion: @escaping (Statistic?, [Mood]?, Error?) -> Swift.Void)
+    func getSamples(for range: DateRange, segment: TimeSegmentType, workouts: [Workout], measure: WorkoutMeasure, completion: @escaping ([String : [Statistic]], [Workout]) -> Void)
+    func getSamples(for range: DateRange, segment: TimeSegmentType, mindfulness: [Mindfulness], completion: @escaping ([Statistic], [Mindfulness]) -> Void)
+    func getSamples(for range: DateRange, segment: TimeSegmentType, moods: [Mood], completion: @escaping ([String : [Statistic]], [Mood]) -> Void)
 }
 
 class HealthDetailService: HealthDetailServiceInterface {
@@ -47,9 +50,56 @@ class HealthDetailService: HealthDetailServiceInterface {
         getMoodStatisticalSamples(moods: moods, types: types, range: range, completion: completion)
     }
     
+    func getSamples(for range: DateRange, segment: TimeSegmentType, workouts: [Workout], measure: WorkoutMeasure, completion: @escaping ([String : [Statistic]], [Workout]) -> Void) {
+        getWorkoutCategoriesStatisticalSamples(segmentType: segment, range: range, workouts: workouts, measure: measure) { (stats, workouts, _) in
+            completion(stats ?? [:], workouts ?? [])
+        }
+    }
+    
+    func getSamples(for range: DateRange, segment: TimeSegmentType, mindfulness: [Mindfulness], completion: @escaping ([Statistic], [Mindfulness]) -> Void) {
+        getMindfulnessStatisticalSamples(segmentType: segment, range: range, mindfulness: mindfulness) { (stats, mindfulness, _) in
+            completion(stats ?? [], mindfulness ?? [])
+        }
+    }
+    
+    func getSamples(for range: DateRange, segment: TimeSegmentType, moods: [Mood], completion: @escaping ([String : [Statistic]], [Mood]) -> Void) {
+        getMoodCategoriesStatisticalSamples(segmentType: segment, range: range, moods: moods) { (stats, moods, _) in
+            completion(stats ?? [:], moods ?? [])
+        }
+    }
+    
     private func getWorkoutCategoriesStatisticalSamples(workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping (Statistic?, [Workout]?, Error?) -> Void) {
         workoutData(workouts: workouts, measure: measure, categories: categories, start: range.startDate, end: range.endDate) { stat, workouts in
             completion(stat, workouts, nil)
+        }
+    }
+    
+    private func getWorkoutCategoriesStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, workouts: [Workout], measure: WorkoutMeasure, completion: @escaping ([String: [Statistic]]?, [Workout]?, Error?) -> Void) {
+        let anchorDate = Date()
+        var startDate = anchorDate
+        var endDate = anchorDate
+        
+        if let range = range {
+            startDate = range.startDate
+            endDate = range.endDate
+        } else if segmentType == .day {
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.endOfDay
+        } else if segmentType == .week {
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.endOfWeek
+        } else if segmentType == .month {
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.endOfMonth
+        } else if segmentType == .year {
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.endOfYear
+        }
+        
+        categorizeWorkouts(workouts: workouts, measure: measure, start: startDate, end: endDate) { (categoryDict, categorizedWorkoutsList) in
+            workoutsOverTimeChartData(workouts: categorizedWorkoutsList, measure: measure, categories: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
+                completion(statsDict, categorizedWorkoutsList, nil)
+            }
         }
     }
     
@@ -59,9 +109,65 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
     }
     
+    private func getMindfulnessStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, mindfulness: [Mindfulness], completion: @escaping ([Statistic]?, [Mindfulness]?, Error?) -> Void) {
+        let anchorDate = Date()
+        var startDate = anchorDate
+        var endDate = anchorDate
+        
+        if let range = range {
+            startDate = range.startDate
+            endDate = range.endDate
+        } else if segmentType == .day {
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.endOfDay
+        } else if segmentType == .week {
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.endOfWeek
+        } else if segmentType == .month {
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.endOfMonth
+        } else if segmentType == .year {
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.endOfYear
+        }
+        
+        mindfulnessesOverTimeChartData(mindfulnesses: mindfulness, start: startDate, end: endDate, segmentType: segmentType) { (statsDict, mindfulnessesList) in
+            completion(statsDict, mindfulnessesList, nil)
+        }
+    }
+    
     private func getMoodStatisticalSamples(moods: [Mood], types: [String]?, range: DateRange, completion: @escaping (Statistic?, [Mood]?, Error?) -> Void) {
         moodData(moods: moods, types: types, start: range.startDate, end: range.endDate) { stat, moods in
             completion(stat, moods, nil)
+        }
+    }
+    
+    private func getMoodCategoriesStatisticalSamples(segmentType: TimeSegmentType, range: DateRange?, moods: [Mood], completion: @escaping ([String: [Statistic]]?, [Mood]?, Error?) -> Void) {
+        let anchorDate = Date()
+        var startDate = anchorDate
+        var endDate = anchorDate
+        
+        if let range = range {
+            startDate = range.startDate
+            endDate = range.endDate
+        } else if segmentType == .day {
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.endOfDay
+        } else if segmentType == .week {
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.endOfWeek
+        } else if segmentType == .month {
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.endOfMonth
+        } else if segmentType == .year {
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.endOfYear
+        }
+        
+        categorizeMoods(moods: moods, start: startDate, end: endDate) { (categoryDict, categorizedMoodsList) in
+            moodsOverTimeChartData(moods: categorizedMoodsList, types: Array(categoryDict.keys), start: startDate, end: endDate, segmentType: segmentType) { (statsDict, _) in
+                completion(statsDict, categorizedMoodsList, nil)
+            }
         }
     }
     

@@ -41,7 +41,7 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
         collectionView.delegate = self
         collectionView.isScrollEnabled = false
                 
-        collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
+        collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(SectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: healthMetricSectionHeaderID)
         
     }
@@ -71,7 +71,7 @@ class HealthControllerCell: UICollectionViewCell, UICollectionViewDelegateFlowLa
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCollectionCell
         let key = healthMetricSections[indexPath.section]
         if let metrics = healthMetrics[key] {
             let metric = metrics[indexPath.row]

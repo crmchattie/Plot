@@ -68,6 +68,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .workoutsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .mindfulnessUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(setupData), name: .moodsUpdated, object: nil)
     }
     
     @objc fileprivate func setupData() {
@@ -107,7 +108,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
         ])
         
-        collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
+        collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = view.backgroundColor
         
@@ -159,7 +160,7 @@ extension HealthListViewController: UICollectionViewDelegateFlowLayout, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCollectionCell
         let key = filteredHealthMetricSections[indexPath.section]
         if let metrics = filteredHealthMetrics[key] {
             let metric = metrics[indexPath.row]
@@ -178,7 +179,7 @@ extension HealthListViewController: UICollectionViewDelegateFlowLayout, UICollec
     
 //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 //        var height: CGFloat = 0
-//        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCell
+//        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: healthMetricCellID, for: indexPath) as! HealthMetricCollectionCell
 //        let key = filteredHealthMetricSections[indexPath.section]
 //        if let metrics = filteredHealthMetrics[key] {
 //            let metric = metrics[indexPath.row]

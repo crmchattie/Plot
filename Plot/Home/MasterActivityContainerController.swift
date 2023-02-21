@@ -15,7 +15,7 @@ import GoogleSignIn
 
 let taskCellID = "taskCellID"
 let eventCellID = "eventCellID"
-let healthMetricCellID = "HealthMetricCellID"
+let healthMetricCellID = "HealthMetricCollectionCellID"
 let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
 let kHeaderCell = "HeaderCell"
 let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
@@ -145,7 +145,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         collectionView.fillSuperview()
         collectionView.register(TaskCollectionCell.self, forCellWithReuseIdentifier: taskCellID)
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
-        collectionView.register(HealthMetricCell.self, forCellWithReuseIdentifier: healthMetricCellID)
+        collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
         collectionView.register(FinanceCollectionViewComparisonCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewComparisonCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
@@ -166,6 +166,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .workoutsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .mindfulnessUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .moodsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
