@@ -478,9 +478,6 @@ extension EventViewController {
         if let _ = activity.recurrences, !active {
             scheduleRecurrences()
         }
-        if let _ = activity.reminder {
-            scheduleReminder()
-        }
     }
     
     func scheduleRecurrences() {
@@ -493,40 +490,6 @@ extension EventViewController {
             var newRecurrences = recurrences
             newRecurrences[recurranceIndex] = recurrenceRule!.toRRuleString()
             self.activity.recurrences = newRecurrences
-        }
-    }
-    
-    func scheduleReminder() {
-        guard let activity = activity, let activityReminder = activity.reminder, let startDate = activity.startDate, let endDate = activity.endDate, let allDay = activity.allDay else {
-            return
-        }
-        let center = UNUserNotificationCenter.current()
-        guard activityReminder != "None" else {
-            center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
-            return
-        }
-        let content = UNMutableNotificationContent()
-        content.title = "\(String(describing: activity.name!)) Reminder"
-        content.sound = UNNotificationSound.default
-        var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: activity.startTimeZone, endTimeZone: activity.endTimeZone)
-        content.subtitle = formattedDate.0
-        if let reminder = EventAlert(rawValue: activityReminder) {
-            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
-            var calendar = Calendar.current
-            if let timeZone = activity.startTimeZone {
-                calendar.timeZone = TimeZone(identifier: timeZone)!
-            }
-            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                        repeats: false)
-            let identifier = "\(activityID)_Reminder"
-            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-            center.add(request, withCompletionHandler: { (error) in
-                if let error = error {
-                    print(error)
-                }
-            })
         }
     }
     

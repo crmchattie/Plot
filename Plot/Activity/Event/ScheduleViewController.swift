@@ -310,9 +310,6 @@ class ScheduleViewController: FormViewController {
                         endRow.updateCell()
                     }
                     self!.schedule.startDateTime = self!.schedule.getNewSubStartDateTime(parent: self!.event, currentDate: row.value ?? Date())
-                    if self!.active {
-                        self!.scheduleReminder()
-                    }
                 }.onExpandInlineRow { [weak self] cell, row, inlineRow in
                     inlineRow.cellUpdate { (cell, row) in
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -460,44 +457,41 @@ class ScheduleViewController: FormViewController {
                     cell.textLabel?.textAlignment = .left
                 }
         
-            <<< PushRow<EventAlert>("Reminder") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textLabel?.textColor = .label
-                row.cell.detailTextLabel?.textColor = .secondaryLabel
-                row.title = row.tag
-                if let schedule = schedule, let value = schedule.reminder {
-                    row.value = EventAlert(rawValue: value)
-                } else {
-                    row.value = EventAlert.None
-                    if let reminder = row.value?.description {
-                        self.schedule.reminder = reminder
-                    }
-                }
-                row.options = EventAlert.allCases
-            }.onPresent { from, to in
-                to.title = "Reminder"
-                to.extendedLayoutIncludesOpaqueBars = true
-                to.tableViewStyle = .insetGrouped
-                to.selectableRowCellUpdate = { cell, row in
-                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                    to.tableView.backgroundColor = .systemGroupedBackground
-                    to.tableView.separatorStyle = .none
-                    cell.backgroundColor = .secondarySystemGroupedBackground
-                    cell.textLabel?.textColor = .label
-                    cell.detailTextLabel?.textColor = .secondaryLabel
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }.onChange() { [unowned self] row in
-                if let reminder = row.value?.description {
-                    self.schedule.reminder = reminder
-                    if self.active {
-                        self.scheduleReminder()
-                    }
-                }
-            }
+//            <<< PushRow<EventAlert>("Reminder") { row in
+//                row.cell.backgroundColor = .secondarySystemGroupedBackground
+//                row.cell.textLabel?.textColor = .label
+//                row.cell.detailTextLabel?.textColor = .secondaryLabel
+//                row.title = row.tag
+//                if let schedule = schedule, let value = schedule.reminder {
+//                    row.value = EventAlert(rawValue: value)
+//                } else {
+//                    row.value = EventAlert.None
+//                    if let reminder = row.value?.description {
+//                        self.schedule.reminder = reminder
+//                    }
+//                }
+//                row.options = EventAlert.allCases
+//            }.onPresent { from, to in
+//                to.title = "Reminder"
+//                to.extendedLayoutIncludesOpaqueBars = true
+//                to.tableViewStyle = .insetGrouped
+//                to.selectableRowCellUpdate = { cell, row in
+//                    to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+//                    to.tableView.backgroundColor = .systemGroupedBackground
+//                    to.tableView.separatorStyle = .none
+//                    cell.backgroundColor = .secondarySystemGroupedBackground
+//                    cell.textLabel?.textColor = .label
+//                    cell.detailTextLabel?.textColor = .secondaryLabel
+//                }
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textLabel?.textColor = .label
+//                cell.detailTextLabel?.textColor = .secondaryLabel
+//            }.onChange() { [unowned self] row in
+//                if let reminder = row.value?.description {
+//                    self.schedule.reminder = reminder
+//                }
+//            }
         
         
             <<< LabelRow("Category") { row in
@@ -786,40 +780,6 @@ class ScheduleViewController: FormViewController {
                 }, at: mvs.count - 1)
                 
             }
-        }
-    }
-    
-    func scheduleReminder() {
-        guard let schedule = schedule, let scheduleReminder = schedule.reminder, let startDate = schedule.getSubStartDate(parent: event), let endDate = schedule.getSubEndDate(parent: event), let allDay = schedule.allDay else {
-            return
-        }
-        let center = UNUserNotificationCenter.current()
-        guard scheduleReminder != "None" else {
-            center.removePendingNotificationRequests(withIdentifiers: ["\(scheduleID)_Reminder"])
-            return
-        }
-        let content = UNMutableNotificationContent()
-        content.title = "\(String(describing: schedule.name!)) Reminder"
-        content.sound = UNNotificationSound.default
-        var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: schedule.startTimeZone, endTimeZone: schedule.endTimeZone)
-        content.subtitle = formattedDate.0
-        if let reminder = EventAlert(rawValue: scheduleReminder) {
-            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
-            var calendar = Calendar.current
-            if let timeZone = schedule.startTimeZone {
-                calendar.timeZone = TimeZone(identifier: timeZone)!
-            }
-            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                        repeats: false)
-            let identifier = "\(scheduleID)_Reminder"
-            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-            center.add(request, withCompletionHandler: { (error) in
-                if let error = error {
-                    print(error)
-                }
-            })
         }
     }
     

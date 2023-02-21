@@ -586,6 +586,12 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["endTimeZone"] = NSNull()
         }
         
+        if let value = self.reminder as AnyObject? {
+            dictionary["reminder"] = value
+        } else {
+            dictionary["endTimeZone"] = NSNull()
+        }
+        
         if let value = self.recurrences as AnyObject? {
             dictionary["recurrences"] = value
         } else {
@@ -961,6 +967,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.endTimeZone {
             newActivity.endTimeZone = value
+        }
+        
+        if let value = updatingActivity.reminder {
+            newActivity.reminder = value
         }
         
         if let value = updatingActivity.recurrences {

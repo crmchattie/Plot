@@ -416,6 +416,7 @@ class ActivityService {
             } else {
                 completion()
             }
+            self?.scheduleReminder(activities: activitiesWithRepeatsInitialAdd)
         }, activitiesAdded: { [weak self] activitiesAdded in
             for activity in activitiesAdded {
                 //remove activities from repeatActivities in case recurrences is updated
@@ -436,9 +437,11 @@ class ActivityService {
                 }
                 self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsAdded)
             }
+            self?.scheduleReminder(activities: activitiesWithRepeatsAdded)
         }, activitiesRemoved: { [weak self] activitiesRemoved in
             self?.activities.removeAll(where: { $0.activityID == activitiesRemoved.first?.activityID })
             self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesRemoved.first?.activityID })
+            self?.deleteReminder(activities: activitiesRemoved)
         }, activitiesChanged: { [weak self] activitiesChanged in
             for activity in activitiesChanged {
                 if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
@@ -458,6 +461,8 @@ class ActivityService {
                 }
                 self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsChanged)
             }
+            self?.scheduleReminder(activities: activitiesWithRepeatsChanged)
+
         })
     }
     
@@ -819,6 +824,160 @@ class ActivityService {
             activitiesFetcher.grabActivitiesViaList(lists: plotLists) { [weak self] activities in
                 self?.activities.append(contentsOf: activities)
             }
+        }
+    }
+    
+    func scheduleReminder(activities: [Activity]) {
+        let today = Date().localTime
+        for activity in activities {
+            guard let activityReminder = activity.reminder, let activityID = activity.activityID, let endDate = activity.endDate, endDate > today else {
+                continue
+            }
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
+            guard activityReminder != "None" else {
+                center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_\(endDate)_Reminder"])
+                continue
+            }
+            
+            if activity.isTask ?? false, activity.isCompleted ?? false {
+                center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_\(endDate)_Reminder"])
+                continue
+            }
+                        
+            if let startDate = activity.startDate, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
+                let content = UNMutableNotificationContent()
+                content.title = "\(String(describing: activity.name!)) Reminder"
+                content.sound = UNNotificationSound.default
+                var formattedDate: (String, String) = ("", "")
+                formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+                content.subtitle = formattedDate.0
+                if let reminder = EventAlert(rawValue: activityReminder) {
+                    let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
+                    var calendar = Calendar.current
+                    calendar.timeZone = TimeZone(identifier: startTimeZone)!
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                                repeats: false)
+                    let identifier = "\(activityID)_\(endDate)_Reminder"
+                    let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+                    center.add(request, withCompletionHandler: { (error) in
+                        if let error = error {
+                            print(error)
+                        }
+                    })
+                }
+            } else {
+                let content = UNMutableNotificationContent()
+                content.title = "\(String(describing: activity.name!)) Reminder"
+                content.sound = UNNotificationSound.default
+                var formattedDate: (Int, String, String) = (1, "", "")
+                formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: activity.hasDeadlineTime ?? false, startDate: activity.startDate, hasStartTime: activity.hasStartTime)
+                content.subtitle = formattedDate.2
+                if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
+                    let calendar = Calendar.current
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                                repeats: false)
+                    let identifier = "\(activityID)_\(endDate)_Reminder"
+                    let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+                    center.add(request, withCompletionHandler: { (error) in
+                        if let error = error {
+                            print(error)
+                        }
+                    })
+                }
+            }
+        }
+    }
+    
+    func scheduleSubReminder(sub_activities: [Activity], parent: Activity) {
+        let today = Date().localTime
+        for sub_activity in sub_activities {
+            guard let reminder = sub_activity.reminder, let sub_activity_ID = sub_activity.activityID, let endDate = sub_activity.getSubEndDate(parent: parent), endDate > today else {
+                continue
+            }
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: ["\(sub_activity_ID)_Reminder"])
+            guard reminder != "None" else {
+                center.removePendingNotificationRequests(withIdentifiers: ["\(sub_activity_ID)_\(endDate)_Reminder"])
+                continue
+            }
+            
+            if sub_activity.isTask ?? false, sub_activity.isCompleted ?? false {
+                center.removePendingNotificationRequests(withIdentifiers: ["\(sub_activity_ID)_\(endDate)_Reminder"])
+                continue
+            }
+            
+            if let startDate = sub_activity.getSubStartDate(parent: parent), let allDay = sub_activity.allDay {
+                let content = UNMutableNotificationContent()
+                content.title = "\(String(describing: sub_activity.name!)) Reminder"
+                content.sound = UNNotificationSound.default
+                var formattedDate: (String, String) = ("", "")
+                formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: sub_activity.startTimeZone, endTimeZone: sub_activity.endTimeZone)
+                content.subtitle = formattedDate.0
+                if let reminder = EventAlert(rawValue: reminder) {
+                    let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
+                    var calendar = Calendar.current
+                    if let timeZone = sub_activity.startTimeZone {
+                        calendar.timeZone = TimeZone(identifier: timeZone)!
+                    }
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                                repeats: false)
+                    let identifier = "\(sub_activity_ID)_\(endDate)_Reminder"
+                    let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+                    center.add(request, withCompletionHandler: { (error) in
+                        if let error = error {
+                            print(error)
+                        }
+                    })
+                }
+            } else {
+                let content = UNMutableNotificationContent()
+                content.title = "\(String(describing: sub_activity.name!)) Reminder"
+                content.sound = UNNotificationSound.default
+                var formattedDate: (Int, String, String) = (1, "", "")
+                formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: sub_activity.hasDeadlineTime ?? false, startDate: sub_activity.startDate, hasStartTime: sub_activity.hasStartTime)
+                content.subtitle = formattedDate.2
+                if let reminder = TaskAlert(rawValue: reminder), let reminderDate = reminder.timeInterval(endDate) {
+                    let calendar = Calendar.current
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
+                                                                repeats: false)
+                    let identifier = "\(sub_activity_ID)_\(endDate)_Reminder"
+                    let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+                    center.add(request, withCompletionHandler: { (error) in
+                        if let error = error {
+                            print(error)
+                        }
+                    })
+                }
+            }
+        }
+    }
+    
+    func deleteReminder(activities: [Activity]) {
+        let today = Date().localTime
+        for activity in activities {
+            guard let activityID = activity.activityID, let endDate = activity.endDate, endDate > today else {
+                continue
+            }
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
+            center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_\(endDate)_Reminder"])
+        }
+    }
+    
+    func deleteSubReminder(sub_activities: [Activity], parent: Activity) {
+        let today = Date().localTime
+        for sub_activity in sub_activities {
+            guard let sub_activity_ID = sub_activity.activityID, let endDate = sub_activity.getSubEndDate(parent: parent), endDate > today else {
+                continue
+            }
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: ["\(sub_activity_ID)_Reminder"])
+            center.removePendingNotificationRequests(withIdentifiers: ["\(sub_activity_ID)_\(endDate)_Reminder"])
         }
     }
 }

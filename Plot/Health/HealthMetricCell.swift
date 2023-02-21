@@ -224,7 +224,6 @@ class HealthMetricCell: BaseContainerCollectionViewCell {
                 badgeLabel.isHidden = true
             }
         } else if let mood = metric as? Mood {
-            print("configuring mood")
             if let mood = mood.mood {
                 titleLabel.text = mood.rawValue
             } else {

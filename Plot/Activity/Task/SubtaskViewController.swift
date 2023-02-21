@@ -659,45 +659,42 @@ class SubtaskViewController: FormViewController {
                 cell.textLabel?.textColor = .label
             }
         
-        <<< PushRow<TaskAlert>("Reminder") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            row.hidden = "$deadlineDateSwitch == false"
-            if let subtask = subtask, let value = subtask.reminder {
-                row.value = TaskAlert(rawValue: value)
-            } else {
-                row.value = TaskAlert.None
-                if let reminder = row.value?.description {
-                    self.subtask.reminder = reminder
-                }
-            }
-            row.options = TaskAlert.allCases
-        }.onPresent { from, to in
-            to.title = "Reminder"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.selectableRowCellUpdate = { cell, row in
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                to.tableView.separatorStyle = .none
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange() { [unowned self] row in
-            if let reminder = row.value?.description {
-                self.subtask.reminder = reminder
-                if self.active {
-                    self.subtaskReminder()
-                }
-            }
-        }
+//        <<< PushRow<TaskAlert>("Reminder") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.textLabel?.textColor = .label
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.title = row.tag
+//            row.hidden = "$deadlineDateSwitch == false"
+//            if let subtask = subtask, let value = subtask.reminder {
+//                row.value = TaskAlert(rawValue: value)
+//            } else {
+//                row.value = TaskAlert.None
+//                if let reminder = row.value?.description {
+//                    self.subtask.reminder = reminder
+//                }
+//            }
+//            row.options = TaskAlert.allCases
+//        }.onPresent { from, to in
+//            to.title = "Reminder"
+//            to.extendedLayoutIncludesOpaqueBars = true
+//            to.tableViewStyle = .insetGrouped
+//            to.selectableRowCellUpdate = { cell, row in
+//                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+//                to.tableView.backgroundColor = .systemGroupedBackground
+//                to.tableView.separatorStyle = .none
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textLabel?.textColor = .label
+//                cell.detailTextLabel?.textColor = .secondaryLabel
+//            }
+//        }.cellUpdate { cell, row in
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.textLabel?.textColor = .label
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//        }.onChange() { [unowned self] row in
+//            if let reminder = row.value?.description {
+//                self.subtask.reminder = reminder
+//            }
+//        }
         
             <<< LabelRow("Category") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -1008,7 +1005,6 @@ class SubtaskViewController: FormViewController {
                 self.subtask.startDateTime = nil
                 self.subtask.hasStartTime = false
             }
-            self.subtaskReminder()
         }
     }
     
@@ -1036,37 +1032,6 @@ class SubtaskViewController: FormViewController {
                 self.subtask.endDateTime = nil
                 self.subtask.hasDeadlineTime = false
             }
-            self.subtaskReminder()
-        }
-    }
-    
-    func subtaskReminder() {
-        guard let subtask = subtask, let activityReminder = subtask.reminder, let endDate = subtask.getSubEndDate(parent: task) else {
-            return
-        }
-        let center = UNUserNotificationCenter.current()
-        guard activityReminder != "None" else {
-            center.removePendingNotificationRequests(withIdentifiers: ["\(subtaskID)_Reminder"])
-            return
-        }
-        let content = UNMutableNotificationContent()
-        content.title = "\(String(describing: subtask.name!)) Reminder"
-        content.sound = UNNotificationSound.default
-        var formattedDate: (Int, String, String) = (1, "", "")
-        formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
-        content.subtitle = formattedDate.2
-        if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
-            let calendar = Calendar.current
-            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                        repeats: false)
-            let identifier = "\(subtaskID)_Reminder"
-            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-            center.add(request, withCompletionHandler: { (error) in
-                if let error = error {
-                    print(error)
-                }
-            })
         }
     }
     

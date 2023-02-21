@@ -584,9 +584,6 @@ class EventViewController: FormViewController, ObjectDetailShowing {
         }.onChange() { [unowned self] row in
             if let reminder = row.value?.description {
                 self.activity.reminder = reminder
-                if self.active {
-                    self.scheduleReminder()
-                }
             }
         }
         

@@ -188,38 +188,6 @@ class ActivityDetailViewController: UICollectionViewController, UICollectionView
         })
     }
     
-    func scheduleReminder() {
-        guard let activity = activity, let activityReminder = activity.reminder, let startDate = startDateTime, let endDate = endDateTime, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone else {
-            return
-        }
-        let center = UNUserNotificationCenter.current()
-        guard activityReminder != "None" else {
-            center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
-            return
-        }
-        let content = UNMutableNotificationContent()
-        content.title = "\(String(describing: activity.name!)) Reminder"
-        content.sound = UNNotificationSound.default
-        var formattedDate: (String, String) = ("", "")
-        formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
-        content.subtitle = formattedDate.0
-        if let reminder = EventAlert(rawValue: activityReminder) {
-            let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
-            var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: startTimeZone)!
-            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                        repeats: false)
-            let identifier = "\(activityID)_Reminder"
-            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-            center.add(request, withCompletionHandler: { (error) in
-                if let error = error {
-                    print(error)
-                }
-            })
-        }
-    }
-    
     fileprivate func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         let badgeRef = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder).child("badge")

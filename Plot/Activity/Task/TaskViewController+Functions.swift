@@ -367,9 +367,6 @@ extension TaskViewController {
         if let _ = task.recurrences, !active {
             scheduleRecurrences()
         }
-        if let _ = task.reminder {
-            scheduleReminder()
-        }
     }
     
     func scheduleRecurrences() {
@@ -382,36 +379,6 @@ extension TaskViewController {
             var newRecurrences = recurrences
             newRecurrences[recurranceIndex] = recurrenceRule!.toRRuleString()
             self.task.recurrences = newRecurrences
-        }
-    }
-    
-    func scheduleReminder() {
-        guard let task = task, let activityReminder = task.reminder, let endDate = task.endDate else {
-            return
-        }
-        let center = UNUserNotificationCenter.current()
-        guard activityReminder != "None" else {
-            center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
-            return
-        }
-        let content = UNMutableNotificationContent()
-        content.title = "\(String(describing: task.name!)) Reminder"
-        content.sound = UNNotificationSound.default
-        var formattedDate: (Int, String, String) = (1, "", "")
-        formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: task.hasDeadlineTime ?? false, startDate: task.startDate, hasStartTime: task.hasStartTime)
-        content.subtitle = formattedDate.2
-        if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
-            let calendar = Calendar.current
-            let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
-                                                        repeats: false)
-            let identifier = "\(activityID)_Reminder"
-            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-            center.add(request, withCompletionHandler: { (error) in
-                if let error = error {
-                    print(error)
-                }
-            })
         }
     }
     

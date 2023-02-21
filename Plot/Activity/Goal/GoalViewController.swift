@@ -1187,9 +1187,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
         }.onChange() { [unowned self] row in
             if let reminder = row.value?.description {
                 self.task.reminder = reminder
-                if self.active {
-                    self.scheduleReminder()
-                }
             }
         }
             
