@@ -32,6 +32,7 @@ class AnalyticsViewModel {
     
     private(set) var sections: [Section] = []
     private let range = DateRange(type: .week)
+    private var isRunning = false
     
     init(networkController: NetworkController) {
         self.networkController = networkController
@@ -47,6 +48,12 @@ class AnalyticsViewModel {
     }
     
     func loadData(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
+        isRunning = true
         let group = DispatchGroup()
         
         group.enter()
@@ -133,11 +140,17 @@ class AnalyticsViewModel {
                 self.sections.append(Section(title: AnalyticsSections.netWorth, items: [self.netWorthDataSource.chartViewModel.value], dataSources: [self.netWorthDataSource]))
             }
             
+            self.isRunning = false
             completion()
         }
     }
     
     func goalsUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         goalDataSource.loadData {
             if self.goalDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.goals} ) {
@@ -153,6 +166,11 @@ class AnalyticsViewModel {
     }
     
     func tasksUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         taskDataSource.loadData {
             if self.taskDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.tasks} ) {
@@ -172,6 +190,11 @@ class AnalyticsViewModel {
     }
     
     func eventsUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         eventDataSource.loadData {
             if self.eventDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.events} ) {
@@ -189,6 +212,11 @@ class AnalyticsViewModel {
     }
     
     func healthUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         let group = DispatchGroup()
         
         group.enter()
@@ -210,6 +238,11 @@ class AnalyticsViewModel {
     }
     
     func stepsUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         stepsDataSource.loadData {
             if self.stepsDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.steps} ) {
@@ -227,6 +260,11 @@ class AnalyticsViewModel {
     }
     
     func sleepUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         sleepDataSource.loadData {
             if self.sleepDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.sleep} ) {
@@ -244,6 +282,11 @@ class AnalyticsViewModel {
     }
     
     func activeEnergyUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         activeEnergyDataSource.loadData {
             if self.activeEnergyDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.activeEnergy} ) {
@@ -261,6 +304,11 @@ class AnalyticsViewModel {
     }
     
     func moodUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         moodsDataSource.loadData {
             if self.moodsDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.mood} ) {
@@ -278,6 +326,11 @@ class AnalyticsViewModel {
     }
     
     func financeUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         let group = DispatchGroup()
         
         group.enter()
@@ -295,6 +348,11 @@ class AnalyticsViewModel {
     }
     
     func spendingUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         spendingDataSource.loadData {
             if self.spendingDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.spending} ) {
@@ -312,6 +370,11 @@ class AnalyticsViewModel {
     }
     
     func netWorthUpdate(completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+        
         netWorthDataSource.loadData {
             if self.netWorthDataSource.dataExists ?? false {
                 if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.netWorth} ) {

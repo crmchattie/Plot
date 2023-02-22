@@ -36,26 +36,33 @@ class AnalyticsDetailViewModel {
         }
     }
     
-    private func updateRange() {
+    private func updateRange(completion: @escaping () -> Void) {
         dataSource.updateRange(range) {
             self.reloadData()
+            completion()
         }
     }
     
     // MARK: - Actions
     
-    func updateType() {
-        updateRange()
+    func updateType(completion: @escaping () -> Void) {
+        updateRange {
+            completion()
+        }
     }
     
-    func loadPreviousSegment() {
+    func loadPreviousSegment(completion: @escaping () -> Void) {
         range.previous()
-        updateRange()
+        updateRange {
+            completion()
+        }
     }
     
-    func loadNextSegment() {
+    func loadNextSegment(completion: @escaping () -> Void) {
         range.next()
-        updateRange()
+        updateRange {
+            completion()
+        }
     }
     
     func filter(date: Date?) {

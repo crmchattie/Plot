@@ -48,6 +48,12 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         return tableView
     }()
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.sizeToFit()
+        return activityIndicator
+    }()
+    
     // MARK: - Lifecycle
     
     init(viewModel: AnalyticsDetailViewModel) {
@@ -66,6 +72,15 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         navigationItem.title = viewModel.title
         
         rangeControlView.addTarget(self, action: #selector(rangeChanged), for: .valueChanged)
+        
+        view.backgroundColor = .systemGroupedBackground
+        
+        view.addSubview(activityIndicator)
+        activityIndicator.center = view.center
+        activityIndicator.autoresizingMask = [.flexibleTopMargin,
+                                              .flexibleBottomMargin,
+                                              .flexibleLeftMargin,
+                                              .flexibleRightMargin]
         
         let rangeContainer = UIView()
         rangeContainer.translatesAutoresizingMaskIntoConstraints = false
@@ -89,7 +104,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
 
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             rangeContainer.widthAnchor.constraint(equalTo: view.widthAnchor)
@@ -102,18 +117,6 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     
     override func viewWillAppear(_ animated: Bool) {
         rangeChanged(rangeControlView)
-    }
-    
-    func showActivityIndicator() {
-        if let tabController = self.tabBarController {
-            self.showSpinner(onView: tabController.view)
-        }
-        self.navigationController?.view.isUserInteractionEnabled = false
-    }
-    
-    func hideActivityIndicator() {
-        self.navigationController?.view.isUserInteractionEnabled = true
-        self.removeSpinner()
     }
     
     private func initBindings() {
@@ -133,9 +136,14 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
+        activityIndicator.startAnimating()
+        tableView.isHidden = true
         filterOff = true
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
-        viewModel.updateType()
+        viewModel.updateType {
+            self.activityIndicator.stopAnimating()
+            self.tableView.isHidden = false
+        }
     }
     
     deinit {
@@ -343,13 +351,24 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
 
 extension AnalyticsDetailViewController: StackedBarChartCellDelegate {
     func previousTouched(on cell: StackedBarChartCell) {
+        activityIndicator.startAnimating()
+        tableView.isHidden = true
         filterOff = true
-        viewModel.loadPreviousSegment()
+        viewModel.loadPreviousSegment {
+            self.activityIndicator.stopAnimating()
+            self.tableView.isHidden = false
+        }
     }
     
     func nextTouched(on cell: StackedBarChartCell) {
         filterOff = true
-        viewModel.loadNextSegment()
+        activityIndicator.startAnimating()
+        tableView.isHidden = true
+        filterOff = true
+        viewModel.loadNextSegment {
+            self.activityIndicator.stopAnimating()
+            self.tableView.isHidden = false
+        }
     }
 }
 

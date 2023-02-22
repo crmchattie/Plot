@@ -59,7 +59,6 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
-        print("load data for accounts")
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
