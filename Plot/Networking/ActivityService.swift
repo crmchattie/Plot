@@ -833,6 +833,7 @@ class ActivityService {
             guard let activityReminder = activity.reminder, let activityID = activity.activityID, let endDate = activity.endDate, endDate > today else {
                 continue
             }
+            
             let center = UNUserNotificationCenter.current()
             center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
             guard activityReminder != "None" else {
@@ -844,7 +845,7 @@ class ActivityService {
                 center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_\(endDate)_Reminder"])
                 continue
             }
-                        
+            
             if let startDate = activity.startDate, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
                 let content = UNMutableNotificationContent()
                 content.title = "\(String(describing: activity.name!)) Reminder"
@@ -852,6 +853,7 @@ class ActivityService {
                 var formattedDate: (String, String) = ("", "")
                 formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
                 content.subtitle = formattedDate.0
+                content.categoryIdentifier = Identifiers.eventCategory
                 if let reminder = EventAlert(rawValue: activityReminder) {
                     let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
                     var calendar = Calendar.current
@@ -874,9 +876,10 @@ class ActivityService {
                 var formattedDate: (Int, String, String) = (1, "", "")
                 formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: activity.hasDeadlineTime ?? false, startDate: activity.startDate, hasStartTime: activity.hasStartTime)
                 content.subtitle = formattedDate.2
+                content.categoryIdentifier = activity.isGoal ?? false ? Identifiers.goalCategory : Identifiers.taskCategory
                 if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
                     let calendar = Calendar.current
-                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate.UTCTime)
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
                     let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                                 repeats: false)
                     let identifier = "\(activityID)_\(endDate)_Reminder"
@@ -916,6 +919,7 @@ class ActivityService {
                 var formattedDate: (String, String) = ("", "")
                 formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: sub_activity.startTimeZone, endTimeZone: sub_activity.endTimeZone)
                 content.subtitle = formattedDate.0
+                content.categoryIdentifier = Identifiers.eventCategory
                 if let reminder = EventAlert(rawValue: reminder) {
                     let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
                     var calendar = Calendar.current
@@ -940,9 +944,10 @@ class ActivityService {
                 var formattedDate: (Int, String, String) = (1, "", "")
                 formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: sub_activity.hasDeadlineTime ?? false, startDate: sub_activity.startDate, hasStartTime: sub_activity.hasStartTime)
                 content.subtitle = formattedDate.2
+                content.categoryIdentifier = sub_activity.isGoal ?? false ? Identifiers.goalCategory : Identifiers.taskCategory
                 if let reminder = TaskAlert(rawValue: reminder), let reminderDate = reminder.timeInterval(endDate) {
                     let calendar = Calendar.current
-                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate.UTCTime)
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
                     let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                                 repeats: false)
                     let identifier = "\(sub_activity_ID)_\(endDate)_Reminder"

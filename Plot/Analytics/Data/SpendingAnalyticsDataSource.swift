@@ -114,13 +114,13 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
 
                 }
                 
-                var cumulativeSpend: Double = 0
+                var cumulative: Double = 0
                 let dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                     let current = startDate.addDays(index)
                     if let stat = stats.first(where: {$0.date == current}) {
-                        cumulativeSpend += stat.value
+                        cumulative += stat.value
                     }
-                    return ChartDataEntry(x: Double(index) + 1, y: cumulativeSpend, data: current)
+                    return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: current)
                 }
                 
                 DispatchQueue.main.async {
@@ -158,83 +158,3 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
 }
 
 private let dateFormatter = ISO8601DateFormatter()
-
-//bar chart with daily spend broken down into categories
-
-//transactions = networkController.financeService.transactions
-//    .filter { $0.should_link ?? true }
-//    .filter { $0.top_level_category != "Investments" && $0.category != "Investments" }
-//    .filter { $0.group != "Income" }
-//    .filter { transaction -> Bool in
-////                #warning("This is extremely unoptimal. A stored Date object should be saved inside the Transaction.")
-//        guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
-//        return range.startDate <= date && date <= range.endDate
-//    }
-//
-//var totalValue: Double = 0
-//var categoryValues: [[Double]] = []
-//var categoryColors: [UIColor] = []
-//var categories: [CategorySummaryViewModel] = []
-//
-//transactions.grouped(by: \.group).forEach { (category, transactions) in
-//    var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
-//    var sum: Double = 0
-//    transactions.forEach { transaction in
-//        guard let day = dateFormatter.date(from: transaction.transacted_at) else { return }
-//        let daysInBetween = day.daysSince(range.startDate)
-//        if transaction.type == .credit {
-//            totalValue -= transaction.amount
-//            values[daysInBetween] -= transaction.amount
-//            sum -= transaction.amount
-//        } else {
-//            totalValue += transaction.amount
-//            values[daysInBetween] += transaction.amount
-//            sum += transaction.amount
-//        }
-//    }
-//
-//    var categoryColor = UIColor()
-//    if let index = financialTransactionsGroupsStatic.firstIndex(where: {$0 == category} ) {
-//        categoryColor = ChartColors.palette()[index % 9]
-//    } else {
-//        categoryColor = topLevelCategoryColor(category)
-//    }
-//    categories.append(CategorySummaryViewModel(title: category,
-//                                               color: categoryColor,
-//                                               value: sum,
-//                                               formattedValue: self.currencyFormatter.string(from: NSNumber(value: sum))!))
-//    categoryColors.append(categoryColor)
-//    categoryValues.append(values)
-//}
-//
-//newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-//if totalValue > 0 {
-//    newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
-//} else {
-//    newChartViewModel.rangeAverageValue = "Saved \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
-//
-//}
-//let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
-//    let current = self.range.startDate.addDays(index)
-//    let yValues = categoryValues.map { $0[index] }
-//    return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
-//}
-//
-//if !transactions.isEmpty {
-//    dataExists = true
-//    let chartDataSet = BarChartDataSet(entries: dataEntries)
-//    chartDataSet.axisDependency = .right
-//    if !categoryColors.isEmpty {
-//        chartDataSet.colors = categoryColors
-//    }
-//    let chartData = BarChartData(dataSets: [chartDataSet])
-//    chartData.setDrawValues(false)
-//    newChartViewModel.chartData = chartData
-//} else {
-//    newChartViewModel.chartData = nil
-//    newChartViewModel.categories = []
-//    newChartViewModel.rangeAverageValue = "-"
-//}
-//
-//chartViewModel.send(newChartViewModel)
-//completion?()

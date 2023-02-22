@@ -25,7 +25,6 @@ enum Identifiers {
     static let calendarCategory = "CALENDAR_CATEGORY"
     
 //    static let viewEventsAction = "VIEW_EVENTS_IDENTIFIER"
-//
 //    static let viewChatsAction = "VIEW_CHAT_IDENTIFIER"
 //    static let viewListsAction = "VIEW_LISTS_IDENTIFIER"
 //    static let replyAction = "REPLY_ACTION"
@@ -137,26 +136,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let calendarCategory = UNNotificationCategory(
                 identifier: Identifiers.calendarCategory, actions: [],
                 intentIdentifiers: [], options: [])
-            
-//            let chatCategory = UNNotificationCategory(
-//                identifier: Identifiers.chatCategory, actions: [],
-//                intentIdentifiers: [], options: [])
-//
-//            let checklistCategory = UNNotificationCategory(
-//                identifier: Identifiers.checklistCategory, actions: [],
-//                intentIdentifiers: [], options: [])
-//
-//            let grocerylistCategory = UNNotificationCategory(
-//                identifier: Identifiers.grocerylistCategory, actions: [],
-//                intentIdentifiers: [], options: [])
-//
-//            let activitylistCategory = UNNotificationCategory(
-//                identifier: Identifiers.activitylistCategory, actions: [],
-//                intentIdentifiers: [], options: [])
-//
-//            let mealCategory = UNNotificationCategory(
-//                identifier: Identifiers.mealCategory, actions: [],
-//                intentIdentifiers: [], options: [])
             
             
             // 3

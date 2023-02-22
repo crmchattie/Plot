@@ -1925,6 +1925,8 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             return 0
         case .At_time_of_event:
             return 0
+        case .Five_Minutes:
+            return -300
         case .Fifteen_Minutes:
             return -900
         case .Half_Hour:
@@ -1939,8 +1941,6 @@ enum EventAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             return -172800
         case .One_Week:
             return -604800
-        default:
-            return 0
         }
     }
 }

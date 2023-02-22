@@ -198,6 +198,9 @@ extension NetworkController {
                         let difference = transactionAccounts.symmetricDifference(Set(filterAccounts))
                         let accts = self.financeService.accounts.filter({ difference.contains($0.guid) && $0.balance > 0 })
                         finalStat.value = accts.map({$0.balance}).reduce(0, +) * -1
+                        if finalStat.value <= 0, let transaction = transactions.first {
+                            finalStat.date = ISO8601DateFormatter().date(from: transaction.transacted_at) ?? Date()
+                        }
                         completion(finalStat)
                     } else {
                         completion(nil)

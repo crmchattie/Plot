@@ -38,12 +38,25 @@ public class XYMarkerView: BalloonMarker {
             let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + "\n"
                 + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
             setLabel(string)
+        } else if units == "timeShift" {
+            dateFormatter.unitsStyle = .abbreviated
+            dateFormatter.allowedUnits = [.hour, .minute]
+            let totalString = dateFormatter.string(from: entry.y) ?? "NaN"
+            let string = totalString + "\n"
+                + xAxisValueFormatter.stringForMarker(entry.x - 1, axis: XAxis())
+            setLabel(string)
         } else if units == "time" {
             dateFormatter.unitsStyle = .abbreviated
             dateFormatter.allowedUnits = [.hour, .minute]
             let totalString = dateFormatter.string(from: entry.y) ?? "NaN"
             let string = totalString + "\n"
                 + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
+            setLabel(string)
+        } else if units.contains("shifted_") {
+            yFormatter.numberStyle = .decimal
+            let startIndex = units.index(units.startIndex, offsetBy: 8)
+            let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + " \(units[startIndex...])\n"
+                + xAxisValueFormatter.stringForMarker(entry.x - 1, axis: XAxis())
             setLabel(string)
         } else {
             yFormatter.numberStyle = .decimal
