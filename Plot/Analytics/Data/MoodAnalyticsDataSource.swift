@@ -72,17 +72,15 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
                         
             self.dataExists = true
             
-            DispatchQueue.global(qos: .background).async {
+            DispatchQueue.global(qos: .userInteractive).async {
                 var categories: [CategorySummaryViewModel] = []
                 var count = 0
-                var totalValue: Double = 0
                 var maxValue = Double()
                 
                 let keys = categoryStats.keys.sorted(by: <)
                 for index in 0...keys.count - 1 {
                     guard let stats = categoryStats[keys[index]] else { continue }
                     let total = stats.reduce(0, { $0 + $1.value })
-                    totalValue += total
                     var totalString = String()
                     if total == 1 {
                         totalString = "1 mood"
@@ -90,14 +88,14 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
                         totalString = "\(Int(total)) moods"
                     }
                     
-                    var categoryColor = UIColor()
-                    if let activityCategory = ActivityCategory(rawValue: keys[index]) {
-                        categoryColor = activityCategory.color
+                    var color = UIColor()
+                    if let moodType = MoodType(rawValue: keys[index]) {
+                        color = moodType.color
                     } else {
-                        categoryColor = ActivityCategory.uncategorized.color
+                        color = ChartColors.palette()[6]
                     }
                     categories.append(CategorySummaryViewModel(title: keys[index],
-                                                               color: categoryColor,
+                                                               color: color,
                                                                value: total,
                                                                formattedValue: totalString))
                     count += stats.count
@@ -114,10 +112,12 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
                 }
                 
                 newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-                if totalValue == 0 {
-                    newChartViewModel.rangeAverageValue = "No tasks"
+                if moodList.count == 0 {
+                    newChartViewModel.rangeAverageValue = "No moods"
+                } else if moodList.count == 1 {
+                    newChartViewModel.rangeAverageValue = "1 mood"
                 } else {
-                    newChartViewModel.rangeAverageValue = "\(Int(totalValue)) tasks"
+                    newChartViewModel.rangeAverageValue = "\(moodList.count) moods"
                     newChartViewModel.maxValue = maxValue + 1
                 }
                 

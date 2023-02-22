@@ -84,17 +84,17 @@ enum ActivityCategory: String, Codable, CaseIterable {
     
     var color: UIColor {
         switch self {
-        case .health: return ChartColors.palette()[1]
+        case .health: return ChartColors.palette()[0]
         case .meal: return ChartColors.palette()[2]
         case .work: return ChartColors.palette()[3]
-        case .school: return ChartColors.palette()[4]
-        case .social: return ChartColors.palette()[5]
+        case .school: return ChartColors.palette()[3]
+        case .social: return ChartColors.palette()[4]
         case .leisure: return ChartColors.palette()[6]
         case .family: return ChartColors.palette()[7]
         case .personal: return ChartColors.palette()[8]
         case .todo: return ChartColors.palette()[1]
         case .finances: return ChartColors.palette()[5]
-        case .uncategorized: return ChartColors.palette()[0]
+        case .uncategorized: return ChartColors.palette()[1]
         case .notApplicable: return ChartColors.palette()[1]
         }
     }

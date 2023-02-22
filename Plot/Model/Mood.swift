@@ -59,31 +59,46 @@ struct UserMood: Codable, Equatable, Hashable {
 
 enum MoodType: String, CaseIterable, Codable {
     case content = "Content"
-    case energized = "Energized"
+    case excited = "Excited"
     case frustrated = "Frustrated"
     case happy = "Happy"
-    case lazy = "Lazy"
-    case optimistic = "Optimistic"
-    case proud = "Proud"
+//    case lazy = "Lazy"
+//    case optimistic = "Optimistic"
+//    case proud = "Proud"
     case sad = "Sad"
     case stressed = "Stressed"
-    case tired = "Tired"
+//    case tired = "Tired"
     
     var image: String {
         switch self {
         case .happy: return "faceHappy" //smiling
         case .sad: return "faceSad" //crying
-        case .tired: return "faceTired" //tired
+//        case .tired: return "faceTired" //tired
         case .stressed: return "faceStressed" //anxious
-        case .proud: return "faceProud" //smirking
-        case .optimistic: return "faceOptimistic"  //smiling with sunglasses
-        case .energized: return "faceEnergized" //grinning
-        case .lazy: return "faceLazy" //slightly frowning
+//        case .proud: return "faceProud" //smirking
+//        case .optimistic: return "faceOptimistic"  //smiling with sunglasses
+        case .excited: return "faceEnergized" //grinning
+//        case .lazy: return "faceLazy" //slightly frowning
         case .content: return "faceContent" //slightly smiling
         case .frustrated: return "faceFrustrated" //steam
         }
     }
     
+    var color: UIColor {
+        switch self {
+        case .happy: return ChartColors.palette()[0]
+        case .sad: return ChartColors.palette()[5]
+//        case .tired: return ChartColors.palette()[3]
+        case .stressed: return ChartColors.palette()[2]
+//        case .proud: return ChartColors.palette()[5]
+//        case .optimistic: return ChartColors.palette()[6]
+        case .excited: return ChartColors.palette()[7]
+//        case .lazy: return ChartColors.palette()[8]
+        case .content: return ChartColors.palette()[8]
+        case .frustrated: return ChartColors.palette()[4]
+        }
+    }
+        
     static var allValues: [String] {
         var array = [String]()
         MoodType.allCases.forEach { category in
@@ -118,7 +133,6 @@ func categorizeMoods(moods: [Mood], start: Date, end: Date, completion: @escapin
             }
         }
     }
-                
     completion(categoryDict, moodsList)
 }
 

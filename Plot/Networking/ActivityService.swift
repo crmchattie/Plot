@@ -876,7 +876,7 @@ class ActivityService {
                 content.subtitle = formattedDate.2
                 if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
                     let calendar = Calendar.current
-                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate.UTCTime)
                     let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                                 repeats: false)
                     let identifier = "\(activityID)_\(endDate)_Reminder"
@@ -942,7 +942,7 @@ class ActivityService {
                 content.subtitle = formattedDate.2
                 if let reminder = TaskAlert(rawValue: reminder), let reminderDate = reminder.timeInterval(endDate) {
                     let calendar = Calendar.current
-                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate.UTCTime)
                     let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                                 repeats: false)
                     let identifier = "\(sub_activity_ID)_\(endDate)_Reminder"

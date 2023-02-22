@@ -561,7 +561,7 @@
 		F926576F2607440A00593FE1 /* Collection+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F926576E2607440A00593FE1 /* Collection+Utility.swift */; };
 		F932E05B261CE1FB007E4336 /* UIViewController+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */; };
 		F94B7C8C25FFE3DB00FE7E2E /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */; };
-		F94EDC4D260667A000B97FF6 /* TransactionAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */; };
+		F94EDC4D260667A000B97FF6 /* SpendingAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94EDC4C260667A000B97FF6 /* SpendingAnalyticsDataSource.swift */; };
 		F95D8EF4261B8C2F006DED56 /* Charts+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */; };
 		F9773A5A2601339A00D1B204 /* EventAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A592601339A00D1B204 /* EventAnalyticsDataSource.swift */; };
 		F9773A862601453500D1B204 /* HourAxisValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */; };
@@ -1165,7 +1165,7 @@
 		F926576E2607440A00593FE1 /* Collection+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Utility.swift"; sourceTree = "<group>"; };
 		F932E05A261CE1FB007E4336 /* UIViewController+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Navigation.swift"; sourceTree = "<group>"; };
 		F94B7C8B25FFE3DB00FE7E2E /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
-		F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		F94EDC4C260667A000B97FF6 /* SpendingAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F95D8EF3261B8C2F006DED56 /* Charts+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Charts+Style.swift"; sourceTree = "<group>"; };
 		F9773A592601339A00D1B204 /* EventAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		F9773A852601453500D1B204 /* HourAxisValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourAxisValueFormatter.swift; sourceTree = "<group>"; };
@@ -2952,7 +2952,7 @@
 				10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */,
 				F983298B2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift */,
 				1093D2C129A54B16003D77C5 /* MoodAnalyticsDataSource.swift */,
-				F94EDC4C260667A000B97FF6 /* TransactionAnalyticsDataSource.swift */,
+				F94EDC4C260667A000B97FF6 /* SpendingAnalyticsDataSource.swift */,
 				F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */,
 				F916C767260E793F0062F952 /* DateRangeFormatter.swift */,
 			);
@@ -3272,7 +3272,7 @@
 				4B4F45431F32246000A6FF96 /* GeneralTabBarController.swift in Sources */,
 				10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */,
 				4BAEE46E21272B380045AB10 /* Biometrics.swift in Sources */,
-				F94EDC4D260667A000B97FF6 /* TransactionAnalyticsDataSource.swift in Sources */,
+				F94EDC4D260667A000B97FF6 /* SpendingAnalyticsDataSource.swift in Sources */,
 				F916C8DA2610C3090062F952 /* Sequence+Utility.swift in Sources */,
 				4BAEE4F221272D890045AB10 /* SelectChatTableViewController.swift in Sources */,
 				10FBC8B724BFE58F00D0E6B5 /* Activitylist.swift in Sources */,

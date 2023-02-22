@@ -13,6 +13,8 @@ protocol FinanceDetailServiceInterface {
     
     func getSamples(for range: DateRange, segment: TimeSegmentType, accountDetails: AccountDetails?, transactionDetails: TransactionDetails?, accounts: [MXAccount]?, transactions: [Transaction]?, completion: @escaping ([Statistic]?, [MXAccount]?, [Transaction]?, Error?) -> Void)
     
+    func getSamples(financialType: FinancialType, segmentType: TimeSegmentType, range: DateRange?, accounts: [MXAccount]?, accountLevel: AccountCatLevel?, transactions: [Transaction]?, transactionLevel: TransactionCatLevel?, filterAccounts: [String]?, completion: @escaping ([AccountDetails: [Statistic]]?, [AccountDetails: [MXAccount]]?, [MXAccount]?, [TransactionDetails: [Statistic]]?, [TransactionDetails: [Transaction]]?, [Transaction]?, Error?) -> Void)
+    
     func getSamples(for range: DateRange, accountDetails: [AccountDetails]?, transactionDetails: [TransactionDetails]?, accounts: [MXAccount]?, transactions: [Transaction]?, filterAccounts: [String]?, ignore_plot_created: Bool?, ignore_transfer_between_accounts: Bool?, completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void)
 }
 
@@ -37,6 +39,18 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                               accounts: accounts,
                               transactions: transactions,
                               filterAccounts: nil,
+                              completion: completion)
+    }
+    
+    func getSamples(financialType: FinancialType, segmentType: TimeSegmentType, range: DateRange?, accounts: [MXAccount]?, accountLevel: AccountCatLevel?, transactions: [Transaction]?, transactionLevel: TransactionCatLevel?, filterAccounts: [String]?, completion: @escaping ([AccountDetails: [Statistic]]?, [AccountDetails: [MXAccount]]?, [MXAccount]?, [TransactionDetails: [Statistic]]?, [TransactionDetails: [Transaction]]?, [Transaction]?, Error?) -> Void) {
+        getStatisticalSamplesWCategories(financialType: financialType,
+                              segmentType: segmentType,
+                              range: range,
+                              accounts: accounts,
+                              accountLevel: accountLevel,
+                              transactions: transactions,
+                              transactionLevel: transactionLevel,
+                              filterAccounts: filterAccounts,
                               completion: completion)
     }
     
@@ -115,6 +129,61 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         }
     }
     
+    private func getStatisticalSamplesWCategories(
+        financialType: FinancialType,
+        segmentType: TimeSegmentType,
+        range: DateRange?,
+        accounts: [MXAccount]?,
+        accountLevel: AccountCatLevel?,
+        transactions: [Transaction]?,
+        transactionLevel: TransactionCatLevel?,
+        filterAccounts: [String]?,
+        completion: @escaping ([AccountDetails: [Statistic]]?, [AccountDetails: [MXAccount]]?, [MXAccount]?, [TransactionDetails: [Statistic]]?, [TransactionDetails: [Transaction]]?, [Transaction]?, Error?) -> Void) {
+        let anchorDate = Date()
+        var startDate = anchorDate
+        var endDate = anchorDate
+
+        if let range = range {
+            startDate = range.startDate.startOfDay.dayBefore
+            endDate = range.endDate
+        } else if segmentType == .day {
+            startDate = Date().localTime.startOfDay
+            endDate = Date().localTime.dayAfter
+        } else if segmentType == .week {
+            startDate = Date().localTime.startOfWeek
+            endDate = Date().localTime.dayAfter
+        } else if segmentType == .month {
+            startDate = Date().localTime.startOfMonth
+            endDate = Date().localTime.dayAfter
+        } else if segmentType == .year {
+            startDate = Date().localTime.startOfYear
+            endDate = Date().localTime.dayAfter
+        }
+        
+        DispatchQueue.global(qos: .background).async {
+            if financialType == .accounts, let accounts = accounts {
+                categorizeAccounts(accounts: accounts, timeSegment: segmentType, level: accountLevel, date: endDate) { accountDetails, accountDetailsDict in
+                    let accountValues = Array(Set(accountDetailsDict.values.flatMap({ $0 })))
+                    accountDetailsOverTimeChartData(accounts: accountValues, accountDetails: accountDetails, start: startDate, end: endDate, segmentType: segmentType) { (statisticDict, accountDict) in
+                        DispatchQueue.main.async {
+                            completion(statisticDict, accountDict, accountValues, nil, nil, nil, nil)
+                        }
+                        
+                    }
+                }
+            } else if financialType == .transactions, let transactions = transactions {
+                categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: filterAccounts) { transactionsDetails, transactionsDetailsDict in
+                    let transactionValues = Array(Set(transactionsDetailsDict.values.flatMap({ $0 })))
+                    transactionDetailsOverTimeChartData(transactions: transactionValues, transactionDetails: transactionsDetails, start: startDate, end: endDate, segmentType: segmentType, accounts: filterAccounts) { (statisticDict, transactionDict) in
+                        DispatchQueue.main.async {
+                            completion(nil, nil, nil, statisticDict, transactionDict, transactionValues, nil)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private func getStatisticalSamples(
         accountDetails: [AccountDetails]?,
         transactionDetails: [TransactionDetails]?,
@@ -164,4 +233,8 @@ struct Statistic {
     var date: Date
     var value: Double
     var xValue: Int?
+}
+
+enum FinancialType {
+    case transactions, accounts
 }

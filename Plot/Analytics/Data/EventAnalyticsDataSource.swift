@@ -73,31 +73,38 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                         
             self.dataExists = true
             
-            DispatchQueue.global(qos: .background).async {
+            DispatchQueue.global(qos: .userInteractive).async {
                 var categories: [CategorySummaryViewModel] = []
-                var activityCount = 0
+                var count = 0
                 
-                let activityKeys = categoryStats.keys.sorted(by: <)
-                for index in 0...activityKeys.count - 1 {
-                    guard let stats = categoryStats[activityKeys[index]] else { continue }
+                let keys = categoryStats.keys.sorted(by: <)
+                for index in 0...keys.count - 1 {
+                    guard let stats = categoryStats[keys[index]] else { continue }
                     let total = stats.reduce(0, { $0 + $1.value * 60 })
                     let totalString = self.dateFormatter.string(from: total) ?? "NaN"
                     
                     var categoryColor = UIColor()
-                    if let activityCategory = ActivityCategory(rawValue: activityKeys[index]) {
+                    if let activityCategory = ActivityCategory(rawValue: keys[index]) {
                         categoryColor = activityCategory.color
                     } else {
                         categoryColor = ActivityCategory.uncategorized.color
                     }
-                    categories.append(CategorySummaryViewModel(title: activityKeys[index],
+                    categories.append(CategorySummaryViewModel(title: keys[index],
                                                                color: categoryColor,
                                                                value: total,
                                                                formattedValue: totalString))
-                    activityCount += stats.count
+                    count += stats.count
                 }
                 categories.sort(by: { $0.value > $1.value })
+                
                 newChartViewModel.categories = Array(categories.prefix(3))
-                newChartViewModel.rangeAverageValue = "\(activityList.count) events"
+                if activityList.count == 0 {
+                    newChartViewModel.rangeAverageValue = "No events"
+                } else if activityList.count == 1 {
+                    newChartViewModel.rangeAverageValue = "1 event"
+                } else {
+                    newChartViewModel.rangeAverageValue = "\(Int(activityList.count)) events"
+                }
                 
                 let daysInRange = self.range.daysInRange
                 let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in

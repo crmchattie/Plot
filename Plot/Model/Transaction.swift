@@ -285,8 +285,7 @@ func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date
     // create dateFormatter with UTC time format
     let isodateFormatter = ISO8601DateFormatter()
     for transaction in transactions {
-        guard transaction.should_link ?? true && !(transaction.plot_created ?? false) && !(transaction.transfer_between_accounts ?? false) else { continue }
-        guard transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
+        guard transaction.should_link ?? true && !(transaction.plot_created ?? false) && !(transaction.transfer_between_accounts ?? false) && transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }
         if accounts != nil {
             guard accounts!.contains(transaction.account_guid ?? "") else { continue }
         }

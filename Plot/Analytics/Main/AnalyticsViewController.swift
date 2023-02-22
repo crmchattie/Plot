@@ -95,34 +95,51 @@ class AnalyticsViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(moodsUpdated), name: .moodsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(workoutsUpdated), name: .workoutsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(mindfulnessUpdated), name: .mindfulnessUpdated, object: nil)
     }
     
     @objc fileprivate func goalsUpdated() {
-        viewModel?.loadData {
+        viewModel?.goalsUpdate {
             self.tableView.reloadData()
         }
     }
     
     @objc fileprivate func tasksUpdated() {
-        viewModel?.loadData {
+        viewModel?.tasksUpdate {
             self.tableView.reloadData()
         }
     }
     
     @objc fileprivate func eventsUpdated() {
-        viewModel?.loadData {
+        viewModel?.eventsUpdate {
             self.tableView.reloadData()
         }
     }
     
     @objc fileprivate func healthUpdated() {
-        viewModel?.loadData {
+        viewModel?.healthUpdate {
             self.tableView.reloadData()
         }
     }
     
+    @objc fileprivate func moodsUpdated() {
+        viewModel?.moodUpdate {
+            self.tableView.reloadData()
+        }
+    }
+    
+    @objc fileprivate func workoutsUpdated() {
+        
+    }
+    
+    @objc fileprivate func mindfulnessUpdated() {
+        
+    }
+    
     @objc fileprivate func financeUpdated() {
-        viewModel?.loadData {
+        viewModel?.financeUpdate {
             self.tableView.reloadData()
         }
     }
@@ -181,7 +198,7 @@ extension AnalyticsViewController {
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier:
                                                                 headerCellID) as? TableViewHeader ?? TableViewHeader()
-        header.titleLabel.text = viewModel!.sections[section].title.capitalized
+        header.titleLabel.text = viewModel!.sections[section].title.rawValue
         header.subTitleLabel.isHidden = true
         return header
 

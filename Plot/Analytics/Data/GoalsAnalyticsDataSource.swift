@@ -15,7 +15,7 @@ private func getTitle(range: DateRange) -> String {
         .format(range: range)
 }
 
-class GoalAnalyticsDataSource: AnalyticsDataSource {
+class GoalAnalyticsDataSource: AnalyticsDataSource {    
     func updateRange(_ newRange: DateRange) {
         
     }
@@ -58,90 +58,80 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
-        
-        let daysInRange = range.daysInRange
-        
-        goals = networkController.activityService.goals
-            .filter { $0.isCompleted ?? false }
-            .filter { task -> Bool in
-                guard let date = task.completedDateDate else { return false }
-                return range.startDate <= date && date <= range.endDate
-            }
-        
-        var totalValue: Double = 0
-        var categoryValues: [[Double]] = []
-        var categoryColors: [UIColor] = []
-        var categories: [CategorySummaryViewModel] = []
-        
-        goals.grouped(by: \.category).forEach { (uncertainCategory, goals) in
-            let category = uncertainCategory ?? "Uncategorized"
-            var values: [Double] = Array(repeating: 0, count: daysInRange + 1)
-            var sum: Double = 0
-            goals.forEach { goal in
-                guard let day = goal.completedDateDate else { return }
-                let daysInBetween = day.daysSince(range.startDate)
-                totalValue += 1
-                values[daysInBetween] += 1
-                sum += 1
+        activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { categoryStats, goalList in
+                        
+            guard !categoryStats.isEmpty else {
+                newChartViewModel.chartData = nil
+                newChartViewModel.categories = []
+                newChartViewModel.rangeAverageValue = "-"
+                self.chartViewModel.send(newChartViewModel)
+                completion?()
+                return
             }
             
-            var categoryColor = UIColor()
-            if let activityCategory = ActivityCategory(rawValue: category) {
-                categoryColor = activityCategory.color
-            } else {
-                categoryColor = ActivityCategory.uncategorized.color
-            }
+            self.goals = goalList
+                        
+            self.dataExists = true
             
-            var totalString = String()
-            if sum == 1 {
-                totalString = "1 goal"
-            } else {
-                totalString = "\(Int(sum)) goals"
-            }
-            
-            categories.append(CategorySummaryViewModel(title: category,
-                                                       color: categoryColor,
-                                                       value: sum,
-                                                       formattedValue: totalString))
-            categoryColors.append(categoryColor)
-            categoryValues.append(values)
-        }
+            DispatchQueue.global(qos: .userInteractive).async {
+                var categories: [CategorySummaryViewModel] = []
+                var activityCount = 0
                 
-        var maxValue = Double()
-        let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
-            let current = self.range.startDate.addDays(index)
-            let yValues = categoryValues.map { $0[index] }
-            maxValue = max(maxValue, yValues.reduce(0, +))
-            return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
-        }
-        
-        newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
-        if totalValue == 0 {
-            newChartViewModel.rangeAverageValue = "No goals"
-        } else {
-            newChartViewModel.rangeAverageValue = "\(Int(totalValue)) goals"
-            newChartViewModel.maxValue = maxValue + 1
-        }
+                let keys = categoryStats.keys.sorted(by: <)
+                for index in 0...keys.count - 1 {
+                    guard let stats = categoryStats[keys[index]] else { continue }
+                    let total = stats.reduce(0, { $0 + $1.value })
+                    var totalString = String()
+                    if total == 1 {
+                        totalString = "1 goal"
+                    } else {
+                        totalString = "\(Int(total)) goals"
+                    }
+                    
+                    var categoryColor = UIColor()
+                    if let activityCategory = ActivityCategory(rawValue: keys[index]) {
+                        categoryColor = activityCategory.color
+                    } else {
+                        categoryColor = ActivityCategory.uncategorized.color
+                    }
+                    categories.append(CategorySummaryViewModel(title: keys[index],
+                                                               color: categoryColor,
+                                                               value: total,
+                                                               formattedValue: totalString))
+                    activityCount += stats.count
+                }
+                categories.sort(by: { $0.value > $1.value })
                 
-        if !goals.isEmpty {
-            dataExists = true
-            let chartDataSet = BarChartDataSet(entries: dataEntries)
-            chartDataSet.axisDependency = .right
-            if !categoryColors.isEmpty {
-                chartDataSet.colors = categoryColors
+                newChartViewModel.categories = Array(categories.prefix(3))
+                if goalList.count == 0 {
+                    newChartViewModel.rangeAverageValue = "No goals"
+                } else if goalList.count == 1 {
+                    newChartViewModel.rangeAverageValue = "1 goal"
+                } else {
+                    newChartViewModel.rangeAverageValue = "\(Int(goalList.count)) goals"
+                }
+                
+                let daysInRange = self.range.daysInRange
+                let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
+                    let current = self.range.startDate.addDays(index)
+                    let yValues = categories.map {
+                        (categoryStats[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value })
+                    }
+                    return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
+                }
+                
+                DispatchQueue.main.async {
+                    let chartDataSet = BarChartDataSet(entries: dataEntries)
+                    chartDataSet.axisDependency = .right
+                    chartDataSet.colors = categories.map { $0.color }
+                    let chartData = BarChartData(dataSets: [chartDataSet])
+                    chartData.setDrawValues(false)
+                    newChartViewModel.chartData = chartData
+                    self.chartViewModel.send(newChartViewModel)
+                    completion?()
+                }
             }
-            let chartData = BarChartData(dataSets: [chartDataSet])
-            chartData.setDrawValues(false)
-            newChartViewModel.chartData = chartData
-        } else {
-            newChartViewModel.chartData = nil
-            newChartViewModel.categories = []
-            newChartViewModel.rangeAverageValue = "-"
         }
-        
-        chartViewModel.send(newChartViewModel)
-        completion?()
-        
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {

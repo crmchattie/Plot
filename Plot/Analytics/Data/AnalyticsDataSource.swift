@@ -13,7 +13,7 @@ import HealthKit
 
 protocol AnalyticsDataSource: AnyObject {    
     var title: String { get }
-    
+    var dataExists: Bool? { get set }
     var range: DateRange { get set }
     func updateRange(_ newRange: DateRange)
     
