@@ -12,7 +12,7 @@ import Combine
 import HealthKit
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Daily average", currentMonth: "Monthly average", currentYear: "Yearly average")
+    DateRangeFormatter(currentWeek: "Over the last week", currentMonth: "Over the last month", currentYear: "Over the last year")
         .format(range: range)
 }
 
@@ -64,6 +64,7 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
                 newChartViewModel.categories = []
                 newChartViewModel.rangeAverageValue = "-"
                 self.chartViewModel.send(newChartViewModel)
+                self.moods = []
                 completion?()
                 return
             }

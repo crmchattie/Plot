@@ -69,6 +69,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
             guard let accountDetailsStats = accountDetailsStats, let accountValues = accountValues, let netWorthDetails = accountDetailsStats.keys.first(where: {$0.name == "Net Worth"}), let stats = accountDetailsStats[netWorthDetails] else {
                 newChartViewModel.chartData = nil
                 self.chartViewModel.send(newChartViewModel)
+                self.accounts = []
                 completion?()
                 return
             }
@@ -87,7 +88,12 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
                 }
                 
                 if let firstValue = firstValue, let lastValue = lastValue {
-                    newChartViewModel.rangeAverageValue = self.currencyFormatter.string(from: NSNumber(value: lastValue - firstValue))!
+                    let finalValue = lastValue - firstValue
+                    if finalValue > 0 {
+                        newChartViewModel.rangeAverageValue = "+" + self.currencyFormatter.string(from: NSNumber(value: finalValue))!
+                    } else {
+                        newChartViewModel.rangeAverageValue = self.currencyFormatter.string(from: NSNumber(value: finalValue))!
+                    }
                 } else {
                     newChartViewModel.rangeAverageValue = "-"
                 }

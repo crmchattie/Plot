@@ -103,6 +103,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
             newChartViewModel.categories = []
             newChartViewModel.rangeAverageValue = "-"
             self.chartViewModel.send(newChartViewModel)
+            self.samples = []
             completion?()
         }
     }

@@ -65,6 +65,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                 newChartViewModel.categories = []
                 newChartViewModel.rangeAverageValue = "-"
                 self.chartViewModel.send(newChartViewModel)
+                self.activities = []
                 completion?()
                 return
             }

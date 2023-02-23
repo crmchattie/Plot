@@ -43,14 +43,26 @@ struct DateRange {
     
     private(set) var startDate: Date
     private(set) var endDate: Date
+    //for saving prior start and end dates when filter is on
     private(set) var priorStartDate: Date?
     private(set) var priorEndDate: Date?
+    //for grabbing last period start and end date for comparison
+    private(set) var pastStartDate: Date?
+    private(set) var pastEndDate: Date?
     
     var filterOff: Bool = true
     
     init(type: DateRangeType) {
         self.type = type
         (startDate, endDate) = type.initial
+        switch type {
+        case .week:
+            pastStartDate = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
+            pastEndDate = Calendar.current.date(byAdding: .day, value: -7, to: endDate)!
+        case .month:
+            pastStartDate = Calendar.current.date(byAdding: .month, value: -1, to: startDate)!
+            pastEndDate = Calendar.current.date(byAdding: .month, value: -1, to: endDate)!
+        }
     }
     
     init(startDate: Date, endDate: Date) {
@@ -64,6 +76,8 @@ struct DateRange {
             endDate = priorEndDate
             filterOff = true
         }
+        pastStartDate = startDate
+        pastEndDate = endDate
         switch type {
         case .week:
             startDate = Calendar.current.date(byAdding: .day, value: 7, to: startDate)!
@@ -89,9 +103,13 @@ struct DateRange {
         case .week:
             startDate = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
             endDate = Calendar.current.date(byAdding: .day, value: -7, to: endDate)!
+            pastStartDate = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
+            pastEndDate = Calendar.current.date(byAdding: .day, value: -7, to: endDate)!
         case .month:
             startDate = Calendar.current.date(byAdding: .month, value: -1, to: startDate)!
             endDate = Calendar.current.date(byAdding: .month, value: -1, to: endDate)!
+            pastStartDate = Calendar.current.date(byAdding: .month, value: -1, to: startDate)!
+            pastEndDate = Calendar.current.date(byAdding: .month, value: -1, to: endDate)!
 //        case .year:
 //            startDate = Calendar.current.date(byAdding: .year, value: -1, to: startDate)!
 //            endDate = Calendar.current.date(byAdding: .year, value: -1, to: endDate)!
@@ -113,6 +131,24 @@ struct DateRange {
             startDate = priorStartDate
             endDate = priorEndDate
             filterOff = true
+        }
+    }
+    
+    func previousDatesForComparison() -> DateRange? {
+        switch type {
+        case .week:
+            let startDate = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
+            let endDate = Calendar.current.date(byAdding: .day, value: -7, to: endDate)!
+            return DateRange(startDate: startDate, endDate: endDate)
+        case .month:
+            let startDate = Calendar.current.date(byAdding: .month, value: -1, to: startDate)!
+            let endDate = Calendar.current.date(byAdding: .month, value: -1, to: endDate)!
+            return DateRange(startDate: startDate, endDate: endDate)
+//        case .year:
+//            startDate = Calendar.current.date(byAdding: .year, value: -1, to: startDate)!
+//            endDate = Calendar.current.date(byAdding: .year, value: -1, to: endDate)!
+        case .none:
+            return nil
         }
     }
     

@@ -65,6 +65,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                 newChartViewModel.categories = []
                 newChartViewModel.rangeAverageValue = "-"
                 self.chartViewModel.send(newChartViewModel)
+                self.tasks = []
                 completion?()
                 return
             }
@@ -104,11 +105,11 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                 
                 newChartViewModel.categories = Array(categories.prefix(3))
                 if taskList.count == 0 {
-                    newChartViewModel.rangeAverageValue = "No tasks"
+                    newChartViewModel.rangeAverageValue = "No completed tasks"
                 } else if taskList.count == 1 {
-                    newChartViewModel.rangeAverageValue = "1 task"
+                    newChartViewModel.rangeAverageValue = "1 completed task"
                 } else {
-                    newChartViewModel.rangeAverageValue = "\(Int(taskList.count)) tasks"
+                    newChartViewModel.rangeAverageValue = "\(Int(taskList.count)) completed tasks"
                 }
                 
                 let daysInRange = self.range.daysInRange
