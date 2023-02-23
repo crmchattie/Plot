@@ -562,7 +562,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 }
             } else if section.type == "Accounts" {
                 if section.subType == "Balances" {
-                    categorizeAccounts(accounts: accounts, timeSegment: .month, level: accountLevel, date: nil) { (accountsList, accountsDict) in
+                    categorizeAccounts(accounts: accounts, timeSegment: .month, level: accountLevel, accountDetails: nil, date: nil) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
                             sections.append(section)
                             groups[section] = accountsList
@@ -572,10 +572,10 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Cash Flow" {
-                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.dayAfter, level: transactionLevel, accounts: nil) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.dayAfter, level: transactionLevel, transactionDetails: nil, accounts: nil) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             let finalCurrentTransactionList = transactionsList.filter({ $0.name == "Income" || $0.name == "Expense" || $0.name == "Net Spending" || $0.name == "Net Savings"})
-                            categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.dayAfter.monthBefore, level: .group, accounts: nil) { (transactionsListPrior, _) in
+                            categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.dayAfter.monthBefore, level: .group, transactionDetails: nil, accounts: nil) { (transactionsListPrior, _) in
                                 if !transactionsListPrior.isEmpty {
                                     addPriorTransactionDetails(currentDetailsList: finalCurrentTransactionList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
                                         sections.append(section)

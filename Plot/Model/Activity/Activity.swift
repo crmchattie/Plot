@@ -1872,16 +1872,6 @@ func categorizeActivities(activities: [Activity], isEvent: Bool, start: Date, en
                     categoryDict[type] = double! + duration
                     activitiesList.append(activity)
                 }
-            } else {
-                let type = "No Category"
-                if categoryDict[type] == nil {
-                    categoryDict[type] = duration
-                    activitiesList.append(activity)
-                } else {
-                    let double = categoryDict[type]
-                    categoryDict[type] = double! + duration
-                    activitiesList.append(activity)
-                }
             }
         }
     } else {
@@ -1890,15 +1880,6 @@ func categorizeActivities(activities: [Activity], isEvent: Bool, start: Date, en
             
             if let type = activity.category {
                 guard type != "Not Applicable" else { continue }
-                if categoryDict[type] == nil {
-                    categoryDict[type] = 1
-                    activitiesList.append(activity)
-                } else {
-                    categoryDict[type]! += 1
-                    activitiesList.append(activity)
-                }
-            } else {
-                let type = "No Category"
                 if categoryDict[type] == nil {
                     categoryDict[type] = 1
                     activitiesList.append(activity)

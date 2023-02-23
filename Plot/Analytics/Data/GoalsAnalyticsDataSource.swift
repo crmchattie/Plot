@@ -51,7 +51,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
         chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: numberFormatter),
-                                                        units: "shifted_completed",
+                                                        units: "completed",
                                                         formatType: range.timeSegment))
     }
     
@@ -64,11 +64,11 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
         case .line:
             
             let daysInRange = range.daysInRange + 1
-            let currentStartDate = range.startDate.startOfDay
-            let pastStartDate = range.pastStartDate?.startOfDay ?? currentStartDate
+            let startDateCurrent = range.startDate.startOfDay
+            let startDatePast = range.pastStartDate?.startOfDay ?? startDateCurrent
             
-            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { currentCategoryStats, currentGoalList in
-                guard !currentCategoryStats.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
+            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { categoryStatsCurrent, goalListCurrent in
+                guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
                     newChartViewModel.rangeAverageValue = "-"
@@ -78,17 +78,17 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
-                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.goals, isEvent: false) { pastCategoryStats, pastGoalList in
+                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.goals, isEvent: false) { categoryStatsPast, goalListPast in
                     
-                    self.goals = currentGoalList
+                    self.goals = Array(Set(goalListCurrent + goalListPast))
                     self.dataExists = true
                     
                     DispatchQueue.global(qos: .userInteractive).async {
-                        var currentCategories: [CategorySummaryViewModel] = []
-                        let currentKeys = currentCategoryStats.keys.sorted(by: <)
-                        for index in 0...currentKeys.count - 1 {
-                            guard let currentStats = currentCategoryStats[currentKeys[index]] else { continue }
-                            let total = currentStats.reduce(0, { $0 + $1.value })
+                        var categoriesCurrent: [CategorySummaryViewModel] = []
+                        let keysCurrent = categoryStatsCurrent.keys.sorted(by: <)
+                        for index in 0...keysCurrent.count - 1 {
+                            guard let statsCurrent = categoryStatsCurrent[keysCurrent[index]] else { continue }
+                            let total = statsCurrent.reduce(0, { $0 + $1.value })
                             var totalString = String()
                             if total == 1 {
                                 totalString = "1 goal"
@@ -97,62 +97,44 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                             }
                             
                             var categoryColor = UIColor()
-                            if let activityCategory = ActivityCategory(rawValue: currentKeys[index]) {
+                            if let activityCategory = ActivityCategory(rawValue: keysCurrent[index]) {
                                 categoryColor = activityCategory.color
                             } else {
                                 categoryColor = ActivityCategory.uncategorized.color
                             }
-                            currentCategories.append(CategorySummaryViewModel(title: currentKeys[index],
+                            categoriesCurrent.append(CategorySummaryViewModel(title: keysCurrent[index],
                                                                        color: categoryColor,
                                                                        value: total,
                                                                        formattedValue: totalString))
                         }
                         
-                        currentCategories.sort(by: { $0.value > $1.value })
-                                                
-                        newChartViewModel.categories = Array(currentCategories.prefix(3))
-                        
-                        let changeInGoals = currentGoalList.count - pastGoalList.count
-                        
-                        if changeInGoals == 0 {
-                            newChartViewModel.rangeAverageValue = "On Track"
-                        } else if changeInGoals == 1 {
-                            newChartViewModel.rangeAverageValue = "+1 completed goal"
-                        } else if changeInGoals == -1 {
-                            newChartViewModel.rangeAverageValue = "1 completed goal"
-                        } else if changeInGoals < -1 {
-                            newChartViewModel.rangeAverageValue = "\(Int(changeInGoals)) completed goals"
-                        } else if changeInGoals > 1 {
-                            newChartViewModel.rangeAverageValue = "+\(Int(changeInGoals)) completed goals"
-                        }
-                        
                         var cumulative: Double = 0
-                        let currentDataEntries = (0...daysInRange).map { index -> ChartDataEntry in
-                            let date = currentStartDate.addDays(index)
-                            let yValues = currentCategories.map {
-                                (currentCategoryStats[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                        var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
+                            let date = startDateCurrent.addDays(index)
+                            let yValues = categoriesCurrent.map {
+                                (categoryStatsCurrent[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                             }.reduce(0, +)
                             cumulative += yValues
                             return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
                         }
                         
-                        let currentChartDataSet = LineChartDataSet(entries: currentDataEntries)
-                        currentChartDataSet.setDrawHighlightIndicators(false)
-                        currentChartDataSet.axisDependency = .right
-                        currentChartDataSet.colors = [NSUIColor.systemBlue]
-                        currentChartDataSet.lineWidth = 5
-                        currentChartDataSet.fillAlpha = 0
-                        currentChartDataSet.drawFilledEnabled = true
-                        currentChartDataSet.drawCirclesEnabled = false
+                        let chartDataSetCurrent = LineChartDataSet(entries: dataEntries)
+                        chartDataSetCurrent.setDrawHighlightIndicators(false)
+                        chartDataSetCurrent.axisDependency = .right
+                        chartDataSetCurrent.colors = [NSUIColor.systemBlue]
+                        chartDataSetCurrent.lineWidth = 5
+                        chartDataSetCurrent.fillAlpha = 0
+                        chartDataSetCurrent.drawFilledEnabled = true
+                        chartDataSetCurrent.drawCirclesEnabled = false
                         
-                        var chartDataSets = [currentChartDataSet]
+                        var chartDataSets = [chartDataSetCurrent]
                         
-                        if !pastCategoryStats.isEmpty {
-                            var pastCategories: [CategorySummaryViewModel] = []
-                            let pastKeys = pastCategoryStats.keys.sorted(by: <)
-                            for index in 0...pastKeys.count - 1 {
-                                guard let pastStats = pastCategoryStats[pastKeys[index]] else { continue }
-                                let total = pastStats.reduce(0, { $0 + $1.value })
+                        if !categoryStatsPast.isEmpty {
+                            var categoriesPast: [CategorySummaryViewModel] = []
+                            let keysPast = categoryStatsPast.keys.sorted(by: <)
+                            for index in 0...keysPast.count - 1 {
+                                guard let statsPast = categoryStatsPast[keysPast[index]] else { continue }
+                                let total = statsPast.reduce(0, { $0 + $1.value })
                                 var totalString = String()
                                 if total == 1 {
                                     totalString = "1 goal"
@@ -161,38 +143,56 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                                 }
                                 
                                 var categoryColor = UIColor()
-                                if let activityCategory = ActivityCategory(rawValue: pastKeys[index]) {
+                                if let activityCategory = ActivityCategory(rawValue: keysPast[index]) {
                                     categoryColor = activityCategory.color
                                 } else {
                                     categoryColor = ActivityCategory.uncategorized.color
                                 }
-                                pastCategories.append(CategorySummaryViewModel(title: pastKeys[index],
+                                categoriesPast.append(CategorySummaryViewModel(title: keysPast[index],
                                                                            color: categoryColor,
                                                                            value: total,
                                                                            formattedValue: totalString))
                             }
                             
                             cumulative = 0
-                            let pastDataEntries = (0...daysInRange).map { index -> ChartDataEntry in
-                                let date = pastStartDate.addDays(index)
-                                let yValues = pastCategories.map {
-                                    (pastCategoryStats[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                            dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
+                                let date = startDatePast.addDays(index)
+                                let yValues = categoriesPast.map {
+                                    (categoryStatsPast[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                                 }.reduce(0, +)
                                 cumulative += yValues
                                 return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
                             }
                             
-                            let pastChartDataSet = LineChartDataSet(entries: pastDataEntries)
-                            pastChartDataSet.setDrawHighlightIndicators(false)
-                            pastChartDataSet.axisDependency = .right
-                            pastChartDataSet.colors = [NSUIColor.systemGray]
-                            pastChartDataSet.lineWidth = 5
-                            pastChartDataSet.fillAlpha = 0
-                            pastChartDataSet.drawFilledEnabled = true
-                            pastChartDataSet.drawCirclesEnabled = false
-                            pastChartDataSet.highlightEnabled = false
-                            chartDataSets.append(pastChartDataSet)
+                            let chartDataSetPast = LineChartDataSet(entries: dataEntries)
+                            chartDataSetPast.setDrawHighlightIndicators(false)
+                            chartDataSetPast.axisDependency = .right
+                            chartDataSetPast.colors = [NSUIColor.systemGray]
+                            chartDataSetPast.lineWidth = 5
+                            chartDataSetPast.fillAlpha = 0
+                            chartDataSetPast.drawFilledEnabled = true
+                            chartDataSetPast.drawCirclesEnabled = false
+                            chartDataSets.append(chartDataSetPast)
                         }
+                        
+                        categoriesCurrent.sort(by: { $0.value > $1.value })
+                                                
+                        newChartViewModel.categories = Array(categoriesCurrent.prefix(3))
+                        
+                        let change = goalListCurrent.count - goalListPast.count
+                        
+                        if change == 0 {
+                            newChartViewModel.rangeAverageValue = "On Track"
+                        } else if change == 1 {
+                            newChartViewModel.rangeAverageValue = "+1 completed goal"
+                        } else if change == -1 {
+                            newChartViewModel.rangeAverageValue = "-1 completed goal"
+                        } else if change < -1 {
+                            newChartViewModel.rangeAverageValue = "\(Int(change)) completed goals"
+                        } else if change > 1 {
+                            newChartViewModel.rangeAverageValue = "+\(Int(change)) completed goals"
+                        }
+            
                         
                         DispatchQueue.main.async {
                             let chartData = LineChartData(dataSets: chartDataSets)

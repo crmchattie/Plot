@@ -283,7 +283,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
                 }
             } else if section.type == "Accounts" {
                 if section.subType == "Balance Sheet" && filterDictionary["search"] == nil {
-                    categorizeAccounts(accounts: filteredAccounts, timeSegment: TimeSegmentType(rawValue: selectedIndex) ?? .month, level: accountLevel, date: nil) { (accountsList, accountsDict) in
+                    categorizeAccounts(accounts: filteredAccounts, timeSegment: TimeSegmentType(rawValue: selectedIndex) ?? .month, level: accountLevel, accountDetails: nil, date: nil) { (accountsList, accountsDict) in
                         if !accountsList.isEmpty {
                             if accountsList.first?.lastPeriodBalance != nil {
                                 self.sections.append(.balancesFinances)
@@ -308,10 +308,10 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
                 }
             } else if section.type == "Transactions" {
                 if section.subType == "Income Statement" && filterDictionary["search"] == nil {
-                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, accounts: filteredAccountsString) { (transactionsList, transactionsDict) in
+                    categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, transactionDetails: nil, accounts: filteredAccountsString) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
                             if self.selectedIndex == 0 {
-                                categorizeTransactions(transactions: self.transactions, start: self.startDate.dayBefore, end: self.endDate.dayBefore, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.dayBefore, end: self.endDate.dayBefore, level: .group, transactionDetails: nil, accounts: filteredAccountsString) { (transactionsListPrior, _) in
                                     if !transactionsListPrior.isEmpty {
                                         addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
                                             self.sections.append(.cashFlow)
@@ -328,7 +328,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
                                     }
                                 }
                             } else if self.selectedIndex == 1 {
-                                categorizeTransactions(transactions: self.transactions, start: self.startDate.weekBefore, end: self.endDate.weekBefore, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.weekBefore, end: self.endDate.weekBefore, level: .group, transactionDetails: nil, accounts: filteredAccountsString) { (transactionsListPrior, _) in
                                     if !transactionsListPrior.isEmpty {
                                         addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
                                             self.sections.append(.cashFlow)
@@ -345,7 +345,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
                                     }
                                 }
                             } else if self.selectedIndex == 2 {
-                                categorizeTransactions(transactions: self.transactions, start: self.startDate.monthBefore, end: self.endDate.monthBefore, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.monthBefore, end: self.endDate.monthBefore, level: .group, transactionDetails: nil, accounts: filteredAccountsString) { (transactionsListPrior, _) in
                                     if !transactionsListPrior.isEmpty {
                                         addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
                                             self.sections.append(.cashFlow)
@@ -362,7 +362,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
                                     }
                                 }
                             } else {
-                                categorizeTransactions(transactions: self.transactions, start: self.startDate.lastYear, end: self.endDate.lastYear, level: .group, accounts: filteredAccountsString) { (transactionsListPrior, _) in
+                                categorizeTransactions(transactions: self.transactions, start: self.startDate.lastYear, end: self.endDate.lastYear, level: .group, transactionDetails: nil, accounts: filteredAccountsString) { (transactionsListPrior, _) in
                                     if !transactionsListPrior.isEmpty {
                                         addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
                                             self.sections.append(.cashFlow)
@@ -396,11 +396,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
                             })
                         }
                         filteredTransactions = filteredTransactions.filter({ (transaction) -> Bool in
-                            if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                                if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
-                                    return true
-                                }
-                            } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                            if let transactionDate = transaction.transactionDate {
                                 if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                                     return true
                                 }

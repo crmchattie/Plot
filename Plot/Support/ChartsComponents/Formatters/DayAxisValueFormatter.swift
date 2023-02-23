@@ -71,6 +71,24 @@ public class DayAxisValueFormatter: NSObject, AxisValueFormatter {
         return ""
     }
     
+    public func stringForMarkerGivenDate(_ data: Any?, axis: AxisBase?) -> String {
+        if let date = data as? Date {
+            switch formatType {
+            case 0:
+                return date.getHourlyTimeStringForMarker()
+            case 1:
+                return date.getMonthAndDateAndYear()
+            case 2:
+                return date.getMonthAndDateAndYear()
+            case 3:
+                return date.getShortMonthAndYear()
+            default:
+                return ""
+            }
+        }
+        return ""
+    }
+    
     private func days(forMonth month: Int, year: Int) -> Int {
         // month is 0-based
         switch month {

@@ -12,8 +12,10 @@ import Combine
 import HealthKit
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Daily average", currentMonth: "Monthly average", currentYear: "Yearly average")
+    DateRangeFormatter(currentWeek: "Daily average vs. the prior week's", currentMonth: "Monthly average vs. the prior month's", currentYear: "Yearly average vs. the prior year's")
         .format(range: range)
+    //    DateRangeFormatter(currentWeek: "Daily average", currentMonth: "Monthly average", currentYear: "Yearly average")
+    //        .format(range: range)
 }
 
 // Steps
@@ -48,7 +50,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
         self.networkController = networkController
         self.range = range
      
-        chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
                                                         units: "hrs",
                                                         formatType: range.timeSegment))
@@ -63,60 +65,168 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
         
-        if let generalMetrics = networkController.healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
-            dataExists = true
-            newChartViewModel.healthMetric = healthMetric
-            healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { stats, samples, error in
-                var data: BarChartData?
-                var sum = 0.0
-                if let stats = stats, stats.count > 0 {
-                    var i = 0
-                    var entries: [BarChartDataEntry] = []
-                    for stat in stats {
-                        let entry = BarChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
-                        entries.append(entry)
-                        sum += stat.value
-                        i += 1
+        switch chartViewModel.value.chartType {
+        case .line:
+            if let generalMetrics = networkController.healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
+                dataExists = true
+                newChartViewModel.healthMetric = healthMetric
+                                
+                healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { statsCurrent, samplesCurrent, error in
+                    var totalValue = 0.0
+                    
+                    self.healthDetailService.getSamples(for: healthMetric, segmentType: self.range.timeSegment, anchorDate: self.range.pastEndDate?.dayBefore.advanced(by: 1)) { statsPast, samplesPast, error in
+                        self.samples = Array(Set((samplesCurrent ?? []) + (samplesPast ?? [])))
+
+                        var chartDataSets = [LineChartDataSet]()
+                        
+                        var sum = 0.0
+                        if let statsCurrent = statsCurrent, statsCurrent.count > 0 {
+                            var i = 0
+                            var dataEntries: [ChartDataEntry] = []
+                            for stat in statsCurrent {
+                                sum += stat.value
+                                let entry = ChartDataEntry(x: Double(i) + 1, y: sum / Double(i + 1), data: stat.date)
+                                dataEntries.append(entry)
+                                i += 1
+                            }
+                            totalValue += sum / Double(statsCurrent.count)
+
+                            let chartDataSetCurrent = LineChartDataSet(entries: dataEntries)
+                            chartDataSetCurrent.setDrawHighlightIndicators(false)
+                            chartDataSetCurrent.axisDependency = .right
+                            chartDataSetCurrent.colors = [NSUIColor.systemBlue]
+                            chartDataSetCurrent.lineWidth = 5
+                            chartDataSetCurrent.fillAlpha = 0
+                            chartDataSetCurrent.drawFilledEnabled = true
+                            chartDataSetCurrent.drawCirclesEnabled = false
+                            chartDataSets.append(chartDataSetCurrent)
+
+                            sum = 0
+                            if let statsPast = statsPast, statsPast.count > 0 {
+                                var i = 0
+                                var dataEntries: [ChartDataEntry] = []
+                                for stat in statsPast {
+                                    sum += stat.value
+                                    let entry = ChartDataEntry(x: Double(i) + 1, y: sum / Double(i + 1), data: stat.date)
+                                    dataEntries.append(entry)
+                                    i += 1
+                                }
+                                totalValue -= sum / Double(statsPast.count)
+                                
+                                let chartDataSetPast = LineChartDataSet(entries: dataEntries)
+                                chartDataSetPast.setDrawHighlightIndicators(false)
+                                chartDataSetPast.axisDependency = .right
+                                chartDataSetPast.colors = [NSUIColor.systemGray]
+                                chartDataSetPast.lineWidth = 5
+                                chartDataSetPast.fillAlpha = 0
+                                chartDataSetPast.drawFilledEnabled = true
+                                chartDataSetPast.drawCirclesEnabled = false
+                                chartDataSets.append(chartDataSetPast)
+                                                        
+                            }
+                            
+                        }
+                        
+                        let total = totalValue * 3600
+                        if let totalString = self.dateFormatter.string(from: total) {
+                            if total > 0 {
+                                newChartViewModel.rangeAverageValue = "+" + totalString + " sleep"
+                            } else {
+                                newChartViewModel.rangeAverageValue = totalString + " sleep"
+                            }
+                        }
+                        
+                        
+                        DispatchQueue.main.async {
+                            let chartData = LineChartData(dataSets: chartDataSets)
+                            chartData.setDrawValues(false)
+                            newChartViewModel.chartData = chartData
+                            self.chartViewModel.send(newChartViewModel)
+                            completion?()
+                        }
+                    }
+                }
+            } else {
+                newChartViewModel.chartData = nil
+                newChartViewModel.categories = []
+                newChartViewModel.rangeAverageValue = "-"
+                self.chartViewModel.send(newChartViewModel)
+                self.samples = []
+                completion?()
+            }
+        case .horizontalBar:
+            break
+        case .verticalBar:
+            if let generalMetrics = networkController.healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
+                dataExists = true
+                newChartViewModel.healthMetric = healthMetric
+                healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { stats, samples, error in
+                    var data: BarChartData?
+                    var sum = 0.0
+                    if let stats = stats, stats.count > 0 {
+                        var i = 0
+                        var entries: [BarChartDataEntry] = []
+                        for stat in stats {
+                            let entry = BarChartDataEntry(x: Double(i) + 0.5, y: stat.value, data: stat.date)
+                            entries.append(entry)
+                            sum += stat.value
+                            i += 1
+                        }
+                        
+                        let dataSet = BarChartDataSet(entries: entries, label: "")
+                        dataSet.drawValuesEnabled = false
+                        dataSet.axisDependency = .right
+                        dataSet.colors = [ChartColors.palette()[6]]
+                        data = BarChartData(dataSets: [dataSet])
+                        data?.setDrawValues(false)
                     }
                     
-                    let dataSet = BarChartDataSet(entries: entries, label: "")
-                    dataSet.drawValuesEnabled = false
-                    dataSet.axisDependency = .right
-                    dataSet.colors = [ChartColors.palette()[6]]
-                    data = BarChartData(dataSets: [dataSet])
-                    data?.setDrawValues(false)
-                }
-                
-                DispatchQueue.main.async {
-                    newChartViewModel.chartData = data
-                    let averageValue = sum / Double(stats!.count) * 3600
-                    if let totalString = self.dateFormatter.string(from: averageValue) {
-                        newChartViewModel.rangeAverageValue = totalString
+                    DispatchQueue.main.async {
+                        newChartViewModel.chartData = data
+                        let averageValue = sum / Double(stats!.count) * 3600
+                        if let totalString = self.dateFormatter.string(from: averageValue) {
+                            newChartViewModel.rangeAverageValue = totalString
+                        }
+                        self.samples = samples ?? []
+                        self.chartViewModel.send(newChartViewModel)
+                        completion?()
                     }
-                    self.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
-                    self.chartViewModel.send(newChartViewModel)
-                    completion?()
                 }
+            } else {
+                newChartViewModel.chartData = nil
+                newChartViewModel.categories = []
+                newChartViewModel.rangeAverageValue = "-"
+                self.chartViewModel.send(newChartViewModel)
+                self.samples = []
+                completion?()
             }
-        } else {
-            newChartViewModel.chartData = nil
-            newChartViewModel.categories = []
-            newChartViewModel.rangeAverageValue = "-"
-            self.chartViewModel.send(newChartViewModel)
-            self.samples = []
-            completion?()
         }
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         if range.filterOff {
-            completion(samples.map { .sample($0) })
+            completion(samples.sorted(by: { $0.startDate > $1.startDate }).map { .sample($0) })
         } else {
-            let filteredSamples = samples
-                .filter { sample -> Bool in
-                    return range.startDate <= sample.startDate && sample.startDate <= range.endDate
-                }
-            completion(filteredSamples.map { .sample($0) })
+            switch chartViewModel.value.chartType {
+            case .line:
+                let filteredSamples = samples
+                    .filter { sample -> Bool in
+                        return range.startDate <= sample.startDate && sample.startDate <= range.endDate
+                    }
+                completion(filteredSamples.map { .sample($0) })
+            case .horizontalBar:
+                let filteredSamples = samples
+                    .filter { sample -> Bool in
+                        return range.startDate <= sample.startDate && sample.startDate <= range.endDate
+                    }
+                completion(filteredSamples.map { .sample($0) })
+            case .verticalBar:
+                let filteredSamples = samples
+                    .filter { sample -> Bool in
+                        return range.startDate <= sample.startDate && sample.startDate <= range.endDate
+                    }
+                completion(filteredSamples.map { .sample($0) })
+            }
         }
     }
 }

@@ -8,7 +8,6 @@
 
 import Foundation
 
-private let isodateFormatter = ISO8601DateFormatter()
 private let dateFormatterPrint: DateFormatter = {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "E, MMM d, yyyy"

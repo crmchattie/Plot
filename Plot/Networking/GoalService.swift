@@ -60,7 +60,9 @@ extension NetworkController {
                         switch metricsRelationshipType {
                         case .or:
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
-                                task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
+                                if !(task.isCompleted ?? false) {
+                                    task.completedDate = NSNumber(value: Int((finalStat.date).timeIntervalSince1970))
+                                }
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                                 updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) && (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
@@ -73,7 +75,9 @@ extension NetworkController {
 
                         case .and:
                             if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
-                                task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
+                                if !(task.isCompleted ?? false) {
+                                    task.completedDate = NSNumber(value: Int((finalStat.date).timeIntervalSince1970))
+                                }
                                 let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                                 updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                             } else if (finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false)) || (finalStatSecond.value < targetSecond && (goal.currentNumberSecond != finalStatSecond.value || task.isCompleted ?? false)) {
@@ -92,7 +96,9 @@ extension NetworkController {
                     }
                 } else {
                     if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
-                        task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
+                        if !(task.isCompleted ?? false) {
+                            task.completedDate = NSNumber(value: Int((finalStat.date).timeIntervalSince1970))
+                        }
                         let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
                         updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                     } else if finalStat.value < target && (goal.currentNumber != finalStat.value || task.isCompleted ?? false) {

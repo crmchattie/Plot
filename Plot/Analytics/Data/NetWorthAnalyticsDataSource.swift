@@ -54,7 +54,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
                                                         verticalAxisType: .fixZeroToMiddleOnVertical,
-                                                        units: "currencyShifted",
+                                                        units: "currency",
                                                         formatType: range.timeSegment))
     }
     
@@ -65,55 +65,65 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         
         let accounts = networkController.financeService.accounts
         
-        financeService.getSamples(financialType: .accounts, segmentType: range.timeSegment, range: range, accounts: accounts, accountLevel: AccountCatLevel.bs_type, transactions: nil, transactionLevel: nil, filterAccounts: nil) { accountDetailsStats, _, accountValues, _, _, _, _ in
-            guard let accountDetailsStats = accountDetailsStats, let accountValues = accountValues, let netWorthDetails = accountDetailsStats.keys.first(where: {$0.name == "Net Worth"}), let stats = accountDetailsStats[netWorthDetails] else {
-                newChartViewModel.chartData = nil
-                self.chartViewModel.send(newChartViewModel)
-                self.accounts = []
-                completion?()
-                return
-            }
-            self.dataExists = true
-            
-            self.accounts = accountValues.sorted(by: { $0.name < $1.name })
-            
-            DispatchQueue.global(qos: .userInteractive).async {
-                var dataEntries: [ChartDataEntry] = []
-                var firstValue: Double?
-                var lastValue: Double?
-                for (index, stat) in stats.enumerated() {
-                    if firstValue == nil { firstValue = stat.value }
-                    else { lastValue = stat.value }
-                    dataEntries.append(ChartDataEntry(x: Double(index) + 1, y: stat.value, data: stat.date))
-                }
-                
-                if let firstValue = firstValue, let lastValue = lastValue {
-                    let finalValue = lastValue - firstValue
-                    if finalValue > 0 {
-                        newChartViewModel.rangeAverageValue = "+" + self.currencyFormatter.string(from: NSNumber(value: finalValue))!
-                    } else {
-                        newChartViewModel.rangeAverageValue = self.currencyFormatter.string(from: NSNumber(value: finalValue))!
-                    }
-                } else {
-                    newChartViewModel.rangeAverageValue = "-"
-                }
-                
-                DispatchQueue.main.async {
-                    let chartDataSet = LineChartDataSet(entries: dataEntries)
-                    chartDataSet.setDrawHighlightIndicators(false)
-                    chartDataSet.axisDependency = .right
-                    chartDataSet.fillColor = .systemBlue
-                    chartDataSet.fillAlpha = 1
-                    chartDataSet.drawFilledEnabled = true
-                    chartDataSet.drawCirclesEnabled = false
-                    let chartData = LineChartData(dataSets: [chartDataSet])
-                    chartData.setDrawValues(false)
-                    newChartViewModel.chartData = chartData
-                    
+        switch chartViewModel.value.chartType {
+        case .line:
+            let detail = AccountDetails(name: "Net Worth", balance: 0, level: .bs_type, subtype: nil, type: nil, bs_type: .NetWorth, currencyCode: "USD")
+            financeService.getSamples(financialType: .accounts, segmentType: range.timeSegment, range: range, accounts: accounts, accountLevel: AccountCatLevel.bs_type, accountDetails: [detail], transactions: nil, transactionLevel: nil, transactionDetails: nil, filterAccounts: nil) { accountDetailsStats, _, accountValues, _, _, _, _ in
+                guard let accountDetailsStats = accountDetailsStats, let accountValues = accountValues, let netWorthDetails = accountDetailsStats.keys.first(where: {$0.name == "Net Worth"}), let stats = accountDetailsStats[netWorthDetails] else {
+                    newChartViewModel.chartData = nil
                     self.chartViewModel.send(newChartViewModel)
+                    self.accounts = []
                     completion?()
+                    return
+                }
+                
+                self.dataExists = true
+                
+                self.accounts = accountValues.sorted(by: { $0.name < $1.name })
+                
+                DispatchQueue.global(qos: .userInteractive).async {
+                    var dataEntries: [ChartDataEntry] = []
+                    var firstValue: Double?
+                    var lastValue: Double?
+                    for (index, stat) in stats.enumerated() {
+                        if firstValue == nil { firstValue = stat.value }
+                        else { lastValue = stat.value }
+                        dataEntries.append(ChartDataEntry(x: Double(index) + 1, y: stat.value, data: stat.date))
+                    }
+                    
+                    if let firstValue = firstValue, let lastValue = lastValue {
+                        let finalValue = lastValue - firstValue
+                        if finalValue > 0 {
+                            newChartViewModel.rangeAverageValue = "+" + self.currencyFormatter.string(from: NSNumber(value: finalValue))!
+                        } else {
+                            newChartViewModel.rangeAverageValue = self.currencyFormatter.string(from: NSNumber(value: finalValue))!
+                        }
+                    } else {
+                        newChartViewModel.rangeAverageValue = "-"
+                    }
+                    
+                    DispatchQueue.main.async {
+                        let chartDataSet = LineChartDataSet(entries: dataEntries)
+                        chartDataSet.setDrawHighlightIndicators(false)
+                        chartDataSet.axisDependency = .right
+                        chartDataSet.colors = [NSUIColor.systemBlue]
+                        chartDataSet.lineWidth = 5
+                        chartDataSet.fillAlpha = 0
+                        chartDataSet.drawFilledEnabled = true
+                        chartDataSet.drawCirclesEnabled = false
+                        let chartData = LineChartData(dataSets: [chartDataSet])
+                        chartData.setDrawValues(false)
+                        newChartViewModel.chartData = chartData
+                        
+                        self.chartViewModel.send(newChartViewModel)
+                        completion?()
+                    }
                 }
             }
+        case .horizontalBar:
+            break
+        case .verticalBar:
+            break
         }
     }
     

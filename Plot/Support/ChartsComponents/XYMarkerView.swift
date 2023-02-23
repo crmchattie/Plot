@@ -28,40 +28,22 @@ public class XYMarkerView: BalloonMarker {
     }
     
     public override func refreshContent(entry: ChartDataEntry, highlight: Highlight) {
-        if units == "currencyShifted" {
+        if units == "currency" {
             yFormatter.numberStyle = .currency
             let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + "\n"
-                + xAxisValueFormatter.stringForMarker(entry.x - 1, axis: XAxis())
-            setLabel(string)
-        } else if units == "currency" {
-            yFormatter.numberStyle = .currency
-            let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + "\n"
-                + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
-            setLabel(string)
-        } else if units == "timeShift" {
-            dateFormatter.unitsStyle = .abbreviated
-            dateFormatter.allowedUnits = [.hour, .minute]
-            let totalString = dateFormatter.string(from: entry.y) ?? "NaN"
-            let string = totalString + "\n"
-                + xAxisValueFormatter.stringForMarker(entry.x - 1, axis: XAxis())
+            + xAxisValueFormatter.stringForMarkerGivenDate(entry.data, axis: XAxis())
             setLabel(string)
         } else if units == "time" {
             dateFormatter.unitsStyle = .abbreviated
             dateFormatter.allowedUnits = [.hour, .minute]
             let totalString = dateFormatter.string(from: entry.y) ?? "NaN"
             let string = totalString + "\n"
-                + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
-            setLabel(string)
-        } else if units.contains("shifted_") {
-            yFormatter.numberStyle = .decimal
-            let startIndex = units.index(units.startIndex, offsetBy: 8)
-            let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + " \(units[startIndex...])\n"
-                + xAxisValueFormatter.stringForMarker(entry.x - 1, axis: XAxis())
+            + xAxisValueFormatter.stringForMarkerGivenDate(entry.data, axis: XAxis())
             setLabel(string)
         } else {
             yFormatter.numberStyle = .decimal
             let string = yFormatter.string(from: NSNumber(floatLiteral: entry.y))! + " \(units)\n"
-                + xAxisValueFormatter.stringForMarker(entry.x, axis: XAxis())
+            + xAxisValueFormatter.stringForMarkerGivenDate(entry.data, axis: XAxis())
             setLabel(string)
         }
     }

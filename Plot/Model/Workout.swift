@@ -114,8 +114,8 @@ func categorizeWorkouts(workouts: [Workout], measure: WorkoutMeasure, start: Dat
     var workoutsList = [Workout]()
     // create dateFormatter with UTC time format
     for workout in workouts {
-        guard var startDate = workout.startDateTime,
-              var endDate = workout.endDateTime else {
+        guard let startDate = workout.startDateTime,
+              let endDate = workout.endDateTime else {
             continue
         }
         

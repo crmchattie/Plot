@@ -57,6 +57,7 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
+        
         healthDetailService.getSamples(for: range, segment: range.timeSegment, moods: networkController.healthService.moods) { categoryStats, moodList in
                         
             guard !categoryStats.isEmpty else {

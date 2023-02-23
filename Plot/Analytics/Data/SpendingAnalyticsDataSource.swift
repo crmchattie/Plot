@@ -11,8 +11,9 @@ import Combine
 import Charts
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Over the last week", currentMonth: "Over the last month", currentYear: "Over the last year")
+    DateRangeFormatter(currentWeek: "Vs. the prior week", currentMonth: "Vs. the prior month", currentYear: "Vs. the prior year")
         .format(range: range)
+//    DateRangeFormatter(currentWeek: "Over the last week", currentMonth: "Over the last month", currentYear: "Over the last year").format(range: range)
 }
 
 class SpendingAnalyticsDataSource: AnalyticsDataSource {
@@ -52,7 +53,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
                                                         verticalAxisType: .fixZeroToMiddleOnVertical,
-                                                        units: "currencyShifted",
+                                                        units: "currency",
                                                         formatType: range.timeSegment))
     }
     
@@ -63,97 +64,168 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
         
         let networkTransactions = networkController.financeService.transactions
         let daysInRange = range.daysInRange + 1
-        let startDate = range.startDate.startOfDay
-                
-        financeService.getSamples(financialType: .transactions, segmentType: range.timeSegment, range: range, accounts: nil, accountLevel: nil, transactions: networkTransactions, transactionLevel: TransactionCatLevel.group, filterAccounts: nil) { _, _, _, transDetailsStats, _, transactionValues, _ in
-            guard let transDetailsStats = transDetailsStats, let transactionValues = transactionValues, let expenseDetails = transDetailsStats.keys.first(where: {$0.name == "Expense"}), let stats = transDetailsStats[expenseDetails], !transDetailsStats.keys.filter( {$0.name != "Income" && $0.name != "Expense" && $0.name != "Net Savings" && $0.name != "Net Spending"}).isEmpty else {
-                newChartViewModel.chartData = nil
-                newChartViewModel.categories = []
-                newChartViewModel.rangeAverageValue = "-"
-                self.chartViewModel.send(newChartViewModel)
-                self.transactions = []
-                completion?()
-                return
+        let startDateCurrent = range.startDate.startOfDay
+        let startDatePast = range.pastStartDate?.startOfDay ?? startDateCurrent
+        
+        switch chartViewModel.value.chartType {
+        case .line:
+            var transactionDetails = [TransactionDetails]()
+            for cat in financialTransactionsGroupsStaticSpending {
+                transactionDetails.append(TransactionDetails(name: cat, amount: 0, level: .group, group: cat))
             }
-            
-            self.dataExists = true
-            
-            self.transactions = transactionValues.sorted(by: { (transaction1, transaction2) -> Bool in
-                if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                    if let date1 = dateFormatter.date(from: transaction1.transacted_at), let date2 = dateFormatter.date(from: transaction2.transacted_at) {
-                        return date1 > date2
-                    }
-                    return transaction1.description < transaction2.description
-                }
-                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
-            })
-                        
-            DispatchQueue.global(qos: .userInteractive).async {
-                let spendingDetails = transDetailsStats.keys.filter( {$0.name != "Income" && $0.name != "Expense" && $0.name != "Net Savings" && $0.name != "Net Spending"})
-                var categories: [CategorySummaryViewModel] = []
-                
-                for detail in spendingDetails {
-                    let finalAmount = detail.amount * -1
-                    if let formatterValue = self.currencyFormatter.string(from: NSNumber(value: finalAmount)) {
-                        categories.append(CategorySummaryViewModel(title: detail.name,
-                                                                   color: .systemBlue,
-                                                                   value: finalAmount,
-                                                                   formattedValue: formatterValue))
-                    }
-                }
-                
-                categories.sort(by: { $0.value > $1.value })
-                
-                newChartViewModel.categories = Array(categories.prefix(3))
-                
-                let totalValue = expenseDetails.amount * -1
-                
-                if totalValue > 0 {
-                    newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
-                } else {
-                    newChartViewModel.rangeAverageValue = "Saved \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!)"
-
-                }
-                
-                var cumulative: Double = 0
-                let dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
-                    let current = startDate.addDays(index)
-                    if let stat = stats.first(where: {$0.date == current}) {
-                        cumulative += stat.value
-                    }
-                    return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: current)
-                }
-                
-                DispatchQueue.main.async {
-                    let chartDataSet = LineChartDataSet(entries: dataEntries)
-                    chartDataSet.setDrawHighlightIndicators(false)
-                    chartDataSet.axisDependency = .right
-                    chartDataSet.fillColor = .systemBlue
-                    chartDataSet.fillAlpha = 1
-                    chartDataSet.drawFilledEnabled = true
-                    chartDataSet.drawCirclesEnabled = false
-                    let chartData = LineChartData(dataSets: [chartDataSet])
-                    chartData.setDrawValues(false)
-                    newChartViewModel.chartData = chartData
+            financeService.getSamples(financialType: .transactions, segmentType: range.timeSegment, range: range, accounts: nil, accountLevel: nil, accountDetails: nil, transactions: networkTransactions, transactionLevel: TransactionCatLevel.group, transactionDetails: transactionDetails, filterAccounts: nil) { _, _, _, transDetailsStatsCurrent, _, transactionValuesCurrent, _ in
+                guard let transDetailsStatsCurrent = transDetailsStatsCurrent, let transactionValuesCurrent = transactionValuesCurrent, let expenseDetailsCurrent = transDetailsStatsCurrent.keys.first(where: {$0.name == "Expense"}), let statsCurrent = transDetailsStatsCurrent[expenseDetailsCurrent], !transDetailsStatsCurrent.keys.filter( {$0.name != "Expense"}).isEmpty, let previousRange = self.range.previousDatesForComparison() else {
+                    newChartViewModel.chartData = nil
+                    newChartViewModel.categories = []
+                    newChartViewModel.rangeAverageValue = "-"
                     self.chartViewModel.send(newChartViewModel)
+                    self.transactions = []
                     completion?()
+                    return
+                }
+                
+                self.financeService.getSamples(financialType: .transactions, segmentType: self.range.timeSegment, range: previousRange, accounts: nil, accountLevel: nil, accountDetails: nil, transactions: networkTransactions, transactionLevel: TransactionCatLevel.group, transactionDetails: transactionDetails, filterAccounts: nil) { _, _, _, transDetailsStatsPast, _, transactionValuesPast, _ in
+                    
+                    self.dataExists = true
+                    
+                    self.transactions = Array(Set(transactionValuesCurrent + (transactionValuesPast ?? [])))
+                                
+                    DispatchQueue.global(qos: .userInteractive).async {
+                        let spendingDetailsCurrent = transDetailsStatsCurrent.keys.filter( {$0.name != "Expense"})
+                        var categoriesCurrent: [CategorySummaryViewModel] = []
+                        
+                        for detail in spendingDetailsCurrent {
+                            let finalAmount = detail.amount
+                            if let formatterValue = self.currencyFormatter.string(from: NSNumber(value: finalAmount)) {
+                                categoriesCurrent.append(CategorySummaryViewModel(title: detail.name,
+                                                                           color: .systemBlue,
+                                                                           value: finalAmount,
+                                                                           formattedValue: formatterValue))
+                            }
+                        }
+                        
+                        categoriesCurrent.sort(by: { $0.value > $1.value })
+                        
+                        newChartViewModel.categories = Array(categoriesCurrent.prefix(3))
+                        
+                        var totalValue: Double = 0
+                        var cumulative: Double = 0
+                        var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
+                            let current = startDateCurrent.addDays(index)
+                            if let stat = statsCurrent.first(where: {$0.date == current}) {
+                                cumulative += stat.value
+                            }
+                            return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: current)
+                        }
+                        
+                        totalValue += cumulative
+                        
+                        let chartDataSetCurrent = LineChartDataSet(entries: dataEntries)
+                        chartDataSetCurrent.setDrawHighlightIndicators(false)
+                        chartDataSetCurrent.axisDependency = .right
+                        chartDataSetCurrent.colors = [NSUIColor.systemBlue]
+                        chartDataSetCurrent.lineWidth = 5
+                        chartDataSetCurrent.fillAlpha = 0
+                        chartDataSetCurrent.drawFilledEnabled = true
+                        chartDataSetCurrent.drawCirclesEnabled = false
+                        
+                        var chartDataSets = [chartDataSetCurrent]
+                                                                        
+                        if let transDetailsStatsPast = transDetailsStatsPast, let expenseDetailsPast = transDetailsStatsPast.keys.first(where: {$0.name == "Expense"}), let statsPast = transDetailsStatsPast[expenseDetailsPast], !transDetailsStatsPast.keys.filter({$0.name != "Expense"}).isEmpty {
+                                                        
+                            let spendingDetailsPast = transDetailsStatsPast.keys.filter( {$0.name != "Expense"})
+                            var categoriesPast: [CategorySummaryViewModel] = []
+                            
+                            for detail in spendingDetailsPast {
+                                let finalAmount = detail.amount
+                                if let formatterValue = self.currencyFormatter.string(from: NSNumber(value: finalAmount)) {
+                                    categoriesPast.append(CategorySummaryViewModel(title: detail.name,
+                                                                               color: .systemBlue,
+                                                                               value: finalAmount,
+                                                                               formattedValue: formatterValue))
+                                }
+                            }
+                            
+                            var cumulative: Double = 0
+                            dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
+                                let current = startDatePast.addDays(index)
+                                if let stat = statsPast.first(where: {$0.date == current}) {
+                                    cumulative += stat.value
+                                }
+                                return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: current)
+                            }
+                            
+                            totalValue -= cumulative
+                            
+                            let chartDataSetPast = LineChartDataSet(entries: dataEntries)
+                            chartDataSetPast.setDrawHighlightIndicators(false)
+                            chartDataSetPast.axisDependency = .right
+                            chartDataSetPast.colors = [NSUIColor.systemGray]
+                            chartDataSetPast.lineWidth = 5
+                            chartDataSetPast.fillAlpha = 0
+                            chartDataSetPast.drawFilledEnabled = true
+                            chartDataSetPast.drawCirclesEnabled = false
+                            chartDataSets.append(chartDataSetPast)
+                            
+                        }
+                        
+                        if totalValue > 0 {
+                            newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!) More"
+                        } else {
+                            newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue * -1))!) Less"
+                        }
+                                            
+                        DispatchQueue.main.async {
+                            let chartData = LineChartData(dataSets: chartDataSets)
+                            chartData.setDrawValues(false)
+                            newChartViewModel.chartData = chartData
+                            self.chartViewModel.send(newChartViewModel)
+                            completion?()
+                        }
+                    }
                 }
             }
+        case .horizontalBar:
+            break
+        case .verticalBar:
+            break
         }
     }
     
     func fetchEntries(range: DateRange, completion: ([AnalyticsBreakdownEntry]) -> Void) {
         if range.filterOff {
-            completion(transactions.map { .transaction($0) })
-        } else {
-            let startDate = range.startDate.dayBefore
-            let endDate = range.endDate.dayBefore
-            let filteredTransactions = transactions
-                .filter { transaction -> Bool in
-                    guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
-                    return startDate <= date && date <= endDate
+            completion(transactions.sorted(by: {
+                if let date1 = $0.transactionDate, let date2 = $1.transactionDate {
+                    return date1 > date2
                 }
-            completion(filteredTransactions.map { .transaction($0) })
+                return $0.description < $1.description
+            }).map { .transaction($0) })
+        } else {
+            switch chartViewModel.value.chartType {
+            case .line:
+                let startDate = range.startDate.dayBefore
+                let endDate = range.endDate.dayBefore
+                let filteredTransactions = transactions
+                    .filter { transaction -> Bool in
+                        guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        return startDate <= date && date <= endDate
+                    }
+                completion(filteredTransactions.map { .transaction($0) })
+            case .horizontalBar:
+                let filteredTransactions = transactions
+                    .filter { transaction -> Bool in
+                        guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        return range.startDate <= date && date <= range.endDate
+                    }
+                completion(filteredTransactions.map { .transaction($0) })
+            case .verticalBar:
+                let filteredTransactions = transactions
+                    .filter { transaction -> Bool in
+                        guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        return range.startDate <= date && date <= range.endDate
+                    }
+                completion(filteredTransactions.map { .transaction($0) })
+            }
         }
     }
 }

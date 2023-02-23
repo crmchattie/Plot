@@ -105,11 +105,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
         
         if setSections.contains(.transactions) {
             let filteredTransactions = transactions.filter { (transaction) -> Bool in
-                if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                    if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
-                        return true
-                    }
-                } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                if let transactionDate = transaction.transactionDate {
                     if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                         return true
                     }
@@ -243,11 +239,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
                     endDate = isodateFormatter.date(from: filterEndDate[0]) ?? Date.distantFuture
                     
                     filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
-                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                            if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
-                                return true
-                            }
-                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                        if let transactionDate = transaction.transactionDate {
                             if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                                 return true
                             }
@@ -258,11 +250,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
                 else if let filterStartDate = filterDictionary["startDate"] {
                     startDate = isodateFormatter.date(from: filterStartDate[0]) ?? Date.distantPast
                     filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
-                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                            if transactionDate > startDate {
-                                return true
-                            }
-                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                        if let transactionDate = transaction.transactionDate {
                             if transactionDate > startDate {
                                 return true
                             }
@@ -273,11 +261,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
                 else if let filterEndDate = filterDictionary["endDate"] {
                     endDate = isodateFormatter.date(from: filterEndDate[0]) ?? Date.distantFuture
                     filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
-                        if let date = transaction.date_for_reports, date != "", let transactionDate = isodateFormatter.date(from: date) {
-                            if endDate > transactionDate {
-                                return true
-                            }
-                        } else if let transactionDate = isodateFormatter.date(from: transaction.transacted_at) {
+                        if let transactionDate = transaction.transactionDate {
                             if endDate > transactionDate {
                                 return true
                             }
