@@ -28,6 +28,8 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
     let title: String = "Events"
+    let titleStringSingular = "event"
+    let titleStringPlural = "events"
     
     private var activities: [Activity] = []
         
@@ -84,35 +86,14 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                     self.activities = Array(Set(activityListCurrent + activityListPast))
                     
                     DispatchQueue.global(qos: .userInteractive).async {
-                        var categoriesCurrent: [CategorySummaryViewModel] = []
+                        var categories: [CategorySummaryViewModel] = []
                         let keysCurrent = categoryStatsCurrent.keys.sorted(by: <)
-                        for index in 0...keysCurrent.count - 1 {
-                            guard let statsCurrent = categoryStatsCurrent[keysCurrent[index]] else { continue }
-                            let total = statsCurrent.reduce(0, { $0 + $1.value * 60 })
-                            var totalString = String()
-                            if total == 1 {
-                                totalString = "1 activity"
-                            } else {
-                                totalString = "\(Int(total)) activities"
-                            }
-                            
-                            var categoryColor = UIColor()
-                            if let activityCategory = ActivityCategory(rawValue: keysCurrent[index]) {
-                                categoryColor = activityCategory.color
-                            } else {
-                                categoryColor = ActivityCategory.uncategorized.color
-                            }
-                            categoriesCurrent.append(CategorySummaryViewModel(title: keysCurrent[index],
-                                                                       color: categoryColor,
-                                                                       value: total,
-                                                                       formattedValue: totalString))
-                        }
                         
                         var cumulative: Double = 0
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
-                            let yValues = categoriesCurrent.map {
-                                (categoryStatsCurrent[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
+                            let yValues = keysCurrent.map {
+                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
                             }.reduce(0, +)
                             cumulative += yValues
                             return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -129,36 +110,20 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                         
                         var chartDataSets = [chartDataSetCurrent]
                         
+                        let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
+                                                                       color: .systemBlue,
+                                                                       value: Double(activityListCurrent.count),
+                                                                       formattedValue: "\(Int(activityListCurrent.count)) " + (activityListCurrent.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                        categories.append(categoryCurrent)
+                        
                         if !categoryStatsPast.isEmpty {
-                            var categoriesPast: [CategorySummaryViewModel] = []
                             let keysPast = categoryStatsPast.keys.sorted(by: <)
-                            for index in 0...keysPast.count - 1 {
-                                guard let statsPast = categoryStatsPast[keysPast[index]] else { continue }
-                                let total = statsPast.reduce(0, { $0 + $1.value * 60 })
-                                var totalString = String()
-                                if total == 1 {
-                                    totalString = "1 activity"
-                                } else {
-                                    totalString = "\(Int(total)) activities"
-                                }
-                                
-                                var categoryColor = UIColor()
-                                if let activityCategory = ActivityCategory(rawValue: keysPast[index]) {
-                                    categoryColor = activityCategory.color
-                                } else {
-                                    categoryColor = ActivityCategory.uncategorized.color
-                                }
-                                categoriesPast.append(CategorySummaryViewModel(title: keysPast[index],
-                                                                           color: categoryColor,
-                                                                           value: total,
-                                                                           formattedValue: totalString))
-                            }
                             
                             cumulative = 0
                             dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                                 let date = startDatePast.addDays(index)
-                                let yValues = categoriesPast.map {
-                                    (categoryStatsPast[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
+                                let yValues = keysPast.map {
+                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
                                 }.reduce(0, +)
                                 cumulative += yValues
                                 return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -167,30 +132,35 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                             let chartDataSetPast = LineChartDataSet(entries: dataEntries)
                             chartDataSetPast.setDrawHighlightIndicators(false)
                             chartDataSetPast.axisDependency = .right
-                            chartDataSetPast.colors = [NSUIColor.systemGray]
+                            chartDataSetPast.colors = [NSUIColor.systemGray4]
                             chartDataSetPast.lineWidth = 5
                             chartDataSetPast.fillAlpha = 0
                             chartDataSetPast.drawFilledEnabled = true
                             chartDataSetPast.drawCirclesEnabled = false
                             chartDataSets.append(chartDataSetPast)
+                            
+                            let categoryPast = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
+                                                                           color: .systemBlue,
+                                                                           value: Double(activityListPast.count),
+                                                                           formattedValue: "\(Int(activityListPast.count)) " + (activityListPast.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                            categories.append(categoryPast)
                         }
                         
-                        categoriesCurrent.sort(by: { $0.value > $1.value })
                                                 
-                        newChartViewModel.categories = Array(categoriesCurrent.prefix(3))
+                        newChartViewModel.categories = categories
                         
                         let change = activityListCurrent.count - activityListPast.count
                         
                         if change == 0 {
                             newChartViewModel.rangeAverageValue = "On Track"
                         } else if change == 1 {
-                            newChartViewModel.rangeAverageValue = "+1 event"
+                            newChartViewModel.rangeAverageValue = "+1 " + self.titleStringSingular
                         } else if change == -1 {
-                            newChartViewModel.rangeAverageValue = "-1 event"
+                            newChartViewModel.rangeAverageValue = "-1 " + self.titleStringSingular
                         } else if change < -1 {
-                            newChartViewModel.rangeAverageValue = "\(Int(change)) events"
+                            newChartViewModel.rangeAverageValue = "\(Int(change)) " + self.titleStringPlural
                         } else if change > 1 {
-                            newChartViewModel.rangeAverageValue = "+\(Int(change)) events"
+                            newChartViewModel.rangeAverageValue = "+\(Int(change)) " + self.titleStringPlural
                         }
             
                         
@@ -248,11 +218,11 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                     
                     newChartViewModel.categories = Array(categories.prefix(3))
                     if activityList.count == 0 {
-                        newChartViewModel.rangeAverageValue = "No events"
+                        newChartViewModel.rangeAverageValue = "No " + self.titleStringPlural
                     } else if activityList.count == 1 {
-                        newChartViewModel.rangeAverageValue = "1 event"
+                        newChartViewModel.rangeAverageValue = "1 " + self.titleStringSingular
                     } else {
-                        newChartViewModel.rangeAverageValue = "\(Int(activityList.count)) events"
+                        newChartViewModel.rangeAverageValue = "\(Int(activityList.count)) " + self.titleStringPlural
                     }
                     
                     let daysInRange = self.range.daysInRange

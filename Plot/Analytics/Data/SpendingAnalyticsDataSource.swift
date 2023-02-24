@@ -92,22 +92,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                     self.transactions = Array(Set(transactionValuesCurrent + (transactionValuesPast ?? [])))
                                 
                     DispatchQueue.global(qos: .userInteractive).async {
-                        let spendingDetailsCurrent = transDetailsStatsCurrent.keys.filter( {$0.name != "Expense"})
-                        var categoriesCurrent: [CategorySummaryViewModel] = []
-                        
-                        for detail in spendingDetailsCurrent {
-                            let finalAmount = detail.amount
-                            if let formatterValue = self.currencyFormatter.string(from: NSNumber(value: finalAmount)) {
-                                categoriesCurrent.append(CategorySummaryViewModel(title: detail.name,
-                                                                           color: .systemBlue,
-                                                                           value: finalAmount,
-                                                                           formattedValue: formatterValue))
-                            }
-                        }
-                        
-                        categoriesCurrent.sort(by: { $0.value > $1.value })
-                        
-                        newChartViewModel.categories = Array(categoriesCurrent.prefix(3))
+                        var categories: [CategorySummaryViewModel] = []
                         
                         var totalValue: Double = 0
                         var cumulative: Double = 0
@@ -131,6 +116,12 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                         chartDataSetCurrent.drawCirclesEnabled = false
                         
                         var chartDataSets = [chartDataSetCurrent]
+                        
+                        let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
+                                                                       color: .systemBlue,
+                                                                       value: cumulative,
+                                                                       formattedValue: "\(self.currencyFormatter.string(from: NSNumber(value: cumulative))!)")
+                        categories.append(categoryCurrent)
                                                                         
                         if let transDetailsStatsPast = transDetailsStatsPast, let expenseDetailsPast = transDetailsStatsPast.keys.first(where: {$0.name == "Expense"}), let statsPast = transDetailsStatsPast[expenseDetailsPast], !transDetailsStatsPast.keys.filter({$0.name != "Expense"}).isEmpty {
                                                         
@@ -161,14 +152,22 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                             let chartDataSetPast = LineChartDataSet(entries: dataEntries)
                             chartDataSetPast.setDrawHighlightIndicators(false)
                             chartDataSetPast.axisDependency = .right
-                            chartDataSetPast.colors = [NSUIColor.systemGray]
+                            chartDataSetPast.colors = [NSUIColor.systemGray4]
                             chartDataSetPast.lineWidth = 5
                             chartDataSetPast.fillAlpha = 0
                             chartDataSetPast.drawFilledEnabled = true
                             chartDataSetPast.drawCirclesEnabled = false
                             chartDataSets.append(chartDataSetPast)
                             
+                            let categoryCurrent = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? ""),
+                                                                           color: .systemGray3,
+                                                                           value: cumulative,
+                                                                           formattedValue: "\(self.currencyFormatter.string(from: NSNumber(value: cumulative))!)")
+                            categories.append(categoryCurrent)
+                            
                         }
+                        
+                        newChartViewModel.categories = categories
                         
                         if totalValue > 0 {
                             newChartViewModel.rangeAverageValue = "Spent \(self.currencyFormatter.string(from: NSNumber(value: totalValue))!) More"

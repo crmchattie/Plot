@@ -31,6 +31,9 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
     var range: DateRange
 
     var title: String = "Steps"
+    let titleStringSingular = "step"
+    let titleStringPlural = "steps"
+    
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     var healthMetric: HealthMetric?
     private var samples: [HKSample] = []
@@ -53,8 +56,9 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
      
         chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
-                                                        verticalAxisType: .fixZeroToMaximumOnVertical,
-                                                        units: "steps",
+                                                        verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: numberFormatter),
+                                                        verticalAxisType: .fixZeroToMiddleOnVertical,
+                                                        units: "date_only",
                                                         formatType: range.timeSegment))
     }
     
@@ -80,31 +84,26 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                 newChartViewModel.healthMetric = healthMetric
                 
                 healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { statsCurrent, samplesCurrent, error in
-                    var totalValue = 0.0
 
                     self.healthDetailService.getSamples(for: healthMetric, segmentType: self.range.timeSegment, anchorDate: self.range.pastEndDate?.dayBefore.advanced(by: 1)) { statsPast, samplesPast, error in
                         self.samples = Array(Set((samplesCurrent ?? []) + (samplesPast ?? [])))
-
+                        var categories: [CategorySummaryViewModel] = []
                         var chartDataSets = [LineChartDataSet]()
 
-                        var sum = 0.0
+                        var totalValue = 0.0
+                        var average = 0.0
+
                         if let statsCurrent = statsCurrent, statsCurrent.count > 0 {
                             var dataEntriesCurrent: [ChartDataEntry] = []
+                            let sum = statsCurrent.reduce(0, { $0 + $1.value })
+                            average = sum / Double(statsCurrent.count)
                             for index in 0...daysInRange {
                                 let date = startDateCurrent.addDays(index)
-                                if let stat = statsCurrent.first(where: { $0.date == date }) {
-                                    if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
-                                        sum += stat.value
-                                        let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
-                                        dataEntriesCurrent.append(entry)
-                                    }
-                                } else {
-                                    let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
-                                    dataEntriesCurrent.append(entry)
-                                }
+                                let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
+                                dataEntriesCurrent.append(entry)
                             }
                             
-                            totalValue += sum / Double(statsCurrent.count)
+                            totalValue += average
 
                             let chartDataSetCurrent = LineChartDataSet(entries: dataEntriesCurrent)
                             chartDataSetCurrent.setDrawHighlightIndicators(false)
@@ -115,44 +114,51 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                             chartDataSetCurrent.drawFilledEnabled = true
                             chartDataSetCurrent.drawCirclesEnabled = false
                             chartDataSets.append(chartDataSetCurrent)
+                            
+                            let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? "") + "'s average",
+                                                                           color: .systemBlue,
+                                                                           value: average,
+                                                                           formattedValue: "\(self.numberFormatter.string(from: NSNumber(value: average))!) " + (average == 1 ? self.titleStringSingular : self.titleStringPlural))
+                            categories.append(categoryCurrent)
 
-                            sum = 0
                             if let statsPast = statsPast, statsPast.count > 0 {
                                 var dataEntriesPast: [ChartDataEntry] = []
+                                let sum = statsPast.reduce(0, { $0 + $1.value })
+                                average = sum / Double(statsCurrent.count)
                                 for index in 0...daysInRange {
                                     let date = startDatePast.addDays(index)
-                                    if let stat = statsPast.first(where: { $0.date == date }) {
-                                        if !dataEntriesPast.contains(where: {$0.data as? Date == stat.date }) {
-                                            sum += stat.value
-                                            let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
-                                            dataEntriesPast.append(entry)
-                                        }
-                                    } else {
-                                        let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
-                                        dataEntriesPast.append(entry)
-                                    }
+                                    let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
+                                    dataEntriesPast.append(entry)
                                 }
                                 
-                                totalValue -= sum / Double(statsPast.count)
+                                totalValue -= average
 
                                 let chartDataSetPast = LineChartDataSet(entries: dataEntriesPast)
                                 chartDataSetPast.setDrawHighlightIndicators(false)
                                 chartDataSetPast.axisDependency = .right
-                                chartDataSetPast.colors = [NSUIColor.systemGray]
+                                chartDataSetPast.colors = [NSUIColor.systemGray4]
                                 chartDataSetPast.lineWidth = 5
                                 chartDataSetPast.fillAlpha = 0
                                 chartDataSetPast.drawFilledEnabled = true
                                 chartDataSetPast.drawCirclesEnabled = false
                                 chartDataSets.append(chartDataSetPast)
+                                
+                                let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? "") + "'s average",
+                                                                               color: .systemGray3,
+                                                                               value: average,
+                                                                               formattedValue: "\(self.numberFormatter.string(from: NSNumber(value: average))!) " + (average == 1 ? self.titleStringSingular : self.titleStringPlural))
+                                categories.append(categoryPast)
 
                             }
+                            
+                            newChartViewModel.categories = categories
 
                         }
 
                         if totalValue > 0 {
-                            newChartViewModel.rangeAverageValue = "+\(self.numberFormatter.string(from: NSNumber(value: totalValue))!) steps"
+                            newChartViewModel.rangeAverageValue = "+\(self.numberFormatter.string(from: NSNumber(value: totalValue))!) " + self.titleStringPlural
                         } else {
-                            newChartViewModel.rangeAverageValue = "\(self.numberFormatter.string(from: NSNumber(value: totalValue))!) steps"
+                            newChartViewModel.rangeAverageValue = "\(self.numberFormatter.string(from: NSNumber(value: totalValue))!) " + self.titleStringPlural
                         }
 
                         DispatchQueue.main.async {
@@ -203,7 +209,7 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                         newChartViewModel.chartData = data
                         let averageValue = sum / Double(stats!.count)
                         let totalValue = self.numberFormatter.string(from: averageValue as NSNumber) ?? ""
-                        newChartViewModel.rangeAverageValue = "\(totalValue) steps"
+                        newChartViewModel.rangeAverageValue = "\(totalValue) " + self.titleStringPlural
                         self.samples = samples?.sorted(by: { $0.startDate > $1.startDate }) ?? []
                         self.chartViewModel.send(newChartViewModel)
                         completion?()

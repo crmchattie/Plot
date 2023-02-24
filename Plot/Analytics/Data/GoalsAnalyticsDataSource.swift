@@ -29,6 +29,8 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
     let title: String = "Goals"
+    let titleStringSingular = "goal"
+    let titleStringPlural = "goals"
     
     private var goals: [Activity] = []
     
@@ -86,35 +88,14 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                     self.goals = Array(Set(goalListCurrent + goalListPast))
                     
                     DispatchQueue.global(qos: .userInteractive).async {
-                        var categoriesCurrent: [CategorySummaryViewModel] = []
+                        var categories: [CategorySummaryViewModel] = []
                         let keysCurrent = categoryStatsCurrent.keys.sorted(by: <)
-                        for index in 0...keysCurrent.count - 1 {
-                            guard let statsCurrent = categoryStatsCurrent[keysCurrent[index]] else { continue }
-                            let total = statsCurrent.reduce(0, { $0 + $1.value })
-                            var totalString = String()
-                            if total == 1 {
-                                totalString = "1 goal"
-                            } else {
-                                totalString = "\(Int(total)) goals"
-                            }
-                            
-                            var categoryColor = UIColor()
-                            if let activityCategory = ActivityCategory(rawValue: keysCurrent[index]) {
-                                categoryColor = activityCategory.color
-                            } else {
-                                categoryColor = ActivityCategory.uncategorized.color
-                            }
-                            categoriesCurrent.append(CategorySummaryViewModel(title: keysCurrent[index],
-                                                                       color: categoryColor,
-                                                                       value: total,
-                                                                       formattedValue: totalString))
-                        }
                         
                         var cumulative: Double = 0
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
-                            let yValues = categoriesCurrent.map {
-                                (categoryStatsCurrent[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                            let yValues = keysCurrent.map {
+                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                             }.reduce(0, +)
                             cumulative += yValues
                             return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -131,36 +112,20 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                         
                         var chartDataSets = [chartDataSetCurrent]
                         
+                        let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
+                                                                       color: .systemBlue,
+                                                                       value: Double(goalListCurrent.count),
+                                                                       formattedValue: "\(Int(goalListCurrent.count)) " + (goalListCurrent.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                        categories.append(categoryCurrent)
+                        
                         if !categoryStatsPast.isEmpty {
-                            var categoriesPast: [CategorySummaryViewModel] = []
-                            let keysPast = categoryStatsPast.keys.sorted(by: <)
-                            for index in 0...keysPast.count - 1 {
-                                guard let statsPast = categoryStatsPast[keysPast[index]] else { continue }
-                                let total = statsPast.reduce(0, { $0 + $1.value })
-                                var totalString = String()
-                                if total == 1 {
-                                    totalString = "1 goal"
-                                } else {
-                                    totalString = "\(Int(total)) goals"
-                                }
-                                
-                                var categoryColor = UIColor()
-                                if let activityCategory = ActivityCategory(rawValue: keysPast[index]) {
-                                    categoryColor = activityCategory.color
-                                } else {
-                                    categoryColor = ActivityCategory.uncategorized.color
-                                }
-                                categoriesPast.append(CategorySummaryViewModel(title: keysPast[index],
-                                                                           color: categoryColor,
-                                                                           value: total,
-                                                                           formattedValue: totalString))
-                            }
+                            let keysPast = categoryStatsPast.keys
                             
                             cumulative = 0
                             dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                                 let date = startDatePast.addDays(index)
-                                let yValues = categoriesPast.map {
-                                    (categoryStatsPast[$0.title] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                                let yValues = keysPast.map {
+                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                                 }.reduce(0, +)
                                 cumulative += yValues
                                 return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -169,30 +134,36 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                             let chartDataSetPast = LineChartDataSet(entries: dataEntries)
                             chartDataSetPast.setDrawHighlightIndicators(false)
                             chartDataSetPast.axisDependency = .right
-                            chartDataSetPast.colors = [NSUIColor.systemGray]
+                            chartDataSetPast.colors = [NSUIColor.systemGray4]
                             chartDataSetPast.lineWidth = 5
                             chartDataSetPast.fillAlpha = 0
                             chartDataSetPast.drawFilledEnabled = true
                             chartDataSetPast.drawCirclesEnabled = false
                             chartDataSets.append(chartDataSetPast)
+                            
+                            let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? ""),
+                                                                        color: .systemGray3,
+                                                                        value: Double(goalListPast.count),
+                                                                        formattedValue: "\(Int(goalListPast.count)) " + (goalListPast.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                            categories.append(categoryPast)
+                            
                         }
+                                        
                         
-                        categoriesCurrent.sort(by: { $0.value > $1.value })
-                                                
-                        newChartViewModel.categories = Array(categoriesCurrent.prefix(3))
+                        newChartViewModel.categories = categories
                         
                         let change = goalListCurrent.count - goalListPast.count
                         
                         if change == 0 {
                             newChartViewModel.rangeAverageValue = "On Track"
                         } else if change == 1 {
-                            newChartViewModel.rangeAverageValue = "+1 completed goal"
+                            newChartViewModel.rangeAverageValue = "+1 completed " + self.titleStringSingular
                         } else if change == -1 {
-                            newChartViewModel.rangeAverageValue = "-1 completed goal"
+                            newChartViewModel.rangeAverageValue = "-1 completed " + self.titleStringSingular
                         } else if change < -1 {
-                            newChartViewModel.rangeAverageValue = "\(Int(change)) completed goals"
+                            newChartViewModel.rangeAverageValue = "\(Int(change)) completed " + self.titleStringPlural
                         } else if change > 1 {
-                            newChartViewModel.rangeAverageValue = "+\(Int(change)) completed goals"
+                            newChartViewModel.rangeAverageValue = "+\(Int(change)) completed " + self.titleStringPlural
                         }
             
                         

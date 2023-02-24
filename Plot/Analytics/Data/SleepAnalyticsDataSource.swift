@@ -30,6 +30,8 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
     var range: DateRange
 
     var title: String = "Sleep"
+    let titleStringSingular = "sleep"
+    
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     var healthMetric: HealthMetric?
     private var samples: [HKSample] = []
@@ -52,8 +54,9 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
      
         chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
-                                                        verticalAxisType: .fixZeroToMaximumOnVertical,
-                                                        units: "hrs",
+                                                        verticalAxisValueFormatter: HourAxisValueFormatter(),
+                                                        verticalAxisType: .fixZeroToMiddleOnVertical,
+                                                        units: "date_only",
                                                         formatType: range.timeSegment))
     }
     
@@ -82,26 +85,22 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                     
                     self.healthDetailService.getSamples(for: healthMetric, segmentType: self.range.timeSegment, anchorDate: self.range.pastEndDate?.dayBefore.advanced(by: 1)) { statsPast, samplesPast, error in
                         self.samples = Array(Set((samplesCurrent ?? []) + (samplesPast ?? [])))
-
+                        var categories: [CategorySummaryViewModel] = []
                         var chartDataSets = [LineChartDataSet]()
                         
-                        var sum = 0.0
+                        var average = 0.0
+
                         if let statsCurrent = statsCurrent, statsCurrent.count > 0 {
                             var dataEntriesCurrent: [ChartDataEntry] = []
+                            let sum = statsCurrent.reduce(0, { $0 + $1.value * 3600 })
+                            average = sum / Double(statsCurrent.count)
                             for index in 0...daysInRange {
                                 let date = startDateCurrent.addDays(index)
-                                if let stat = statsCurrent.first(where: { $0.date == date }) {
-                                    if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
-                                        sum += stat.value
-                                        let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
-                                        dataEntriesCurrent.append(entry)
-                                    }
-                                } else {
-                                    let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
-                                    dataEntriesCurrent.append(entry)
-                                }
+                                let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
+                                dataEntriesCurrent.append(entry)
                             }
-                            totalValue += sum / Double(statsCurrent.count)
+                            
+                            totalValue += average
 
                             let chartDataSetCurrent = LineChartDataSet(entries: dataEntriesCurrent)
                             chartDataSetCurrent.setDrawHighlightIndicators(false)
@@ -112,45 +111,52 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                             chartDataSetCurrent.drawFilledEnabled = true
                             chartDataSetCurrent.drawCirclesEnabled = false
                             chartDataSets.append(chartDataSetCurrent)
+                            
+                            let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? "") + "'s average",
+                                                                           color: .systemBlue,
+                                                                           value: average,
+                                                                           formattedValue: "\(self.dateFormatter.string(from: average)!) " + self.titleStringSingular)
+                            categories.append(categoryCurrent)
 
-                            sum = 0
-                            if let statsPast = statsPast, statsPast.count > 0 {
+                            if let statsPast = statsPast, statsPast.count > 0  {
                                 var dataEntriesPast: [ChartDataEntry] = []
+                                let sum = statsPast.reduce(0, { $0 + $1.value * 3600 })
+                                average = sum / Double(statsCurrent.count)
                                 for index in 0...daysInRange {
                                     let date = startDatePast.addDays(index)
-                                    if let stat = statsPast.first(where: { $0.date == date }) {
-                                        if !dataEntriesPast.contains(where: {$0.data as? Date == stat.date }) {
-                                            sum += stat.value
-                                            let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
-                                            dataEntriesPast.append(entry)
-                                        }
-                                    } else {
-                                        let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
-                                        dataEntriesPast.append(entry)
-                                    }
+                                    let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
+                                    dataEntriesPast.append(entry)
                                 }
-                                totalValue -= sum / Double(statsPast.count)
+                                
+                                totalValue -= average
                                 
                                 let chartDataSetPast = LineChartDataSet(entries: dataEntriesPast)
                                 chartDataSetPast.setDrawHighlightIndicators(false)
                                 chartDataSetPast.axisDependency = .right
-                                chartDataSetPast.colors = [NSUIColor.systemGray]
+                                chartDataSetPast.colors = [NSUIColor.systemGray4]
                                 chartDataSetPast.lineWidth = 5
                                 chartDataSetPast.fillAlpha = 0
                                 chartDataSetPast.drawFilledEnabled = true
                                 chartDataSetPast.drawCirclesEnabled = false
                                 chartDataSets.append(chartDataSetPast)
                                                         
+                                let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? "") + "'s average",
+                                                                               color: .systemGray3,
+                                                                               value: average,
+                                                                               formattedValue: "\(self.dateFormatter.string(from: average)!) " + self.titleStringSingular)
+                                categories.append(categoryPast)
+
                             }
+                            
+                            newChartViewModel.categories = categories
                             
                         }
                         
-                        let total = totalValue * 3600
-                        if let totalString = self.dateFormatter.string(from: total) {
-                            if total > 0 {
-                                newChartViewModel.rangeAverageValue = "+" + totalString + " sleep"
+                        if let totalString = self.dateFormatter.string(from: totalValue) {
+                            if totalValue > 0 {
+                                newChartViewModel.rangeAverageValue = "+" + totalString + " " + self.titleStringSingular
                             } else {
-                                newChartViewModel.rangeAverageValue = totalString + " sleep"
+                                newChartViewModel.rangeAverageValue = totalString + " " + self.titleStringSingular
                             }
                         }
                         

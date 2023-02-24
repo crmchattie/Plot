@@ -28,6 +28,14 @@ enum DateRangeType: CaseIterable {
 //        case .year: return "Yearly"
         }
     }
+    
+    var title: String {
+        switch self {
+        case .week: return "week"
+        case .month: return "month"
+//        case .year: return "Year"
+        }
+    }
 }
 
 struct DateRange {

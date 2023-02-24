@@ -27,7 +27,9 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
     
     var range: DateRange
 
-    var title: String = "Active Calories"
+    var title: String = "Moods"
+    let titleStringSingular = "mood"
+    let titleStringPlural = "moods"
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     private var moods: [Mood] = []
     
@@ -49,7 +51,7 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
      
         chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
-                                                        units: "mood",
+                                                        units: titleStringSingular,
                                                         formatType: range.timeSegment))
     }
     
@@ -85,9 +87,9 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
                     let total = stats.reduce(0, { $0 + $1.value })
                     var totalString = String()
                     if total == 1 {
-                        totalString = "1 mood"
+                        totalString = "1 " + self.titleStringSingular
                     } else {
-                        totalString = "\(Int(total)) moods"
+                        totalString = "\(Int(total)) " + self.titleStringPlural
                     }
                     
                     var color = UIColor()
@@ -115,11 +117,11 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
                 
                 newChartViewModel.categories = Array(categories.sorted(by: { $0.value > $1.value }).prefix(3))
                 if moodList.count == 0 {
-                    newChartViewModel.rangeAverageValue = "No moods"
+                    newChartViewModel.rangeAverageValue = "No " + self.titleStringPlural
                 } else if moodList.count == 1 {
-                    newChartViewModel.rangeAverageValue = "1 mood"
+                    newChartViewModel.rangeAverageValue = "1 " + self.titleStringSingular
                 } else {
-                    newChartViewModel.rangeAverageValue = "\(moodList.count) moods"
+                    newChartViewModel.rangeAverageValue = "\(moodList.count) " + self.titleStringPlural
                     newChartViewModel.maxValue = maxValue + 1
                 }
                 
