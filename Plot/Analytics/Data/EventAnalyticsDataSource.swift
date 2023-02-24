@@ -52,6 +52,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
         chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: HourAxisValueFormatter(),
+                                                        verticalAxisType: .fixZeroToMinimumOnVertical,
                                                         units: "time",
                                                         formatType: range.timeSegment))
     }

@@ -212,6 +212,13 @@ func moodListStats(
     var stat = Statistic(date: chunkStart, value: 0)
     var moodList = [Mood]()
     for mood in moods {
+        print(chunkStart)
+        print(chunkEnd)
+        print("passed dates moods")
+        print(mood.moodDate)
+        print(mood.mood?.rawValue)
+        print(type)
+        
         guard let moodDate = mood.moodDate?.localTime, moodDate < chunkEnd, moodDate >= chunkStart else {
             continue
         }

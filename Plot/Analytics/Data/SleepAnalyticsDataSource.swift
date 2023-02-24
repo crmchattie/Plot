@@ -141,7 +141,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                                 chartDataSets.append(chartDataSetPast)
                                                         
                                 let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? "") + "'s average",
-                                                                               color: .systemGray3,
+                                                                               color: .secondaryLabel,
                                                                                value: average,
                                                                                formattedValue: "\(self.dateFormatter.string(from: average)!) " + self.titleStringSingular)
                                 categories.append(categoryPast)

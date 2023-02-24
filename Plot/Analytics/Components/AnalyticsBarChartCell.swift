@@ -48,6 +48,8 @@ class AnalyticsBarChartCell: StackedBarChartCell {
             if maxValue < 25 {
                 chartView.rightAxis.labelCount = Int(maxValue)
             }
+        } else {
+            chartView.rightAxis.labelCount = 6
         }
         
         let dayAxisValueFormatter = DayAxisValueFormatter(chart: chartView)
@@ -55,7 +57,6 @@ class AnalyticsBarChartCell: StackedBarChartCell {
         chartView.xAxis.valueFormatter = dayAxisValueFormatter
         chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         chartView.xAxis.granularity = 1
-        chartView.xAxis.labelCount = 5
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         let marker = XYMarkerView(color: .systemGroupedBackground,
                                   font: UIFont.body.with(weight: .regular),
@@ -66,7 +67,7 @@ class AnalyticsBarChartCell: StackedBarChartCell {
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
         chartView.data = viewModel.chartData
-        chartView.extraTopOffset = 3
+        chartView.extraTopOffset = 5
         chartView.resetZoom()
         chartView.notifyDataSetChanged()
     }

@@ -998,6 +998,11 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
             guard accounts.contains(transaction.account_guid ?? "") else { continue }
         }
         
+        print(date)
+        print(nextDate)
+        print("passed dates transactions")
+        print(transaction.transactionDate)
+        
         if let transactionDate = transaction.transactionDate {
             if transactionDate.localTime < date || nextDate < transactionDate.localTime {
                 continue

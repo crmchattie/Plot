@@ -48,7 +48,6 @@ class AnalyticsHorizontalBarChartCell: StackedBarChartCell {
         chartView.xAxis.valueFormatter = dayAxisValueFormatter
         chartView.xAxis.labelFont = UIFont.caption1.with(weight: .regular)
         chartView.xAxis.granularity = 1
-        chartView.xAxis.labelCount = 5
         chartView.rightAxis.valueFormatter = viewModel.verticalAxisValueFormatter
         let marker = XYMarkerView(color: .systemGroupedBackground,
                                   font: UIFont.body.with(weight: .regular),
@@ -59,7 +58,7 @@ class AnalyticsHorizontalBarChartCell: StackedBarChartCell {
         marker.minimumSize = CGSize(width: 80, height: 40)
         chartView.marker = marker
         chartView.data = viewModel.chartData
-        chartView.extraBottomOffset = 3
+        chartView.extraBottomOffset = 5
         chartView.resetZoom()
         chartView.notifyDataSetChanged()
     }

@@ -160,7 +160,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                             chartDataSets.append(chartDataSetPast)
                             
                             let categoryCurrent = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? ""),
-                                                                           color: .systemGray3,
+                                                                           color: .secondaryLabel,
                                                                            value: cumulative,
                                                                            formattedValue: "\(self.currencyFormatter.string(from: NSNumber(value: cumulative))!)")
                             categories.append(categoryCurrent)

@@ -27,23 +27,35 @@ extension TaskCell {
         
         if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
-            if subcategory == .uncategorized {
-                activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = subcategory.rawValue
             }
-            activityTypeLabel.text = subcategory.rawValue
         } else if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             }
-            activityTypeLabel.text = category.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = category.rawValue
+            }
         } else {
             activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
-            activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            }
         }
 
         
-        let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
+        var image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
+        if task.isGoal ?? false, !(task.isCompleted ?? false), let endDate = task.endDate, endDate < Date() {
+            image = "x.circle"
+        }
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         if let badgeDate = task.badgeDate, let finalDateTime = task.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))], badge > 0 {
@@ -123,19 +135,34 @@ extension TaskCollectionCell {
         
         if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
-            activityTypeLabel.text = subcategory.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = subcategory.rawValue
+            }
         } else if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             }
-            activityTypeLabel.text = category.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = category.rawValue
+            }
         } else {
             activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
-            activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            }
         }
                 
-        let image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
+        var image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
+        if task.isGoal ?? false, !(task.isCompleted ?? false), let endDate = task.endDate, endDate < Date() {
+            image = "x.circle"
+        }
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         if let badgeDate = task.badgeDate, let finalDateTime = task.finalDateTime, let badge = badgeDate[String(describing: Int(truncating: finalDateTime))], badge > 0 {

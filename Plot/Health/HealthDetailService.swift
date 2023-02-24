@@ -277,6 +277,10 @@ class HealthDetailService: HealthDetailServiceInterface {
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.advanced(by: 43200)
+            
+            print("sleep stats for everything else")
+            print(startDate)
+            print(endDate)
         }
         
         if HealthKitService.authorized {
@@ -483,6 +487,10 @@ class HealthDetailService: HealthDetailServiceInterface {
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.advanced(by: 43200)
+            
+            print("sleep stats for goals")
+            print(startDate)
+            print(endDate)
         }
         
         if HealthKitService.authorized {

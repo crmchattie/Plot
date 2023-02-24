@@ -39,10 +39,10 @@ extension NetworkController {
                 continue
             }
             
-//            print("metricCheck")
-//            print(metric)
-//            print(task.goalStartDate)
-//            print(task.goalEndDate)
+            print("metricCheck")
+            print(metric)
+            print(task.goalStartDate)
+            print(task.goalEndDate)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
@@ -418,8 +418,8 @@ extension NetworkController {
 //                            print(recurrenceRule.occurrences(between: date.dayBefore, and: Date().nextYear))
                         }
                         
-                        let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
-                        activityAction.createNewActivity(updateDirectAssociation: false)
+//                        let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
+//                        activityAction.createNewActivity(updateDirectAssociation: false)
 
                     }
                 }

@@ -51,6 +51,7 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
      
         chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
+                                                        verticalAxisType: .fixZeroToMinimumOnVertical,
                                                         units: titleStringSingular,
                                                         formatType: range.timeSegment))
     }

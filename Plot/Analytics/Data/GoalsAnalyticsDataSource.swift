@@ -142,7 +142,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                             chartDataSets.append(chartDataSetPast)
                             
                             let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? ""),
-                                                                        color: .systemGray3,
+                                                                        color: .secondaryLabel,
                                                                         value: Double(goalListPast.count),
                                                                         formattedValue: "\(Int(goalListPast.count)) " + (goalListPast.count == 1 ? self.titleStringSingular : self.titleStringPlural))
                             categories.append(categoryPast)

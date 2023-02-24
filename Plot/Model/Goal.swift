@@ -453,6 +453,75 @@ struct Goal: Codable, Equatable, Hashable {
         return MetricsRelationshipType.certainValues
     }
     
+    var cellDescription: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.maximumFractionDigits = 0
+                
+        if let target = targetNumber as? NSNumber, let current = currentNumber as? NSNumber, let unit = unit {
+            var description = String()
+
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            if let targetString = numberFormatter.string(from: target), let currentString = numberFormatter.string(from: current) {
+                description = "\(currentString)/\(targetString) \(unit.shortenedString)"
+            }
+            
+            if let type = metricsRelationshipType, let targetSecond = targetNumberSecond as? NSNumber, let currentSecond = currentNumberSecond as? NSNumber, let unitSecond = unitSecond {
+                switch unitSecond {
+                case .calories:
+                    numberFormatter.numberStyle = .decimal
+                case .count:
+                    numberFormatter.numberStyle = .decimal
+                case .amount:
+                    numberFormatter.numberStyle = .currency
+                case .percent:
+                    numberFormatter.numberStyle = .percent
+                case .multiple:
+                    numberFormatter.numberStyle = .decimal
+                case .minutes:
+                    numberFormatter.numberStyle = .decimal
+                case .hours:
+                    numberFormatter.numberStyle = .decimal
+                    numberFormatter.maximumFractionDigits = 1
+                case .days:
+                    numberFormatter.numberStyle = .decimal
+                    numberFormatter.maximumFractionDigits = 1
+                case .level:
+                    numberFormatter.numberStyle = .decimal
+                }
+                
+                if let targetString = numberFormatter.string(from: targetSecond), let currentString = numberFormatter.string(from: currentSecond) {
+                    description += " \(type.descriptionText) \(currentString)/\(targetString) \(unitSecond.shortenedString)"
+                    
+                }
+            }
+            return description
+        }
+        return nil
+    }
+    
     var description: String? {
         let numberFormatter = NumberFormatter()
         numberFormatter.currencyCode = "USD"
@@ -1434,6 +1503,28 @@ enum GoalUnit: String, Codable, CaseIterable {
     case days = "Days"
     case level = "Level"
     
+    var shortenedString: String {
+        switch self {
+        case .calories:
+            return "cal"
+        case .count:
+            return "ct"
+        case .amount:
+            return "amt"
+        case .percent:
+            return "pct"
+        case .multiple:
+            return "mult"
+        case .minutes:
+            return "mins"
+        case .hours:
+            return "hrs"
+        case .days:
+            return "days"
+        case .level:
+            return "lvl"
+        }
+    }
     
     var workoutMeasure: WorkoutMeasure? {
         switch self {

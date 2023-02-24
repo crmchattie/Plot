@@ -1998,6 +1998,12 @@ func activityListStats(
                 continue
             }
             
+            print(chunkStart)
+            print(chunkEnd)
+            print("passed dates activities")
+            print(activityStartDate)
+            print(activityEndDate)
+            
             // Skipping activities that are outside of the interest range.
             if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
                 continue
