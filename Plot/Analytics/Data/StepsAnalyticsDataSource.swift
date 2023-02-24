@@ -70,7 +70,13 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
         switch chartViewModel.value.chartType {
         case .line:
             if let generalMetrics = networkController.healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .steps}) {
+                
                 dataExists = true
+
+                let daysInRange = range.daysInRange + 1
+                let startDateCurrent = range.startDate.dayBefore
+                let startDatePast = range.pastStartDate?.dayBefore ?? startDateCurrent
+                            
                 newChartViewModel.healthMetric = healthMetric
                 
                 healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { statsCurrent, samplesCurrent, error in
@@ -83,14 +89,21 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
 
                         var sum = 0.0
                         if let statsCurrent = statsCurrent, statsCurrent.count > 0 {
-                            var i = 0
                             var dataEntriesCurrent: [ChartDataEntry] = []
-                            for stat in statsCurrent {
-                                sum += stat.value
-                                let entry = ChartDataEntry(x: Double(i) + 1, y: stat.value, data: stat.date)
-                                dataEntriesCurrent.append(entry)
-                                i += 1
+                            for index in 0...daysInRange {
+                                let date = startDateCurrent.addDays(index)
+                                if let stat = statsCurrent.first(where: { $0.date == date }) {
+                                    if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
+                                        sum += stat.value
+                                        let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
+                                        dataEntriesCurrent.append(entry)
+                                    }
+                                } else {
+                                    let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
+                                    dataEntriesCurrent.append(entry)
+                                }
                             }
+                            
                             totalValue += sum / Double(statsCurrent.count)
 
                             let chartDataSetCurrent = LineChartDataSet(entries: dataEntriesCurrent)
@@ -105,14 +118,21 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
 
                             sum = 0
                             if let statsPast = statsPast, statsPast.count > 0 {
-                                var i = 0
                                 var dataEntriesPast: [ChartDataEntry] = []
-                                for stat in statsPast {
-                                    sum += stat.value
-                                    let entry = ChartDataEntry(x: Double(i) + 1, y: stat.value, data: stat.date)
-                                    dataEntriesPast.append(entry)
-                                    i += 1
+                                for index in 0...daysInRange {
+                                    let date = startDatePast.addDays(index)
+                                    if let stat = statsPast.first(where: { $0.date == date }) {
+                                        if !dataEntriesPast.contains(where: {$0.data as? Date == stat.date }) {
+                                            sum += stat.value
+                                            let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
+                                            dataEntriesPast.append(entry)
+                                        }
+                                    } else {
+                                        let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
+                                        dataEntriesPast.append(entry)
+                                    }
                                 }
+                                
                                 totalValue -= sum / Double(statsPast.count)
 
                                 let chartDataSetPast = LineChartDataSet(entries: dataEntriesPast)

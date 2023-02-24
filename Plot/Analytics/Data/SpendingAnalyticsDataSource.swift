@@ -63,10 +63,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.formatType = range.timeSegment
         
         let networkTransactions = networkController.financeService.transactions
-        let daysInRange = range.daysInRange + 1
-        let startDateCurrent = range.startDate.startOfDay
-        let startDatePast = range.pastStartDate?.startOfDay ?? startDateCurrent
-        
+                
         switch chartViewModel.value.chartType {
         case .line:
             var transactionDetails = [TransactionDetails]()
@@ -87,6 +84,10 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                 self.financeService.getSamples(financialType: .transactions, segmentType: self.range.timeSegment, range: previousRange, accounts: nil, accountLevel: nil, accountDetails: nil, transactions: networkTransactions, transactionLevel: TransactionCatLevel.group, transactionDetails: transactionDetails, filterAccounts: nil) { _, _, _, transDetailsStatsPast, _, transactionValuesPast, _ in
                     
                     self.dataExists = true
+                    
+                    let daysInRange = self.range.daysInRange + 1
+                    let startDateCurrent = self.range.startDate.startOfDay
+                    let startDatePast = self.range.pastStartDate?.startOfDay ?? startDateCurrent
                     
                     self.transactions = Array(Set(transactionValuesCurrent + (transactionValuesPast ?? [])))
                                 

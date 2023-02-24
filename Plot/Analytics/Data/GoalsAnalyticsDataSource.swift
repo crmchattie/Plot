@@ -63,10 +63,6 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
         switch chartViewModel.value.chartType {
         case .line:
             
-            let daysInRange = range.daysInRange + 1
-            let startDateCurrent = range.startDate.startOfDay
-            let startDatePast = range.pastStartDate?.startOfDay ?? startDateCurrent
-            
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { categoryStatsCurrent, goalListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
@@ -78,10 +74,16 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
+                
                 self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.goals, isEvent: false) { categoryStatsPast, goalListPast in
                     
-                    self.goals = Array(Set(goalListCurrent + goalListPast))
                     self.dataExists = true
+
+                    let daysInRange = self.range.daysInRange + 1
+                    let startDateCurrent = self.range.startDate.startOfDay
+                    let startDatePast = self.range.pastStartDate?.startOfDay ?? startDateCurrent
+                                    
+                    self.goals = Array(Set(goalListCurrent + goalListPast))
                     
                     DispatchQueue.global(qos: .userInteractive).async {
                         var categoriesCurrent: [CategorySummaryViewModel] = []

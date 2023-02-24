@@ -62,10 +62,6 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         
         switch chartViewModel.value.chartType {
         case .line:
-            let daysInRange = range.daysInRange + 1
-            let startDateCurrent = range.startDate.startOfDay
-            let startDatePast = range.pastStartDate?.startOfDay ?? startDateCurrent
-            
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.tasks, isEvent: false) { categoryStatsCurrent, taskListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
@@ -79,8 +75,14 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                 
                 self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.tasks, isEvent: false) { categoryStatsPast, taskListPast in
                     
-                    self.tasks = Array(Set(taskListCurrent + taskListPast))
                     self.dataExists = true
+
+                    let daysInRange = self.range.daysInRange + 1
+                    let startDateCurrent = self.range.startDate.startOfDay
+                    let startDatePast = self.range.pastStartDate?.startOfDay ?? startDateCurrent
+                
+                    
+                    self.tasks = Array(Set(taskListCurrent + taskListPast))
                     
                     DispatchQueue.global(qos: .userInteractive).async {
                         var categoriesCurrent: [CategorySummaryViewModel] = []
