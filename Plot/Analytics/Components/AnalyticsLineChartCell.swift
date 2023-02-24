@@ -37,6 +37,7 @@ class AnalyticsLineChartCell: StackedBarChartCell {
             chartView.rightAxis.axisMinimum = 0
             chartView.rightAxis.resetCustomAxisMax()
         case .fixZeroToMiddleOnVertical:
+            chartView.rightAxis.resetCustomAxisMin()
             print("")
         case .fixZeroToMaximumOnVertical:
             print("")

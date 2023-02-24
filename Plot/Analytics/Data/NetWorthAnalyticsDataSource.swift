@@ -53,7 +53,7 @@ class NetWorthAnalyticsDataSource: AnalyticsDataSource {
         chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
-                                                        verticalAxisType: .fixZeroToMiddleOnVertical,
+                                                        verticalAxisType: .fixZeroToMaximumOnVertical,
                                                         units: "currency",
                                                         formatType: range.timeSegment))
     }

@@ -12,7 +12,7 @@ import Combine
 import HealthKit
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Daily average vs. the prior week's", currentMonth: "Monthly average vs. the prior month's", currentYear: "Yearly average vs. the prior year's")
+    DateRangeFormatter(currentWeek: "Daily average vs. prior week's", currentMonth: "Daily average vs. prior month's", currentYear: "Daily average vs. prior year's")
         .format(range: range)
     //    DateRangeFormatter(currentWeek: "Daily average", currentMonth: "Monthly average", currentYear: "Yearly average")
     //        .format(range: range)
@@ -52,6 +52,7 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
      
         chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
+                                                        verticalAxisType: .fixZeroToMaximumOnVertical,
                                                         units: "calories",
                                                         formatType: range.timeSegment))
     }
@@ -82,16 +83,16 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                         var sum = 0.0
                         if let statsCurrent = statsCurrent, statsCurrent.count > 0 {
                             var i = 0
-                            var dataEntries: [ChartDataEntry] = []
+                            var dataEntriesCurrent: [ChartDataEntry] = []
                             for stat in statsCurrent {
                                 sum += stat.value
-                                let entry = ChartDataEntry(x: Double(i) + 1, y: sum / Double(i + 1), data: stat.date)
-                                dataEntries.append(entry)
+                                let entry = ChartDataEntry(x: Double(i) + 1, y: stat.value, data: stat.date)
+                                dataEntriesCurrent.append(entry)
                                 i += 1
                             }
                             totalValue += sum / Double(statsCurrent.count)
 
-                            let chartDataSetCurrent = LineChartDataSet(entries: dataEntries)
+                            let chartDataSetCurrent = LineChartDataSet(entries: dataEntriesCurrent)
                             chartDataSetCurrent.setDrawHighlightIndicators(false)
                             chartDataSetCurrent.axisDependency = .right
                             chartDataSetCurrent.colors = [NSUIColor.systemBlue]
@@ -104,16 +105,16 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                             sum = 0
                             if let statsPast = statsPast, statsPast.count > 0 {
                                 var i = 0
-                                var dataEntries: [ChartDataEntry] = []
+                                var dataEntriesPast: [ChartDataEntry] = []
                                 for stat in statsPast {
                                     sum += stat.value
-                                    let entry = ChartDataEntry(x: Double(i) + 1, y: sum / Double(i + 1), data: stat.date)
-                                    dataEntries.append(entry)
+                                    let entry = ChartDataEntry(x: Double(i) + 1, y: stat.value, data: stat.date)
+                                    dataEntriesPast.append(entry)
                                     i += 1
                                 }
                                 totalValue -= sum / Double(statsPast.count)
                                 
-                                let chartDataSetPast = LineChartDataSet(entries: dataEntries)
+                                let chartDataSetPast = LineChartDataSet(entries: dataEntriesPast)
                                 chartDataSetPast.setDrawHighlightIndicators(false)
                                 chartDataSetPast.axisDependency = .right
                                 chartDataSetPast.colors = [NSUIColor.systemGray]

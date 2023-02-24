@@ -11,7 +11,7 @@ import Charts
 import Combine
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Vs. the prior week", currentMonth: "Vs. the prior month", currentYear: "Vs. the prior year")
+    DateRangeFormatter(currentWeek: "Vs. prior week", currentMonth: "Vs. prior month", currentYear: "Vs. prior year")
         .format(range: range)
 //    DateRangeFormatter(currentWeek: "Over the last week", currentMonth: "Over the last month", currentYear: "Over the last year").format(range: range)
 }

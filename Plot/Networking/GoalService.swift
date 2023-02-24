@@ -33,7 +33,7 @@ extension NetworkController {
                 continue
             }
                         
-            let range = DateRange(startDate: task.goalStartDate ?? Date().localTime, endDate: task.goalEndDate ?? Date().localTime)
+            let range = DateRange(startDate: task.goalStartDate ?? Date(), endDate: task.goalEndDate ?? Date())
             guard range.endDate > past, range.startDate <= tomorrow else {
                 group.leave()
                 continue
@@ -376,10 +376,10 @@ extension NetworkController {
                             
                             switch recurrenceRule.frequency {
                             case .yearly:
-                                date = date.startOfYear
+                                date = date.startOfYear.UTCTime
                                 let month = calendar.component(.month, from: date)
                                 recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
-                                task.endDateTime = NSNumber(value: Int((date.endOfYear).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfYear.UTCTime).timeIntervalSince1970))
                             case .monthly:
                                 date = date.startOfMonth.UTCTime
                                 let monthday = calendar.component(.day, from: date)
@@ -387,14 +387,14 @@ extension NetworkController {
                                 task.endDateTime = NSNumber(value: Int((date.endOfMonth.UTCTime).timeIntervalSince1970))
                                 recurrenceRule.bymonthday = [1]
                             case .weekly:
-                                date = date.startOfWeek
+                                date = date.startOfWeek.UTCTime
                                 let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: date))!
                                 recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
-                                task.endDateTime = NSNumber(value: Int((date.endOfWeek).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfWeek.UTCTime).timeIntervalSince1970))
                             case .daily:
-                                date = date.startOfDay
+                                date = date.startOfDay.UTCTime
                                 recurrenceRule = RecurrenceRule.dailyRecurrence()
-                                task.endDateTime = NSNumber(value: Int((date.endOfDay).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfDay.UTCTime).timeIntervalSince1970))
                             case .hourly, .minutely, .secondly:
                                 break
                             }
@@ -412,7 +412,7 @@ extension NetworkController {
 //                            print(task.startDateTime)
 //                            print(task.endDate)
 //                            print(task.endDateTime)
-//
+
 //                            print(date)
 //                            print(recurrenceRule.toRRuleString())
 //                            print(recurrenceRule.occurrences(between: date.dayBefore, and: Date().nextYear))
