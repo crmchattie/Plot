@@ -54,9 +54,9 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
      
         chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
-                                                        verticalAxisValueFormatter: HourAxisValueFormatter(),
+//                                                        verticalAxisValueFormatter: HourAxisValueFormatter(),
                                                         verticalAxisType: .fixZeroToMiddleOnVertical,
-                                                        units: "date_only",
+                                                        units: "hrs",
                                                         formatType: range.timeSegment))
     }
     
@@ -96,8 +96,19 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                             average = sum / Double(statsCurrent.count)
                             for index in 0...daysInRange {
                                 let date = startDateCurrent.addDays(index)
-                                let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
-                                dataEntriesCurrent.append(entry)
+                                
+                                if let stat = statsCurrent.first(where: { $0.date == date }) {
+                                    if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
+                                        let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
+                                        dataEntriesCurrent.append(entry)
+                                    }
+                                } else {
+                                    let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
+                                    dataEntriesCurrent.append(entry)
+                                }
+                                
+//                                let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
+//                                dataEntriesCurrent.append(entry)
                             }
                             
                             totalValue += average
@@ -115,7 +126,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                             let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? "") + "'s average",
                                                                            color: .systemBlue,
                                                                            value: average,
-                                                                           formattedValue: "\(self.dateFormatter.string(from: average)!) " + self.titleStringSingular)
+                                                                           formattedValue: "\(self.dateFormatter.string(from: average)!)")
                             categories.append(categoryCurrent)
 
                             if let statsPast = statsPast, statsPast.count > 0  {
@@ -124,8 +135,19 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                                 average = sum / Double(statsCurrent.count)
                                 for index in 0...daysInRange {
                                     let date = startDatePast.addDays(index)
-                                    let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
-                                    dataEntriesPast.append(entry)
+                                    
+                                    if let stat = statsPast.first(where: { $0.date == date }) {
+                                        if !dataEntriesPast.contains(where: {$0.data as? Date == stat.date }) {
+                                            let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
+                                            dataEntriesPast.append(entry)
+                                        }
+                                    } else {
+                                        let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
+                                        dataEntriesPast.append(entry)
+                                    }
+                                    
+//                                    let entry = ChartDataEntry(x: Double(index) + 1, y: average, data: date)
+//                                    dataEntriesPast.append(entry)
                                 }
                                 
                                 totalValue -= average
@@ -143,7 +165,7 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                                 let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? "") + "'s average",
                                                                                color: .secondaryLabel,
                                                                                value: average,
-                                                                               formattedValue: "\(self.dateFormatter.string(from: average)!) " + self.titleStringSingular)
+                                                                               formattedValue: "\(self.dateFormatter.string(from: average)!)")
                                 categories.append(categoryPast)
 
                             }

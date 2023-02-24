@@ -11,9 +11,8 @@ import Charts
 import Combine
 
 private func getTitle(range: DateRange) -> String {
-    DateRangeFormatter(currentWeek: "Vs. prior week", currentMonth: "Vs. prior month", currentYear: "Vs. prior year")
-        .format(range: range)
-//    DateRangeFormatter(currentWeek: "Over the last week", currentMonth: "Over the last month", currentYear: "Over the last year").format(range: range)
+//    DateRangeFormatter(currentWeek: "Vs. prior week", currentMonth: "Vs. prior month", currentYear: "Vs. prior year").format(range: range)
+    DateRangeFormatter(currentWeek: "Over the last week", currentMonth: "Over the last month", currentYear: "Over the last year").format(range: range)
 }
 
 class TaskAnalyticsDataSource: AnalyticsDataSource {
@@ -50,7 +49,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         self.networkController = networkController
         self.range = range
         
-        chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
+        chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: numberFormatter),
                                                         units: "completed",
