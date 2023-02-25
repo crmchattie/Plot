@@ -30,7 +30,7 @@ class HealthDetailViewModel: HealthDetailViewModelInterface {
     }
     
     func fetchChartData(for segmentType: TimeSegmentType, completion: @escaping (BarChartData?) -> ()) {
-        healthDetailService.getSamples(for: healthMetric, segmentType: segmentType, anchorDate: nil) { [weak self] (stats, samples, error) in
+        healthDetailService.getSamples(for: healthMetric, segmentType: segmentType, anchorDate: nil, extraDataPoint: false) { [weak self] (stats, samples, error) in
 
             var data: BarChartData?
             if let stats = stats, stats.count > 0 {

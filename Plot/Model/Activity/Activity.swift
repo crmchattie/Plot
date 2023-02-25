@@ -1998,11 +1998,11 @@ func activityListStats(
                 continue
             }
             
-            print(chunkStart)
-            print(chunkEnd)
-            print("passed dates activities")
-            print(activityStartDate)
-            print(activityEndDate)
+//            print(chunkStart)
+//            print(chunkEnd)
+//            print("passed dates activities")
+//            print(activityStartDate)
+//            print(activityEndDate)
             
             // Skipping activities that are outside of the interest range.
             if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
@@ -2117,24 +2117,6 @@ extension Activity {
     var completedDateDate: Date? {
         if let completedDate = completedDate?.doubleValue {
             return Date(timeIntervalSince1970: completedDate)
-        }
-        return nil
-    }
-    
-    var goalStartDate: Date? {
-        if let startDateTemp = self.startDate {
-            return startDateTemp
-        } else if let startDateTemp = self.startDateGivenEndDatePeriod {
-            return startDateTemp
-        }
-        return nil
-    }
-    
-    var goalEndDate: Date? {
-        if let endDateTemp = self.endDate {
-            return endDateTemp
-        } else if let startDateTemp = self.endDateGivenStartDatePeriod {
-            return startDateTemp
         }
         return nil
     }

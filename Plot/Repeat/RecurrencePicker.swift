@@ -245,28 +245,6 @@ extension RecurrencePicker {
         default:
             break
         }
-        
-//        switch indexPath.row {
-//        case 0:
-//            recurrenceRule = nil
-//        case 1:
-//            occurrenceDate = occurrenceDateStatic.startOfDay.UTCTime
-//            recurrenceRule = RecurrenceRule.dailyRecurrence()
-//        case 2:
-//            occurrenceDate = occurrenceDateStatic.startOfWeek.UTCTime
-//            let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: occurrenceDate))!
-//            recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
-//        case 3:
-//            occurrenceDate = occurrenceDateStatic.startOfMonth.UTCTime
-//            let monthday = calendar.component(.day, from: occurrenceDate)
-//            recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-//        case 4:
-//            occurrenceDate = occurrenceDateStatic.startOfYear.UTCTime
-//            let month = calendar.component(.month, from: occurrenceDate)
-//            recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
-//        default:
-//            break
-//        }
     }
 
     fileprivate func recurrenceRuleText() -> String? {

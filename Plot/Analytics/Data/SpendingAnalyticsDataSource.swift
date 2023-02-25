@@ -92,6 +92,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                     self.transactions = Array(Set(transactionValuesCurrent + (transactionValuesPast ?? [])))
                                 
                     DispatchQueue.global(qos: .userInteractive).async {
+                        var chartDataSets = [LineChartDataSet]()
                         var categories: [CategorySummaryViewModel] = []
                         
                         var totalValue: Double = 0
@@ -114,9 +115,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                         chartDataSetCurrent.fillAlpha = 0
                         chartDataSetCurrent.drawFilledEnabled = true
                         chartDataSetCurrent.drawCirclesEnabled = false
-                        
-                        var chartDataSets = [chartDataSetCurrent]
-                        
+                                                
                         let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
                                                                        color: .systemBlue,
                                                                        value: cumulative,
@@ -166,6 +165,8 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                             categories.append(categoryCurrent)
                             
                         }
+                        
+                        chartDataSets.append(chartDataSetCurrent)
                         
                         newChartViewModel.categories = categories
                         

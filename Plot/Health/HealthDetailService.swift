@@ -10,8 +10,8 @@ import Foundation
 import HealthKit
 
 protocol HealthDetailServiceInterface {
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, extraDataPoint: Bool?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, extraDataPoint: Bool?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void)
     func getSamples(for healthMetric: HealthMetric, range: DateRange, completion: @escaping (Statistic?, [HKSample]?, Error?) -> Swift.Void)
     func getSamples(for workouts: [Workout], measure: WorkoutMeasure, categories: [String]?, range: DateRange, completion: @escaping (Statistic?, [Workout]?, Error?) -> Swift.Void)
     func getSamples(for mindfulnesses: [Mindfulness], range: DateRange, completion: @escaping (Statistic?, [Mindfulness]?, Error?) -> Swift.Void)
@@ -26,12 +26,12 @@ class HealthDetailService: HealthDetailServiceInterface {
     var workouts = [String: [HKWorkout]]()
     var mindfulnesses = [HKCategorySample]()
     
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
-        getStatisticalSamples(for: healthMetric, segmentType: segmentType, range: nil, anchorDate: anchorDate, completion: completion)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, anchorDate: Date?, extraDataPoint: Bool?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
+        getStatisticalSamples(for: healthMetric, segmentType: segmentType, range: nil, anchorDate: anchorDate, extraDataPoint: extraDataPoint, completion: completion)
     }
     
-    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
-        getStatisticalSamples(for: healthMetric, segmentType: segmentType, range: range, anchorDate: anchorDate, completion: completion)
+    func getSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, extraDataPoint: Bool?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Swift.Void) {
+        getStatisticalSamples(for: healthMetric, segmentType: segmentType, range: range, anchorDate: anchorDate, extraDataPoint: extraDataPoint, completion: completion)
     }
     
     func getSamples(for healthMetric: HealthMetric, range: DateRange, completion: @escaping (Statistic?, [HKSample]?, Error?) -> Swift.Void) {
@@ -171,7 +171,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
     }
     
-    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
+    private func getStatisticalSamples(for healthMetric: HealthMetric, segmentType: TimeSegmentType, range: DateRange?, anchorDate: Date?, extraDataPoint: Bool?, completion: @escaping ([Statistic]?, [HKSample]?, Error?) -> Void) {
         let healthMetricType = healthMetric.type
         var interval = DateComponents()
         var quantityType: HKQuantityType?
@@ -256,7 +256,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         else if segmentType == .week {
             interval.day = 1
-            startDate = anchorDate.weekBefore.advanced(by: 86400)
+            startDate = anchorDate.weekBefore
         }
         else if segmentType == .month {
             interval.day = 1
@@ -277,10 +277,10 @@ class HealthDetailService: HealthDetailServiceInterface {
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.advanced(by: 43200)
-            
-            print("sleep stats for everything else")
-            print(startDate)
-            print(endDate)
+        }
+        
+        if segmentType != .day, !(extraDataPoint ?? false) {
+            startDate = startDate.advanced(by: 86400)
         }
         
         if HealthKitService.authorized {

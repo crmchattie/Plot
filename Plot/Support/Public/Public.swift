@@ -1954,10 +1954,12 @@ enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
     case None = "None"
     case NineAMOnDeadlineDate = "Day of at 9 AM"
     case SixPMOnDeadlineDate = "Day of at 6 PM"
-    case NineAMOneDayOnDeadlineDate = "Day before at 9 AM"
-    case SixPMOneDayOnDeadlineDate = "Day before at 6 PM"
-    case NineAMOneWeekOnDeadlineDate = "Week before at 9 AM"
-    case SixPMOneWeekOnDeadlineDate = "Week before at 6 PM"
+    case NineAMOneDayBeforeDeadlineDate = "Day before at 9 AM"
+    case SixPMOneDayBeforeDeadlineDate = "Day before at 6 PM"
+    case NineAMOneWeekBeforeDeadlineDate = "Week before at 9 AM"
+    case SixPMOneWeekBeforeDeadlineDate = "Week before at 6 PM"
+    case NineAMOneMonthBeforeDeadlineDate = "Month before at 9 AM"
+    case SixPMOneMonthBeforeDeadlineDate = "Month before at 6 PM"
 
     var description : String { return rawValue }
         
@@ -1967,7 +1969,7 @@ enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
         dateComponents.timeZone = TimeZone.current
         switch self {
         case .None:
-            return deadlineDate
+            return nil
         case .NineAMOnDeadlineDate:
             dateComponents.year = deadlineDate.yearNumber()
             dateComponents.month = deadlineDate.monthNumber()
@@ -1982,7 +1984,7 @@ enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             dateComponents.hour = 18
             dateComponents.minute = 0
             return calendar.date(from: dateComponents)
-        case .NineAMOneDayOnDeadlineDate:
+        case .NineAMOneDayBeforeDeadlineDate:
             let newDate = deadlineDate.dayBefore
             dateComponents.year = newDate.yearNumber()
             dateComponents.month = newDate.monthNumber()
@@ -1990,7 +1992,7 @@ enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             dateComponents.hour = 9
             dateComponents.minute = 0
             return calendar.date(from: dateComponents)
-        case .SixPMOneDayOnDeadlineDate:
+        case .SixPMOneDayBeforeDeadlineDate:
             let newDate = deadlineDate.dayBefore
             dateComponents.year = newDate.yearNumber()
             dateComponents.month = newDate.monthNumber()
@@ -1998,7 +2000,7 @@ enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             dateComponents.hour = 18
             dateComponents.minute = 0
             return calendar.date(from: dateComponents)
-        case .NineAMOneWeekOnDeadlineDate:
+        case .NineAMOneWeekBeforeDeadlineDate:
             let newDate = deadlineDate.weekBefore
             dateComponents.year = newDate.yearNumber()
             dateComponents.month = newDate.monthNumber()
@@ -2006,8 +2008,24 @@ enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
             dateComponents.hour = 9
             dateComponents.minute = 0
             return calendar.date(from: dateComponents)
-        case .SixPMOneWeekOnDeadlineDate:
+        case .SixPMOneMonthBeforeDeadlineDate:
             let newDate = deadlineDate.weekBefore
+            dateComponents.year = newDate.yearNumber()
+            dateComponents.month = newDate.monthNumber()
+            dateComponents.day = newDate.dayNumber()
+            dateComponents.hour = 18
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        case .NineAMOneMonthBeforeDeadlineDate:
+            let newDate = deadlineDate.monthBefore
+            dateComponents.year = newDate.yearNumber()
+            dateComponents.month = newDate.monthNumber()
+            dateComponents.day = newDate.dayNumber()
+            dateComponents.hour = 9
+            dateComponents.minute = 0
+            return calendar.date(from: dateComponents)
+        case .SixPMOneWeekBeforeDeadlineDate:
+            let newDate = deadlineDate.monthBefore
             dateComponents.year = newDate.yearNumber()
             dateComponents.month = newDate.monthNumber()
             dateComponents.day = newDate.dayNumber()

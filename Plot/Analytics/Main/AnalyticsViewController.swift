@@ -101,7 +101,6 @@ class AnalyticsViewController: UITableViewController {
     }
     
     @objc fileprivate func goalsUpdated() {
-        print("goalsUpdated")
         viewModel?.goalsUpdate {
             self.tableView.reloadData()
         }

@@ -222,11 +222,11 @@ func workoutListStats(
             continue
         }
         
-        print(chunkStart)
-        print(chunkEnd)
-        print("passed dates workouts")
-        print(startDate)
-        print(endDate)
+//        print(chunkStart)
+//        print(chunkEnd)
+//        print("passed dates workouts")
+//        print(startDate)
+//        print(endDate)
         
         // Skipping activities that are outside of the interest range.
         if startDate >= chunkEnd || endDate <= chunkStart {

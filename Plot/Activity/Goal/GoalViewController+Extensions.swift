@@ -346,13 +346,13 @@ extension GoalViewController: RecurrencePickerDelegate {
             if let recurrenceRule = recurrenceRule {
                 switch recurrenceRule.frequency {
                 case .yearly:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfYear.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfYear.advanced(by: -1)).timeIntervalSince1970))
                 case .monthly:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfMonth.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfMonth.advanced(by: -1)).timeIntervalSince1970))
                 case .weekly:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfWeek.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfWeek.advanced(by: -1)).timeIntervalSince1970))
                 case .daily:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfDay.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfDay.advanced(by: -1)).timeIntervalSince1970))
                 case .hourly, .minutely, .secondly:
                     break
                 }

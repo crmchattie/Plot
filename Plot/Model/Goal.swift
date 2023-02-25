@@ -1261,7 +1261,7 @@ struct Goal: Codable, Equatable, Hashable {
     }
 }
 
-let prebuiltGoals = [mindfulnessGoal, sleepGoal, workoutsGoal, moodGoal, spendingGoal, savingsGoal, spendingGoal, emergencyFundGoal, creditCardGoal, debtGoal, dentistGoal, timeOffGoal, generalCheckUpGoal, eyeCheckUpGoal, skinCheckUpGoal, socialGoal]
+let prebuiltGoals = [mindfulnessGoal, sleepGoal, workoutsGoal, moodGoal, savingsGoal, spendingGoal, emergencyFundGoal, creditCardGoal, debtGoal, dentistGoal, timeOffGoal, generalCheckUpGoal, eyeCheckUpGoal, skinCheckUpGoal, socialGoal]
 
 let mindfulnessGoal = Goal(name: "Daily Mindfulness", metric: GoalMetric.mindfulness, submetric: nil, option: nil, unit: GoalUnit.minutes, period: GoalPeriod.day, targetNumber: 15, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.events, submetricSecond: GoalSubMetric.category, optionSecond: ["Personal"], unitSecond: GoalUnit.minutes, periodSecond: nil, targetNumberSecond: 15, currentNumberSecond: nil, metricsRelationshipType: MetricsRelationshipType.or)
 let sleepGoal = Goal(name: "Daily Sleep", metric: GoalMetric.sleep, submetric: nil, option: nil, unit: GoalUnit.hours, period: GoalPeriod.day, targetNumber: 7, currentNumber: nil, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)

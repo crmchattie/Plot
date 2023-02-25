@@ -33,16 +33,17 @@ extension NetworkController {
                 continue
             }
                         
-            let range = DateRange(startDate: task.goalStartDate ?? Date(), endDate: task.goalEndDate ?? Date())
+            let range = DateRange(startDate: task.startDate ?? Date(), endDate: task.endDate ?? Date())
             guard range.endDate > past, range.startDate <= tomorrow else {
                 group.leave()
                 continue
             }
             
             print("metricCheck")
+            print(task.name)
             print(metric)
-            print(task.goalStartDate)
-            print(task.goalEndDate)
+            print(task.startDate)
+            print(task.endDate)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
@@ -333,7 +334,7 @@ extension NetworkController {
                 }
                 
                 if let list = list {
-                    var date = Date()
+                    var date = Date().localTime.weekBefore
                     let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
                     task.name = goal.name
                     task.isGoal = true
@@ -352,7 +353,7 @@ extension NetworkController {
                             let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
                             let endOfLastMonth = Date().endOfMonth.monthBefore
                             checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
-                                goal.targetNumber = round(stat?.value ?? 0 / 3 * 0.2)
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.2) / 3)
                                 group.leave()
                             }
                         } else if goal.name == "Daily Spending" {
@@ -360,7 +361,7 @@ extension NetworkController {
                             let endOfLastMonth = Date().endOfMonth.monthBefore
                             let daysBetween = Double(Calendar.current.numberOfDaysBetween(startOfThreeMonthsAgo, and: endOfLastMonth))
                             checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
-                                goal.targetNumber = round(stat?.value ?? 0 / daysBetween * 0.8)
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.8) / daysBetween)
                                 group.leave()
                             }
                         }
@@ -376,25 +377,25 @@ extension NetworkController {
                             
                             switch recurrenceRule.frequency {
                             case .yearly:
-                                date = date.startOfYear.UTCTime
+                                date = date.startOfYear
                                 let month = calendar.component(.month, from: date)
                                 recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
-                                task.endDateTime = NSNumber(value: Int((date.endOfYear.UTCTime).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfYear.advanced(by: -1)).timeIntervalSince1970))
                             case .monthly:
-                                date = date.startOfMonth.UTCTime
+                                date = date.startOfMonth
                                 let monthday = calendar.component(.day, from: date)
                                 recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.UTCTime).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.advanced(by: -1)).timeIntervalSince1970))
                                 recurrenceRule.bymonthday = [1]
                             case .weekly:
-                                date = date.startOfWeek.UTCTime
+                                date = date.startOfWeek
                                 let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: date))!
                                 recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
-                                task.endDateTime = NSNumber(value: Int((date.endOfWeek.UTCTime).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfWeek.advanced(by: -1)).timeIntervalSince1970))
                             case .daily:
-                                date = date.startOfDay.UTCTime
+                                date = date.startOfDay
                                 recurrenceRule = RecurrenceRule.dailyRecurrence()
-                                task.endDateTime = NSNumber(value: Int((date.endOfDay.UTCTime).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfDay.advanced(by: -1)).timeIntervalSince1970))
                             case .hourly, .minutely, .secondly:
                                 break
                             }
@@ -404,22 +405,31 @@ extension NetworkController {
                             task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
                             
                             recurrenceRule.startDate = date
-                            recurrenceRule.interval = goal.name != "Dentist" ? 1 : 2
+                            recurrenceRule.interval = goal.name != "Bi-Annual Dental Cleaning" ? 1 : 2
                             task.recurrences = [recurrenceRule.toRRuleString()]
                             
+                            if goal.name == "Daily Mood" {
+                                task.reminder = TaskAlert.SixPMOnDeadlineDate.description
+                            } else if goal.name == "Daily Sleep" {
+                                task.reminder = TaskAlert.SixPMOneDayBeforeDeadlineDate.description
+                            } else if frequency == .monthly {
+                                task.reminder = TaskAlert.NineAMOneWeekBeforeDeadlineDate.description
+                            } else if frequency == .yearly {
+                                task.reminder = TaskAlert.NineAMOneMonthBeforeDeadlineDate.description
+                            } else {
+                                task.reminder = TaskAlert.NineAMOnDeadlineDate.description
+                            }
+                                         
+//                            print("setup initial goal")
 //                            print(task.name)
 //                            print(task.startDate)
-//                            print(task.startDateTime)
 //                            print(task.endDate)
-//                            print(task.endDateTime)
-
-//                            print(date)
 //                            print(recurrenceRule.toRRuleString())
-//                            print(recurrenceRule.occurrences(between: date.dayBefore, and: Date().nextYear))
+//                            print(task.reminder)
                         }
                         
-//                        let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
-//                        activityAction.createNewActivity(updateDirectAssociation: false)
+                        let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
+                        activityAction.createNewActivity(updateDirectAssociation: false)
 
                     }
                 }

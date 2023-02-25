@@ -62,14 +62,15 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                         i += 1
                     }
                     
-                    let dataSet = LineChartDataSet(entries: entries, label: "")
-                    dataSet.setDrawHighlightIndicators(false)
-                    dataSet.fillColor = .systemBlue
-                    dataSet.fillAlpha = 1
-                    dataSet.drawFilledEnabled = true
-                    dataSet.drawCirclesEnabled = false
-                    
-                    lineChartData = LineChartData(dataSet: dataSet)
+                    let chartDataSet = LineChartDataSet(entries: entries, label: "")
+                    chartDataSet.setDrawHighlightIndicators(false)
+                    chartDataSet.axisDependency = .right
+                    chartDataSet.colors = [NSUIColor.systemBlue]
+                    chartDataSet.lineWidth = 5
+                    chartDataSet.fillAlpha = 0
+                    chartDataSet.drawFilledEnabled = true
+                    chartDataSet.drawCirclesEnabled = false
+                    lineChartData = LineChartData(dataSet: chartDataSet)
                     lineChartData?.setDrawValues(false)
                 }
                 
@@ -96,14 +97,15 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                         i += 1
                     }
                     
-                    let dataSet = LineChartDataSet(entries: entries, label: "")
-                    dataSet.setDrawHighlightIndicators(false)
-                    dataSet.fillColor = .systemBlue
-                    dataSet.fillAlpha = 1
-                    dataSet.drawFilledEnabled = true
-                    dataSet.drawCirclesEnabled = false
-                    
-                    lineChartData = LineChartData(dataSet: dataSet)
+                    let chartDataSet = LineChartDataSet(entries: entries, label: "")
+                    chartDataSet.setDrawHighlightIndicators(false)
+                    chartDataSet.axisDependency = .right
+                    chartDataSet.colors = [NSUIColor.systemBlue]
+                    chartDataSet.lineWidth = 5
+                    chartDataSet.fillAlpha = 0
+                    chartDataSet.drawFilledEnabled = true
+                    chartDataSet.drawCirclesEnabled = false
+                    lineChartData = LineChartData(dataSet: chartDataSet)
                     lineChartData?.setDrawValues(false)
                 }
                 

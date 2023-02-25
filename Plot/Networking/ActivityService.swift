@@ -144,10 +144,10 @@ class ActivityService {
         didSet {
             if oldValue != goals {
                 goals.sort { goal1, goal2 in
-                    if goal1.goalEndDate == goal2.goalEndDate {
+                    if goal1.endDate == goal2.endDate {
                         return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return goal1.goalEndDate ?? Date.distantFuture < goal2.goalEndDate ?? Date.distantFuture
+                    return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
                 }
                 NotificationCenter.default.post(name: .goalsUpdated, object: nil)
             }
@@ -158,10 +158,10 @@ class ActivityService {
         didSet {
             if oldValue != goalsNoRepeats {
                 goalsNoRepeats.sort { goal1, goal2 in
-                    if goal1.goalEndDate == goal2.goalEndDate {
+                    if goal1.endDate == goal2.endDate {
                         return goal1.name ?? "" < goal2.name ?? ""
                     }
-                    return goal1.goalEndDate ?? Date.distantFuture < goal2.goalEndDate ?? Date.distantFuture
+                    return goal1.endDate ?? Date.distantFuture < goal2.endDate ?? Date.distantFuture
                 }
                 NotificationCenter.default.post(name: .goalsNoRepeatsUpdated, object: nil)
             }
@@ -828,12 +828,10 @@ class ActivityService {
     }
     
     func scheduleReminder(activities: [Activity]) {
-        let today = Date().localTime
         for activity in activities {
-            guard let activityReminder = activity.reminder, let activityID = activity.activityID, let endDate = activity.endDate, endDate > today else {
+            guard let activityReminder = activity.reminder, let activityID = activity.activityID, let endDate = activity.endDate, endDate > Date() else {
                 continue
             }
-            
             let center = UNUserNotificationCenter.current()
             center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
             guard activityReminder != "None" else {
@@ -895,9 +893,8 @@ class ActivityService {
     }
     
     func scheduleSubReminder(sub_activities: [Activity], parent: Activity) {
-        let today = Date().localTime
         for sub_activity in sub_activities {
-            guard let reminder = sub_activity.reminder, let sub_activity_ID = sub_activity.activityID, let endDate = sub_activity.getSubEndDate(parent: parent), endDate > today else {
+            guard let reminder = sub_activity.reminder, let sub_activity_ID = sub_activity.activityID, let endDate = sub_activity.getSubEndDate(parent: parent), endDate > Date() else {
                 continue
             }
             let center = UNUserNotificationCenter.current()

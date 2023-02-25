@@ -80,10 +80,10 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
 
                 newChartViewModel.healthMetric = healthMetric
                 
-                healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { statsCurrent, samplesCurrent, error in
+                healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1), extraDataPoint: true) { statsCurrent, samplesCurrent, error in
                     var totalValue = 0.0
                     
-                    self.healthDetailService.getSamples(for: healthMetric, segmentType: self.range.timeSegment, anchorDate: self.range.pastEndDate?.dayBefore.advanced(by: 1)) { statsPast, samplesPast, error in
+                    self.healthDetailService.getSamples(for: healthMetric, segmentType: self.range.timeSegment, anchorDate: self.range.pastEndDate?.dayBefore.advanced(by: 1), extraDataPoint: true) { statsPast, samplesPast, error in
                         self.samples = Array(Set((samplesCurrent ?? []) + (samplesPast ?? [])))
                         var categories: [CategorySummaryViewModel] = []
                         var chartDataSets = [LineChartDataSet]()
@@ -121,7 +121,6 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                             chartDataSetCurrent.fillAlpha = 0
                             chartDataSetCurrent.drawFilledEnabled = true
                             chartDataSetCurrent.drawCirclesEnabled = false
-                            chartDataSets.append(chartDataSetCurrent)
                             
                             let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? "") + "'s average",
                                                                            color: .systemBlue,
@@ -170,6 +169,8 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
 
                             }
                             
+                            chartDataSets.append(chartDataSetCurrent)
+
                             newChartViewModel.categories = categories
                             
                         }
@@ -203,7 +204,7 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
             if let workoutMetrics = networkController.healthService.healthMetrics[.workouts], let healthMetric = workoutMetrics.first(where: {$0.type == .activeEnergy}) {
                 dataExists = true
                 newChartViewModel.healthMetric = healthMetric
-                healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1)) { stats, samples, error in
+                healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1), extraDataPoint: false) { stats, samples, error in
                     var data: BarChartData?
                     var sum = 0.0
                     if let stats = stats, stats.count > 0 {

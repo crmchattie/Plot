@@ -86,6 +86,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                     self.tasks = Array(Set(taskListCurrent + taskListPast))
                     
                     DispatchQueue.global(qos: .userInteractive).async {
+                        var chartDataSets = [LineChartDataSet]()
                         var categories: [CategorySummaryViewModel] = []
                         let keysCurrent = categoryStatsCurrent.keys.sorted(by: <)
                         
@@ -107,9 +108,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                         chartDataSetCurrent.fillAlpha = 0
                         chartDataSetCurrent.drawFilledEnabled = true
                         chartDataSetCurrent.drawCirclesEnabled = false
-                        
-                        var chartDataSets = [chartDataSetCurrent]
-                        
+                                                
                         let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
                                                                        color: .systemBlue,
                                                                        value: Double(taskListCurrent.count),
@@ -145,7 +144,9 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                                                                         formattedValue: "\(Int(taskListPast.count)) " + (taskListPast.count == 1 ? self.titleStringSingular : self.titleStringPlural))
                             categories.append(categoryPast)
                         }
-                                                                        
+                                    
+                        chartDataSets.append(chartDataSetCurrent)
+                        
                         newChartViewModel.categories = categories
                         
                         let change = taskListCurrent.count - taskListPast.count

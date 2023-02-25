@@ -109,9 +109,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 print(activityID)
                 print(task.instanceID as Any)
                 print(task.startDate)
-                print(task.goalStartDate)
                 print(task.endDate)
-                print(task.goalEndDate)
 
             }
             if task.admin == nil, let currentUserID = Auth.auth().currentUser?.uid {
