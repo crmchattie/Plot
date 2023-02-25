@@ -249,7 +249,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
         let anchorDate = anchorDate ?? Date().localTime.startOfDay.addingTimeInterval(-seconds)
         var startDate = anchorDate
-        let endDate = anchorDate.advanced(by: 86399)
+        var endDate = anchorDate.advanced(by: 86399)
                                 
         if segmentType == .day {
             interval.hour = 1
@@ -277,6 +277,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.advanced(by: 43200)
+            if segmentType == .day {
+                endDate = startDate.advanced(by: 86400)
+            }
         }
         
         if segmentType != .day, !(extraDataPoint ?? false) {
@@ -483,14 +486,11 @@ class HealthDetailService: HealthDetailServiceInterface {
         let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
         let anchorDate = range.startDate.dayAfter.localTime.startOfDay.addingTimeInterval(-seconds)
         var startDate = anchorDate
-        let endDate = anchorDate.advanced(by: 86399)
+        var endDate = anchorDate.advanced(by: 86399)
         
         if case .sleep = healthMetricType {
             startDate = startDate.dayBefore.advanced(by: 43200)
-            
-            print("sleep stats for goals")
-            print(startDate)
-            print(endDate)
+            endDate = startDate.advanced(by: 86400)
         }
         
         if HealthKitService.authorized {
@@ -877,7 +877,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             completion(stat, customSamples)
             return
         }
-                
+                        
         var typeOfSleep: PlotSleepAnalysis = .inBed
         
         let sleepValues = samples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
@@ -894,7 +894,8 @@ class HealthDetailService: HealthDetailServiceInterface {
                 typeOfSleep = .inBed
             }
         }
-                
+        
+        var sum = Double()
         for sample in samples {
             guard let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value) else {
                 continue
@@ -909,7 +910,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
                         
             stat.value += TimeInterval(timeSum).totalHours
-            
+            sum += TimeInterval(timeSum)
             let customSample = HKCategorySample(type: sample.categoryType, value: sleepValue.rawValue, start: sample.startDate, end: sample.endDate)
             customSamples.append(customSample)
 

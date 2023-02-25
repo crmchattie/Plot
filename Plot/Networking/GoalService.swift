@@ -39,11 +39,12 @@ extension NetworkController {
                 continue
             }
             
-            print("metricCheck")
-            print(task.name)
-            print(metric)
-            print(task.startDate)
-            print(task.endDate)
+//            print("metricCheck")
+//            print(task.name)
+//            print(task.activityID)
+//            print(metric)
+//            print(task.startDate)
+//            print(task.endDate)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
@@ -334,7 +335,7 @@ extension NetworkController {
                 }
                 
                 if let list = list {
-                    var date = Date().localTime.weekBefore
+                    var date = Date()
                     let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
                     task.name = goal.name
                     task.isGoal = true
@@ -382,10 +383,11 @@ extension NetworkController {
                                 recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
                                 task.endDateTime = NSNumber(value: Int((date.endOfYear.advanced(by: -1)).timeIntervalSince1970))
                             case .monthly:
-                                date = date.startOfMonth
+                                // monthly needs UTCTime in order for recurrence to calc the correct dates
+                                date = date.startOfMonth.UTCTime
                                 let monthday = calendar.component(.day, from: date)
                                 recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
-                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.advanced(by: -1)).timeIntervalSince1970))
+                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.UTCTime.advanced(by: -1)).timeIntervalSince1970))
                                 recurrenceRule.bymonthday = [1]
                             case .weekly:
                                 date = date.startOfWeek
@@ -424,6 +426,8 @@ extension NetworkController {
 //                            print(task.name)
 //                            print(task.startDate)
 //                            print(task.endDate)
+//                            print(task.startDateTime)
+//                            print(task.endDateTime)
 //                            print(recurrenceRule.toRRuleString())
 //                            print(task.reminder)
                         }

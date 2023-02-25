@@ -348,7 +348,8 @@ extension GoalViewController: RecurrencePickerDelegate {
                 case .yearly:
                     self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfYear.advanced(by: -1)).timeIntervalSince1970))
                 case .monthly:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfMonth.advanced(by: -1)).timeIntervalSince1970))
+                    // monthly needs UTCTime in order for recurrence to calc the correct dates
+                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfMonth.UTCTime.advanced(by: -1)).timeIntervalSince1970))
                 case .weekly:
                     self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfWeek.advanced(by: -1)).timeIntervalSince1970))
                 case .daily:
