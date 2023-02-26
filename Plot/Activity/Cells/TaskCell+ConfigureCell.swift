@@ -160,7 +160,7 @@ extension TaskCollectionCell {
         }
                 
         var image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
-        if task.isGoal ?? false, !(task.isCompleted ?? false), let endDate = task.endDate, endDate < Date() {
+        if task.isGoal ?? false, !(task.isCompleted ?? false), let endDate = task.endDate, endDate < Date().localTime {
             image = "x.circle"
         }
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)

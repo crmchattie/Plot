@@ -21,6 +21,14 @@ enum DateRangeType: CaseIterable {
         }
     }
     
+    var pastInitial: (Date, Date) {
+        switch self {
+        case .week: return (Date().localTime.startOfDay.UTCTime.weekBefore.advanced(by: 86400).weekBefore, Date().localTime.startOfDay.UTCTime.advanced(by: 86399).weekBefore)
+        case .month: return (Date().localTime.startOfDay.UTCTime.monthBefore.advanced(by: 86400).monthBefore, Date().localTime.startOfDay.UTCTime.advanced(by: 86399).monthBefore)
+//        case .year: return (Date().yearBefore, Date())
+        }
+    }
+    
     var filterTitle: String {
         switch self {
         case .week: return "Weekly"
@@ -45,6 +53,7 @@ struct DateRange {
             if let type = type {
                 filterOff = true
                 (startDate, endDate) = type.initial
+                (pastStartDate, pastEndDate) = type.pastInitial
             }
         }
     }
@@ -63,14 +72,7 @@ struct DateRange {
     init(type: DateRangeType) {
         self.type = type
         (startDate, endDate) = type.initial
-        switch type {
-        case .week:
-            pastStartDate = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
-            pastEndDate = Calendar.current.date(byAdding: .day, value: -7, to: endDate)!
-        case .month:
-            pastStartDate = Calendar.current.date(byAdding: .month, value: -1, to: startDate)!
-            pastEndDate = Calendar.current.date(byAdding: .month, value: -1, to: endDate)!
-        }
+        (pastStartDate, pastEndDate) = type.pastInitial
     }
     
     init(startDate: Date, endDate: Date) {

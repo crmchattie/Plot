@@ -138,6 +138,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
         activityIndicator.startAnimating()
         tableView.isHidden = true
+        tableView.reloadData()
         filterOff = true
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
         viewModel.updateType {

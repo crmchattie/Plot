@@ -256,7 +256,9 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                     .filter { sample -> Bool in
                         return range.startDate <= sample.startDate && sample.startDate <= range.endDate
                     }
-                completion(filteredSamples.map { .sample($0) })
+                if let first = filteredSamples.first {
+                    completion([AnalyticsBreakdownEntry.sample(first)])
+                }
             case .horizontalBar:
                 let filteredSamples = samples
                     .filter { sample -> Bool in

@@ -82,7 +82,7 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                 let startDatePast = range.pastStartDate?.dayBefore ?? startDateCurrent
                             
                 newChartViewModel.healthMetric = healthMetric
-                                                
+                
                 healthDetailService.getSamples(for: healthMetric, segmentType: range.timeSegment, anchorDate: range.endDate.dayBefore.advanced(by: 1), extraDataPoint: true) { statsCurrent, samplesCurrent, error in
 
                     self.healthDetailService.getSamples(for: healthMetric, segmentType: self.range.timeSegment, anchorDate: self.range.pastEndDate?.dayBefore.advanced(by: 1), extraDataPoint: true) { statsPast, samplesPast, error in
@@ -260,7 +260,9 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                     .filter { sample -> Bool in
                         return range.startDate <= sample.startDate && sample.startDate <= range.endDate
                     }
-                completion(filteredSamples.map { .sample($0) })
+                if let first = filteredSamples.first {
+                    completion([AnalyticsBreakdownEntry.sample(first)])
+                }
             case .horizontalBar:
                 let filteredSamples = samples
                     .filter { sample -> Bool in
