@@ -344,24 +344,19 @@ extension GoalViewController: RecurrencePickerDelegate {
     func recurrencePicker(_ picker: RecurrencePicker, didPickRecurrence recurrenceRule: RecurrenceRule?) {
         if let row: LabelRow = form.rowBy(tag: "Repeat") {
             if let recurrenceRule = recurrenceRule {
+                print("recurrenceRule")
+                print(recurrenceRule)
                 switch recurrenceRule.frequency {
-                case .yearly:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfYear.advanced(by: -1)).timeIntervalSince1970))
                 case .monthly:
                     // monthly needs UTCTime in order for recurrence to calc the correct dates
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfMonth.UTCTime.advanced(by: -1)).timeIntervalSince1970))
-                case .weekly:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfWeek.advanced(by: -1)).timeIntervalSince1970))
-                case .daily:
-                    self.task.endDateTime = NSNumber(value: Int((recurrenceRule.startDate.endOfDay.advanced(by: -1)).timeIntervalSince1970))
-                case .hourly, .minutely, .secondly:
+                    self.task.endDateTime = NSNumber(value: Int((self.task.endDate?.UTCTime)?.timeIntervalSince1970 ?? 0))
+                case .yearly, .weekly, .daily, .hourly, .minutely, .secondly:
                     break
                 }
-                task.startDateTime = NSNumber(value: Int((recurrenceRule.startDate).timeIntervalSince1970))
                 task.hasStartTime = false
                 task.hasDeadlineTime = false
                 task.recurrences = [recurrenceRule.toRRuleString()]
-                let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: task.endDate ?? Date())
+                let rowText = recurrenceRule.typeOfRecurrence(language: .english, occurrence: task.startDate ?? Date())
                 row.value = rowText
                 row.updateCell()
             } else {

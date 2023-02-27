@@ -930,20 +930,30 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 cell.isUserInteractionEnabled = false
             }
         }.onChange { row in
-            if let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
+            if let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch"), let dateSwitchRowEnd: SwitchRow = self.form.rowBy(tag: "deadlineDateSwitch") {
                 if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
                     switchDateRow.hidden = true
                     switchDateRow.evaluateHidden()
+                    dateSwitchRowEnd.hidden = false
+                    dateSwitchRowEnd.evaluateHidden()
                     self.task.goal!.period = updatedValue
                     if let startDateTime = self.task.startDateGivenEndDatePeriod {
                         self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
+                    } else {
+                        self.task.startDateTime = NSNumber(value: Int((Date()).timeIntervalSince1970))
                     }
                 } else {
                     row.value = "None"
                     self.task.goal!.period = nil
                     self.task.startDateTime = nil
+                    self.task.endDateTime = nil
+                    self.task.recurrences = nil
+                    self.task.reminder = nil
                     switchDateRow.hidden = false
                     switchDateRow.evaluateHidden()
+                    dateSwitchRowEnd.value = false
+                    dateSwitchRowEnd.hidden = true
+                    dateSwitchRowEnd.evaluateHidden()
                 }
                 self.updateDescriptionRow()
             }
@@ -984,7 +994,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 row.disabled = condition
                 startDateRow.hidden = condition
                 startDateRow.evaluateHidden()
-
             }
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
@@ -1002,7 +1011,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-            if let task = self.task, let startDate = task.startDate {
+            if let task = self.task, let startDate = task.startDate, let goal = task.goal, goal.period == nil {
                 cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
             } else {
                 cell.detailTextLabel?.text = nil
@@ -1050,6 +1059,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.value = false
                 $0.cell.detailTextLabel?.text = nil
             }
+            $0.hidden = Condition(booleanLiteral: self.task.startDate == nil)
         }.onChange { [weak self] row in
             if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
                 if value {
@@ -1151,6 +1161,15 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
+            if let task = self.task, let recurrences = task.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
+                if let endDate = self.task.instanceOriginalStartDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                } else if let endDate = self.task.endDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                }
+            } else {
+                row.value = "Never"
+            }
         }
         
         <<< PushRow<TaskAlert>("Reminder") { row in
@@ -1184,6 +1203,14 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
+            if let task = self.task, let value = task.reminder {
+                row.value = TaskAlert(rawValue: value)
+            } else {
+                row.value = TaskAlert.None
+                if let reminder = row.value?.description {
+                    self.task.reminder = reminder
+                }
+            }
         }.onChange() { [unowned self] row in
             if let reminder = row.value?.description {
                 self.task.reminder = reminder

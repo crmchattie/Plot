@@ -407,7 +407,7 @@ extension NetworkController {
                         if let frequency = goal.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
                             var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
                             let calendar = Calendar.current
-                            
+
                             switch recurrenceRule.frequency {
                             case .yearly:
                                 date = date.startOfYear
