@@ -2286,14 +2286,14 @@ class TapGesture: UITapGestureRecognizer {
 
 extension Date {
     var localTime: Date {
-        let timezoneOffset =  TimeZone.current.secondsFromGMT()
+        let timezoneOffset = TimeZone.current.secondsFromGMT()
         let epochDate = self.timeIntervalSince1970
         let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
         return Date(timeIntervalSince1970: timezoneEpochOffset)
     }
     
     var UTCTime: Date {
-        let timezoneOffset =  TimeZone.current.secondsFromGMT()
+        let timezoneOffset = TimeZone.current.secondsFromGMT()
         let epochDate = self.timeIntervalSince1970
         let timezoneEpochOffset = (epochDate - Double(timezoneOffset))
         return Date(timeIntervalSince1970: timezoneEpochOffset)
