@@ -259,6 +259,8 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
             button.setImage(UIImage(named: "event"), for: .normal)
         } else if notification.aps.category == Identifiers.taskCategory {
             button.setImage(UIImage(named: "task"), for: .normal)
+        }  else if notification.aps.category == Identifiers.goalCategory {
+            button.setImage(UIImage(named: "goal"), for: .normal)
         } else if notification.aps.category == Identifiers.transactionCategory {
             button.setImage(UIImage(named: "transaction"), for: .normal)
             cell.accessoryView?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)

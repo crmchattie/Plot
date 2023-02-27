@@ -424,7 +424,11 @@ class ActivityActions: NSObject {
         updateInstanceValues["instanceID"] = instanceID
         
         if activity.instanceOriginalStartDateTime == nil {
-            updateInstanceValues["instanceOriginalStartDateTime"] = activity.finalDateTime
+            if activity.isGoal ?? false, let finalDate = activity.finalDate {
+                updateInstanceValues["instanceOriginalStartDateTime"] = NSNumber(value: Int(finalDate.localTime.timeIntervalSince1970))
+            } else {
+                updateInstanceValues["instanceOriginalStartDateTime"] = activity.finalDateTime
+            }
         }
         
         if activity.isTask ?? false {

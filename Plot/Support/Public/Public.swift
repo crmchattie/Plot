@@ -1966,7 +1966,6 @@ enum TaskAlert : String, Comparable, CustomStringConvertible, CaseIterable {
     func timeInterval(_ deadlineDate: Date) -> Date? {
         let calendar = Calendar.current
         var dateComponents = DateComponents()
-        dateComponents.timeZone = TimeZone.current
         switch self {
         case .None:
             return nil

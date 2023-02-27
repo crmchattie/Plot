@@ -286,7 +286,7 @@ class ActivitiesFetcher: NSObject {
             group.enter()
             counter += 1
             if let _ = activity.goalPeriod {
-                if let endDate = activity.endDate, let startDate = activity.startDate {
+                if let startDate = activity.startDate {
                     if let instanceIDs = activity.instanceIDs {
                         ActivitiesFetcher.grabInstanceActivities(IDs: instanceIDs) { activities, _ in
                             guard counter > 0 else {
@@ -301,7 +301,6 @@ class ActivitiesFetcher: NSObject {
                             }
                             let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: startDate)
                             let dates = iCalUtility().recurringDates(forRules: rules, ruleStartDate: startDate, startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
-                            let duration = endDate.timeIntervalSince(startDate)
                             for (index, date) in dates.enumerated() {
                                 let updatedStartDate = NSNumber(value: Int(date.timeIntervalSince1970))
                                 if let instanceActivity = activities[updatedStartDate], let instanceID = instanceActivity.instanceID {
@@ -309,7 +308,7 @@ class ActivitiesFetcher: NSObject {
                                     newActivity.recurrenceStartDateTime = activity.startDateTime
                                     newActivity.instanceIndex = index
                                     newActivity.startDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970))
-                                    newActivity.endDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970 + duration))
+                                    newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
                                     self.instanceActivities[instanceID] = newActivity
                                     newActivities.append(newActivity)
                                 } else {
@@ -317,7 +316,7 @@ class ActivitiesFetcher: NSObject {
                                     newActivity.recurrenceStartDateTime = activity.finalDateTime
                                     newActivity.instanceIndex = index
                                     newActivity.startDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970))
-                                    newActivity.endDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970 + duration))
+                                    newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
                                     newActivities.append(newActivity)
                                 }
                             }
@@ -327,13 +326,12 @@ class ActivitiesFetcher: NSObject {
                     } else {
                         let dayBeforeNowDate = Calendar.current.date(byAdding: .day, value: -1, to: startDate)
                         let dates = iCalUtility().recurringDates(forRules: rules, ruleStartDate: startDate, startDate: dayBeforeNowDate ?? Date(), endDate: futureDate ?? Date())
-                        let duration = endDate.timeIntervalSince(startDate)
                         for (index, date) in dates.enumerated() {
                             let newActivity = activity.copy() as! Activity
                             newActivity.recurrenceStartDateTime = activity.startDateTime
                             newActivity.instanceIndex = index
                             newActivity.startDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970))
-                            newActivity.endDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970 + duration))
+                            newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
                             newActivities.append(newActivity)
                         }
                         group.leave()
@@ -502,16 +500,6 @@ class ActivitiesFetcher: NSObject {
             }
         }
         group.notify(queue: .main) {
-            print(activity.name)
-            print(activity.activityID)
-            print(activity.startDate)
-            print(activity.endDate)
-            for newActivity in newActivities {
-                print(newActivity.name)
-                print(newActivity.startDate)
-                print(newActivity.endDate)
-                print(newActivity.instanceID)
-            }
             completion(newActivities)
         }
     }

@@ -754,6 +754,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     fileprivate func compileActivityDates(activities: [Activity]) {
+        activityDates = [:]
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
         let dispatchGroup = DispatchGroup()

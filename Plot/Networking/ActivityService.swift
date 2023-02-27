@@ -54,6 +54,7 @@ class ActivityService {
                 self.tasks = activitiesWithRepeats.filter { $0.isTask ?? false && !($0.isGoal ?? false) }
                 self.goals = activitiesWithRepeats.filter { $0.isGoal ?? false }
                 self.calendarActivities = activitiesWithRepeats.filter { $0.finalDateForDisplay != nil && !($0.isGoal ?? false) }
+                self.scheduleReminder(activities: activitiesWithRepeats)
             }
         }
     }
@@ -416,7 +417,6 @@ class ActivityService {
             } else {
                 completion()
             }
-            self?.scheduleReminder(activities: activitiesWithRepeatsInitialAdd)
         }, activitiesAdded: { [weak self] activitiesAdded in
             for activity in activitiesAdded {
                 //remove activities from repeatActivities in case recurrences is updated
@@ -437,7 +437,6 @@ class ActivityService {
                 }
                 self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsAdded)
             }
-            self?.scheduleReminder(activities: activitiesWithRepeatsAdded)
         }, activitiesRemoved: { [weak self] activitiesRemoved in
             self?.activities.removeAll(where: { $0.activityID == activitiesRemoved.first?.activityID })
             self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesRemoved.first?.activityID })
@@ -461,8 +460,6 @@ class ActivityService {
                 }
                 self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsChanged)
             }
-            self?.scheduleReminder(activities: activitiesWithRepeatsChanged)
-
         })
     }
     
@@ -828,12 +825,13 @@ class ActivityService {
     }
     
     func scheduleReminder(activities: [Activity]) {
-        for activity in activities {
-            guard let activityReminder = activity.reminder, let activityID = activity.activityID, let endDate = activity.endDate, endDate > Date() else {
+        //only 64 notifications; think about repeating ones that repeat
+        let sortedActivities = activities.filter({ $0.reminder != nil && $0.endDate ?? Date() > Date().dayBefore }).sorted(by: { $0.finalDate ?? Date.distantFuture < $1.finalDate ?? Date.distantFuture})
+        for activity in Array(sortedActivities.prefix(64)) {
+            guard let activityReminder = activity.reminder, let activityID = activity.activityID, let endDate = activity.endDate, endDate > Date().dayBefore else {
                 continue
             }
             let center = UNUserNotificationCenter.current()
-            center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_Reminder"])
             guard activityReminder != "None" else {
                 center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_\(endDate)_Reminder"])
                 continue
@@ -843,7 +841,7 @@ class ActivityService {
                 center.removePendingNotificationRequests(withIdentifiers: ["\(activityID)_\(endDate)_Reminder"])
                 continue
             }
-            
+                                                
             if let startDate = activity.startDate, let allDay = activity.allDay, let startTimeZone = activity.startTimeZone, let endTimeZone = activity.endTimeZone {
                 let content = UNMutableNotificationContent()
                 content.title = "\(String(describing: activity.name!)) Reminder"
@@ -863,6 +861,7 @@ class ActivityService {
                     let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
                     center.add(request, withCompletionHandler: { (error) in
                         if let error = error {
+                            print("error")
                             print(error)
                         }
                     })
@@ -884,6 +883,7 @@ class ActivityService {
                     let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
                     center.add(request, withCompletionHandler: { (error) in
                         if let error = error {
+                            print("error")
                             print(error)
                         }
                     })
@@ -898,7 +898,6 @@ class ActivityService {
                 continue
             }
             let center = UNUserNotificationCenter.current()
-            center.removePendingNotificationRequests(withIdentifiers: ["\(sub_activity_ID)_Reminder"])
             guard reminder != "None" else {
                 center.removePendingNotificationRequests(withIdentifiers: ["\(sub_activity_ID)_\(endDate)_Reminder"])
                 continue
@@ -960,7 +959,7 @@ class ActivityService {
     }
     
     func deleteReminder(activities: [Activity]) {
-        let today = Date().localTime
+        let today = Date()
         for activity in activities {
             guard let activityID = activity.activityID, let endDate = activity.endDate, endDate > today else {
                 continue
@@ -972,7 +971,7 @@ class ActivityService {
     }
     
     func deleteSubReminder(sub_activities: [Activity], parent: Activity) {
-        let today = Date().localTime
+        let today = Date()
         for sub_activity in sub_activities {
             guard let sub_activity_ID = sub_activity.activityID, let endDate = sub_activity.getSubEndDate(parent: parent), endDate > today else {
                 continue

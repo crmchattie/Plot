@@ -1004,10 +1004,10 @@ func transactionListStats(transactions: [Transaction], transactionDetail: Transa
             }
         }
         
-        print(date)
-        print(nextDate)
-        print("passed dates transactions")
-        print(transaction.transactionDate)
+//        print(date)
+//        print(nextDate)
+//        print("passed dates transactions")
+//        print(transaction.transactionDate)
         
         if transactionDetail.name == "Net Savings" || transactionDetail.name == "Net Spending" {
             switch transaction.type {

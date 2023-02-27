@@ -111,6 +111,10 @@ extension Date {
         return Calendar.current.date(byAdding: .year, value: -1, to: self)!
     }
     
+    var yearAfter: Date {
+        return Calendar.current.date(byAdding: .year, value: 1, to: self)!
+    }
+    
     func daysSince(_ date: Date) -> Int {
         Calendar.current.dateComponents([.day], from: date, to: self).day ?? 0
     }

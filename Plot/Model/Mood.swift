@@ -217,12 +217,12 @@ func moodListStats(
             continue
         }
         
-        print(chunkStart)
-        print(chunkEnd)
-        print("passed dates moods")
-        print(mood.moodDate)
-        print(mood.mood?.rawValue)
-        print(type)
+//        print(chunkStart)
+//        print(chunkEnd)
+//        print("passed dates moods")
+//        print(mood.moodDate)
+//        print(mood.mood?.rawValue)
+//        print(type)
         
         if let type = type, let moodType = mood.mood?.rawValue, moodType == type {
             stat.value += 1

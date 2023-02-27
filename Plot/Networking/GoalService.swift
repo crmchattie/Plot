@@ -33,33 +33,45 @@ extension NetworkController {
                 continue
             }
             
+            var range = DateRange(startDate: Date().localTime.startOfDay, endDate: Date().localTime.endOfDay.advanced(by: -1))
+            
             //not all tasks will have a start date
-            let range = DateRange(startDate: task.startDate?.startOfDay ?? Date().localTime.startOfDay, endDate: task.endDateGivenStartDatePeriod ?? Date().localTime.endOfDay.advanced(by: -1))
+            if let startDate = task.startDate, let endDate = task.endDate {
+                range = DateRange(startDate: startDate.localTime, endDate: endDate.localTime)
+            } else if let endDate = task.endDate {
+                range = DateRange(startDate: endDate.localTime, endDate: endDate.localTime)
+            }
+            
             guard range.endDate > past, range.startDate <= tomorrow else {
                 group.leave()
                 continue
             }
             
-            print("metricCheck")
-            print(task.name)
-            print(task.activityID)
-            print(metric)
-            print(task.startDate)
-            print(task.startDate?.localTime)
-            print(task.startDate?.UTCTime)
-            print(task.startDateTime)
-            print(range.startDate)
-            print(task.endDate)
-            print(task.endDate?.localTime)
-            print(task.endDate?.UTCTime)
-            print(task.endDateTime)
-            print(range.endDate)
+//            print("metricCheck")
+//            print(task.name)
+//            print(task.activityID)
+//            print(metric)
+//            print(task.startDate)
+//            print(range.startDate)
+//            print(task.endDate)
+//            print(range.endDate)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
                 if let stat = stat {
                     finalStat = stat
                 }
+                
+//                print("metricCheck")
+//                print(task.name)
+//                print(task.activityID)
+//                print(metric)
+//                print(task.startDate)
+//                print(range.startDate)
+//                print(task.endDate)
+//                print(range.endDate)
+//                print(finalStat.date)
+//                print(finalStat.value)
 
                 if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
                     self.checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { statSecond in
@@ -67,6 +79,17 @@ extension NetworkController {
                         if let statSecond = statSecond {
                             finalStatSecond = statSecond
                         }
+                        
+//                        print("metricCheckSecond")
+//                        print(task.name)
+//                        print(task.activityID)
+//                        print(metric)
+//                        print(task.startDate)
+//                        print(range.startDate)
+//                        print(task.endDate)
+//                        print(range.endDate)
+//                        print(finalStatSecond.date)
+//                        print(finalStatSecond.value)
                         
                         switch metricsRelationshipType {
                         case .or:
@@ -344,7 +367,7 @@ extension NetworkController {
                 }
                 
                 if let list = list {
-                    var date = Date()
+                    var date = Date().dayBefore
                     let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
                     task.name = goal.name
                     task.isGoal = true

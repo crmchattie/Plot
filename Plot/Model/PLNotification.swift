@@ -69,6 +69,14 @@ class PLNotification: NSObject, Codable, NSCoding {
             } else {
                 return "\(self.aps.alert.title) added you to a task"
             }
+        } else if aps.category == Identifiers.goalCategory {
+            if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
+                let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)
+                let newBody = body.replacingOccurrences(of: "The goal", with: "The \(newSubtitle) goal")
+                return "\(newBody) by \(self.aps.alert.title)"
+            } else {
+                return "\(self.aps.alert.title) added you to a task"
+            }
         } else if aps.category == Identifiers.workoutCategory {
             if let subtitle = self.aps.alert.subtitle, let body = self.aps.alert.body {
                 let newSubtitle = subtitle.trimmingCharacters(in: .whitespaces)

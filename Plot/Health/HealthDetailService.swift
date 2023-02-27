@@ -281,9 +281,9 @@ class HealthDetailService: HealthDetailServiceInterface {
                 endDate = startDate.advanced(by: 86400)
             }
             
-            print("sleep dates everything else")
-            print(startDate)
-            print(endDate)
+//            print("sleep dates everything else")
+//            print(startDate)
+//            print(endDate)
         }
         
         if segmentType != .day, !(extraDataPoint ?? false) {
@@ -496,11 +496,11 @@ class HealthDetailService: HealthDetailServiceInterface {
             startDate = startDate.startOfDay.dayBefore.addHours(18).UTCTime
             endDate = startDate.advanced(by: 86400)
             
-            print("sleep dates goal")
-            print(startDate)
-            print(startDate.localTime)
-            print(endDate)
-            print(endDate.localTime)
+//            print("sleep dates goal")
+//            print(startDate)
+//            print(startDate.localTime)
+//            print(endDate)
+//            print(endDate.localTime)
             
         }
         
@@ -787,7 +787,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             
         }
         else {
-            var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)
+            var midDay = startDate.dayBefore.startOfDay.addHours(18)
             var interval = NSDateInterval(start: midDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0
@@ -820,6 +820,12 @@ class HealthDetailService: HealthDetailServiceInterface {
                 } else if typeOfSleep == .asleep, (sleepValue == .inBed || sleepValue == .awake) {
                     continue
                 }
+                
+//                print("sleep sample everything else")
+//                print(midDay)
+//                print(interval)
+//                print(sample.startDate)
+//                print(sample.endDate)
                 
                 let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
                 map[interval.endDate, default: 0] += timeSum
@@ -918,6 +924,12 @@ class HealthDetailService: HealthDetailServiceInterface {
                 continue
             }
             
+//            print("sleep sample goal")
+//            print(startDate)
+//            print(endDate)
+//            print(sample.startDate)
+//            print(sample.endDate)
+            
             let timeSum = sample.endDate.timeIntervalSince(sample.startDate)
                         
             stat.value += TimeInterval(timeSum).totalHours
@@ -927,10 +939,10 @@ class HealthDetailService: HealthDetailServiceInterface {
 
         }
         
-        print("sleep stats")
-        print(startDate)
-        print(endDate)
-        print(sum.stringTimeShort)
+//        print("sleep stats")
+//        print(startDate)
+//        print(endDate)
+//        print(sum.stringTimeShort)
         
         completion(stat, customSamples)
     }

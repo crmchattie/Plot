@@ -75,8 +75,8 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                 dataExists = true
                 
                 let daysInRange = range.daysInRange + 1
-                let startDateCurrent = range.startDate.startOfDay.dayBefore.advanced(by: 43200)
-                let startDatePast = range.pastStartDate?.startOfDay.dayBefore.advanced(by: 43200) ?? startDateCurrent
+                let startDateCurrent = range.startDate.startOfDay.dayBefore.addHours(18)
+                let startDatePast = range.pastStartDate?.startOfDay.dayBefore.addHours(18) ?? startDateCurrent
 
                 newChartViewModel.healthMetric = healthMetric
                                 
@@ -96,7 +96,6 @@ class SleepAnalyticsDataSource: AnalyticsDataSource {
                             average = sum / Double(statsCurrent.count)
                             for index in 0...daysInRange {
                                 let date = startDateCurrent.addDays(index)
-                                
                                 if let stat = statsCurrent.first(where: { $0.date == date }) {
                                     if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
                                         let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)

@@ -496,6 +496,7 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
     }
     
     fileprivate func compileActivityDates(activities: [Activity]) {
+        activityDates = [:]
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
         let dispatchGroup = DispatchGroup()
@@ -503,12 +504,12 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
             dispatchGroup.enter()
             dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
             if activity.isCompleted ?? false {
-                if let startDate = activity.startDate, let endDate = activity.endDate {
+                if let startDate = activity.startDate?.localTime, let endDate = activity.endDate?.localTime {
                     for activityDate in stride(from: startDate, to: endDate, by: 86400) {
                         activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
                     }
                     dispatchGroup.leave()
-                } else if let endDate = activity.endDate {
+                } else if let endDate = activity.endDate?.localTime {
                     activityDates[dateFormatter.string(from: endDate), default: 0] += 1
                     dispatchGroup.leave()
                 }

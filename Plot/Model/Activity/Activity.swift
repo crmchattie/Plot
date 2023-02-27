@@ -2003,12 +2003,12 @@ func activityListStats(
                 continue
             }
             
-            print(chunkStart)
-            print(chunkEnd)
-            print("passed dates activities")
-            print(activityStartDate)
-            print(activityEndDate)
-                    
+//            print(chunkStart)
+//            print(chunkEnd)
+//            print("passed dates activities")
+//            print(activityStartDate)
+//            print(activityEndDate)
+//                    
             // Truncate events that out of the [chunkStart, chunkEnd] range.
             // Multi-day events, chunked into single day `Statistic`s are the best example.
             if activityStartDate < chunkStart {
@@ -2127,13 +2127,13 @@ extension Activity {
             case .none:
                 return nil
             case .day:
-                return endDate.dayBefore
+                return endDate.dayBefore.advanced(by: 1)
             case .week:
-                return endDate.weekBefore
+                return endDate.weekBefore.advanced(by: 1)
             case .month:
-                return endDate.monthBefore
+                return endDate.monthBefore.advanced(by: 1)
             case .year:
-                return endDate.lastYear
+                return endDate.lastYear.advanced(by: 1)
             }
         }
         return nil
@@ -2145,13 +2145,13 @@ extension Activity {
             case .none:
                 return nil
             case .day:
-                return startDate.endOfDay.advanced(by: -1)
+                return startDate.dayAfter.advanced(by: -1)
             case .week:
-                return startDate.endOfWeek.advanced(by: -1)
+                return startDate.weekAfter.advanced(by: -1)
             case .month:
-                return startDate.endOfMonth.advanced(by: -1)
+                return startDate.monthAfter.advanced(by: -1)
             case .year:
-                return startDate.endOfYear.advanced(by: -1)
+                return startDate.yearAfter.advanced(by: -1)
             }
         }
         return nil

@@ -22,7 +22,7 @@ class SleepOperation: AsyncOperation {
     }
     
     private func startFetchRequest() {
-        let endDate = date.localTime.advanced(by: 43200)
+        let endDate = date.localTime.addHours(18)
         let startDate = endDate.lastYear
         HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self] sleepSamples, error  in
             guard let sleepSamples = sleepSamples, sleepSamples.count > 0, error == nil, let _self = self else {
@@ -32,15 +32,14 @@ class SleepOperation: AsyncOperation {
             
             var typeOfSleep: PlotSleepAnalysis = .inBed
             
-            // 12 hours = 43200 seconds
-            var midDay = startDate.dayBefore.startOfDay.advanced(by: 43200)
+            var midDay = startDate.dayBefore.startOfDay.addHours(18)
             var interval = NSDateInterval(start: midDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0
             
             for sample in sleepSamples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
-                    midDay = midDay.advanced(by: 86400)
+                    midDay = midDay.addHours(18)
                     interval = NSDateInterval(start: midDay, duration: 86400)
                     let relevantSamples = sleepSamples.filter({interval.contains($0.endDate.localTime)})
                     let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})
