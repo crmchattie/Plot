@@ -873,7 +873,7 @@ extension GoalViewController {
         recurrencePicker.language = .english
         recurrencePicker.calendar = Calendar.current
         recurrencePicker.tintColor = FalconPalette.defaultBlue
-        recurrencePicker.occurrenceDate = task.startDate ?? task.endDate
+        recurrencePicker.occurrenceDate = task.finalDate
         recurrencePicker.isGoal = true
 
         // assign delegate
@@ -1107,7 +1107,7 @@ extension GoalViewController {
                             var oldActivityRule = oldRecurrenceRule
                             //update only future instances of task
                             var newActivityRule = RecurrenceRule(rruleString: newRecurrences[newRecurranceIndex])
-                            newActivityRule!.startDate = self.task.endDate ?? Date()
+                            newActivityRule!.startDate = self.task.finalDate ?? Date()
                             
                             var newRecurrences = oldRecurrences
                             newRecurrences[newRecurranceIndex] = newActivityRule!.toRRuleString()
