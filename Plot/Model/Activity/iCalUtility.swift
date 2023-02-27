@@ -37,6 +37,7 @@ struct iCalUtility {
                     guard let rule = InclusionDate(rdateString: rule) else { continue }
                     totalRule.rdate = rule
                 } else if rule.starts(with: "EXDATE") {
+                    print("EXDATE")
                     //not sure what to do with granularity here
                     guard let rule = ExclusionDate(exdateString: rule, granularity: .day) else { continue }
                     totalRule.exdate = rule

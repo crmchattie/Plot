@@ -115,6 +115,10 @@ extension Date {
         Calendar.current.dateComponents([.day], from: date, to: self).day ?? 0
     }
     
+    func addHours(_ hours: Int) -> Date {
+        Calendar.current.date(byAdding: .hour, value: hours, to: self)!
+    }
+    
     func addDays(_ days: Int) -> Date {
         Calendar.current.date(byAdding: .day, value: days, to: self)!
     }

@@ -1998,16 +1998,16 @@ func activityListStats(
                 continue
             }
             
-//            print(chunkStart)
-//            print(chunkEnd)
-//            print("passed dates activities")
-//            print(activityStartDate)
-//            print(activityEndDate)
-            
             // Skipping activities that are outside of the interest range.
             if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
                 continue
             }
+            
+            print(chunkStart)
+            print(chunkEnd)
+            print("passed dates activities")
+            print(activityStartDate)
+            print(activityEndDate)
                     
             // Truncate events that out of the [chunkStart, chunkEnd] range.
             // Multi-day events, chunked into single day `Statistic`s are the best example.
@@ -2145,13 +2145,13 @@ extension Activity {
             case .none:
                 return nil
             case .day:
-                return startDate.endOfDay
+                return startDate.endOfDay.advanced(by: -1)
             case .week:
-                return startDate.endOfWeek
+                return startDate.endOfWeek.advanced(by: -1)
             case .month:
-                return startDate.endOfMonth
+                return startDate.endOfMonth.advanced(by: -1)
             case .year:
-                return startDate.endOfYear
+                return startDate.endOfYear.advanced(by: -1)
             }
         }
         return nil

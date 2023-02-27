@@ -32,19 +32,28 @@ extension NetworkController {
                 group.leave()
                 continue
             }
-                        
-            let range = DateRange(startDate: task.startDate ?? Date(), endDate: task.endDate ?? Date())
+            
+            //not all tasks will have a start date
+            let range = DateRange(startDate: task.startDate?.startOfDay ?? Date().localTime.startOfDay, endDate: task.endDateGivenStartDatePeriod ?? Date().localTime.endOfDay.advanced(by: -1))
             guard range.endDate > past, range.startDate <= tomorrow else {
                 group.leave()
                 continue
             }
             
-//            print("metricCheck")
-//            print(task.name)
-//            print(task.activityID)
-//            print(metric)
-//            print(task.startDate)
-//            print(task.endDate)
+            print("metricCheck")
+            print(task.name)
+            print(task.activityID)
+            print(metric)
+            print(task.startDate)
+            print(task.startDate?.localTime)
+            print(task.startDate?.UTCTime)
+            print(task.startDateTime)
+            print(range.startDate)
+            print(task.endDate)
+            print(task.endDate?.localTime)
+            print(task.endDate?.UTCTime)
+            print(task.endDateTime)
+            print(range.endDate)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)

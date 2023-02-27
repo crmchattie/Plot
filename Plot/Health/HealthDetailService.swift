@@ -276,10 +276,14 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         
         if case .sleep = healthMetricType {
-            startDate = startDate.dayBefore.advanced(by: 43200)
+            startDate = startDate.startOfDay.dayBefore.addHours(18).UTCTime
             if segmentType == .day {
                 endDate = startDate.advanced(by: 86400)
             }
+            
+            print("sleep dates everything else")
+            print(startDate)
+            print(endDate)
         }
         
         if segmentType != .day, !(extraDataPoint ?? false) {
@@ -489,8 +493,15 @@ class HealthDetailService: HealthDetailServiceInterface {
         var endDate = anchorDate.advanced(by: 86399)
         
         if case .sleep = healthMetricType {
-            startDate = startDate.dayBefore.advanced(by: 43200)
+            startDate = startDate.startOfDay.dayBefore.addHours(18).UTCTime
             endDate = startDate.advanced(by: 86400)
+            
+            print("sleep dates goal")
+            print(startDate)
+            print(startDate.localTime)
+            print(endDate)
+            print(endDate.localTime)
+            
         }
         
         if HealthKitService.authorized {
@@ -915,6 +926,11 @@ class HealthDetailService: HealthDetailServiceInterface {
             customSamples.append(customSample)
 
         }
+        
+        print("sleep stats")
+        print(startDate)
+        print(endDate)
+        print(sum.stringTimeShort)
         
         completion(stat, customSamples)
     }

@@ -448,27 +448,27 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let startDate = selectedDate.startOfDay
         let endDate = selectedDate.endOfDay
         filteredPinnedActivities = pinnedActivities.filter({ (activity) -> Bool in
-            if let activityStartDate = activity.startDate, activityStartDate > startDate, endDate > activityStartDate {
+            if let activityStartDate = activity.startDate?.localTime, activityStartDate > startDate, endDate > activityStartDate {
                 return true
-            } else if let activityEndDate = activity.endDate, activityEndDate > startDate,  endDate > activityEndDate {
+            } else if let activityEndDate = activity.endDate?.localTime, activityEndDate > startDate,  endDate > activityEndDate {
                 if activity.allDay ?? false, let activityStartDate = activity.startDate, Calendar.current.dateComponents([.hour], from: activityStartDate, to: activityEndDate).hour > 22 {
                     return false
                 }
                 return true
-            } else if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate, startDate > activityStartDate, activityEndDate > endDate {
+            } else if let activityStartDate = activity.startDate?.localTime, let activityEndDate = activity.endDate?.localTime, startDate > activityStartDate, activityEndDate > endDate {
                 return true
             }
             return false
         })
         filteredActivities = activities.filter({ (activity) -> Bool in
-            if let activityStartDate = activity.startDate, activityStartDate > startDate, endDate > activityStartDate {
+            if let activityStartDate = activity.startDate?.localTime, activityStartDate > startDate, endDate > activityStartDate {
                 return true
-            } else if let activityEndDate = activity.endDate, activityEndDate > startDate,  endDate > activityEndDate {
+            } else if let activityEndDate = activity.endDate?.localTime, activityEndDate > startDate,  endDate > activityEndDate {
                 if activity.allDay ?? false, let activityStartDate = activity.startDate, Calendar.current.dateComponents([.hour], from: activityStartDate, to: activityEndDate).hour > 22 {
                     return false
                 }
                 return true
-            } else if let activityStartDate = activity.startDate, let activityEndDate = activity.endDate, startDate > activityStartDate, activityEndDate > endDate {
+            } else if let activityStartDate = activity.startDate?.localTime, let activityEndDate = activity.endDate?.localTime, startDate > activityStartDate, activityEndDate > endDate {
                 return true
             }
             return false
@@ -578,14 +578,14 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.selectedDate = date
+        self.selectedDate = date.localTime
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        self.selectedDate = calendar.currentPage
+        self.selectedDate = calendar.currentPage.localTime
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
