@@ -26,7 +26,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     var participants = [String : [User]]()
     
-    var sections: [SectionType] = [.custom, .templates, .allTemplates]
+    var sections: [SectionType] = [.time, .health, .finances]
     var groups = [SectionType: [AnyHashable]]()
     var customTypes: [CustomType] = [.goal, .task, .event, .mood, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
