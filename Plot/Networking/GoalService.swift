@@ -377,7 +377,7 @@ extension NetworkController {
             print("list")
             print(list.name)
         }
-        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+        if activityService.goals.isEmpty, let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
             for g in prebuiltGoals {
                 print(g.name)
                 var goal = g

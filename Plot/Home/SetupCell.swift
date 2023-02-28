@@ -44,7 +44,7 @@ class SetupCell: BaseContainerCollectionViewCell {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 100 / 2
+        imageView.layer.cornerRadius = 75 / 2
         return imageView
     }()
     
@@ -71,7 +71,7 @@ class SetupCell: BaseContainerCollectionViewCell {
     let subDescriptionLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
@@ -110,8 +110,8 @@ class SetupCell: BaseContainerCollectionViewCell {
         containerImageView.layer.masksToBounds = true
         containerImageView.layer.cornerRadius = 75 / 2
         
-        imageView.constrainWidth(40)
-        imageView.constrainHeight(40)
+        imageView.constrainWidth(50)
+        imageView.constrainHeight(50)
         
         button.constrainWidth(contentView.frame.width - 32)
         button.constrainHeight(45)

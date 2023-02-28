@@ -82,7 +82,8 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     
     var participants: [String: [User]] = [:]
     
-    var isNewUser: Bool = true
+    var isNewUser = false
+    var isOldUser = false
         
     var isAppLoaded = false
         
@@ -178,12 +179,19 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func setupData() {
+        print("setupData")
         groups = []
         var list = [AnyHashable]()
         list.append(SectionType.time)
         if activitiesSections.isEmpty {
             list.append(CustomType.time)
         } else {
+            print(isNewUser)
+            print(isOldUser)
+            if isNewUser && !isOldUser {
+                isNewUser = false
+                networkController.setupInitialGoals()
+            }
             for section in activitiesSections {
                 if activitiesSections.count > 1 {
                     list.append(section)

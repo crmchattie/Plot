@@ -28,6 +28,21 @@ class SubLibraryCell: UICollectionViewCell {
         }
     }
     
+    var customType: CustomType! {
+        didSet {
+            if let customType = customType {
+                nameLabel.textColor = .label
+                nameLabel.text = customType.name
+                imageView.image = UIImage(named: customType.image)!.withRenderingMode(.alwaysTemplate)
+                imageView.tintColor = colors[intColor].withAlphaComponent(1)
+                imageView.contentMode = .scaleAspectFit
+                imageView.backgroundColor = .clear
+                containerImageView.backgroundColor = colors[intColor].withAlphaComponent(0.3)
+                setupViews()
+            }
+        }
+    }
+    
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label

@@ -65,31 +65,13 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         self.networkController = networkController
         
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
-            return LibraryViewController.topSection()
-            
 //            if sectionNumber == 0 {
 //                return LibraryViewController.topSection()
 //            } else if sectionNumber == 1 {
 //                return LibraryViewController.secondSection()
 //            } else {
 //                // second section
-//                let heightDimension = NSCollectionLayoutDimension.estimated(500)
-//
-//                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
-//
-//                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
-//                group.contentInsets.trailing = 16
-//
-//                let section = NSCollectionLayoutSection(group: group)
-//                section.orthogonalScrollingBehavior = .none
-//                section.contentInsets.leading = 16
-//
-//                let kind = UICollectionView.elementKindSectionHeader
-//                section.boundarySupplementaryItems = [
-//                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
-//                ]
-//
-//                return section
+            return LibraryViewController.standardSection()
 //            }
         }
         
@@ -101,6 +83,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     }
     
     static func topSection() -> NSCollectionLayoutSection {
+        
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
         item.contentInsets.trailing = 8
         
@@ -141,34 +124,37 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         return section
     }
     
+    static func standardSection() -> NSCollectionLayoutSection {
+        let heightDimension = NSCollectionLayoutDimension.estimated(500)
+
+        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
+
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
+        group.contentInsets.trailing = 16
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .none
+        section.contentInsets.leading = 16
+
+        let kind = UICollectionView.elementKindSectionHeader
+        section.boundarySupplementaryItems = [
+            .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
+        ]
+
+        return section
+    }
+    
     func updateLayoutToInitial() {
         collectionView.reloadData()
         collectionView.collectionViewLayout.invalidateLayout()
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
-            LibraryViewController.topSection()
 //            if sectionNumber == 0 {
 //                return LibraryViewController.topSection()
 //            } else if sectionNumber == 1 {
 //                return LibraryViewController.secondSection()
 //            } else {
 //                // second section
-//                let heightDimension = NSCollectionLayoutDimension.estimated(500)
-//
-//                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
-//
-//                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
-//                group.contentInsets.trailing = 16
-//
-//                let section = NSCollectionLayoutSection(group: group)
-//                section.orthogonalScrollingBehavior = .none
-//                section.contentInsets.leading = 16
-//
-//                let kind = UICollectionView.elementKindSectionHeader
-//                section.boundarySupplementaryItems = [
-//                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
-//                ]
-//
-//                return section
+            return LibraryViewController.standardSection()
 //            }
         }
         collectionView.setCollectionViewLayout(layout, animated: true)
@@ -301,14 +287,21 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     lazy var diffableDataSource: UICollectionViewDiffableDataSource<SectionType, AnyHashable> = .init(collectionView: self.collectionView) { (collectionView, indexPath, object) -> UICollectionViewCell? in
         let snapshot = self.diffableDataSource.snapshot()
-        if let object = object as? CustomType {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kLibraryCell, for: indexPath) as! LibraryCell
+        if let object = object as? CustomType, let section = snapshot.sectionIdentifier(containingItem: object) {
+            let totalItems = (self.groups[section]?.count ?? 1) - 1
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
             if indexPath.section == 0 {
                 cell.intColor = 5
             } else if indexPath.section == 1 {
                 cell.intColor = 0
             } else if indexPath.section == 2 {
                 cell.intColor = 3
+            }
+            if indexPath.item == 0 {
+                cell.firstPosition = true
+            }
+            if indexPath.item == totalItems {
+                cell.lastPosition = true
             }
             cell.customType = object
             return cell

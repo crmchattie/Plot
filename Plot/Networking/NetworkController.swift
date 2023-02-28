@@ -80,31 +80,9 @@ class NetworkController {
     
     func setupFirebase() {
         print("setupFirebase")
-        let dispatchGroup = DispatchGroup()
-        
-        dispatchGroup.enter()
-        print("setupFirebase Activities")
-        activityService.setupFirebase {
-            print("done setupFirebase Activities")
-            dispatchGroup.leave()
-        }
-        dispatchGroup.enter()
-        print("setupFirebase Finance")
-        financeService.setupFirebase {
-            print("done setupFirebase Finance")
-            dispatchGroup.leave()
-        }
-        dispatchGroup.enter()
-        print("setupFirebase Health")
-        healthService.setupFirebase {
-            print("done setupFirebase Health")
-            dispatchGroup.leave()
-        }
-        dispatchGroup.notify(queue: .main) {
-            print("setupInitialGoals")
-            self.setupInitialGoals()
-        }
-        
+        activityService.setupFirebase {}
+        financeService.setupFirebase {}
+        healthService.setupFirebase {}
 
     }
     

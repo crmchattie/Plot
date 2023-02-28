@@ -85,6 +85,7 @@ class GeneralTabBarController: UITabBarController {
     
     @objc fileprivate func oldUserLoggedIn() {
         isOldUser = true
+        homeController.isOldUser = isOldUser
     }
     
     fileprivate func loadVariables() {
