@@ -89,7 +89,7 @@ enum CustomType: String, Equatable, Hashable {
         case .todoTemplate: return "To-do"
         case .financesTemplate: return "Finance"
         case .tutorialOne: return "Welcome to Your New Personal Assistant"
-        case .tutorialTwo: return "Better Manage Your Time and Tasks"
+        case .tutorialTwo: return "Better Manage Your Time, Goals and Tasks"
         case .tutorialThree: return "Take Control of Your Health"
         case .tutorialFour: return "See Your Complete Financial Picture"
         }

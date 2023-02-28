@@ -175,8 +175,10 @@ extension NetworkController {
                     case .calories, .amount, .percent, .multiple, .level:
                         completion(finalStat)
                     }
+                } else {
+                    completion(nil)
                 }
-                completion(nil)
+                
             }
         case .tasks:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.tasks, isEvent: false, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
@@ -190,7 +192,9 @@ extension NetworkController {
                         completion(finalStat)
                     }
                 }
-                completion(nil)
+                else {
+                    completion(nil)
+                }
             }
         case .financialTransactions:
             var transactionDetails = [TransactionDetails]()
@@ -227,7 +231,9 @@ extension NetworkController {
                         completion(nil)
                     }
                 }
-                completion(nil)
+                else {
+                    completion(nil)
+                }
             }
         case .financialAccounts:
             if let option = option, option.count == 1, option.first == "Credit Card" {
@@ -246,7 +252,9 @@ extension NetworkController {
                         }
                         completion(finalStat)
                     }
-                    completion(nil)
+                    else {
+                        completion(nil)
+                    }
                 }
             } else {
                 var accountDetails = [AccountDetails]()
@@ -286,7 +294,9 @@ extension NetworkController {
                             completion(nil)
                         }
                     }
-                    completion(nil)
+                    else {
+                        completion(nil)
+                    }
 
                 }
             }
@@ -311,7 +321,9 @@ extension NetworkController {
                         completion(nil)
                     }
                 }
-                completion(nil)
+                else {
+                    completion(nil)
+                }
 
             }
         case .mood:
@@ -326,7 +338,9 @@ extension NetworkController {
                         completion(nil)
                     }
                 }
-                completion(nil)
+                else {
+                    completion(nil)
+                }
 
             }
         case .sleep:
@@ -360,6 +374,7 @@ extension NetworkController {
         print("setupInitialGoals")
         if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
             for g in prebuiltGoals {
+                print(g.name)
                 var goal = g
                 let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 let category = goal.category

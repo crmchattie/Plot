@@ -228,6 +228,8 @@
 		10B541E225479D3100CC9023 /* MealViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E125479D3100CC9023 /* MealViewController.swift */; };
 		10B541E625479D4300CC9023 /* GroceryProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */; };
 		10B541EA25479D6500CC9023 /* MenuProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */; };
+		10B555B029AD9B150070CEC9 /* WorkoutAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B555AF29AD9B150070CEC9 /* WorkoutAnalyticsDataSource.swift */; };
+		10B555B229AD9B250070CEC9 /* MindfulnessAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B555B129AD9B250070CEC9 /* MindfulnessAnalyticsDataSource.swift */; };
 		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
 		10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* SectionType.swift */; };
 		10B6B31625410D37008037AD /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B6B31525410D37008037AD /* TagsViewController.swift */; };
@@ -830,6 +832,8 @@
 		10B541E125479D3100CC9023 /* MealViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViewController.swift; sourceTree = "<group>"; };
 		10B541E525479D4300CC9023 /* GroceryProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroceryProductDetailViewController.swift; sourceTree = "<group>"; };
 		10B541E925479D6500CC9023 /* MenuProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuProductDetailViewController.swift; sourceTree = "<group>"; };
+		10B555AF29AD9B150070CEC9 /* WorkoutAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutAnalyticsDataSource.swift; sourceTree = "<group>"; };
+		10B555B129AD9B250070CEC9 /* MindfulnessAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
 		10B656CD24AFB0E7006686FA /* SectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionType.swift; sourceTree = "<group>"; };
 		10B6B31525410D37008037AD /* TagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsViewController.swift; sourceTree = "<group>"; };
@@ -2951,7 +2955,9 @@
 				10A18659291C8C56009AB7F4 /* StepsAnalyticsDataSource.swift */,
 				10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */,
 				F983298B2602A7B300EB51F7 /* ActiveEnergyAnalyticsDataSource.swift */,
+				10B555AF29AD9B150070CEC9 /* WorkoutAnalyticsDataSource.swift */,
 				1093D2C129A54B16003D77C5 /* MoodAnalyticsDataSource.swift */,
+				10B555B129AD9B250070CEC9 /* MindfulnessAnalyticsDataSource.swift */,
 				F94EDC4C260667A000B97FF6 /* SpendingAnalyticsDataSource.swift */,
 				F916C9072610D0E10062F952 /* NetWorthAnalyticsDataSource.swift */,
 				F916C767260E793F0062F952 /* DateRangeFormatter.swift */,
@@ -3655,6 +3661,7 @@
 				4BAEE4EC21272D890045AB10 /* UserInfoCreateContactTableViewController.swift in Sources */,
 				10C50FA62276345500111033 /* EventCell+ConfigureCell.swift in Sources */,
 				10C766E525321AAD003C8E1F /* FinanceTransactionNewLevelViewController.swift in Sources */,
+				10B555B029AD9B150070CEC9 /* WorkoutAnalyticsDataSource.swift in Sources */,
 				1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */,
 				4BAEE46621272B380045AB10 /* PrivacyTableViewController.swift in Sources */,
 				10196EFF24411B5600B6AFDF /* LocationFinderTableViewController.swift in Sources */,
@@ -3738,6 +3745,7 @@
 				10E0D7A32594D0AA00B0F83C /* NetworkController.swift in Sources */,
 				10196F0924411B5600B6AFDF /* ChooseChatTableViewController.swift in Sources */,
 				10D420AB2478739100CBAFA7 /* GrocerylistFetcher.swift in Sources */,
+				10B555B229AD9B250070CEC9 /* MindfulnessAnalyticsDataSource.swift in Sources */,
 				10F3032724EC622000C04B8F /* FinancialAccountsViewController.swift in Sources */,
 				F926576F2607440A00593FE1 /* Collection+Utility.swift in Sources */,
 				4BAEE50321272D890045AB10 /* ChatInputContainerView.swift in Sources */,

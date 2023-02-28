@@ -43,5 +43,5 @@ enum AnalyticsBreakdownEntry {
     case sample(HKSample)
     case mood(Mood)
     case workout(Workout)
-    case mindfuless(Mindfulness)
+    case mindfulness(Mindfulness)
 }

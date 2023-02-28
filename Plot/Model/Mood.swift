@@ -213,7 +213,7 @@ func moodListStats(
     var moodList = [Mood]()
     for mood in moods {
         
-        guard let moodDate = mood.moodDate, moodDate < chunkEnd, moodDate >= chunkStart else {
+        guard let moodDate = mood.moodDate?.localTime, moodDate < chunkEnd, moodDate >= chunkStart else {
             continue
         }
         

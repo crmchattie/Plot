@@ -300,7 +300,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.configure(workout)
                 return cell
-            case .mindfuless(let mindfulness):
+            case .mindfulness(let mindfulness):
                 let cell = tableView.dequeueReusableCell(ofType: HealthMetricTableCell.self, for: indexPath)
                 cell.backgroundColor = .secondarySystemGroupedBackground
                 cell.configure(mindfulness)
@@ -342,7 +342,7 @@ extension AnalyticsDetailViewController: UITableViewDataSource, UITableViewDeleg
             showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         case .workout(let workout):
             showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-        case .mindfuless(let mindfulness):
+        case .mindfulness(let mindfulness):
             showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
         }
     }

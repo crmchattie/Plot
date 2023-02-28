@@ -95,7 +95,9 @@ class AnalyticsViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(workoutsUpdated), name: .workoutsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(moodsUpdated), name: .moodsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(mindfulnessUpdated), name: .mindfulnessUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(workoutsUpdated), name: .workoutsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(mindfulnessUpdated), name: .mindfulnessUpdated, object: nil)
     }
@@ -124,18 +126,22 @@ class AnalyticsViewController: UITableViewController {
         }
     }
     
+    @objc fileprivate func workoutsUpdated() {
+        viewModel?.workoutUpdate {
+            self.tableView.reloadData()
+        }
+    }
+    
     @objc fileprivate func moodsUpdated() {
         viewModel?.moodUpdate {
             self.tableView.reloadData()
         }
     }
     
-    @objc fileprivate func workoutsUpdated() {
-        
-    }
-    
     @objc fileprivate func mindfulnessUpdated() {
-        
+        viewModel?.mindfulnessUpdate {
+            self.tableView.reloadData()
+        }
     }
     
     @objc fileprivate func financeUpdated() {

@@ -217,8 +217,8 @@ func workoutListStats(
     var stat = Statistic(date: chunkStart, value: 0)
     var workoutList = [Workout]()
     for workout in workouts {
-        guard var startDate = workout.startDateTime,
-              var endDate = workout.endDateTime else {
+        guard var startDate = workout.startDateTime?.localTime,
+              var endDate = workout.endDateTime?.localTime else {
             continue
         }
         

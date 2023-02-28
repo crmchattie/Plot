@@ -136,8 +136,8 @@ func mindfulnessListStats(
     var stat = Statistic(date: chunkStart, value: 0)
     var mindfulnessList = [Mindfulness]()
     for mindfulness in mindfulnesses {
-        guard var startDate = mindfulness.startDateTime,
-              var endDate = mindfulness.endDateTime else {
+        guard var startDate = mindfulness.startDateTime?.localTime,
+              var endDate = mindfulness.endDateTime?.localTime else {
             continue
         }
         
