@@ -10,7 +10,7 @@ import UIKit
 
 class LibraryCell: UICollectionViewCell {
     
-    var colors : [UIColor] = ChartColors.palette()
+    var colors: [UIColor] = ChartColors.palette()
     var intColor: Int = 0
     
     var customType: CustomType! {

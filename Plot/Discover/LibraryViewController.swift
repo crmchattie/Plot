@@ -29,6 +29,9 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     var sections: [SectionType] = [.time, .health, .finances]
     var groups = [SectionType: [AnyHashable]]()
     var customTypes: [CustomType] = [.goal, .task, .event, .mood, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
+    var timeCustomTypes: [CustomType] = [.goal, .task, .event]
+    var healthCustomTypes: [CustomType] = [.mood, .workout, .mindfulness]
+    var financeCustomTypes: [CustomType] = [.transaction, .financialAccount, .transactionRule]
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()
     var templates = [Template]()
@@ -62,31 +65,32 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         self.networkController = networkController
         
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
+            return LibraryViewController.topSection()
             
-            if sectionNumber == 0 {
-                return LibraryViewController.topSection()
-            } else if sectionNumber == 1 {
-                return LibraryViewController.secondSection()
-            } else {
-                // second section
-                let heightDimension = NSCollectionLayoutDimension.estimated(500)
-                
-                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
-                
-                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
-                group.contentInsets.trailing = 16
-                
-                let section = NSCollectionLayoutSection(group: group)
-                section.orthogonalScrollingBehavior = .none
-                section.contentInsets.leading = 16
-                
-                let kind = UICollectionView.elementKindSectionHeader
-                section.boundarySupplementaryItems = [
-                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
-                ]
-                
-                return section
-            }
+//            if sectionNumber == 0 {
+//                return LibraryViewController.topSection()
+//            } else if sectionNumber == 1 {
+//                return LibraryViewController.secondSection()
+//            } else {
+//                // second section
+//                let heightDimension = NSCollectionLayoutDimension.estimated(500)
+//
+//                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
+//
+//                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
+//                group.contentInsets.trailing = 16
+//
+//                let section = NSCollectionLayoutSection(group: group)
+//                section.orthogonalScrollingBehavior = .none
+//                section.contentInsets.leading = 16
+//
+//                let kind = UICollectionView.elementKindSectionHeader
+//                section.boundarySupplementaryItems = [
+//                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
+//                ]
+//
+//                return section
+//            }
         }
         
         super.init(collectionViewLayout: layout)
@@ -141,31 +145,31 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.reloadData()
         collectionView.collectionViewLayout.invalidateLayout()
         let layout = UICollectionViewCompositionalLayout { (sectionNumber, _) -> NSCollectionLayoutSection? in
-            
-            if sectionNumber == 0 {
-                return LibraryViewController.topSection()
-            } else if sectionNumber == 1 {
-                return LibraryViewController.secondSection()
-            } else {
-                // second section
-                let heightDimension = NSCollectionLayoutDimension.estimated(500)
-                
-                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
-                
-                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
-                group.contentInsets.trailing = 16
-                
-                let section = NSCollectionLayoutSection(group: group)
-                section.orthogonalScrollingBehavior = .none
-                section.contentInsets.leading = 16
-                
-                let kind = UICollectionView.elementKindSectionHeader
-                section.boundarySupplementaryItems = [
-                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
-                ]
-                
-                return section
-            }
+            LibraryViewController.topSection()
+//            if sectionNumber == 0 {
+//                return LibraryViewController.topSection()
+//            } else if sectionNumber == 1 {
+//                return LibraryViewController.secondSection()
+//            } else {
+//                // second section
+//                let heightDimension = NSCollectionLayoutDimension.estimated(500)
+//
+//                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension))
+//
+//                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: heightDimension), subitems: [item])
+//                group.contentInsets.trailing = 16
+//
+//                let section = NSCollectionLayoutSection(group: group)
+//                section.orthogonalScrollingBehavior = .none
+//                section.contentInsets.leading = 16
+//
+//                let kind = UICollectionView.elementKindSectionHeader
+//                section.boundarySupplementaryItems = [
+//                    .init(layoutSize: .init(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(70)), elementKind: kind, alignment: .topLeading)
+//                ]
+//
+//                return section
+//            }
         }
         collectionView.setCollectionViewLayout(layout, animated: true)
     }
@@ -192,7 +196,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Discover"
+        navigationItem.title = "Create"
         navigationController?.navigationBar.layoutIfNeeded()        
         navigationItem.largeTitleDisplayMode = .always
                 
@@ -208,16 +212,20 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
         
-        groups[.custom] = customTypes
+        groups[.time] = timeCustomTypes
+        groups[.health] = healthCustomTypes
+        groups[.finances] = financeCustomTypes
         
-        fetchTemplates()
-        setupSearchController()
+        setupData()
+
+//        fetchTemplates()
+//        setupSearchController()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        fetchFavAct()
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        fetchFavAct()
+//    }
     
     fileprivate func setupSearchController() {
         searchController = UISearchController(searchResultsController: nil)
@@ -295,7 +303,13 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         let snapshot = self.diffableDataSource.snapshot()
         if let object = object as? CustomType {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kLibraryCell, for: indexPath) as! LibraryCell
-            cell.intColor = (indexPath.item % 9)
+            if indexPath.section == 0 {
+                cell.intColor = 5
+            } else if indexPath.section == 1 {
+                cell.intColor = 0
+            } else if indexPath.section == 2 {
+                cell.intColor = 3
+            }
             cell.customType = object
             return cell
         } else if let object = object as? Template, let section = snapshot.sectionIdentifier(containingItem: object) {

@@ -74,7 +74,7 @@ class GeneralTabBarController: UITabBarController {
             //has to be here given currentUserID = nil on app start
             GeneralTabBarController.networkController.setupFirebase()
             GeneralTabBarController.networkController.setupOtherVariables()
-            discoverController.fetchTemplates()
+//            discoverController.fetchTemplates()
             analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
             //change to stop from running
             isNewUser = false

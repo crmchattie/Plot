@@ -109,9 +109,9 @@ enum CustomType: String, Equatable, Hashable {
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
         case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar, .googleCalendarEvent, .iOSReminder, .googleTask, .investment: return ""
-        case .time: return "Set up Time by connecting your Apple or Gmail Account\nAny tasks or events created in Plot will be exported to your Apple or Gmail Account"
-        case .health: return "Set up Health by connecting to the Apple Health App\nWe will only share your health data with the Apple Health App"
-        case .finances: return "Set up Finances by connecting your existing financial accounts\nWe do not store your login info and access is limited to read only, we cannot move your money"
+        case .time: return "Set up Time by connecting your Apple or Gmail Account"
+        case .health: return "Set up Health by connecting to the Apple Health App"
+        case .finances: return "Set up Finances by connecting your existing financial accounts"
         case .healthTemplate: return "Health"
         case .mealTemplate: return "Meal"
         case .workTemplate: return "Work"
@@ -126,7 +126,7 @@ enum CustomType: String, Equatable, Hashable {
         case .tutorialTwo: return "Set goals, plan events and create your ideal routine"
         case .tutorialThree: return "Improve your health by tracking your workouts, sleep, steps and more"
         case .tutorialFour: return "Understand your spending and achieve your financial goals"
-        case .tutorialFive: return "We will never share/sell your data"
+        case .tutorialFive: return "We will never share or sell your data"
         }
     }
     
