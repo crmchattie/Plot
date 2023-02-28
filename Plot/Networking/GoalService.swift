@@ -372,14 +372,8 @@ extension NetworkController {
     
     func setupInitialGoals() {
         print("setupInitialGoals")
-        print(activityService.lists[ListSourceOptions.plot.name])
-        for list in activityService.lists[ListSourceOptions.plot.name] ?? [] {
-            print("list")
-            print(list.name)
-        }
         if activityService.goals.isEmpty, let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
             for g in prebuiltGoals {
-                print(g.name)
                 var goal = g
                 let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
                 let category = goal.category

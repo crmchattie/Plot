@@ -142,7 +142,7 @@ enum CustomType: String, Equatable, Hashable {
         case .sleep: return "Wake Up"
         case .work: return "End of Work"
         case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar, .googleCalendarEvent, .iOSReminder, .googleTask, .investment: return ""
-        case .time: return "Any tasks/events created in Plot will be exported to your Apple or Gmail Account"
+        case .time: return "Any tasks/events created in Plot will be exported to your external Account"
         case .health: return "We will only share your health data with Apple Health"
         case .finances: return "We do not store your login info and access is limited to read only, we cannot move your money"
         case .healthTemplate: return "Health"

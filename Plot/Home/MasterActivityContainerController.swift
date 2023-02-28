@@ -179,15 +179,12 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func setupData() {
-        print("setupData")
         groups = []
         var list = [AnyHashable]()
         list.append(SectionType.time)
         if activitiesSections.isEmpty {
             list.append(CustomType.time)
         } else {
-            print(isNewUser)
-            print(isOldUser)
             if isNewUser && !isOldUser {
                 isNewUser = false
                 networkController.setupInitialGoals()
