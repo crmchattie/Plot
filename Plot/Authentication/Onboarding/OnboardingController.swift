@@ -14,7 +14,7 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     
     let onboardingContainerView = OnboardingContainerView()
     
-    let items: [CustomType] = [.tutorialOne, .tutorialTwo, .tutorialThree, .tutorialFour]
+    let items: [CustomType] = [.tutorialOne, .tutorialTwo, .tutorialThree, .tutorialFour, .tutorialFive]
     
     lazy var activities: [Activity] = {
         return createActivities()
@@ -68,7 +68,6 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: onboardingCollectionViewCell, for: indexPath) as! OnboardingCollectionViewCell
-        cell.intColor = indexPath.item
         cell.customType = items[indexPath.item]
         if indexPath.item == 0 {
             cell.activities = nil
@@ -81,6 +80,11 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
             cell.healthMetrics = healthMetrics
         } else if indexPath.item == 3 {
             cell.finances = finances
+        } else if indexPath.item == 4 {
+            cell.activities = nil
+            cell.healthMetrics = nil
+            cell.finances = nil
+            cell.collectionView.reloadData()
         }
         return cell
     }

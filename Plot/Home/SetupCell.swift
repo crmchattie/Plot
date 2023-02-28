@@ -29,6 +29,7 @@ class SetupCell: BaseContainerCollectionViewCell {
             button.backgroundColor = colors[intColor]
             typeLabel.text = customType.categoryText
             descriptionLabel.text = customType.subcategoryText
+            subDescriptionLabel.text = customType.subSubcategoryText
             setupViews()
         }
     }
@@ -61,6 +62,16 @@ class SetupCell: BaseContainerCollectionViewCell {
         let label = UILabel()
         label.textColor = .label
         label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
+        return label
+    }()
+    
+    let subDescriptionLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .label
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
@@ -114,7 +125,7 @@ class SetupCell: BaseContainerCollectionViewCell {
             imageView.centerYAnchor.constraint(equalTo: containerImageView.centerYAnchor)
         ])
         
-        let stackView = VerticalStackView(arrangedSubviews: [containerImageView, typeLabel, descriptionLabel, button], spacing: 10)
+        let stackView = VerticalStackView(arrangedSubviews: [containerImageView, typeLabel, descriptionLabel, subDescriptionLabel, button], spacing: 10)
         
         stackView.alignment = .center
         
@@ -127,6 +138,7 @@ class SetupCell: BaseContainerCollectionViewCell {
         super.prepareForReuse()
         typeLabel.textColor = .label
         descriptionLabel.textColor = .label
+        subDescriptionLabel.textColor = .label
         
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 
 enum CustomType: String, Equatable, Hashable {
-    case event, task, goal, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour
+    case event, task, goal, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour, tutorialFive
     
     var name: String {
         switch self {
@@ -50,6 +50,7 @@ enum CustomType: String, Equatable, Hashable {
         case .tutorialTwo: return "Tutorial Two"
         case .tutorialThree: return "Tutorial Three"
         case .tutorialFour: return "Tutorial Four"
+        case .tutorialFive: return "Tutorial Five"
         }
     }
     
@@ -92,6 +93,7 @@ enum CustomType: String, Equatable, Hashable {
         case .tutorialTwo: return "Better Manage Your Time, Goals and Tasks"
         case .tutorialThree: return "Take Control of Your Health"
         case .tutorialFour: return "See Your Complete Financial Picture"
+        case .tutorialFive: return "We Take Security and Your Privacy Seriously"
         }
     }
     
@@ -120,10 +122,44 @@ enum CustomType: String, Equatable, Hashable {
         case .personalTemplate: return "Personal"
         case .todoTemplate: return "To-do"
         case .financesTemplate: return "Finance"
-        case .tutorialOne: return "Simplify your life by integrating your calendar, health data and finances\nWe take your privacy seriously and will never share/sell your data"
+        case .tutorialOne: return "Simplify your life by integrating your calendar, health data and finances"
         case .tutorialTwo: return "Set goals, plan events and create your ideal routine"
         case .tutorialThree: return "Improve your health by tracking your workouts, sleep, steps and more"
         case .tutorialFour: return "Understand your spending and achieve your financial goals"
+        case .tutorialFive: return "We will never share/sell your data"
+        }
+    }
+    
+    var subSubcategoryText: String {
+        switch self {
+        case .event: return "Includes basic event fields plus task, health and transaction fields"
+        case .task: return "Includes basic task fields plus event, health and transaction fields"
+        case .goal: return "Includes basic task fields plus event, health and transaction fields"
+        case .lists: return "Includes basic event fields plus a checklist, health and transaction fields"
+        case .meal: return "Build a meal by looking up grocery products and/or restaurant menu items"
+        case .workout: return "Build a workout by setting type, duration and intensity"
+        case .flight: return "Look up your flight details based on flight number, airline or airport"
+        case .sleep: return "Wake Up"
+        case .work: return "End of Work"
+        case .transaction, .financialAccount, .transactionRule, .mood, .iOSCalendarEvent, .mindfulness, .calendar, .googleCalendarEvent, .iOSReminder, .googleTask, .investment: return ""
+        case .time: return "Any tasks or events created in Plot will be exported to your connected Apple or Gmail Account"
+        case .health: return "We will only share your health data with the Apple Health App if connected"
+        case .finances: return "We do not store your login info and access is limited to read only, we cannot move your money"
+        case .healthTemplate: return "Health"
+        case .mealTemplate: return "Meal"
+        case .workTemplate: return "Work"
+        case .schoolTemplate: return "School"
+        case .socialTemplate: return "Social"
+        case .leisureTemplate: return "Leisure"
+        case .familyTemplate: return "Family"
+        case .personalTemplate: return "Personal"
+        case .todoTemplate: return "To-do"
+        case .financesTemplate: return "Finance"
+        case .tutorialOne: return "Simplify your life by integrating your calendar, health data and finances"
+        case .tutorialTwo: return "Set goals, plan events and create your ideal routine"
+        case .tutorialThree: return "Improve your health by tracking your workouts, sleep, steps and more"
+        case .tutorialFour: return "Understand your spending and achieve your financial goals"
+        case .tutorialFive: return "We will never share/sell your data"
         }
     }
     
@@ -163,7 +199,7 @@ enum CustomType: String, Equatable, Hashable {
         case .tutorialTwo: return "plotLogo"
         case .tutorialThree: return "plotLogo"
         case .tutorialFour: return "plotLogo"
-            
+        case .tutorialFive: return "plotLogo"
         }
     }
 }

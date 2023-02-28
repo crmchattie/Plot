@@ -9,9 +9,7 @@
 import Foundation
 import UIKit
 
-class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {
-    var colors : [UIColor] = [FalconPalette.defaultBlue, FalconPalette.defaultRed, FalconPalette.defaultDarkBlue, FalconPalette.defaultOrange, FalconPalette.defaultGreen]
-    
+class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate, UICollectionViewDataSource {    
     let collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -23,7 +21,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
     var customType: CustomType! {
         didSet {
             imageView.image = UIImage(named: customType.image)!.withRenderingMode(.alwaysTemplate)
-            imageView.tintColor = colors[0]
+            imageView.tintColor = FalconPalette.defaultBlue
             imageView.contentMode = .scaleAspectFit
             typeLabel.text = customType.categoryText
             descriptionLabel.text = customType.subcategoryText
@@ -68,7 +66,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         label.font = UIFont.title1.with(weight: .bold)
         label.numberOfLines = 2
         label.textAlignment = .center
-//        label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontForContentSizeCategory = true
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -77,9 +75,9 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         let label = UILabel()
         label.textColor = .label
         label.font = UIFont.title3.with(weight: .medium)
-        label.numberOfLines = 2
+        label.numberOfLines = 0
         label.textAlignment = .center
-//        label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontForContentSizeCategory = true
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -194,7 +192,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height: CGFloat = 300
+        var height: CGFloat = 328
         if let activities = activities {
             let item = activities[indexPath.item]
             if item.isTask ?? false {
