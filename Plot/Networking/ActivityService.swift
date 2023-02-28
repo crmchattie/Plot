@@ -316,13 +316,14 @@ class ActivityService {
         self.saveDataToSharedContainer(activities: self.activities)
     }
     
-    func setupFirebase() {
+    func setupFirebase(_ completion: @escaping () -> Void) {
         self.observeActivitiesForCurrentUser({
             self.observeCalendarsForCurrentUser()
             self.observeListsForCurrentUser()
             self.observeInvitationForCurrentUser()
             self.hasLoadedCalendarEventActivities = true
             self.hasLoadedListTaskActivities = true
+            completion()
         })
     }
     

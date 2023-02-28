@@ -131,11 +131,12 @@ class HealthService {
         }
     }
     
-    func setupFirebase() {
+    func setupFirebase(_ completion: @escaping () -> Void) {
         self.observeWorkoutsForCurrentUser {}
         self.observeMindfulnesssForCurrentUser {}
         self.observeMoodForCurrentUser {}
         self.hasLoadedHealth = true
+        completion()
     }
     
     func regrabHealth(_ completion: @escaping () -> Void) {

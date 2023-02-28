@@ -79,9 +79,25 @@ class NetworkController {
     }
     
     func setupFirebase() {
-        activityService.setupFirebase()
-        financeService.setupFirebase()
-        healthService.setupFirebase()
+        let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
+        activityService.setupFirebase {
+            dispatchGroup.leave()
+        }
+        dispatchGroup.enter()
+        financeService.setupFirebase {
+            dispatchGroup.leave()
+        }
+        dispatchGroup.enter()
+        healthService.setupFirebase {
+            dispatchGroup.leave()
+        }
+        dispatchGroup.notify(queue: .main) {
+            self.setupInitialGoals()
+        }
+        
+
     }
     
     func setupOtherVariables() {

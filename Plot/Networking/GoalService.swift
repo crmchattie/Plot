@@ -176,6 +176,7 @@ extension NetworkController {
                         completion(finalStat)
                     }
                 }
+                completion(nil)
             }
         case .tasks:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.tasks, isEvent: false, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
@@ -189,6 +190,7 @@ extension NetworkController {
                         completion(finalStat)
                     }
                 }
+                completion(nil)
             }
         case .financialTransactions:
             var transactionDetails = [TransactionDetails]()
@@ -225,6 +227,7 @@ extension NetworkController {
                         completion(nil)
                     }
                 }
+                completion(nil)
             }
         case .financialAccounts:
             if let option = option, option.count == 1, option.first == "Credit Card" {
@@ -242,9 +245,8 @@ extension NetworkController {
                             finalStat.date = ISO8601DateFormatter().date(from: transaction.transacted_at) ?? Date()
                         }
                         completion(finalStat)
-                    } else {
-                        completion(nil)
                     }
+                    completion(nil)
                 }
             } else {
                 var accountDetails = [AccountDetails]()
@@ -284,6 +286,8 @@ extension NetworkController {
                             completion(nil)
                         }
                     }
+                    completion(nil)
+
                 }
             }
             
@@ -307,6 +311,8 @@ extension NetworkController {
                         completion(nil)
                     }
                 }
+                completion(nil)
+
             }
         case .mood:
             healthDetailService.getSamples(for: healthService.moods, types: option, range: range) {stat, moods,_ in
@@ -320,6 +326,8 @@ extension NetworkController {
                         completion(nil)
                     }
                 }
+                completion(nil)
+
             }
         case .sleep:
             if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
@@ -444,13 +452,11 @@ extension NetworkController {
                             
                             if goal.name == "Daily Mood" {
                                 task.reminder = TaskAlert.SixPMOnDeadlineDate.description
-                            } else if goal.name == "Daily Sleep" {
-                                task.reminder = TaskAlert.SixPMOneDayBeforeDeadlineDate.description
                             } else if frequency == .monthly {
                                 task.reminder = TaskAlert.NineAMOneWeekBeforeDeadlineDate.description
                             } else if frequency == .yearly {
                                 task.reminder = TaskAlert.NineAMOneMonthBeforeDeadlineDate.description
-                            } else {
+                            } else if goal.name != "Daily Sleep" {
                                 task.reminder = TaskAlert.NineAMOnDeadlineDate.description
                             }
                                          

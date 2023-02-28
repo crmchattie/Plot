@@ -130,7 +130,7 @@ class FinanceService {
         self.observeMembersForCurrentUser {}
     }
     
-    func setupFirebase() {
+    func setupFirebase(_ completion: @escaping () -> Void) {
         self.observeAccountsForCurrentUser {}
         self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
             self.transactionRules = transactionRules
@@ -140,6 +140,7 @@ class FinanceService {
         self.observeTransactionRulesForCurrentUser {}
         self.observeHoldingsForCurrentUser()
         self.observeMembersForCurrentUser {}
+        completion()
     }
     
     func regrabFinances(_ completion: @escaping () -> Void) {

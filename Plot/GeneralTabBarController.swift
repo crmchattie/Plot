@@ -73,7 +73,6 @@ class GeneralTabBarController: UITabBarController {
         if isNewUser && Auth.auth().currentUser != nil {
             //has to be here given currentUserID = nil on app start
             GeneralTabBarController.networkController.setupFirebase()
-            GeneralTabBarController.networkController.setupInitialGoals()
             GeneralTabBarController.networkController.setupOtherVariables()
             discoverController.fetchTemplates()
             analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
@@ -89,7 +88,6 @@ class GeneralTabBarController: UITabBarController {
     }
     
     fileprivate func loadVariables() {
-        print("loadVariables")
         isNewUser = Auth.auth().currentUser == nil
         homeController.isNewUser = isNewUser
         homeController.addObservers()
@@ -122,6 +120,7 @@ class GeneralTabBarController: UITabBarController {
     @objc func reloadVariables() {
         GeneralTabBarController.networkController.setupKeyVariables {
             GeneralTabBarController.networkController.setupOtherVariables()
+            GeneralTabBarController.networkController.setupInitialGoals()
         }
     }
     
