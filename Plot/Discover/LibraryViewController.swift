@@ -196,7 +196,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Create"
+        navigationItem.title = "Discover"
         navigationController?.navigationBar.layoutIfNeeded()        
         navigationItem.largeTitleDisplayMode = .always
                 
