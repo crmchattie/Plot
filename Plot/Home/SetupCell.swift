@@ -10,15 +10,22 @@ import Foundation
 
 class SetupCell: BaseContainerCollectionViewCell {
     var colors : [UIColor] = [FalconPalette.defaultRed, FalconPalette.defaultBlue, FalconPalette.defaultOrange, FalconPalette.defaultDarkBlue, FalconPalette.defaultGreen]
-    var intColor: Int = 0
     
     var customType: CustomType! {
         didSet {
             imageView.image = UIImage(named: customType.image)!.withRenderingMode(.alwaysTemplate)
-            imageView.tintColor = colors[intColor]
             imageView.contentMode = .scaleAspectFit
             imageView.backgroundColor = .secondarySystemGroupedBackground
             containerImageView.backgroundColor = .secondarySystemGroupedBackground
+            var intColor: Int = 0
+            if customType == CustomType.time {
+                intColor = 1
+            } else if customType == CustomType.health {
+                intColor = 0
+            } else if customType == CustomType.finances {
+                intColor = 4
+            }
+            imageView.tintColor = colors[intColor]
             button.backgroundColor = colors[intColor]
             typeLabel.text = customType.categoryText
             descriptionLabel.text = customType.subcategoryText

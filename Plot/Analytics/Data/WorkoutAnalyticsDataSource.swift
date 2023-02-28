@@ -91,14 +91,14 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
                         var categories: [CategorySummaryViewModel] = []
                         let keysCurrent = categoryStatsCurrent.keys.sorted(by: <)
                         
-                        var cumulative: Double = 0
+                        var cumulativeCurrent: Double = 0
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
                             let yValues = keysCurrent.map {
                                 (categoryStatsCurrent[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
                             }.reduce(0, +)
-                            cumulative += yValues
-                            return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
+                            cumulativeCurrent += yValues
+                            return ChartDataEntry(x: Double(index) + 1, y: cumulativeCurrent, data: date)
                         }
                         
                         let chartDataSetCurrent = LineChartDataSet(entries: dataEntries)
@@ -112,21 +112,21 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
                                                 
                         let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
                                                                        color: .systemBlue,
-                                                                       value: Double(workoutListCurrent.count),
-                                                                       formattedValue: "\(Int(workoutListCurrent.count)) " + (workoutListCurrent.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                                                                       value: Double(cumulativeCurrent),
+                                                                       formattedValue: "\(self.dateFormatter.string(from: cumulativeCurrent)!)")
                         categories.append(categoryCurrent)
+                        var cumulativePast: Double = 0
                         
                         if !categoryStatsPast.isEmpty {
                             let keysPast = categoryStatsPast.keys
                             
-                            cumulative = 0
                             dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                                 let date = startDatePast.addDays(index)
                                 let yValues = keysPast.map {
                                     (categoryStatsPast[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
                                 }.reduce(0, +)
-                                cumulative += yValues
-                                return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
+                                cumulativePast += yValues
+                                return ChartDataEntry(x: Double(index) + 1, y: cumulativePast, data: date)
                             }
                             
                             let chartDataSetPast = LineChartDataSet(entries: dataEntries)
@@ -141,8 +141,8 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
                             
                             let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? ""),
                                                                         color: .secondaryLabel,
-                                                                        value: Double(workoutListPast.count),
-                                                                        formattedValue: "\(Int(workoutListPast.count)) " + (workoutListPast.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                                                                        value: Double(cumulativePast),
+                                                                        formattedValue: "\(self.dateFormatter.string(from: cumulativePast)!)")
                             categories.append(categoryPast)
                             
                         }
@@ -151,27 +151,33 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
                         
                         newChartViewModel.categories = categories
                         
-                        let change = workoutListCurrent.count - workoutListPast.count
+                        let change = cumulativeCurrent - cumulativePast
                         
-                        if change == 0 {
-                            newChartViewModel.rangeAverageValue = "On Track"
-                        } else if change == 1 {
-                            newChartViewModel.rangeAverageValue = "+1 " + self.titleStringSingular
-                        } else if change == -1 {
-                            newChartViewModel.rangeAverageValue = "-1 " + self.titleStringSingular
-                        } else if change < -1 {
-                            newChartViewModel.rangeAverageValue = "\(Int(change)) " + self.titleStringPlural
-                        } else if change > 1 {
-                            newChartViewModel.rangeAverageValue = "+\(Int(change)) " + self.titleStringPlural
+                        if let changeString = self.dateFormatter.string(from: change) {
+                            if change > 0 {
+                                newChartViewModel.rangeAverageValue = "+" + changeString
+                            } else {
+                                newChartViewModel.rangeAverageValue = changeString
+                            }
                         }
             
                         
                         DispatchQueue.main.async {
-                            let chartData = LineChartData(dataSets: chartDataSets)
-                            chartData.setDrawValues(false)
-                            newChartViewModel.chartData = chartData
-                            self.chartViewModel.send(newChartViewModel)
-                            completion?()
+                            if !self.workouts.isEmpty {
+                                self.dataExists = true
+                                let chartData = LineChartData(dataSets: chartDataSets)
+                                chartData.setDrawValues(false)
+                                newChartViewModel.chartData = chartData
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            } else {
+                                self.dataExists = false
+                                newChartViewModel.chartData = nil
+                                newChartViewModel.categories = []
+                                newChartViewModel.rangeAverageValue = "-"
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            }
                         }
                     }
                 }
@@ -180,7 +186,7 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
             break
         case .verticalBar:
             healthDetailService.getSamples(for: range, segment: range.timeSegment, workouts: networkController.healthService.workouts, measure: .duration) { categoryStats, workoutList in
-                guard !categoryStats.isEmpty else {
+                guard !workoutList.isEmpty else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
                     newChartViewModel.rangeAverageValue = "-"

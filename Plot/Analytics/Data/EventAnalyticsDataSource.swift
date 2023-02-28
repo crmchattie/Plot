@@ -166,11 +166,21 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
             
                         
                         DispatchQueue.main.async {
-                            let chartData = LineChartData(dataSets: chartDataSets)
-                            chartData.setDrawValues(false)
-                            newChartViewModel.chartData = chartData
-                            self.chartViewModel.send(newChartViewModel)
-                            completion?()
+                            if !self.activities.isEmpty {
+                                self.dataExists = true
+                                let chartData = LineChartData(dataSets: chartDataSets)
+                                chartData.setDrawValues(false)
+                                newChartViewModel.chartData = chartData
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            } else {
+                                self.dataExists = false
+                                newChartViewModel.chartData = nil
+                                newChartViewModel.categories = []
+                                newChartViewModel.rangeAverageValue = "-"
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            }
                         }
                     }
                 }
@@ -179,7 +189,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
             break
         case .verticalBar:
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events, isEvent: true) { categoryStats, activityList in
-                guard !categoryStats.isEmpty else {
+                guard !activityList.isEmpty else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
                     newChartViewModel.rangeAverageValue = "-"

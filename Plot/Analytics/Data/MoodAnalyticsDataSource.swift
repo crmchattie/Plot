@@ -62,8 +62,7 @@ class MoodAnalyticsDataSource: AnalyticsDataSource {
         newChartViewModel.formatType = range.timeSegment
         
         healthDetailService.getSamples(for: range, segment: range.timeSegment, moods: networkController.healthService.moods) { categoryStats, moodList in
-                        
-            guard !categoryStats.isEmpty else {
+            guard !moodList.isEmpty else {
                 newChartViewModel.chartData = nil
                 newChartViewModel.categories = []
                 newChartViewModel.rangeAverageValue = "-"

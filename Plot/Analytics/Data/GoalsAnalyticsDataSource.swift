@@ -79,8 +79,6 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                 
                 self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.goals, isEvent: false) { categoryStatsPast, goalListPast in
                     
-                    self.dataExists = true
-
                     let daysInRange = self.range.daysInRange + 1
                     let startDateCurrent = self.range.startDate.startOfDay
                     let startDatePast = self.range.pastStartDate?.startOfDay ?? startDateCurrent
@@ -168,11 +166,21 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
             
                         
                         DispatchQueue.main.async {
-                            let chartData = LineChartData(dataSets: chartDataSets)
-                            chartData.setDrawValues(false)
-                            newChartViewModel.chartData = chartData
-                            self.chartViewModel.send(newChartViewModel)
-                            completion?()
+                            if !self.goals.isEmpty {
+                                self.dataExists = true
+                                let chartData = LineChartData(dataSets: chartDataSets)
+                                chartData.setDrawValues(false)
+                                newChartViewModel.chartData = chartData
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            } else {
+                                self.dataExists = false
+                                newChartViewModel.chartData = nil
+                                newChartViewModel.categories = []
+                                newChartViewModel.rangeAverageValue = "-"
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            }
                         }
                     }
                 }
@@ -181,8 +189,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
             break
         case .verticalBar:
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { categoryStats, goalList in
-                            
-                guard !categoryStats.isEmpty else {
+                guard !goalList.isEmpty else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
                     newChartViewModel.rangeAverageValue = "-"

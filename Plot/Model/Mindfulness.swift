@@ -111,7 +111,7 @@ func mindfulnessesOverTimeChartData(mindfulnesses: [Mindfulness], start: Date, e
         nextDate = calendar.date(byAdding: component, value: 1, to: nextDate)!
     }
     
-    completion(statistics, mindfulnesses)
+    completion(statistics, mindfulness)
 }
 
 func mindfulnessData(mindfulnesses: [Mindfulness], start: Date, end: Date, completion: @escaping (Statistic, [Mindfulness]) -> ()) {

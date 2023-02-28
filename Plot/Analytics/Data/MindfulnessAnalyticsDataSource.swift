@@ -76,10 +76,6 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
-                let daysInRange = self.range.daysInRange + 1
-                let startDateCurrent = self.range.startDate.startOfDay.dayBefore.addHours(18)
-                let startDatePast = self.range.pastStartDate?.startOfDay.dayBefore.addHours(18) ?? startDateCurrent
-                
                 self.healthDetailService.getSamples(for: previousRange, segment: self.range.timeSegment, mindfulness: self.networkController.healthService.mindfulnesses) { statsPast, mindfulnessListPast in
                     
                     self.dataExists = true
@@ -94,7 +90,7 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                         var chartDataSets = [LineChartDataSet]()
                         var categories: [CategorySummaryViewModel] = []
                         var dataEntriesCurrent: [ChartDataEntry] = []
-
+                        let sumCurrent = statsPast.reduce(0, { $0 + $1.value })
                         for index in 0...daysInRange {
                             let date = startDateCurrent.addDays(index)
                             if let stat = statsCurrent.first(where: { $0.date == date }) {
@@ -122,13 +118,13 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                                                 
                         let categoryCurrent = CategorySummaryViewModel(title: "This " + (self.range.type?.title ?? ""),
                                                                        color: .systemBlue,
-                                                                       value: Double(mindfulnessListCurrent.count),
-                                                                       formattedValue: "\(Int(mindfulnessListCurrent.count)) " + (mindfulnessListCurrent.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                                                                       value: Double(sumCurrent),
+                                                                       formattedValue: "\(self.dateFormatter.string(from: sumCurrent)!)")
                         categories.append(categoryCurrent)
-                        
+                        var sumPast: Double = 0
                         if !statsPast.isEmpty {
                             var dataEntriesPast: [ChartDataEntry] = []
-                            let sum = statsPast.reduce(0, { $0 + $1.value })
+                            sumPast = statsPast.reduce(0, { $0 + $1.value })
                             for index in 0...daysInRange {
                                 let date = startDatePast.addDays(index)
                                 
@@ -159,8 +155,8 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                             
                             let categoryPast = CategorySummaryViewModel(title: "Last " + (self.range.type?.title ?? ""),
                                                                         color: .secondaryLabel,
-                                                                        value: Double(mindfulnessListPast.count),
-                                                                        formattedValue: "\(Int(mindfulnessListPast.count)) " + (mindfulnessListPast.count == 1 ? self.titleStringSingular : self.titleStringPlural))
+                                                                        value: Double(sumPast),
+                                                                        formattedValue: "\(self.dateFormatter.string(from: sumPast)!)")
                             categories.append(categoryPast)
                             
                         }
@@ -169,27 +165,33 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                         
                         newChartViewModel.categories = categories
                         
-                        let change = mindfulnessListCurrent.count - mindfulnessListPast.count
+                        let change = sumCurrent - sumPast
                         
-                        if change == 0 {
-                            newChartViewModel.rangeAverageValue = "On Track"
-                        } else if change == 1 {
-                            newChartViewModel.rangeAverageValue = "+1 " + self.titleStringSingular
-                        } else if change == -1 {
-                            newChartViewModel.rangeAverageValue = "-1 " + self.titleStringSingular
-                        } else if change < -1 {
-                            newChartViewModel.rangeAverageValue = "\(Int(change)) " + self.titleStringPlural
-                        } else if change > 1 {
-                            newChartViewModel.rangeAverageValue = "+\(Int(change)) " + self.titleStringPlural
+                        if let changeString = self.dateFormatter.string(from: change) {
+                            if change > 0 {
+                                newChartViewModel.rangeAverageValue = "+" + changeString
+                            } else {
+                                newChartViewModel.rangeAverageValue = changeString
+                            }
                         }
             
                         
                         DispatchQueue.main.async {
-                            let chartData = LineChartData(dataSets: chartDataSets)
-                            chartData.setDrawValues(false)
-                            newChartViewModel.chartData = chartData
-                            self.chartViewModel.send(newChartViewModel)
-                            completion?()
+                            if !self.mindfulness.isEmpty {
+                                self.dataExists = true
+                                let chartData = LineChartData(dataSets: chartDataSets)
+                                chartData.setDrawValues(false)
+                                newChartViewModel.chartData = chartData
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            } else {
+                                self.dataExists = false
+                                newChartViewModel.chartData = nil
+                                newChartViewModel.categories = []
+                                newChartViewModel.rangeAverageValue = "-"
+                                self.chartViewModel.send(newChartViewModel)
+                                completion?()
+                            }
                         }
                     }
                 }
