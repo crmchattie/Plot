@@ -71,7 +71,7 @@ class SetupCell: BaseContainerCollectionViewCell {
     let subDescriptionLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = UIFont.preferredFont(forTextStyle: .footnote)
         label.numberOfLines = 0
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
@@ -104,14 +104,14 @@ class SetupCell: BaseContainerCollectionViewCell {
     override func setupViews() {
         super.setupViews()
         
-        containerImageView.constrainWidth(100)
-        containerImageView.constrainHeight(100)
+        containerImageView.constrainWidth(75)
+        containerImageView.constrainHeight(75)
         
         containerImageView.layer.masksToBounds = true
-        containerImageView.layer.cornerRadius = 100 / 2
+        containerImageView.layer.cornerRadius = 75 / 2
         
-        imageView.constrainWidth(50)
-        imageView.constrainHeight(50)
+        imageView.constrainWidth(40)
+        imageView.constrainHeight(40)
         
         button.constrainWidth(contentView.frame.width - 32)
         button.constrainHeight(45)
