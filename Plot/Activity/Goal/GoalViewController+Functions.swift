@@ -407,14 +407,14 @@ extension GoalViewController {
     }
     
     func updateGoal(selectedGoalProperty: SelectedGoalProperty, value: String?) {
-        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Option") {
+        if let unitRow : PushRow<String> = self.form.rowBy(tag: "Unit"), let submetricRow : PushRow<String> = self.form.rowBy(tag: "Submetric"), let optionRow : MultipleSelectorRow<String> = self.form.rowBy(tag: "Option"), let relationshipRow : PushRow<String> = self.form.rowBy(tag: "metricRelationship") {
             switch selectedGoalProperty {
             case .metric:
                 if let value = value, let updatedValue = GoalMetric(rawValue: value) {
                     if let _ = task.goal {
                         task.goal!.metric = updatedValue
                     } else {
-                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        task.goal = Goal(name: nil, metric: updatedValue, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, metricRelationship: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
                     }
                     
                     //units
@@ -454,21 +454,23 @@ extension GoalViewController {
                         submetricRow.evaluateHidden()
                         submetricRow.value = nil
                     }
-
                     
-                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch"), let switchDateRowEnd: SwitchRow = self.form.rowBy(tag: "deadlineDateSwitch") {
+                    relationshipRow.hidden = false
+                    relationshipRow.evaluateHidden()
+                    
+                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-                            periodRow.hidden = Condition(booleanLiteral: task.goal?.period == nil && task.startDate != nil)
-                            switchDateRowStart.hidden = Condition(booleanLiteral: task.goal?.period != nil)
-                            switchDateRowEnd.hidden = Condition(booleanLiteral: task.startDate == nil)
+                            periodRow.hidden = false
+                            switchDateRowStart.hidden = false
                         } else {
                             periodRow.hidden = true
                             switchDateRowStart.hidden = true
-                            switchDateRowEnd.hidden = false
+                            switchDateRowStart.value = false
+                            task.goal!.period = nil
+                            task.startDateTime = nil
                         }
                         periodRow.evaluateHidden()
                         switchDateRowStart.evaluateHidden()
-                        switchDateRowEnd.evaluateHidden()
                     }
                     
                 }
@@ -477,7 +479,7 @@ extension GoalViewController {
                     if let _ = task.goal {
                         task.goal!.submetric = updatedValue
                     } else {
-                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                        task.goal = Goal(name: nil, metric: nil, submetric: updatedValue, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, metricRelationship: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
                     }
                     if let options = task.goal!.options() {
                         optionRow.value = Set(arrayLiteral: options[0])
@@ -550,19 +552,19 @@ extension GoalViewController {
                         submetricRow.value = nil
                     }
                     
-                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch"), let switchDateRowEnd: SwitchRow = self.form.rowBy(tag: "deadlineDateSwitch") {
+                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-                            periodRow.hidden = Condition(booleanLiteral: task.goal?.period == nil && task.startDate != nil)
-                            switchDateRowStart.hidden = Condition(booleanLiteral: task.goal?.period != nil)
-                            switchDateRowEnd.hidden = Condition(booleanLiteral: task.startDate == nil)
+                            periodRow.hidden = false
+                            switchDateRowStart.hidden = false
                         } else {
                             periodRow.hidden = true
                             switchDateRowStart.hidden = true
-                            switchDateRowEnd.hidden = false
+                            switchDateRowStart.value = false
+                            task.goal!.period = nil
+                            task.startDateTime = nil
                         }
                         periodRow.evaluateHidden()
                         switchDateRowStart.evaluateHidden()
-                        switchDateRowEnd.evaluateHidden()
                     }
                     
                 } else {
@@ -575,19 +577,19 @@ extension GoalViewController {
                     submetricRow.value = nil
                     unitRow.value = nil
                     
-                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch"), let switchDateRowEnd: SwitchRow = self.form.rowBy(tag: "deadlineDateSwitch") {
+                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
                         if task.goal!.metric!.type != .pointInTime {
-                            periodRow.hidden = Condition(booleanLiteral: task.goal?.period == nil && task.startDate != nil)
-                            switchDateRowStart.hidden = Condition(booleanLiteral: task.goal?.period != nil)
-                            switchDateRowEnd.hidden = Condition(booleanLiteral: task.startDate == nil)
+                            periodRow.hidden = false
+                            switchDateRowStart.hidden = false
                         } else {
                             periodRow.hidden = true
                             switchDateRowStart.hidden = true
-                            switchDateRowEnd.hidden = false
+                            switchDateRowStart.value = false
+                            task.goal!.period = nil
+                            task.startDateTime = nil
                         }
                         periodRow.evaluateHidden()
                         switchDateRowStart.evaluateHidden()
-                        switchDateRowEnd.evaluateHidden()
                     }
                 }
                 
@@ -659,6 +661,9 @@ extension GoalViewController {
                 descriptionRow.evaluateHidden()
             }
             updateRightBarButton()
+            
+            print(self.task.startDate)
+            print(self.task.endDate)
         }
     }
     
@@ -1251,27 +1256,22 @@ extension GoalViewController {
     }
     
     func updateStartDateGoal() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let dateSwitchRowEnd: SwitchRow = form.rowBy(tag: "deadlineDateSwitch") {
+        print("updateStartDateGoal")
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period") {
             if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                periodRow.hidden = true
-                periodRow.evaluateHidden()
-                dateSwitchRowEnd.hidden = false
-                dateSwitchRowEnd.evaluateHidden()
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                let date = Calendar.current.date(from: dateComponents)
-                self.task.startDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
+                if let endDate = task.endDate, dateRowValue.compare(endDate) == .orderedDescending {
+                    self.task.endDateTime = NSNumber(value: Int((dateRowValue.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                }
+                periodRow.value = "None"
+                periodRow.updateCell()
+                self.task.startDateTime = NSNumber(value: Int((dateRowValue.startOfDay.UTCTime).timeIntervalSince1970))
                 self.task.hasStartTime = false
+                self.task.goalPeriod = nil
             } else {
-                periodRow.hidden = false
-                periodRow.evaluateHidden()
-                dateSwitchRowEnd.value = false
-                dateSwitchRowEnd.hidden = true
-                dateSwitchRowEnd.evaluateHidden()
+                periodRow.value = "None"
+                periodRow.updateCell()
+                self.task.goalPeriod = nil
                 self.task.startDateTime = nil
-                self.task.endDateTime = nil
                 self.task.recurrences = nil
                 self.task.reminder = nil
                 self.task.hasStartTime = false
@@ -1281,19 +1281,20 @@ extension GoalViewController {
     }
     
     func updateDeadlineDateGoal() {
-        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate") {
+        if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period") {
             if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                var dateComponents = DateComponents()
-                dateComponents.year = dateRowValue.yearNumber()
-                dateComponents.month = dateRowValue.monthNumber()
-                dateComponents.day = dateRowValue.dayNumber()
-                let date = Calendar.current.date(from: dateComponents)?.endOfDay.advanced(by: -1)
-                self.task.endDateTime = NSNumber(value: Int((date)?.timeIntervalSince1970 ?? 0))
-                self.task.hasDeadlineTime = false
-                if let startDateTime = self.task.startDateGivenEndDatePeriod {
-                    self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
+                if let startDate = task.startDate, dateRowValue.compare(startDate) == .orderedAscending {
+                    self.task.startDateTime = NSNumber(value: Int((dateRowValue.startOfDay.UTCTime).timeIntervalSince1970))
                 }
+                periodRow.value = "None"
+                periodRow.updateCell()
+                self.task.endDateTime = NSNumber(value: Int((dateRowValue.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                self.task.hasDeadlineTime = false
+                self.task.goalPeriod = nil
             } else {
+                periodRow.value = "None"
+                periodRow.updateCell()
+                self.task.goalPeriod = nil
                 self.task.recurrences = nil
                 self.task.reminder = nil
                 self.task.endDateTime = nil

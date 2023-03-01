@@ -108,6 +108,7 @@ class Activity: NSObject, NSCopying, Codable {
     var goalPeriod: String?
     var goalTargetNumber: NSNumber?
     var goalCurrentNumber: NSNumber?
+    var goalMetricRelationship: String?
     var goalMetricSecond: String?
     var goalSubmetricSecond: String?
     var goalOptionSecond: [String]?
@@ -115,6 +116,7 @@ class Activity: NSObject, NSCopying, Codable {
     var goalPeriodSecond: String?
     var goalTargetNumberSecond: NSNumber?
     var goalCurrentNumberSecond: NSNumber?
+    var goalMetricRelationshipSecond: String?
     var goalMetricsRelationshipType: String?
     private var _goal: Goal?
     var goal: Goal? {
@@ -122,7 +124,7 @@ class Activity: NSObject, NSCopying, Codable {
             if let _goal = _goal {
                 return _goal
             } else {
-                var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                var goal = Goal(name: self.name, metric: nil, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: nil, currentNumber: nil, metricRelationship: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
                 goal.activityID = self.activityID
                 if let value = goalMetric {
                     goal.metric = GoalMetric(rawValue: value)
@@ -145,6 +147,9 @@ class Activity: NSObject, NSCopying, Codable {
                 if let value = goalCurrentNumber {
                     goal.currentNumber = Double(truncating: value)
                 }
+                if let value = goalMetricRelationship {
+                    goal.metricRelationship = MetricsRelationshipType(rawValue: value)
+                }
                 if let value = goalMetricSecond {
                     goal.metricSecond = GoalMetric(rawValue: value)
                 }
@@ -165,6 +170,9 @@ class Activity: NSObject, NSCopying, Codable {
                 }
                 if let value = goalCurrentNumberSecond {
                     goal.currentNumberSecond = Double(truncating: value)
+                }
+                if let value = goalMetricRelationshipSecond {
+                    goal.metricRelationshipSecond = MetricsRelationshipType(rawValue: value)
                 }
                 if let value = goalMetricsRelationshipType {
                     goal.metricsRelationshipType = MetricsRelationshipType(rawValue: value)
@@ -259,9 +267,11 @@ class Activity: NSObject, NSCopying, Codable {
         case goalPeriod
         case goalMetricSecond
         case goalSubmetricSecond
+        case goalMetricRelationship
         case goalOptionSecond
         case goalUnitSecond
         case goalPeriodSecond
+        case goalMetricRelationshipSecond
         case goalMetricsRelationshipType
     }
     
@@ -333,6 +343,9 @@ class Activity: NSObject, NSCopying, Codable {
             if let value = goal.currentNumber as? NSNumber {
                 self.goalCurrentNumber = value
             }
+            if let value = goal.metricRelationship {
+                self.goalMetricRelationship = value.rawValue
+            }
             if let value = goal.metricSecond {
                 self.goalMetricSecond = value.rawValue
             }
@@ -353,6 +366,9 @@ class Activity: NSObject, NSCopying, Codable {
             }
             if let value = goal.currentNumberSecond as? NSNumber {
                 self.goalCurrentNumberSecond = value
+            }
+            if let value = goal.metricRelationshipSecond {
+                self.goalMetricRelationshipSecond = value.rawValue
             }
             if let value = goal.metricsRelationshipType {
                 self.goalMetricsRelationshipType = value.rawValue
@@ -453,6 +469,7 @@ class Activity: NSObject, NSCopying, Codable {
         goalPeriod = dictionary?["goalPeriod"] as? String
         goalTargetNumber = dictionary?["goalTargetNumber"] as? NSNumber
         goalCurrentNumber = dictionary?["goalCurrentNumber"] as? NSNumber
+        goalMetricRelationship = dictionary?["goalMetricRelationship"] as? String
         goalMetricSecond = dictionary?["goalMetricSecond"] as? String
         goalSubmetricSecond = dictionary?["goalSubmetricSecond"] as? String
         goalOptionSecond = dictionary?["goalOptionSecond"] as? [String]
@@ -460,6 +477,7 @@ class Activity: NSObject, NSCopying, Codable {
         goalPeriodSecond = dictionary?["goalPeriodSecond"] as? String
         goalTargetNumberSecond = dictionary?["goalTargetNumberSecond"] as? NSNumber
         goalCurrentNumberSecond = dictionary?["goalCurrentNumberSecond"] as? NSNumber
+        goalMetricRelationshipSecond = dictionary?["goalMetricRelationshipSecond"] as? String
         goalMetricsRelationshipType = dictionary?["goalMetricsRelationshipType"] as? String
     }
     
@@ -827,6 +845,10 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["goalCurrentNumber"] = value
         }
         
+        if let goal = self.goal, let value = goal.metricRelationship?.rawValue as AnyObject? {
+            dictionary["goalMetricRelationship"] = value
+        }
+        
         if let goal = self.goal, let value = goal.metricSecond?.rawValue as AnyObject? {
             dictionary["goalMetricSecond"] = value
         } else {
@@ -867,6 +889,12 @@ class Activity: NSObject, NSCopying, Codable {
             dictionary["goalCurrentNumberSecond"] = value
         } else {
             dictionary["goalCurrentNumberSecond"] = NSNull()
+        }
+        
+        if let goal = self.goal, let value = goal.metricRelationshipSecond?.rawValue as AnyObject? {
+            dictionary["goalMetricRelationshipSecond"] = value
+        } else {
+            dictionary["goalMetricRelationshipSecond"] = NSNull()
         }
         
         if let goal = self.goal, let value = goal.metricsRelationshipType?.rawValue as AnyObject? {
@@ -1182,6 +1210,10 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.goalCurrentNumber = value
         }
         
+        if let value = updatingActivity.goalMetricRelationship {
+            newActivity.goalMetricRelationship = value
+        }
+        
         if let value = updatingActivity.goalUnitSecond {
             newActivity.goalUnitSecond = value
         }
@@ -1196,6 +1228,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.goalCurrentNumberSecond {
             newActivity.goalCurrentNumberSecond = value
+        }
+        
+        if let value = updatingActivity.goalMetricRelationshipSecond {
+            newActivity.goalMetricRelationshipSecond = value
         }
         
         if let value = updatingActivity.goalMetricsRelationshipType {
@@ -1503,6 +1539,10 @@ class Activity: NSObject, NSCopying, Codable {
             self.goalCurrentNumber = value
         }
         
+        if let value = updatingActivity.goalMetricRelationship {
+            self.goalMetricRelationship = value
+        }
+        
         if let value = updatingActivity.goalUnitSecond {
             self.goalUnitSecond = value
         }
@@ -1517,6 +1557,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if let value = updatingActivity.goalCurrentNumberSecond {
             self.goalCurrentNumberSecond = value
+        }
+        
+        if let value = updatingActivity.goalMetricRelationshipSecond {
+            self.goalMetricRelationshipSecond = value
         }
         
         if let value = updatingActivity.goalMetricsRelationshipType {
@@ -1811,6 +1855,10 @@ class Activity: NSObject, NSCopying, Codable {
             newActivity.goalCurrentNumber = self.goalCurrentNumber
         }
         
+        if self.goalMetricRelationship != otherActivity.goalMetricRelationship {
+            newActivity.goalMetricRelationship = self.goalMetricRelationship
+        }
+        
         if self.goalUnitSecond != otherActivity.goalUnitSecond {
             newActivity.goalUnitSecond = self.goalUnitSecond
         }
@@ -1825,6 +1873,10 @@ class Activity: NSObject, NSCopying, Codable {
         
         if self.goalCurrentNumberSecond != otherActivity.goalCurrentNumberSecond {
             newActivity.goalCurrentNumberSecond = self.goalCurrentNumberSecond
+        }
+        
+        if self.goalMetricRelationshipSecond != otherActivity.goalMetricRelationshipSecond {
+            newActivity.goalMetricRelationshipSecond = self.goalMetricRelationshipSecond
         }
         
         if self.goalMetricsRelationshipType != otherActivity.goalMetricsRelationshipType {
@@ -2127,13 +2179,13 @@ extension Activity {
             case .none:
                 return nil
             case .day:
-                return endDate.dayBefore.advanced(by: 1)
+                return endDate.startOfDay
             case .week:
-                return endDate.weekBefore.advanced(by: 1)
+                return endDate.startOfWeek
             case .month:
-                return endDate.monthBefore.advanced(by: 1)
+                return endDate.startOfMonth
             case .year:
-                return endDate.lastYear.advanced(by: 1)
+                return endDate.startOfYear
             }
         }
         return nil

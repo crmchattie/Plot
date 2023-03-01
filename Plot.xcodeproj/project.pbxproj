@@ -101,7 +101,6 @@
 		105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */; };
 		105F66FB24185B4000F6EDB6 /* ExerciseDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */; };
 		1061BF72292D3BA50037CED0 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1061BF71292D3BA50037CED0 /* Goal.swift */; };
-		1061BF74292FE8C00037CED0 /* GoalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1061BF73292FE8BF0037CED0 /* GoalRow.swift */; };
 		10623B9428CA2CF800E05AF0 /* ParticipantsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */; };
 		10623B9628CF7C4500E05AF0 /* HealthListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */; };
 		10623B9828CF7D5F00E05AF0 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */; };
@@ -705,7 +704,6 @@
 		105F66F824171A8400F6EDB6 /* WorkoutDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailCell.swift; sourceTree = "<group>"; };
 		105F66FA24185B4000F6EDB6 /* ExerciseDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailCell.swift; sourceTree = "<group>"; };
 		1061BF71292D3BA50037CED0 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
-		1061BF73292FE8BF0037CED0 /* GoalRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalRow.swift; sourceTree = "<group>"; };
 		10623B9328CA2CF800E05AF0 /* ParticipantsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantsFetcher.swift; sourceTree = "<group>"; };
 		10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthListViewController.swift; sourceTree = "<group>"; };
 		10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -1787,7 +1785,6 @@
 				103E968922C2B309007D6668 /* PurchaseRow.swift */,
 				10DFAFCB2877775800D38016 /* HealthRow.swift */,
 				1092E28628BE53D00018FCAA /* ColorRow.swift */,
-				1061BF73292FE8BF0037CED0 /* GoalRow.swift */,
 				101B90962458DA2D00EDDB90 /* WeatherRow.swift */,
 			);
 			path = Cells;
@@ -3597,7 +3594,6 @@
 				107BC99B258FB32B008E6DD5 /* ActiveDaysRow.swift in Sources */,
 				10B3E4FD28AE9F7000E1713D /* Event.swift in Sources */,
 				10196F0324411B5600B6AFDF /* ScheduleViewController.swift in Sources */,
-				1061BF74292FE8C00037CED0 /* GoalRow.swift in Sources */,
 				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
 				10B3E51928B4FF2000E1713D /* ChooseTaskTableViewController.swift in Sources */,

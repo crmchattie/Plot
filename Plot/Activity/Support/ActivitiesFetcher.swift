@@ -308,9 +308,9 @@ class ActivitiesFetcher: NSObject {
                                     newActivity.recurrenceStartDateTime = activity.startDateTime
                                     newActivity.instanceIndex = index
                                     if period != .month {
-                                        newActivity.startDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970))
+                                        newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
                                     } else {
-                                        newActivity.startDateTime = NSNumber(value: Int(date.startOfMonth.UTCTime.timeIntervalSince1970))
+                                        newActivity.startDateTime = NSNumber(value: Int(date.startOfDay.UTCTime.timeIntervalSince1970))
                                     }
                                     newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
                                     self.instanceActivities[instanceID] = newActivity
@@ -320,9 +320,9 @@ class ActivitiesFetcher: NSObject {
                                     newActivity.recurrenceStartDateTime = activity.finalDateTime
                                     newActivity.instanceIndex = index
                                     if period != .month {
-                                        newActivity.startDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970))
+                                        newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
                                     } else {
-                                        newActivity.startDateTime = NSNumber(value: Int(date.startOfMonth.UTCTime.timeIntervalSince1970))
+                                        newActivity.startDateTime = NSNumber(value: Int(date.startOfDay.UTCTime.timeIntervalSince1970))
                                     }
                                     newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
                                     newActivities.append(newActivity)
@@ -339,9 +339,9 @@ class ActivitiesFetcher: NSObject {
                             newActivity.recurrenceStartDateTime = activity.startDateTime
                             newActivity.instanceIndex = index
                             if period != .month {
-                                newActivity.startDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970))
+                                newActivity.startDateTime = NSNumber(value: Int(date.timeIntervalSince1970))
                             } else {
-                                newActivity.startDateTime = NSNumber(value: Int(date.startOfMonth.UTCTime.timeIntervalSince1970))
+                                newActivity.startDateTime = NSNumber(value: Int(date.startOfDay.UTCTime.timeIntervalSince1970))
                             }
                             newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
                             newActivities.append(newActivity)
@@ -371,9 +371,9 @@ class ActivitiesFetcher: NSObject {
                                     newActivity.recurrenceStartDateTime = activity.endDateTime
                                     newActivity.instanceIndex = index
                                     if period != .month {
-                                        newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
+                                        newActivity.endDateTime = NSNumber(value: Int(date.endOfDay.advanced(by: -1).timeIntervalSince1970))
                                     } else {
-                                        newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.localTime.timeIntervalSince1970 ?? 0))
+                                        newActivity.endDateTime = NSNumber(value: Int(date.endOfDay.advanced(by: -1).UTCTime.timeIntervalSince1970))
                                     }
                                     self.instanceActivities[instanceID] = newActivity
                                     newActivities.append(newActivity)
@@ -382,9 +382,9 @@ class ActivitiesFetcher: NSObject {
                                     newActivity.recurrenceStartDateTime = activity.endDateTime
                                     newActivity.instanceIndex = index
                                     if period != .month {
-                                        newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.timeIntervalSince1970 ?? 0))
+                                        newActivity.endDateTime = NSNumber(value: Int(date.endOfDay.advanced(by: -1).timeIntervalSince1970))
                                     } else {
-                                        newActivity.endDateTime = NSNumber(value: Int(newActivity.endDateGivenStartDatePeriod?.localTime.timeIntervalSince1970 ?? 0))
+                                        newActivity.endDateTime = NSNumber(value: Int(date.endOfDay.advanced(by: -1).UTCTime.timeIntervalSince1970))
                                     }
                                     newActivities.append(newActivity)
                                 }
@@ -399,7 +399,11 @@ class ActivitiesFetcher: NSObject {
                             let newActivity = activity.copy() as! Activity
                             newActivity.recurrenceStartDateTime = activity.endDateTime
                             newActivity.instanceIndex = index
-                            newActivity.endDateTime = NSNumber(value: Int(date.UTCTime.timeIntervalSince1970))
+                            if period != .month {
+                                newActivity.endDateTime = NSNumber(value: Int(date.endOfDay.advanced(by: -1).timeIntervalSince1970))
+                            } else {
+                                newActivity.endDateTime = NSNumber(value: Int(date.endOfDay.advanced(by: -1).UTCTime.timeIntervalSince1970))
+                            }
                             newActivities.append(newActivity)
                         }
                         group.leave()
@@ -520,6 +524,21 @@ class ActivitiesFetcher: NSObject {
             }
         }
         group.notify(queue: .main) {
+//            if activity.isGoal ?? false {
+//                print("found goal")
+//                print(activity.name)
+//                print(activity.activityID)
+//                print(activity.startDate)
+//                print(activity.endDate)
+//                print(activity.startDateTime)
+//                print(activity.endDateTime)
+//                for newActivity in newActivities {
+//                    print("instance")
+//                    print(newActivity.name)
+//                    print(newActivity.startDate)
+//                    print(newActivity.endDate)
+//                }
+//            }
             completion(newActivities)
         }
     }

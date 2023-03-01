@@ -80,6 +80,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
     
     var active = false
     var sectionChanged: Bool = false
+    var ignoreUpdate = false
     
     weak var updateDiscoverDelegate : UpdateDiscover?
     
@@ -164,12 +165,22 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                         task = Activity(activityID: activityID, admin: currentUserID, listID: list?.id ?? "", listName: list?.name ?? "", listColor: list?.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list?.source ?? "", goal: nil, recurrences: nil, endDateTime: nil, createdDate: NSNumber(value: Int((Date()).timeIntervalSince1970)))
                         task.category = list?.category
                         if let endDateTime = endDateTime {
-                            task.endDateTime = NSNumber(value: Int((endDateTime).timeIntervalSince1970))
+                            task.endDateTime = NSNumber(value: Int((endDateTime.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                        } else {
+                            task.startDateTime = NSNumber(value: Int((Date().startOfDay.UTCTime).timeIntervalSince1970))
+                            task.endDateTime = NSNumber(value: Int((Date().endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
                         }
                     }
                     if let container = container {
                         task.containerID = container.id
                     }
+                }
+                
+                if task.startDateTime == nil {
+                    task.startDateTime = NSNumber(value: Int((Date().startOfDay.UTCTime).timeIntervalSince1970))
+                }
+                if task.startDateTime == nil {
+                    task.endDateTime = NSNumber(value: Int((Date().endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
                 }
             }
         }
@@ -398,10 +409,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             if let task = task, let goal = task.goal, let value = goal.metric {
                 row.value = value.rawValue
             }
-//                else {
-//                    row.value = GoalMetric.allValues[0]
-//                    self.task.goal = Goal(name: nil, metric: GoalMetric(rawValue: GoalMetric.allValues[0]), submetric: nil, option: nil, unit: nil, targetNumber: nil, currentNumber: nil)
-//                }
         }.onPresent { from, to in
             to.title = "Metrics"
             to.extendedLayoutIncludesOpaqueBars = true
@@ -580,7 +587,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             if let _ = self.task.goal {
                 self.task.goal!.targetNumber = row.value
             } else {
-                self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: row.value, currentNumber: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricsRelationshipType: nil)
+                self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: row.value, currentNumber: nil, metricRelationship: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
             }
             self.updateSecondTargetRow()
         }
@@ -603,6 +610,48 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
         }
         
         form.last!
+        
+        <<< PushRow<String>("metricRelationship") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.title = "Metric Relationship"
+            row.options = MetricsRelationshipType.moreLessValues
+            if let task = self.task, let goal = task.goal {
+                if let value = goal.metricRelationship {
+                    row.value = value.rawValue
+                } else {
+                    row.hidden = Condition(booleanLiteral: !self.active)
+                    row.value = MetricsRelationshipType.more.rawValue
+                }
+            }
+        }.onPresent { from, to in
+            to.title = "Metric Relationship"
+            to.extendedLayoutIncludesOpaqueBars = true
+            to.tableViewStyle = .insetGrouped
+            to.dismissOnSelection = true
+            to.dismissOnChange = true
+            to.enableDeselection = false
+            to.selectableRowCellUpdate = { cell, row in
+                to.tableView.separatorStyle = .none
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                to.form.last?.footer = HeaderFooterView(title: MetricRelationshipFooter)
+        
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+        }.onChange { row in
+            if let value = row.value, let type = MetricsRelationshipType(rawValue: value), let _ = self.task.goal {
+                self.task.goal?.metricRelationship = type
+            }
+            self.updateDescriptionRow()
+        }
         
         <<< SwitchRow("addSecondMetric") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -846,6 +895,48 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
         
         form.last!
         
+        <<< PushRow<String>("metricRelationshipSecond") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.title = "Second Metric Relationship"
+            row.hidden = "$addSecondMetric == false"
+            row.options = MetricsRelationshipType.moreLessValues
+            if let task = self.task, let goal = task.goal {
+                if let value = goal.metricRelationshipSecond {
+                    row.value = value.rawValue
+                } else {
+                    row.value = MetricsRelationshipType.more.rawValue
+                }
+            }
+        }.onPresent { from, to in
+            to.title = "Second Metric Relationship"
+            to.extendedLayoutIncludesOpaqueBars = true
+            to.tableViewStyle = .insetGrouped
+            to.dismissOnSelection = true
+            to.dismissOnChange = true
+            to.enableDeselection = false
+            to.selectableRowCellUpdate = { cell, row in
+                to.tableView.separatorStyle = .none
+                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+                to.tableView.backgroundColor = .systemGroupedBackground
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .label
+                cell.detailTextLabel?.textColor = .secondaryLabel
+                to.form.last?.footer = HeaderFooterView(title: MetricRelationshipFooter)
+        
+            }
+        }.cellUpdate { cell, row in
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+        }.onChange { row in
+            if let value = row.value, let type = MetricsRelationshipType(rawValue: value), let _ = self.task.goal {
+                self.task.goal?.metricRelationshipSecond = type
+            }
+            self.updateDescriptionRow()
+        }
+        
         <<< PushRow<String>("metricsRelationship") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
@@ -873,9 +964,9 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 cell.detailTextLabel?.textColor = .secondaryLabel
                 if let task = self.task, let goal = task.goal {
                     if goal.metricsRelationshipTypes.count > 3 {
-                        to.form.last?.footer = HeaderFooterView(title: MetricRelationshipFooterAll)
+                        to.form.last?.footer = HeaderFooterView(title: MetricsRelationshipFooterAll)
                     } else {
-                        to.form.last?.footer = HeaderFooterView(title: MetricRelationshipFooterCertain)
+                        to.form.last?.footer = HeaderFooterView(title: MetricsRelationshipFooterCertain)
                     }
                 }
             }
@@ -924,39 +1015,36 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-            if let options = row.options, !options.isEmpty {
-                cell.isUserInteractionEnabled = true
+            if let task = self.task, let goal = task.goal, let value = goal.period {
+                row.value = value.rawValue
             } else {
-                cell.isUserInteractionEnabled = false
+                row.value = "None"
             }
         }.onChange { row in
-            if let switchDateRow: SwitchRow = self.form.rowBy(tag: "startDateSwitch"), let dateSwitchRowEnd: SwitchRow = self.form.rowBy(tag: "deadlineDateSwitch") {
-                if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
-                    switchDateRow.hidden = true
-                    switchDateRow.evaluateHidden()
-                    dateSwitchRowEnd.hidden = false
-                    dateSwitchRowEnd.evaluateHidden()
-                    self.task.goal!.period = updatedValue
-                    if let startDateTime = self.task.startDateGivenEndDatePeriod {
-                        self.task.startDateTime = NSNumber(value: Int((startDateTime).timeIntervalSince1970))
-                    } else {
-                        self.task.startDateTime = NSNumber(value: Int((Date()).timeIntervalSince1970))
-                    }
-                } else {
-                    row.value = "None"
-                    self.task.goal!.period = nil
-                    self.task.startDateTime = nil
-                    self.task.endDateTime = nil
-                    self.task.recurrences = nil
-                    self.task.reminder = nil
-                    switchDateRow.hidden = false
-                    switchDateRow.evaluateHidden()
-                    dateSwitchRowEnd.value = false
-                    dateSwitchRowEnd.hidden = true
-                    dateSwitchRowEnd.evaluateHidden()
+            if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
+                self.task.goal!.period = updatedValue
+                switch updatedValue {
+                case .none:
+                    break
+                case .day:
+                    self.task.startDateTime = NSNumber(value: Int((Date().startOfDay.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((Date().endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                case .week:
+                    self.task.startDateTime = NSNumber(value: Int((Date().startOfWeek.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((Date().endOfWeek.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                case .month:
+                    self.task.startDateTime = NSNumber(value: Int((Date().startOfMonth.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((Date().endOfMonth.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                case .year:
+                    self.task.startDateTime = NSNumber(value: Int((Date().startOfYear.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((Date().endOfYear.advanced(by: -1).UTCTime).timeIntervalSince1970))
                 }
-                self.updateDescriptionRow()
+                self.ignoreUpdate = true
+            } else {
+                row.value = "None"
+                self.task.goal!.period = nil
             }
+            self.updateDescriptionRow()
         }
         
         <<< SwitchRow("startDateSwitch") {
@@ -968,22 +1056,21 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.value = true
                 $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
             } else {
-                $0.value = false
+                $0.value = true
                 $0.cell.detailTextLabel?.text = nil
+                $0.hidden = Condition(booleanLiteral: self.active)
             }
-            $0.hidden = Condition(booleanLiteral: !(self.task.goal?.period == nil))
         }.onChange { [weak self] row in
-            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
+            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate"), !self!.ignoreUpdate {
                 if value {
                     row.cell.detailTextLabel?.textColor = .systemBlue
                     if let task = self?.task, let startDate = task.startDate {
                         row.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
                         startDateRow.value = startDate
                     } else {
-                        let startDateTime = Date()
+                        let startDateTime = Date().startOfDay.UTCTime
                         startDateRow.value = startDateTime
                         row.cell.detailTextLabel?.text = startDateTime.getMonthAndDateAndYear()
-
                     }
                 } else {
                     row.cell.detailTextLabel?.text = nil
@@ -995,6 +1082,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 startDateRow.hidden = condition
                 startDateRow.evaluateHidden()
             }
+            self!.ignoreUpdate = false
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
                 if let startDate: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
@@ -1011,10 +1099,12 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-            if let task = self.task, let startDate = task.startDate, let goal = task.goal, goal.period == nil {
+            if let task = self.task, let startDate = task.startDate {
                 cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
+                row.value = true
             } else {
                 cell.detailTextLabel?.text = nil
+                row.value = false
             }
         }
 
@@ -1068,7 +1158,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                         row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                         endDateRow.value = endDate
                     } else {
-                        let endDateTime = Date()
+                        let endDateTime = Date().endOfDay.addingTimeInterval(-1)
                         endDateRow.value = endDateTime
                         row.cell.detailTextLabel?.text = endDateTime.getMonthAndDateAndYear()
 

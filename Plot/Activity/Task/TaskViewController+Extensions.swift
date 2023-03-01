@@ -354,7 +354,6 @@ extension TaskViewController: RecurrencePickerDelegate {
                 row.updateCell()
                 self.task.recurrences = nil
             }
-            self.updateDescriptionRow()
         }
     }
 }
