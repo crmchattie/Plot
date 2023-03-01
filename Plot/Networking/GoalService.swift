@@ -23,7 +23,7 @@ extension NetworkController {
         //add check to see if endDate is in the past - maybe add buffer like a month? If so, skip and move to next goal?
         
         let past = Date().weekBefore
-        let current = Date()
+        let current = Date().localTime
         let group = DispatchGroup()
         
         for task in activityService.goals {
