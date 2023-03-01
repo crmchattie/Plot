@@ -533,8 +533,8 @@ struct Goal: Codable, Equatable, Hashable {
         numberFormatter.currencyCode = "USD"
         numberFormatter.maximumFractionDigits = 0
         var description = "Goal is complete when"
-        let metricRelationship = metricRelationship?.descriptionText ?? MetricsRelationshipType.more.descriptionText
-        if let metricsRelationshipType = metricsRelationshipType, (metricsRelationshipType == .equal || metricsRelationshipType == .more || metricsRelationshipType == .less) {
+        let metricRelationship = metricRelationship?.descriptionText ?? MetricsRelationshipType.equalMore.descriptionText
+        if let metricsRelationshipType = metricsRelationshipType, (metricsRelationshipType == .equal || metricsRelationshipType == .equalMore || metricsRelationshipType == .equalLess) {
             if let targetNumber = targetNumber as? NSNumber {
                 if let unit = unit, let metric = metric, let submetric = submetric, let option = option {
                     switch unit {
@@ -903,9 +903,9 @@ struct Goal: Codable, Equatable, Hashable {
         numberFormatter.maximumFractionDigits = 0
         var description = " "
         guard let type = metricsRelationshipType else { return nil }
-        let metricRelationship = metricRelationship?.descriptionText ?? MetricsRelationshipType.more.descriptionText
+        let metricRelationship = metricRelationship?.descriptionText ?? MetricsRelationshipType.equalMore.descriptionText
         description += type.descriptionText
-        if type == .equal || type == .more || type == .less {
+        if type == .equal || type == .equalMore || type == .equalLess {
             if let targetNumber = targetNumberSecond as? NSNumber {
                 if let unit = unitSecond, let metric = metricSecond, let submetric = submetricSecond, let option = optionSecond {
                     switch unit {
@@ -1271,21 +1271,21 @@ struct Goal: Codable, Equatable, Hashable {
 
 let prebuiltGoals = [mindfulnessGoal, sleepGoal, workoutsGoal, moodGoal, savingsGoal, spendingGoal, emergencyFundGoal, creditCardGoal, debtGoal, dentistGoal, timeOffGoal, generalCheckUpGoal, eyeCheckUpGoal, skinCheckUpGoal, socialGoal]
 
-let mindfulnessGoal = Goal(name: "Daily Mindfulness", metric: GoalMetric.mindfulness, submetric: nil, option: nil, unit: GoalUnit.minutes, period: GoalPeriod.day, targetNumber: 15, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.events, submetricSecond: GoalSubMetric.category, optionSecond: ["Personal"], unitSecond: GoalUnit.minutes, periodSecond: nil, targetNumberSecond: 15, currentNumberSecond: nil, metricRelationshipSecond: MetricsRelationshipType.more, metricsRelationshipType: MetricsRelationshipType.or)
-let sleepGoal = Goal(name: "Daily Sleep", metric: GoalMetric.sleep, submetric: nil, option: nil, unit: GoalUnit.hours, period: GoalPeriod.day, targetNumber: 7, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let workoutsGoal = Goal(name: "Daily Workout", metric: GoalMetric.workout, submetric: nil, option: nil, unit: GoalUnit.minutes, period: GoalPeriod.day, targetNumber: 15, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.steps, submetricSecond: nil, optionSecond: nil, unitSecond: GoalUnit.count, periodSecond: nil, targetNumberSecond: 5000, currentNumberSecond: nil, metricRelationshipSecond: MetricsRelationshipType.more, metricsRelationshipType: MetricsRelationshipType.or)
-let moodGoal = Goal(name: "Daily Mood", metric: GoalMetric.mood, submetric: nil, option: nil, unit: GoalUnit.count, period: GoalPeriod.day, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let savingsGoal = Goal(name: "Monthly Savings", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Net Savings"], unit: GoalUnit.amount, period: GoalPeriod.month, targetNumber: nil, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.monthly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let spendingGoal = Goal(name: "Daily Spending", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, period: GoalPeriod.day, targetNumber: nil, currentNumber: nil, metricRelationship: MetricsRelationshipType.less, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let creditCardGoal = Goal(name: "Pay Off Credit Card(s)", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Credit Card"], unit: GoalUnit.amount, period: GoalPeriod.month, targetNumber: 0, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.monthly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let emergencyFundGoal = Goal(name: "Save Emergency Fund", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Cash", "Checking", "Savings"], unit: GoalUnit.amount, period: nil,  targetNumber: nil, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let debtGoal = Goal(name: "Pay Off Debt", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Mortgage", "Loan", "Line of Credit"], unit: GoalUnit.amount, period: nil, targetNumber: 0, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let timeOffGoal = Goal(name: "Annual Time Off", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Time Off"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 5, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let generalCheckUpGoal = Goal(name: "Annual Physical", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - General"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let dentistGoal = Goal(name: "Bi-Annual Dental Cleaning", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - Dentist"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 2, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let eyeCheckUpGoal = Goal(name: "Annual Vision Exam", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - Eye"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let skinCheckUpGoal = Goal(name: "Annual Skin Screening", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - Dermatologist"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-let socialGoal = Goal(name: "Weekly Social", metric: GoalMetric.events, submetric: GoalSubMetric.category, option: ["Social"], unit: GoalUnit.count, period: GoalPeriod.week, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.more, frequency: PlotRecurrenceFrequency.weekly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let mindfulnessGoal = Goal(name: "Daily Mindfulness", metric: GoalMetric.mindfulness, submetric: nil, option: nil, unit: GoalUnit.minutes, period: GoalPeriod.day, targetNumber: 15, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.events, submetricSecond: GoalSubMetric.category, optionSecond: ["Personal"], unitSecond: GoalUnit.minutes, periodSecond: nil, targetNumberSecond: 15, currentNumberSecond: nil, metricRelationshipSecond: MetricsRelationshipType.equalMore, metricsRelationshipType: MetricsRelationshipType.or)
+let sleepGoal = Goal(name: "Daily Sleep", metric: GoalMetric.sleep, submetric: nil, option: nil, unit: GoalUnit.hours, period: GoalPeriod.day, targetNumber: 7, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let workoutsGoal = Goal(name: "Daily Workout", metric: GoalMetric.workout, submetric: nil, option: nil, unit: GoalUnit.minutes, period: GoalPeriod.day, targetNumber: 15, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.daily, metricSecond: GoalMetric.steps, submetricSecond: nil, optionSecond: nil, unitSecond: GoalUnit.count, periodSecond: nil, targetNumberSecond: 5000, currentNumberSecond: nil, metricRelationshipSecond: MetricsRelationshipType.equalMore, metricsRelationshipType: MetricsRelationshipType.or)
+let moodGoal = Goal(name: "Daily Mood", metric: GoalMetric.mood, submetric: nil, option: nil, unit: GoalUnit.count, period: GoalPeriod.day, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let savingsGoal = Goal(name: "Monthly Savings", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Net Savings"], unit: GoalUnit.amount, period: GoalPeriod.month, targetNumber: nil, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.monthly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let spendingGoal = Goal(name: "Daily Spending", metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, period: GoalPeriod.day, targetNumber: nil, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalLess, frequency: PlotRecurrenceFrequency.daily, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let creditCardGoal = Goal(name: "Pay Off Credit Card(s)", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Credit Card"], unit: GoalUnit.amount, period: GoalPeriod.month, targetNumber: 0, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalLess, frequency: PlotRecurrenceFrequency.monthly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let emergencyFundGoal = Goal(name: "Save Emergency Fund", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Cash", "Checking", "Savings"], unit: GoalUnit.amount, period: nil,  targetNumber: nil, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let debtGoal = Goal(name: "Pay Off Debt", metric: GoalMetric.financialAccounts, submetric: GoalSubMetric.category, option: ["Mortgage", "Loan", "Line of Credit"], unit: GoalUnit.amount, period: nil, targetNumber: 0, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalLess, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let timeOffGoal = Goal(name: "Annual Time Off", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Time Off"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 5, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let generalCheckUpGoal = Goal(name: "Annual Physical", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - General"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let dentistGoal = Goal(name: "Bi-Annual Dental Cleaning", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - Dentist"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 2, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let eyeCheckUpGoal = Goal(name: "Annual Vision Exam", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - Eye"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let skinCheckUpGoal = Goal(name: "Annual Skin Screening", metric: GoalMetric.events, submetric: GoalSubMetric.subcategory, option: ["Doctor - Dermatologist"], unit: GoalUnit.count, period: GoalPeriod.year, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.yearly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+let socialGoal = Goal(name: "Weekly Social", metric: GoalMetric.events, submetric: GoalSubMetric.category, option: ["Social"], unit: GoalUnit.count, period: GoalPeriod.week, targetNumber: 1, currentNumber: nil, metricRelationship: MetricsRelationshipType.equalMore, frequency: PlotRecurrenceFrequency.weekly, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
 
 enum GoalMetric: String, Codable, CaseIterable {
 //    case time = "Time"
@@ -1381,9 +1381,9 @@ enum GoalMetric: String, Codable, CaseIterable {
             return [.count]
         case .financialTransactions:
 //            return [.amount, .percent, .multiple]
-            return [.count, .amount]
+            return [.amount]
         case .financialAccounts:
-            return [.count, .amount]
+            return [.amount]
         case .workout:
             return [.count, .calories, .minutes]
         case .mindfulness:
@@ -1576,8 +1576,8 @@ enum MetricsRelationshipType: String, Codable, CaseIterable {
     case or = "Or"
     case and = "And"
     case equal = "Equal"
-    case more = "More"
-    case less = "Less"
+    case equalMore = "Equal or More"
+    case equalLess = "Equal or Less"
     
     static var allValues: [String] {
         var array = [String]()
@@ -1594,7 +1594,7 @@ enum MetricsRelationshipType: String, Codable, CaseIterable {
     }
     
     static var moreLessValues: [String] {
-        return [MetricsRelationshipType.more.rawValue, MetricsRelationshipType.less.rawValue]
+        return [MetricsRelationshipType.equalMore.rawValue, MetricsRelationshipType.equalLess.rawValue]
     }
     
     var descriptionText: String {
@@ -1605,10 +1605,10 @@ enum MetricsRelationshipType: String, Codable, CaseIterable {
             return "and"
         case .equal:
             return "is equal to"
-        case .more:
-            return "is more than"
-        case .less:
-            return "is less than"
+        case .equalMore:
+            return "is equal to or more than"
+        case .equalLess:
+            return "is equal to or less than"
         }
     }
 }
@@ -1617,7 +1617,7 @@ let MetricsRelationshipFooterAll = "If OR is selected, goal will be marked as co
 
 let MetricsRelationshipFooterCertain = "If OR is selected, goal will be marked as complete if the first OR the second metric is hit\nIf AND is selected, goal will be marked as complete when the first AND the second metric are hit"
 
-let MetricRelationshipFooter = "If MORE is selected, goal will be marked as complete if current is more than target\nIf LESS is selected, goal will be marked as complete if current is less than target"
+let MetricRelationshipFooter = "If EQUAL or MORE is selected, goal will be marked as complete if current is equal to or more than target\nIf EQUAL or LESS is selected, goal will be marked as complete if current is equal to or less than target"
 
 enum SelectedGoalProperty {
     case metric, unit, submetric, option

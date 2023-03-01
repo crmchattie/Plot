@@ -95,10 +95,10 @@ extension NetworkController {
                         
                         switch metricsRelationshipType {
                         case .or:
-                            switch goal.metricRelationship ?? MetricsRelationshipType.more {
-                            case .more:
-                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.more {
-                                    case .more:
+                            switch goal.metricRelationship ?? MetricsRelationshipType.equalMore {
+                            case .equalMore:
+                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.equalMore {
+                                    case .equalMore:
                                         if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -113,7 +113,7 @@ extension NetworkController {
                                             updateTask.updateCompletion(isComplete: task.isCompleted ?? false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                                         }
                                     
-                                    case .less:
+                                    case .equalLess:
                                         if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value <= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -131,9 +131,9 @@ extension NetworkController {
                                         break
                                 }
 
-                            case .less:
-                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.more {
-                                    case .more:
+                            case .equalLess:
+                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.equalMore {
+                                    case .equalMore:
                                         if (finalStat.value <= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -149,7 +149,7 @@ extension NetworkController {
                                         }
 
                                     
-                                    case .less:
+                                    case .equalLess:
                                         if (finalStat.value <= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) || (finalStatSecond.value <= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -170,10 +170,10 @@ extension NetworkController {
                                 break
                             }
                         case .and:
-                            switch goal.metricRelationship ?? MetricsRelationshipType.more {
-                            case .more:
-                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.more {
-                                    case .more:
+                            switch goal.metricRelationship ?? MetricsRelationshipType.equalMore {
+                            case .equalMore:
+                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.equalMore {
+                                    case .equalMore:
                                         if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -188,7 +188,7 @@ extension NetworkController {
                                             updateTask.updateCompletion(isComplete: task.isCompleted ?? false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: finalStatSecond.value as NSNumber)
                                         }
                                     
-                                    case .less:
+                                    case .equalLess:
                                         if (finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value <= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -206,9 +206,9 @@ extension NetworkController {
                                         break
                                 }
 
-                            case .less:
-                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.more {
-                                    case .more:
+                            case .equalLess:
+                                switch goal.metricRelationshipSecond ?? MetricsRelationshipType.equalMore {
+                                    case .equalMore:
                                         if (finalStat.value <= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value >= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -224,7 +224,7 @@ extension NetworkController {
                                         }
 
                                     
-                                    case .less:
+                                    case .equalLess:
                                         if (finalStat.value <= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false))) && (finalStatSecond.value <= targetSecond && (goal.currentNumberSecond != finalStatSecond.value || !(task.isCompleted ?? false))) {
                                             if !(task.isCompleted ?? false) {
                                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -246,14 +246,14 @@ extension NetworkController {
                             }
 
                         //not in use yet
-                        case .equal, .more, .less:
+                        case .equal, .equalMore, .equalLess:
                             break
                         }
                         group.leave()
                     }
                 } else {
-                    switch goal.metricRelationship ?? MetricsRelationshipType.more {
-                    case .more:
+                    switch goal.metricRelationship ?? MetricsRelationshipType.equalMore {
+                    case .equalMore:
                         if finalStat.value >= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
                             if !(task.isCompleted ?? false) {
                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))
@@ -268,7 +268,7 @@ extension NetworkController {
                             updateTask.updateCompletion(isComplete: task.isCompleted ?? false, completeUpdatedByUser: false, goalCurrentNumber: finalStat.value as NSNumber, goalCurrentNumberSecond: nil)
                         }
 
-                    case .less:
+                    case .equalLess:
                         if finalStat.value <= target && (goal.currentNumber != finalStat.value || !(task.isCompleted ?? false)) {
                             if !(task.isCompleted ?? false) {
                                 task.completedDate = NSNumber(value: Int((range.endDate).timeIntervalSince1970))

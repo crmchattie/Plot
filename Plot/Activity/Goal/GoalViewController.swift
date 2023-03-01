@@ -622,7 +622,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                     row.value = value.rawValue
                 } else {
                     row.hidden = Condition(booleanLiteral: !self.active)
-                    row.value = MetricsRelationshipType.more.rawValue
+                    row.value = MetricsRelationshipType.equalMore.rawValue
                 }
             }
         }.onPresent { from, to in
@@ -906,7 +906,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 if let value = goal.metricRelationshipSecond {
                     row.value = value.rawValue
                 } else {
-                    row.value = MetricsRelationshipType.more.rawValue
+                    row.value = MetricsRelationshipType.equalMore.rawValue
                 }
             }
         }.onPresent { from, to in

@@ -458,20 +458,22 @@ extension GoalViewController {
                     relationshipRow.hidden = false
                     relationshipRow.evaluateHidden()
                     
-                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
-                        if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-                            periodRow.hidden = false
-                            switchDateRowStart.hidden = false
-                        } else {
-                            periodRow.hidden = true
-                            switchDateRowStart.hidden = true
-                            switchDateRowStart.value = false
-                            task.goal!.period = nil
-                            task.startDateTime = nil
-                        }
-                        periodRow.evaluateHidden()
-                        switchDateRowStart.evaluateHidden()
-                    }
+//                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
+//                        if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
+//                            periodRow.hidden = false
+//                            switchDateRowStart.hidden = false
+//                            periodRow.value = "Daily"
+//                            periodRow.updateCell()
+//                        } else {
+//                            periodRow.hidden = true
+//                            switchDateRowStart.hidden = true
+//                            switchDateRowStart.value = false
+//                            task.goal!.period = nil
+//                            task.startDateTime = nil
+//                        }
+//                        periodRow.evaluateHidden()
+//                        switchDateRowStart.evaluateHidden()
+//                    }
                     
                 }
             case .submetric:
@@ -552,20 +554,22 @@ extension GoalViewController {
                         submetricRow.value = nil
                     }
                     
-                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
-                        if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-                            periodRow.hidden = false
-                            switchDateRowStart.hidden = false
-                        } else {
-                            periodRow.hidden = true
-                            switchDateRowStart.hidden = true
-                            switchDateRowStart.value = false
-                            task.goal!.period = nil
-                            task.startDateTime = nil
-                        }
-                        periodRow.evaluateHidden()
-                        switchDateRowStart.evaluateHidden()
-                    }
+//                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
+//                        if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
+//                            periodRow.hidden = false
+//                            switchDateRowStart.hidden = false
+//                            periodRow.value = "Daily"
+//                            periodRow.updateCell()
+//                        } else {
+//                            periodRow.hidden = true
+//                            switchDateRowStart.hidden = true
+//                            switchDateRowStart.value = false
+//                            task.goal!.period = nil
+//                            task.startDateTime = nil
+//                        }
+//                        periodRow.evaluateHidden()
+//                        switchDateRowStart.evaluateHidden()
+//                    }
                     
                 } else {
                     task.goal!.metricSecond = nil
@@ -577,20 +581,22 @@ extension GoalViewController {
                     submetricRow.value = nil
                     unitRow.value = nil
                     
-                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
-                        if task.goal!.metric!.type != .pointInTime {
-                            periodRow.hidden = false
-                            switchDateRowStart.hidden = false
-                        } else {
-                            periodRow.hidden = true
-                            switchDateRowStart.hidden = true
-                            switchDateRowStart.value = false
-                            task.goal!.period = nil
-                            task.startDateTime = nil
-                        }
-                        periodRow.evaluateHidden()
-                        switchDateRowStart.evaluateHidden()
-                    }
+//                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
+//                        if task.goal!.metric!.type != .pointInTime {
+//                            periodRow.hidden = false
+//                            switchDateRowStart.hidden = false
+//                            periodRow.value = "Daily"
+//                            periodRow.updateCell()
+//                        } else {
+//                            periodRow.hidden = true
+//                            switchDateRowStart.hidden = true
+//                            switchDateRowStart.value = false
+//                            task.goal!.period = nil
+//                            task.startDateTime = nil
+//                        }
+//                        periodRow.evaluateHidden()
+//                        switchDateRowStart.evaluateHidden()
+//                    }
                 }
                 
             case .submetric:
