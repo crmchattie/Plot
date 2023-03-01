@@ -1259,8 +1259,9 @@ extension GoalViewController {
         print("updateStartDateGoal")
         if let dateSwitchRow: SwitchRow = form.rowBy(tag: "startDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "StartDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period") {
             if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                if let endDate = task.endDate, dateRowValue.compare(endDate) == .orderedDescending {
+                if let endDate = task.endDate, dateRowValue.compare(endDate) == .orderedDescending, let dateSwitchRowEnd: SwitchRow = form.rowBy(tag: "deadlineDateSwitch") {
                     self.task.endDateTime = NSNumber(value: Int((dateRowValue.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                    dateSwitchRowEnd.cell.detailTextLabel?.text = self.task.endDate!.getMonthAndDateAndYear()
                 }
                 periodRow.value = "None"
                 periodRow.updateCell()
@@ -1283,8 +1284,9 @@ extension GoalViewController {
     func updateDeadlineDateGoal() {
         if let dateSwitchRow: SwitchRow = form.rowBy(tag: "deadlineDateSwitch"), let dateSwitchRowValue = dateSwitchRow.value, let dateRow: DatePickerRow = form.rowBy(tag: "DeadlineDate"), let periodRow: PushRow<String> = form.rowBy(tag: "Period") {
             if dateSwitchRowValue, let dateRowValue = dateRow.value {
-                if let startDate = task.startDate, dateRowValue.compare(startDate) == .orderedAscending {
+                if let startDate = task.startDate, dateRowValue.compare(startDate) == .orderedAscending, let dateSwitchRowStart: SwitchRow = form.rowBy(tag: "startDateSwitch") {
                     self.task.startDateTime = NSNumber(value: Int((dateRowValue.startOfDay.UTCTime).timeIntervalSince1970))
+                    dateSwitchRowStart.cell.detailTextLabel?.text = self.task.startDate!.getMonthAndDateAndYear()
                 }
                 periodRow.value = "None"
                 periodRow.updateCell()

@@ -1023,21 +1023,22 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
         }.onChange { row in
             if let value = row.value, let updatedValue = GoalPeriod(rawValue: value), updatedValue != .none, let _ = self.task.goal {
                 self.task.goal!.period = updatedValue
+                let date = self.task.startDate ?? self.task.endDate ?? Date()
                 switch updatedValue {
                 case .none:
                     break
                 case .day:
-                    self.task.startDateTime = NSNumber(value: Int((Date().startOfDay.UTCTime).timeIntervalSince1970))
-                    self.task.endDateTime = NSNumber(value: Int((Date().endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                    self.task.startDateTime = NSNumber(value: Int((date.startOfDay.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((date.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
                 case .week:
-                    self.task.startDateTime = NSNumber(value: Int((Date().startOfWeek.UTCTime).timeIntervalSince1970))
-                    self.task.endDateTime = NSNumber(value: Int((Date().endOfWeek.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                    self.task.startDateTime = NSNumber(value: Int((date.startOfWeek.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((date.endOfWeek.advanced(by: -1).UTCTime).timeIntervalSince1970))
                 case .month:
-                    self.task.startDateTime = NSNumber(value: Int((Date().startOfMonth.UTCTime).timeIntervalSince1970))
-                    self.task.endDateTime = NSNumber(value: Int((Date().endOfMonth.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                    self.task.startDateTime = NSNumber(value: Int((date.startOfMonth.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((date.endOfMonth.advanced(by: -1).UTCTime).timeIntervalSince1970))
                 case .year:
-                    self.task.startDateTime = NSNumber(value: Int((Date().startOfYear.UTCTime).timeIntervalSince1970))
-                    self.task.endDateTime = NSNumber(value: Int((Date().endOfYear.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                    self.task.startDateTime = NSNumber(value: Int((date.startOfYear.UTCTime).timeIntervalSince1970))
+                    self.task.endDateTime = NSNumber(value: Int((date.endOfYear.advanced(by: -1).UTCTime).timeIntervalSince1970))
                 }
                 self.ignoreUpdate = true
             } else {
