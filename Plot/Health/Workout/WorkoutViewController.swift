@@ -819,7 +819,7 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
         }
     }
     
-    func resetBadgeForSelf() {
+    fileprivate func resetBadgeForSelf() {
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         let badgeRef = Database.database().reference().child(userWorkoutsEntity).child(currentUserID).child(workout.id).child("badge")
         badgeRef.runTransactionBlock({ (mutableData) -> TransactionResult in

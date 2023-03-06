@@ -276,9 +276,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         
         if case .sleep = healthMetricType {
-            print("before sleep dates everything else")
-            print(startDate)
-            print(endDate)
+//            print("before sleep dates everything else")
+//            print(startDate)
+//            print(endDate)
             
             startDate = startDate.startOfDay.localTime
             if segmentType == .day {
@@ -287,9 +287,9 @@ class HealthDetailService: HealthDetailServiceInterface {
                 endDate = endDate.localTime
             }
             
-            print("after sleep dates everything else")
-            print(startDate)
-            print(endDate)
+//            print("after sleep dates everything else")
+//            print(startDate)
+//            print(endDate)
         }
         
         if segmentType != .day, !(extraDataPoint ?? false) {
@@ -499,16 +499,16 @@ class HealthDetailService: HealthDetailServiceInterface {
         var endDate = anchorDate.advanced(by: 86399)
         
         if case .sleep = healthMetricType {
-            print("before sleep dates goal")
-            print(startDate)
-            print(endDate)
+//            print("before sleep dates goal")
+//            print(startDate)
+//            print(endDate)
             
             startDate = startDate.startOfDay.localTime
             endDate = startDate.advanced(by: 86400)
             
-            print("after sleep dates goal")
-            print(startDate)
-            print(endDate)
+//            print("after sleep dates goal")
+//            print(startDate)
+//            print(endDate)
             
         }
         

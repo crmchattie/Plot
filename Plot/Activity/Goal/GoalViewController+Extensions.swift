@@ -58,6 +58,51 @@ extension GoalViewController: UITextFieldDelegate {
 //
 //}
 
+extension GoalViewController: UpdateGoalDelegate {
+    func update(goal: Goal?, number: Int) {
+        print("updateGoal")
+        if let goal = goal {
+            if number == 0, let row: LabelRow = form.rowBy(tag: "Metric") {
+                print("row exists")
+                row.value = goal.cellDescriptionFirst ?? goal.metric?.rawValue
+                row.updateCell()
+                if let _ = self.task.goal {
+                    self.task.goal!.metric = goal.metric
+                    self.task.goal!.submetric = goal.submetric
+                    self.task.goal!.option = goal.option
+                    self.task.goal!.unit = goal.unit
+                    self.task.goal!.period = goal.period
+                    self.task.goal!.targetNumber = goal.targetNumber
+                    self.task.goal!.currentNumber = goal.currentNumber
+                    self.task.goal!.metricRelationship = goal.metricRelationship
+                } else {
+                    self.task.goal = Goal(name: nil, metric: goal.metric, submetric: goal.submetric, option: goal.option, unit: goal.unit, period: goal.period, targetNumber: goal.targetNumber, currentNumber: goal.currentNumber, metricRelationship: goal.metricRelationship, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+                }
+            } else if number == 1, let row: LabelRow = form.rowBy(tag: "secondMetric") {
+                row.value = goal.cellDescriptionFirst ?? goal.metric?.rawValue
+                row.updateCell()
+                if let _ = self.task.goal {
+                    self.task.goal!.metricSecond = goal.metric
+                    self.task.goal!.submetricSecond = goal.submetric
+                    self.task.goal!.optionSecond = goal.option
+                    self.task.goal!.unitSecond = goal.unit
+                    self.task.goal!.periodSecond = goal.period
+                    self.task.goal!.targetNumberSecond = goal.targetNumber
+                    self.task.goal!.currentNumberSecond = goal.currentNumber
+                    self.task.goal!.metricRelationshipSecond = goal.metricRelationship
+                }
+                if self.task.goal?.metricsRelationshipType == nil, let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship") {
+                    metricsRelationshipRow.value = MetricsRelationshipType.or.rawValue
+                    self.task.goal!.metricsRelationshipType = MetricsRelationshipType.or
+                    
+                }
+            }
+        }
+        self.updateCategorySubCategoryRows()
+        self.updateDescriptionRow()
+    }
+}
+
 extension GoalViewController: UpdateActivityLevelDelegate {
     func update(value: String, level: String) {
         if let row: LabelRow = form.rowBy(tag: level) {

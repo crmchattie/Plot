@@ -452,6 +452,100 @@ struct Goal: Codable, Equatable, Hashable {
         }
     }
     
+    var firstGoal: Goal? {
+        if let _ = metric {
+            return Goal(name: name, metric: metric, submetric: submetric, option: option, unit: unit, period: period, targetNumber: targetNumber, currentNumber: currentNumber, metricRelationship: metricRelationship, frequency: frequency, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+        }
+        return nil
+    }
+    
+    var secondGoal: Goal? {
+        if let _ = metricSecond {
+            return Goal(name: name, metric: metricSecond, submetric: submetricSecond, option: optionSecond, unit: unitSecond, period: periodSecond, targetNumber: targetNumberSecond, currentNumber: currentNumberSecond, metricRelationship: metricRelationshipSecond, frequency: frequency, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+        }
+        return nil
+    }
+    
+    var cellDescriptionFirst: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.maximumFractionDigits = 0
+                
+        if let target = targetNumber as? NSNumber, let current = currentNumber as? NSNumber, let unit = unit {
+            var description = String()
+
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            if let targetString = numberFormatter.string(from: target), let currentString = numberFormatter.string(from: current) {
+                description = "\(currentString)/\(targetString) \(unit.shortenedString)"
+            }
+            
+            return description
+        }
+        return nil
+    }
+    
+    var cellDescriptionSecond: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = "USD"
+        numberFormatter.maximumFractionDigits = 0
+                
+        if let target = targetNumberSecond as? NSNumber, let current = currentNumberSecond as? NSNumber, let unit = unitSecond {
+            var description = String()
+
+            switch unit {
+            case .calories:
+                numberFormatter.numberStyle = .decimal
+            case .count:
+                numberFormatter.numberStyle = .decimal
+            case .amount:
+                numberFormatter.numberStyle = .currency
+            case .percent:
+                numberFormatter.numberStyle = .percent
+            case .multiple:
+                numberFormatter.numberStyle = .decimal
+            case .minutes:
+                numberFormatter.numberStyle = .decimal
+            case .hours:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .days:
+                numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
+            case .level:
+                numberFormatter.numberStyle = .decimal
+            }
+            
+            if let targetString = numberFormatter.string(from: target), let currentString = numberFormatter.string(from: current) {
+                description = "\(currentString)/\(targetString) \(unit.shortenedString)"
+            }
+            
+            return description
+        }
+        return nil
+    }
+    
     var metricsRelationshipTypes: [String] {
         if let metric = metric, let submetricSecond = metricSecond, (metric == .financialAccounts || metric == .financialTransactions), (submetricSecond == .financialAccounts || submetricSecond == .financialTransactions) {
             return MetricsRelationshipType.allValues

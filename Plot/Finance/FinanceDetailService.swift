@@ -188,8 +188,8 @@ class FinanceDetailService: FinanceDetailServiceInterface {
         completion: @escaping (Statistic?, [MXAccount]?, [Transaction]?, Error?) -> Void
     ) {
 
-        let startDate = range.startDate.startOfDay
-        let endDate = Date().localTime.dayAfter
+        let startDate = range.startDate
+        let endDate = range.endDate
         
         var finalStat = Statistic(date: startDate, value: 0)
         

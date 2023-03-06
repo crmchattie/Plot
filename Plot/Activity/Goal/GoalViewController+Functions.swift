@@ -458,23 +458,6 @@ extension GoalViewController {
                     relationshipRow.hidden = false
                     relationshipRow.evaluateHidden()
                     
-//                    if let periodRow: PushRow<String> = form.rowBy(tag: "Period"), let switchDateRowStart: SwitchRow = self.form.rowBy(tag: "startDateSwitch") {
-//                        if updatedValue.type != .pointInTime || (task.goal!.metricSecond != nil && task.goal!.metricSecond?.type != .pointInTime) {
-//                            periodRow.hidden = false
-//                            switchDateRowStart.hidden = false
-//                            periodRow.value = "Daily"
-//                            periodRow.updateCell()
-//                        } else {
-//                            periodRow.hidden = true
-//                            switchDateRowStart.hidden = true
-//                            switchDateRowStart.value = false
-//                            task.goal!.period = nil
-//                            task.startDateTime = nil
-//                        }
-//                        periodRow.evaluateHidden()
-//                        switchDateRowStart.evaluateHidden()
-//                    }
-                    
                 }
             case .submetric:
                 if let value = value, let updatedValue = GoalSubMetric(rawValue: value) {
@@ -667,9 +650,6 @@ extension GoalViewController {
                 descriptionRow.evaluateHidden()
             }
             updateRightBarButton()
-            
-            print(self.task.startDate)
-            print(self.task.endDate)
         }
     }
     
@@ -846,6 +826,14 @@ extension GoalViewController {
                 targetRow.value = nil
             }
         }
+    }
+    
+    func openGoal(goal: Goal?, number: Int) {
+        let destination = GoalDetailViewController()
+        destination.delegate = self
+        destination.goal = goal
+        destination.number = number
+        self.navigationController?.pushViewController(destination, animated: true)
     }
     
     func openLevel(value: String, level: String) {

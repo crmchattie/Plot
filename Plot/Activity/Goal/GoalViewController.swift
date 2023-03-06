@@ -191,12 +191,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
         
         if let goal = task.goal, let _ = goal.metric {
             self.updateNumberRows()
-            if let _ = goal.metricSecond {
-                self.updateNumberRowsSecond()
-                self.updateSecondTargetRow()
-            } else {
-                self.updateDescriptionRow()
-            }
+            self.updateDescriptionRow()
         }
         
         purchaseUsers = self.selectedFalconUsers
@@ -387,7 +382,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             row.cell.accessoryType = .none
             row.cell.selectionStyle = .none
             row.cell.textLabel?.numberOfLines = 0
-            if let task = task, let goal = task.goal, let _ = goal.description {
+            if let task = task, let goal = task.goal, let description = goal.description {
+                row.title = description
                 row.hidden = false
             } else {
                 row.hidden = true
@@ -400,257 +396,24 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.accessoryType = .none
         }
         
-        <<< PushRow<String>("Metric") { row in
+        <<< LabelRow("Metric") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
             row.title = row.tag
-            row.options = GoalMetric.allValues
-            if let task = task, let goal = task.goal, let value = goal.metric {
-                row.value = value.rawValue
+            if let task = task, let goal = task.goal, let value = goal.cellDescriptionFirst {
+                row.value = value
             }
-        }.onPresent { from, to in
-            to.title = "Metrics"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
+        }.onCellSelection({ _, row in
+            self.openGoal(goal: self.task.goal?.firstGoal, number: 0)
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange { row in
-            self.updateGoal(selectedGoalProperty: .metric, value: row.value)
-        }
-        
-        <<< PushRow<String>("Submetric") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            row.options = []
-            if let task = task, let goal = task.goal {
-                if let value = goal.submetric, let metric = goal.metric, metric.allValuesSubmetrics.count > 0 {
-                    row.value = value.rawValue
-                    row.options = metric.allValuesSubmetrics
-                } else {
-                    row.hidden = true
-                }
-            }
-        }.onPresent { from, to in
-            to.title = "Submetrics"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let options = row.options, !options.isEmpty {
-                cell.isUserInteractionEnabled = true
-            } else {
-                cell.isUserInteractionEnabled = false
-            }
-        }.onChange { row in
-            self.updateGoal(selectedGoalProperty: .submetric, value: row.value)
-        }
-        
-        <<< MultipleSelectorRow<String>("Option") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            row.options = []
-            if let task = task, let goal = task.goal, let _ = goal.metric, let options = goal.options() {
-                row.options = options
-                if let value = goal.option {
-                    row.value = Set(value)
-                }
-            } else {
-                row.hidden = true
-            }
-        }.onPresent { from, to in
-            to.title = "Options"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let options = row.options, !options.isEmpty {
-                cell.isUserInteractionEnabled = true
-            } else {
-                cell.isUserInteractionEnabled = false
-            }
-        }.onChange { row in
-            if let value = row.value, value.isEmpty, let options = row.options {
-                row.value = Set(arrayLiteral: options[0])
-            } else if let value = row.value {
-                if let _ = self.task.goal {
-                    self.task.goal!.option = Array(value)
-                }
-                self.updateDescriptionRow()
-                self.updateCategorySubCategoryRows()
-            }
-        }
-        
-        <<< PushRow<String>("Unit") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            row.options = []
-            if let task = task, let goal = task.goal, let metric = goal.metric {
-                row.options = metric.allValuesUnits
-                if let value = goal.unit {
-                    row.value = value.rawValue
-                } else if metric.allValuesUnits.count > 0 {
-                    self.task.goal!.unit = GoalUnit(rawValue: metric.allValuesUnits[0])
-                    row.value = metric.allValuesUnits[0]
-                }
-            }
-        }.onPresent { from, to in
-            to.title = "Units"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let options = row.options, !options.isEmpty {
-                cell.isUserInteractionEnabled = true
-            } else {
-                cell.isUserInteractionEnabled = false
-            }
-        }.onChange { row in
-            if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
-                if let _ = self.task.goal {
-                    if updatedValue == .percent, let number = self.task.goal!.targetNumber {
-                        self.task.goal!.targetNumber = number / 100
-                    }
-                    self.task.goal!.unit = updatedValue
-                }
-                self.updateNumberRows()
-                self.updateDescriptionRow()
-            }
-        }
-        
-        <<< DecimalRow("Target") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textField?.textColor = .secondaryLabel
-            $0.title = $0.tag
-            if let task = task, let goal = task.goal, let number = goal.targetNumber {
-                $0.value = number
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textField?.textColor = .secondaryLabel
-        }.onChange { row in
-            if let _ = self.task.goal {
-                self.task.goal!.targetNumber = row.value
-            } else {
-                self.task.goal = Goal(name: nil, metric: nil, submetric: nil, option: nil, unit: nil, period: nil, targetNumber: row.value, currentNumber: nil, metricRelationship: nil, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
-            }
-            self.updateSecondTargetRow()
-        }
-        
-        if active {
-            form.last!
-            <<< DecimalRow("Current") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textField?.textColor = .secondaryLabel
-                row.cell.selectionStyle = .none
-                row.cell.isUserInteractionEnabled = false
-                row.title = row.tag
-                if let task = task, let goal = task.goal, let number = goal.currentNumber {
-                    row.value = number
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textField?.textColor = .secondaryLabel
-            }
-        }
-        
-        form.last!
-        
-        <<< PushRow<String>("metricRelationship") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = "Metric Relationship"
-            row.options = MetricsRelationshipType.moreLessValues
-            if let task = self.task, let goal = task.goal {
-                if let value = goal.metricRelationship {
-                    row.value = value.rawValue
-                } else {
-                    row.hidden = Condition(booleanLiteral: !self.active)
-                    row.value = MetricsRelationshipType.equalMore.rawValue
-                }
-            }
-        }.onPresent { from, to in
-            to.title = "Metric Relationship"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-                to.form.last?.footer = HeaderFooterView(title: MetricRelationshipFooter)
-        
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange { row in
-            if let value = row.value, let type = MetricsRelationshipType(rawValue: value), let _ = self.task.goal {
-                self.task.goal?.metricRelationship = type
-            }
-            self.updateDescriptionRow()
+            cell.textLabel?.textAlignment = .left
         }
         
         <<< SwitchRow("addSecondMetric") { row in
@@ -667,7 +430,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
         }.onChange({ row in
-            if !(row.value ?? false), let secondMetricRow : PushRow<String> = self.form.rowBy(tag: "secondMetric"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship") {
+            if !(row.value ?? false), let secondMetricRow : LabelRow = self.form.rowBy(tag: "secondMetric"), let metricsRelationshipRow : PushRow<String> = self.form.rowBy(tag: "metricsRelationship") {
                 if self.task.goal != nil {
                     self.task.goal!.metricsRelationshipType = nil
                     self.task.goal!.metricSecond = nil
@@ -676,265 +439,33 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                     self.task.goal!.periodSecond = nil
                     self.task.goal!.optionSecond = nil
                     self.task.goal!.targetNumberSecond = nil
+                    self.task.goal!.currentNumberSecond = nil
+                    self.task.goal!.metricRelationshipSecond = nil
                 }
                 secondMetricRow.value = nil
                 metricsRelationshipRow.value = nil
             }
         })
         
-        <<< PushRow<String>("secondMetric") { row in
+        <<< LabelRow("secondMetric") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
             row.title = "Second Metric"
-            row.options = GoalMetric.allValues
-            if let task = task, let goal = task.goal, let value = goal.metricSecond {
-                row.value = value.rawValue
+            if let task = task, let goal = task.goal, let value = goal.cellDescriptionSecond {
+                row.value = value
             }
             row.hidden = "$addSecondMetric == false"
-        }.onPresent { from, to in
-            to.title = "Metrics"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
+        }.onCellSelection({ _, row in
+            self.openGoal(goal: self.task.goal?.secondGoal, number: 1)
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange { row in
-            self.updateGoalSecondary(selectedGoalProperty: .metric, value: row.value)
-        }
-        
-        <<< PushRow<String>("Second Submetric") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            row.options = []
-            if let task = task, let goal = task.goal {
-                if let value = goal.submetricSecond, let metric = goal.metricSecond, metric.allValuesSubmetrics.count > 0 {
-                    row.value = value.rawValue
-                    row.options = metric.allValuesSubmetrics
-                } else {
-                    row.hidden = true
-                }
-            }
-        }.onPresent { from, to in
-            to.title = "Submetrics"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let options = row.options, !options.isEmpty {
-                cell.isUserInteractionEnabled = true
-            } else {
-                cell.isUserInteractionEnabled = false
-            }
-        }.onChange { row in
-            self.updateGoalSecondary(selectedGoalProperty: .submetric, value: row.value)
-        }
-        
-        <<< MultipleSelectorRow<String>("Second Option") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = row.tag
-            row.options = []
-            if let task = task, let goal = task.goal, let _ = goal.metricSecond, let options = goal.optionsSecond() {
-                row.options = options
-                if let value = goal.optionSecond {
-                    row.value = Set(value)
-                }
-            } else {
-                row.hidden = true
-            }
-        }.onPresent { from, to in
-            to.title = "Options"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let options = row.options, !options.isEmpty {
-                cell.isUserInteractionEnabled = true
-            } else {
-                cell.isUserInteractionEnabled = false
-            }
-        }.onChange { row in
-            if let value = row.value, value.isEmpty, let options = row.options {
-                row.value = Set(arrayLiteral: options[0])
-            } else if let value = row.value {
-                if let _ = self.task.goal {
-                    self.task.goal!.optionSecond = Array(value)
-                }
-                self.updateDescriptionRow()
-            }
-        }
-        
-        
-        <<< PushRow<String>("secondUnit") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = "Second Unit"
-            row.options = []
-            if let task = task, let goal = task.goal, let metric = goal.metricSecond {
-                row.options = metric.allValuesUnits
-                if let value = goal.unitSecond {
-                    row.value = value.rawValue
-                } else if metric.allValuesUnits.count > 0 {
-                    self.task.goal!.unitSecond = GoalUnit(rawValue: metric.allValuesUnits[0])
-                    row.value = metric.allValuesUnits[0]
-                }
-            }
-            row.hidden = "$addSecondMetric == false"
-        }.onPresent { from, to in
-            to.title = "Units"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            if let options = row.options, !options.isEmpty {
-                cell.isUserInteractionEnabled = true
-            } else {
-                cell.isUserInteractionEnabled = false
-            }
-        }.onChange { row in
-            if let value = row.value, let updatedValue = GoalUnit(rawValue: value) {
-                if let _ = self.task.goal {
-                    if updatedValue == .percent, let number = self.task.goal!.targetNumberSecond {
-                        self.task.goal!.targetNumberSecond = number / 100
-                    }
-                    self.task.goal!.unitSecond = updatedValue
-                }
-            }
-            self.updateNumberRowsSecond()
-            self.updateDescriptionRow()
-        }
-        
-        <<< DecimalRow("Second Target") {
-            $0.cell.backgroundColor = .secondarySystemGroupedBackground
-            $0.cell.textField?.textColor = .secondaryLabel
-            $0.title = $0.tag
-            if let task = task, let goal = task.goal, let number = goal.targetNumberSecond {
-                $0.value = number
-            }
-            $0.hidden = "$addSecondMetric == false"
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textField?.textColor = .secondaryLabel
-        }.onChange { row in
-            if let _ = self.task.goal {
-                self.task.goal!.targetNumberSecond = row.value
-            }
-            self.updateSecondTargetRow()
-        }
-        
-        if active {
-            form.last!
-            <<< DecimalRow("Second Current") { row in
-                row.cell.backgroundColor = .secondarySystemGroupedBackground
-                row.cell.textField?.textColor = .secondaryLabel
-                row.cell.selectionStyle = .none
-                row.cell.isUserInteractionEnabled = false
-                row.title = row.tag
-                if let task = task, let goal = task.goal, let number = goal.currentNumberSecond {
-                    row.value = number
-                }
-                row.hidden = "$addSecondMetric == false"
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textField?.textColor = .secondaryLabel
-            }
-        }
-        
-        form.last!
-        
-        <<< PushRow<String>("metricRelationshipSecond") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = "Second Metric Relationship"
-            row.hidden = "$addSecondMetric == false"
-            row.options = MetricsRelationshipType.moreLessValues
-            if let task = self.task, let goal = task.goal {
-                if let value = goal.metricRelationshipSecond {
-                    row.value = value.rawValue
-                } else {
-                    row.value = MetricsRelationshipType.equalMore.rawValue
-                }
-            }
-        }.onPresent { from, to in
-            to.title = "Second Metric Relationship"
-            to.extendedLayoutIncludesOpaqueBars = true
-            to.tableViewStyle = .insetGrouped
-            to.dismissOnSelection = true
-            to.dismissOnChange = true
-            to.enableDeselection = false
-            to.selectableRowCellUpdate = { cell, row in
-                to.tableView.separatorStyle = .none
-                to.navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-                to.tableView.backgroundColor = .systemGroupedBackground
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textLabel?.textColor = .label
-                cell.detailTextLabel?.textColor = .secondaryLabel
-                to.form.last?.footer = HeaderFooterView(title: MetricRelationshipFooter)
-        
-            }
-        }.cellUpdate { cell, row in
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-        }.onChange { row in
-            if let value = row.value, let type = MetricsRelationshipType(rawValue: value), let _ = self.task.goal {
-                self.task.goal?.metricRelationshipSecond = type
-            }
-            self.updateDescriptionRow()
+            cell.textLabel?.textAlignment = .left
         }
         
         <<< PushRow<String>("metricsRelationship") { row in
@@ -942,7 +473,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
             row.title = "Metrics Relationship"
-            row.hidden = "!($addSecondMetric != false && $secondUnit != nil && $Unit != nil)"
+            row.hidden = "$addSecondMetric == false"
             if let task = self.task, let goal = task.goal {
                 if let value = goal.metricsRelationshipType {
                     row.value = value.rawValue
@@ -981,7 +512,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             if let value = row.value, let type = MetricsRelationshipType(rawValue: value), let _ = self.task.goal {
                 self.task.goal?.metricsRelationshipType = type
             }
-            self.updateSecondTargetRow()
+            self.updateDescriptionRow()
         }
         
         <<< PushRow<String>("Period") { row in
@@ -993,7 +524,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             if let task = task, let goal = task.goal, let value = goal.period {
                 row.value = value.rawValue
             } else {
-                row.value = "None"
+                row.value = self.active ? "None" : GoalPeriod.day.rawValue
                 row.hidden = Condition(booleanLiteral: self.active)
             }
         }.onPresent { from, to in

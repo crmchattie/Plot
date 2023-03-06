@@ -47,16 +47,16 @@ extension NetworkController {
                 continue
             }
             
-//            print("metricCheck")
-//            print(task.name)
-//            print(task.activityID)
-//            print(metric)
-//            print(task.startDate)
-//            print(range.startDate)
-//            print(task.endDate)
-//            print(range.endDate)
-//            print(past)
-//            print(current)
+            print("metricCheck")
+            print(task.name)
+            print(task.activityID)
+            print(metric)
+            print(task.startDate)
+            print(range.startDate)
+            print(task.endDate)
+            print(range.endDate)
+            print(past)
+            print(current)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
@@ -390,7 +390,7 @@ extension NetworkController {
                         let transactionAccounts = Set(transactions.map({ $0.account_guid ?? "" }))
                         let difference = transactionAccounts.symmetricDifference(Set(filterAccounts))
                         let accts = self.financeService.accounts.filter({ difference.contains($0.guid) && $0.balance > 0 })
-                        finalStat.value = accts.map({$0.balance}).reduce(0, +) * -1
+                        finalStat.value = accts.map({$0.balance}).reduce(0, +)
                         if finalStat.value <= 0, let transaction = transactions.first {
                             finalStat.date = ISO8601DateFormatter().date(from: transaction.transacted_at) ?? Date()
                         }

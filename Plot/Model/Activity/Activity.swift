@@ -374,6 +374,7 @@ class Activity: NSObject, NSCopying, Codable {
                 self.goalMetricsRelationshipType = value.rawValue
             }
         }
+
     }
     
     init(dictionary: [String: AnyObject]?) {

@@ -15,6 +15,7 @@
 		100A53F323E3BDAC004AA952 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100A53F223E3BDAC004AA952 /* Filter.swift */; };
 		100B9F5D2564536E00A80C87 /* FinanceDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */; };
 		100B9F632564539300A80C87 /* FinanceDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100B9F622564539300A80C87 /* FinanceDetailService.swift */; };
+		100BC57929B64B81005D9F9C /* GoalDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100BC57829B64B81005D9F9C /* GoalDetailViewController.swift */; };
 		100E0DB024D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100E0DAF24D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift */; };
 		100FE7032892D91200D3124C /* ChooseCalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE7022892D91200D3124C /* ChooseCalendarViewController.swift */; };
 		100FE7082892DCE000D3124C /* CalendarDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100FE7072892DCE000D3124C /* CalendarDetailViewController.swift */; };
@@ -608,6 +609,7 @@
 		100A53F223E3BDAC004AA952 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		100B9F5C2564536E00A80C87 /* FinanceDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailViewModel.swift; sourceTree = "<group>"; };
 		100B9F622564539300A80C87 /* FinanceDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailService.swift; sourceTree = "<group>"; };
+		100BC57829B64B81005D9F9C /* GoalDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailViewController.swift; sourceTree = "<group>"; };
 		100E0DAF24D4AB3D00B963D5 /* ActivityExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityExpandedDetailCell.swift; sourceTree = "<group>"; };
 		100FE7022892D91200D3124C /* ChooseCalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseCalendarViewController.swift; sourceTree = "<group>"; };
 		100FE7072892DCE000D3124C /* CalendarDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDetailViewController.swift; sourceTree = "<group>"; };
@@ -1671,6 +1673,7 @@
 				1093D2B3299C39D8003D77C5 /* GoalViewController+UpdateInvitees.swift */,
 				1093D2B5299C39FF003D77C5 /* GoalViewController+Functions.swift */,
 				1093D2B7299C3A0B003D77C5 /* GoalViewController+Extensions.swift */,
+				100BC57829B64B81005D9F9C /* GoalDetailViewController.swift */,
 			);
 			path = Goal;
 			sourceTree = "<group>";
@@ -3434,6 +3437,7 @@
 				1067753E25E1AE01002F78E7 /* ChangeEmailView.swift in Sources */,
 				10E8E50325923C070076BE42 /* BaseContainerCell.swift in Sources */,
 				4BAEE54E212735880045AB10 /* Message.swift in Sources */,
+				100BC57929B64B81005D9F9C /* GoalDetailViewController.swift in Sources */,
 				10D6276F28DDFE0C009D2BD0 /* FeedbackViewController.swift in Sources */,
 				10B3E50828B146DC00E1713D /* ChooseListViewController.swift in Sources */,
 				10C83344249AD5B90037F638 /* FoursquareVenueRecSearchResult.swift in Sources */,
@@ -3821,7 +3825,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 105;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3832,7 +3836,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.3;
+				MARKETING_VERSION = 1.4.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
@@ -3853,7 +3857,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 105;
 				DEVELOPMENT_TEAM = G226F98322;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -3863,7 +3867,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.3;
+				MARKETING_VERSION = 1.4.5;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4014,7 +4018,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 105;
 				DEVELOPMENT_TEAM = G226F98322;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -4031,7 +4035,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.3;
+				MARKETING_VERSION = 1.4.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4058,7 +4062,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 105;
 				DEVELOPMENT_TEAM = G226F98322;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -4075,7 +4079,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.3;
+				MARKETING_VERSION = 1.4.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.immaturecreations.MessengingApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";

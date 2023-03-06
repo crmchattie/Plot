@@ -53,11 +53,9 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     if transactionDetails.group == "Income", let amount = numberFormatter.string(from: transactionDetails.amount as NSNumber) {
                         categoryLabel.text = amount
                         topHeightConstraint = 20
-
                     } else if let amount = numberFormatter.string(from: transactionDetails.amount * -1 as NSNumber) {
                         categoryLabel.text = amount
                         topHeightConstraint = 5
-
                     }
                 case .group:
                     if mode == .fullscreen {
