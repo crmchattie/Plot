@@ -256,10 +256,6 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     }
     
     private func setupData() {
-        guard currentReachabilityStatus != .notReachable else {
-            return
-        }
-        
         var snapshot = self.diffableDataSource.snapshot()
         snapshot.deleteAllItems()
         self.diffableDataSource.apply(snapshot)

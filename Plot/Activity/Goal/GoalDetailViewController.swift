@@ -33,9 +33,11 @@ class GoalDetailViewController: FormViewController {
         super.viewDidLoad()
         active = goal != nil
         goalOld = goal
-        self.title = active ? "New Goal" : "Goal"
+        self.title = active ? "Goal" : "New Goal"
         configureTableView()
         initializeForm()
+        updateNumberRows()
+        updateDescriptionRow()
     }
     
     fileprivate func configureTableView() {
@@ -467,6 +469,7 @@ class GoalDetailViewController: FormViewController {
             }
         }
     }
+    
     
     func updateDescriptionRow() {
         if let descriptionRow: LabelRow = self.form.rowBy(tag: "Description") {
