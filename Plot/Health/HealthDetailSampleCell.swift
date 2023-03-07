@@ -140,7 +140,7 @@ class HealthDetailSampleCell: UITableViewCell {
             titleLabel.text = string
             
             if segmentType == .week || segmentType == .month {
-                dateFormatter.dateFormat = "MMM dd, yyy"
+                dateFormatter.dateFormat = "E, MMM dd, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
@@ -154,7 +154,7 @@ class HealthDetailSampleCell: UITableViewCell {
             titleLabel.text = string
             
             if segmentType == .week || segmentType == .month {
-                dateFormatter.dateFormat = "MMM dd, yyy"
+                dateFormatter.dateFormat = "E, MMM dd, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
@@ -168,7 +168,7 @@ class HealthDetailSampleCell: UITableViewCell {
             titleLabel.text = string
             
             if segmentType == .week || segmentType == .month {
-                dateFormatter.dateFormat = "MMM dd, yyy"
+                dateFormatter.dateFormat = "E, MMM dd, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
@@ -181,7 +181,7 @@ class HealthDetailSampleCell: UITableViewCell {
             titleLabel.text = string
             
             if segmentType == .week || segmentType == .month {
-                dateFormatter.dateFormat = "MMM dd, yyy"
+                dateFormatter.dateFormat = "E, MMM dd, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
@@ -193,7 +193,7 @@ class HealthDetailSampleCell: UITableViewCell {
             let string = "\(count) \(healthMetric.unitName)"
             titleLabel.text = string
             if segmentType == .week || segmentType == .month {
-                dateFormatter.dateFormat = "MMM dd, yyy"
+                dateFormatter.dateFormat = "E, MMM dd, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
@@ -212,7 +212,7 @@ class HealthDetailSampleCell: UITableViewCell {
             titleLabel.text = string
             
             if segmentType == .week || segmentType == .month {
-                dateFormatter.dateFormat = "MMM dd, yyy"
+                dateFormatter.dateFormat = "E, MMM dd, yyy"
                 titleLabelRight.text = dateFormatter.string(from: sample.startDate)
             } else if segmentType == .year {
                 dateFormatter.dateFormat = "MMM, yyy"
@@ -221,7 +221,7 @@ class HealthDetailSampleCell: UITableViewCell {
         }
         else if case .sleep = healthMetric.type, let categorySample = sample as? HKCategorySample, let sleepValue = HKCategoryValueSleepAnalysis(rawValue: categorySample.value) {
             if segmentType != .day {
-                dateFormatter.dateFormat = "MMM dd, yyy"
+                dateFormatter.dateFormat = "E, MMM dd, yyy"
             }
             titleLabelRight.text = dateFormatter.string(from: sample.endDate)
             

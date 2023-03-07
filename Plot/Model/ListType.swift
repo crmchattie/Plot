@@ -39,6 +39,11 @@ struct ListType: Codable, Equatable, Hashable, Comparable {
     var healthList: Bool?
     var goalList: Bool?
     
+    enum CodingKeys: String, CodingKey {
+        case name, id, description, color, source, participantsIDs, lastModifiedDate, createdDate, admin, badge, pinned, muted, defaultList, financeList, healthList, goalList
+        case taskIDs = "list-tasks"
+    }
+    
     init(id: String, name: String?, color: String?, source: String, admin: String?, defaultList: Bool?, financeList: Bool?, healthList: Bool?, goalList: Bool?) {
         self.id = id
         self.name = name

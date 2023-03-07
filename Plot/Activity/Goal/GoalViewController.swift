@@ -851,7 +851,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
 //                row.cell.textLabel?.textAlignment = .left
 //                row.cell.selectionStyle = .default
 //                row.title = row.tag
-//                row.value = String(selectedFalconUsers.count + 1)
+//                row.value = String(selectedFalconUsers.count)
 //            }.onCellSelection({ _, row in
 //                self.openParticipantsInviter()
 //            }).cellUpdate { cell, row in
@@ -864,28 +864,28 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
 //        }
         
         form.last!
-        <<< LabelRow("List") { row in
-            row.cell.backgroundColor = .secondarySystemGroupedBackground
-            row.cell.textLabel?.textColor = .label
-            row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.cell.accessoryType = .disclosureIndicator
-            row.cell.selectionStyle = .default
-            row.title = row.tag
-            if let task = task, task.listName != nil {
-                row.value = self.task.listName
-            } else {
-                list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
-                row.value = list?.name ?? "Default"
-            }
-        }.onCellSelection({ _, row in
-            self.openTaskList()
-        }).cellUpdate { cell, row in
-            cell.accessoryType = .disclosureIndicator
-            cell.backgroundColor = .secondarySystemGroupedBackground
-            cell.textLabel?.textColor = .label
-            cell.detailTextLabel?.textColor = .secondaryLabel
-            cell.textLabel?.textAlignment = .left
-        }
+//        <<< LabelRow("List") { row in
+//            row.cell.backgroundColor = .secondarySystemGroupedBackground
+//            row.cell.textLabel?.textColor = .label
+//            row.cell.detailTextLabel?.textColor = .secondaryLabel
+//            row.cell.accessoryType = .disclosureIndicator
+//            row.cell.selectionStyle = .default
+//            row.title = row.tag
+//            if let task = task, task.listName != nil {
+//                row.value = self.task.listName
+//            } else {
+//                list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
+//                row.value = list?.name ?? "Default"
+//            }
+//        }.onCellSelection({ _, row in
+//            self.openTaskList()
+//        }).cellUpdate { cell, row in
+//            cell.accessoryType = .disclosureIndicator
+//            cell.backgroundColor = .secondarySystemGroupedBackground
+//            cell.textLabel?.textColor = .label
+//            cell.detailTextLabel?.textColor = .secondaryLabel
+//            cell.textLabel?.textAlignment = .left
+//        }
         
         <<< LabelRow("Category") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground

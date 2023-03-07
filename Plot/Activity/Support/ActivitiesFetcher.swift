@@ -60,6 +60,7 @@ class ActivitiesFetcher: NSObject {
                 var counter = 0
                 let activityIDs = snapshot.value as? [String: AnyObject] ?? [:]
                 for (ID, userActivityInfo) in activityIDs {
+                    print(ID)
                     var handle = UInt.max
                     if let dictionary = userActivityInfo as? [String: AnyObject] {
                         let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
@@ -700,9 +701,13 @@ class ActivitiesFetcher: NSObject {
                         group.enter()
                         self.getDataFromSnapshotViaList(ID: ID, userID: admin, list: list) { activityList in
                             for activity in activityList {
+                                guard !(activity.isGoal ?? false) else {
+                                    continue
+                                }
+                                
                                 self.userActivities[activity.activityID ?? ""] = activity
+                                activities.append(activity)
                             }
-                            activities.append(contentsOf: activityList)
                             group.leave()
                         }
                     }
@@ -716,6 +721,10 @@ class ActivitiesFetcher: NSObject {
     }
     
     func getDataFromSnapshotViaList(ID: String, userID: String, list: ListType, completion: @escaping ([Activity])->()) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
         let ref = Database.database().reference()
         var activities: [Activity] = []
         let group = DispatchGroup()
@@ -726,6 +735,7 @@ class ActivitiesFetcher: NSObject {
                 ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
                     if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
                         let activity = Activity(dictionary: activitySnapshotValue)
+                        activity.participantsIDs?.append(currentUserID)
                         activity.showExtras = userActivity.showExtras
                         activity.calendarID = userActivity.calendarID
                         activity.calendarName = userActivity.calendarName
@@ -747,6 +757,7 @@ class ActivitiesFetcher: NSObject {
                 ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observeSingleEvent(of: .value, with: { activitySnapshot in
                     if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject] {
                         let activity = Activity(dictionary: activitySnapshotValue)
+                        activity.participantsIDs?.append(currentUserID)
                         activities.append(activity)
                     }
                     group.leave()

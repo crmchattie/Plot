@@ -47,16 +47,16 @@ extension NetworkController {
                 continue
             }
             
-            print("metricCheck")
-            print(task.name)
-            print(task.activityID)
-            print(metric)
-            print(task.startDate)
-            print(range.startDate)
-            print(task.endDate)
-            print(range.endDate)
-            print(past)
-            print(current)
+//            print("metricCheck")
+//            print(task.name)
+//            print(task.activityID)
+//            print(metric)
+//            print(task.startDate)
+//            print(range.startDate)
+//            print(task.endDate)
+//            print(range.endDate)
+//            print(past)
+//            print(current)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)

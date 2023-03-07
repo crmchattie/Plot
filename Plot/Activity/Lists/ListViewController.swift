@@ -117,14 +117,6 @@ class ListViewController: UIViewController, ObjectDetailShowing {
                 return false
             }
             filteredTasks = dailyTasks
-        case .goalList:
-            let goalTasks = tasks.filter {
-                if $0.isGoal ?? false {
-                    return true
-                }
-                return false
-            }
-            filteredTasks = goalTasks
         default:
             filteredTasks = tasks.filter { $0.listID == list.id }
         }
@@ -220,34 +212,10 @@ class ListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func newItem() {
-        if list.name == "Goals" {
-            self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+        if let id = self.list.id, id != "" {
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil)
         } else {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "Goal", style: .default, handler: { (_) in
-                if let id = self.list.id, id != "" {
-                    self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil)
-                } else {
-                    self.showGoalDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Task", style: .default, handler: { (_) in
-                if let id = self.list.id, id != "" {
-                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: self.list, startDateTime: nil, endDateTime: nil)
-                } else {
-                    self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                }
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
-                print("User click Dismiss button")
-            }))
-            
-            self.present(alert, animated: true, completion: {
-                print("completion block")
-            })
+            self.showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
         }
     }
     
@@ -554,14 +522,6 @@ extension ListViewController: UpdateFilter {
                 return false
             }
             filteredTasks = dailyTasks
-        case .goalList:
-            let goalTasks = tasks.filter {
-                if $0.isGoal ?? false {
-                    return true
-                }
-                return false
-            }
-            filteredTasks = goalTasks
         default:
             filteredTasks = filteredTasks.filter { $0.listID == list.id }
         }

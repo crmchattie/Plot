@@ -1130,7 +1130,7 @@ extension SubtaskViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            inviteesRow.value = String(self.selectedFalconUsers.count + 1)
+            inviteesRow.value = String(self.selectedFalconUsers.count)
             inviteesRow.updateCell()
         }
     }

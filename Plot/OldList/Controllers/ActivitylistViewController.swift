@@ -325,7 +325,7 @@ class ActivitylistViewController: FormViewController {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                row.value = String(selectedFalconUsers.count + 1)
+                row.value = String(selectedFalconUsers.count)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in
@@ -519,7 +519,7 @@ extension ActivitylistViewController: UpdateInvitees {
     func updateInvitees(selectedFalconUsers: [User]) {
         if let inviteesRow: LabelRow = form.rowBy(tag: "Participants") {
             self.selectedFalconUsers = selectedFalconUsers
-            inviteesRow.value = String(selectedFalconUsers.count + 1)
+            inviteesRow.value = String(selectedFalconUsers.count)
             inviteesRow.updateCell()
             
             if active {

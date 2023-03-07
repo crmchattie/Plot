@@ -38,6 +38,11 @@ struct CalendarType: Codable, Equatable, Hashable, Comparable {
     var eventIDs: [String: Bool]?
     var defaultCalendar: Bool?
     
+    enum CodingKeys: String, CodingKey {
+        case name, id, description, type, color, source, locationName, locationAddress, participantsIDs, lastModifiedDate, createdDate, admin, badge, pinned, muted, defaultCalendar
+        case eventIDs = "calendar-events"
+    }
+    
     init(id: String, name: String?, color: String?, source: String, admin: String?, defaultCalendar: Bool?) {
         self.id = id
         self.name = name

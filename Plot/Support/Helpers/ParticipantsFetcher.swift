@@ -11,7 +11,7 @@ import Firebase
 
 class ParticipantsFetcher: NSObject {
     class func getParticipants(forActivity activity: Activity?, completion: @escaping ([User])->()) {
-        guard let activity = activity, let participantsIDs = activity.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid else {
+        guard let activity = activity, let participantsIDs = activity.participantsIDs else {
             completion([])
             return
         }
@@ -20,7 +20,7 @@ class ParticipantsFetcher: NSObject {
         var participants: [User] = []
         for id in participantsIDs {
             // Only if the current user is created this activity
-            if id == currentUserID || id.isEmpty {
+            if id.isEmpty {
                 continue
             }
             
@@ -81,11 +81,11 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forTransaction transaction: Transaction?, completion: @escaping ([User])->()) {
-        if let transaction = transaction, let participantsIDs = transaction.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let transaction = transaction, let participantsIDs = transaction.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -113,12 +113,12 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forAccount account: MXAccount?, completion: @escaping ([User])->()) {
-        if let account = account, let participantsIDs = account.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let account = account, let participantsIDs = account.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -145,12 +145,12 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forHolding holding: MXHolding?, completion: @escaping ([User])->()) {
-        if let holding = holding, let participantsIDs = holding.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let holding = holding, let participantsIDs = holding.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -177,12 +177,12 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forList list: ListType?, completion: @escaping ([User])->()) {
-        if let list = list, let participantsIDs = list.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let list = list, let participantsIDs = list.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -209,12 +209,12 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forCalendar calendar: CalendarType?, completion: @escaping ([User])->()) {
-        if let calendar = calendar, let participantsIDs = calendar.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let calendar = calendar, let participantsIDs = calendar.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -241,12 +241,12 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forWorkout workout: Workout?, completion: @escaping ([User])->()) {
-        if let workout = workout, let participantsIDs = workout.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let workout = workout, let participantsIDs = workout.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -273,12 +273,12 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forMindfulness mindfulness: Mindfulness?, completion: @escaping ([User])->()) {
-        if let mindfulness = mindfulness, let participantsIDs = mindfulness.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let mindfulness = mindfulness, let participantsIDs = mindfulness.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -305,12 +305,12 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(forMood mood: Mood?, completion: @escaping ([User])->()) {
-        if let mood = mood, let participantsIDs = mood.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let mood = mood, let participantsIDs = mood.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -337,11 +337,11 @@ class ParticipantsFetcher: NSObject {
     }
     
     class func getParticipants(grocerylist: Grocerylist?, checklist: Checklist?, packinglist: Packinglist?, activitylist: Activitylist?, completion: @escaping ([User])->()) {
-        if let grocerylist = grocerylist, let participantsIDs = grocerylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        if let grocerylist = grocerylist, let participantsIDs = grocerylist.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -361,11 +361,11 @@ class ParticipantsFetcher: NSObject {
             group.notify(queue: .main) {
                 completion(participants)
             }
-        } else if let checklist = checklist, let participantsIDs = checklist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        } else if let checklist = checklist, let participantsIDs = checklist.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -385,11 +385,11 @@ class ParticipantsFetcher: NSObject {
             group.notify(queue: .main) {
                 completion(participants)
             }
-        } else if let activitylist = activitylist, let participantsIDs = activitylist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        } else if let activitylist = activitylist, let participantsIDs = activitylist.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 
@@ -409,11 +409,11 @@ class ParticipantsFetcher: NSObject {
             group.notify(queue: .main) {
                 completion(participants)
             }
-        } else if let packinglist = packinglist, let participantsIDs = packinglist.participantsIDs, let currentUserID = Auth.auth().currentUser?.uid {
+        } else if let packinglist = packinglist, let participantsIDs = packinglist.participantsIDs {
             let group = DispatchGroup()
             var participants: [User] = []
             for id in participantsIDs {
-                if id == currentUserID || id.isEmpty {
+                if id.isEmpty {
                     continue
                 }
                 

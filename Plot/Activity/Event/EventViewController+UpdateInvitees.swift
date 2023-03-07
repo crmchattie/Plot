@@ -16,7 +16,7 @@ extension EventViewController: UpdateInvitees {
             self.selectedFalconUsers = selectedFalconUsers
             self.acceptedParticipant = acceptedParticipant.filter { selectedFalconUsers.contains($0) }
             
-            inviteesRow.value = String(selectedFalconUsers.count + 1)
+            inviteesRow.value = String(selectedFalconUsers.count)
             inviteesRow.updateCell()
             
             if active {

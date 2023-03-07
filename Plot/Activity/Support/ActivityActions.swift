@@ -476,7 +476,7 @@ class ActivityActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let _ = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
+        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 
@@ -487,6 +487,19 @@ class ActivityActions: NSObject {
             guard let id = selectedUser.id else { continue }
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
             membersIDs.append(id)
+        }
+        
+        //add list participants to task
+        if activity.isTask ?? false, !(activity.isGoal ?? false), let source = activity.listSource, source == ListSourceOptions.plot.name, let listID = activity.listID {
+            ListFetcher.getDataFromSnapshot(ID: listID) { lists in
+                ParticipantsFetcher.getParticipants(forList: lists.first) { listUsers in
+                    for selectedUser in listUsers {
+                        guard let id = selectedUser.id, membersIDsDictionary[id] == nil else { continue }
+                        membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+                        membersIDs.append(id)
+                    }
+                }
+            }
         }
         
         return (membersIDs.sorted(), membersIDsDictionary)

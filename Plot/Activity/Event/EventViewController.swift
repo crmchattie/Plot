@@ -597,7 +597,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                 row.cell.textLabel?.textAlignment = .left
                 row.cell.selectionStyle = .default
                 row.title = row.tag
-                row.value = String(selectedFalconUsers.count + 1)
+                row.value = String(selectedFalconUsers.count)
             }.onCellSelection({ _, row in
                 self.openParticipantsInviter()
             }).cellUpdate { cell, row in

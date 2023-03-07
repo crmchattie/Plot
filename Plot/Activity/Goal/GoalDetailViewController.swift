@@ -309,7 +309,7 @@ class GoalDetailViewController: FormViewController {
             row.cell.backgroundColor = .secondarySystemGroupedBackground
             row.cell.textLabel?.textColor = .label
             row.cell.detailTextLabel?.textColor = .secondaryLabel
-            row.title = "Metric Relationship"
+            row.title = "Relationship"
             row.options = MetricsRelationshipType.moreLessValues
             if let goal = goal, let value = goal.metricRelationship {
                 row.value = value.rawValue
@@ -317,7 +317,7 @@ class GoalDetailViewController: FormViewController {
                 row.value = MetricsRelationshipType.equalMore.rawValue
             }
         }.onPresent { from, to in
-            to.title = "Metric Relationship"
+            to.title = "Relationship"
             to.extendedLayoutIncludesOpaqueBars = true
             to.tableViewStyle = .insetGrouped
             to.dismissOnSelection = true
