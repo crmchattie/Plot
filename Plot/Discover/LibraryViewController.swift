@@ -239,8 +239,8 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
             reference.removeObserver(withHandle: refHandle)
             if snapshot.exists(), let snapshotValue = snapshot.value as? NSArray {
                 for value in snapshotValue {
-                    if let template = try? FirebaseDecoder().decode(Template.self, from: value) {
-                        self.templatesDict[template.category, default: []].append(template)
+                    if let template = try? FirebaseDecoder().decode(Template.self, from: value), let category = template.category {
+                        self.templatesDict[category, default: []].append(template)
                         self.templates.append(template)
                     }
                 }
@@ -380,6 +380,12 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                 print("subtask")
             case .schedule:
                 print("schedule")
+            case .mood:
+                print("mood")
+            case .transaction:
+                print("transaction")
+            case .account:
+                print("account")
             }
         }
     }

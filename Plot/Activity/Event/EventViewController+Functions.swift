@@ -661,18 +661,6 @@ extension EventViewController {
             self.showTaskDetailPush(task: taskList[taskIndex], updateDiscoverDelegate: nil, delegate: self, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil, startDateTime: nil, endDateTime: nil)
         } else {
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "New Goal", style: .default, handler: { (_) in
-                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
-                    mvs.remove(at: mvs.count - 2)
-                }
-                if let container = self.container {
-                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.activity, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil, startDateTime: nil, endDateTime: nil)
-                } else {
-                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
-                    self.container = Container(id: containerID, activityIDs: [self.activityID], taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.activity.participantsIDs)
-                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.activity, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, list: nil, startDateTime: nil, endDateTime: nil)
-                }
-            }))
             alert.addAction(UIAlertAction(title: "New Task", style: .default, handler: { (_) in
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
@@ -685,7 +673,7 @@ extension EventViewController {
                     self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.activity, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, list: nil, startDateTime: nil, endDateTime: nil)
                 }
             }))
-            alert.addAction(UIAlertAction(title: "Existing Goal/Task", style: .default, handler: { (_) in
+            alert.addAction(UIAlertAction(title: "Existing Task", style: .default, handler: { (_) in
                 if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }

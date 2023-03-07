@@ -61,6 +61,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
     var healthIndex: Int = 0
     var eventList = [Activity]()
     var eventIndex: Int = 0
+    var taskList = [Activity]()
+    var taskIndex: Int = 0
     var startDateTime: Date?
     var endDateTime: Date?
     
@@ -300,24 +302,11 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 } else {
                     cell.tintAdjustmentMode = .automatic
                 }
-            }.onChange { row in
-                self.task.isCompleted = row.value
-                if row.value ?? false, let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On"), let goal = self.task.goal {
-                    row.cell.tintAdjustmentMode = .automatic
-                    
-                    let original = Date()
-                    let updateDate = Date(timeIntervalSinceReferenceDate:
-                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
-                    completedRow.value = updateDate
-                    completedRow.updateCell()
-                    completedRow.hidden = false
-                    completedRow.evaluateHidden()
-                    self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
-                    let goalCurrentNumber = goal.currentNumber ?? 0 > goal.targetNumber ?? 0 ? goal.currentNumber ?? 0 : goal.targetNumber ?? 0
-                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0 > goal.targetNumberSecond ?? 0 ? goal.currentNumberSecond ?? 0 : goal.targetNumberSecond ?? 0
-                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    updateTask.updateCompletion(isComplete: true, completeUpdatedByUser: true, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
-                } else if let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
+            }.onCellSelection({ cell, row in
+                if row.value ?? false, let goal = self.task.goal {
+                    row.value = false
+                    self.updateGoalCompletion(goal: goal)
+                } else if !(row.value ?? false), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                     row.cell.tintAdjustmentMode = .dimmed
                     completedRow.value = nil
                     completedRow.updateCell()
@@ -327,7 +316,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                     let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
                     updateTask.updateCompletion(isComplete: false, completeUpdatedByUser: false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                 }
-            }
+            })
             
             <<< DateTimeInlineRow("Completed On") {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -864,28 +853,28 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
 //        }
         
         form.last!
-//        <<< LabelRow("List") { row in
-//            row.cell.backgroundColor = .secondarySystemGroupedBackground
-//            row.cell.textLabel?.textColor = .label
-//            row.cell.detailTextLabel?.textColor = .secondaryLabel
-//            row.cell.accessoryType = .disclosureIndicator
-//            row.cell.selectionStyle = .default
-//            row.title = row.tag
-//            if let task = task, task.listName != nil {
-//                row.value = self.task.listName
-//            } else {
-//                list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
-//                row.value = list?.name ?? "Default"
-//            }
-//        }.onCellSelection({ _, row in
-//            self.openTaskList()
-//        }).cellUpdate { cell, row in
-//            cell.accessoryType = .disclosureIndicator
-//            cell.backgroundColor = .secondarySystemGroupedBackground
-//            cell.textLabel?.textColor = .label
-//            cell.detailTextLabel?.textColor = .secondaryLabel
-//            cell.textLabel?.textAlignment = .left
-//        }
+        <<< LabelRow("List") { row in
+            row.cell.backgroundColor = .secondarySystemGroupedBackground
+            row.cell.textLabel?.textColor = .label
+            row.cell.detailTextLabel?.textColor = .secondaryLabel
+            row.cell.accessoryType = .disclosureIndicator
+            row.cell.selectionStyle = .default
+            row.title = row.tag
+            if let task = task, task.listName != nil {
+                row.value = self.task.listName
+            } else {
+                list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
+                row.value = list?.name ?? "Default"
+            }
+        }.onCellSelection({ _, row in
+            self.openTaskList()
+        }).cellUpdate { cell, row in
+            cell.accessoryType = .disclosureIndicator
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+            cell.textLabel?.textAlignment = .left
+        }
         
         <<< LabelRow("Category") { row in
             row.cell.backgroundColor = .secondarySystemGroupedBackground

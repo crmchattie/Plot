@@ -448,7 +448,23 @@ extension NetworkController {
             
         case .workout:
             healthDetailService.getSamples(for: healthService.workouts, measure: unit.workoutMeasure ?? .duration, categories: option, range: range) {stat, workouts,_ in
-                completion(stat)
+                if let stat = stat, let workouts = workouts {
+                    var finalStat = stat
+                    switch unit {
+                    case .count:
+                        finalStat.value = Double(workouts.count)
+                        completion(finalStat)
+                    case .minutes:
+                        completion(finalStat)
+                    case .calories:
+                        completion(finalStat)
+                    case .hours, .days, .amount, .percent, .multiple, .level:
+                        completion(nil)
+                    }
+                }
+                else {
+                    completion(nil)
+                }
             }
             
         case .mindfulness:

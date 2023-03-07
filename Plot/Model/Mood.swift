@@ -37,7 +37,9 @@ struct Mood: Codable, Equatable, Hashable {
     
     init(fromTemplate template: Template) {
         self.id = UUID().uuidString
+        self.createdDate = Date()
         self.mood = template.mood
+        self.moodDate = template.getStartDate()
     }
 }
 

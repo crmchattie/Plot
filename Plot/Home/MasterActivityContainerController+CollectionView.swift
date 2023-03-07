@@ -29,6 +29,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                     cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
                 }
                 cell.configureCell(for: indexPath, task: item)
+                cell.updateCompletionDelegate = self
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: eventCellID, for: indexPath) as? EventCollectionCell ?? EventCollectionCell()

@@ -76,10 +76,15 @@ struct Workout: Codable, Equatable, Hashable {
     
     init(fromTemplate template: Template) {
         self.id = UUID().uuidString
+        self.createdDate = Date()
         self.name = template.name
         self.type = template.name
+        self.totalEnergyBurned = template.totalEnergyBurned
+        self.startDateTime = template.getStartDate()
+        self.endDateTime = template.getEndDate()
         self.user_created = true
         self.directAssociation = true
+        self.directAssociationType = .event
     }
 }
 

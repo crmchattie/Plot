@@ -60,10 +60,8 @@ extension GoalViewController: UITextFieldDelegate {
 
 extension GoalViewController: UpdateGoalDelegate {
     func update(goal: Goal?, number: Int) {
-        print("updateGoal")
         if let goal = goal {
             if number == 0, let row: LabelRow = form.rowBy(tag: "Metric") {
-                print("row exists")
                 row.value = goal.cellDescriptionFirst ?? goal.metric?.rawValue
                 row.updateCell()
                 if let _ = self.task.goal {
@@ -160,36 +158,234 @@ extension GoalViewController: UpdateSubtaskListDelegate {
 
 extension GoalViewController: UpdateActivityDelegate {
     func updateActivity(activity: Activity) {
-        if let _ = activity.name {
-            if eventList.indices.contains(eventIndex), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
-                let scheduleRow = mvs.allRows[eventIndex]
-                scheduleRow.baseValue = activity
-                scheduleRow.reload()
-                eventList[eventIndex] = activity
-            } else {
-                var mvs = (form.sectionBy(tag: "Events") as! MultivaluedSection)
-                mvs.insert(ScheduleRow() {
-                    if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                        $0.cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                    } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
-                        $0.cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+        if let _ = activity.name, let checkRow: CheckRow = self.form.rowBy(tag: "Completed"), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On"), let goal = self.task.goal {
+            if goal.metric == .events, let metricRow: LabelRow = form.rowBy(tag: "Metric") {
+                if goal.unit == .count {
+                    var goalCurrentNumber = goal.currentNumber ?? 0
+                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumber = 1
+                    switch goal.metricRelationship ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                    case .or, .and, .equal:
+                        break
                     }
-                    $0.value = activity
-                }.onCellSelection() { cell, row in
-                    self.eventIndex = row.indexPath!.row
-                    self.openEvent()
-                    cell.cellResignFirstResponder()
-                }, at: mvs.count - 1)
-                
-                Analytics.logEvent("new_schedule", parameters: [
-                    "schedule_name": activity.name ?? "name" as NSObject,
-                    "schedule_type": activity.activityType ?? "basic" as NSObject
-                ])
-                eventList.append(activity)
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricRow.value = self.task.goal?.cellDescriptionFirst
+                    metricRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if let startDate = activity.startDate, let endDate = activity.endDate {
+                    var goalCurrentNumber = goal.currentNumber ?? 0
+                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    let duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970)
+                    switch goal.unitSecond {
+                    case .minutes:
+                        goalCurrentNumber = duration.totalMinutes
+                    case .hours:
+                        goalCurrentNumber = duration.totalMinutes
+                    case .days:
+                        goalCurrentNumber = duration.totalMinutes
+                    case .none, .count, .calories, .amount, .percent, .multiple, .level:
+                        break
+                    }
+                    
+                    switch goal.metricRelationship ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumber > goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumber < goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricRow.value = self.task.goal?.cellDescriptionFirst
+                    metricRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                }
+            } else if goal.metricSecond == .events, let metricSecondRow: LabelRow = form.rowBy(tag: "secondMetric") {
+                if goal.unitSecond == .count {
+                    let goalCurrentNumber = goal.currentNumber ?? 0
+                    var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumberSecond = 1
+                    switch goal.metricRelationshipSecond ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                    metricSecondRow.updateCell()
+
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if let startDate = activity.startDate, let endDate = activity.endDate {
+                    let goalCurrentNumber = goal.currentNumber ?? 0
+                    var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    let duration = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970)
+                    switch goal.unitSecond {
+                    case .minutes:
+                        goalCurrentNumberSecond = duration.totalMinutes
+                    case .hours:
+                        goalCurrentNumberSecond = duration.totalMinutes
+                    case .days:
+                        goalCurrentNumberSecond = duration.totalMinutes
+                    case .none, .count, .calories, .amount, .percent, .multiple, .level:
+                        break
+                    }
+                    
+                    switch goal.metricRelationshipSecond ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                    metricSecondRow.updateCell()
+
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                }
             }
-            
-            sortSchedule()
-            updateLists(type: "container")
         }
     }
 }
@@ -221,6 +417,145 @@ extension GoalViewController: ChooseActivityDelegate {
             
             eventList.append(mergeActivity)
             sortSchedule()
+            updateLists(type: "container")
+        }
+    }
+}
+
+extension GoalViewController: UpdateTaskDelegate {
+    func updateTask(task: Activity) {
+        if let _ = task.name, let checkRow: CheckRow = self.form.rowBy(tag: "Completed"), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On"), let goal = self.task.goal {
+            if goal.metric == .tasks, task.isCompleted ?? false, let metricRow: LabelRow = form.rowBy(tag: "Metric") {
+                var goalCurrentNumber = goal.currentNumber ?? 0
+                let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                var complete = false
+                
+                goalCurrentNumber = 1
+                switch goal.metricRelationship ?? .equalMore {
+                case .equalMore:
+                    complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                case .equalLess:
+                    complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                case .or, .and, .equal:
+                    break
+                }
+                
+                self.task.isCompleted = complete
+                self.task.goal?.currentNumber = goalCurrentNumber
+                self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                
+                checkRow.value = complete
+                checkRow.updateCell()
+                
+                metricRow.value = self.task.goal?.cellDescriptionFirst
+                metricRow.updateCell()
+                
+                if complete {
+                    checkRow.cell.tintAdjustmentMode = .automatic
+                    
+                    let original = Date()
+                    let updateDate = Date(timeIntervalSinceReferenceDate:
+                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    completedRow.value = updateDate
+                    completedRow.updateCell()
+                    completedRow.hidden = false
+                    completedRow.evaluateHidden()
+                    
+                    self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                } else {
+                    checkRow.cell.tintAdjustmentMode = .dimmed
+                    
+                    completedRow.value = nil
+                    completedRow.updateCell()
+                    completedRow.hidden = true
+                    completedRow.evaluateHidden()
+                    
+                    self.task.completedDate = nil
+                }
+                
+                let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+            } else if goal.metricSecond == .tasks, task.isCompleted ?? false, let metricSecondRow: LabelRow = form.rowBy(tag: "secondMetric") {
+                let goalCurrentNumber = goal.currentNumber ?? 0
+                var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                var complete = false
+                
+                goalCurrentNumberSecond = 1
+                switch goal.metricRelationshipSecond ?? .equalMore {
+                case .equalMore:
+                    complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                case .equalLess:
+                    complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                case .or, .and, .equal:
+                    break
+                }
+                
+                self.task.isCompleted = complete
+                self.task.goal?.currentNumber = goalCurrentNumber
+                self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                
+                checkRow.value = complete
+                checkRow.updateCell()
+                
+                metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                metricSecondRow.updateCell()
+
+                if complete {
+                    checkRow.cell.tintAdjustmentMode = .automatic
+                    
+                    let original = Date()
+                    let updateDate = Date(timeIntervalSinceReferenceDate:
+                                            (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                    completedRow.value = updateDate
+                    completedRow.updateCell()
+                    completedRow.hidden = false
+                    completedRow.evaluateHidden()
+                    
+                    self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                } else {
+                    checkRow.cell.tintAdjustmentMode = .dimmed
+                    
+                    completedRow.value = nil
+                    completedRow.updateCell()
+                    completedRow.hidden = true
+                    completedRow.evaluateHidden()
+                    
+                    self.task.completedDate = nil
+                }
+                
+                let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+            }
+        }
+    }
+}
+
+extension GoalViewController: ChooseTaskDelegate {
+    func chosenTask(mergeTask: Activity) {
+        if let _: SubtaskRow = form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+            mvs.remove(at: mvs.count - 2)
+        }
+        if let _ = mergeTask.name {
+            var mvs = (form.sectionBy(tag: "Tasks") as! MultivaluedSection)
+            mvs.insert(SubtaskRow() {
+                if let listID = mergeTask.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
+                    $0.cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
+                    $0.cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                }
+                $0.value = mergeTask
+            }.onCellSelection() { cell, row in
+                self.taskIndex = row.indexPath!.row
+                self.openTask()
+                cell.cellResignFirstResponder()
+            }, at: mvs.count - 1)
+            
+            Analytics.logEvent("new_task", parameters: [
+                "task_name": mergeTask.name ?? "name" as NSObject,
+                "task_type": mergeTask.activityType ?? "basic" as NSObject
+            ])
+            
+            taskList.append(mergeTask)
             updateLists(type: "container")
         }
     }
@@ -290,64 +625,597 @@ extension GoalViewController: ChooseTransactionDelegate {
 
 extension GoalViewController: UpdateWorkoutDelegate {
     func updateWorkout(workout: Workout) {
-        var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
-        if workout.name != "Name" {
-            if healthList.indices.contains(healthIndex) {
-                healthList[healthIndex].workout = workout
-            } else {
-                var health = HealthContainer()
-                health.workout = workout
-                healthList.append(health)
+        if workout.name != "Name", let checkRow: CheckRow = self.form.rowBy(tag: "Completed"), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On"), let goal = self.task.goal {
+            if goal.metric == .workout, let metricRow: LabelRow = form.rowBy(tag: "Metric") {
+                if goal.unit == .count {
+                    var goalCurrentNumber = goal.currentNumber ?? 0
+                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumber = 1
+                    switch goal.metricRelationship ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricRow.value = self.task.goal?.cellDescriptionFirst
+                    metricRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if goal.unit == .minutes, let startDate = workout.startDateTime?.localTime, let endDate = workout.endDateTime?.localTime {
+                    var goalCurrentNumber = goal.currentNumber ?? 0
+                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumber = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+                    switch goal.metricRelationship ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricRow.value = self.task.goal?.cellDescriptionFirst
+                    metricRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if goal.unit == .calories, let calories = workout.totalEnergyBurned {
+                    var goalCurrentNumber = goal.currentNumber ?? 0
+                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumber = calories
+                    switch goal.metricRelationship ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricRow.value = self.task.goal?.cellDescriptionFirst
+                    metricRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                }
+            } else if goal.metricSecond == .workout, let metricSecondRow: LabelRow = form.rowBy(tag: "secondMetric") {
+                if goal.unitSecond == .count {
+                    let goalCurrentNumber = goal.currentNumber ?? 0
+                    var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumberSecond = 1
+                    switch goal.metricRelationshipSecond ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                    metricSecondRow.updateCell()
+
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if goal.unitSecond == .minutes, let startDate = workout.startDateTime?.localTime, let endDate = workout.endDateTime?.localTime {
+                    let goalCurrentNumber = goal.currentNumber ?? 0
+                    var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumberSecond = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+                    switch goal.metricRelationshipSecond ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                    metricSecondRow.updateCell()
+
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if goal.unitSecond == .calories, let calories = workout.totalEnergyBurned {
+                    let goalCurrentNumber = goal.currentNumber ?? 0
+                    var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumberSecond = calories
+                    switch goal.metricRelationshipSecond ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                    metricSecondRow.updateCell()
+
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                }
             }
-            if mvs.allRows.count - 1 == healthIndex {
-                mvs.insert(HealthRow() {
-                    $0.value = healthList[healthIndex]
-                    }.onCellSelection() { cell, row in
-                        self.healthIndex = row.indexPath!.row
-                        self.openHealth()
-                        cell.cellResignFirstResponder()
-                }, at: healthIndex)
-            } else {
-                let row = mvs.allRows[healthIndex]
-                row.baseValue = healthList[healthIndex]
-                row.updateCell()
-            }
-            updateLists(type: "container")
-        }
-        else if mvs.allRows.count - 1 > healthIndex {
-            mvs.remove(at: healthIndex)
         }
     }
 }
 
 extension GoalViewController: UpdateMindfulnessDelegate {
     func updateMindfulness(mindfulness: Mindfulness) {
-        var mvs = self.form.sectionBy(tag: "Health") as! MultivaluedSection
-        if mindfulness.name != "Name" {
-            if healthList.indices.contains(healthIndex) {
-                healthList[healthIndex].mindfulness = mindfulness
-            } else {
-                var health = HealthContainer()
-                health.mindfulness = mindfulness
-                healthList.append(health)
+        if mindfulness.name != "Name", let checkRow: CheckRow = self.form.rowBy(tag: "Completed"), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On"), let goal = self.task.goal {
+            if goal.metric == .mindfulness, let metricRow: LabelRow = form.rowBy(tag: "Metric") {
+                if goal.unit == .count {
+                    var goalCurrentNumber = goal.currentNumber ?? 0
+                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumber = 1
+                    switch goal.metricRelationship ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricRow.value = self.task.goal?.cellDescriptionFirst
+                    metricRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if goal.unit == .minutes, let startDate = mindfulness.startDateTime?.localTime, let endDate = mindfulness.endDateTime?.localTime {
+                    var goalCurrentNumber = goal.currentNumber ?? 0
+                    let goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumber = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+                    switch goal.metricRelationship ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricRow.value = self.task.goal?.cellDescriptionFirst
+                    metricRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                }
+                
+            } else if goal.metricSecond == .mindfulness, let metricSecondRow: LabelRow = form.rowBy(tag: "secondMetric") {
+                if goal.unitSecond == .count {
+                    let goalCurrentNumber = goal.currentNumber ?? 0
+                    var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumberSecond = 1
+                    switch goal.metricRelationshipSecond ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                    metricSecondRow.updateCell()
+                    
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                } else if goal.unitSecond == .minutes, let startDate = mindfulness.startDateTime?.localTime, let endDate = mindfulness.endDateTime?.localTime {
+                    let goalCurrentNumber = goal.currentNumber ?? 0
+                    var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+                    var complete = false
+                    
+                    goalCurrentNumberSecond = (endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / 60
+                    switch goal.metricRelationshipSecond ?? .equalMore {
+                    case .equalMore:
+                        complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                    case .equalLess:
+                        complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                    case .or, .and, .equal:
+                        break
+                    }
+                    
+                    self.task.isCompleted = complete
+                    self.task.goal?.currentNumber = goalCurrentNumber
+                    self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+                    
+                    checkRow.value = complete
+                    checkRow.updateCell()
+                    
+                    metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+                    metricSecondRow.updateCell()
+
+                    if complete {
+                        checkRow.cell.tintAdjustmentMode = .automatic
+                        
+                        let original = Date()
+                        let updateDate = Date(timeIntervalSinceReferenceDate:
+                                                (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                        completedRow.value = updateDate
+                        completedRow.updateCell()
+                        completedRow.hidden = false
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+                    } else {
+                        checkRow.cell.tintAdjustmentMode = .dimmed
+                        
+                        completedRow.value = nil
+                        completedRow.updateCell()
+                        completedRow.hidden = true
+                        completedRow.evaluateHidden()
+                        
+                        self.task.completedDate = nil
+                    }
+                    
+                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+                    updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
+                }
             }
-            if mvs.allRows.count - 1 == healthIndex {
-                mvs.insert(HealthRow() {
-                    $0.value = healthList[healthIndex]
-                    }.onCellSelection() { cell, row in
-                        self.healthIndex = row.indexPath!.row
-                        self.openHealth()
-                        cell.cellResignFirstResponder()
-                }, at: healthIndex)
-            } else {
-                let row = mvs.allRows[healthIndex]
-                row.baseValue = healthList[healthIndex]
-                row.updateCell()
-            }
-            updateLists(type: "container")
         }
-        else if mvs.allRows.count - 1 > healthIndex {
-            mvs.remove(at: healthIndex)
+    }
+}
+
+extension GoalViewController: UpdateMoodDelegate {
+    func updateMood(mood: Mood) {
+        if mood.mood != nil, let checkRow: CheckRow = self.form.rowBy(tag: "Completed"), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On"), let metricRow: LabelRow = form.rowBy(tag: "Metric"), let metricSecondRow: LabelRow = form.rowBy(tag: "secondMetric"), let goal = self.task.goal {
+            var goalCurrentNumber = goal.currentNumber ?? 0
+            var goalCurrentNumberSecond = goal.currentNumberSecond ?? 0
+            var complete = false
+            
+            if goal.metric == .mood {
+                goalCurrentNumber = 1
+                switch goal.metricRelationship ?? .equalMore {
+                case .equalMore:
+                    complete = goalCurrentNumber >= goal.targetNumber ?? 0
+                case .equalLess:
+                    complete = goalCurrentNumber <= goal.targetNumber ?? 0
+                case .or, .and, .equal:
+                    break
+                }
+                
+            } else if goal.metricSecond == .mood {
+                goalCurrentNumberSecond = 1
+                switch goal.metricRelationshipSecond ?? .equalMore {
+                case .equalMore:
+                    complete = goalCurrentNumberSecond >= goal.targetNumberSecond ?? 0
+                case .equalLess:
+                    complete = goalCurrentNumberSecond <= goal.targetNumberSecond ?? 0
+                case .or, .and, .equal:
+                    break
+                }
+            }
+            
+            self.task.isCompleted = complete
+            self.task.goal?.currentNumber = goalCurrentNumber
+            self.task.goal?.currentNumberSecond = goalCurrentNumberSecond
+            
+            checkRow.value = complete
+            checkRow.updateCell()
+            
+            metricRow.value = self.task.goal?.cellDescriptionFirst
+            metricRow.updateCell()
+            
+            metricSecondRow.value = self.task.goal?.cellDescriptionSecond
+            metricSecondRow.updateCell()
+
+            if complete {
+                checkRow.cell.tintAdjustmentMode = .automatic
+                
+                let original = Date()
+                let updateDate = Date(timeIntervalSinceReferenceDate:
+                                        (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                completedRow.value = updateDate
+                completedRow.updateCell()
+                completedRow.hidden = false
+                completedRow.evaluateHidden()
+                
+                self.task.completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+            } else {
+                checkRow.cell.tintAdjustmentMode = .dimmed
+                
+                completedRow.value = nil
+                completedRow.updateCell()
+                completedRow.hidden = true
+                completedRow.evaluateHidden()
+                
+                self.task.completedDate = nil
+            }
+            
+            let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
+            updateTask.updateCompletion(isComplete: complete, completeUpdatedByUser: false, goalCurrentNumber: goalCurrentNumber as NSNumber, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber)
         }
     }
 }
@@ -410,5 +1278,24 @@ extension GoalViewController: UpdateTagsDelegate {
         task.tags = tags
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(["tags": tags as AnyObject])
+    }
+}
+
+extension GoalViewController: UpdateTaskCellDelegate {
+    func updateCompletion(task: Activity) {
+        if let index = taskList.firstIndex(where: {$0.activityID == task.activityID} ) {
+            taskList[index].isCompleted = task.isCompleted ?? false
+            if (taskList[index].isCompleted ?? false) {
+                let original = Date()
+                let updateDate = Date(timeIntervalSinceReferenceDate:
+                                    (original.timeIntervalSinceReferenceDate / 300.0).rounded(.toNearestOrEven) * 300.0)
+                taskList[index].completedDate = NSNumber(value: Int((updateDate).timeIntervalSince1970))
+            } else {
+                taskList[index].completedDate = nil
+            }
+            
+            let updateTask = ActivityActions(activity: taskList[index], active: true, selectedFalconUsers: [])
+            updateTask.updateCompletion(isComplete: taskList[index].isCompleted ?? false, completeUpdatedByUser: taskList[index].isCompleted ?? false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
+        }
     }
 }

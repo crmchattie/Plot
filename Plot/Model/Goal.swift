@@ -1521,6 +1521,87 @@ enum GoalMetric: String, Codable, CaseIterable {
             return .periodOfTime
         }
     }
+    
+    var canBeUpdatedByUser: Bool {
+        switch self {
+        case .events:
+            return true
+        case .tasks:
+            return true
+        case .financialTransactions:
+            return false
+        case .financialAccounts:
+            return false
+        case .workout:
+            return true
+        case .mindfulness:
+            return true
+        case .sleep:
+            return false
+        case .steps:
+            return false
+        case .flightsClimbed:
+            return false
+        case .activeCalories:
+            return false
+        case .mood:
+            return true
+        }
+    }
+    
+    var alertTitle: String {
+        switch self {
+        case .events:
+            return "New Event"
+        case .tasks:
+            return "New Task"
+        case .financialTransactions:
+            return "New Transaction"
+        case .financialAccounts:
+            return ""
+        case .workout:
+            return "New Workout"
+        case .mindfulness:
+            return "New Mindfulness"
+        case .sleep:
+            return ""
+        case .steps:
+            return ""
+        case .flightsClimbed:
+            return ""
+        case .activeCalories:
+            return ""
+        case .mood:
+            return "New Mood"
+        }
+    }
+    
+    var objectType: ObjectType? {
+        switch self {
+        case .events:
+            return .event
+        case .tasks:
+            return .task
+        case .financialTransactions:
+            return .transaction
+        case .financialAccounts:
+            return .account
+        case .workout:
+            return .workout
+        case .mindfulness:
+            return .mindfulness
+        case .sleep:
+            return nil
+        case .steps:
+            return nil
+        case .flightsClimbed:
+            return nil
+        case .activeCalories:
+            return nil
+        case .mood:
+            return .mood
+        }
+    }
 }
 
 enum GoalSubMetric: String, Codable, CaseIterable {

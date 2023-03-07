@@ -267,6 +267,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 }
                 DispatchQueue.main.async {
                     self.setupData()
+                    self.networkController.checkGoals {}
                 }
             }
         })
@@ -289,6 +290,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 }
                 DispatchQueue.main.async {
                     self.setupData()
+                    self.networkController.checkGoals {}
                 }
             }
         })
@@ -304,6 +306,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         self.grabHealthItems() {
             DispatchQueue.main.async {
                 self.setupData()
+                self.networkController.checkGoals {}
             }
         }
     }
@@ -315,6 +318,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                 self.financeGroups = groups
                 DispatchQueue.main.async {
                     self.setupData()
+                    self.networkController.checkGoals {}
                 }
             }
         }
@@ -709,6 +713,39 @@ extension MasterActivityContainerController: GIDSignInDelegate {
 }
 
 // MARK: - ActivitiesControllerCellDelegate
+extension MasterActivityContainerController: UpdateCompletionDelegate {
+    func updateCompletion(task: Activity) {
+        if task.isGoal ?? false, let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber {
+            if let metricSecond = goal.metricSecond, metricSecond.canBeUpdatedByUser, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
+                if metric.canBeUpdatedByUser {
+                    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                    
+                    alert.addAction(UIAlertAction(title: metric.alertTitle, style: .default, handler: { (_) in
+                        self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: metricSecond.alertTitle, style: .default, handler: { (_) in
+                        self.newMetric(task: task, metric: metricSecond, unit: unitSecond, target: targetSecond, submetric: goal.submetricSecond, option: goal.optionSecond?.first)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                        print("User click Dismiss button")
+                    }))
+                    
+                    self.present(alert, animated: true, completion: {
+                        print("completion block")
+                    })
+                } else {
+                    self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first)
+                }
+            } else if metric.canBeUpdatedByUser {
+                self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first)
+            } else {
+                basicAlert(title: basicErrorTitleForAlert, message: goalCannotBeUpdatedByUserMessage, controller: self.navigationController?.presentingViewController)
+            }
+        }
+    }
+}
 
 extension MasterActivityContainerController: UpdateInvitationDelegate {
     func updateInvitation(invitation: Invitation) {

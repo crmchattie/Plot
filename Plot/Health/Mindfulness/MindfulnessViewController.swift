@@ -86,14 +86,15 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
                     mindfulness.id = ID
                 } else {
                     mindfulness = Mindfulness(id: ID, name: "Name", admin: currentUserID, lastModifiedDate: Date(), createdDate: Date(), startDateTime: nil, endDateTime: nil, user_created: true, directAssociation: true, directAssociationType: .event)
-                    
                     //need to fix; sloppy code that is used to stop an event from being created
-                    if let container = container {
-                        mindfulness.containerID = container.id
-                    }
+                }
+                if let container = container {
+                    mindfulness.containerID = container.id
                 }
             }
         }
+        
+        print(mindfulness)
         
         configureTableView()
         setupRightBarButton()
@@ -147,7 +148,7 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
         } else if delegate != nil {
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             navigationItem.rightBarButtonItem = plusBarButton
-        } else if mindfulness.user_created ?? false {
+        } else {
             let dotsImage = UIImage(named: "dots")
             let plusBarButton =  UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(create))
             let dotsBarButton = UIBarButtonItem(image: dotsImage, style: .plain, target: self, action: #selector(goToExtras))

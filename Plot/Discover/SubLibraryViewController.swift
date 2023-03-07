@@ -154,6 +154,12 @@ class SubLibraryViewController: UICollectionViewController, UICollectionViewDele
                 print("subtask")
             case .schedule:
                 print("schedule")
+            case .mood:
+                print("mood")
+            case .transaction:
+                print("transaction")
+            case .account:
+                print("account")
             }
         }
     }

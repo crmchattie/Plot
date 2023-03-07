@@ -99,6 +99,36 @@ enum ActivityCategory: String, Codable, CaseIterable {
         }
     }
     
+    var subcategory: ActivitySubcategory {
+        switch self {
+        case .family:
+            return ActivitySubcategory.family
+        case .finances:
+            return ActivitySubcategory.finances
+        case .health:
+            return ActivitySubcategory.health
+        case .leisure:
+            return ActivitySubcategory.leisure
+        case .meal:
+            return ActivitySubcategory.meal
+        case .personal:
+            return ActivitySubcategory.personal
+        case .school:
+            return ActivitySubcategory.school
+        case .social:
+            return ActivitySubcategory.social
+        case .todo:
+            return ActivitySubcategory.todo
+        case .work:
+            return ActivitySubcategory.work
+        case .uncategorized:
+            return ActivitySubcategory.uncategorized
+        case .notApplicable:
+            return ActivitySubcategory.notApplicable
+        }
+    }
+
+    
     // MARK: - Utility
     static func categorize(_ activity: Activity) -> ActivityCategory {
         let text = "\(activity.name?.lowercased() ?? "") \(activity.notes?.lowercased() ?? "") \(activity.activityDescription?.lowercased() ?? "")"

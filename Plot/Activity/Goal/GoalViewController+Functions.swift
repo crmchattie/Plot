@@ -940,6 +940,38 @@ extension GoalViewController {
     
     }
     
+    func updateGoalCompletion(goal: Goal) {
+        if let task = task, let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber {
+            if let metricSecond = goal.metricSecond, metricSecond.canBeUpdatedByUser, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
+                if metric.canBeUpdatedByUser {
+                    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                    
+                    alert.addAction(UIAlertAction(title: metric.alertTitle, style: .default, handler: { (_) in
+                        self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first, updateActivityDelegate: self, updateTaskDelegate: self, updateTransactionDelegate: self, updateWorkoutDelegate: self, updateMindfulnessDelegate: self, updateMoodDelegate: self)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: metricSecond.alertTitle, style: .default, handler: { (_) in
+                        self.newMetric(task: task, metric: metricSecond, unit: unitSecond, target: targetSecond, submetric: goal.submetricSecond, option: goal.optionSecond?.first, updateActivityDelegate: self, updateTaskDelegate: self, updateTransactionDelegate: self, updateWorkoutDelegate: self, updateMindfulnessDelegate: self, updateMoodDelegate: self)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                        print("User click Dismiss button")
+                    }))
+                    
+                    self.present(alert, animated: true, completion: {
+                        print("completion block")
+                    })
+                } else {
+                    self.newMetric(task: task, metric: metricSecond, unit: unitSecond, target: targetSecond, submetric: goal.submetricSecond, option: goal.optionSecond?.first, updateActivityDelegate: self, updateTaskDelegate: self, updateTransactionDelegate: self, updateWorkoutDelegate: self, updateMindfulnessDelegate: self, updateMoodDelegate: self)
+                }
+            } else if metric.canBeUpdatedByUser {
+                self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first, updateActivityDelegate: self, updateTaskDelegate: self, updateTransactionDelegate: self, updateWorkoutDelegate: self, updateMindfulnessDelegate: self, updateMoodDelegate: self)
+            } else {
+                basicAlert(title: basicErrorTitleForAlert, message: goalCannotBeUpdatedByUserMessage, controller: self.navigationController?.presentingViewController)
+            }
+        }
+    }
+    
     func openEvent() {
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
@@ -969,6 +1001,42 @@ extension GoalViewController {
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
                 if let _: ScheduleRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Events") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+            }))
+            self.present(alert, animated: true)
+        }
+    }
+    
+    func openTask() {
+        guard currentReachabilityStatus != .notReachable else {
+            basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: noInternetError, controller: self)
+            return
+        }
+        if taskList.indices.contains(taskIndex) {
+            self.showTaskDetailPush(task: taskList[taskIndex], updateDiscoverDelegate: nil, delegate: self, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil, startDateTime: nil, endDateTime: nil)
+        } else {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "New Task", style: .default, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+                if let container = self.container {
+                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.task, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: container, list: nil, startDateTime: nil, endDateTime: nil)
+                } else {
+                    let containerID = Database.database().reference().child(containerEntity).childByAutoId().key ?? ""
+                    self.container = Container(id: containerID, activityIDs: [self.activityID], taskIDs: self.taskList.map({$0.activityID ?? ""}), workoutIDs: self.healthList.filter({ $0.workout != nil }).map({$0.ID}), mindfulnessIDs: self.healthList.filter({ $0.mindfulness != nil }).map({$0.ID}), mealIDs: nil, transactionIDs: self.purchaseList.map({$0.guid}), participantsIDs: self.task.participantsIDs)
+                    self.showTaskDetailPush(task: nil, updateDiscoverDelegate: nil, delegate: self, event: self.task, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: self.selectedFalconUsers, container: self.container, list: nil, startDateTime: nil, endDateTime: nil)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Existing Task", style: .default, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
+                    mvs.remove(at: mvs.count - 2)
+                }
+                self.showChooseTaskDetailPush(needDelegate: true, movingBackwards: true, delegate: self, tasks: self.tasks, existingTasks: self.taskList)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                if let _: SubtaskRow = self.form.rowBy(tag: "label"), let mvs = self.form.sectionBy(tag: "Tasks") as? MultivaluedSection {
                     mvs.remove(at: mvs.count - 2)
                 }
             }))

@@ -72,9 +72,9 @@ class NetworkController {
             self.checkGoalsForCompletion() {
                 print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
+                self.isRunning = false
+                completion()
             }
-            self.isRunning = false
-            completion()
         }
     }
     
@@ -124,7 +124,25 @@ class NetworkController {
             self.checkGoalsForCompletion() {
                 print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
+                self.isRunning = false
+                completion()
             }
+        }
+    }
+    
+    func checkGoals(_ completion: @escaping () -> Void) {
+        guard !isRunning else {
+            completion()
+            return
+        }
+                
+        isRunning = true
+        hasLoadedListGoalActivities = false
+        
+        print("checkGoalsForCompletion")
+        self.checkGoalsForCompletion() {
+            print("done checkGoalsForCompletion")
+            self.hasLoadedListGoalActivities = true
             self.isRunning = false
             completion()
         }

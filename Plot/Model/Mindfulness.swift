@@ -58,8 +58,12 @@ struct Mindfulness: Codable, Equatable, Hashable {
     init(fromTemplate template: Template) {
         self.id = UUID().uuidString
         self.name = template.name
+        self.createdDate = Date()
+        self.startDateTime = template.getStartDate()
+        self.endDateTime = template.getEndDate()
         self.user_created = true
         self.directAssociation = true
+        self.directAssociationType = .event
     }
 } 
 

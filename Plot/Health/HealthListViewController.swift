@@ -28,6 +28,9 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     var mindfulness: [Mindfulness] {
         return networkController.healthService.mindfulnesses
     }
+    var moods: [Mood] {
+        return networkController.healthService.moods
+    }
     
     var healthMetricSections = [HealthMetricCategory]()
     var healthMetrics = [HealthMetricCategory: [AnyHashable]]()
@@ -73,7 +76,13 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func setupData() {
         filteredHealthMetricSections = healthMetricSections
-        filteredHealthMetrics = healthMetrics
+        if healthMetrics[.workoutsList] != nil {
+            filteredHealthMetrics[.workoutsList] = workouts
+        } else if healthMetrics[.mindfulnessList] != nil {
+            filteredHealthMetrics[.mindfulnessList] = mindfulness
+        } else if healthMetrics[.moodList] != nil {
+            filteredHealthMetrics[.moodList] = moods
+        }
         
         if filteredHealthMetrics[.workoutsList] != nil {
             filters = [.search, .workoutCategory]

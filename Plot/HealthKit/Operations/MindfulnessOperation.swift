@@ -32,7 +32,7 @@ class MindfulnessOperation: AsyncOperation {
                 return
             }
             
-            let healthkitMindfulnessReference = Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey)
+            let healthkitMindfulnessReference = Database.database().reference().child(userHealthEntity).child(currentUserID).child(healthkitMindfulnessKey)
             healthkitMindfulnessReference.observeSingleEvent(of: .value) { dataSnapshot in
                 var existingMindfulnessKeys: [String: Any] = [:]
                 if dataSnapshot.exists(), let dataSnapshotValue = dataSnapshot.value as? [String: Any] {

@@ -18,7 +18,11 @@ class SubLibraryCell: UICollectionViewCell {
             if let template = template {
                 nameLabel.text = template.name
                 subLabel.text = template.object.rawValue
-                imageView.image = template.subcategory.icon.withRenderingMode(.alwaysTemplate)
+                if let subcategory = template.subcategory {
+                    imageView.image = subcategory.icon.withRenderingMode(.alwaysTemplate)
+                } else {
+                    imageView.image = ActivitySubcategory.uncategorized.icon.withRenderingMode(.alwaysTemplate)
+                }
                 imageView.tintColor = colors[intColor].withAlphaComponent(1)
                 imageView.contentMode = .scaleAspectFit
                 imageView.backgroundColor = .clear

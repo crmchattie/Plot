@@ -16,7 +16,6 @@ protocol ObjectDetailShowing: UIViewController {
 }
 
 extension ObjectDetailShowing {
-    
     func showTaskDetailPush(task: Activity?, updateDiscoverDelegate: UpdateDiscover?, delegate: UpdateTaskDelegate?, event: Activity?, transaction: Transaction?, workout: Workout?, mindfulness: Mindfulness?, template: Template?, users: [User]?, container: Container?, list: ListType?, startDateTime: Date?, endDateTime: Date?) {
         let destination = TaskViewController(networkController: networkController)
         destination.task = task
@@ -658,6 +657,66 @@ extension ObjectDetailShowing {
         let navigationViewController = UINavigationController(rootViewController: destination)
         navigationViewController.modalPresentationStyle = .fullScreen
         self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
+    func newMetric(task: Activity, metric: GoalMetric, unit: GoalUnit, target: Double, submetric: GoalSubMetric?, option: String?) {
+        guard let template = TemplateBuilder.createActivity(from: task, metric: metric, unit: unit, target: target, submetric: submetric, option: option) else {
+            return
+        }
+        switch metric {
+        case .events:
+            showEventDetailPresent(event: nil, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
+        case .tasks:
+            showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+        case .financialTransactions:
+            break
+        case .financialAccounts:
+            break
+        case .workout:
+            showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: nil, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
+        case .mindfulness:
+            showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: nil, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
+        case .sleep:
+            break
+        case .steps:
+            break
+        case .flightsClimbed:
+            break
+        case .activeCalories:
+            break
+        case .mood:
+            showMoodDetailPresent(mood: nil, updateDiscoverDelegate: nil, delegate: nil, template: template, users: nil, container: nil, movingBackwards: nil)
+        }
+    }
+    
+    func newMetric(task: Activity, metric: GoalMetric, unit: GoalUnit, target: Double, submetric: GoalSubMetric?, option: String?, updateActivityDelegate: UpdateActivityDelegate?, updateTaskDelegate: UpdateTaskDelegate?, updateTransactionDelegate: UpdateTransactionDelegate?, updateWorkoutDelegate: UpdateWorkoutDelegate?, updateMindfulnessDelegate: UpdateMindfulnessDelegate?, updateMoodDelegate: UpdateMoodDelegate?) {
+        guard let template = TemplateBuilder.createActivity(from: task, metric: metric, unit: unit, target: target, submetric: submetric, option: option) else {
+            return
+        }
+        switch metric {
+        case .events:
+            showEventDetailPresent(event: nil, updateDiscoverDelegate: nil, delegate: updateActivityDelegate, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
+        case .tasks:
+            showTaskDetailPresent(task: nil, updateDiscoverDelegate: nil, delegate: updateTaskDelegate, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: template, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+        case .financialTransactions:
+            break
+        case .financialAccounts:
+            break
+        case .workout:
+            showWorkoutDetailPresent(workout: nil, updateDiscoverDelegate: nil, delegate: updateWorkoutDelegate, template: template, users: nil, container: nil, movingBackwards: nil)
+        case .mindfulness:
+            showMindfulnessDetailPresent(mindfulness: nil, updateDiscoverDelegate: nil, delegate: updateMindfulnessDelegate, template: template, users: nil, container: nil, movingBackwards: nil)
+        case .sleep:
+            break
+        case .steps:
+            break
+        case .flightsClimbed:
+            break
+        case .activeCalories:
+            break
+        case .mood:
+            showMoodDetailPresent(mood: nil, updateDiscoverDelegate: nil, delegate: updateMoodDelegate, template: template, users: nil, container: nil, movingBackwards: nil)
+        }
     }
     
     func openNotification(forNotification notification: PLNotification) {

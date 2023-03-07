@@ -404,6 +404,7 @@ extension GoalListViewController: UITableViewDataSource, UITableViewDelegate {
                     cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
                 }
                 cell.configureCell(for: indexPath, task: goal)
+                cell.updateCompletionDelegate = self
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
@@ -418,6 +419,7 @@ extension GoalListViewController: UITableViewDataSource, UITableViewDelegate {
                 } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
                     cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
                 }
+                cell.updateCompletionDelegate = self
                 cell.configureCell(for: indexPath, task: goal)
                 return cell
             } else {
@@ -605,6 +607,40 @@ extension GoalListViewController { /* hiding keyboard */
         self.searchBar?.endEditing(true)
         if let cancelButton : UIButton = searchBar.value(forKey: "cancelButton") as? UIButton {
             cancelButton.isEnabled = true
+        }
+    }
+}
+
+extension GoalListViewController: UpdateCompletionDelegate {
+    func updateCompletion(task: Activity) {
+        if task.isGoal ?? false, let goal = task.goal, let metric = goal.metric, let unit = goal.unit, let target = goal.targetNumber {
+            if let metricSecond = goal.metricSecond, metricSecond.canBeUpdatedByUser, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
+                if metric.canBeUpdatedByUser {
+                    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                    
+                    alert.addAction(UIAlertAction(title: metric.alertTitle, style: .default, handler: { (_) in
+                        self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: metricSecond.alertTitle, style: .default, handler: { (_) in
+                        self.newMetric(task: task, metric: metricSecond, unit: unitSecond, target: targetSecond, submetric: goal.submetricSecond, option: goal.optionSecond?.first)
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+                        print("User click Dismiss button")
+                    }))
+                    
+                    self.present(alert, animated: true, completion: {
+                        print("completion block")
+                    })
+                } else {
+                    self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first)
+                }
+            } else if metric.canBeUpdatedByUser {
+                self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first)
+            } else {
+                basicAlert(title: basicErrorTitleForAlert, message: goalCannotBeUpdatedByUserMessage, controller: self.navigationController?.presentingViewController)
+            }
         }
     }
 }

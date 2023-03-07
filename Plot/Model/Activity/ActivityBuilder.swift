@@ -166,8 +166,8 @@ class EventBuilder {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = template.name
         activity.isEvent = true
-        activity.category = template.category.rawValue
-        activity.subcategory = template.subcategory.rawValue
+        activity.category = template.category?.rawValue ?? ActivityCategory.uncategorized.rawValue
+        activity.subcategory = template.subcategory?.rawValue ?? ActivitySubcategory.uncategorized.rawValue
         activity.activityDescription = template.description
         
         if let startDate = template.getStartDate(), let endDate = template.getEndDate() {
@@ -202,8 +202,8 @@ class EventBuilder {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = subtemplate.name
         activity.isSchedule = true
-        activity.category = subtemplate.category.rawValue
-        activity.subcategory = subtemplate.subcategory.rawValue
+        activity.category = subtemplate.category?.rawValue ?? ActivityCategory.uncategorized.rawValue
+        activity.subcategory = subtemplate.subcategory?.rawValue ?? ActivitySubcategory.uncategorized.rawValue
         activity.activityDescription = subtemplate.description
         activity.startTimeZone = TimeZone.current.identifier
         activity.endTimeZone = TimeZone.current.identifier
@@ -436,12 +436,16 @@ class TaskBuilder {
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = template.name
         activity.isTask = true
-        activity.category = template.category.rawValue
-        activity.subcategory = template.subcategory.rawValue
+        activity.category = template.category?.rawValue ?? ActivityCategory.uncategorized.rawValue
+        activity.subcategory = template.subcategory?.rawValue ?? ActivitySubcategory.uncategorized.rawValue
         activity.activityDescription = template.description
+        activity.isCompleted = template.isCompleted
         
         if let endDate = template.getEndDate() {
             activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
+            if template.isCompleted ?? false {
+                activity.completedDate = NSNumber(value: Int(endDate.timeIntervalSince1970))
+            }
             if let frequency = template.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
                 var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
                 recurrenceRule.startDate = endDate
@@ -468,11 +472,15 @@ class TaskBuilder {
 
         let activity = Activity(dictionary: ["activityID": activityID as AnyObject])
         activity.name = subtemplate.name
-        activity.category = subtemplate.category.rawValue
-        activity.subcategory = subtemplate.subcategory.rawValue
+        activity.category = subtemplate.category?.rawValue ?? ActivityCategory.uncategorized.rawValue
+        activity.subcategory = subtemplate.subcategory?.rawValue ?? ActivitySubcategory.uncategorized.rawValue
         activity.activityDescription = subtemplate.description
+        activity.isCompleted = subtemplate.isCompleted
         if let endDate = subtemplate.getEndDate() {
             activity.endDateTime = NSNumber(value: Int(endDate.timeIntervalSince1970))
+            if subtemplate.isCompleted ?? false {
+                activity.completedDate = NSNumber(value: Int(endDate.timeIntervalSince1970))
+            }
         }
         activity.createdDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
         activity.lastModifiedDate = NSNumber(value: Int((Date()).timeIntervalSince1970))
@@ -659,10 +667,7 @@ class TaskBuilder {
                     activity.hasDeadlineTime = false
                     activity.participantsIDs = transaction.participantsIDs
                     activity.containerID = transaction.containerID
-                    print(end)
-                    print(end.timeIntervalSinceNow.sign)
                     if end.timeIntervalSinceNow.sign == .minus {
-                        print("task isCompleted via transaction")
                         activity.isCompleted = true
                         activity.completedDate = NSNumber(value: Int((end).timeIntervalSince1970))
                     }
@@ -782,8 +787,8 @@ class TaskBuilder {
                     activity.listColor = list.color
                     activity.name = template.name
                     activity.isTask = true
-                    activity.category = template.category.rawValue
-                    activity.subcategory = template.subcategory.rawValue
+                    activity.category = template.category?.rawValue ?? ActivityCategory.uncategorized.rawValue
+                    activity.subcategory = template.subcategory?.rawValue ?? ActivitySubcategory.uncategorized.rawValue
                     activity.activityDescription = template.description
                     
                     if let endDate = template.getEndDate() {

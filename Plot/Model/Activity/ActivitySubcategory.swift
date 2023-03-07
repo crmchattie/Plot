@@ -160,6 +160,87 @@ enum ActivitySubcategory: String, Codable, CaseIterable {
         case .therapy: return "personal"
         }
     }
+    
+    var category: ActivityCategory {
+        switch self {
+        case .bills:
+            return ActivityCategory.finances
+        case .car:
+            return ActivityCategory.todo
+        case .chores:
+            return ActivityCategory.todo
+        case .doctorGeneral:
+            return ActivityCategory.health
+        case .doctorDentist:
+            return ActivityCategory.health
+        case .doctorEye:
+            return ActivityCategory.health
+        case .doctorSkin:
+            return ActivityCategory.health
+        case .entertainment:
+            return ActivityCategory.leisure
+        case .errand:
+            return ActivityCategory.todo
+        case .family:
+            return ActivityCategory.family
+        case .finances:
+            return ActivityCategory.finances
+        case .health:
+            return ActivityCategory.health
+        case .home:
+            return ActivityCategory.family
+        case .hygiene:
+            return ActivityCategory.health
+        case .investments:
+            return ActivityCategory.finances
+        case .kids:
+            return ActivityCategory.family
+        case .leisure:
+            return ActivityCategory.leisure
+        case .meal:
+            return ActivityCategory.meal
+        case .mindfulness:
+            return ActivityCategory.health
+        case .moving:
+            return ActivityCategory.todo
+        case .personal:
+            return ActivityCategory.personal
+        case .pets:
+            return ActivityCategory.family
+        case .income:
+            return ActivityCategory.finances
+        case .school:
+            return ActivityCategory.school
+        case .shopping:
+            return ActivityCategory.leisure
+        case .skill:
+            return ActivityCategory.todo
+        case .sleep:
+            return ActivityCategory.health
+        case .social:
+            return ActivityCategory.social
+        case .spending:
+            return ActivityCategory.finances
+        case .timeOff:
+            return ActivityCategory.leisure
+        case .todo:
+            return ActivityCategory.todo
+        case .travel:
+            return ActivityCategory.leisure
+        case .therapy:
+            return ActivityCategory.health
+        case .wedding:
+            return ActivityCategory.social
+        case .work:
+            return ActivityCategory.work
+        case .workout:
+            return ActivityCategory.health
+        case .uncategorized:
+            return ActivityCategory.uncategorized
+        case .notApplicable:
+            return ActivityCategory.notApplicable
+        }
+    }
         
     // MARK: - Utility
     static func categorize(_ activity: Activity) -> ActivitySubcategory {

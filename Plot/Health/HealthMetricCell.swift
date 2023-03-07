@@ -248,7 +248,7 @@ class HealthMetricCollectionCell: BaseContainerCollectionViewCell {
         } else if let mindfulness = metric as? Mindfulness {
             titleLabel.text = mindfulness.name
             let timeAgo = NSCalendar.current.isDateInToday(mindfulness.endDateTime ?? Date()) ? "today" : timeAgoSinceDate(mindfulness.endDateTime ?? Date())
-            if let length = mindfulness.length {
+            if let length = mindfulness.length, length > 0 {
                 let total = TimeInterval(length).stringTimeShort
                 subtitleLabel.text = "\(total) \(timeAgo)"
             } else {

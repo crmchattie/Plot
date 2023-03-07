@@ -14,16 +14,18 @@ let templateEntity = "templates"
 struct Template: Codable, Equatable, Hashable {
     var name: String
     var object: ObjectType
-    var category: ActivityCategory
-    var subcategory: ActivitySubcategory
-    var type: String
+    var category: ActivityCategory?
+    var subcategory: ActivitySubcategory?
+    var type: String?
     var frequency: PlotRecurrenceFrequency?
     var interval: Int?
     var description: String?
     var order: Int?
     var mood: MoodType?
+    var isCompleted: Bool?
     var subtemplates: [Template]?
     var dateType: DateType?
+    var totalEnergyBurned: Double?
     var startYearAbsolute: Int?
     var startMonthAbsolute: Int?
     var startDayAbsolute: Int?
@@ -56,13 +58,12 @@ struct Template: Codable, Equatable, Hashable {
         switch self.dateType {
         case .absolute:
             var dateComponents = DateComponents()
-            dateComponents.timeZone = TimeZone.current
             dateComponents.year = self.startYearAbsolute ?? date.yearNumber()
             dateComponents.month = self.startMonthAbsolute ?? date.monthNumber()
             dateComponents.day = self.startDayAbsolute ?? date.dayNumber()
             dateComponents.hour = self.startHourAbsolute ?? date.hourNumber()
-            dateComponents.minute = self.startMinuteRelative ?? date.minuteNumber()
-            dateComponents.second = self.startSecondRelative ?? date.secondNumber()
+            dateComponents.minute = self.startMinuteAbsolute ?? date.minuteNumber()
+            dateComponents.second = self.startSecondAbsolute ?? date.secondNumber()
             let calendar = Calendar.current
             date = calendar.date(from: dateComponents) ?? Date()
         case .relative:
@@ -88,13 +89,12 @@ struct Template: Codable, Equatable, Hashable {
         switch self.dateType {
         case .absolute:
             var dateComponents = DateComponents()
-            dateComponents.timeZone = TimeZone.current
             dateComponents.year = self.endYearAbsolute ?? date.yearNumber()
             dateComponents.month = self.endMonthAbsolute ?? date.monthNumber()
             dateComponents.day = self.endDayAbsolute ?? date.dayNumber()
             dateComponents.hour = self.endHourAbsolute ?? date.hourNumber()
-            dateComponents.minute = self.endMinuteRelative ?? date.minuteNumber()
-            dateComponents.second = self.endSecondRelative ?? date.secondNumber()
+            dateComponents.minute = self.endMinuteAbsolute ?? date.minuteNumber()
+            dateComponents.second = self.endSecondAbsolute ?? date.secondNumber()
             let calendar = Calendar.current
             date = calendar.date(from: dateComponents) ?? Date()
         case .relative:
@@ -117,11 +117,14 @@ struct Template: Codable, Equatable, Hashable {
 enum ObjectType: String, Codable, CaseIterable {
     case event = "Event"
     case task = "Task"
+    case goal = "Goal"
     case subtask = "Subtask"
     case workout = "Workout"
     case mindfulness = "Mindfulness"
+    case mood = "Mood"
     case schedule = "Schedule"
-    case goal = "Goal"
+    case transaction = "Transaction"
+    case account = "Account"
 }
 
 enum PlotRecurrenceFrequency: String, Codable {
@@ -204,4 +207,159 @@ enum PlotRecurrenceFrequency: String, Codable {
 enum DateType: String, Codable, CaseIterable {
     case absolute = "Absolute"
     case relative = "Relative"
+}
+
+class TemplateBuilder {
+    class func createActivity(from task: Activity, metric: GoalMetric, unit: GoalUnit, target: Double, submetric: GoalSubMetric?, option: String?) -> Template? {
+        guard let name = task.name, var startDate = task.startDate, let object = metric.objectType else {
+            return nil
+        }
+        
+        var template = Template(name: name, object: object)
+        
+        switch object {
+        case .event:
+            switch submetric {
+            case .category:
+                if let option = option {
+                    template.category = ActivityCategory(rawValue: option)
+                    template.subcategory = ActivityCategory(rawValue: option)?.subcategory ?? .uncategorized
+                }
+            case .subcategory:
+                if let option = option {
+                    template.category = ActivitySubcategory(rawValue: option)?.category ?? .uncategorized
+                    template.subcategory = ActivitySubcategory(rawValue: option)
+                }
+            case .some(.none), .some(.group):
+                break
+            case nil:
+                break
+            }
+        case .task:
+            switch submetric {
+            case .category:
+                if let option = option {
+                    template.category = ActivityCategory(rawValue: option)
+                    template.subcategory = ActivityCategory(rawValue: option)?.subcategory ?? .uncategorized
+                }
+            case .subcategory:
+                if let option = option {
+                    template.category = ActivitySubcategory(rawValue: option)?.category ?? .uncategorized
+                    template.subcategory = ActivitySubcategory(rawValue: option)
+                }
+            case .some(.none), .some(.group):
+                break
+            case nil:
+                break
+            }
+        case .workout:
+            switch submetric {
+            case .category:
+                if let option = option {
+                    template.name = option
+                }
+            case .subcategory, .some(.none), .some(.group):
+                template.name = "Running"
+            case nil:
+                template.name = "Running"
+            }
+        case .mood:
+            switch submetric {
+            case .category:
+                if let option = option {
+                    template.mood = MoodType(rawValue: option)
+                }
+            case .subcategory, .some(.none), .some(.group):
+                break
+            case nil:
+                break
+            }
+        case .mindfulness, .goal, .subtask, .schedule, .transaction, .account:
+            break
+        }
+        
+        switch unit {
+        case .calories:
+            template.totalEnergyBurned = target
+            startDate = startDate.addHours(12)
+            template.dateType = .absolute
+            template.startYearAbsolute = startDate.yearNumber()
+            template.startMonthAbsolute = startDate.monthNumber()
+            template.startDayAbsolute = startDate.dayNumber()
+            template.startHourAbsolute = Date().hourNumber()
+            template.startMinuteAbsolute = Date().minuteNumber()
+            template.startSecondAbsolute = 0
+            
+            template.startYearAbsolute = startDate.yearNumber()
+            template.startMonthAbsolute = startDate.monthNumber()
+            template.startDayAbsolute = startDate.dayNumber()
+            template.startHourAbsolute = Date().hourNumber()
+            template.startMinuteAbsolute = Date().minuteNumber()
+            template.startSecondAbsolute = 0
+        case .minutes:
+            startDate = startDate.addHours(12)
+            template.dateType = .absolute
+            template.startYearAbsolute = startDate.yearNumber()
+            template.startMonthAbsolute = startDate.monthNumber()
+            template.startDayAbsolute = startDate.dayNumber()
+            template.startHourAbsolute = startDate.hourNumber()
+            template.startMinuteAbsolute = startDate.minuteNumber()
+            template.startSecondAbsolute = 0
+            
+            template.endYearAbsolute = startDate.addingTimeInterval(target * 60).yearNumber()
+            template.endMonthAbsolute = startDate.addingTimeInterval(target * 60).monthNumber()
+            template.endDayAbsolute = startDate.addingTimeInterval(target * 60).dayNumber()
+            template.endHourAbsolute = startDate.addingTimeInterval(target * 60).hourNumber()
+            template.endMinuteAbsolute = startDate.addingTimeInterval(target * 60).minuteNumber()
+            template.endSecondAbsolute = 0
+        case .hours:
+            startDate = startDate.addHours(12)
+            template.dateType = .absolute
+            template.startYearAbsolute = startDate.yearNumber()
+            template.startMonthAbsolute = startDate.monthNumber()
+            template.startDayAbsolute = startDate.dayNumber()
+            template.startHourAbsolute = startDate.hourNumber()
+            template.startMinuteAbsolute = startDate.minuteNumber()
+            template.startSecondAbsolute = 0
+            
+            template.endYearAbsolute = startDate.addHours(Int(target)).yearNumber()
+            template.endMonthAbsolute = startDate.addHours(Int(target)).monthNumber()
+            template.endDayAbsolute = startDate.addHours(Int(target)).dayNumber()
+            template.endHourAbsolute = startDate.addHours(Int(target)).hourNumber()
+            template.endMinuteAbsolute = startDate.addHours(Int(target)).minuteNumber()
+            template.endSecondAbsolute = 0
+        case .days:
+            template.dateType = .absolute
+            template.startYearAbsolute = startDate.yearNumber()
+            template.startMonthAbsolute = startDate.monthNumber()
+            template.startDayAbsolute = startDate.dayNumber()
+            template.startHourAbsolute = startDate.hourNumber()
+            template.startMinuteAbsolute = startDate.minuteNumber()
+            template.startSecondAbsolute = 0
+            
+            template.endYearAbsolute = startDate.addDays(Int(target)).yearNumber()
+            template.endMonthAbsolute = startDate.addDays(Int(target)).monthNumber()
+            template.endDayAbsolute = startDate.addDays(Int(target)).dayNumber()
+            template.endHourAbsolute = startDate.addDays(Int(target)).hourNumber()
+            template.endMinuteAbsolute = startDate.addDays(Int(target)).minuteNumber()
+            template.endSecondAbsolute = 0
+        case .count, .amount, .percent, .multiple, .level:
+            startDate = startDate.addHours(12)
+            template.dateType = .absolute
+            template.startYearAbsolute = startDate.yearNumber()
+            template.startMonthAbsolute = startDate.monthNumber()
+            template.startDayAbsolute = startDate.dayNumber()
+            template.startHourAbsolute = Date().hourNumber()
+            template.startMinuteAbsolute = Date().minuteNumber()
+            template.startSecondAbsolute = 0
+            
+            template.endYearAbsolute = startDate.yearNumber()
+            template.endMonthAbsolute = startDate.monthNumber()
+            template.endDayAbsolute = startDate.dayNumber()
+            template.endHourAbsolute = Date().hourNumber()
+            template.endMinuteAbsolute = Date().minuteNumber()
+            template.endSecondAbsolute = 0
+        }
+        return template
+    }
 }

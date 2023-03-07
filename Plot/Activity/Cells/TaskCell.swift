@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol UpdateCompletionDelegate: AnyObject {
+    func updateCompletion(task: Activity)
+}
+
 class TaskCell: UITableViewCell {
     var iconViewHeightConstraint: NSLayoutConstraint!
     var iconViewTopAnchor: NSLayoutConstraint!
@@ -18,6 +22,7 @@ class TaskCell: UITableViewCell {
     let thumbnailsCount = 8
     var thumbnails: [UIImageView] = []
     var task: Activity?
+    weak var updateCompletionDelegate: UpdateCompletionDelegate?
     
     //name of activity
     let nameLabel: UILabel = {
@@ -220,26 +225,16 @@ class TaskCell: UITableViewCell {
         guard let task = task else {
             return
         }
-
-        let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
-        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
-        var goalCurrentNumber: Double?
-        var goalCurrentNumberSecond: Double?
-        
-        if task.isGoal ?? false, let goal = task.goal {
-            if !(task.isCompleted ?? false) {
-                goalCurrentNumber = goal.currentNumber ?? 0 > goal.targetNumber ?? 0 ? goal.currentNumber ?? 0 : goal.targetNumber ?? 0
-                goalCurrentNumberSecond = goal.currentNumberSecond ?? 0 > goal.targetNumberSecond ?? 0 ? goal.currentNumberSecond ?? 0 : goal.targetNumberSecond ?? 0
-            } else {
-                goalCurrentNumber = 0
-                goalCurrentNumberSecond = 0
-            }
+        if task.isGoal ?? false, !(task.isCompleted ?? false) {
+            self.updateCompletionDelegate?.updateCompletion(task: task)
+        } else {
+            let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
+            checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
+            
+            let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+            updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: 0, goalCurrentNumberSecond: 0)
         }
-        
-        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
-        
     }
 }
 
@@ -253,6 +248,7 @@ class TaskCollectionCell: UICollectionViewCell {
     let thumbnailsCount = 8
     var thumbnails: [UIImageView] = []
     var task: Activity?
+    weak var updateCompletionDelegate: UpdateCompletionDelegate?
     
     //name of activity
     let nameLabel: UILabel = {
@@ -468,23 +464,14 @@ class TaskCollectionCell: UICollectionViewCell {
             return
         }
 
-        let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
-        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
-        
-        var goalCurrentNumber: Double?
-        var goalCurrentNumberSecond: Double?
-        
-        if task.isGoal ?? false, let goal = task.goal {
-            if !(task.isCompleted ?? false) {
-                goalCurrentNumber = goal.currentNumber ?? 0 > goal.targetNumber ?? 0 ? goal.currentNumber ?? 0 : goal.targetNumber ?? 0
-                goalCurrentNumberSecond = goal.currentNumberSecond ?? 0 > goal.targetNumberSecond ?? 0 ? goal.currentNumberSecond ?? 0 : goal.targetNumberSecond ?? 0
-            } else {
-                goalCurrentNumber = 0
-                goalCurrentNumberSecond = 0
-            }
+        if task.isGoal ?? false, !(task.isCompleted ?? false) {
+            self.updateCompletionDelegate?.updateCompletion(task: task)
+        } else {
+            let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
+            checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
+            
+            let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
+            updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: 0, goalCurrentNumberSecond: 0)
         }
-        
-        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: goalCurrentNumber as NSNumber?, goalCurrentNumberSecond: goalCurrentNumberSecond as NSNumber?)
     }
 }
