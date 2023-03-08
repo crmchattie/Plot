@@ -267,9 +267,6 @@ class HealthMetricCollectionCell: BaseContainerCollectionViewCell {
                 badgeLabel.isHidden = true
             }
         }
-        
-        
-        
     }
     
     func updateImage(_ healthMetric: HealthMetric) {

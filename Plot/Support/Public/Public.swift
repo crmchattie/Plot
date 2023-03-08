@@ -251,7 +251,7 @@ let listDeletedMessage = "List Deleted"
 let tasksDeletedMessage = "Tasks Deleted"
 let eventsDeletedMessage = "Events Deleted"
 
-let goalCannotBeUpdatedByUserMessage = "Sorry, this goal cannot be updated by the user since the underlying metric is from an external source"
+let goalCannotBeUpdatedByUserMessage = "Sorry, this cannot be updated since the underlying metric is from an external source"
 
 extension String {
     
@@ -1309,7 +1309,8 @@ extension UIViewController {
     }
 }
 
-func basicErrorAlertWithClose(title: String, message: String, controller: UIViewController) {
+func basicErrorAlertWithClose(title: String, message: String, controller: UIViewController?) {
+    guard let controller = controller else { return }
     let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
     alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.cancel, handler: nil))
     DispatchQueue.main.async {

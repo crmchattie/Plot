@@ -304,8 +304,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 }
             }.onCellSelection({ cell, row in
                 if row.value ?? false, let goal = self.task.goal {
-                    row.value = false
                     self.updateGoalCompletion(goal: goal)
+                    row.value = false
                 } else if !(row.value ?? false), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
                     row.cell.tintAdjustmentMode = .dimmed
                     completedRow.value = nil
