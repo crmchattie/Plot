@@ -967,7 +967,7 @@ extension GoalViewController {
             } else if metric.canBeUpdatedByUser {
                 self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first, updateActivityDelegate: self, updateTaskDelegate: self, updateTransactionDelegate: self, updateWorkoutDelegate: self, updateMindfulnessDelegate: self, updateMoodDelegate: self)
             } else {
-                basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: goalCannotBeUpdatedByUserMessage, controller: self)
+                basicErrorAlertWithClose(title: basicSorryTitleForAlert, message: goalCannotBeUpdatedByUserMessage, controller: self)
             }
         }
     }

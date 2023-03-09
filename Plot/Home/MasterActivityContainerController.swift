@@ -741,7 +741,7 @@ extension MasterActivityContainerController: UpdateCompletionDelegate {
             } else if metric.canBeUpdatedByUser {
                 self.newMetric(task: task, metric: metric, unit: unit, target: target, submetric: goal.submetric, option: goal.option?.first)
             } else {
-                basicErrorAlertWithClose(title: basicErrorTitleForAlert, message: goalCannotBeUpdatedByUserMessage, controller: self)
+                basicErrorAlertWithClose(title: basicSorryTitleForAlert, message: goalCannotBeUpdatedByUserMessage, controller: self)
             }
         }
     }

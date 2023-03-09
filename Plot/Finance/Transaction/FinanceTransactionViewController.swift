@@ -379,45 +379,45 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
             }
             
             //need to add change to amount or amount per rows
-            <<< IntRow("splitNumber") {
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.cell.textField?.textColor = .secondaryLabel
-                $0.title = "Split amount by"
-                $0.value = transaction.splitNumber
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textField?.textColor = .secondaryLabel
-            }.onChange { row in
-                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
-                if let value = row.value {
-                    self.transaction.splitNumber = value
-                    reference.setValue(value)
-                    if let row: DecimalRow = self.form.rowBy(tag: "Per Person Amount"), self.transaction.amount != 0, value != 0 {
-                        row.value = self.transaction.amount / Double(value)
-                        row.updateCell()
-                    }
-                } else {
-                    self.transaction.splitNumber = nil
-                    reference.removeValue()
-                }
-            }
-            
-            <<< DecimalRow("Per Person Amount") {
-                $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
-                $0.cell.backgroundColor = .secondarySystemGroupedBackground
-                $0.cell.textField?.textColor = .secondaryLabel
-                $0.title = $0.tag
-                $0.formatter = numberFormatter
-                $0.hidden = "$splitNumber == nil || $splitNumber == 0"
-                if let splitNumber = transaction.splitNumber, splitNumber != 0 {
-                    $0.value = transaction.amount / Double(splitNumber)
-                } else if let participantsIDs = transaction.participantsIDs, participantsIDs.count > 1 {
-                    $0.value = transaction.amount / Double(participantsIDs.count)
-                }
-            }.cellUpdate { cell, row in
-                cell.backgroundColor = .secondarySystemGroupedBackground
-                cell.textField?.textColor = .secondaryLabel
-            }
+//            <<< IntRow("splitNumber") {
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.cell.textField?.textColor = .secondaryLabel
+//                $0.title = "Split amount by"
+//                $0.value = transaction.splitNumber
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textField?.textColor = .secondaryLabel
+//            }.onChange { row in
+//                let reference = Database.database().reference().child(financialTransactionsEntity).child(self.transaction.guid).child("splitNumber")
+//                if let value = row.value {
+//                    self.transaction.splitNumber = value
+//                    reference.setValue(value)
+//                    if let row: DecimalRow = self.form.rowBy(tag: "Per Person Amount"), self.transaction.amount != 0, value != 0 {
+//                        row.value = self.transaction.amount / Double(value)
+//                        row.updateCell()
+//                    }
+//                } else {
+//                    self.transaction.splitNumber = nil
+//                    reference.removeValue()
+//                }
+//            }
+//
+//            <<< DecimalRow("Per Person Amount") {
+//                $0.cell.isUserInteractionEnabled = transaction.user_created ?? false
+//                $0.cell.backgroundColor = .secondarySystemGroupedBackground
+//                $0.cell.textField?.textColor = .secondaryLabel
+//                $0.title = $0.tag
+//                $0.formatter = numberFormatter
+//                $0.hidden = "$splitNumber == nil || $splitNumber == 0"
+//                if let splitNumber = transaction.splitNumber, splitNumber != 0 {
+//                    $0.value = transaction.amount / Double(splitNumber)
+//                } else if let participantsIDs = transaction.participantsIDs, participantsIDs.count > 1 {
+//                    $0.value = transaction.amount / Double(participantsIDs.count)
+//                }
+//            }.cellUpdate { cell, row in
+//                cell.backgroundColor = .secondarySystemGroupedBackground
+//                cell.textField?.textColor = .secondaryLabel
+//            }
             
             <<< TextRow("Status") {
                 $0.cell.isUserInteractionEnabled = false

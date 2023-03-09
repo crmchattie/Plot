@@ -303,18 +303,10 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                     cell.tintAdjustmentMode = .automatic
                 }
             }.onCellSelection({ cell, row in
-                if row.value ?? false, let goal = self.task.goal {
+                row.value = !(row.value ?? false)
+                row.updateCell()
+                if !(row.value ?? false), let goal = self.task.goal {
                     self.updateGoalCompletion(goal: goal)
-                    row.value = false
-                } else if !(row.value ?? false), let completedRow: DateTimeInlineRow = self.form.rowBy(tag: "Completed On") {
-                    row.cell.tintAdjustmentMode = .dimmed
-                    completedRow.value = nil
-                    completedRow.updateCell()
-                    completedRow.hidden = true
-                    completedRow.evaluateHidden()
-                    self.task.completedDate = nil
-                    let updateTask = ActivityActions(activity: self.task, active: self.active, selectedFalconUsers: self.selectedFalconUsers)
-                    updateTask.updateCompletion(isComplete: false, completeUpdatedByUser: false, goalCurrentNumber: nil, goalCurrentNumberSecond: nil)
                 }
             })
             
@@ -394,6 +386,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             row.title = row.tag
             if let task = task, let goal = task.goal, let value = goal.cellDescriptionFirst {
                 row.value = value
+            } else if let task = task, let goal = task.goal, let metric = goal.metric {
+                row.value = metric.rawValue
             }
         }.onCellSelection({ _, row in
             self.openGoal(goal: self.task.goal?.firstGoal, number: 0)
@@ -445,6 +439,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             row.title = "Second Metric"
             if let task = task, let goal = task.goal, let value = goal.cellDescriptionSecond {
                 row.value = value
+            } else if let task = task, let goal = task.goal, let metric = goal.metricSecond {
+                row.value = metric.rawValue
             }
             row.hidden = "$addSecondMetric == false"
         }.onCellSelection({ _, row in

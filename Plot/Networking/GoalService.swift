@@ -249,8 +249,8 @@ extension NetworkController {
                         case .equal, .equalMore, .equalLess:
                             break
                         }
-                        group.leave()
                     }
+                    group.leave()
                 } else {
                     switch goal.metricRelationship ?? MetricsRelationshipType.equalMore {
                     case .equalMore:

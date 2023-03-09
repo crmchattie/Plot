@@ -228,7 +228,7 @@ class TaskCell: UITableViewCell {
         
         if task.isGoal ?? false, !(task.isCompleted ?? false) {
             self.updateCompletionDelegate?.updateCompletion(task: task)
-        } else {
+        } else if !(task.isGoal ?? false) {
             let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
             checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
             
@@ -466,7 +466,7 @@ class TaskCollectionCell: UICollectionViewCell {
 
         if task.isGoal ?? false, !(task.isCompleted ?? false) {
             self.updateCompletionDelegate?.updateCompletion(task: task)
-        } else {
+        } else if !(task.isGoal ?? false) {
             let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
             checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
             

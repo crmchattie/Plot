@@ -251,7 +251,8 @@ let listDeletedMessage = "List Deleted"
 let tasksDeletedMessage = "Tasks Deleted"
 let eventsDeletedMessage = "Events Deleted"
 
-let goalCannotBeUpdatedByUserMessage = "Sorry, this cannot be updated since the underlying metric is from an external source"
+let basicSorryTitleForAlert = "Sorry"
+let goalCannotBeUpdatedByUserMessage = "This cannot be updated since the underlying metric is from an external source"
 
 extension String {
     
