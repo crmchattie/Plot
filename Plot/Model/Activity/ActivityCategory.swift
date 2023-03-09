@@ -15,7 +15,7 @@ private let keywordsMap = ["Health": ["fitness", "workout", "run", "training", "
                            "To-do": ["groceries", "to-dos", "tasks", "errand", "chore"],
                            "Work": ["meeting", "assignment", "project", "standup", "work"],
                            "School": ["class", "homework", "test"],
-                           "Social": ["party", "birthday", "wedding", "drinks", "date"],
+                           "Social": ["party", "wedding", "drinks", "date"],
                            "Family": ["family", "kids"],
                            "Personal": ["consultation", "haircut", "read", "journal"],
                            "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation", "brunch"],

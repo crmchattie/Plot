@@ -300,7 +300,7 @@ extension NetworkController {
     func checkGoal(metric: GoalMetric, submetric: GoalSubMetric?, option: [String]?, unit: GoalUnit, range: DateRange, completion: @escaping (Statistic?) -> Void) {
         switch metric {
         case .events:
-            activityDetailService.getActivityCategoriesSamples(activities: activityService.events, isEvent: true, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
+            activityDetailService.getActivityCategoriesSamples(activities: activityService.events, isEvent: true, level: submetric?.activityLevel ?? .none, options: option, range: range) { stat, activities in
                 if let stat = stat, let activities = activities {
                     var finalStat = stat
                     switch unit {
@@ -325,7 +325,7 @@ extension NetworkController {
                 
             }
         case .tasks:
-            activityDetailService.getActivityCategoriesSamples(activities: activityService.tasks, isEvent: false, level: submetric?.activityLevel ?? .none, options: nil, range: range) { stat, activities in
+            activityDetailService.getActivityCategoriesSamples(activities: activityService.tasks, isEvent: false, level: submetric?.activityLevel ?? .none, options: option, range: range) { stat, activities in
                 if let stat = stat, let activities = activities {
                     var finalStat = stat
                     switch unit {

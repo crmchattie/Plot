@@ -11,17 +11,16 @@ import UIKit
 
 let userActivitySubcategoriesEntity = "user-activities-subcategories"
 
-private let keywordsMap = ["Workout": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise"],
-                           "Mindfulness": ["mindfulness", "meditation"],
-                           "Wedding": ["wedding"],
-                           "Social": ["party", "birthday"],
-                           "Family": ["family"],
-                           "Doctor": ["appointment", "therapy", "dr", "doctor"],
+private let keywordsMap = ["Health": ["fitness", "workout", "run", "training", "cycling", "hiit", "exercise", "mindfulness", "meditation", "dr", "doctor", "therapy", "appointment"],
+                           "To-do": ["groceries", "to-dos", "tasks", "errand", "chore"],
+                           "Work": ["meeting", "assignment", "project", "standup", "work"],
+                           "School": ["class", "homework", "test"],
+                           "Social": ["party", "wedding", "drinks", "date"],
+                           "Family": ["family", "kids"],
                            "Personal": ["consultation", "haircut", "read", "journal"],
-                           "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation"],
-                           "Travel": ["trip", "vacation"],
-                           "Bills": ["bill", "payment"],
-                           "Kids": ["kids"]
+                           "Meal": ["dinner", "lunch", "meal", "breakfast", "reservation", "brunch"],
+                           "Leisure": ["vacation", "shopping", "concert", "sporting event", "museum", "movies"],
+                           "Finances": ["bill", "payment"]
 ]
 
 enum ActivitySubcategory: String, Codable, CaseIterable {

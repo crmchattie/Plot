@@ -1996,6 +1996,7 @@ enum ActivityLevel: String {
 }
 
 func activitiesData(activities: [Activity], isEvent: Bool, level: ActivityLevel, options: [String]?, start: Date, end: Date, completion: @escaping (Statistic, [Activity]) -> ()) {
+    
     switch level {
     case .none:
         activityListStats(activities: activities, isEvent: isEvent, activityCategory: nil, activitySubcategory: nil, chunkStart: start, chunkEnd: end) { (stat, activities) in
@@ -2046,21 +2047,24 @@ func activityListStats(
     
     if isEvent {
         for activity in activities {
-            guard var activityStartDate = activity.startDate,
-                  var activityEndDate = activity.endDate else {
+            guard var activityStartDate = activity.startDate?.localTime,
+                  var activityEndDate = activity.endDate?.localTime else {
                 continue
             }
+            
             
             // Skipping activities that are outside of the interest range.
             if activityStartDate >= chunkEnd || activityEndDate <= chunkStart {
                 continue
             }
             
+//            print("passed dates activities")
 //            print(chunkStart)
 //            print(chunkEnd)
-//            print("passed dates activities")
 //            print(activityStartDate)
 //            print(activityEndDate)
+//            print(activityCategory)
+//            print(activitySubcategory)
 //                    
             // Truncate events that out of the [chunkStart, chunkEnd] range.
             // Multi-day events, chunked into single day `Statistic`s are the best example.

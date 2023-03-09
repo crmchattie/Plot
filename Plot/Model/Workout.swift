@@ -117,10 +117,9 @@ enum WorkoutMeasure {
 func categorizeWorkouts(workouts: [Workout], measure: WorkoutMeasure, start: Date, end: Date, completion: @escaping ([String: Double], [Workout]) -> ()) {
     var categoryDict = [String: Double]()
     var workoutsList = [Workout]()
-    // create dateFormatter with UTC time format
     for workout in workouts {
-        guard let startDate = workout.startDateTime,
-              let endDate = workout.endDateTime else {
+        guard let startDate = workout.startDateTime?.localTime,
+              let endDate = workout.endDateTime?.localTime else {
             continue
         }
         

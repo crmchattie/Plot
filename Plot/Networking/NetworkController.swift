@@ -68,13 +68,12 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
-            completion()
-
             print("checkGoalsForCompletion")
             self.checkGoalsForCompletion() {
                 print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
                 self.isRunning = false
+                completion()
             }
         }
     }
@@ -121,13 +120,12 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
-            completion()
-
             print("checkGoalsForCompletion")
             self.checkGoalsForCompletion() {
                 print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
                 self.isRunning = false
+                completion()
             }
         }
     }

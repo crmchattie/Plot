@@ -182,7 +182,7 @@ class GeneralTabBarController: UITabBarController {
             wrapInNavigationController(analyticsController,
                                        icon: UIImage(named: "chart")!),
             wrapInNavigationController(homeController, icon: UIImage(named: "home")!),
-            wrapInNavigationController(discoverController, icon: UIImage(named: "discover")!)
+            wrapInNavigationController(discoverController, icon: UIImage(named: "plusTab")!)
         ]
         viewControllers = tabBarControllers
         selectedIndex = Tabs.home.rawValue
