@@ -121,6 +121,8 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                     completion(statistics, nil, sortedTransactions, nil)
                 }
             }
+        } else {
+            completion(nil, nil, nil, nil)
         }
     }
     
@@ -157,23 +159,25 @@ class FinanceDetailService: FinanceDetailServiceInterface {
             endDate = Date().localTime.dayAfter
         }
         
-            if financialType == .accounts, let accounts = accounts {
-                categorizeAccounts(accounts: accounts, timeSegment: segmentType, level: accountLevel, accountDetails: accountDetails, date: endDate) { accountDetailsFinal, accountDetailsDict in
-                    let accountValues = Array(Set(accountDetailsDict.values.flatMap({ $0 })))
-                    accountDetailsOverTimeChartData(accounts: accountValues, accountDetails: accountDetailsFinal, start: startDate, end: endDate, segmentType: segmentType) { (statisticDict, accountDict) in
-                        completion(statisticDict, accountDict, accountValues, nil, nil, nil, nil)
-                        
-                    }
-                }
-            } else if financialType == .transactions, let transactions = transactions {
-                categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, transactionDetails: transactionDetails, accounts: filterAccounts) { transactionsDetailsFinal, transactionsDetailsDict in
-                    let transactionValues = Array(Set(transactionsDetailsDict.values.flatMap({ $0 })))
-                    transactionDetailsOverTimeChartData(transactions: transactionValues, transactionDetails: transactionsDetailsFinal, start: startDate, end: endDate, segmentType: segmentType, accounts: filterAccounts) { (statisticDict, transactionDict) in
-                        completion(nil, nil, nil, statisticDict, transactionDict, transactionValues, nil)
-
-                    }
+        if financialType == .accounts, let accounts = accounts {
+            categorizeAccounts(accounts: accounts, timeSegment: segmentType, level: accountLevel, accountDetails: accountDetails, date: endDate) { accountDetailsFinal, accountDetailsDict in
+                let accountValues = Array(Set(accountDetailsDict.values.flatMap({ $0 })))
+                accountDetailsOverTimeChartData(accounts: accountValues, accountDetails: accountDetailsFinal, start: startDate, end: endDate, segmentType: segmentType) { (statisticDict, accountDict) in
+                    completion(statisticDict, accountDict, accountValues, nil, nil, nil, nil)
+                    
                 }
             }
+        } else if financialType == .transactions, let transactions = transactions {
+            categorizeTransactions(transactions: transactions, start: startDate, end: endDate, level: transactionLevel, transactionDetails: transactionDetails, accounts: filterAccounts) { transactionsDetailsFinal, transactionsDetailsDict in
+                let transactionValues = Array(Set(transactionsDetailsDict.values.flatMap({ $0 })))
+                transactionDetailsOverTimeChartData(transactions: transactionValues, transactionDetails: transactionsDetailsFinal, start: startDate, end: endDate, segmentType: segmentType, accounts: filterAccounts) { (statisticDict, transactionDict) in
+                    completion(nil, nil, nil, statisticDict, transactionDict, transactionValues, nil)
+
+                }
+            }
+        } else {
+            completion(nil, nil, nil, nil, nil, nil, nil)
+        }
     }
     
     private func getStatisticalSamples(
@@ -215,6 +219,8 @@ class FinanceDetailService: FinanceDetailServiceInterface {
                 }
             }
             completion(finalStat, nil, trans, nil)
+        } else {
+            completion(nil, nil, nil, nil)
         }
     }
 }

@@ -106,6 +106,15 @@ class ParticipantsFetcher: NSObject {
             group.notify(queue: .main) {
                 completion(participants)
             }
+        } else if let transaction = transaction, let id = transaction.admin {
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    completion([user])
+                }
+            })
         } else {
             let participants: [User] = []
             completion(participants)
@@ -138,6 +147,15 @@ class ParticipantsFetcher: NSObject {
             group.notify(queue: .main) {
                 completion(participants)
             }
+        } else if let account = account, let id = account.admin {
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    completion([user])
+                }
+            })
         } else {
             let participants: [User] = []
             completion(participants)
@@ -170,6 +188,15 @@ class ParticipantsFetcher: NSObject {
             group.notify(queue: .main) {
                 completion(participants)
             }
+        } else if let holding = holding, let id = holding.admin {
+            let participantReference = Database.database().reference().child("users").child(id)
+            participantReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists(), var dictionary = snapshot.value as? [String: AnyObject] {
+                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+                    let user = User(dictionary: dictionary)
+                    completion([user])
+                }
+            })
         } else {
             let participants: [User] = []
             completion(participants)

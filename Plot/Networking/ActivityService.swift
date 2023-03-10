@@ -539,6 +539,7 @@ class ActivityService {
                     }
                 }
             }
+            
             self.googleCalManager.authorizeGEvents { _ in
                 self.googleCalManager.grabCalendars() { calendars in
                     if let calendars = calendars {
