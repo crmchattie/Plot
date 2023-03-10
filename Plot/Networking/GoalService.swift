@@ -47,7 +47,7 @@ extension NetworkController {
                 continue
             }
             
-//            print("metricCheck")
+//            print("metricCheck check")
 //            print(task.name)
 //            print(task.activityID)
 //            print(metric)
@@ -64,7 +64,7 @@ extension NetworkController {
                     finalStat = stat
                 }
                 
-//                print("metricCheck")
+//                print("metricCheck done")
 //                print(task.name)
 //                print(task.activityID)
 //                print(metric)
@@ -82,7 +82,7 @@ extension NetworkController {
                             finalStatSecond = statSecond
                         }
                         
-//                        print("metricCheckSecond")
+//                        print("metricCheckSecond done")
 //                        print(task.name)
 //                        print(task.activityID)
 //                        print(metric)
@@ -504,28 +504,36 @@ extension NetworkController {
 
             }
         case .sleep:
-            if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) {
-                healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    completion(stat)
-                }
+            guard let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) else {
+                completion(nil)
+                return
+            }
+            healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
+                completion(stat)
             }
         case .steps:
-            if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .steps}) {
-                healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    completion(stat)
-                }
+            guard let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .steps}) else {
+                completion(nil)
+                return
+            }
+            healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
+                completion(stat)
             }
         case .flightsClimbed:
-            if let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .flightsClimbed}) {
-                healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    completion(stat)
-                }
+            guard let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .flightsClimbed}) else {
+                completion(nil)
+                return
+            }
+            healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
+                completion(stat)
             }
         case .activeCalories:
-            if let workoutsMetrics = healthService.healthMetrics[.workouts], let healthMetric = workoutsMetrics.first(where: {$0.type == .activeEnergy}) {
-                healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
-                    completion(stat)
-                }
+            guard let workoutsMetrics = healthService.healthMetrics[.workouts], let healthMetric = workoutsMetrics.first(where: {$0.type == .activeEnergy}) else {
+                completion(nil)
+                return
+            }
+            healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
+                completion(stat)
             }
         }
     }

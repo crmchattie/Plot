@@ -576,6 +576,24 @@ class HealthDetailService: HealthDetailServiceInterface {
                     }
                 }
             }
+        } else {
+            if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
+                let workoutActivityType = hkWorkout.workoutActivityType
+                grabWorkouts(forWorkoutActivityType: workoutActivityType.name, startDate: startDate, endDate: endDate) { [weak self] (workouts) in
+                    let stat = self?.perpareCustomStatsForWorkoutsForGoal(from: workouts, startDate: startDate)
+                    completion(stat, workouts, nil)
+                }
+            } else if case .mindfulness = healthMetricType {
+                grabMindfulness(startDate: startDate, endDate: endDate) { [weak self] (samples) in
+                    let stat = self?.perpareCustomStatsForCategorySamplesForGoal(from: samples, startDate: startDate, endDate: endDate, type: healthMetricType)
+                    completion(stat, samples, nil)
+                }
+            } else if case HealthMetricType.nutrition(let value) = healthMetric.type {
+                grabNutrition(forNutritionType: value, startDate: startDate, endDate: endDate) { [weak self] (samples) in
+                    let stats = self?.perpareCustomStatsForQuantitySamplesForGoal(from: samples, startDate: startDate, endDate: endDate, type: healthMetricType)
+                    completion(stats, samples, nil)
+                }
+            }
         }
     }
     
@@ -668,7 +686,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         return customStats
     }
     
-    private func perpareCustomStatsForQuantitySamplesForGoal(from samples: [HKQuantitySample]?, startDate: Date, endDate: Date, segmentType: TimeSegmentType, type: HealthMetricType) -> Statistic? {
+    private func perpareCustomStatsForQuantitySamplesForGoal(from samples: [HKQuantitySample]?, startDate: Date, endDate: Date, type: HealthMetricType) -> Statistic? {
         var stat = Statistic(date: startDate, value: 0)
         
         guard let samples = samples else {
