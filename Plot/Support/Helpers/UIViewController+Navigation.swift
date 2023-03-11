@@ -719,56 +719,54 @@ extension ObjectDetailShowing {
         }
     }
     
-    func openNotification(forNotification notification: PLNotification) {
-        let aps = notification.aps
-        if let ID = notification.objectID {
-            let category = aps.category
-            if category == Identifiers.eventCategory {
-                if let date = aps.date, let activity = networkController.activityService.events.first(where: { $0.instanceID == ID && Int(truncating: $0.startDateTime ?? 0) == date }) {
-                    showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
-                } else if let activity = networkController.activityService.eventsNoRepeats.first(where: { $0.activityID == ID }) {
-                    showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
-                }
-            } else if category == Identifiers.taskCategory {
-                if let date = aps.date, let activity = networkController.activityService.tasks.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
-                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                } else if let activity = networkController.activityService.tasksNoRepeats.first(where: {$0.activityID == ID }) {
-                    showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                }
-            } else if category == Identifiers.goalCategory {
-                if let date = aps.date, let activity = networkController.activityService.tasks.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
-                    showGoalDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                } else if let activity = networkController.activityService.tasksNoRepeats.first(where: {$0.activityID == ID }) {
-                    showGoalDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
-                }
-            } else if category == Identifiers.workoutCategory {
-                if let workout = networkController.healthService.workouts.first(where: {$0.id == ID }) {
-                    showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-                }
-            } else if category == Identifiers.mindfulnessCategory {
-                if let mindfulness = networkController.healthService.mindfulnesses.first(where: {$0.id == ID }) {
-                    showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-                }
-            } else if category == Identifiers.moodCategory {
-                if let mood = networkController.healthService.moods.first(where: {$0.id == ID }) {
-                    showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
-                }
-            } else if category == Identifiers.transactionCategory {
-                if let transaction = networkController.financeService.transactions.first(where: {$0.guid == ID }) {
-                    showTransactionDetailPresent(transaction: transaction, updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
-                }
-            } else if category == Identifiers.accountCategory {
-                if let account = networkController.financeService.accounts.first(where: {$0.guid == ID }) {
-                    showAccountDetailPresent(account: account, updateDiscoverDelegate: nil)
-                }
-            } else if category == Identifiers.listCategory {
-                if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.id == ID }) {
-                    showListDetailPresent(list: list, updateDiscoverDelegate: nil)
-                }
-            } else if category == Identifiers.calendarCategory {
-                if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.id == ID }) {
-                    showCalendarDetailPresent(calendar: calendar, updateDiscoverDelegate: nil)
-                }
+    func openNotification(ID: String, category: String, date: Int?) {
+        if category == Identifiers.eventCategory {
+            if let date = date, let activity = networkController.activityService.events.first(where: { $0.instanceID == ID && Int(truncating: $0.startDateTime ?? 0) == date }) {
+                showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
+            } else if let activity = networkController.activityService.eventsNoRepeats.first(where: { $0.activityID == ID }) {
+                showEventDetailPresent(event: activity, updateDiscoverDelegate: nil, delegate: nil, task: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, startDateTime: nil, endDateTime: nil)
+            }
+        } else if category == Identifiers.taskCategory {
+            if let date = date, let activity = networkController.activityService.tasks.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
+                showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            } else if let activity = networkController.activityService.tasksNoRepeats.first(where: {$0.activityID == ID }) {
+                showTaskDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            }
+        } else if category == Identifiers.goalCategory {
+            if let date = date, let activity = networkController.activityService.goals.first(where: {$0.instanceID == ID && Int(truncating: $0.startDateTime ?? 0) == date }) {
+                showGoalDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            } else if let date = date, let activity = networkController.activityService.goals.first(where: {$0.instanceID == ID && Int(truncating: $0.endDateTime ?? 0) == date }) {
+                showGoalDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            } else if let activity = networkController.activityService.goalsNoRepeats.first(where: {$0.activityID == ID }) {
+                showGoalDetailPresent(task: activity, updateDiscoverDelegate: nil, delegate: nil, event: nil, transaction: nil, workout: nil, mindfulness: nil, template: nil, users: nil, container: nil, list: nil, startDateTime: nil, endDateTime: nil)
+            }
+        } else if category == Identifiers.workoutCategory {
+            if let workout = networkController.healthService.workouts.first(where: {$0.id == ID }) {
+                showWorkoutDetailPresent(workout: workout, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+            }
+        } else if category == Identifiers.mindfulnessCategory {
+            if let mindfulness = networkController.healthService.mindfulnesses.first(where: {$0.id == ID }) {
+                showMindfulnessDetailPresent(mindfulness: mindfulness, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+            }
+        } else if category == Identifiers.moodCategory {
+            if let mood = networkController.healthService.moods.first(where: {$0.id == ID }) {
+                showMoodDetailPresent(mood: mood, updateDiscoverDelegate: nil, delegate: nil, template: nil, users: nil, container: nil, movingBackwards: nil)
+            }
+        } else if category == Identifiers.transactionCategory {
+            if let transaction = networkController.financeService.transactions.first(where: {$0.guid == ID }) {
+                showTransactionDetailPresent(transaction: transaction, updateDiscoverDelegate: nil, delegate: nil, users: nil, container: nil, movingBackwards: nil)
+            }
+        } else if category == Identifiers.accountCategory {
+            if let account = networkController.financeService.accounts.first(where: {$0.guid == ID }) {
+                showAccountDetailPresent(account: account, updateDiscoverDelegate: nil)
+            }
+        } else if category == Identifiers.listCategory {
+            if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.id == ID }) {
+                showListDetailPresent(list: list, updateDiscoverDelegate: nil)
+            }
+        } else if category == Identifiers.calendarCategory {
+            if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.id == ID }) {
+                showCalendarDetailPresent(calendar: calendar, updateDiscoverDelegate: nil)
             }
         }
     }

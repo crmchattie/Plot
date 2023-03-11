@@ -313,7 +313,10 @@ extension NotificationsViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func openNotification(notification: PLNotification) {
-        openNotification(forNotification: notification)
+        let aps = notification.aps
+        if let ID = notification.objectID {
+            openNotification(ID: ID, category: aps.category, date: aps.date)
+        }
     }
 }
 

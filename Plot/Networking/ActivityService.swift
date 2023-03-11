@@ -852,6 +852,7 @@ class ActivityService {
                 formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
                 content.subtitle = formattedDate.0
                 content.categoryIdentifier = Identifiers.eventCategory
+                content.userInfo = [PlotNotification.CodingKeys.ID.rawValue: activity.instanceID ?? activityID, PlotNotification.CodingKeys.date.rawValue: activity.finalDateTime as Any]
                 if let reminder = EventAlert(rawValue: activityReminder) {
                     let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
                     var calendar = Calendar.current
@@ -876,6 +877,7 @@ class ActivityService {
                 formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: activity.hasDeadlineTime ?? false, startDate: activity.startDate, hasStartTime: activity.hasStartTime)
                 content.subtitle = formattedDate.2
                 content.categoryIdentifier = activity.isGoal ?? false ? Identifiers.goalCategory : Identifiers.taskCategory
+                content.userInfo = [PlotNotification.CodingKeys.ID.rawValue: activity.instanceID ?? activityID, PlotNotification.CodingKeys.date.rawValue: activity.finalDateTime as Any]
                 if let reminder = TaskAlert(rawValue: activityReminder), let reminderDate = reminder.timeInterval(endDate) {
                     let calendar = Calendar.current
                     let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)

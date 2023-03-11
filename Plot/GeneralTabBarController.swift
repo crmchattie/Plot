@@ -94,22 +94,21 @@ class GeneralTabBarController: UITabBarController {
         homeController.addObservers()
         GeneralTabBarController.networkController.askPermissionToTrack()
         let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-        let previousAppVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
+//        let previousAppVersion = UserDefaults.standard.string(forKey: kAppVersionKey)
         //if new user, do nothing; if existing user with old version of app, load other variables
         //if existing user with current version, load everything
         if !isNewUser {
             UserDefaults.standard.setValue(currentAppVersion, forKey: kAppVersionKey)
             GeneralTabBarController.networkController.setupKeyVariables {
                 self.analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
-                GeneralTabBarController.networkController.setupOtherVariables()
                 self.homeController.removeLaunchScreenView(animated: true) {
                     self.homeController.openNotification()
-//                    GeneralTabBarController.networkController.setupInitialGoals()
-//                    GeneralTabBarController.networkController.deleteGoals()
+                    GeneralTabBarController.networkController.setupOtherVariables()
+                    GeneralTabBarController.networkController.setupInitialGoals()
                     
-                    if let currentAppVersion = currentAppVersion, let previousAppVersion = previousAppVersion, previousAppVersion.compare(currentAppVersion) == .orderedAscending {
-                        GeneralTabBarController.networkController.setupInitialGoals()
-                    }
+//                    if let currentAppVersion = currentAppVersion, let previousAppVersion = previousAppVersion, previousAppVersion.compare(currentAppVersion) == .orderedAscending {
+//                        GeneralTabBarController.networkController.setupInitialGoals()
+//                    }
                 }
             }
         } else {

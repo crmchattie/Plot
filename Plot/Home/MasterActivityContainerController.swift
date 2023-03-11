@@ -78,7 +78,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var transactionsDictionary = [TransactionDetails: [Transaction]]()
     var accountsDictionary = [AccountDetails: [MXAccount]]()
     
-    var notification: PLNotification?
+    var notification: PlotNotification?
     
     var participants: [String: [User]] = [:]
     
@@ -119,6 +119,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         setNavBar()
         setupData()
         delegate?.manageAppearanceHome(self, didFinishLoadingWith: true)
+        isAppLoaded = true
     }
     
     override func viewWillAppear(_ animated: Bool) {

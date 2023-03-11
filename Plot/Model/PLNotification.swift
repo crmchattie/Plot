@@ -8,6 +8,35 @@
 
 import Foundation
 
+class PlotNotification {
+    let ID: String
+    let category: String
+    let date: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case ID
+        case category
+        case date
+    }
+    
+    init(ID: String, category: String, date: Int?) {
+        self.ID = ID
+        self.category = category
+        self.date = date
+    }
+    
+    init?(category: String, userInfo: [AnyHashable: Any]) {
+        guard let ID = userInfo[CodingKeys.ID.rawValue] as? String else {
+            return nil
+        }
+        
+        self.category = category
+        self.ID = ID
+        self.date = userInfo[CodingKeys.date.rawValue] as? Int
+    }
+    
+}
+
 class PLNotification: NSObject, Codable, NSCoding {
     let objectID: String?
     let googleCAE: String?
@@ -50,6 +79,13 @@ class PLNotification: NSObject, Codable, NSCoding {
         coder.encode(self.googleCAE, forKey: CodingKeys.googleCAE.rawValue)
         coder.encode(self.gcmMessageID, forKey: CodingKeys.gcmMessageID.rawValue)
         coder.encode(self.aps, forKey: CodingKeys.aps.rawValue)
+    }
+    
+    var plotNotification: PlotNotification? {
+        if let ID = self.objectID {
+            return PlotNotification(ID: ID, category: self.aps.category, date: self.aps.date)
+        }
+        return nil
     }
     
     override var description: String {

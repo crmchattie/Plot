@@ -355,7 +355,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void) {
-            print("UNUserNotificationCenter didReceive")
         
         // 1
         let userInfo = response.notification.request.content.userInfo
@@ -363,10 +362,21 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         saveUserNotification(notification: response.notification)
         
         // 2
-        if let notification = try? DictionaryDecoder().decode(PLNotification.self, from: userInfo) {
+        if let plNotification = try? DictionaryDecoder().decode(PLNotification.self, from: userInfo), let notification = plNotification.plotNotification {
             if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
                 masterController.notification = notification
             }
+        } else if let notification = PlotNotification(category: response.notification.request.content.categoryIdentifier, userInfo: userInfo) {
+            if let rvc = self.window?.rootViewController, let masterController = UIApplication.getCurrentViewController(rvc) as? MasterActivityContainerController {
+                masterController.notification = notification
+            }
+        }
+        
+        // 4
+        completionHandler()
+    }
+}
+
 //            switch response.actionIdentifier {
 //            case Identifiers.viewChatsAction:
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
@@ -376,12 +386,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //                (window?.rootViewController as? UITabBarController)?.selectedIndex = 1
 //            default:
 //            }
-        }
-        
-        // 4
-        completionHandler()
-    }
-}
 
 extension AppDelegate : MessagingDelegate {
     // [START refresh_token]

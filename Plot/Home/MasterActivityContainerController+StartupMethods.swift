@@ -34,12 +34,11 @@ extension MasterActivityContainerController {
     
     func openNotification() {
         print("openNotification")
+        print(notification)
         //remove to open notifications
         if let notification = notification {
-            print("found notification")
             self.notification = nil
-            openNotification(forNotification: notification)
-            print(notification)
+            openNotification(ID: notification.ID, category: notification.category, date: notification.date)
         }
     }
 }

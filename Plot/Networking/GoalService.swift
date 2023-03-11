@@ -301,43 +301,44 @@ extension NetworkController {
         switch metric {
         case .events:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.events, isEvent: true, level: submetric?.activityLevel ?? .none, options: option, range: range) { stat, activities in
-                if let stat = stat, let activities = activities {
-                    var finalStat = stat
-                    switch unit {
-                    case .count:
-                        finalStat.value = Double(activities.count)
-                        completion(finalStat)
-                    case .minutes:
-                        finalStat.value = finalStat.value.totalMinutes
-                        completion(finalStat)
-                    case .hours:
-                        finalStat.value = finalStat.value.totalHours
-                        completion(finalStat)
-                    case .days:
-                        finalStat.value = finalStat.value.totalDays
-                        completion(finalStat)
-                    case .calories, .amount, .percent, .multiple, .level:
-                        completion(finalStat)
-                    }
-                } else {
+                guard let stat = stat, let activities = activities else {
                     completion(nil)
+                    return
+                }
+                
+                var finalStat = stat
+                switch unit {
+                case .count:
+                    finalStat.value = Double(activities.count)
+                    completion(finalStat)
+                case .minutes:
+                    finalStat.value = finalStat.value.totalMinutes
+                    completion(finalStat)
+                case .hours:
+                    finalStat.value = finalStat.value.totalHours
+                    completion(finalStat)
+                case .days:
+                    finalStat.value = finalStat.value.totalDays
+                    completion(finalStat)
+                case .calories, .amount, .percent, .multiple, .level:
+                    completion(finalStat)
                 }
                 
             }
         case .tasks:
             activityDetailService.getActivityCategoriesSamples(activities: activityService.tasks, isEvent: false, level: submetric?.activityLevel ?? .none, options: option, range: range) { stat, activities in
-                if let stat = stat, let activities = activities {
-                    var finalStat = stat
-                    switch unit {
-                    case .count:
-                        finalStat.value = Double(activities.count)
-                        completion(finalStat)
-                    case .hours, .minutes, .days, .calories, .amount, .percent, .multiple, .level:
-                        completion(finalStat)
-                    }
-                }
-                else {
+                guard let stat = stat, let activities = activities else {
                     completion(nil)
+                    return
+                }
+                
+                var finalStat = stat
+                switch unit {
+                case .count:
+                    finalStat.value = Double(activities.count)
+                    completion(finalStat)
+                case .hours, .minutes, .days, .calories, .amount, .percent, .multiple, .level:
+                    completion(finalStat)
                 }
             }
         case .financialTransactions:
@@ -363,19 +364,20 @@ extension NetworkController {
             }
             
             financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: nil, ignore_plot_created: nil, ignore_transfer_between_accounts: true) { stat, _, transactions, err in
-                if let stat = stat, let transactions = transactions {
-                    var finalStat = stat
-                    switch unit {
-                    case .count:
-                        finalStat.value = Double(transactions.count)
-                        completion(finalStat)
-                    case .amount:
-                        completion(finalStat)
-                    case .hours, .minutes, .days, .calories, .percent, .multiple, .level:
-                        completion(nil)
-                    }
+                guard let stat = stat, let transactions = transactions else {
+                    completion(nil)
+                    return
+                    
                 }
-                else {
+                
+                var finalStat = stat
+                switch unit {
+                case .count:
+                    finalStat.value = Double(transactions.count)
+                    completion(finalStat)
+                case .amount:
+                    completion(finalStat)
+                case .hours, .minutes, .days, .calories, .percent, .multiple, .level:
                     completion(nil)
                 }
             }
@@ -385,24 +387,22 @@ extension NetworkController {
                 let accounts = financeService.accounts.filter({ $0.type == .creditCard})
                 let filterAccounts = accounts.map({ $0.guid })
                 financeDetailService.getSamples(for: range, accountDetails: nil, transactionDetails: transactionDetails, accounts: nil, transactions: financeService.transactions, filterAccounts: filterAccounts, ignore_plot_created: nil, ignore_transfer_between_accounts: false) { stat, _, transactions, err in
-                    if let stat = stat, let transactions = transactions {
-                        var finalStat = stat
-                        let transactionAccounts = Set(transactions.map({ $0.account_guid ?? "" }))
-                        let difference = transactionAccounts.symmetricDifference(Set(filterAccounts))
-                        let accts = self.financeService.accounts.filter({ difference.contains($0.guid) && $0.balance > 0 })
-                        finalStat.value = accts.map({$0.balance}).reduce(0, +)
-                        if finalStat.value <= 0, let transaction = transactions.first {
-                            finalStat.date = ISO8601DateFormatter().date(from: transaction.transacted_at) ?? Date()
-                        }
-                        completion(finalStat)
-                    }
-                    else {
+                    guard let stat = stat, let transactions = transactions else {
                         completion(nil)
+                        return
                     }
+                    var finalStat = stat
+                    let transactionAccounts = Set(transactions.map({ $0.account_guid ?? "" }))
+                    let difference = transactionAccounts.symmetricDifference(Set(filterAccounts))
+                    let accts = self.financeService.accounts.filter({ difference.contains($0.guid) && $0.balance > 0 })
+                    finalStat.value = accts.map({$0.balance}).reduce(0, +)
+                    if finalStat.value <= 0, let transaction = transactions.first {
+                        finalStat.date = ISO8601DateFormatter().date(from: transaction.transacted_at) ?? Date()
+                    }
+                    completion(finalStat)
                 }
             } else {
                 var accountDetails = [AccountDetails]()
-
                 switch submetric {
                 case nil, .some(.none):
                     break
@@ -426,82 +426,78 @@ extension NetworkController {
                 }
                 
                 financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil, ignore_plot_created: nil, ignore_transfer_between_accounts: nil) { stat, accounts, _, err in
-                    if let stat = stat, let accounts = accounts {
-                        var finalStat = stat
-                        switch unit {
-                        case .count:
-                            finalStat.value = Double(accounts.count)
-                            completion(finalStat)
-                        case .amount:
-                            completion(finalStat)
-                        case .hours, .minutes, .days, .calories, .percent, .multiple, .level:
-                            completion(nil)
-                        }
+                    guard let stat = stat, let accounts = accounts else {
+                        completion(nil)
+                        return
                     }
-                    else {
+                    
+                    var finalStat = stat
+                    switch unit {
+                    case .count:
+                        finalStat.value = Double(accounts.count)
+                        completion(finalStat)
+                    case .amount:
+                        completion(finalStat)
+                    case .hours, .minutes, .days, .calories, .percent, .multiple, .level:
                         completion(nil)
                     }
-
                 }
             }
             
             
         case .workout:
             healthDetailService.getSamples(for: healthService.workouts, measure: unit.workoutMeasure ?? .duration, categories: option, range: range) {stat, workouts,_ in
-                if let stat = stat, let workouts = workouts {
-                    var finalStat = stat
-                    switch unit {
-                    case .count:
-                        finalStat.value = Double(workouts.count)
-                        completion(finalStat)
-                    case .minutes:
-                        completion(finalStat)
-                    case .calories:
-                        completion(finalStat)
-                    case .hours, .days, .amount, .percent, .multiple, .level:
-                        completion(nil)
-                    }
+                guard let stat = stat, let workouts = workouts else {
+                    completion(nil)
+                    return
                 }
-                else {
+                
+                var finalStat = stat
+                switch unit {
+                case .count:
+                    finalStat.value = Double(workouts.count)
+                    completion(finalStat)
+                case .minutes:
+                    completion(finalStat)
+                case .calories:
+                    completion(finalStat)
+                case .hours, .days, .amount, .percent, .multiple, .level:
                     completion(nil)
                 }
             }
             
         case .mindfulness:
             healthDetailService.getSamples(for: healthService.mindfulnesses, range: range) {stat, mindfulnesses,_ in
-                if let stat = stat, let mindfulnesses = mindfulnesses {
-                    var finalStat = stat
-                    switch unit {
-                    case .count:
-                        finalStat.value = Double(mindfulnesses.count)
-                        completion(finalStat)
-                    case .minutes:
-                        completion(finalStat)
-                    case .hours, .days, .calories, .amount, .percent, .multiple, .level:
-                        completion(nil)
-                    }
+                guard let stat = stat, let mindfulnesses = mindfulnesses else {
+                    completion(nil)
+                    return
                 }
-                else {
+                var finalStat = stat
+                switch unit {
+                case .count:
+                    finalStat.value = Double(mindfulnesses.count)
+                    completion(finalStat)
+                case .minutes:
+                    completion(finalStat)
+                case .hours, .days, .calories, .amount, .percent, .multiple, .level:
                     completion(nil)
                 }
 
             }
         case .mood:
             healthDetailService.getSamples(for: healthService.moods, types: option, range: range) {stat, moods,_ in
-                if let stat = stat, let moods = moods {
-                    var finalStat = stat
-                    switch unit {
-                    case .count:
-                        finalStat.value = Double(moods.count)
-                        completion(finalStat)
-                    case .hours, .days, .calories, .amount, .percent, .multiple, .level, .minutes:
-                        completion(nil)
-                    }
+                guard let stat = stat, let moods = moods else {
+                    completion(nil)
+                    return
                 }
-                else {
+                var finalStat = stat
+                switch unit {
+                case .count:
+                    finalStat.value = Double(moods.count)
+                    completion(finalStat)
+                case .hours, .days, .calories, .amount, .percent, .multiple, .level, .minutes:
                     completion(nil)
                 }
-
             }
         case .sleep:
             guard let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) else {
