@@ -91,8 +91,6 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
     let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 75 / 2
         return imageView
     }()
     
@@ -122,10 +120,14 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
     
     func setupViews() {
         containerView.backgroundColor = .systemGroupedBackground
-        containerView.layer.masksToBounds = true
-        containerView.layer.cornerRadius = 10
         collectionView.backgroundColor = .systemGroupedBackground
         imageView.backgroundColor = .secondarySystemGroupedBackground
+        
+        imageView.constrainWidth(collectionView.frame.width)
+        imageView.constrainHeight(collectionView.frame.height)
+        
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = collectionView.frame.height / 2
         
         addSubview(typeLabel)
         addSubview(descriptionLabel)
@@ -143,10 +145,6 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
             imageView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
         ])
-        
-        imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 75 / 2
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

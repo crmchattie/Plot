@@ -58,8 +58,8 @@ class OnboardingContainerView: UIView {
             pageControl.bottomAnchor.constraint(equalTo: startPlotting.topAnchor, constant: -20),
             pageControl.heightAnchor.constraint(equalToConstant: 15),
             
-            startPlotting.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            startPlotting.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            startPlotting.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+            startPlotting.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
             startPlotting.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -30),
             startPlotting.heightAnchor.constraint(equalToConstant: 50)
         ])
