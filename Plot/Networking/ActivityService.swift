@@ -857,7 +857,7 @@ class ActivityService {
                     let reminderDate = startDate.addingTimeInterval(reminder.timeInterval)
                     var calendar = Calendar.current
                     calendar.timeZone = TimeZone(identifier: startTimeZone)!
-                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second,], from: reminderDate)
+                    let triggerDate = calendar.dateComponents([.year,.month,.day,.hour,.minute,.second], from: reminderDate)
                     let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate,
                                                                 repeats: false)
                     let identifier = "\(activityID)_\(endDate)_Reminder"
