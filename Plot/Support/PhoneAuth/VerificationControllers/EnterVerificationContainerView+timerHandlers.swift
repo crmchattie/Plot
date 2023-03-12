@@ -20,8 +20,6 @@ extension EnterVerificationContainerView {
     }
     
     @objc func updateTimer() {
-        print("updateTimer")
-        print(seconds)
         if seconds < 1 {
             resetTimer()
         } else {
