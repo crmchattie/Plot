@@ -55,16 +55,15 @@ class ChangeEmailView: UIView {
     }()
     
     let nextView: UIButton = {
-        let next = UIButton()
-        next.translatesAutoresizingMaskIntoConstraints = false
-        next.setTitle("Add", for: .normal)
-        next.contentVerticalAlignment = .center
-        next.contentHorizontalAlignment = .center
-        next.setTitleColor(FalconPalette.defaultBlue, for: .normal)
-        next.setTitleColor(.secondaryLabel, for: .highlighted)
-        next.setTitleColor(.secondaryLabel, for: .disabled)
-        next.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        return next
+        let nextView = UIButton()
+        nextView.translatesAutoresizingMaskIntoConstraints = false
+        nextView.titleLabel?.backgroundColor = .clear
+        nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
+        nextView.setTitle("Add", for: .normal)
+        nextView.setTitleColor(.systemBlue, for: .normal)
+        nextView.backgroundColor = .secondarySystemGroupedBackground
+        nextView.layer.cornerRadius = 10
+        return nextView
     }()
     
     override init(frame: CGRect) {
@@ -75,11 +74,9 @@ class ChangeEmailView: UIView {
         addSubview(emailView)
         emailView.addSubview(email)
         addSubview(nextView)
-        
-        email.delegate = self
-        
-        let leftConstant: CGFloat = 10
-        let rightConstant: CGFloat = -10
+                
+        let leftConstant: CGFloat = 15
+        let rightConstant: CGFloat = -15
         let heightConstant: CGFloat = 50
         let spacingConstant: CGFloat = 20
         
@@ -114,17 +111,5 @@ class ChangeEmailView: UIView {
     //necessary to deserialize the UIView
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
-    }
-}
-
-extension ChangeEmailView: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let text = textField.text else { return true }
-        let newLength = text.utf16.count + string.utf16.count - range.length
-        return newLength <= 25
-    }
-    func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard let text = textField.text else { return }
-        textField.text = text
     }
 }

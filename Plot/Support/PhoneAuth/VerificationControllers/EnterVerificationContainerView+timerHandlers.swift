@@ -25,8 +25,8 @@ extension EnterVerificationContainerView {
         if seconds < 1 {
             resetTimer()
         } else {
-            seconds -= -1
-            subtitleText.text =  "You can try again in \(timeString(time: TimeInterval(seconds)))"
+            seconds -= 1
+            subtitleText.text =  "We can send another code in \(timeString(time: TimeInterval(seconds)))"
         }
     }
     

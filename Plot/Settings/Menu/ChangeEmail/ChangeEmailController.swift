@@ -12,6 +12,7 @@ import Firebase
 class ChangeEmailController: UIViewController {
     let changeEmailView = ChangeEmailView()
     var link: String!
+    var emailForVerification = String()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +32,7 @@ class ChangeEmailController: UIViewController {
         changeEmailView.email.attributedPlaceholder = NSAttributedString(string: "New Email", attributes: attributes)
         let leftBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(leftBarButtonDidTap))
         navigationItem.leftBarButtonItem = leftBarButton
+        changeEmailView.email.delegate = self
     }
 
     @objc func leftBarButtonDidTap() {
@@ -42,7 +44,6 @@ class ChangeEmailController: UIViewController {
     }
     
     func setRightBarButtonStatus() {
-        let emailForVerification = changeEmailView.email.text ?? ""
         if !emailForVerification.isValidEmail {
             changeEmailView.nextView.isEnabled = false
         } else {
@@ -52,7 +53,6 @@ class ChangeEmailController: UIViewController {
 }
 
 extension ChangeEmailController {
-
     @objc func didTapSendSignInLink(_ sender: AnyObject) {
         guard let email = changeEmailView.email.text else { return }
 
@@ -66,6 +66,25 @@ extension ChangeEmailController {
             } else {
                 basicErrorAlertWithClose(title: "Verification email sent", message: "Check your inbox for the verification link.", controller: self)
             }
+        }
+    }
+}
+
+extension ChangeEmailController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        let newLength = text.utf16.count + string.utf16.count - range.length
+        return newLength <= 25
+    }
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        emailForVerification = textField.text ?? ""
+
+        if !emailForVerification.isValidEmail {
+            changeEmailView.nextView.setTitleColor(.systemBlue, for: .normal)
+            changeEmailView.nextView.backgroundColor = .secondarySystemGroupedBackground
+        } else {
+            changeEmailView.nextView.setTitleColor(.white, for: .normal)
+            changeEmailView.nextView.backgroundColor = .systemBlue
         }
     }
 }
