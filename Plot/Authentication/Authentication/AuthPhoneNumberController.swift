@@ -17,4 +17,12 @@ class AuthPhoneNumberController: EnterPhoneNumberController {
         phoneNumberContainerView.phoneNumber.attributedPlaceholder = NSAttributedString(string: "Phone number", attributes: attributes)
     }
     
+    override func rightBarButtonDidTap() {
+        super.rightBarButtonDidTap()
+        
+        let destination = AuthVerificationController()
+        destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
+        navigationController?.pushViewController(destination, animated: true)
+    }
+    
 }

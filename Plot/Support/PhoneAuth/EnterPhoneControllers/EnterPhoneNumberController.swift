@@ -73,13 +73,7 @@ class EnterPhoneNumberController: UIViewController {
                 sendSMSConfirmation()
             } else {
                 print("verification has already been sent once")
-            }
-            guard self.navigationController != nil else { return }
-            if !(self.navigationController!.topViewController!.isKind(of: AuthVerificationController.self)) {
-                let destination = AuthVerificationController()
-                destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
-                self.navigationController?.pushViewController(destination, animated: true)
-            }
+            }            
         }
     }
     
