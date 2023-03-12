@@ -99,6 +99,10 @@ class EnterVerificationCodeController: UIViewController {
         let verificationID = userDefaults.currentStringObjectState(for: userDefaults.authVerificationID)
         let verificationCode = enterVerificationContainerView.verificationCode.text
         
+        print("changeNumber")
+        print(verificationID)
+        print(verificationCode)
+        
         guard let verificationID = verificationID, let verificationCode = verificationCode, verificationCode.isEmpty, let currentUser = Auth.auth().currentUser else {
             self.removeSpinner()
             self.enterVerificationContainerView.verificationCode.shake()

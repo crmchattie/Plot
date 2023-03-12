@@ -14,24 +14,24 @@ extension EnterVerificationContainerView {
     
     func runTimer() {
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,  selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
-        nextView.setTitle("Sent", for: .normal)
-        nextView.setTitleColor(.systemBlue, for: .normal)
-        nextView.backgroundColor = .secondarySystemGroupedBackground
+        resend.setTitle("Sent", for: .normal)
+        resend.setTitleColor(.systemBlue, for: .normal)
+        resend.backgroundColor = .secondarySystemGroupedBackground
     }
     
     @objc func updateTimer() {
+        seconds = Int(timer.timeInterval)
         if seconds < 1 {
             resetTimer()
             subtitleText.text =  "We have sent you an SMS with the code"
-            nextView.setTitle("Resend", for: .normal)
-            nextView.setTitleColor(.white, for: .normal)
-            nextView.backgroundColor = .systemBlue
+            resend.setTitle("Resend", for: .normal)
+            resend.setTitleColor(.white, for: .normal)
+            resend.backgroundColor = .systemBlue
         } else {
-            seconds -= 1
             subtitleText.text =  "You can try again in \(timeString(time: TimeInterval(seconds)))"
-            nextView.setTitle("Sent", for: .normal)
-            nextView.setTitleColor(.systemBlue, for: .normal)
-            nextView.backgroundColor = .secondarySystemGroupedBackground
+            resend.setTitle("Sent", for: .normal)
+            resend.setTitleColor(.systemBlue, for: .normal)
+            resend.backgroundColor = .secondarySystemGroupedBackground
         }
     }
     
