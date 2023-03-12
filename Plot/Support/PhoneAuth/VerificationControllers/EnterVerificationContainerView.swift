@@ -56,7 +56,7 @@ class EnterVerificationContainerView: UIView {
         let resend = UIButton()
         resend.translatesAutoresizingMaskIntoConstraints = false
         resend.setTitle("Resend", for: .normal)
-        resend.setTitle("Sent!", for: .disabled)
+        resend.setTitle("Sent", for: .disabled)
         resend.setTitleColor(.white, for: .normal)
         resend.setTitleColor(.white, for: .disabled)
         resend.titleLabel?.backgroundColor = .clear

@@ -13,24 +13,31 @@ extension EnterVerificationContainerView {
     typealias CompletionHandler = (_ success: Bool) -> Void
     
     func runTimer() {
-        resend.isEnabled = false
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,  selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
+        nextView.setTitle("Sent", for: .normal)
+        nextView.setTitleColor(.systemBlue, for: .normal)
+        nextView.backgroundColor = .secondarySystemGroupedBackground
     }
     
     @objc func updateTimer() {
         if seconds < 1 {
             resetTimer()
-            resend.isEnabled = true
+            subtitleText.text =  "We have sent you an SMS with the code"
+            nextView.setTitle("Resend", for: .normal)
+            nextView.setTitleColor(.white, for: .normal)
+            nextView.backgroundColor = .systemBlue
         } else {
             seconds -= 1
-//        timerLabel.text =  "The message has been sent!\nYou can try again in \(timeString(time: TimeInterval(seconds)))"
+            subtitleText.text =  "You can try again in \(timeString(time: TimeInterval(seconds)))"
+            nextView.setTitle("Sent", for: .normal)
+            nextView.setTitleColor(.systemBlue, for: .normal)
+            nextView.backgroundColor = .secondarySystemGroupedBackground
         }
     }
     
     func resetTimer() {
         timer.invalidate()
         seconds = 120
-
     }
     
     func timeString(time:TimeInterval) -> String {

@@ -53,8 +53,11 @@ class EnterVerificationCodeController: UIViewController {
             basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
             return
         }
+        guard enterVerificationContainerView.seconds < 1 else {
+            enterVerificationContainerView.updateTimer()
+            return
+        }
         
-        enterVerificationContainerView.resend.isEnabled = false
         print("tapped sms confirmation")
                 
         var phoneNumberForVerification = String()
@@ -74,7 +77,6 @@ class EnterVerificationCodeController: UIViewController {
             }
             
             print("verification sent")
-            self.enterVerificationContainerView.resend.isEnabled = false
             
             userDefaults.updateObject(for: userDefaults.authVerificationID, with: verificationID)
             self.enterVerificationContainerView.runTimer()
@@ -94,12 +96,8 @@ class EnterVerificationCodeController: UIViewController {
             return
         }
         
-        let verificationID = userDefaults.currentStringObjectState(for: userDefaults.changeNumberAuthVerificationID)
+        let verificationID = userDefaults.currentStringObjectState(for: userDefaults.authVerificationID)
         let verificationCode = enterVerificationContainerView.verificationCode.text
-        
-        print("changeNumber")
-        print(verificationID)
-        print(verificationCode)
         
         guard let verificationID = verificationID, let verificationCode = verificationCode, verificationCode.isEmpty, let currentUser = Auth.auth().currentUser else {
             self.removeSpinner()
@@ -155,10 +153,6 @@ class EnterVerificationCodeController: UIViewController {
         
         let verificationID = userDefaults.currentStringObjectState(for: userDefaults.authVerificationID)
         let verificationCode = enterVerificationContainerView.verificationCode.text
-        
-        print("authenticate")
-        print(verificationID)
-        print(verificationCode)
         
         guard let verificationID = verificationID, let verificationCode = verificationCode, verificationCode.isEmpty else {
             self.removeSpinner()
