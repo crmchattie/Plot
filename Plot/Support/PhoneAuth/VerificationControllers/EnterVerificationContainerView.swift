@@ -79,7 +79,7 @@ class EnterVerificationContainerView: UIView {
     
     weak var enterVerificationCodeController: EnterVerificationCodeController?
     
-    var seconds = 0
+    var seconds = 120
     
     var timer = Timer()
     

@@ -54,13 +54,10 @@ class EnterVerificationCodeController: UIViewController {
             return
         }
         
-        guard enterVerificationContainerView.seconds < 1 else {
-            enterVerificationContainerView.updateTimer()
+        guard enterVerificationContainerView.seconds == 120 else {
             return
         }
-        
-        print("tapped sms confirmation")
-                
+                        
         var phoneNumberForVerification = String()
         
         do {

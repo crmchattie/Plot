@@ -20,24 +20,24 @@ extension EnterVerificationContainerView {
     }
     
     @objc func updateTimer() {
-        seconds = Int(timer.timeInterval)
+        print("updateTimer")
+        print(seconds)
         if seconds < 1 {
             resetTimer()
-            subtitleText.text =  "We have sent you an SMS with the code"
-            resend.setTitle("Resend", for: .normal)
-            resend.setTitleColor(.white, for: .normal)
-            resend.backgroundColor = .systemBlue
         } else {
+            seconds -= -1
             subtitleText.text =  "You can try again in \(timeString(time: TimeInterval(seconds)))"
-            resend.setTitle("Sent", for: .normal)
-            resend.setTitleColor(.systemBlue, for: .normal)
-            resend.backgroundColor = .secondarySystemGroupedBackground
         }
     }
     
     func resetTimer() {
+        subtitleText.text =  "We have sent you an SMS with the code"
+        resend.setTitle("Resend", for: .normal)
+        resend.setTitleColor(.white, for: .normal)
+        resend.backgroundColor = .systemBlue
+        
         timer.invalidate()
-        seconds = 0
+        seconds = 120
     }
     
     func timeString(time:TimeInterval) -> String {
