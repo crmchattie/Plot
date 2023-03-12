@@ -49,7 +49,6 @@ class EnterVerificationCodeController: UIViewController {
     }
     
     @objc fileprivate func sendSMSConfirmation () {
-        
         if currentReachabilityStatus == .notReachable {
             basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
             return
@@ -90,17 +89,21 @@ class EnterVerificationCodeController: UIViewController {
     
     func changeNumber() {
         enterVerificationContainerView.verificationCode.resignFirstResponder()
+        if currentReachabilityStatus == .notReachable {
+            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
+            return
+        }
         
         let verificationID = userDefaults.currentStringObjectState(for: userDefaults.changeNumberAuthVerificationID)
         let verificationCode = enterVerificationContainerView.verificationCode.text
         
-        if verificationID == nil {
-            self.enterVerificationContainerView.verificationCode.shake()
-            return
-        }
+        print("changeNumber")
+        print(verificationID)
+        print(verificationCode)
         
-        if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
+        guard let verificationID = verificationID, let verificationCode = verificationCode, verificationCode.isEmpty, let currentUser = Auth.auth().currentUser else {
+            self.removeSpinner()
+            self.enterVerificationContainerView.verificationCode.shake()
             return
         }
         
@@ -111,9 +114,9 @@ class EnterVerificationCodeController: UIViewController {
             self.showSpinner(onView: self.view)
         }
         
-        let credential = PhoneAuthProvider.provider().credential (withVerificationID: verificationID!, verificationCode: verificationCode!)
+        let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: verificationCode)
         
-        Auth.auth().currentUser?.updatePhoneNumber(credential, completion: { (error) in
+        currentUser.updatePhoneNumber(credential, completion: { (error) in
             if error != nil {
                 self.removeSpinner()
                 basicErrorAlertWithClose(title: "Error", message: error?.localizedDescription ?? "Number changing process failed. Please try again later.", controller: self)
@@ -129,7 +132,7 @@ class EnterVerificationCodeController: UIViewController {
                 phoneNumberForFB = self.enterVerificationContainerView.titleNumber.text!
             }
             
-            let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
+            let userReference = Database.database().reference().child("users").child(currentUser.uid)
             userReference.updateChildValues(["phoneNumber" : phoneNumberForFB]) { (error, reference) in
                 if error != nil {
                     self.removeSpinner()
@@ -153,7 +156,11 @@ class EnterVerificationCodeController: UIViewController {
         let verificationID = userDefaults.currentStringObjectState(for: userDefaults.authVerificationID)
         let verificationCode = enterVerificationContainerView.verificationCode.text
         
-        guard let unwrappedVerificationID = verificationID, let unwrappedVerificationCode = verificationCode, !unwrappedVerificationCode.isEmpty else {
+        print("authenticate")
+        print(verificationID)
+        print(verificationCode)
+        
+        guard let verificationID = verificationID, let verificationCode = verificationCode, verificationCode.isEmpty else {
             self.removeSpinner()
             self.enterVerificationContainerView.verificationCode.shake()
             return
@@ -169,9 +176,7 @@ class EnterVerificationCodeController: UIViewController {
             self.showSpinner(onView: self.view)
         }
         
-        let credential = PhoneAuthProvider.provider().credential (
-            withVerificationID: unwrappedVerificationID,
-            verificationCode: unwrappedVerificationCode)
+        let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: verificationCode)
         
         Auth.auth().signIn(with: credential) { (authDataResult, error) in
             if error != nil {

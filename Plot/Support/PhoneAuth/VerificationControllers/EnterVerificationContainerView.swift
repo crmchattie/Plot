@@ -70,10 +70,10 @@ class EnterVerificationContainerView: UIView {
         let nextView = UIButton()
         nextView.translatesAutoresizingMaskIntoConstraints = false
         nextView.setTitle("Next", for: .normal)
-        nextView.setTitleColor(.white, for: .normal)
         nextView.titleLabel?.backgroundColor = .clear
         nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
-        nextView.backgroundColor = .systemBlue
+        nextView.setTitleColor(.systemBlue, for: .normal)
+        nextView.backgroundColor = .secondarySystemGroupedBackground
         nextView.layer.cornerRadius = 10
         return nextView
     }()

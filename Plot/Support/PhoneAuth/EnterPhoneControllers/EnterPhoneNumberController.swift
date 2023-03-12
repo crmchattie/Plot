@@ -71,9 +71,7 @@ class EnterPhoneNumberController: UIViewController {
         } else {
             if !isVerificationSent {
                 sendSMSConfirmation()
-            } else {
-                print("verification has already been sent once")
-            }            
+            }
         }
     }
     
