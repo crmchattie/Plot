@@ -94,6 +94,11 @@ class EnterVerificationContainerView: UIView {
         addSubview(nextView)
         addSubview(resend)
         
+        let leftConstant: CGFloat = 15
+        let rightConstant: CGFloat = -15
+        let heightConstant: CGFloat = 50
+        let spacingConstant: CGFloat = 20
+        
         NSLayoutConstraint.activate([
             titleNumber.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             titleNumber.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -105,19 +110,19 @@ class EnterVerificationContainerView: UIView {
             subtitleText.trailingAnchor.constraint(equalTo: trailingAnchor),
             subtitleText.heightAnchor.constraint(equalToConstant: 30),
             
-            verificationCode.topAnchor.constraint(equalTo: subtitleText.bottomAnchor, constant: 20),
-            verificationCode.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            verificationCode.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            verificationCode.heightAnchor.constraint(equalToConstant: 50),
+            verificationCode.topAnchor.constraint(equalTo: subtitleText.bottomAnchor, constant: spacingConstant),
+            verificationCode.leadingAnchor.constraint(equalTo: leadingAnchor, constant: leftConstant),
+            verificationCode.trailingAnchor.constraint(equalTo: trailingAnchor, constant: rightConstant),
+            verificationCode.heightAnchor.constraint(equalToConstant: heightConstant),
             
-            resend.topAnchor.constraint(equalTo: verificationCode.bottomAnchor, constant: 20),
-            resend.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            resend.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            resend.topAnchor.constraint(equalTo: verificationCode.bottomAnchor, constant: spacingConstant),
+            resend.leadingAnchor.constraint(equalTo: leadingAnchor, constant: leftConstant),
+            resend.trailingAnchor.constraint(equalTo: trailingAnchor, constant: rightConstant),
             resend.heightAnchor.constraint(equalToConstant: 45),
             
-            nextView.topAnchor.constraint(equalTo: resend.bottomAnchor, constant: 20),
-            nextView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            nextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            nextView.topAnchor.constraint(equalTo: resend.bottomAnchor, constant: spacingConstant),
+            nextView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: leftConstant),
+            nextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: rightConstant),
             nextView.heightAnchor.constraint(equalToConstant: 45),
             
         ])

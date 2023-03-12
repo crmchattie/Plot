@@ -24,6 +24,8 @@ class EnterVerificationCodeController: UIViewController {
         enterVerificationContainerView.resend.addTarget(self, action: #selector(sendSMSConfirmation), for: .touchUpInside)
         enterVerificationContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
         enterVerificationContainerView.enterVerificationCodeController = self
+        enterVerificationContainerView.verificationCode.delegate = self
+        self.hideKeyboardWhenTappedAround()
         
         if let text = enterVerificationContainerView.titleNumber.text {
             do {
@@ -86,7 +88,7 @@ class EnterVerificationCodeController: UIViewController {
     
     @objc func rightBarButtonDidTap () {}
     
-    func changeNumber () {
+    func changeNumber() {
         enterVerificationContainerView.verificationCode.resignFirstResponder()
         
         let verificationID = userDefaults.currentStringObjectState(for: userDefaults.changeNumberAuthVerificationID)
@@ -193,5 +195,17 @@ class EnterVerificationCodeController: UIViewController {
                 }
             })
         }
+    }
+}
+
+extension EnterVerificationCodeController: UITextFieldDelegate {
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        guard let verificationCode = textField.text, !verificationCode.isEmpty else {
+            enterVerificationContainerView.nextView.setTitleColor(.systemBlue, for: .normal)
+            enterVerificationContainerView.nextView.backgroundColor = .secondarySystemGroupedBackground
+            return
+        }
+        enterVerificationContainerView.nextView.setTitleColor(.white, for: .normal)
+        enterVerificationContainerView.nextView.backgroundColor = .systemBlue
     }
 }

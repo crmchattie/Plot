@@ -93,7 +93,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         collectionView.dataSource = self
@@ -104,7 +104,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
         collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(FinanceCollectionViewComparisonCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewComparisonCell)
-        
+                
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -140,8 +140,11 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
             imageView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
         ])
         
+        imageView.constrainWidth(280)
+        imageView.constrainHeight(280)
+        
         imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 300 / 2
+        imageView.layer.cornerRadius = 280 / 2
 
     }
     

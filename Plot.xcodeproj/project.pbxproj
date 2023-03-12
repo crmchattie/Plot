@@ -416,7 +416,6 @@
 		4BAEE47121272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE46321272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift */; };
 		4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE47421272C4F0045AB10 /* UserProfileContainerView.swift */; };
 		4BAEE48021272C4F0045AB10 /* UserProfileDataDatabaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE47521272C4F0045AB10 /* UserProfileDataDatabaseUpdater.swift */; };
-		4BAEE48121272C4F0045AB10 /* UserProfileController+keyboardHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE47621272C4F0045AB10 /* UserProfileController+keyboardHandlers.swift */; };
 		4BAEE48221272C4F0045AB10 /* UserProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE47721272C4F0045AB10 /* UserProfileController.swift */; };
 		4BAEE48321272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE47821272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift */; };
 		4BAEE48421272C4F0045AB10 /* AuthPhoneNumberController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEE47A21272C4F0045AB10 /* AuthPhoneNumberController.swift */; };
@@ -1020,7 +1019,6 @@
 		4BAEE46321272B380045AB10 /* AccountSettingsAvatarOpenerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountSettingsAvatarOpenerDelegate.swift; sourceTree = "<group>"; };
 		4BAEE47421272C4F0045AB10 /* UserProfileContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileContainerView.swift; sourceTree = "<group>"; };
 		4BAEE47521272C4F0045AB10 /* UserProfileDataDatabaseUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileDataDatabaseUpdater.swift; sourceTree = "<group>"; };
-		4BAEE47621272C4F0045AB10 /* UserProfileController+keyboardHandlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserProfileController+keyboardHandlers.swift"; sourceTree = "<group>"; };
 		4BAEE47721272C4F0045AB10 /* UserProfileController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileController.swift; sourceTree = "<group>"; };
 		4BAEE47821272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileAvatarOpenerDelegate.swift; sourceTree = "<group>"; };
 		4BAEE47A21272C4F0045AB10 /* AuthPhoneNumberController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthPhoneNumberController.swift; sourceTree = "<group>"; };
@@ -2273,7 +2271,6 @@
 			children = (
 				4BAEE47421272C4F0045AB10 /* UserProfileContainerView.swift */,
 				4BAEE47521272C4F0045AB10 /* UserProfileDataDatabaseUpdater.swift */,
-				4BAEE47621272C4F0045AB10 /* UserProfileController+keyboardHandlers.swift */,
 				4BAEE47721272C4F0045AB10 /* UserProfileController.swift */,
 				4BAEE47821272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift */,
 			);
@@ -3411,7 +3408,6 @@
 				4BAEE46721272B380045AB10 /* ChangePhoneNumberController.swift in Sources */,
 				4BAEE52221272D890045AB10 /* InformationMessageCell.swift in Sources */,
 				108087372585072300FB9BB0 /* MindfulnessActions.swift in Sources */,
-				4BAEE48121272C4F0045AB10 /* UserProfileController+keyboardHandlers.swift in Sources */,
 				F9DD16FF2613E65F00B8374D /* AnalyticsLineChartCell.swift in Sources */,
 				1082C89724F0A91500CF6491 /* HealthViewController.swift in Sources */,
 				10C7F92525A520ED004E9277 /* ActiveEnergyOperation.swift in Sources */,

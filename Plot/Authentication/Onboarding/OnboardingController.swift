@@ -89,7 +89,6 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        print("scrollViewDidScroll")
         let scrollPos = scrollView.contentOffset.x / view.frame.width
         onboardingContainerView.pageControl.currentPage = Int(scrollPos)
     }
