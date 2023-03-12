@@ -53,6 +53,7 @@ class EnterVerificationCodeController: UIViewController {
             basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
             return
         }
+        
         guard enterVerificationContainerView.seconds < 1 else {
             enterVerificationContainerView.updateTimer()
             return
@@ -103,7 +104,7 @@ class EnterVerificationCodeController: UIViewController {
         print(verificationID)
         print(verificationCode)
         
-        guard let verificationID = verificationID, let verificationCode = verificationCode, verificationCode.isEmpty, let currentUser = Auth.auth().currentUser else {
+        guard let verificationID = verificationID, let verificationCode = verificationCode, !verificationCode.isEmpty, let currentUser = Auth.auth().currentUser else {
             self.removeSpinner()
             self.enterVerificationContainerView.verificationCode.shake()
             return
@@ -158,14 +159,14 @@ class EnterVerificationCodeController: UIViewController {
         let verificationID = userDefaults.currentStringObjectState(for: userDefaults.authVerificationID)
         let verificationCode = enterVerificationContainerView.verificationCode.text
         
-        guard let verificationID = verificationID, let verificationCode = verificationCode, verificationCode.isEmpty else {
+        print("authenticate")
+        print(verificationID)
+        print(verificationCode)
+        
+        guard let verificationID = verificationID, let verificationCode = verificationCode, !verificationCode.isEmpty else {
             self.removeSpinner()
             self.enterVerificationContainerView.verificationCode.shake()
             return
-        }
-        
-        if currentReachabilityStatus == .notReachable {
-            basicErrorAlertWithClose(title: "No internet connection", message: noInternetError, controller: self)
         }
         
         if let navController = self.navigationController {

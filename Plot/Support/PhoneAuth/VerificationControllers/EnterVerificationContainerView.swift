@@ -55,12 +55,10 @@ class EnterVerificationContainerView: UIView {
     let resend: UIButton = {
         let resend = UIButton()
         resend.translatesAutoresizingMaskIntoConstraints = false
-        resend.setTitle("Resend", for: .normal)
-        resend.setTitle("Sent", for: .disabled)
         resend.setTitleColor(.white, for: .normal)
-        resend.setTitleColor(.white, for: .disabled)
         resend.titleLabel?.backgroundColor = .clear
         resend.titleLabel?.font = UIFont.title3.with(weight: .semibold)
+        resend.setTitle("Resend", for: .normal)
         resend.backgroundColor = .systemBlue
         resend.layer.cornerRadius = 10
         return resend
@@ -81,7 +79,7 @@ class EnterVerificationContainerView: UIView {
     
     weak var enterVerificationCodeController: EnterVerificationCodeController?
     
-    var seconds = 120
+    var seconds = 0
     
     var timer = Timer()
     

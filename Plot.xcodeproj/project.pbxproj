@@ -2827,9 +2827,9 @@
 		4BAEE597212735E50045AB10 /* VerificationControllers */ = {
 			isa = PBXGroup;
 			children = (
-				4BAEE598212735E50045AB10 /* EnterVerificationContainerView+timerHandlers.swift */,
 				4BAEE599212735E50045AB10 /* EnterVerificationCodeController.swift */,
 				4BAEE59A212735E50045AB10 /* EnterVerificationContainerView.swift */,
+				4BAEE598212735E50045AB10 /* EnterVerificationContainerView+timerHandlers.swift */,
 			);
 			path = VerificationControllers;
 			sourceTree = "<group>";

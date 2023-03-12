@@ -37,7 +37,7 @@ extension EnterVerificationContainerView {
     
     func resetTimer() {
         timer.invalidate()
-        seconds = 120
+        seconds = 0
     }
     
     func timeString(time:TimeInterval) -> String {
