@@ -16,17 +16,9 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     
     let items: [CustomType] = [.tutorialOne, .tutorialTwo, .tutorialThree, .tutorialFour, .tutorialFive]
     
-    lazy var activities: [Activity] = {
-        return createActivities()
-    }()
-    
-    lazy var healthMetrics: [HealthMetric] = {
-        return createHealthMetrics()
-    }()
-    
-    lazy var finances: [AnyHashable] = {
-        return createFinances()
-    }()
+    var activities = [Activity]()
+    var healthMetrics = [HealthMetric]()
+    var finances = [AnyHashable]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,14 +37,17 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
         onboardingContainerView.collectionView.delegate = self
         onboardingContainerView.collectionView.dataSource = self
         onboardingContainerView.collectionView.register(OnboardingCollectionViewCell.self, forCellWithReuseIdentifier: onboardingCollectionViewCell)
-        
+
         onboardingContainerView.collectionView.isPagingEnabled = true
         onboardingContainerView.collectionView.showsHorizontalScrollIndicator = false
         onboardingContainerView.pageControl.numberOfPages = items.count
         onboardingContainerView.pageControl.currentPage = 0
         
         onboardingContainerView.startPlotting.addTarget(self, action: #selector(startPlottingDidTap), for: .touchUpInside)
-
+        
+        activities = createActivities()
+        healthMetrics = createHealthMetrics()
+        finances = createFinances()
         
     }
     
@@ -69,7 +64,7 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: onboardingCollectionViewCell, for: indexPath) as! OnboardingCollectionViewCell
         cell.customType = items[indexPath.item]
-        if indexPath.item == 0 {
+        if indexPath.item == 0 || indexPath.item == 4 {
             cell.activities = nil
             cell.healthMetrics = nil
             cell.finances = nil
@@ -80,12 +75,8 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
             cell.healthMetrics = healthMetrics
         } else if indexPath.item == 3 {
             cell.finances = finances
-        } else if indexPath.item == 4 {
-            cell.activities = nil
-            cell.healthMetrics = nil
-            cell.finances = nil
-            cell.collectionView.reloadData()
         }
+        
         return cell
     }
     
@@ -98,6 +89,7 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print("scrollViewDidScroll")
         let scrollPos = scrollView.contentOffset.x / view.frame.width
         onboardingContainerView.pageControl.currentPage = Int(scrollPos)
     }

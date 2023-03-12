@@ -123,12 +123,6 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         collectionView.backgroundColor = .systemGroupedBackground
         imageView.backgroundColor = .secondarySystemGroupedBackground
         
-        imageView.constrainWidth(collectionView.frame.width)
-        imageView.constrainHeight(collectionView.frame.height)
-        
-        imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = collectionView.frame.height / 2
-        
         addSubview(typeLabel)
         addSubview(descriptionLabel)
         addSubview(containerView)
@@ -145,6 +139,10 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
             imageView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
         ])
+        
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 300 / 2
+
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
