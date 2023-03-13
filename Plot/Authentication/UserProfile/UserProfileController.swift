@@ -48,14 +48,18 @@ class UserProfileController: UIViewController {
         userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.name.delegate = self
+        userProfileContainerView.email.delegate = self
+        userProfileContainerView.age.delegate = self
         userProfileContainerView.phone.isUserInteractionEnabled = false
     }
     
     fileprivate func configureColorsAccordingToTheme() {
         userProfileContainerView.name.textColor = .label
+        userProfileContainerView.age.textColor = .label
         userProfileContainerView.bio.textColor = .label
         userProfileContainerView.bio.keyboardAppearance = .default
         userProfileContainerView.name.keyboardAppearance = .default
+        userProfileContainerView.age.textColor = .label
         userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image != nil)
     }
     
@@ -127,6 +131,17 @@ extension UserProfileController {
         emailReference.observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists() {
                 self.userProfileContainerView.email.text = snapshot.value as? String
+            }
+        })
+        
+        let ageReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("age")
+        ageReference.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.exists() {
+                if let age = snapshot.value as? Double {
+                    let ageComponents = Calendar.current.dateComponents([.year], from: Date(timeIntervalSince1970: age), to: Date())
+                    let birthdayString = "\(ageComponents.year ?? 0) years old"
+                    self.userProfileContainerView.age.text = birthdayString
+                }
             }
         })
                 

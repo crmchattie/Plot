@@ -27,7 +27,7 @@ extension AccountSettingsController: UITextViewDelegate {
     }
     
     func tableHeaderHeight() -> CGFloat {
-        return 180 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
+        return 240 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -79,6 +79,19 @@ extension AccountSettingsController { /* user name editing */
         }
     }
     
+    @objc func ageDidBeginEditing() {
+        setEditingBarButtons()
+    }
+    
+    @objc func ageEditingChanged() {
+        if userProfileContainerView.age.text!.count == 0 ||
+            userProfileContainerView.age.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+            updateBarButton.isEnabled = false
+        } else {
+            updateBarButton.isEnabled = true
+        }
+    }
+    
     func setEditingBarButtons() {
         navigationItem.leftBarButtonItem = cancelBarButton
         navigationItem.rightBarButtonItem = updateBarButton
@@ -87,12 +100,15 @@ extension AccountSettingsController { /* user name editing */
     @objc func cancelBarButtonPressed() {
         userProfileContainerView.name.text = currentName
         userProfileContainerView.bio.text = currentBio
+        userProfileContainerView.age.text = currentAge
         userProfileContainerView.name.endEditing(true)
+        userProfileContainerView.age.endEditing(true)
         userProfileContainerView.bio.endEditing(true)
         userProfileContainerView.name.resignFirstResponder()
+        userProfileContainerView.age.resignFirstResponder()
         userProfileContainerView.bio.resignFirstResponder()
         userProfileContainerView.phone.resignFirstResponder()
-//        userProfileContainerView.email.resignFirstResponder()
+        userProfileContainerView.email.resignFirstResponder()
         navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = doneBarButton
         view.setNeedsLayout()
@@ -108,6 +124,7 @@ extension AccountSettingsController { /* user name editing */
         navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = doneBarButton
         userProfileContainerView.name.resignFirstResponder()
+        userProfileContainerView.age.resignFirstResponder()
         userProfileContainerView.bio.resignFirstResponder()
         
         let userNameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)

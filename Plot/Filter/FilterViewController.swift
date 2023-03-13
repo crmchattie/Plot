@@ -244,7 +244,7 @@ class FilterViewController: FormViewController {
                 }
             } else if filter.typeOfSection == "date" {
                 form +++ Section(filter.descriptionText)
-                <<< DateInlineRow("\(filter.rawValue)") {
+                <<< DateTimeInlineRow("\(filter.rawValue)") {
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground
                     $0.cell.textLabel?.textColor = .label
                     $0.cell.detailTextLabel?.textColor = .secondaryLabel
@@ -262,12 +262,9 @@ class FilterViewController: FormViewController {
                     inlineRow.cellUpdate { (cell, row) in
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
+                        cell.datePicker.tintColor = .systemBlue
                         if #available(iOS 14.0, *) {
                             cell.datePicker.preferredDatePickerStyle = .inline
-                            cell.datePicker.tintColor = .systemBlue
-                        }
-                        else {
-                            cell.datePicker.datePickerMode = .dateAndTime
                         }
                     }
                     cell.detailTextLabel?.textColor = cell.tintColor

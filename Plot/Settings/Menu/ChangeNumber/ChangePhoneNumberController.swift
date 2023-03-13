@@ -16,8 +16,7 @@ class ChangePhoneNumberController: EnterPhoneNumberController {
         let leftBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(leftBarButtonDidTap))
         navigationItem.leftBarButtonItem = leftBarButton
         phoneNumberContainerView.instructions.text = "Please confirm your country code\nand enter your NEW phone number."
-        let attributes = [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel]
-        phoneNumberContainerView.phoneNumber.attributedPlaceholder = NSAttributedString(string: "New Phone Number", attributes: attributes)
+        phoneNumberContainerView.phoneNumber.placeholder = "New Phone Number"
     }
     
     override func rightBarButtonDidTap() {

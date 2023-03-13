@@ -540,12 +540,9 @@ class SubtaskViewController: FormViewController {
                 $0.cell.tintColor = .secondarySystemGroupedBackground
                 $0.hidden = true
                 $0.minuteInterval = 5
+                $0.cell.datePicker.tintColor = .systemBlue
                 if #available(iOS 14.0, *) {
                     $0.cell.datePicker.preferredDatePickerStyle = .inline
-                    $0.cell.datePicker.tintColor = .systemBlue
-                }
-                else {
-                    $0.cell.datePicker.datePickerMode = .date
                 }
                 if let subtask = subtask, let endDate = subtask.getSubEndDate(parent: task) {
                     $0.value = endDate
@@ -639,11 +636,10 @@ class SubtaskViewController: FormViewController {
                 $0.cell.tintColor = .secondarySystemGroupedBackground
                 $0.hidden = true
                 $0.minuteInterval = 5
+                $0.cell.datePicker.tintColor = .systemBlue
+
                 if #available(iOS 13.4, *) {
                     $0.cell.datePicker.preferredDatePickerStyle = .wheels
-                }
-                else {
-                    $0.cell.datePicker.datePickerMode = .time
                 }
                 if let subtask = subtask, subtask.hasDeadlineTime ?? false, let endDate = subtask.getSubEndDate(parent: self.task) {
                     $0.value = endDate

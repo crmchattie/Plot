@@ -335,12 +335,9 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.tintColor = .secondarySystemGroupedBackground
+                    cell.datePicker.tintColor = .systemBlue
                     if #available(iOS 14.0, *) {
                         cell.datePicker.preferredDatePickerStyle = .inline
-                        cell.datePicker.tintColor = .systemBlue
-                    }
-                    else {
-                        cell.datePicker.datePickerMode = .dateAndTime
                     }
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
@@ -633,14 +630,11 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.tintColor = .secondarySystemGroupedBackground
+            $0.cell.datePicker.tintColor = .systemBlue
             $0.hidden = true
             $0.minuteInterval = 5
             if #available(iOS 14.0, *) {
                 $0.cell.datePicker.preferredDatePickerStyle = .inline
-                $0.cell.datePicker.tintColor = .systemBlue
-            }
-            else {
-                $0.cell.datePicker.datePickerMode = .date
             }
             if let task = task, let startDate = task.goalStartDateUTC {
                 $0.value = startDate
@@ -725,14 +719,11 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.cell.backgroundColor = .secondarySystemGroupedBackground
             $0.cell.tintColor = .secondarySystemGroupedBackground
+            $0.cell.datePicker.tintColor = .systemBlue
             $0.hidden = true
             $0.minuteInterval = 5
             if #available(iOS 14.0, *) {
                 $0.cell.datePicker.preferredDatePickerStyle = .inline
-                $0.cell.datePicker.tintColor = .systemBlue
-            }
-            else {
-                $0.cell.datePicker.datePickerMode = .date
             }
             if let task = task, let endDate = task.goalEndDateUTC {
                 $0.value = endDate

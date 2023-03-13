@@ -378,9 +378,9 @@ class EventViewController: FormViewController, ObjectDetailShowing {
             inlineRow.cellUpdate { (cell, row) in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
                 row.cell.tintColor = .secondarySystemGroupedBackground
+                cell.datePicker.tintColor = .systemBlue
                 if #available(iOS 14.0, *) {
                     cell.datePicker.preferredDatePickerStyle = .inline
-                    cell.datePicker.tintColor = .systemBlue
                 }
                 let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                 if allRow.value ?? false {
@@ -389,9 +389,6 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                 else {
                     cell.datePicker.datePickerMode = .dateAndTime
                 }
-//                if let startTimeZone = self?.activity.startTimeZone {
-//                    cell.datePicker.timeZone = TimeZone(identifier: startTimeZone)
-//                }
             }
             cell.detailTextLabel?.textColor = cell.tintColor
             if let timeZoneRow: LabelRow = self?.form.rowBy(tag: "startTimeZone") {
@@ -473,9 +470,9 @@ class EventViewController: FormViewController, ObjectDetailShowing {
 //                if let endTimeZone = self?.activity.endTimeZone {
 //                    cell.datePicker.timeZone = TimeZone(identifier: endTimeZone)
 //                }
+                cell.datePicker.tintColor = .systemBlue
                 if #available(iOS 14.0, *) {
                     cell.datePicker.preferredDatePickerStyle = .inline
-                    cell.datePicker.tintColor = .systemBlue
                 }
                 let allRow: SwitchRow! = self?.form.rowBy(tag: "All-day")
                 if allRow.value ?? false {

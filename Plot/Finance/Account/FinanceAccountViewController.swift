@@ -392,7 +392,7 @@ class FinanceAccountViewController: FormViewController {
         
         if (account.payment_due_at != nil) || (account.user_created ?? false) {
             form.last!
-                <<< DateInlineRow("Payment Due Date") {
+                <<< DateTimeInlineRow("Payment Due Date") {
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground
                     $0.cell.textLabel?.textColor = .secondaryLabel
                     $0.cell.detailTextLabel?.textColor = .secondaryLabel
@@ -406,10 +406,9 @@ class FinanceAccountViewController: FormViewController {
                     inlineRow.cellUpdate() { cell, row in
                         row.cell.backgroundColor = .secondarySystemGroupedBackground
                         row.cell.tintColor = .secondarySystemGroupedBackground
-                        cell.datePicker.datePickerMode = .dateAndTime
+                        cell.datePicker.tintColor = .systemBlue
                         if #available(iOS 14.0, *) {
                             cell.datePicker.preferredDatePickerStyle = .inline
-                            cell.datePicker.tintColor = .systemBlue
                         }
                     }
                     let color = cell.detailTextLabel?.textColor

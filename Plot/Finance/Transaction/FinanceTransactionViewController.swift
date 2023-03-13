@@ -250,7 +250,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
 //                    self.transaction.transactionDescription = row.value
 //                }
             
-            <<< DateInlineRow("Transacted On") {
+            <<< DateTimeInlineRow("Transacted On") {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.textLabel?.textColor = .secondaryLabel
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
@@ -264,10 +264,9 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                 inlineRow.cellUpdate() { cell, row in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.tintColor = .secondarySystemGroupedBackground
-                    cell.datePicker.datePickerMode = .dateAndTime
+                    cell.datePicker.tintColor = .systemBlue
                     if #available(iOS 14.0, *) {
                         cell.datePicker.preferredDatePickerStyle = .inline
-                        cell.datePicker.tintColor = .systemBlue
                     }
                 }
                 let color = cell.detailTextLabel?.textColor
@@ -282,7 +281,7 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                 }
             }
             
-            <<< DateInlineRow("Financial Profile Date") {
+            <<< DateTimeInlineRow("Financial Profile Date") {
                 $0.cell.backgroundColor = .secondarySystemGroupedBackground
                 $0.cell.textLabel?.textColor = .secondaryLabel
                 $0.cell.detailTextLabel?.textColor = .secondaryLabel
@@ -298,10 +297,9 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                 inlineRow.cellUpdate() { cell, row in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.tintColor = .secondarySystemGroupedBackground
-                    cell.datePicker.datePickerMode = .dateAndTime
+                    cell.datePicker.tintColor = .systemBlue
                     if #available(iOS 14.0, *) {
                         cell.datePicker.preferredDatePickerStyle = .inline
-                        cell.datePicker.tintColor = .systemBlue
                     }
                 }
                 let color = cell.detailTextLabel?.textColor

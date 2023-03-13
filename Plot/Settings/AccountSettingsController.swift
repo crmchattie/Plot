@@ -34,6 +34,8 @@ class AccountSettingsController: UITableViewController {
     var updateBarButton = UIBarButtonItem()
     var doneBarButton = UIBarButtonItem()
     var currentName = String()
+    var currentAge = String()
+    var currentBirthday = Date()
     var currentBio = String()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let nightMode = UIButton()
@@ -65,6 +67,7 @@ class AccountSettingsController: UITableViewController {
         configureContainerView()
         listenChanges()
         addObservers()
+        hideKeyboardWhenTappedAround()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -109,23 +112,27 @@ class AccountSettingsController: UITableViewController {
     fileprivate func configureContainerView() {
         userProfileContainerView.name.addTarget(self, action: #selector(nameDidBeginEditing), for: .editingDidBegin)
         userProfileContainerView.name.addTarget(self, action: #selector(nameEditingChanged), for: .editingChanged)
+        userProfileContainerView.age.addTarget(self, action: #selector(changeAge), for: .editingDidBegin)
         userProfileContainerView.phone.addTarget(self, action: #selector(changePhoneNumber), for: .editingDidBegin)
         userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.email.delegate = self
         userProfileContainerView.name.delegate = self
+        userProfileContainerView.age.delegate = self
         userProfileContainerView.phone.delegate = self
         userProfileContainerView.backgroundColor = .systemGroupedBackground
         userProfileContainerView.bio.backgroundColor = .secondarySystemGroupedBackground
         userProfileContainerView.userData.backgroundColor = .secondarySystemGroupedBackground
         //        userProfileContainerView.email.backgroundColor = .secondarySystemGroupedBackground
         userProfileContainerView.name.textColor = .label
+        userProfileContainerView.age.textColor = .label
         userProfileContainerView.phone.textColor = .label
         userProfileContainerView.bio.textColor = .label
         userProfileContainerView.email.textColor = .label
         userProfileContainerView.bio.keyboardAppearance = .default
         userProfileContainerView.name.keyboardAppearance = .default
+        userProfileContainerView.age.keyboardAppearance = .default
     }
     
     @objc func doneBarButtonPressed() {
@@ -177,6 +184,7 @@ class AccountSettingsController: UITableViewController {
     @objc func clearUserData() {
         userProfileContainerView.name.text = ""
         userProfileContainerView.phone.text = ""
+        userProfileContainerView.age.text = ""
         userProfileContainerView.profileImageView.image = nil
     }
     
@@ -193,6 +201,14 @@ class AccountSettingsController: UITableViewController {
                     self.userProfileContainerView.name.text = name
                     self.currentName = name
                 }
+                if let age = userInfo["age"] as? Double {
+                    self.currentBirthday = Date(timeIntervalSince1970: age)
+                    let ageComponents = Calendar.current.dateComponents([.year], from: Date(timeIntervalSince1970: age), to: Date())
+                    let birthdayString = "\(ageComponents.year ?? 0) years old"
+                    self.userProfileContainerView.age.text = birthdayString
+                    self.currentAge = birthdayString
+                }
+                
                 if let bio = userInfo["bio"] as? String {
                     self.userProfileContainerView.bio.text = bio
                     self.userProfileContainerView.bioPlaceholderLabel.isHidden = !self.userProfileContainerView.bio.text.isEmpty
@@ -226,6 +242,18 @@ class AccountSettingsController: UITableViewController {
     @objc func changeEmail() {
         cancelBarButtonPressed()
         let controller = ChangeEmailController()
+        let destination = UINavigationController(rootViewController: controller)
+        destination.navigationBar.shadowImage = UIImage()
+        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.hidesBottomBarWhenPushed = true
+        destination.navigationBar.isTranslucent = false
+        present(destination, animated: true, completion: nil)
+    }
+    
+    @objc func changeAge() {
+        cancelBarButtonPressed()
+        let controller = ChangeBirthdayController()
+        controller.birthday = currentBirthday
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
         destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
@@ -275,7 +303,6 @@ class AccountSettingsController: UITableViewController {
     }
     
     func deleteButtonTapped() {
-        print("deleteButtonTapped")
         guard let user = Auth.auth().currentUser else { return }
         guard currentReachabilityStatus != .notReachable else {
             basicErrorAlertWithClose(title: "Error Deleting Account", message: noInternetError, controller: self)

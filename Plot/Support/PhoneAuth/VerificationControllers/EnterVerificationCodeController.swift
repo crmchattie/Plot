@@ -25,7 +25,7 @@ class EnterVerificationCodeController: UIViewController {
         enterVerificationContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
         enterVerificationContainerView.enterVerificationCodeController = self
         enterVerificationContainerView.verificationCode.delegate = self
-        self.hideKeyboardWhenTappedAround()
+        hideKeyboardWhenTappedAround()
         
         if let text = enterVerificationContainerView.titleNumber.text {
             do {

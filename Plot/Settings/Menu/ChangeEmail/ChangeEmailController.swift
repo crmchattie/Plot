@@ -28,8 +28,7 @@ class ChangeEmailController: UIViewController {
         changeEmailView.nextView.addTarget(self, action: #selector(didTapSendSignInLink), for: .touchUpInside)
         changeEmailView.nextView.isEnabled = false
         changeEmailView.instructions.text = "Please enter your email."
-        let attributes = [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel]
-        changeEmailView.email.attributedPlaceholder = NSAttributedString(string: "New Email", attributes: attributes)
+        changeEmailView.email.placeholder = "New Email"
         let leftBarButton = UIBarButtonItem(title: "Cancel", style: .done, target: self, action: #selector(leftBarButtonDidTap))
         navigationItem.leftBarButtonItem = leftBarButton
         changeEmailView.email.delegate = self

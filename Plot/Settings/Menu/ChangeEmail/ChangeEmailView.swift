@@ -16,7 +16,7 @@ class ChangeEmailView: UIView {
         title.textAlignment = .center
         title.text = "Email Address"
         title.textColor = .label
-        title.font = .preferredFont(forTextStyle: .title1)
+        title.font = UIFont.title1.with(weight: .bold)
         title.adjustsFontForContentSizeCategory = true
         return title
     }()
@@ -27,14 +27,14 @@ class ChangeEmailView: UIView {
         instructions.textAlignment = .center
         instructions.numberOfLines = 2
         instructions.textColor = .label
-        instructions.font = .preferredFont(forTextStyle: .body)
+        instructions.font = UIFont.title3.with(weight: .medium)
         instructions.adjustsFontForContentSizeCategory = true
         return instructions
     }()
     
     let email: UITextField = {
         let email = UITextField()
-        email.font = UIFont.preferredFont(forTextStyle: .body)
+        email.font = UIFont.title3.with(weight: .medium)
         email.adjustsFontForContentSizeCategory = true
         email.translatesAutoresizingMaskIntoConstraints = false
         email.textAlignment = .center

@@ -114,8 +114,6 @@
 		1067750025DD665C002F78E7 /* FinanceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106774FF25DD665C002F78E7 /* FinanceDetailViewController.swift */; };
 		1067753625E1AB19002F78E7 /* ChangeEmailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067753525E1AB19002F78E7 /* ChangeEmailController.swift */; };
 		1067753E25E1AE01002F78E7 /* ChangeEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067753D25E1AE01002F78E7 /* ChangeEmailView.swift */; };
-		1067754225E1B590002F78E7 /* ChooseEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067754125E1B590002F78E7 /* ChooseEmailView.swift */; };
-		1067754825E1B767002F78E7 /* ChooseEmailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067754725E1B767002F78E7 /* ChooseEmailController.swift */; };
 		1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */; };
 		1069B2D02430EC880048244C /* IncomingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */; };
 		1069B2D22430F3620048244C /* OutgoingActivityMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */; };
@@ -200,6 +198,10 @@
 		10A1865C291C9014009AB7F4 /* SleepAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */; };
 		10A1865E291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A1865D291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift */; };
 		10A2AE9F2508131700D49A0C /* FinanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */; };
+		10B123CE29BF86870022CBB0 /* SurveyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123CD29BF86870022CBB0 /* SurveyController.swift */; };
+		10B123D029BF87AC0022CBB0 /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123CF29BF87AC0022CBB0 /* SurveyCell.swift */; };
+		10B123D229BF8C390022CBB0 /* Survey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123D129BF8C390022CBB0 /* Survey.swift */; };
+		10B123D529BF9EC00022CBB0 /* ChangeBirthdayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123D429BF9EC00022CBB0 /* ChangeBirthdayController.swift */; };
 		10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAA257ACC7200E3A798 /* Scheduler.swift */; };
 		10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAE257ACC9000E3A798 /* Mood.swift */; };
 		10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BC05257D38BA00E3A798 /* MoodViewController.swift */; };
@@ -717,8 +719,6 @@
 		106774FF25DD665C002F78E7 /* FinanceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceDetailViewController.swift; sourceTree = "<group>"; };
 		1067753525E1AB19002F78E7 /* ChangeEmailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeEmailController.swift; sourceTree = "<group>"; };
 		1067753D25E1AE01002F78E7 /* ChangeEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeEmailView.swift; sourceTree = "<group>"; };
-		1067754125E1B590002F78E7 /* ChooseEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseEmailView.swift; sourceTree = "<group>"; };
-		1067754725E1B767002F78E7 /* ChooseEmailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseEmailController.swift; sourceTree = "<group>"; };
 		1069B2CD2430D74F0048244C /* BaseActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2CF2430EC880048244C /* IncomingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingActivityMessageCell.swift; sourceTree = "<group>"; };
 		1069B2D12430F3620048244C /* OutgoingActivityMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingActivityMessageCell.swift; sourceTree = "<group>"; };
@@ -803,6 +803,10 @@
 		10A1865B291C9014009AB7F4 /* SleepAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		10A1865D291D41E6009AB7F4 /* TaskAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		10A2AE9E2508131700D49A0C /* FinanceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewCell.swift; sourceTree = "<group>"; };
+		10B123CD29BF86870022CBB0 /* SurveyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyController.swift; sourceTree = "<group>"; };
+		10B123CF29BF87AC0022CBB0 /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
+		10B123D129BF8C390022CBB0 /* Survey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Survey.swift; sourceTree = "<group>"; };
+		10B123D429BF9EC00022CBB0 /* ChangeBirthdayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeBirthdayController.swift; sourceTree = "<group>"; };
 		10B2BBAA257ACC7200E3A798 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		10B2BBAE257ACC9000E3A798 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
 		10B2BC05257D38BA00E3A798 /* MoodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodViewController.swift; sourceTree = "<group>"; };
@@ -1333,7 +1337,6 @@
 				10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */,
 				10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */,
 				10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */,
-				10BA3BCD259BEDF9005D98EC /* SetupCell.swift */,
 				10E8E50225923C070076BE42 /* BaseContainerCell.swift */,
 				10E8E506259295260076BE42 /* HeaderContainerCell.swift */,
 				10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */,
@@ -1397,8 +1400,6 @@
 		1067753425E1AB04002F78E7 /* ChangeEmail */ = {
 			isa = PBXGroup;
 			children = (
-				1067754725E1B767002F78E7 /* ChooseEmailController.swift */,
-				1067754125E1B590002F78E7 /* ChooseEmailView.swift */,
 				1067753525E1AB19002F78E7 /* ChangeEmailController.swift */,
 				1067753D25E1AE01002F78E7 /* ChangeEmailView.swift */,
 			);
@@ -1685,6 +1686,24 @@
 				108087362585072300FB9BB0 /* MindfulnessActions.swift */,
 			);
 			path = Mindfulness;
+			sourceTree = "<group>";
+		};
+		10B123CC29BF860F0022CBB0 /* Survey & Set-up */ = {
+			isa = PBXGroup;
+			children = (
+				10B123CD29BF86870022CBB0 /* SurveyController.swift */,
+				10B123CF29BF87AC0022CBB0 /* SurveyCell.swift */,
+				10BA3BCD259BEDF9005D98EC /* SetupCell.swift */,
+			);
+			path = "Survey & Set-up";
+			sourceTree = "<group>";
+		};
+		10B123D329BF9E960022CBB0 /* ChangeBirthday */ = {
+			isa = PBXGroup;
+			children = (
+				10B123D429BF9EC00022CBB0 /* ChangeBirthdayController.swift */,
+			);
+			path = ChangeBirthday;
 			sourceTree = "<group>";
 		};
 		10B2BC03257D386E00E3A798 /* Scheduler */ = {
@@ -2199,6 +2218,7 @@
 				4BAEE45121272B380045AB10 /* PrivacyAndSecurity */,
 				4BAEE45321272B380045AB10 /* ChangeNumber */,
 				1067753425E1AB04002F78E7 /* ChangeEmail */,
+				10B123D329BF9E960022CBB0 /* ChangeBirthday */,
 				4BAEE45821272B380045AB10 /* Storage */,
 			);
 			path = Menu;
@@ -2262,6 +2282,7 @@
 				4BAEE47C21272C4F0045AB10 /* Onboarding */,
 				4BAEE47921272C4F0045AB10 /* Authentication */,
 				4BAEE47321272C4F0045AB10 /* UserProfile */,
+				10B123CC29BF860F0022CBB0 /* Survey & Set-up */,
 			);
 			path = Authentication;
 			sourceTree = "<group>";
@@ -2639,6 +2660,7 @@
 				103946892549FD4B005CED3A /* FoodProductContainer.swift */,
 				101B908F2457999600EDDB90 /* Weather.swift */,
 				100A53F223E3BDAC004AA952 /* Filter.swift */,
+				10B123D129BF8C390022CBB0 /* Survey.swift */,
 				10737F8424912BDD00D146D6 /* Preview.swift */,
 				10B656CD24AFB0E7006686FA /* SectionType.swift */,
 				1092E26C28B7D91F0018FCAA /* CustomType.swift */,
@@ -3290,6 +3312,7 @@
 				106618B324BB655E003C3F36 /* PlaceExpandedDetailCell.swift in Sources */,
 				F9B82C9025FAB1FE0072BE74 /* AnalyticsDataSource.swift in Sources */,
 				F9E5BD0B260298D200CA027D /* WeekdayAxisValueFormatter.swift in Sources */,
+				10B123D229BF8C390022CBB0 /* Survey.swift in Sources */,
 				F916C764260E66170062F952 /* DateRange.swift in Sources */,
 				109FEB4222A9C3DD00621D2F /* Purchase.swift in Sources */,
 				10DFC3EB255CC3EA00565DAD /* MealActions.swift in Sources */,
@@ -3446,6 +3469,7 @@
 				10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */,
 				4BAEE50C21272D890045AB10 /* UserInfoTableViewController+handlers.swift in Sources */,
 				4BAEE50921272D890045AB10 /* SelectedMediaCollectionCell+timerHandlers.swift in Sources */,
+				10B123CE29BF86870022CBB0 /* SurveyController.swift in Sources */,
 				10196F0024411B5600B6AFDF /* PlacesAnnotation.swift in Sources */,
 				1040E583242AA05D00304D05 /* MessageViewController.swift in Sources */,
 				4BAEE5DF212735E50045AB10 /* UIEdgeInsetsExtensions.swift in Sources */,
@@ -3480,6 +3504,7 @@
 				4BE44DAA212B5CC600E722B8 /* ContactsFetcher.swift in Sources */,
 				4BAEE5F1212735E50045AB10 /* UICollectionView+Extension.swift in Sources */,
 				4BAEE5BE212735E50045AB10 /* UIVIew+INSPhotoViewer.swift in Sources */,
+				10B123D029BF87AC0022CBB0 /* SurveyCell.swift in Sources */,
 				4BAEE48021272C4F0045AB10 /* UserProfileDataDatabaseUpdater.swift in Sources */,
 				4BAEE546212735200045AB10 /* SplashScreenContainer+BiometricalControl.swift in Sources */,
 				4BAEE5ED212735E50045AB10 /* NewAdminTableViewCell.swift in Sources */,
@@ -3597,6 +3622,7 @@
 				10DE9CDD2463631100C8332C /* InstructionsDetailCell.swift in Sources */,
 				4BAEE5E7212735E50045AB10 /* SelectCountryCodeController.swift in Sources */,
 				10B3E51928B4FF2000E1713D /* ChooseTaskTableViewController.swift in Sources */,
+				10B123D529BF9EC00022CBB0 /* ChangeBirthdayController.swift in Sources */,
 				106D758B2442447C0039B534 /* ActivityActions.swift in Sources */,
 				10B3E52828B6B42E00E1713D /* ListsViewController.swift in Sources */,
 				10D420AD24787AD500CBAFA7 /* ChecklistActions.swift in Sources */,
@@ -3614,7 +3640,6 @@
 				4BAEE5E0212735E50045AB10 /* UIImageExtensions.swift in Sources */,
 				10DE97372475801400D4A7E8 /* ListCell+ConfigureCell.swift in Sources */,
 				4BAEE4F121272D890045AB10 /* UserinfoHeaderTableViewCell.swift in Sources */,
-				1067754225E1B590002F78E7 /* ChooseEmailView.swift in Sources */,
 				F95D8EF4261B8C2F006DED56 /* Charts+Style.swift in Sources */,
 				1067753625E1AB19002F78E7 /* ChangeEmailController.swift in Sources */,
 				100A53EC23E0DD9C004AA952 /* ActivityHeaderCell.swift in Sources */,
@@ -3628,7 +3653,6 @@
 				26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */,
 				10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */,
 				4BAEE46F21272B380045AB10 /* NotificationsTableViewController.swift in Sources */,
-				1067754825E1B767002F78E7 /* ChooseEmailController.swift in Sources */,
 				4BAEE50421272D890045AB10 /* AutoSizingCollectionViewFlowLayout.swift in Sources */,
 				10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */,
 				10F5CFF625CB7E3B0078C821 /* GFetchCalendarEventsOp.swift in Sources */,

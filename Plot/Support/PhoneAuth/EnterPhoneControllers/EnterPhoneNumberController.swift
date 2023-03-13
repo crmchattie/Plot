@@ -25,7 +25,7 @@ class EnterPhoneNumberController: UIViewController {
         configurePhoneNumberContainerView()
         phoneNumberContainerView.selectCountry.addTarget(self, action: #selector(openCountryCodesList), for: .touchUpInside)
         setCountry()
-        self.hideKeyboardWhenTappedAround()
+        hideKeyboardWhenTappedAround()
 
     }
     

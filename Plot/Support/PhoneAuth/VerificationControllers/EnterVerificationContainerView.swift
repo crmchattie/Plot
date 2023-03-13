@@ -47,8 +47,7 @@ class EnterVerificationContainerView: UIView {
         verificationCode.keyboardAppearance = .default
         verificationCode.backgroundColor = .secondarySystemGroupedBackground
         verificationCode.layer.cornerRadius = 10
-        verificationCode.attributedPlaceholder = NSAttributedString(string: "Code", attributes: [NSAttributedString.Key.foregroundColor:
-                                                                                                    UIColor.secondaryLabel])
+        verificationCode.placeholder = "Code"
         return verificationCode
     }()
     

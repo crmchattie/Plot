@@ -348,12 +348,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
                 inlineRow.cellUpdate { (cell, row) in
                     row.cell.backgroundColor = .secondarySystemGroupedBackground
                     row.cell.tintColor = .secondarySystemGroupedBackground
+                    cell.datePicker.tintColor = .systemBlue
                     if #available(iOS 14.0, *) {
                         cell.datePicker.preferredDatePickerStyle = .inline
-                        cell.datePicker.tintColor = .systemBlue
-                    }
-                    else {
-                        cell.datePicker.datePickerMode = .dateAndTime
                     }
                 }
                 cell.detailTextLabel?.textColor = cell.tintColor
@@ -680,12 +677,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             $0.cell.tintColor = .secondarySystemGroupedBackground
             $0.hidden = true
             $0.minuteInterval = 5
+            $0.cell.datePicker.tintColor = .systemBlue
             if #available(iOS 14.0, *) {
                 $0.cell.datePicker.preferredDatePickerStyle = .inline
-                $0.cell.datePicker.tintColor = .systemBlue
-            }
-            else {
-                $0.cell.datePicker.datePickerMode = .date
             }
             if let task = task, let endDate = task.endDate {
                 $0.value = endDate
@@ -787,11 +781,9 @@ class TaskViewController: FormViewController, ObjectDetailShowing {
             $0.cell.tintColor = .secondarySystemGroupedBackground
             $0.hidden = true
             $0.minuteInterval = 5
+            $0.cell.datePicker.tintColor = .systemBlue
             if #available(iOS 13.4, *) {
                 $0.cell.datePicker.preferredDatePickerStyle = .wheels
-            }
-            else {
-                $0.cell.datePicker.datePickerMode = .time
             }
             if let task = task, task.hasDeadlineTime ?? false, let endDate = task.endDate {
                 $0.value = endDate
