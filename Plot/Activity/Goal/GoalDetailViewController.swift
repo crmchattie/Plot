@@ -286,7 +286,7 @@ class GoalDetailViewController: FormViewController {
             self.updateDescriptionRow()
         }
         
-        if active {
+        if active, let goal = goal, goal.currentNumber != nil {
             form.last!
             <<< DecimalRow("Current") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -294,7 +294,7 @@ class GoalDetailViewController: FormViewController {
                 row.cell.selectionStyle = .none
                 row.cell.isUserInteractionEnabled = false
                 row.title = row.tag
-                if let goal = goal, let number = goal.currentNumber {
+                if let number = goal.currentNumber {
                     row.value = number
                 }
             }.cellUpdate { cell, row in

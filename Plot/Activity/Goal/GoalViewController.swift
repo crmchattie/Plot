@@ -82,7 +82,8 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
     
     var active = false
     var sectionChanged: Bool = false
-    var ignoreUpdate = false
+    var ignoreUpdateStart = false
+    var ignoreUpdateEnd = false
     
     weak var updateDiscoverDelegate : UpdateDiscover?
     
@@ -556,10 +557,11 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                     self.task.startDateTime = NSNumber(value: Int((date.startOfYear.UTCTime).timeIntervalSince1970))
                     self.task.endDateTime = NSNumber(value: Int((date.endOfYear.advanced(by: -1).UTCTime).timeIntervalSince1970))
                 }
-                self.ignoreUpdate = true
+                self.ignoreUpdateStart = true
+                self.ignoreUpdateEnd = true
             } else {
                 row.value = "None"
-                self.task.goal!.period = nil
+                self.task.goal?.period = nil
             }
             self.updateDescriptionRow()
         }
@@ -578,7 +580,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 $0.hidden = Condition(booleanLiteral: self.active)
             }
         }.onChange { [weak self] row in
-            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate"), !self!.ignoreUpdate {
+            if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate"), !self!.ignoreUpdateStart {
                 if value {
                     row.cell.detailTextLabel?.textColor = .systemBlue
                     if let task = self?.task, let startDate = task.goalStartDateUTC {
@@ -599,7 +601,6 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 startDateRow.hidden = condition
                 startDateRow.evaluateHidden()
             }
-            self!.ignoreUpdate = false
         }.onCellSelection({ [weak self] _, row in
             if row.value ?? false {
                 if let startDate: DatePickerRow = self?.form.rowBy(tag: "StartDate") {
@@ -623,6 +624,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 cell.detailTextLabel?.text = nil
                 row.value = false
             }
+            self.ignoreUpdateStart = false
         }
 
         <<< DatePickerRow("StartDate") {
@@ -668,7 +670,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             }
             $0.hidden = Condition(booleanLiteral: self.task.startDate == nil)
         }.onChange { [weak self] row in
-            if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
+            if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate"), !self!.ignoreUpdateEnd {
                 if value {
                     row.cell.detailTextLabel?.textColor = .systemBlue
                     if let task = self?.task, let endDate = task.goalEndDateUTC {
@@ -709,9 +711,12 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.detailTextLabel?.textColor = .secondaryLabel
             if let task = self.task, let endDate = task.goalEndDateUTC {
                 cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
+                row.value = true
             } else {
                 cell.detailTextLabel?.text = nil
+                row.value = false
             }
+            self.ignoreUpdateEnd = false
         }
         
         <<< DatePickerRow("DeadlineDate") {

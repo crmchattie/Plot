@@ -69,12 +69,11 @@ extension GoalViewController: UpdateGoalDelegate {
                     self.task.goal!.submetric = goal.submetric
                     self.task.goal!.option = goal.option
                     self.task.goal!.unit = goal.unit
-                    self.task.goal!.period = goal.period
                     self.task.goal!.targetNumber = goal.targetNumber
                     self.task.goal!.currentNumber = goal.currentNumber
                     self.task.goal!.metricRelationship = goal.metricRelationship
                 } else {
-                    self.task.goal = Goal(name: nil, metric: goal.metric, submetric: goal.submetric, option: goal.option, unit: goal.unit, period: goal.period, targetNumber: goal.targetNumber, currentNumber: goal.currentNumber, metricRelationship: goal.metricRelationship, frequency: nil, metricSecond: nil, submetricSecond: nil, optionSecond: nil, unitSecond: nil, periodSecond: nil, targetNumberSecond: nil, currentNumberSecond: nil, metricRelationshipSecond: nil, metricsRelationshipType: nil)
+                    self.task.goal = goal
                 }
             } else if number == 1, let row: LabelRow = form.rowBy(tag: "secondMetric") {
                 row.value = goal.cellDescriptionFirst ?? goal.metric?.rawValue
@@ -84,7 +83,6 @@ extension GoalViewController: UpdateGoalDelegate {
                     self.task.goal!.submetricSecond = goal.submetric
                     self.task.goal!.optionSecond = goal.option
                     self.task.goal!.unitSecond = goal.unit
-                    self.task.goal!.periodSecond = goal.period
                     self.task.goal!.targetNumberSecond = goal.targetNumber
                     self.task.goal!.currentNumberSecond = goal.currentNumber
                     self.task.goal!.metricRelationshipSecond = goal.metricRelationship

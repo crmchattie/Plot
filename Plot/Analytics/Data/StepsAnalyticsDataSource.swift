@@ -97,25 +97,25 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
                             var dataEntriesCurrent: [ChartDataEntry] = []
                             let sum = statsCurrent.reduce(0, { $0 + $1.value })
                             average = sum / Double(statsCurrent.count)
-                            print("creating data entries steps")
-                            print(startDateCurrent)
-                            for current in statsCurrent {
-                                print(current.date)
-                                print(current.value)
-                            }
+//                            print("creating data entries steps")
+//                            print(startDateCurrent)
+//                            for current in statsCurrent {
+//                                print(current.date)
+//                                print(current.value)
+//                            }
                             for index in 0...daysInRange {
                                 let date = startDateCurrent.addDays(index)
-                                if let stat = statsCurrent.first(where: { $0.date == date }) {
-                                    print("found stat")
-                                    print(stat.date)
-                                    print(stat.value)
+                                if let stat = statsCurrent.first(where: { $0.date.startOfDay == date.startOfDay }) {
+//                                    print("found stat")
+//                                    print(stat.date)
+//                                    print(stat.value)
                                     if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
                                         let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
                                         dataEntriesCurrent.append(entry)
                                     }
                                 } else {
-                                    print("did not find stat")
-                                    print(date)
+//                                    print("did not find stat")
+//                                    print(date)
                                     let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
                                     dataEntriesCurrent.append(entry)
                                 }
@@ -153,7 +153,7 @@ class StepsAnalyticsDataSource: AnalyticsDataSource {
 //                                }
                                 for index in 0...daysInRange {
                                     let date = startDatePast.addDays(index)
-                                    if let stat = statsPast.first(where: { $0.date == date }) {
+                                    if let stat = statsPast.first(where: { $0.date.startOfDay == date.startOfDay }) {
 //                                        print("found stat")
 //                                        print(stat.date)
 //                                        print(stat.value)
