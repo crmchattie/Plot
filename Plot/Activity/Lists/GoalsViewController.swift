@@ -302,7 +302,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
         
         if showRecurringGoals {
             goals = networkGoals.filter({
-                if $0.endDate ?? selectedDate >= selectedDate, $0.startDate ?? selectedDate <= selectedDate {
+                if $0.goalEndDateUTC ?? selectedDate >= selectedDate, $0.goalStartDateUTC ?? selectedDate <= selectedDate {
                     return true
                 }
                 return false
@@ -311,7 +311,13 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             goals = []
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                    if goal.endDate ?? selectedDate >= selectedDate, goal.startDate ?? selectedDate <= selectedDate {
+                    if goal.goalEndDateUTC ?? selectedDate >= selectedDate, goal.goalStartDateUTC ?? selectedDate <= selectedDate {
+                        print(goal.name)
+                        print(selectedDate)
+                        print(goal.startDate)
+                        print(goal.endDate)
+                        print(goal.startDate?.localTime)
+                        print(goal.endDate?.localTime)
                         goals.append(goal)
                     }
                 }
@@ -454,15 +460,11 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
         self.selectedDate = date
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
-        if let value = activityDates[dateString] {
-            print(value)
-        }
         sortandreload()
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        calendar.select(calendar.currentPage)
         self.selectedDate = calendar.currentPage
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
@@ -512,12 +514,12 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
             dispatchGroup.enter()
             dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
             if activity.isCompleted ?? false {
-                if let startDate = activity.startDate?.localTime, let endDate = activity.endDate?.localTime {
+                if let startDate = activity.goalStartDateUTC, let endDate = activity.goalEndDateUTC {
                     for activityDate in stride(from: startDate, to: endDate, by: 86400) {
                         activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
                     }
                     dispatchGroup.leave()
-                } else if let endDate = activity.endDate?.localTime {
+                } else if let endDate = activity.goalEndDateUTC {
                     activityDates[dateFormatter.string(from: endDate), default: 0] += 1
                     dispatchGroup.leave()
                 }
@@ -625,7 +627,7 @@ extension GoalsViewController: UpdateFilter {
                 let bool = value[0].lowercased()
                 if bool == "yes" {
                     goals = networkGoals.filter({
-                        if $0.endDate ?? selectedDate >= selectedDate, $0.startDate ?? selectedDate <= selectedDate {
+                        if $0.goalEndDateUTC ?? selectedDate >= selectedDate, $0.goalStartDateUTC ?? selectedDate <= selectedDate {
                             return true
                         }
                         return false
@@ -635,7 +637,7 @@ extension GoalsViewController: UpdateFilter {
                     goals = []
                     for goal in networkGoals {
                         if !goals.contains(where: {$0.activityID == goal.activityID}) {
-                            if goal.endDate ?? selectedDate >= selectedDate, goal.startDate ?? selectedDate <= selectedDate {
+                            if goal.goalEndDateUTC ?? selectedDate >= selectedDate, goal.goalStartDateUTC ?? selectedDate <= selectedDate {
                                 goals.append(goal)
                             }
                         }

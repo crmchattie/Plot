@@ -245,22 +245,27 @@ class HealthDetailService: HealthDetailServiceInterface {
         // The date used to anchor the collection’s time intervals.
         // Use the anchor date to set the start time for your time intervals. For example, if you are using a day interval, you might create a date object with a time of 2:00 a.m. This value sets the start of each day for all of your time intervals.
         // Use start of the day in local time
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-        let anchorDate = anchorDate ?? Date().localTime.startOfDay.addingTimeInterval(-seconds)
-        var startDate = anchorDate
-        var endDate = anchorDate.advanced(by: 86399)
+        
+        
+        
+        var anchorDateFinal = Date().localTime.startOfDay.UTCTime
+        if let anchorDate = anchorDate {
+            anchorDateFinal = anchorDate
+        }
+
+        var startDate = anchorDateFinal
+        var endDate = anchorDateFinal.addDays(1)
                                 
         if segmentType == .day {
             interval.hour = 1
         }
         else if segmentType == .week {
             interval.day = 1
-            startDate = anchorDate.weekBefore
+            startDate = anchorDateFinal.weekBefore
         }
         else if segmentType == .month {
             interval.day = 1
-            startDate = anchorDate.monthBefore
+            startDate = anchorDateFinal.monthBefore
         }
         else if segmentType == .year {
             if case .steps = healthMetricType {
@@ -272,29 +277,28 @@ class HealthDetailService: HealthDetailServiceInterface {
             } else {
                 interval.month = 1
             }
-            startDate = anchorDate.lastYear
+            startDate = anchorDateFinal.lastYear
         }
         
         if case .sleep = healthMetricType {
-//            print("before sleep dates everything else")
-//            print(startDate)
-//            print(endDate)
-            
             startDate = startDate.startOfDay.localTime
             if segmentType == .day {
-                endDate = startDate.advanced(by: 86400)
+                endDate = startDate.addDays(1)
             } else {
                 endDate = endDate.localTime
             }
-            
-//            print("after sleep dates everything else")
-//            print(startDate)
-//            print(endDate)
         }
         
         if segmentType != .day, !(extraDataPoint ?? false) {
-            startDate = startDate.advanced(by: 86400)
+            startDate = startDate.addDays(1)
         }
+        
+//        print("health detail service non-goals")
+//        print(healthMetricType)
+//        print(startDate)
+//        print(endDate)
+//        print(startDate.localTime)
+//        print(endDate.localTime)
         
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
@@ -339,7 +343,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                     return
                 }
                 
-                HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDate, interval: interval) { [weak self] (results, error) in
+                HealthKitService.getIntervalBasedSamples(for: quantityTypeValue, statisticsOptions: statisticsOptions, startDate: startDate, endDate: endDate, anchorDate: anchorDateFinal, interval: interval) { [weak self] (results, error) in
                     if case .steps = healthMetricType {
                         HealthKitService.getAllTheSamples(for: quantityTypeValue, startDate: startDate, endDate: endDate) { (samples, error) in
                             if segmentType == .year {
@@ -492,25 +496,25 @@ class HealthDetailService: HealthDetailServiceInterface {
         // The date used to anchor the collection’s time intervals.
         // Use the anchor date to set the start time for your time intervals. For example, if you are using a day interval, you might create a date object with a time of 2:00 a.m. This value sets the start of each day for all of your time intervals.
         // Use start of the day in local time
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: Date()))
-        let anchorDate = range.startDate.dayAfter.localTime.startOfDay.addingTimeInterval(-seconds)
+        
+//        print("health detail service goals")
+//        print(range.startDate)
+//        print(range.endDate)
+        
+        let anchorDate = range.startDate.UTCTime
         var startDate = anchorDate
-        var endDate = anchorDate.advanced(by: 86399)
+        var endDate = range.endDate.UTCTime
         
         if case .sleep = healthMetricType {
-//            print("before sleep dates goal")
-//            print(startDate)
-//            print(endDate)
-            
             startDate = startDate.startOfDay.localTime
-            endDate = startDate.advanced(by: 86400)
-            
-//            print("after sleep dates goal")
-//            print(startDate)
-//            print(endDate)
-            
+            endDate = endDate.advanced(by: 1).startOfDay.localTime.advanced(by: -1)
         }
+        
+//        print(healthMetricType)
+//        print(startDate)
+//        print(endDate)
+//        print(startDate.localTime)
+//        print(endDate.localTime)
         
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
@@ -660,7 +664,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             var sum: Double = 0
             for sample in samples {
                 while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
-                    startDay = startDay.advanced(by: 86400)
+                    startDay = startDay.addDays(1)
                     interval = NSDateInterval(start: startDay, duration: 86400)
                 }
                 
@@ -728,7 +732,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             var sum: Double = 0
             for sample in samples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
-                    startDay = startDay.advanced(by: 86400)
+                    startDay = startDay.addDays(1)
                     interval = NSDateInterval(start: startDay, duration: 86400)
                 }
                 
@@ -820,7 +824,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             
             for sample in samples {
                 while !(interval.contains(sample.endDate.localTime)) && interval.endDate < endDate {
-                    midDay = midDay.advanced(by: 86400)
+                    midDay = midDay.addDays(1)
                     interval = NSDateInterval(start: midDay, duration: 86400)
                     let relevantSamples = samples.filter({interval.contains($0.endDate.localTime)})
                     let sleepValues = relevantSamples.map({HKCategoryValueSleepAnalysis(rawValue: $0.value)})

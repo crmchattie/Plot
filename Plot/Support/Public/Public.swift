@@ -1006,7 +1006,30 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
         }
         
     }
-    else if let date = task.endDate {
+    else if let date = task.goalEndDateUTC {
+        value += "Due: "
+        let allDay = !(task.hasDeadlineTime ?? false)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d"
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var day = ""
+        let dayString = dateFormatter.string(from: date)
+        if let integer = Int(dayString) {
+            let number = NSNumber(value: integer)
+            day = numberFormatter.string(from: number) ?? ""
+        }
+        
+        dateFormatter.dateFormat = "E, MMM"
+        value += "\(dateFormatter.string(from: date)) \(day)"
+        
+        if !allDay {
+            dateFormatter.dateFormat = "h:mm a"
+            value += " \(dateFormatter.string(from: date))"
+        }
+    } else if let date = task.endDate {
         value += "Due: "
         let allDay = !(task.hasDeadlineTime ?? false)
         let dateFormatter = DateFormatter()
@@ -2300,14 +2323,14 @@ class TapGesture: UITapGestureRecognizer {
 
 extension Date {
     var localTime: Date {
-        let timezoneOffset = TimeZone.current.secondsFromGMT()
+        let timezoneOffset = TimeZone.current.secondsFromGMT(for: self)
         let epochDate = self.timeIntervalSince1970
         let timezoneEpochOffset = (epochDate + Double(timezoneOffset))
         return Date(timeIntervalSince1970: timezoneEpochOffset)
     }
     
     var UTCTime: Date {
-        let timezoneOffset = TimeZone.current.secondsFromGMT()
+        let timezoneOffset = TimeZone.current.secondsFromGMT(for: self)
         let epochDate = self.timeIntervalSince1970
         let timezoneEpochOffset = (epochDate - Double(timezoneOffset))
         return Date(timeIntervalSince1970: timezoneEpochOffset)

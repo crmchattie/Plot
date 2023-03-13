@@ -96,7 +96,6 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                             average = sum / Double(statsCurrent.count)
                             for index in 0...daysInRange {
                                 let date = startDateCurrent.addDays(index)
-                                
                                 if let stat = statsCurrent.first(where: { $0.date == date }) {
                                     if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
                                         let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
@@ -134,7 +133,6 @@ class ActiveEnergyAnalyticsDataSource: AnalyticsDataSource {
                                 average = sum / Double(statsCurrent.count)
                                 for index in 0...daysInRange {
                                     let date = startDatePast.addDays(index)
-                                    
                                     if let stat = statsPast.first(where: { $0.date == date }) {
                                         if !dataEntriesPast.contains(where: {$0.data as? Date == stat.date }) {
                                             let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)

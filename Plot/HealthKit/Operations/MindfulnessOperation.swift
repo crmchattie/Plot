@@ -45,7 +45,7 @@ class MindfulnessOperation: AsyncOperation {
                 var sum: Double = 0
                 for sample in samples {
                     while !(interval.contains(sample.endDate)) && interval.endDate < endDate {
-                        startDay = startDay.advanced(by: 86400)
+                        startDay = startDay.addDays(1)
                         interval = NSDateInterval(start: startDay, duration: 86400)
                     }
                     

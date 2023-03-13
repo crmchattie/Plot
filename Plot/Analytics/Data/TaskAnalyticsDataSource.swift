@@ -63,6 +63,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         
         switch chartViewModel.value.chartType {
         case .line:
+            
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.tasks, isEvent: false) { categoryStatsCurrent, taskListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
@@ -187,6 +188,13 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         case .horizontalBar:
             break
         case .verticalBar:
+            
+            print("load data tasks")
+            print(range.startDate)
+            print(range.endDate)
+            print(range.startDate.localTime)
+            print(range.endDate.localTime)
+            
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.tasks, isEvent: false) { categoryStats, taskList in
                             
                 guard !taskList.isEmpty else {
@@ -244,6 +252,9 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                     let daysInRange = self.range.daysInRange
                     let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
                         let current = self.range.startDate.addDays(index)
+                        print("chart data entry task")
+                        print(current)
+                        print(current.localTime)
                         let yValues = categories.map {
                             (categoryStats[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value })
                         }

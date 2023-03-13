@@ -36,10 +36,10 @@ extension NetworkController {
             var range = DateRange(startDate: Date().localTime.startOfDay, endDate: Date().localTime.endOfDay.advanced(by: -1))
             
             //not all tasks will have a start date
-            if let startDate = task.startDate, let endDate = task.endDate {
-                range = DateRange(startDate: startDate.localTime, endDate: endDate.localTime)
-            } else if let endDate = task.endDate {
-                range = DateRange(startDate: endDate.localTime, endDate: endDate.localTime)
+            if let startDate = task.goalStartDate, let endDate = task.goalEndDate {
+                range = DateRange(startDate: startDate, endDate: endDate)
+            } else if let endDate = task.goalEndDate {
+                range = DateRange(startDate: endDate.endOfDay.advanced(by: -1), endDate: endDate.endOfDay.advanced(by: -1))
             }
             
             guard range.endDate > past, range.startDate <= current else {

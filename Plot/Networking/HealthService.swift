@@ -447,7 +447,7 @@ class HealthService {
 //                        var sum: Double = 0
 //                        for mindfuless in self!.mindfulnesses {
 //                            while !(interval.contains(mindfuless.endDate)) && interval.endDate < endDate {
-//                                startDay = startDay.advanced(by: 86400)
+//                                startDay = startDayaddDays(1)
 //                                interval = NSDateInterval(start: startDay, duration: 86400)
 //                            }
 //

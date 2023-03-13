@@ -15,16 +15,36 @@ enum DateRangeType: CaseIterable {
     
     var initial: (Date, Date) {
         switch self {
-        case .week: return (Date().localTime.startOfDay.UTCTime.weekBefore.advanced(by: 86400), Date().localTime.startOfDay.UTCTime.advanced(by: 86399))
-        case .month: return (Date().localTime.startOfDay.UTCTime.monthBefore.advanced(by: 86400), Date().localTime.startOfDay.UTCTime.advanced(by: 86399))
+        case .week:
+//            if TimeZone.current.isDaylightSavingTime() {
+//                return (Date().localTime.startOfDay.UTCTime.weekBefore.addDays(1).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()), Date().localTime.startOfDay.UTCTime.advanced(by: 86399).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()))
+//            } else {
+            return (Date().localTime.startOfDay.weekBefore.addDays(1).UTCTime, Date().localTime.startOfDay.advanced(by: 86399).UTCTime)
+//            }
+        case .month:
+//            if TimeZone.current.isDaylightSavingTime() {
+//                return (Date().localTime.startOfDay.UTCTime.monthBefore.addDays(1).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()), Date().localTime.startOfDay.UTCTime.advanced(by: 86399).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()))
+//            } else {
+            return (Date().localTime.startOfDay.monthBefore.addDays(1).UTCTime, Date().localTime.startOfDay.advanced(by: 86399).UTCTime)
+//            }
 //        case .year: return (Date().yearBefore, Date())
         }
     }
     
     var pastInitial: (Date, Date) {
         switch self {
-        case .week: return (Date().localTime.startOfDay.UTCTime.weekBefore.advanced(by: 86400).weekBefore, Date().localTime.startOfDay.UTCTime.advanced(by: 86399).weekBefore)
-        case .month: return (Date().localTime.startOfDay.UTCTime.monthBefore.advanced(by: 86400).monthBefore, Date().localTime.startOfDay.UTCTime.advanced(by: 86399).monthBefore)
+        case .week:
+//            if TimeZone.current.isDaylightSavingTime() {
+//                return (Date().localTime.startOfDay.UTCTime.weekBefore.addDays(1).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()).weekBefore, Date().localTime.startOfDay.UTCTime.advanced(by: 86399).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()).weekBefore)
+//            } else {
+            return (Date().localTime.startOfDay.weekBefore.addDays(1).weekBefore.UTCTime, Date().localTime.startOfDay.advanced(by: 86399).weekBefore.UTCTime)
+//            }
+        case .month:
+//            if TimeZone.current.isDaylightSavingTime() {
+//                return (Date().localTime.startOfDay.UTCTime.monthBefore.addDays(1).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()).monthBefore, Date().localTime.startOfDay.UTCTime.advanced(by: 86399).addingTimeInterval(TimeZone.current.daylightSavingTimeOffset()).monthBefore)
+//            } else {
+            return (Date().localTime.startOfDay.monthBefore.addDays(1).monthBefore.UTCTime, Date().localTime.startOfDay.advanced(by: 86399).monthBefore.UTCTime)
+//            }
 //        case .year: return (Date().yearBefore, Date())
         }
     }

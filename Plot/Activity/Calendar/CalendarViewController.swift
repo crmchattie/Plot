@@ -577,6 +577,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        calendar.select(calendar.currentPage)
         self.selectedDate = calendar.currentPage.localTime
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString

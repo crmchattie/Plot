@@ -569,7 +569,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             $0.cell.textLabel?.textColor = .label
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Start Date"
-            if let task = task, let startDate = task.startDate {
+            if let task = task, let startDate = task.goalStartDateUTC {
                 $0.value = true
                 $0.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
             } else {
@@ -581,7 +581,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             if let value = row.value, let startDateRow: DatePickerRow = self?.form.rowBy(tag: "StartDate"), !self!.ignoreUpdate {
                 if value {
                     row.cell.detailTextLabel?.textColor = .systemBlue
-                    if let task = self?.task, let startDate = task.startDate {
+                    if let task = self?.task, let startDate = task.goalStartDateUTC {
                         row.cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
                         startDateRow.value = startDate
                     } else {
@@ -616,7 +616,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-            if let task = self.task, let startDate = task.startDate {
+            if let task = self.task, let startDate = task.goalStartDateUTC {
                 cell.detailTextLabel?.text = startDate.getMonthAndDateAndYear()
                 row.value = true
             } else {
@@ -640,7 +640,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             else {
                 $0.cell.datePicker.datePickerMode = .date
             }
-            if let task = task, let startDate = task.startDate {
+            if let task = task, let startDate = task.goalStartDateUTC {
                 $0.value = startDate
                 $0.updateCell()
             }
@@ -659,7 +659,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             $0.cell.textLabel?.textColor = .label
             $0.cell.detailTextLabel?.textColor = .secondaryLabel
             $0.title = "Deadline Date"
-            if let task = task, let endDate = task.endDate {
+            if let task = task, let endDate = task.goalEndDateUTC {
                 $0.value = true
                 $0.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
             } else {
@@ -671,7 +671,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             if let value = row.value, let endDateRow: DatePickerRow = self?.form.rowBy(tag: "DeadlineDate") {
                 if value {
                     row.cell.detailTextLabel?.textColor = .systemBlue
-                    if let task = self?.task, let endDate = task.endDate {
+                    if let task = self?.task, let endDate = task.goalEndDateUTC {
                         row.cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
                         endDateRow.value = endDate
                     } else {
@@ -707,7 +707,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.textLabel?.textColor = .label
             cell.detailTextLabel?.textColor = .secondaryLabel
-            if let task = self.task, let endDate = task.endDate {
+            if let task = self.task, let endDate = task.goalEndDateUTC {
                 cell.detailTextLabel?.text = endDate.getMonthAndDateAndYear()
             } else {
                 cell.detailTextLabel?.text = nil
@@ -729,7 +729,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             else {
                 $0.cell.datePicker.datePickerMode = .date
             }
-            if let task = task, let endDate = task.endDate {
+            if let task = task, let endDate = task.goalEndDateUTC {
                 $0.value = endDate
                 $0.updateCell()
             }
@@ -752,8 +752,10 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             row.title = row.tag
             row.hidden = "$deadlineDateSwitch == false"
             if let task = task, let recurrences = task.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
-                if let endDate = self.task.instanceOriginalStartDate {
-                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                if let instanceOriginalStartDate = self.task.instanceOriginalStartDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: instanceOriginalStartDate)
+                } else if let startDate = self.task.startDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
                 } else if let endDate = self.task.endDate {
                     row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
                 }
@@ -769,8 +771,10 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.accessoryType = .disclosureIndicator
             if let task = self.task, let recurrences = task.recurrences, let recurrence = recurrences.first(where: { $0.starts(with: "RRULE") }), let recurrenceRule = RecurrenceRule(rruleString: recurrence) {
-                if let endDate = self.task.instanceOriginalStartDate {
-                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
+                if let instanceOriginalStartDate = self.task.instanceOriginalStartDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: instanceOriginalStartDate)
+                } else if let startDate = self.task.startDate {
+                    row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: startDate)
                 } else if let endDate = self.task.endDate {
                     row.value = recurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate)
                 }

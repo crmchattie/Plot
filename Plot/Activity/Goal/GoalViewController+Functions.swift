@@ -714,7 +714,7 @@ extension GoalViewController {
             subcategoryRow.updateCell()
             
             task.category = category.rawValue
-            task.category = subcategory.rawValue
+            task.subcategory = subcategory.rawValue
             
             if let listRow: LabelRow = self.form.rowBy(tag: "List"), let lists = self.lists[ListSourceOptions.plot.name] {
                 var list: ListType?
@@ -1133,7 +1133,7 @@ extension GoalViewController {
     }
     
     @objc func createNewActivity() {
-        if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
+        if active, let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let finalDate = taskOld.finalDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: finalDate) != "Never", let currentUserID = Auth.auth().currentUser?.uid {
             if self.task.recurrences == nil {
                 self.deleteRecurrences()
             } else {
@@ -1199,7 +1199,7 @@ extension GoalViewController {
                             self.createActivity(title: tasksUpdatedMessage)
                         } else if let date = self.task.recurrenceStartDateTime {
                             //update all instances of activity
-                            self.task.endDateTime = date
+                            self.task.startDateTime = date
                             self.createActivity(title: tasksUpdatedMessage)
                         }
                     }
@@ -1421,7 +1421,7 @@ extension GoalViewController {
     
     func deleteActivity() {
         //need to look into equatable protocol for activities
-        if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let endDate = taskOld.endDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: endDate) != "Never" {
+        if let oldRecurrences = self.taskOld.recurrences, let oldRecurranceIndex = oldRecurrences.firstIndex(where: { $0.starts(with: "RRULE") }), let oldRecurrenceRule = RecurrenceRule(rruleString: oldRecurrences[oldRecurranceIndex]), let finalDate = taskOld.finalDate, oldRecurrenceRule.typeOfRecurrence(language: .english, occurrence: finalDate) != "Never" {
             let alert = UIAlertController(title: nil, message: "This is a repeating goal.", preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction(title: "Delete This Goal Only", style: .default, handler: { (_) in
@@ -1429,7 +1429,7 @@ extension GoalViewController {
                 //update activity's recurrence to skip repeat on this date
                 var oldActivityRule = oldRecurrenceRule
                 //update existing activity with exlusion date that fall's on this date
-                oldActivityRule.exdate = ExclusionDate(dates: [endDate], granularity: .day)
+                oldActivityRule.exdate = ExclusionDate(dates: [finalDate], granularity: .day)
                 self.task.recurrences!.append(oldActivityRule.exdate!.toExDateString()!)
                 self.updateRecurrences(recurrences: self.task.recurrences!, title: taskDeletedMessage)
             }))

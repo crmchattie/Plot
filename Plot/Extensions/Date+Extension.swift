@@ -80,54 +80,126 @@ extension Date {
     }
     
     var hourBefore: Date {
-        return Calendar.current.date(byAdding: .hour, value: -1, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .hour, value: -1, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .hour, value: -1, to: self)!
+        }
     }
     
     var dayBefore: Date {
-        return Calendar.current.date(byAdding: .day, value: -1, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .day, value: -1, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .day, value: -1, to: self)!
+        }
     }
     
     var dayAfter: Date {
-        return Calendar.current.date(byAdding: .day, value: 1, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .day, value: 1, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .day, value: 1, to: self)!
+        }
     }
     
     var weekBefore: Date {
-        return Calendar.current.date(byAdding: .day, value: -7, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .day, value: -7, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .day, value: -7, to: self)!
+        }
     }
     
     var weekAfter: Date {
-        return Calendar.current.date(byAdding: .day, value: 7, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .day, value: 7, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .day, value: 7, to: self)!
+        }
     }
     
     var monthBefore: Date {
-        return Calendar.current.date(byAdding: .month, value: -1, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .month, value: -1, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .month, value: -1, to: self)!
+        }
     }
     
     var monthAfter: Date {
-        return Calendar.current.date(byAdding: .month, value: 1, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .month, value: 1, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .month, value: 1, to: self)!
+        }
     }
     
     var lastYear: Date {
-        return Calendar.current.date(byAdding: .year, value: -1, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .year, value: -1, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .year, value: -1, to: self)!
+        }
     }
     
     var yearAfter: Date {
-        return Calendar.current.date(byAdding: .year, value: 1, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .year, value: 1, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .year, value: 1, to: self)!
+        }
     }
     
     func daysSince(_ date: Date) -> Int {
-        Calendar.current.dateComponents([.day], from: date, to: self).day ?? 0
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.dateComponents([.day], from: date, to: self).day ?? 0
+        } else {
+            return Calendar.current.dateComponents([.day], from: date, to: self).day ?? 0
+        }
     }
     
     func addHours(_ hours: Int) -> Date {
-        Calendar.current.date(byAdding: .hour, value: hours, to: self)!
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.date(byAdding: .hour, value: hours, to: self)!
+        } else {
+            return Calendar.current.date(byAdding: .hour, value: hours, to: self)!
+        }
     }
     
     func addDays(_ days: Int) -> Date {
-        Calendar.current.date(byAdding: .day, value: days, to: self)!
+        return Calendar.current.date(byAdding: .day, value: days, to: self)!
     }
     
     func isSameDay(as date: Date) -> Bool {
-        Calendar.current.isDate(self, inSameDayAs: date)
+        var calendar = Calendar(identifier: .gregorian)
+        if let utcTimeZone = TimeZone(identifier: "UTC") {
+            calendar.timeZone = utcTimeZone
+            return calendar.isDate(self, inSameDayAs: date)
+        } else {
+            return Calendar.current.isDate(self, inSameDayAs: date)
+        }
     }
 }
