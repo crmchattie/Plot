@@ -2143,38 +2143,6 @@ extension Activity {
         return nil
     }
     
-    var goalStartDate: Date? {
-        if let startDateTime = startDateTime?.doubleValue {
-            return Date(timeIntervalSince1970: startDateTime).startOfDay
-        }
-        return nil
-    }
-    
-    var goalEndDate: Date? {
-        if let startDate = self.startDate, let endDate = self.endDate {
-            let difference = startDate.distance(to: endDate)
-            return startDate.startOfDay.addingTimeInterval(difference)
-        }
-        else if let endDateTime = endDateTime?.doubleValue {
-            return Date(timeIntervalSince1970: endDateTime)
-        }
-        return nil
-    }
-    
-    var goalStartDateUTC: Date? {
-        if let goalStartDate = goalStartDate {
-            return goalStartDate.UTCTime
-        }
-        return nil
-    }
-    
-    var goalEndDateUTC: Date? {
-        if let goalEndDate = goalEndDate {
-            return goalEndDate.UTCTime
-        }
-        return nil
-    }
-    
     var finalDate: Date? {
         if isTask ?? false, !(isGoal ?? false) {
             return endDate
@@ -2206,6 +2174,38 @@ extension Activity {
     var completedDateDate: Date? {
         if let completedDate = completedDate?.doubleValue {
             return Date(timeIntervalSince1970: completedDate)
+        }
+        return nil
+    }
+    
+    var goalStartDate: Date? {
+        if let startDateTime = startDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: startDateTime).startOfDay
+        }
+        return nil
+    }
+    
+    var goalEndDate: Date? {
+        if let startDate = self.startDate, let endDate = self.endDate {
+            let difference = startDate.distance(to: endDate)
+            return startDate.startOfDay.addingTimeInterval(difference)
+        }
+        else if let endDateTime = endDateTime?.doubleValue {
+            return Date(timeIntervalSince1970: endDateTime)
+        }
+        return nil
+    }
+    
+    var goalStartDateUTC: Date? {
+        if let goalStartDate = goalStartDate {
+            return goalStartDate.UTCTime
+        }
+        return nil
+    }
+    
+    var goalEndDateUTC: Date? {
+        if let goalEndDate = goalEndDate {
+            return goalEndDate.UTCTime
         }
         return nil
     }
