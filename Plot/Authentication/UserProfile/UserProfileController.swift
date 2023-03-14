@@ -44,6 +44,7 @@ class UserProfileController: UIViewController {
     }
     
     fileprivate func configureNavigationBar () {
+        self.title = "Profile"
         self.navigationItem.setHidesBackButton(true, animated: true)
     }
     

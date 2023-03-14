@@ -211,6 +211,7 @@
 		10B123E429C0CBD60022CBB0 /* SetupHealthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */; };
 		10B123E629C0CBE80022CBB0 /* SetupFinanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */; };
 		10B123E829C0F6C80022CBB0 /* SetupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E729C0F6C80022CBB0 /* SetupCell.swift */; };
+		10B123EA29C102D10022CBB0 /* SetupFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E929C102D10022CBB0 /* SetupFooter.swift */; };
 		10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAA257ACC7200E3A798 /* Scheduler.swift */; };
 		10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAE257ACC9000E3A798 /* Mood.swift */; };
 		10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BC05257D38BA00E3A798 /* MoodViewController.swift */; };
@@ -825,6 +826,7 @@
 		10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupHealthController.swift; sourceTree = "<group>"; };
 		10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupFinanceController.swift; sourceTree = "<group>"; };
 		10B123E729C0F6C80022CBB0 /* SetupCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupCell.swift; sourceTree = "<group>"; };
+		10B123E929C102D10022CBB0 /* SetupFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupFooter.swift; sourceTree = "<group>"; };
 		10B2BBAA257ACC7200E3A798 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		10B2BBAE257ACC9000E3A798 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
 		10B2BC05257D38BA00E3A798 /* MoodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodViewController.swift; sourceTree = "<group>"; };
@@ -1736,6 +1738,7 @@
 				10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */,
 				10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */,
 				10B123E729C0F6C80022CBB0 /* SetupCell.swift */,
+				10B123E929C102D10022CBB0 /* SetupFooter.swift */,
 			);
 			path = "Set-up";
 			sourceTree = "<group>";
@@ -3365,6 +3368,7 @@
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,
 				1092E25E28B6F2EA0018FCAA /* EKReminderTaskOp.swift in Sources */,
 				10B3E50A28B1478A00E1713D /* ListDetailViewController.swift in Sources */,
+				10B123EA29C102D10022CBB0 /* SetupFooter.swift in Sources */,
 				4BAEE50121272D890045AB10 /* OutgoingPhotoMessageCell.swift in Sources */,
 				100B9F632564539300A80C87 /* FinanceDetailService.swift in Sources */,
 				4BAEE50F21272D890045AB10 /* PlayerCellView.swift in Sources */,

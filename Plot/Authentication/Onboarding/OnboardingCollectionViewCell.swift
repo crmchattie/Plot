@@ -140,8 +140,8 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
             imageView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
         ])
         
-        imageView.constrainWidth(280)
-        imageView.constrainHeight(280)
+        imageView.constrainWidth(275)
+        imageView.constrainHeight(275)
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 280 / 2

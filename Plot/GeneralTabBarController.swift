@@ -192,6 +192,7 @@ class GeneralTabBarController: UITabBarController {
         newNavigationController.navigationBar.shadowImage = UIImage()
         newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
         newNavigationController.navigationBar.backgroundColor = .systemGroupedBackground
+        newNavigationController.preferredStatusBarStyle = .default
         newNavigationController.modalTransitionStyle = .crossDissolve
         newNavigationController.modalPresentationStyle = .fullScreen
         homeController.removeLaunchScreenView(animated: false) {

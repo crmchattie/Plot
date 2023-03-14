@@ -58,6 +58,16 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         
     }
     
+    @objc func new() {
+        if customType == .time {
+            newCalendar()
+        } else if customType == .health {
+            networkController.healthService.regrabHealth {}
+        } else {
+            openMXConnect(current_member_guid: nil, delegate: self)
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1
     }
@@ -69,18 +79,12 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
+        return CGSize(width: self.collectionView.frame.size.width - 30, height: 240)
             
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if customType == .time {
-            newCalendar()
-        } else if customType == .health {
-            networkController.healthService.regrabHealth {}
-        } else {
-            openMXConnect(current_member_guid: nil, delegate: self)
-        }
+        new()
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
@@ -91,6 +95,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         if kind == UICollectionView.elementKindSectionFooter {
             let setupFooter = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: setupFooter, for: indexPath) as! SetupFooter
             setupFooter.footerTitle = footerTitle
+            setupFooter.button.addTarget(self, action: #selector(new), for: .touchUpInside)
             setupFooter.nextView.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
             return setupFooter
         } else { //No footer in this case but can add option for that
@@ -138,40 +143,5 @@ extension SetupController: EndedWebViewDelegate {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
-    }
-}
-
-let setupFooter = "SetupFooter"
-
-class SetupFooter: UICollectionReusableView {
-    
-    var footerTitle = "Continue"
-    
-    let nextView: UIButton = {
-        let nextView = UIButton()
-        nextView.translatesAutoresizingMaskIntoConstraints = false
-        nextView.titleLabel?.backgroundColor = .clear
-        nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
-        nextView.setTitle("Continue", for: .normal)
-        nextView.setTitleColor(.systemBlue, for: .normal)
-        nextView.backgroundColor = .secondarySystemGroupedBackground
-        nextView.layer.cornerRadius = 10
-        return nextView
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupViews()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setupViews() {
-        backgroundColor = .systemGroupedBackground
-        nextView.setTitle(footerTitle, for: .normal)
-        addSubview(nextView)
-        nextView.fillSuperview(padding: .init(top: 10, left: 15, bottom: 10, right: 15))
     }
 }
