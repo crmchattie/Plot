@@ -50,7 +50,7 @@ class UserProfileController: UIViewController {
     fileprivate func configureContainerView() {
         view.addSubview(userProfileContainerView)
         userProfileContainerView.frame = view.bounds
-        userProfileContainerView.hideNextView = false
+        userProfileContainerView.nextView.isHidden = false
         userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image == nil)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
         userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)

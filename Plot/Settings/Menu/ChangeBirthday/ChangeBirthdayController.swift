@@ -79,6 +79,7 @@ class ChangeBirthdayController: FormViewController {
             row.cell.textLabel?.textAlignment = .center
             row.cell.textLabel?.textColor = .white
             row.cell.accessoryType = .none
+            row.cell.textLabel?.font = UIFont.title3.with(weight: .semibold)
             row.title = "Done"
         }.onCellSelection({ _,_ in
             if let currentUser = Auth.auth().currentUser?.uid {

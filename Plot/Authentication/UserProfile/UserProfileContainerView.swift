@@ -183,9 +183,7 @@ class UserProfileContainerView: UIView {
         
         return countLabel
     }()
-    
-    var hideNextView = true
-    
+        
     let bioMaxCharactersCount = 70
     
     override init(frame: CGRect) {
@@ -243,8 +241,7 @@ class UserProfileContainerView: UIView {
             addPhotoLabel.isHidden = false
         }
         
-        nextView.isHidden = hideNextView
-        
+        nextView.isHidden = true
         
         if #available(iOS 11.0, *) {
             NSLayoutConstraint.activate([
