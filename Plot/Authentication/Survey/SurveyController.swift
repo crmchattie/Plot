@@ -43,13 +43,14 @@ class SurveyController: FormViewController {
     
     func initializeForm() {
         form +++
-        Section(footer: survey.questionReason)
+        Section()
         
         <<< ButtonRow() { row in
             row.cell.backgroundColor = .systemGroupedBackground
             row.cell.textLabel?.textAlignment = .center
             row.cell.textLabel?.textColor = .label
             row.cell.textLabel?.font = UIFont.title1.with(weight: .bold)
+            row.cell.textLabel?.numberOfLines = 0
             row.title = survey.question
             row.cell.isUserInteractionEnabled = false
         }.cellUpdate({ (cell, row) in
@@ -58,7 +59,7 @@ class SurveyController: FormViewController {
         })
         
         if survey.typeOfSection == .single {
-            form +++ SelectableSection<ListCheckRow<String>>("", selectionType: .singleSelection(enableDeselection: false))
+            form +++ SelectableSection<ListCheckRow<String>>(header: nil, footer: survey.questionReason, selectionType: .singleSelection(enableDeselection: false))
             for choice in survey.choices {
                 form.last! <<< ListCheckRow<String>("\(choice)_\(survey.rawValue)"){ row in
                     row.title = choice
@@ -86,7 +87,7 @@ class SurveyController: FormViewController {
                     })
             }
         } else if survey.typeOfSection == .multiple {
-            form +++ SelectableSection<ListCheckRow<String>>("", selectionType: .multipleSelection)
+            form +++ SelectableSection<ListCheckRow<String>>(header: nil, footer: survey.questionReason, selectionType: .multipleSelection)
                 for choice in survey.choices {
                     form.last! <<< ListCheckRow<String>("\(choice)_\(survey.rawValue)"){ row in
                         row.title = choice
@@ -137,6 +138,7 @@ class SurveyController: FormViewController {
             row.cell.backgroundColor = .systemBlue
             row.cell.textLabel?.textAlignment = .center
             row.cell.textLabel?.textColor = .white
+            row.cell.textLabel?.font = UIFont.title3.with(weight: .semibold)
             row.cell.accessoryType = .none
             row.title = "Continue"
         }.onCellSelection({ _,_ in

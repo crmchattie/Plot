@@ -33,18 +33,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     var customType: CustomType!
     let networkController: NetworkController
     var participants: [String : [User]] = [:]
-    
-    let nextView: UIButton = {
-        let nextView = UIButton()
-        nextView.translatesAutoresizingMaskIntoConstraints = false
-        nextView.titleLabel?.backgroundColor = .clear
-        nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
-        nextView.setTitle("Continue", for: .normal)
-        nextView.setTitleColor(.systemBlue, for: .normal)
-        nextView.backgroundColor = .secondarySystemGroupedBackground
-        nextView.layer.cornerRadius = 10
-        return nextView
-    }()
+    var footerTitle = "Continue"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,6 +48,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
+        collectionView.register(SetupFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: setupFooter)
         
     }
     
@@ -103,13 +93,15 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         return CGSize(width: self.collectionView.frame.size.width, height: 70)
     }
     
-    func collectionView(_ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Footer", for: indexPath)
-        footerView.addSubview(nextView)
-        nextView.fillSuperview(padding: .init(top: 10, left: 15, bottom: 10, right: 15))
-        nextView.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
-        return footerView
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let setupFooter = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: setupFooter, for: indexPath) as! SetupFooter
+            setupFooter.footerTitle = footerTitle
+            setupFooter.nextView.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
+            return setupFooter
+        } else { //No footer in this case but can add option for that
+            return UICollectionReusableView()
+        }
     }
 }
 
@@ -152,5 +144,41 @@ extension SetupController: EndedWebViewDelegate {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
+    }
+}
+
+let setupFooter = "SetupFooter"
+
+class SetupFooter: UICollectionReusableView {
+    
+    var footerTitle = "Continue"
+    
+    let nextView: UIButton = {
+        let nextView = UIButton()
+        nextView.translatesAutoresizingMaskIntoConstraints = false
+        nextView.titleLabel?.backgroundColor = .clear
+        nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
+        nextView.setTitle("Continue", for: .normal)
+        nextView.setTitleColor(.systemBlue, for: .normal)
+        nextView.backgroundColor = .secondarySystemGroupedBackground
+        nextView.layer.cornerRadius = 10
+        return nextView
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupViews() {
+        backgroundColor = .systemGroupedBackground
+        nextView.setTitle(footerTitle, for: .normal)
+        addSubview(nextView)
+        nextView.fillSuperview(padding: .init(top: 10, left: 15, bottom: 10, right: 15))
+        
     }
 }

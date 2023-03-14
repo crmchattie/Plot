@@ -11,7 +11,7 @@ import Foundation
 class SetupFinanceController: SetupController {
     override func viewDidLoad() {
         customType = CustomType.finances
-        nextView.setTitle("Finish", for: .normal)
+        footerTitle = "Finish"
         super.viewDidLoad()
     }
     

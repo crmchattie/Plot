@@ -125,7 +125,7 @@ class UserProfileContainerView: UIView {
         nextView.translatesAutoresizingMaskIntoConstraints = false
         nextView.titleLabel?.backgroundColor = .clear
         nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
-        nextView.setTitle("Next", for: .normal)
+        nextView.setTitle("Continue", for: .normal)
         nextView.setTitleColor(.systemBlue, for: .normal)
         nextView.backgroundColor = .secondarySystemGroupedBackground
         nextView.layer.cornerRadius = 10
@@ -180,7 +180,6 @@ class UserProfileContainerView: UIView {
         countLabel.font = UIFont.preferredFont(forTextStyle: .body)
         countLabel.adjustsFontForContentSizeCategory = true
         countLabel.isHidden = true
-        
         return countLabel
     }()
         

@@ -53,6 +53,7 @@ class UserProfileController: UIViewController {
         userProfileContainerView.nextView.isHidden = false
         userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image == nil)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
+        userProfileContainerView.name.addTarget(self, action: #selector(nameEditingChanged), for: .editingChanged)
         userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
         userProfileContainerView.age.addTarget(self, action: #selector(changeAge), for: .editingDidBegin)
         userProfileContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
@@ -120,7 +121,7 @@ extension UserProfileController {
             userProfileContainerView.name.text!.trimmingCharacters(in: .whitespaces).isEmpty {
             userProfileContainerView.name.shake()
         } else if userProfileContainerView.phone.text?.count == 0 ||
-                    userProfileContainerView.phone.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+            userProfileContainerView.phone.text!.trimmingCharacters(in: .whitespaces).isEmpty {
             userProfileContainerView.phone.shake()
         } else {
             if currentReachabilityStatus == .notReachable {
@@ -244,7 +245,6 @@ extension UserProfileController: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        
         if text == "\n" {
             textView.resignFirstResponder()
             return false
@@ -258,6 +258,19 @@ extension UserProfileController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+}
+
+extension UserProfileController {
+    @objc func nameEditingChanged() {
+        if userProfileContainerView.name.text!.count == 0 ||
+            userProfileContainerView.name.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+            userProfileContainerView.nextView.setTitleColor(.systemBlue, for: .normal)
+            userProfileContainerView.nextView.backgroundColor = .secondarySystemGroupedBackground
+        } else {
+            userProfileContainerView.nextView.setTitleColor(.white, for: .normal)
+            userProfileContainerView.nextView.backgroundColor = .systemBlue
+        }
     }
 }
 

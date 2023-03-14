@@ -66,7 +66,7 @@ class EnterVerificationContainerView: UIView {
     let nextView: UIButton = {
         let nextView = UIButton()
         nextView.translatesAutoresizingMaskIntoConstraints = false
-        nextView.setTitle("Next", for: .normal)
+        nextView.setTitle("Continue", for: .normal)
         nextView.titleLabel?.backgroundColor = .clear
         nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
         nextView.setTitleColor(.systemBlue, for: .normal)
