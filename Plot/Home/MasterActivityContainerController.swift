@@ -83,7 +83,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     var participants: [String: [User]] = [:]
     
     var isNewUser = false
-    var isOldUser = false
         
     var isAppLoaded = false
         
@@ -173,7 +172,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListGoalActivities), name: .hasLoadedListGoalActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedHealth), name: .hasLoadedHealth, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
     }
     
     func setupData() {
@@ -183,10 +181,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         if activitiesSections.isEmpty {
             list.append(CustomType.time)
         } else {
-            if isNewUser && !isOldUser {
-                isNewUser = false
-                networkController.setupInitialGoals()
-            }
             for section in activitiesSections {
                 if activitiesSections.count > 1 {
                     list.append(section)
@@ -367,10 +361,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
-    }
-    
-    @objc fileprivate func oldUserLoggedIn() {
-        isOldUser = true
     }
     
     func setNavBar() {

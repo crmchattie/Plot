@@ -14,6 +14,7 @@ extension NSNotification.Name {
     static let financeUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeUpdated")
     static let transactionRulesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".transactionRulesUpdated")
     static let hasLoadedFinancials = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedFinancials")
+    static let financeDataIsSetup = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeDataIsSetup")
 }
 
 class FinanceService {
@@ -92,6 +93,13 @@ class FinanceService {
             NotificationCenter.default.post(name: .hasLoadedFinancials, object: nil)
         }
     }
+    var dataIsSetup = false {
+        didSet {
+            if dataIsSetup {
+                NotificationCenter.default.post(name: .financeDataIsSetup, object: nil)
+            }
+        }
+    }
     var memberAccountsDict = [MXMember: [MXAccount]]()
     var institutionDict = [String: String]()
     var mxUser: MXUser!
@@ -106,7 +114,7 @@ class FinanceService {
     
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
-    
+        
     var isRunning: Bool = true
     
     func grabFinances(_ completion: @escaping () -> Void) {
@@ -277,6 +285,7 @@ class FinanceService {
     
     func observeAccountsForCurrentUser(_ completion: @escaping () -> Void) {
         self.accountFetcher.observeAccountForCurrentUser(accountsInitialAdd: { [weak self] accountsInitialAdd in
+            self?.dataIsSetup = true
             if self?.accounts.isEmpty ?? true {
                 self?.accounts = accountsInitialAdd
                 completion()

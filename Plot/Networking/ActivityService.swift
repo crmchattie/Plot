@@ -24,6 +24,8 @@ extension NSNotification.Name {
     static let calendarActivitiesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".calendarActivitiesUpdated")
     static let hasLoadedCalendarEventActivities = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedCalendarEventActivities")
     static let hasLoadedListTaskActivities = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedListTaskActivities")
+    static let timeDataIsSetup = NSNotification.Name(Bundle.main.bundleIdentifier! + ".timeDataIsSetup")
+
 }
 
 class ActivityService {
@@ -34,6 +36,14 @@ class ActivityService {
     
     var askedforCalendarAuthorization: Bool = false
     var askedforReminderAuthorization: Bool = false
+    
+    var dataIsSetup = false {
+        didSet {
+            if dataIsSetup {
+                NotificationCenter.default.post(name: .timeDataIsSetup, object: nil)
+            }
+        }
+    }
     
     var activities = [Activity]() {
         didSet {
@@ -389,6 +399,7 @@ class ActivityService {
     
     func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
+            self?.dataIsSetup = true
             if self?.activities.isEmpty ?? true {
                 self?.activities = activitiesInitialAdd
             } else if !activitiesInitialAdd.isEmpty {
@@ -618,6 +629,7 @@ class ActivityService {
     }
     
     func updatePrimaryCalendar(value: String) {
+        self.dataIsSetup = true
         if let currentUserID = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -752,6 +764,7 @@ class ActivityService {
     }
     
     func updatePrimaryList(value: String) {
+        self.dataIsSetup = true
         if let currentUserID = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in

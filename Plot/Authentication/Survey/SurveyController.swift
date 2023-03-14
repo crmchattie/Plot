@@ -32,6 +32,7 @@ class SurveyController: FormViewController {
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
         extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = UIRectEdge.top
         
         view.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
@@ -42,6 +43,20 @@ class SurveyController: FormViewController {
         if let currentUser = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference().child("users").child(currentUser).child("survey").child(self.survey.rawValue)
             reference.setValue(self.surveyAnswers)
+        }
+    }
+    
+    func updateButton() {
+        if let row: ButtonRow = self.form.rowBy(tag: "button") {
+            if surveyAnswers[survey.rawValue] != nil {
+                row.cell.backgroundColor = .systemBlue
+                row.cell.textLabel?.textColor = .white
+                row.cell.isUserInteractionEnabled = true
+            } else {
+                row.cell.backgroundColor = .secondarySystemGroupedBackground
+                row.cell.textLabel?.textColor = .systemBlue
+                row.cell.isUserInteractionEnabled = false
+            }
         }
     }
     
@@ -69,7 +84,7 @@ class SurveyController: FormViewController {
                     row.title = choice
                     row.selectableValue = choice
                     }.cellSetup { (cell, row) in
-                        if self.surveyAnswers.keys.contains(self.survey.rawValue), let choiceList = self.surveyAnswers[self.survey.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                        if let choiceList = self.surveyAnswers[self.survey.rawValue], let _ = choiceList.firstIndex(of: choice) {
                             row.value = choice
                         }
                         cell.accessoryType = .checkmark
@@ -79,13 +94,14 @@ class SurveyController: FormViewController {
                     }.onChange({ row in
                         if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                             let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
-                            let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                            let survey = String(rowTag[rowTag.index(index, offsetBy: 1)...])
                             if row.value != nil {
                                 print("single choice list is not empty")
-                                self.surveyAnswers[filter] = [choice]
+                                self.surveyAnswers[survey] = [choice]
                             } else {
-                                self.surveyAnswers[filter] = nil
+                                self.surveyAnswers[survey] = nil
                             }
+                            self.updateButton()
                         }
                         print(self.surveyAnswers)
                     })
@@ -98,7 +114,7 @@ class SurveyController: FormViewController {
                         row.selectableValue = choice
                         row.value = nil
                         }.cellSetup { (cell, row) in
-                            if self.surveyAnswers.keys.contains(self.survey.rawValue), let choiceList = self.surveyAnswers[self.survey.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                            if let choiceList = self.surveyAnswers[self.survey.rawValue], let _ = choiceList.firstIndex(of: choice) {
                                 row.value = choice
                             }
                             cell.accessoryType = .checkmark
@@ -108,27 +124,27 @@ class SurveyController: FormViewController {
                     }.onChange({ row in
                         if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                             let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
-                            let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                            let survey = String(rowTag[rowTag.index(index, offsetBy: 1)...])
                             if row.value != nil {
-                                if var choiceList = self.surveyAnswers[filter], !choiceList.isEmpty {
+                                if var choiceList = self.surveyAnswers[survey], !choiceList.isEmpty {
                                     if choiceList.contains(choice) {
                                         return
                                     } else {
                                         choiceList.append(choice)
-                                        self.surveyAnswers[filter] = choiceList
+                                        self.surveyAnswers[survey] = choiceList
                                     }
                                 } else {
-                                    self.surveyAnswers[filter] = [choice]
+                                    self.surveyAnswers[survey] = [choice]
                                 }
                             } else {
-                                if var choiceList = self.surveyAnswers[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
-                                    print("multiple choice list is not empty")
+                                if var choiceList = self.surveyAnswers[survey], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
                                     choiceList.remove(at: indexChoice)
-                                    self.surveyAnswers[filter] = choiceList
+                                    self.surveyAnswers[survey] = choiceList
                                 } else {
-                                    self.surveyAnswers[filter] = nil
+                                    self.surveyAnswers[survey] = nil
                                 }
                             }
+                            self.updateButton()
                         }
                         print(self.surveyAnswers)
                     })
@@ -138,7 +154,7 @@ class SurveyController: FormViewController {
         form +++
         Section()
         
-        <<< ButtonRow(){ row in
+        <<< ButtonRow("button"){ row in
             row.cell.backgroundColor = .systemBlue
             row.cell.textLabel?.textAlignment = .center
             row.cell.textLabel?.textColor = .white
@@ -147,9 +163,6 @@ class SurveyController: FormViewController {
             row.title = "Continue"
         }.onCellSelection({ _,_ in
             self.nextButtonDidTap()
-        }).cellUpdate({ (cell, row) in
-            cell.backgroundColor = .systemBlue
-            cell.textLabel?.textColor = .white
         })
     }
 }

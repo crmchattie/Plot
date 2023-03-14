@@ -25,7 +25,6 @@ class UserProfileController: UIViewController {
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
-    var newUser = true
     let phoneNumberKit = PhoneNumberKit()
     var currentBirthday = Date()
     var surveyAnswers = [String: [String]]()
@@ -143,9 +142,9 @@ extension UserProfileController {
             nameReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists() {
                     self.userProfileContainerView.name.text = snapshot.value as? String
-                    self.newUser = false
                     NotificationCenter.default.post(name: .oldUserLoggedIn, object: nil)
                 }
+                NotificationCenter.default.post(name: .userLoggedIn, object: nil)
             })
             
             let bioReference = Database.database().reference().child("users").child(currentUserID).child("bio")

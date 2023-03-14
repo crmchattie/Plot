@@ -17,6 +17,7 @@ extension NSNotification.Name {
     static let moodsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".moodsUpdated")
     static let healthKitUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthKitUpdated")
     static let hasLoadedHealth = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedHealth")
+    static let healthDataIsSetup = NSNotification.Name(Bundle.main.bundleIdentifier! + ".healthDataIsSetup")
 }
 
 class HealthService {
@@ -87,16 +88,25 @@ class HealthService {
         }
     }
     
-    var askedforAuthorization: Bool = false
+    var dataIsSetup = false {
+        didSet {
+            if dataIsSetup {
+                NotificationCenter.default.post(name: .healthDataIsSetup, object: nil)
+            }
+        }
+    }
+    
+    var authorized: Bool = false
     
     var isRunning: Bool = true
     
     func grabHealth(_ completion: @escaping () -> Void) {
         healhKitManager.checkHealthAuthorizationStatus {}
-        HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
-            self?.askedforAuthorization = askedforAuthorization
+        HealthKitService.authorizeHealthKit { [weak self] _ in
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
-                HealthKitService.authorized = true
+                self?.dataIsSetup = successfullyGrabbedHealthMetrics
+                self?.authorized = successfullyGrabbedHealthMetrics
+                HealthKitService.authorized = successfullyGrabbedHealthMetrics
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
                 if self?.isRunning ?? true {
@@ -143,9 +153,10 @@ class HealthService {
         hasLoadedHealth = false
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
-            self?.askedforAuthorization = askedforAuthorization
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
-                HealthKitService.authorized = true
+                self?.dataIsSetup = successfullyGrabbedHealthMetrics
+                self?.authorized = successfullyGrabbedHealthMetrics
+                HealthKitService.authorized = successfullyGrabbedHealthMetrics
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
                 self?.hasLoadedHealth = true

@@ -29,6 +29,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     var customType: CustomType!
     let networkController: NetworkController
     var participants: [String : [User]] = [:]
+    var dataIsSetup = false
     var footerTitle = "Continue"
     
     override func viewDidLoad() {
@@ -104,9 +105,18 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     }
 }
 
+extension SetupController: UpdateWithGoogleAppleSignInDelegate {
+    func UpdateWithGoogleAppleSignIn() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+}
+
 extension SetupController: GIDSignInDelegate {
     func newCalendar() {
         let destination = SignInAppleGoogleViewController(networkController: networkController)
+        destination.delegate = self
         destination.title = "Providers"
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
@@ -140,8 +150,7 @@ extension SetupController: GIDSignInDelegate {
 
 extension SetupController: EndedWebViewDelegate {
     func updateMXMembers() {
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
-        }
+        nextButtonDidTap()
+        networkController.financeService.regrabFinances {}
     }
 }

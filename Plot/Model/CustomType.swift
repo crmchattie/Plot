@@ -9,7 +9,7 @@
 import Foundation
 
 enum CustomType: String, Equatable, Hashable {
-    case event, task, goal, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour, tutorialFive
+    case event, task, goal, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, timeIsSetup, healthIsSetup, financesIsSetup, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour, tutorialFive
     
     var name: String {
         switch self {
@@ -33,9 +33,9 @@ enum CustomType: String, Equatable, Hashable {
         case .mindfulness: return "Mindfulness"
         case .calendar: return "Calendar"
         case .investment: return "Investment"
-        case .time: return "Time"
-        case .health: return "Health"
-        case .finances: return "Finances"
+        case .time, .timeIsSetup: return "Time"
+        case .health, .healthIsSetup: return "Health"
+        case .finances, .financesIsSetup: return "Finances"
         case .healthTemplate: return "Health"
         case .mealTemplate: return "Meal"
         case .workTemplate: return "Work"
@@ -79,6 +79,9 @@ enum CustomType: String, Equatable, Hashable {
         case .time: return "Set Up Time"
         case .health: return "Set Up Health"
         case .finances: return "Set Up Finances"
+        case .timeIsSetup: return "Set Up Time"
+        case .healthIsSetup: return "Set Up Health"
+        case .financesIsSetup: return "Set Up Finances"
         case .healthTemplate: return "Health"
         case .mealTemplate: return "Meal"
         case .workTemplate: return "Work"
@@ -112,6 +115,9 @@ enum CustomType: String, Equatable, Hashable {
         case .time: return "Connect your Apple or Gmail Account"
         case .health: return "Connect to Apple Health"
         case .finances: return "Connect your Financial Accounts"
+        case .timeIsSetup: return "Connect your Apple or Gmail Account"
+        case .healthIsSetup: return "Connect to Apple Health"
+        case .financesIsSetup: return "Connect your Financial Accounts"
         case .healthTemplate: return "Health"
         case .mealTemplate: return "Meal"
         case .workTemplate: return "Work"
@@ -145,6 +151,9 @@ enum CustomType: String, Equatable, Hashable {
         case .time: return "Any tasks/events created in Plot will be exported to your external Account"
         case .health: return "We will only share your health data with Apple Health"
         case .finances: return "We do not store your login info and access is limited to read only, we cannot move your money"
+        case .timeIsSetup: return "Any tasks/events created in Plot will be exported to your external Account"
+        case .healthIsSetup: return "We will only share your health data with Apple Health"
+        case .financesIsSetup: return "We do not store your login info and access is limited to read only, we cannot move your money"
         case .healthTemplate: return "Health"
         case .mealTemplate: return "Meal"
         case .workTemplate: return "Work"
@@ -182,9 +191,9 @@ enum CustomType: String, Equatable, Hashable {
         case .calendar: return "calendar"
         case .investment: return "investment"
         case .iOSCalendarEvent,.googleCalendarEvent, .iOSReminder, .googleTask: return ""
-        case .time: return "calendar"
-        case .health: return "heart"
-        case .finances: return "money"
+        case .time, .timeIsSetup: return "calendar"
+        case .health, .healthIsSetup: return "heart"
+        case .finances, .financesIsSetup: return "money"
         case .healthTemplate: return "heart-filled"
         case .mealTemplate: return "food"
         case .workTemplate: return "work"

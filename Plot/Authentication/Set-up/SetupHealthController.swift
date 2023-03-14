@@ -11,6 +11,7 @@ import Foundation
 class SetupHealthController: SetupController {
     override func viewDidLoad() {
         customType = CustomType.health
+        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .healthDataIsSetup, object: nil)
         super.viewDidLoad()
     }
     

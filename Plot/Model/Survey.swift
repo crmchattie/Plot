@@ -22,11 +22,11 @@ enum Survey: String {
         case .hearAboutPlot:
             return "How did you hear about Plot?"
         case .goalsTime:
-            return "What are your time goal(s)?"
+            return "What are your time goals?"
         case .goalsHealth:
-            return "What are your health goal(s)?"
+            return "What are your health goals?"
         case .goalsFinance:
-            return "What are your financial goal(s)?"
+            return "What are your financial goals?"
         }
     }
     

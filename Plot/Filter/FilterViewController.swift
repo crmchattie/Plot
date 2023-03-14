@@ -121,7 +121,7 @@ class FilterViewController: FormViewController {
                         })
                         }.cellSetup { (cell, row) in
                             print("filter.rawValue \(filter.rawValue)")
-                            if self.filterDictionary.keys.contains(filter.rawValue), let choiceList = self.filterDictionary[filter.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                            if let choiceList = self.filterDictionary[filter.rawValue], let _ = choiceList.firstIndex(of: choice) {
                                 row.value = choice
                             }
                             cell.accessoryType = .checkmark
@@ -172,7 +172,7 @@ class FilterViewController: FormViewController {
                                 return row.value ?? false == false
                             })
                             }.cellSetup { (cell, row) in
-                                if self.filterDictionary.keys.contains(filter.rawValue), let choiceList = self.filterDictionary[filter.rawValue], let _ = choiceList.firstIndex(of: choice) {
+                                if let choiceList = self.filterDictionary[filter.rawValue], let _ = choiceList.firstIndex(of: choice) {
                                     row.value = choice
                                 }
                                 cell.accessoryType = .checkmark

@@ -24,7 +24,6 @@ class SetupFooter: UICollectionReusableView {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.clipsToBounds = true
         button.layer.cornerRadius = 8
-        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -34,8 +33,8 @@ class SetupFooter: UICollectionReusableView {
         nextView.titleLabel?.backgroundColor = .clear
         nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
         nextView.setTitle("Continue", for: .normal)
-        nextView.setTitleColor(.systemBlue, for: .normal)
-        nextView.backgroundColor = .secondarySystemGroupedBackground
+        nextView.setTitleColor(.white, for: .normal)
+        nextView.backgroundColor = .systemBlue
         nextView.layer.cornerRadius = 10
         return nextView
     }()
@@ -65,6 +64,7 @@ class SetupFooter: UICollectionReusableView {
             button.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: spacingConstant),
             button.rightAnchor.constraint(equalTo: rightAnchor, constant: rightConstant),
             button.leftAnchor.constraint(equalTo: leftAnchor, constant: leftConstant),
+            nextView.heightAnchor.constraint(equalToConstant: heightConstant),
             
             nextView.topAnchor.constraint(equalTo: button.bottomAnchor, constant: spacingConstant),
             nextView.rightAnchor.constraint(equalTo: button.rightAnchor),

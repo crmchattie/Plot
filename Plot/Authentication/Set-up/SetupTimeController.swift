@@ -11,6 +11,7 @@ import Foundation
 class SetupTimeController: SetupController {
     override func viewDidLoad() {
         customType = CustomType.time
+        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .timeDataIsSetup, object: nil)
         super.viewDidLoad()
     }
     

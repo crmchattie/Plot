@@ -19,6 +19,7 @@ enum Tabs: Int {
 
 extension NSNotification.Name {
     static let oldUserLoggedIn = NSNotification.Name(Bundle.main.bundleIdentifier! + ".oldUserLoggedIn")
+    static let userLoggedIn = NSNotification.Name(Bundle.main.bundleIdentifier! + ".userLoggedIn")
 }
 
 class GeneralTabBarController: UITabBarController {
@@ -68,21 +69,6 @@ class GeneralTabBarController: UITabBarController {
         onceToken = 1
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if isNewUser && Auth.auth().currentUser != nil {
-            //has to be here given currentUserID = nil on app start
-            GeneralTabBarController.networkController.setupFirebase()
-            GeneralTabBarController.networkController.setupOtherVariables()
-//            discoverController.fetchTemplates()
-            analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
-            //change to stop from running
-            isNewUser = false
-        } else if isOldUser {
-            reloadVariables()
-        }
-    }
-    
     @objc fileprivate func oldUserLoggedIn() {
         isOldUser = true
     }
@@ -103,11 +89,7 @@ class GeneralTabBarController: UITabBarController {
                 self.homeController.removeLaunchScreenView(animated: true) {
                     self.homeController.openNotification()
                     GeneralTabBarController.networkController.setupOtherVariables()
-                    GeneralTabBarController.networkController.setupInitialGoals()
-                    
-//                    if let currentAppVersion = currentAppVersion, let previousAppVersion = previousAppVersion, previousAppVersion.compare(currentAppVersion) == .orderedAscending {
-//                        GeneralTabBarController.networkController.setupInitialGoals()
-//                    }
+                    GeneralTabBarController.networkController.setupInitialGoals()                    
                 }
             }
         } else {
@@ -117,9 +99,19 @@ class GeneralTabBarController: UITabBarController {
     }
     
     @objc func reloadVariables() {
-        GeneralTabBarController.networkController.setupKeyVariables {
+        if isNewUser {
+            //has to be here given currentUserID = nil on app start
+            GeneralTabBarController.networkController.setupFirebase()
             GeneralTabBarController.networkController.setupOtherVariables()
-            GeneralTabBarController.networkController.setupInitialGoals()
+//            discoverController.fetchTemplates()
+            analyticsController.viewModel = .init(networkController: GeneralTabBarController.networkController)
+            //change to stop from running
+            isNewUser = false
+        } else if isOldUser {
+            GeneralTabBarController.networkController.setupKeyVariables {
+                GeneralTabBarController.networkController.setupOtherVariables()
+                GeneralTabBarController.networkController.setupInitialGoals()
+            }
         }
     }
     
@@ -129,6 +121,8 @@ class GeneralTabBarController: UITabBarController {
     
     fileprivate func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadVariables), name: .userLoggedIn, object: nil)
+
     }
     
     func setApplicationBadge() {

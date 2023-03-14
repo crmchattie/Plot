@@ -11,12 +11,14 @@ import Foundation
 class SetupFinanceController: SetupController {
     override func viewDidLoad() {
         customType = CustomType.finances
+        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .financeDataIsSetup, object: nil)
         footerTitle = "Finish"
         super.viewDidLoad()
     }
     
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
+        self.networkController.setupInitialGoals()
         self.dismiss(animated: true)
     }
 }
