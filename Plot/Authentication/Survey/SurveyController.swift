@@ -30,6 +30,7 @@ class SurveyController: FormViewController {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = false
         edgesForExtendedLayout = []
+        setNeedsStatusBarAppearanceUpdate()
         view.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         initializeForm()
