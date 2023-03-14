@@ -173,6 +173,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedListGoalActivities), name: .hasLoadedListGoalActivities, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedHealth), name: .hasLoadedHealth, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedFinancials), name: .hasLoadedFinancials, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
     }
     
     func setupData() {
@@ -366,6 +367,10 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
+    }
+    
+    @objc fileprivate func oldUserLoggedIn() {
+        isOldUser = true
     }
     
     func setNavBar() {

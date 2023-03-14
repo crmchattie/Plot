@@ -29,6 +29,8 @@ class NetworkController {
     let healthDetailService = HealthDetailService()
     let financeDetailService = FinanceDetailService()
     
+    var isOldUser = false
+    
     var hasLoadedListGoalActivities = false {
         didSet {
             NotificationCenter.default.post(name: .hasLoadedListGoalActivities, object: nil)
@@ -37,6 +39,7 @@ class NetworkController {
     
     init() {
         isRunning = false
+        addObservers()
     }
     
     func setupKeyVariables(_ completion: @escaping () -> Void) {
@@ -147,6 +150,14 @@ class NetworkController {
             self.isRunning = false
             completion()
         }
+    }
+        
+    func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(oldUserLoggedIn), name: .oldUserLoggedIn, object: nil)
+    }
+    
+    @objc fileprivate func oldUserLoggedIn() {
+        isOldUser = true
     }
     
     func askPermissionToTrack() {
