@@ -20,6 +20,7 @@ class SetupFooter: UICollectionReusableView {
         button.titleLabel?.font = UIFont.title3.with(weight: .semibold)
         button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .systemBlue
         button.translatesAutoresizingMaskIntoConstraints = false
         button.clipsToBounds = true
         button.layer.cornerRadius = 8

@@ -28,9 +28,11 @@ class SurveyController: FormViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        extendedLayoutIncludesOpaqueBars = false
-        edgesForExtendedLayout = []
-        setNeedsStatusBarAppearanceUpdate()
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        extendedLayoutIncludesOpaqueBars = true
+        
         view.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         initializeForm()
