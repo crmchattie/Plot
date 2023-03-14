@@ -17,7 +17,10 @@ class SetupTimeController: SetupController {
     
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
-        let destination = SetupHealthController(networkController: networkController)
-        navigationController?.pushViewController(destination, animated: true)
+        DispatchQueue.main.async {
+            print("nextButtonDidTap time")
+            let destination = SetupHealthController(networkController: networkController)
+            navigationController?.pushViewController(destination, animated: true)
+        }
     }
 }

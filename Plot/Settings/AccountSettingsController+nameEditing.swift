@@ -27,7 +27,7 @@ extension AccountSettingsController: UITextViewDelegate {
     }
     
     func tableHeaderHeight() -> CGFloat {
-        return 260 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
+        return 240 + estimateFrameForText(userProfileContainerView.bio.text, width: userProfileContainerView.bio.textContainer.size.width - 10).height
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {

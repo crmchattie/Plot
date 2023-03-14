@@ -17,7 +17,10 @@ class SetupHealthController: SetupController {
     
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
-        let destination = SetupFinanceController(networkController: networkController)
-        navigationController?.pushViewController(destination, animated: true)
+        DispatchQueue.main.async {
+            print("nextButtonDidTap health")
+            let destination = SetupFinanceController(networkController: networkController)
+            navigationController?.pushViewController(destination, animated: true)
+        }
     }
 }

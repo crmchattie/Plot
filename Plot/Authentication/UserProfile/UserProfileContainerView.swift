@@ -223,10 +223,10 @@ class UserProfileContainerView: UIView {
             phone.rightAnchor.constraint(equalTo: userData.rightAnchor, constant: 0),
             phone.heightAnchor.constraint(equalToConstant: 50),
             
-            age.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 20),
+            age.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
             age.heightAnchor.constraint(equalToConstant: 50),
             
-            email.topAnchor.constraint(equalTo: age.bottomAnchor, constant: 20),
+            email.topAnchor.constraint(equalTo: age.bottomAnchor, constant: 10),
             email.heightAnchor.constraint(equalToConstant: 50),
             
             nextView.topAnchor.constraint(equalTo: email.bottomAnchor, constant: 20),

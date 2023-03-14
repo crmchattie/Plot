@@ -324,7 +324,8 @@ class AccountSettingsController: UITableViewController {
             if snapshot.exists(), let userInfo = snapshot.value as? [String: Any], let user_guid = userInfo["guid"] as? String {
                 Service.shared.deleteMXUser(user_guid: user_guid) {_,_ in }
             }
-                                    
+            
+                        
             user.delete { error in
                 print(error)
                 guard error == nil else {
