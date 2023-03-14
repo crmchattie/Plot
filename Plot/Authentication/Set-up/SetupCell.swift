@@ -127,7 +127,7 @@ class SetupCell: BaseContainerCollectionViewCell {
         let stackView = VerticalStackView(arrangedSubviews: [containerImageView, typeLabel, descriptionLabel, subDescriptionLabel], spacing: 10)
         stackView.backgroundColor = .secondarySystemGroupedBackground
         stackView.alignment = .center
-        stackView.constrainHeight(250)
+        stackView.constrainHeight(230)
         
         addSubview(stackView)
         addSubview(button)
@@ -135,10 +135,9 @@ class SetupCell: BaseContainerCollectionViewCell {
         let leftConstant: CGFloat = 15
         let rightConstant: CGFloat = -15
         let heightConstant: CGFloat = 50
-        let spacingConstant: CGFloat = 20
+        let spacingConstant: CGFloat = 10
         
         NSLayoutConstraint.activate([
-            
             stackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: spacingConstant),
             stackView.rightAnchor.constraint(equalTo: rightAnchor, constant: rightConstant),
             stackView.leftAnchor.constraint(equalTo: leftAnchor, constant: leftConstant),

@@ -35,6 +35,10 @@ class SurveyController: FormViewController {
         initializeForm()
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
+    
     @objc func nextButtonDidTap() {
         if let currentUser = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference().child("users").child(currentUser).child("survey").child(self.survey.rawValue)
