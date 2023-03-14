@@ -35,6 +35,7 @@ class UserProfileController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = .systemGroupedBackground
         
         configureNavigationBar()

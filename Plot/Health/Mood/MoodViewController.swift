@@ -90,10 +90,6 @@ class MoodViewController: FormViewController {
             self.delegate?.updateMood(mood: mood)
         }
     }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .default
-    }
 
     
     fileprivate func configureTableView() {

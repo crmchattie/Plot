@@ -184,7 +184,7 @@ class GeneralTabBarController: UITabBarController {
         let destination = OnboardingController(networkController: GeneralTabBarController.networkController)
         let newNavigationController = UINavigationController(rootViewController: destination)
         newNavigationController.navigationBar.shadowImage = UIImage()
-        newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        newNavigationController.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         newNavigationController.navigationBar.backgroundColor = .systemGroupedBackground
         newNavigationController.modalTransitionStyle = .crossDissolve
         newNavigationController.modalPresentationStyle = .fullScreen

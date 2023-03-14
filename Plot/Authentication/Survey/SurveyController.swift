@@ -31,17 +31,13 @@ class SurveyController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        extendedLayoutIncludesOpaqueBars = false
-        edgesForExtendedLayout = []
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = UIRectEdge.top
         
         view.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         initializeForm()
         updateButton()
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .default
     }
     
     @objc func nextButtonDidTap() {
@@ -168,6 +164,16 @@ class SurveyController: FormViewController {
             row.title = "Continue"
         }.onCellSelection({ _,_ in
             self.nextButtonDidTap()
+        }).cellUpdate({ cell, row in
+            if self.surveyAnswers[self.survey.rawValue] != nil {
+                cell.backgroundColor = .systemBlue
+                cell.textLabel?.textColor = .white
+                cell.isUserInteractionEnabled = true
+            } else {
+                cell.backgroundColor = .secondarySystemGroupedBackground
+                cell.textLabel?.textColor = .systemBlue
+                cell.isUserInteractionEnabled = false
+            }
         })
     }
 }

@@ -108,7 +108,7 @@ class EnterPhoneNumberContainerView: UIView {
         let leftConstant: CGFloat = 15
         let rightConstant: CGFloat = -15
         let heightConstant: CGFloat = 50
-        let spacingConstant: CGFloat = 20
+        let spacingConstant: CGFloat = 10
         
         NSLayoutConstraint.activate([
             
