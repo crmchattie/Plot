@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum survey: String {
+enum Survey: String {
     case age, hearAboutPlot, goalsTime, goalsHealth, goalsFinance
     
     var question: String {
@@ -22,18 +22,18 @@ enum survey: String {
         case .hearAboutPlot:
             return "How did you hear about Plot?"
         case .goalsTime:
-            return "What are your time goals?"
+            return "What are your time goal(s)?"
         case .goalsHealth:
-            return "What are your health goals?"
+            return "What are your health goal(s)?"
         case .goalsFinance:
-            return "What are your financial goals?"
+            return "What are your financial goal(s)?"
         }
     }
     
     var questionReason: String {
         switch self {
         case .age:
-            return "We are asking so we can develop better benchmark and scores for you"
+            return "We are asking so we can give you more accurate goals and scores"
 //        case .height:
 //            return "We are asking so we can calculate certain health metrics"
 //        case .weight:
@@ -41,11 +41,11 @@ enum survey: String {
         case .hearAboutPlot:
             return "We are asking to better understand how people are learning about Plot"
         case .goalsTime:
-            return "We are asking so we give you better insights and recommendations"
+            return "We are asking so we can give you better goals and insights"
         case .goalsHealth:
-            return "We are asking so we give you better insights and recommendations"
+            return "We are asking so we can give you better goals and insights"
         case .goalsFinance:
-            return "We are asking so we give you better insights and recommendations"
+            return "We are asking so we can give you better goals and insights"
         }
     }
     
@@ -65,6 +65,21 @@ enum survey: String {
             return ["Maintain healthy weight", "Eat a more balanced and nutritious diet", "Stay physically active", "Get more sleep", "Reduce stress"]
         case .goalsFinance:
             return ["Build and stick to a budget", "Save an emergency fund", "Pay off debt", "Save for retirement", "Save for a big purchase", "Improve credit score"]
+        }
+    }
+    
+    var typeOfSection: TypeOfSection {
+        switch self {
+        case .age:
+            return .date
+        case .hearAboutPlot:
+            return .single
+        case .goalsTime:
+            return .multiple
+        case .goalsHealth:
+            return .multiple
+        case .goalsFinance:
+            return .multiple
         }
     }
 }

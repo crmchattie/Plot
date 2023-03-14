@@ -11,6 +11,16 @@ import UIKit
 let onboardingCollectionViewCell = "OnboardingCollectionViewCell"
 
 class OnboardingController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    let networkController: NetworkController
     
     let onboardingContainerView = OnboardingContainerView()
     
@@ -53,7 +63,7 @@ class OnboardingController: UIViewController, UICollectionViewDelegate, UICollec
     
     //move to next ViewController when user taps on startMessagingDidTap button
     @objc func startPlottingDidTap() {
-        let destination = AuthPhoneNumberController()
+        let destination = AuthPhoneNumberController(networkController: networkController)
         navigationController?.pushViewController(destination, animated: true)
     }
     

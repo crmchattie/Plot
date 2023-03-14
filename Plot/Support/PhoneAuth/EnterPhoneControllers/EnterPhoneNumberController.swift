@@ -11,7 +11,18 @@ import Firebase
 import SafariServices
 import PhoneNumberKit
 
-class EnterPhoneNumberController: UIViewController {    
+class EnterPhoneNumberController: UIViewController {
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    let networkController: NetworkController
+    
     let phoneNumberKit = PhoneNumberKit()
     let phoneNumberContainerView = EnterPhoneNumberContainerView()
     let countries = Country().countries

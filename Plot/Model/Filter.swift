@@ -73,46 +73,46 @@ enum filter: String {
         }
     }
     
-    var typeOfSection: String {
+    var typeOfSection: TypeOfSection {
         switch self {
-        case .search: return "search"
-        case .cuisine: return "multiple"
-        case .excludeCuisine: return "multiple"
-        case .diet: return "single"
-        case .intolerances: return "multiple"
-        case .recipeType: return "single"
-        case .eventType: return "single"
-        case .startDate: return "date"
-        case .endDate: return "date"
-        case .date: return "date"
-        case .location: return "input"
-        case .workoutType: return "single"
-        case .muscles: return "multiple"
-        case .duration: return "single"
-        case .equipment: return "multiple"
-        case .equipmentLevel: return "single"
-        case .fsOpenNow: return "single"
-        case .fsPrice: return "multiple"
-        case .fsFoodCategoryId: return "multiple"
-        case .fsNightlifeCategoryId: return "multiple"
-        case .fsSightseeingCategoryId: return "multiple"
-        case .fsRecreationCategoryId: return "multiple"
-        case .fsShoppingCategoryId: return "multiple"
-        case .calendarView: return "single"
-        case .calendarCategory: return "multiple"
-        case .healthCategory: return "multiple"
-        case .workoutCategory: return "multiple"
-        case .financeAccount: return "multiple"
-        case .financeLevel: return "single"
-        case .showPendingTransactions: return "single"
-        case .taskCategory: return "multiple"
-        case .showCompletedTasks: return "single"
-        case .showRecurringTasks: return "single"
-        case .taskSort: return "single"
-        case .goalCategory: return "multiple"
-        case .showCompletedGoals: return "single"
-        case .showRecurringGoals: return "single"
-        case .goalSort: return "single"
+        case .search: return .search
+        case .cuisine: return .multiple
+        case .excludeCuisine: return .multiple
+        case .diet: return .single
+        case .intolerances: return .multiple
+        case .recipeType: return .single
+        case .eventType: return .single
+        case .startDate: return .date
+        case .endDate: return .date
+        case .date: return .date
+        case .location: return .input
+        case .workoutType: return .single
+        case .muscles: return .multiple
+        case .duration: return .single
+        case .equipment: return .multiple
+        case .equipmentLevel: return .single
+        case .fsOpenNow: return .single
+        case .fsPrice: return .multiple
+        case .fsFoodCategoryId: return .multiple
+        case .fsNightlifeCategoryId: return .multiple
+        case .fsSightseeingCategoryId: return .multiple
+        case .fsRecreationCategoryId: return .multiple
+        case .fsShoppingCategoryId: return .multiple
+        case .calendarView: return .single
+        case .calendarCategory: return .multiple
+        case .healthCategory: return .multiple
+        case .workoutCategory: return .multiple
+        case .financeAccount: return .multiple
+        case .financeLevel: return .single
+        case .showPendingTransactions: return .single
+        case .taskCategory: return .multiple
+        case .showCompletedTasks: return .single
+        case .showRecurringTasks: return .single
+        case .taskSort: return .single
+        case .goalCategory: return .multiple
+        case .showCompletedGoals: return .single
+        case .showRecurringGoals: return .single
+        case .goalSort: return .single
         }
     }
     
@@ -244,5 +244,9 @@ enum filter: String {
         }
     }
     
+}
+
+enum TypeOfSection {
+    case single, multiple, search, date, input
 }
 

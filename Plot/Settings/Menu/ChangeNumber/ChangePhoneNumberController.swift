@@ -22,7 +22,7 @@ class ChangePhoneNumberController: EnterPhoneNumberController {
     override func rightBarButtonDidTap() {
         super.rightBarButtonDidTap()
         
-        let destination = ChangeNumberVerificationController()
+        let destination = ChangeNumberVerificationController(networkController: networkController)
         destination.enterVerificationContainerView.titleNumber.text = phoneNumberContainerView.countryCode.text! + phoneNumberContainerView.phoneNumber.text!
         navigationController?.pushViewController(destination, animated: true)
         

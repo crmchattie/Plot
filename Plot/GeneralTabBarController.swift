@@ -188,7 +188,7 @@ class GeneralTabBarController: UITabBarController {
     }
     
     func presentOnboardingController() {
-        let destination = OnboardingController()
+        let destination = OnboardingController(networkController: GeneralTabBarController.networkController)
         let newNavigationController = UINavigationController(rootViewController: destination)
         newNavigationController.navigationBar.shadowImage = UIImage()
         newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)

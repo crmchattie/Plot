@@ -120,6 +120,18 @@ class UserProfileContainerView: UIView {
         return textField
     }()
     
+    let nextView: UIButton = {
+        let nextView = UIButton()
+        nextView.translatesAutoresizingMaskIntoConstraints = false
+        nextView.titleLabel?.backgroundColor = .clear
+        nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
+        nextView.setTitle("Next", for: .normal)
+        nextView.setTitleColor(.systemBlue, for: .normal)
+        nextView.backgroundColor = .secondarySystemGroupedBackground
+        nextView.layer.cornerRadius = 10
+        return nextView
+    }()
+    
     let userData: UIView = {
         let userData = UIView()
         userData.translatesAutoresizingMaskIntoConstraints = false
@@ -172,6 +184,8 @@ class UserProfileContainerView: UIView {
         return countLabel
     }()
     
+    var hideNextView = true
+    
     let bioMaxCharactersCount = 70
     
     override init(frame: CGRect) {
@@ -182,13 +196,11 @@ class UserProfileContainerView: UIView {
         addSubview(profileImageView)
         addSubview(addPhotoLabel)
         addSubview(userData)
-        addSubview(bio)
         addSubview(email)
         addSubview(age)
-        addSubview(countLabel)
+        addSubview(nextView)
         userData.addSubview(name)
         userData.addSubview(phone)
-        bio.addSubview(bioPlaceholderLabel)
         
         NSLayoutConstraint.activate([
             profileImageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 30),
@@ -214,53 +226,46 @@ class UserProfileContainerView: UIView {
             phone.rightAnchor.constraint(equalTo: userData.rightAnchor, constant: 0),
             phone.heightAnchor.constraint(equalToConstant: 50),
             
-            email.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
-            email.heightAnchor.constraint(equalToConstant: 50),
-            
-            age.topAnchor.constraint(equalTo: email.bottomAnchor, constant: 10),
+            age.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
             age.heightAnchor.constraint(equalToConstant: 50),
             
-            bio.topAnchor.constraint(equalTo: phone.bottomAnchor, constant: 10),
-                        
-            countLabel.widthAnchor.constraint(equalToConstant: 30),
-            countLabel.heightAnchor.constraint(equalToConstant: 30),
-            countLabel.rightAnchor.constraint(equalTo: bio.rightAnchor, constant: -5),
-            countLabel.bottomAnchor.constraint(equalTo: bio.bottomAnchor, constant: -5),
-            countLabel.bottomAnchor.constraint(equalTo: bio.bottomAnchor, constant: -5),
+            email.topAnchor.constraint(equalTo: age.bottomAnchor, constant: 10),
+            email.heightAnchor.constraint(equalToConstant: 50),
             
-            bioPlaceholderLabel.centerXAnchor.constraint(equalTo: bio.centerXAnchor, constant: 0),
-            bioPlaceholderLabel.centerYAnchor.constraint(equalTo: bio.centerYAnchor, constant: 0),
+            nextView.topAnchor.constraint(equalTo: email.bottomAnchor, constant: 10),
+            nextView.heightAnchor.constraint(equalToConstant: 50),
+            
         ])
-        
-        bioPlaceholderLabel.isHidden = !bio.text.isEmpty
-        
+                
         if profileImageView.image != nil {
             addPhotoLabel.isHidden = true
         } else {
             addPhotoLabel.isHidden = false
         }
         
+        nextView.isHidden = hideNextView
+        
         
         if #available(iOS 11.0, *) {
             NSLayoutConstraint.activate([
                 profileImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
-                bio.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
-                bio.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
                 email.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 email.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
                 age.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
                 age.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
+                nextView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 15),
+                nextView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -15),
             ])
         } else {
             NSLayoutConstraint.activate([
                 profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
-                bio.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
-                bio.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
                 email.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 email.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
                 age.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
                 age.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+                nextView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
+                nextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
                 userData.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
             ])
         }

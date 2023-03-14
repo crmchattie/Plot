@@ -105,10 +105,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         plotLogoView.image = UIImage(named: "plotLogo")
         return plotLogoView
     }()
-    
-    let onboardingController: OnboardingController = {
-        return OnboardingController()
-    }()
             
     let refreshControl = UIRefreshControl()
         

@@ -91,7 +91,7 @@ class FilterViewController: FormViewController {
     func initializeForm() {
                 
         for filter in filters {
-            if filter.typeOfSection == "single" {
+            if filter.typeOfSection == .single {
                 form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .singleSelection(enableDeselection: true))
                     <<< CheckRow(filter.rawValue) {
                     $0.title = filter.titleText
@@ -142,7 +142,7 @@ class FilterViewController: FormViewController {
                             print(self.filterDictionary)
                         })
                 }
-            } else if filter.typeOfSection == "multiple" {
+            } else if filter.typeOfSection == .multiple {
                 form +++ SelectableSection<ListCheckRow<String>>(filter.descriptionText, selectionType: .multipleSelection)
                     <<< CheckRow(filter.rawValue) {
                         $0.title = filter.titleText
@@ -207,7 +207,7 @@ class FilterViewController: FormViewController {
                             print(self.filterDictionary)
                         })
                     }
-            } else if filter.typeOfSection == "input" {
+            } else if filter.typeOfSection == .input {
                 form +++ Section(filter.descriptionText)
                 <<< LabelRow("\(filter.rawValue)") { row in
                 row.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -242,7 +242,7 @@ class FilterViewController: FormViewController {
                         }
                     }
                 }
-            } else if filter.typeOfSection == "date" {
+            } else if filter.typeOfSection == .date {
                 form +++ Section(filter.descriptionText)
                 <<< DateTimeInlineRow("\(filter.rawValue)") {
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground
@@ -273,7 +273,7 @@ class FilterViewController: FormViewController {
                         self?.filterDictionary["\(filter.rawValue)"] = [dateString]
                     }
                 }
-            } else if filter.typeOfSection == "search" {
+            } else if filter.typeOfSection == .search {
                 form +++ Section(filter.descriptionText)
                 <<< TextRow("\(filter.rawValue)") {
                     $0.cell.backgroundColor = .secondarySystemGroupedBackground

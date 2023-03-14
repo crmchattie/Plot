@@ -11,6 +11,17 @@ import Firebase
 import PhoneNumberKit
 
 class EnterVerificationCodeController: UIViewController {
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    let networkController: NetworkController
+    
     let enterVerificationContainerView = EnterVerificationContainerView()
     
     let phoneNumberKit = PhoneNumberKit()
@@ -173,7 +184,8 @@ class EnterVerificationCodeController: UIViewController {
                 return
             }
             
-            let destination = UserProfileController()
+            let destination = UserProfileController(networkController: self.networkController)
+            
             do {
                 let phoneNumber = try self.phoneNumberKit.parse(self.enterVerificationContainerView.titleNumber.text ?? "")
                 destination.userProfileContainerView.phone.text = self.phoneNumberKit.format(phoneNumber, toType: .international)
@@ -183,10 +195,7 @@ class EnterVerificationCodeController: UIViewController {
             
             destination.checkIfUserDataExists(completionHandler: { _ in
                 self.removeSpinner()
-                guard self.navigationController != nil else { return }
-                if !(self.navigationController!.topViewController!.isKind(of: UserProfileController.self)) {
-                    self.navigationController?.pushViewController(destination, animated: true)
-                }
+                self.navigationController?.pushViewController(destination, animated: true)
             })
         }
     }

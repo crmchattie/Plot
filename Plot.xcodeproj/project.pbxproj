@@ -202,6 +202,14 @@
 		10B123D029BF87AC0022CBB0 /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123CF29BF87AC0022CBB0 /* SurveyCell.swift */; };
 		10B123D229BF8C390022CBB0 /* Survey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123D129BF8C390022CBB0 /* Survey.swift */; };
 		10B123D529BF9EC00022CBB0 /* ChangeBirthdayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123D429BF9EC00022CBB0 /* ChangeBirthdayController.swift */; };
+		10B123D729C09F210022CBB0 /* SetupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123D629C09F210022CBB0 /* SetupController.swift */; };
+		10B123DA29C0C6280022CBB0 /* FirstSurveyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123D929C0C6280022CBB0 /* FirstSurveyController.swift */; };
+		10B123DC29C0C6EA0022CBB0 /* SecondSurveyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123DB29C0C6EA0022CBB0 /* SecondSurveyController.swift */; };
+		10B123DE29C0C7000022CBB0 /* ThirdSurveyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123DD29C0C7000022CBB0 /* ThirdSurveyController.swift */; };
+		10B123E029C0C7150022CBB0 /* FourthSurveyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123DF29C0C7150022CBB0 /* FourthSurveyController.swift */; };
+		10B123E229C0CBC30022CBB0 /* SetupTimeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E129C0CBC30022CBB0 /* SetupTimeController.swift */; };
+		10B123E429C0CBD60022CBB0 /* SetupHealthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */; };
+		10B123E629C0CBE80022CBB0 /* SetupFinanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */; };
 		10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAA257ACC7200E3A798 /* Scheduler.swift */; };
 		10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAE257ACC9000E3A798 /* Mood.swift */; };
 		10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BC05257D38BA00E3A798 /* MoodViewController.swift */; };
@@ -807,6 +815,14 @@
 		10B123CF29BF87AC0022CBB0 /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
 		10B123D129BF8C390022CBB0 /* Survey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Survey.swift; sourceTree = "<group>"; };
 		10B123D429BF9EC00022CBB0 /* ChangeBirthdayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeBirthdayController.swift; sourceTree = "<group>"; };
+		10B123D629C09F210022CBB0 /* SetupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupController.swift; sourceTree = "<group>"; };
+		10B123D929C0C6280022CBB0 /* FirstSurveyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstSurveyController.swift; sourceTree = "<group>"; };
+		10B123DB29C0C6EA0022CBB0 /* SecondSurveyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondSurveyController.swift; sourceTree = "<group>"; };
+		10B123DD29C0C7000022CBB0 /* ThirdSurveyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdSurveyController.swift; sourceTree = "<group>"; };
+		10B123DF29C0C7150022CBB0 /* FourthSurveyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourthSurveyController.swift; sourceTree = "<group>"; };
+		10B123E129C0CBC30022CBB0 /* SetupTimeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupTimeController.swift; sourceTree = "<group>"; };
+		10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupHealthController.swift; sourceTree = "<group>"; };
+		10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupFinanceController.swift; sourceTree = "<group>"; };
 		10B2BBAA257ACC7200E3A798 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		10B2BBAE257ACC9000E3A798 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
 		10B2BC05257D38BA00E3A798 /* MoodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodViewController.swift; sourceTree = "<group>"; };
@@ -1688,14 +1704,17 @@
 			path = Mindfulness;
 			sourceTree = "<group>";
 		};
-		10B123CC29BF860F0022CBB0 /* Survey & Set-up */ = {
+		10B123CC29BF860F0022CBB0 /* Survey */ = {
 			isa = PBXGroup;
 			children = (
 				10B123CD29BF86870022CBB0 /* SurveyController.swift */,
+				10B123D929C0C6280022CBB0 /* FirstSurveyController.swift */,
+				10B123DB29C0C6EA0022CBB0 /* SecondSurveyController.swift */,
+				10B123DD29C0C7000022CBB0 /* ThirdSurveyController.swift */,
+				10B123DF29C0C7150022CBB0 /* FourthSurveyController.swift */,
 				10B123CF29BF87AC0022CBB0 /* SurveyCell.swift */,
-				10BA3BCD259BEDF9005D98EC /* SetupCell.swift */,
 			);
-			path = "Survey & Set-up";
+			path = Survey;
 			sourceTree = "<group>";
 		};
 		10B123D329BF9E960022CBB0 /* ChangeBirthday */ = {
@@ -1704,6 +1723,18 @@
 				10B123D429BF9EC00022CBB0 /* ChangeBirthdayController.swift */,
 			);
 			path = ChangeBirthday;
+			sourceTree = "<group>";
+		};
+		10B123D829C0C46E0022CBB0 /* Set-up */ = {
+			isa = PBXGroup;
+			children = (
+				10B123D629C09F210022CBB0 /* SetupController.swift */,
+				10B123E129C0CBC30022CBB0 /* SetupTimeController.swift */,
+				10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */,
+				10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */,
+				10BA3BCD259BEDF9005D98EC /* SetupCell.swift */,
+			);
+			path = "Set-up";
 			sourceTree = "<group>";
 		};
 		10B2BC03257D386E00E3A798 /* Scheduler */ = {
@@ -2282,7 +2313,8 @@
 				4BAEE47C21272C4F0045AB10 /* Onboarding */,
 				4BAEE47921272C4F0045AB10 /* Authentication */,
 				4BAEE47321272C4F0045AB10 /* UserProfile */,
-				10B123CC29BF860F0022CBB0 /* Survey & Set-up */,
+				10B123CC29BF860F0022CBB0 /* Survey */,
+				10B123D829C0C46E0022CBB0 /* Set-up */,
 			);
 			path = Authentication;
 			sourceTree = "<group>";
@@ -3307,6 +3339,7 @@
 				4BAEE50821272D890045AB10 /* UserCell.swift in Sources */,
 				1092E25C28B6F2D00018FCAA /* EKSyncReminderTasksOp.swift in Sources */,
 				1082B66423EF1B7500A27046 /* ActivityDetailCell.swift in Sources */,
+				10B123DC29C0C6EA0022CBB0 /* SecondSurveyController.swift in Sources */,
 				4BAEE5E1212735E50045AB10 /* ImagePickerTrayController.swift in Sources */,
 				10196F0224411B5600B6AFDF /* MapActivityViewController.swift in Sources */,
 				106618B324BB655E003C3F36 /* PlaceExpandedDetailCell.swift in Sources */,
@@ -3340,6 +3373,7 @@
 				10B541CA25476D8B00CC9023 /* GroceryProduct.swift in Sources */,
 				1017D32D24F2B879001D7CBE /* MXMerchant.swift in Sources */,
 				4B5E99DE212CC0C0001F067F /* InAppNotificationManager.swift in Sources */,
+				10B123DE29C0C7000022CBB0 /* ThirdSurveyController.swift in Sources */,
 				26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */,
 				108C37F7289C089500DC4998 /* HKCategorySampleViewController.swift in Sources */,
 				103038EE29197A21006F76DA /* AnalyticsPieChartCell.swift in Sources */,
@@ -3371,6 +3405,7 @@
 				4BA1E7832152582F00391BCB /* ChatLogController+DataSource.swift in Sources */,
 				103F492C286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift in Sources */,
 				10EE27F1245C6B6400C80AAF /* Packinglist.swift in Sources */,
+				10B123E429C0CBD60022CBB0 /* SetupHealthController.swift in Sources */,
 				260C87CA24FF5FE900715A64 /* HealthKitManager.swift in Sources */,
 				10920EAF290463160069F027 /* GDeletedPlotActivityOp.swift in Sources */,
 				26958553255A7355008FEE9B /* NutritionOperation.swift in Sources */,
@@ -3455,6 +3490,7 @@
 				4BAEE50721272D890045AB10 /* ContactDataTableViewCell.swift in Sources */,
 				1067753E25E1AE01002F78E7 /* ChangeEmailView.swift in Sources */,
 				10E8E50325923C070076BE42 /* BaseContainerCell.swift in Sources */,
+				10B123E029C0C7150022CBB0 /* FourthSurveyController.swift in Sources */,
 				4BAEE54E212735880045AB10 /* Message.swift in Sources */,
 				100BC57929B64B81005D9F9C /* GoalDetailViewController.swift in Sources */,
 				10D6276F28DDFE0C009D2BD0 /* FeedbackViewController.swift in Sources */,
@@ -3510,6 +3546,7 @@
 				4BAEE5ED212735E50045AB10 /* NewAdminTableViewCell.swift in Sources */,
 				10DFAFC62877752500D38016 /* EventViewController+Functions.swift in Sources */,
 				106618B124BA3C59003C3F36 /* PlaceDetailCell.swift in Sources */,
+				10B123E629C0CBE80022CBB0 /* SetupFinanceController.swift in Sources */,
 				4BAEE4EB21272D890045AB10 /* OutgoingTextMessageCell.swift in Sources */,
 				26036766256CC88900FE9142 /* EventKitService.swift in Sources */,
 				2603676C256CD9A000FE9142 /* EventKitManager.swift in Sources */,
@@ -3598,6 +3635,7 @@
 				10E93D5824BE43B700F6EE18 /* VerticalStackView.swift in Sources */,
 				4BAEE50021272D890045AB10 /* UserInfoTableViewController.swift in Sources */,
 				108C380328AC483E00DC4998 /* TaskViewController+UpdateInvitees.swift in Sources */,
+				10B123DA29C0C6280022CBB0 /* FirstSurveyController.swift in Sources */,
 				1092E26028B6F2FB0018FCAA /* EKPlotTaskOp.swift in Sources */,
 				10B541D025476DA700CC9023 /* MenuProduct.swift in Sources */,
 				10F3032A24EC6FBC00C04B8F /* MXUser.swift in Sources */,
@@ -3687,6 +3725,7 @@
 				10196EFF24411B5600B6AFDF /* LocationFinderTableViewController.swift in Sources */,
 				4BAEE51521272D890045AB10 /* ChatLogController.swift in Sources */,
 				4BAEE4EE21272D890045AB10 /* ChatInputContainer+AttachedImagesCollectionConfig.swift in Sources */,
+				10B123D729C09F210022CBB0 /* SetupController.swift in Sources */,
 				10196F0624411B5600B6AFDF /* EventViewController+UpdateInvitees.swift in Sources */,
 				10DE973B2475E4E600D4A7E8 /* ChecklistFetcher.swift in Sources */,
 				10196F0D24411C2800B6AFDF /* ChooseEventTableViewController.swift in Sources */,
@@ -3751,6 +3790,7 @@
 				F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */,
 				2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */,
 				10A1865C291C9014009AB7F4 /* SleepAnalyticsDataSource.swift in Sources */,
+				10B123E229C0CBC30022CBB0 /* SetupTimeController.swift in Sources */,
 				4BAEE5D3212735E50045AB10 /* RoundProgressView.swift in Sources */,
 				26036762256CC4DA00FE9142 /* EventKitSetupAssistant.swift in Sources */,
 				10DE97392475837B00D4A7E8 /* ListContainer.swift in Sources */,

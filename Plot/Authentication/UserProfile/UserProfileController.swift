@@ -11,13 +11,23 @@ import Firebase
 import PhoneNumberKit
 
 class UserProfileController: UIViewController {
+    init(networkController: NetworkController) {
+        self.networkController = networkController
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    let networkController: NetworkController
     
-    var networkController = NetworkController()
     let userProfileContainerView = UserProfileContainerView()
     let avatarOpener = AvatarOpener()
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
     var newUser = true
     let phoneNumberKit = PhoneNumberKit()
+    var surveyAnswers = [String: Bool]()
     
     // typealias allows you to rename a data type
     typealias CompletionHandler = (_ success: Bool) -> Void
@@ -26,7 +36,6 @@ class UserProfileController: UIViewController {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = .systemGroupedBackground
-        view.addSubview(userProfileContainerView)
         
         configureNavigationBar()
         configureContainerView()
@@ -34,18 +43,19 @@ class UserProfileController: UIViewController {
     }
     
     fileprivate func configureNavigationBar () {
-        let rightBarButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(rightBarButtonDidTap))
-        self.navigationItem.rightBarButtonItem = rightBarButton
         self.title = "Profile"
         self.navigationItem.setHidesBackButton(true, animated: true)
     }
     
     fileprivate func configureContainerView() {
+        view.addSubview(userProfileContainerView)
         userProfileContainerView.frame = view.bounds
-        userProfileContainerView.bioPlaceholderLabel.isHidden = !userProfileContainerView.bio.text.isEmpty
+        userProfileContainerView.hideNextView = false
         userProfileContainerView.addPhotoLabel.isHidden = (userProfileContainerView.profileImageView.image == nil)
         userProfileContainerView.profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openUserProfilePicture)))
         userProfileContainerView.email.addTarget(self, action: #selector(changeEmail), for: .editingDidBegin)
+        userProfileContainerView.age.addTarget(self, action: #selector(changeAge), for: .editingDidBegin)
+        userProfileContainerView.nextView.addTarget(self, action: #selector(rightBarButtonDidTap), for: .touchUpInside)
         userProfileContainerView.bio.delegate = self
         userProfileContainerView.name.delegate = self
         userProfileContainerView.email.delegate = self
@@ -88,17 +98,29 @@ class UserProfileController: UIViewController {
         destination.navigationBar.isTranslucent = false
         present(destination, animated: true, completion: nil)
     }
+    
+    @objc func changeAge() {
+        let controller = ChangeBirthdayController()
+        controller.delegate = self
+        let destination = UINavigationController(rootViewController: controller)
+        destination.navigationBar.shadowImage = UIImage()
+        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.hidesBottomBarWhenPushed = true
+        destination.navigationBar.isTranslucent = false
+        present(destination, animated: true, completion: nil)
+    }
 }
 
 extension UserProfileController {
     
     @objc func rightBarButtonDidTap () {
         userProfileContainerView.name.resignFirstResponder()
+        userProfileContainerView.age.resignFirstResponder()
         if userProfileContainerView.name.text?.count == 0 ||
             userProfileContainerView.name.text!.trimmingCharacters(in: .whitespaces).isEmpty {
             userProfileContainerView.name.shake()
         } else if userProfileContainerView.phone.text?.count == 0 ||
-            userProfileContainerView.phone.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+                    userProfileContainerView.phone.text!.trimmingCharacters(in: .whitespaces).isEmpty {
             userProfileContainerView.phone.shake()
         } else {
             if currentReachabilityStatus == .notReachable {
@@ -111,78 +133,90 @@ extension UserProfileController {
     }
     
     func checkIfUserDataExists(completionHandler: @escaping CompletionHandler) {
-        let nameReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("name")
-        nameReference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                self.userProfileContainerView.name.text = snapshot.value as? String
-                self.newUser = false
-                NotificationCenter.default.post(name: .oldUserLoggedIn, object: nil)
-            }
-        })
-        
-        let bioReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("bio")
-        bioReference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                self.userProfileContainerView.bio.text = snapshot.value as? String
-            }
-        })
-        
-        let emailReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("email")
-        emailReference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                self.userProfileContainerView.email.text = snapshot.value as? String
-            }
-        })
-        
-        let ageReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("age")
-        ageReference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                if let age = snapshot.value as? Double {
-                    let ageComponents = Calendar.current.dateComponents([.year], from: Date(timeIntervalSince1970: age), to: Date())
-                    let birthdayString = "\(ageComponents.year ?? 0) years old"
-                    self.userProfileContainerView.age.text = birthdayString
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let nameReference = Database.database().reference().child("users").child(currentUserID).child("name")
+            nameReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    self.userProfileContainerView.name.text = snapshot.value as? String
+                    self.newUser = false
+                    NotificationCenter.default.post(name: .oldUserLoggedIn, object: nil)
                 }
-            }
-        })
-                
-        let photoReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid).child("photoURL")
-        photoReference.observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot.exists() {
-                guard let urlString = snapshot.value as? String else {
-                    completionHandler(true)
-                    return
+            })
+            
+            let bioReference = Database.database().reference().child("users").child(currentUserID).child("bio")
+            bioReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    self.userProfileContainerView.bio.text = snapshot.value as? String
                 }
-                self.userProfileContainerView.profileImageView.sd_setImage(with: URL(string: urlString), placeholderImage: nil, options: [.scaleDownLargeImages , .continueInBackground], completed: { (_, _, _, _) in
-                    self.userProfileContainerView.addPhotoLabel.isHidden = true
+            })
+            
+            let emailReference = Database.database().reference().child("users").child(currentUserID).child("email")
+            emailReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    self.userProfileContainerView.email.text = snapshot.value as? String
+                }
+            })
+            
+            let ageReference = Database.database().reference().child("users").child(currentUserID).child("age")
+            ageReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    if let age = snapshot.value as? Double {
+                        let ageComponents = Calendar.current.dateComponents([.year], from: Date(timeIntervalSince1970: age), to: Date())
+                        let birthdayString = "\(ageComponents.year ?? 0) years old"
+                        self.userProfileContainerView.age.text = birthdayString
+                    }
+                }
+            })
+            
+            let photoReference = Database.database().reference().child("users").child(currentUserID).child("photoURL")
+            photoReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    guard let urlString = snapshot.value as? String else {
+                        completionHandler(true)
+                        return
+                    }
+                    self.userProfileContainerView.profileImageView.sd_setImage(with: URL(string: urlString), placeholderImage: nil, options: [.scaleDownLargeImages , .continueInBackground], completed: { (_, _, _, _) in
+                        self.userProfileContainerView.addPhotoLabel.isHidden = true
+                        completionHandler(true)
+                    })
+                } else {
+                    self.userProfileContainerView.addPhotoLabel.isHidden = false
                     completionHandler(true)
-                })
-            } else {
-                self.userProfileContainerView.addPhotoLabel.isHidden = false
-                completionHandler(true)
-            }
-        })
+                }
+            })
+            
+            let surveyReference = Database.database().reference().child("users").child(currentUserID).child("survey")
+            surveyReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.exists() {
+                    if let surveyAnswers = snapshot.value as? [String: Bool] {
+                        self.surveyAnswers = surveyAnswers
+                    }
+                }
+            })
+        }
     }
     
     func updateUserData() {
-        let userReference = Database.database().reference().child("users").child(Auth.auth().currentUser!.uid)
-        
-        var phoneNumberForFB = String()
-        
-        do {
-            let phoneNumber = try self.phoneNumberKit.parse(userProfileContainerView.phone.text!)
-            phoneNumberForFB = self.phoneNumberKit.format(phoneNumber, toType: .e164)
-        } catch {
-            phoneNumberForFB = userProfileContainerView.phone.text!
-        }
-        
-        userReference.updateChildValues(["name": userProfileContainerView.name.text!,
-                                         "phoneNumber": phoneNumberForFB,
-                                         "bio": userProfileContainerView.bio.text!]) { (_, _) in
-            Analytics.logEvent(AnalyticsEventSignUp, parameters: [
-                AnalyticsParameterMethod: self.method
-            ])
-            self.dismiss(animated: true) {
-                AppUtility.lockOrientation(.portrait)
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let userReference = Database.database().reference().child("users").child(currentUserID)
+            
+            var phoneNumberForFB = String()
+            
+            do {
+                let phoneNumber = try self.phoneNumberKit.parse(userProfileContainerView.phone.text!)
+                phoneNumberForFB = self.phoneNumberKit.format(phoneNumber, toType: .e164)
+            } catch {
+                phoneNumberForFB = userProfileContainerView.phone.text!
+            }
+            
+            userReference.updateChildValues(["name": userProfileContainerView.name.text!,
+                                             "phoneNumber": phoneNumberForFB,
+                                             "bio": userProfileContainerView.bio.text!]) { (_, _) in
+                Analytics.logEvent(AnalyticsEventSignUp, parameters: [
+                    AnalyticsParameterMethod: self.method
+                ])
+                let destination = FirstSurveyController(survey: Survey.hearAboutPlot, networkController: self.networkController)
+                self.navigationController?.pushViewController(destination, animated: true)
             }
         }
     }
@@ -224,5 +258,13 @@ extension UserProfileController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+}
+
+extension UserProfileController: ChangeBirthdayDelegate {
+    func update(birthday: Date) {
+        let ageComponents = Calendar.current.dateComponents([.year], from: birthday, to: Date())
+        let birthdayString = "\(ageComponents.year ?? 0) years old"
+        self.userProfileContainerView.age.text = birthdayString
     }
 }

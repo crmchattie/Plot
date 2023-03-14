@@ -36,6 +36,7 @@ class AccountSettingsController: UITableViewController {
     var currentName = String()
     var currentAge = String()
     var currentBirthday = Date()
+    var surveyAnswers = [String: Bool]()
     var currentBio = String()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let nightMode = UIButton()
@@ -201,6 +202,9 @@ class AccountSettingsController: UITableViewController {
                     self.userProfileContainerView.name.text = name
                     self.currentName = name
                 }
+                if let email = userInfo["email"] as? String {
+                    self.userProfileContainerView.email.text = email
+                }
                 if let age = userInfo["age"] as? Double {
                     self.currentBirthday = Date(timeIntervalSince1970: age)
                     let ageComponents = Calendar.current.dateComponents([.year], from: Date(timeIntervalSince1970: age), to: Date())
@@ -208,14 +212,15 @@ class AccountSettingsController: UITableViewController {
                     self.userProfileContainerView.age.text = birthdayString
                     self.currentAge = birthdayString
                 }
+                if let surveyAnswers = userInfo["survey"] as? [String: Bool] {
+                    self.surveyAnswers = surveyAnswers
+                }
                 
                 if let bio = userInfo["bio"] as? String {
                     self.userProfileContainerView.bio.text = bio
                     self.userProfileContainerView.bioPlaceholderLabel.isHidden = !self.userProfileContainerView.bio.text.isEmpty
                     self.currentBio = bio
                 }
-                self.userProfileContainerView.email.text = userInfo["email"] as? String
-                
                 if let phoneNumber = userInfo["phoneNumber"] as? String {
                     do {
                         let phoneNumber = try self.phoneNumberKit.parse(phoneNumber)
@@ -230,7 +235,7 @@ class AccountSettingsController: UITableViewController {
     
     @objc func changePhoneNumber() {
         cancelBarButtonPressed()
-        let controller = ChangePhoneNumberController()
+        let controller = ChangePhoneNumberController(networkController: networkController)
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
         destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
@@ -285,7 +290,7 @@ class AccountSettingsController: UITableViewController {
         
         UIApplication.shared.applicationIconBadgeNumber = 0
         
-        let destination = OnboardingController()
+        let destination = OnboardingController(networkController: networkController)
         
         let newNavigationController = UINavigationController(rootViewController: destination)
         newNavigationController.navigationBar.shadowImage = UIImage()
@@ -330,7 +335,7 @@ class AccountSettingsController: UITableViewController {
                 
                 UIApplication.shared.applicationIconBadgeNumber = 0
                 
-                let destination = OnboardingController()
+                let destination = OnboardingController(networkController: self.networkController)
                 
                 let newNavigationController = UINavigationController(rootViewController: destination)
                 newNavigationController.navigationBar.shadowImage = UIImage()

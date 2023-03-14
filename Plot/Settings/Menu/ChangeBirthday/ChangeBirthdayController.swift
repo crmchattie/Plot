@@ -10,6 +10,10 @@ import UIKit
 import Firebase
 import Eureka
 
+protocol ChangeBirthdayDelegate: AnyObject {
+    func update(birthday: Date)
+}
+
 class ChangeBirthdayController: FormViewController {
     init() {
         super.init(style: .insetGrouped)
@@ -20,6 +24,7 @@ class ChangeBirthdayController: FormViewController {
     }
     
     var birthday = Date()
+    weak var delegate : ChangeBirthdayDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +37,6 @@ class ChangeBirthdayController: FormViewController {
 
     }
     
-
     @objc func leftBarButtonDidTap() {
         self.dismiss(animated: true)
     }
@@ -54,7 +58,8 @@ class ChangeBirthdayController: FormViewController {
         })
         
         form +++
-        Section()
+        
+        Section(footer: "We use your age to give you more accurate goals and benchmarks")
         
         <<< DatePickerRow(){
             $0.value = birthday
@@ -80,6 +85,7 @@ class ChangeBirthdayController: FormViewController {
                 let reference = Database.database().reference().child("users").child(currentUser).child("age")
                 reference.setValue(NSNumber(value: Int((self.birthday).timeIntervalSince1970)))
             }
+            self.delegate?.update(birthday: self.birthday)
             self.dismiss(animated: true)
         }).cellUpdate({ (cell, row) in
             cell.backgroundColor = .systemBlue
