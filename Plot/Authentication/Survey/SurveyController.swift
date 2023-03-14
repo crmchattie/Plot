@@ -11,8 +11,9 @@ import Firebase
 import Eureka
 
 class SurveyController: FormViewController {
-    init(survey: Survey, networkController: NetworkController) {
+    init(survey: Survey, surveyAnswers: [String: [String]], networkController: NetworkController) {
         self.survey = survey
+        self.surveyAnswers = surveyAnswers
         self.networkController = networkController
         super.init(style: .insetGrouped)
     }
@@ -22,7 +23,7 @@ class SurveyController: FormViewController {
     }
     
     let survey: Survey!
-    var surveyAnswers = [String: Bool]()
+    var surveyAnswers = [String: [String]]()
     let networkController: NetworkController
 
     override func viewDidLoad() {
@@ -59,11 +60,11 @@ class SurveyController: FormViewController {
         if survey.typeOfSection == .single {
             form +++ SelectableSection<ListCheckRow<String>>("", selectionType: .singleSelection(enableDeselection: false))
             for choice in survey.choices {
-                form.last! <<< ListCheckRow<String>("\(choice)"){ row in
+                form.last! <<< ListCheckRow<String>("\(choice)_\(survey.rawValue)"){ row in
                     row.title = choice
                     row.selectableValue = choice
                     }.cellSetup { (cell, row) in
-                        if self.surveyAnswers[choice] != nil {
+                        if self.surveyAnswers.keys.contains(self.survey.rawValue), let choiceList = self.surveyAnswers[self.survey.rawValue], let _ = choiceList.firstIndex(of: choice) {
                             row.value = choice
                         }
                         cell.accessoryType = .checkmark
@@ -73,11 +74,12 @@ class SurveyController: FormViewController {
                     }.onChange({ row in
                         if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                             let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
-                            let survey = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                            let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
                             if row.value != nil {
-                                self.surveyAnswers[choice] = true
+                                print("single choice list is not empty")
+                                self.surveyAnswers[filter] = [choice]
                             } else {
-                                self.surveyAnswers[choice] = nil
+                                self.surveyAnswers[filter] = nil
                             }
                         }
                         print(self.surveyAnswers)
@@ -86,12 +88,12 @@ class SurveyController: FormViewController {
         } else if survey.typeOfSection == .multiple {
             form +++ SelectableSection<ListCheckRow<String>>("", selectionType: .multipleSelection)
                 for choice in survey.choices {
-                    form.last! <<< ListCheckRow<String>("\(choice)"){ row in
+                    form.last! <<< ListCheckRow<String>("\(choice)_\(survey.rawValue)"){ row in
                         row.title = choice
                         row.selectableValue = choice
                         row.value = nil
                         }.cellSetup { (cell, row) in
-                            if self.surveyAnswers[choice] != nil {
+                            if self.surveyAnswers.keys.contains(self.survey.rawValue), let choiceList = self.surveyAnswers[self.survey.rawValue], let _ = choiceList.firstIndex(of: choice) {
                                 row.value = choice
                             }
                             cell.accessoryType = .checkmark
@@ -101,11 +103,26 @@ class SurveyController: FormViewController {
                     }.onChange({ row in
                         if let rowTag = row.tag, let index = rowTag.firstIndex(of: "_") {
                             let choice = String(rowTag[...rowTag.index(index, offsetBy: -1)])
-                            let survey = String(rowTag[rowTag.index(index, offsetBy: 1)...])
+                            let filter = String(rowTag[rowTag.index(index, offsetBy: 1)...])
                             if row.value != nil {
-                                self.surveyAnswers[choice] = true
+                                if var choiceList = self.surveyAnswers[filter], !choiceList.isEmpty {
+                                    if choiceList.contains(choice) {
+                                        return
+                                    } else {
+                                        choiceList.append(choice)
+                                        self.surveyAnswers[filter] = choiceList
+                                    }
+                                } else {
+                                    self.surveyAnswers[filter] = [choice]
+                                }
                             } else {
-                                self.surveyAnswers[choice] = nil
+                                if var choiceList = self.surveyAnswers[filter], let indexChoice = choiceList.firstIndex(of: choice), choiceList.count > 1 {
+                                    print("multiple choice list is not empty")
+                                    choiceList.remove(at: indexChoice)
+                                    self.surveyAnswers[filter] = choiceList
+                                } else {
+                                    self.surveyAnswers[filter] = nil
+                                }
                             }
                         }
                         print(self.surveyAnswers)
@@ -121,7 +138,7 @@ class SurveyController: FormViewController {
             row.cell.textLabel?.textAlignment = .center
             row.cell.textLabel?.textColor = .white
             row.cell.accessoryType = .none
-            row.title = "Next"
+            row.title = "Continue"
         }.onCellSelection({ _,_ in
             self.nextButtonDidTap()
         }).cellUpdate({ (cell, row) in

@@ -36,7 +36,7 @@ class AccountSettingsController: UITableViewController {
     var currentName = String()
     var currentAge = String()
     var currentBirthday = Date()
-    var surveyAnswers = [String: Bool]()
+    var surveyAnswers = [String: [String]]()
     var currentBio = String()
     let navigationItemActivityIndicator = NavigationItemActivityIndicator()
     let nightMode = UIButton()
@@ -212,7 +212,7 @@ class AccountSettingsController: UITableViewController {
                     self.userProfileContainerView.age.text = birthdayString
                     self.currentAge = birthdayString
                 }
-                if let surveyAnswers = userInfo["survey"] as? [String: Bool] {
+                if let surveyAnswers = userInfo["survey"] as? [String: [String]] {
                     self.surveyAnswers = surveyAnswers
                 }
                 

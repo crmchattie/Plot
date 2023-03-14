@@ -27,7 +27,7 @@ class UserProfileController: UIViewController {
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
     var newUser = true
     let phoneNumberKit = PhoneNumberKit()
-    var surveyAnswers = [String: Bool]()
+    var surveyAnswers = [String: [String]]()
     
     // typealias allows you to rename a data type
     typealias CompletionHandler = (_ success: Bool) -> Void
@@ -188,7 +188,7 @@ extension UserProfileController {
             let surveyReference = Database.database().reference().child("users").child(currentUserID).child("survey")
             surveyReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists() {
-                    if let surveyAnswers = snapshot.value as? [String: Bool] {
+                    if let surveyAnswers = snapshot.value as? [String: [String]] {
                         self.surveyAnswers = surveyAnswers
                     }
                 }
@@ -215,7 +215,7 @@ extension UserProfileController {
                 Analytics.logEvent(AnalyticsEventSignUp, parameters: [
                     AnalyticsParameterMethod: self.method
                 ])
-                let destination = FirstSurveyController(survey: Survey.hearAboutPlot, networkController: self.networkController)
+                let destination = FirstSurveyController(survey: Survey.hearAboutPlot, surveyAnswers: self.surveyAnswers, networkController: self.networkController)
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         }
