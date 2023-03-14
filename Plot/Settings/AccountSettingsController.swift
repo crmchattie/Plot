@@ -238,7 +238,7 @@ class AccountSettingsController: UITableViewController {
         let controller = ChangePhoneNumberController(networkController: networkController)
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
-        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         destination.hidesBottomBarWhenPushed = true
         destination.navigationBar.isTranslucent = false
         present(destination, animated: true, completion: nil)
@@ -249,7 +249,7 @@ class AccountSettingsController: UITableViewController {
         let controller = ChangeEmailController()
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
-        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         destination.hidesBottomBarWhenPushed = true
         destination.navigationBar.isTranslucent = false
         present(destination, animated: true, completion: nil)
@@ -261,7 +261,7 @@ class AccountSettingsController: UITableViewController {
         controller.birthday = currentBirthday
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
-        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         destination.hidesBottomBarWhenPushed = true
         destination.navigationBar.isTranslucent = false
         present(destination, animated: true, completion: nil)
@@ -294,7 +294,7 @@ class AccountSettingsController: UITableViewController {
         
         let newNavigationController = UINavigationController(rootViewController: destination)
         newNavigationController.navigationBar.shadowImage = UIImage()
-        newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        newNavigationController.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         
         newNavigationController.modalPresentationStyle = .fullScreen
         newNavigationController.navigationBar.isTranslucent = false
@@ -324,8 +324,9 @@ class AccountSettingsController: UITableViewController {
             if snapshot.exists(), let userInfo = snapshot.value as? [String: Any], let user_guid = userInfo["guid"] as? String {
                 Service.shared.deleteMXUser(user_guid: user_guid) {_,_ in }
             }
-                        
+                                    
             user.delete { error in
+                print(error)
                 guard error == nil else {
                     basicErrorAlertWithClose(title: "Error Deleting Account", message: error?.localizedDescription ?? "", controller: self)
                     return
@@ -339,7 +340,7 @@ class AccountSettingsController: UITableViewController {
                 
                 let newNavigationController = UINavigationController(rootViewController: destination)
                 newNavigationController.navigationBar.shadowImage = UIImage()
-                newNavigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+                newNavigationController.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
                 
                 newNavigationController.modalPresentationStyle = .fullScreen
                 newNavigationController.navigationBar.isTranslucent = false

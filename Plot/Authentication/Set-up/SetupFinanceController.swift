@@ -19,6 +19,7 @@ class SetupFinanceController: SetupController {
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
         self.dismiss(animated: true) {
+            self.dismiss(animated: true)
             self.networkController.setupInitialGoals()
         }
     }

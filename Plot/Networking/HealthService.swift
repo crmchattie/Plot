@@ -90,8 +90,9 @@ class HealthService {
     
     var dataIsSetup = false {
         didSet {
+            print("healthDataIsSetup")
+            print(dataIsSetup)
             if dataIsSetup {
-                print("healthDataIsSetup")
                 NotificationCenter.default.post(name: .healthDataIsSetup, object: nil)
             }
         }
@@ -105,7 +106,7 @@ class HealthService {
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] _ in
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
-                self?.dataIsSetup = successfullyGrabbedHealthMetrics
+                self?.dataIsSetup = true
                 self?.authorized = successfullyGrabbedHealthMetrics
                 HealthKitService.authorized = successfullyGrabbedHealthMetrics
                 self?.healthMetricSections = Array(metrics.keys)
@@ -155,7 +156,7 @@ class HealthService {
         healhKitManager.checkHealthAuthorizationStatus {}
         HealthKitService.authorizeHealthKit { [weak self] askedforAuthorization in
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
-                self?.dataIsSetup = successfullyGrabbedHealthMetrics
+                self?.dataIsSetup = true
                 self?.authorized = successfullyGrabbedHealthMetrics
                 HealthKitService.authorized = successfullyGrabbedHealthMetrics
                 self?.healthMetricSections = Array(metrics.keys)

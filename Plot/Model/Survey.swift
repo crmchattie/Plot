@@ -41,11 +41,11 @@ enum Survey: String {
         case .hearAboutPlot:
             return "We are asking to better understand how people are learning about Plot"
         case .goalsTime:
-            return "We are asking so we can give you better goals and insights"
+            return "We are asking so we can give you better goals and insights in the future"
         case .goalsHealth:
-            return "We are asking so we can give you better goals and insights"
+            return "We are asking so we can give you better goals and insights in the future"
         case .goalsFinance:
-            return "We are asking so we can give you better goals and insights"
+            return "We are asking so we can give you better goals and insights in the future"
         }
     }
     

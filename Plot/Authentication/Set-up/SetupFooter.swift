@@ -57,10 +57,9 @@ class SetupFooter: UICollectionReusableView {
         let leftConstant: CGFloat = 15
         let rightConstant: CGFloat = -15
         let heightConstant: CGFloat = 50
-        let spacingConstant: CGFloat = 10
+        let spacingConstant: CGFloat = 20
         
         NSLayoutConstraint.activate([
-            
             button.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: spacingConstant),
             button.rightAnchor.constraint(equalTo: rightAnchor, constant: rightConstant),
             button.leftAnchor.constraint(equalTo: leftAnchor, constant: leftConstant),

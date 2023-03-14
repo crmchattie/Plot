@@ -96,7 +96,7 @@ class UserProfileController: UIViewController {
         let controller = ChangeEmailController()
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
-        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         destination.hidesBottomBarWhenPushed = true
         destination.navigationBar.isTranslucent = false
         present(destination, animated: true, completion: nil)
@@ -109,7 +109,7 @@ class UserProfileController: UIViewController {
         controller.birthday = currentBirthday
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
-        destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        destination.toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         destination.hidesBottomBarWhenPushed = true
         destination.navigationBar.isTranslucent = false
         present(destination, animated: true, completion: nil)

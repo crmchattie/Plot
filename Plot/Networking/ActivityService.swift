@@ -39,8 +39,9 @@ class ActivityService {
     
     var dataIsSetup = false {
         didSet {
+            print("timeDataIsSetup")
+            print(dataIsSetup)
             if dataIsSetup {
-                print("timeDataIsSetup")
                 NotificationCenter.default.post(name: .timeDataIsSetup, object: nil)
             }
         }
@@ -400,6 +401,7 @@ class ActivityService {
     
     func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
+            self?.dataIsSetup = true
             if self?.activities.isEmpty ?? true {
                 self?.activities = activitiesInitialAdd
             } else if !activitiesInitialAdd.isEmpty {
