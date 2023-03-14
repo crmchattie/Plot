@@ -28,8 +28,8 @@ class SurveyController: FormViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        extendedLayoutIncludesOpaqueBars = false
-        edgesForExtendedLayout = []
+        extendedLayoutIncludesOpaqueBars = true
+        edgesForExtendedLayout = .top
         view.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         initializeForm()

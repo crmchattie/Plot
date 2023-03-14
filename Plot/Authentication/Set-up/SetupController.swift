@@ -82,7 +82,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         return CGSize(width: self.collectionView.frame.size.width, height: 70)
     }
     

@@ -99,10 +99,10 @@ class EnterPhoneNumberContainerView: UIView {
         
         addSubview(title)
         addSubview(instructions)
-        addSubview(selectCountry)
         addSubview(phoneContainer)
         phoneContainer.addSubview(countryCode)
         phoneContainer.addSubview(phoneNumber)
+        addSubview(selectCountry)
         addSubview(nextView)
                 
         let leftConstant: CGFloat = 15
@@ -121,12 +121,7 @@ class EnterPhoneNumberContainerView: UIView {
             instructions.rightAnchor.constraint(equalTo: title.rightAnchor),
             instructions.leftAnchor.constraint(equalTo: title.leftAnchor),
             
-            selectCountry.topAnchor.constraint(equalTo: instructions.bottomAnchor, constant: spacingConstant),
-            selectCountry.rightAnchor.constraint(equalTo: title.rightAnchor),
-            selectCountry.leftAnchor.constraint(equalTo: title.leftAnchor),
-            selectCountry.heightAnchor.constraint(equalToConstant: heightConstant),
-            
-            phoneContainer.topAnchor.constraint(equalTo: selectCountry.bottomAnchor, constant: spacingConstant),
+            phoneContainer.topAnchor.constraint(equalTo: instructions.bottomAnchor, constant: spacingConstant),
             phoneContainer.rightAnchor.constraint(equalTo: title.rightAnchor),
             phoneContainer.leftAnchor.constraint(equalTo: title.leftAnchor),
             phoneContainer.heightAnchor.constraint(equalToConstant: heightConstant),
@@ -140,7 +135,12 @@ class EnterPhoneNumberContainerView: UIView {
             phoneNumber.centerYAnchor.constraint(equalTo: phoneContainer.centerYAnchor),
             phoneNumber.heightAnchor.constraint(equalTo: phoneContainer.heightAnchor),
             
-            nextView.topAnchor.constraint(equalTo: phoneContainer.bottomAnchor, constant: spacingConstant),
+            selectCountry.topAnchor.constraint(equalTo: phoneContainer.bottomAnchor, constant: spacingConstant),
+            selectCountry.rightAnchor.constraint(equalTo: title.rightAnchor),
+            selectCountry.leftAnchor.constraint(equalTo: title.leftAnchor),
+            selectCountry.heightAnchor.constraint(equalToConstant: heightConstant),
+            
+            nextView.topAnchor.constraint(equalTo: selectCountry.bottomAnchor, constant: spacingConstant),
             nextView.rightAnchor.constraint(equalTo: title.rightAnchor),
             nextView.leftAnchor.constraint(equalTo: title.leftAnchor),
             nextView.heightAnchor.constraint(equalToConstant: heightConstant),
