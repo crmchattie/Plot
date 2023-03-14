@@ -143,6 +143,7 @@ extension UserProfileController {
             nameReference.observeSingleEvent(of: .value, with: { (snapshot) in
                 if snapshot.exists() {
                     self.userProfileContainerView.name.text = snapshot.value as? String
+                    self.nameEditingChanged()
                     NotificationCenter.default.post(name: .oldUserLoggedIn, object: nil)
                 }
                 NotificationCenter.default.post(name: .userLoggedIn, object: nil)
