@@ -19,8 +19,8 @@ class SetupHealthController: SetupController {
         super.nextButtonDidTap()
         DispatchQueue.main.async {
             print("nextButtonDidTap health")
-            let destination = SetupFinanceController(networkController: networkController)
-            navigationController?.pushViewController(destination, animated: true)
+            let destination = SetupFinanceController(networkController: self.networkController)
+            self.navigationController?.pushViewController(destination, animated: true)
         }
     }
 }

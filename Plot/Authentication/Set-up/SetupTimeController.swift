@@ -19,8 +19,8 @@ class SetupTimeController: SetupController {
         super.nextButtonDidTap()
         DispatchQueue.main.async {
             print("nextButtonDidTap time")
-            let destination = SetupHealthController(networkController: networkController)
-            navigationController?.pushViewController(destination, animated: true)
+            let destination = SetupHealthController(networkController: self.networkController)
+            self.navigationController?.pushViewController(destination, animated: true)
         }
     }
 }
