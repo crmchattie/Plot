@@ -21,14 +21,8 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         fatalError("init(coder:) has not been implemented")
     }
     
-    let collectionView: UICollectionView = {
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .systemGroupedBackground
-        return collectionView
-    }()
+    let collectionView:UICollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+    let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
     
     var customType: CustomType!
     let networkController: NetworkController
@@ -39,14 +33,20 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         super.viewDidLoad()
         
         //set-up interface with the help of OnboardingContainerView file
-        extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = .systemGroupedBackground
+        collectionView.indicatorStyle = .default
+        collectionView.backgroundColor = .systemGroupedBackground
+        
+        definesPresentationContext = true
+        layout.scrollDirection = UICollectionView.ScrollDirection.vertical
+        collectionView.setCollectionViewLayout(layout, animated: true)
+        
+        collectionView.dataSource = self
+        collectionView.delegate = self
         
         view.addSubview(collectionView)
         collectionView.fillSuperview()
         
-        collectionView.delegate = self
-        collectionView.dataSource = self
         collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
         collectionView.register(SetupFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: setupFooter)
         
@@ -68,14 +68,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var height: CGFloat = 300
-        let dummyCell = SetupCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-        dummyCell.backgroundColor = .secondarySystemGroupedBackground
-        dummyCell.customType = customType
-        dummyCell.layoutIfNeeded()
-        let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
-        height = estimatedSize.height
-        return CGSize(width: self.collectionView.frame.size.width - 30, height: height)
+        return CGSize(width: self.collectionView.frame.size.width - 30, height: 300)
             
     }
     
@@ -94,7 +87,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionView.elementKindSectionHeader {
+        if kind == UICollectionView.elementKindSectionFooter {
             let setupFooter = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: setupFooter, for: indexPath) as! SetupFooter
             setupFooter.footerTitle = footerTitle
             setupFooter.nextView.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)

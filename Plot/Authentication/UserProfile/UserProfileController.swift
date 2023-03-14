@@ -91,6 +91,7 @@ class UserProfileController: UIViewController {
     }
     
     @objc func changeEmail() {
+        userProfileContainerView.email.resignFirstResponder()
         let controller = ChangeEmailController()
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
@@ -101,6 +102,7 @@ class UserProfileController: UIViewController {
     }
     
     @objc func changeAge() {
+        userProfileContainerView.age.resignFirstResponder()
         let controller = ChangeBirthdayController()
         controller.delegate = self
         let destination = UINavigationController(rootViewController: controller)
