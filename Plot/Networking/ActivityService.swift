@@ -40,6 +40,7 @@ class ActivityService {
     var dataIsSetup = false {
         didSet {
             if dataIsSetup {
+                print("timeDataIsSetup")
                 NotificationCenter.default.post(name: .timeDataIsSetup, object: nil)
             }
         }
@@ -399,7 +400,6 @@ class ActivityService {
     
     func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
-            self?.dataIsSetup = true
             if self?.activities.isEmpty ?? true {
                 self?.activities = activitiesInitialAdd
             } else if !activitiesInitialAdd.isEmpty {
@@ -629,7 +629,6 @@ class ActivityService {
     }
     
     func updatePrimaryCalendar(value: String) {
-        self.dataIsSetup = true
         if let currentUserID = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(primaryCalendarKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -764,7 +763,6 @@ class ActivityService {
     }
     
     func updatePrimaryList(value: String) {
-        self.dataIsSetup = true
         if let currentUserID = Auth.auth().currentUser?.uid {
             let reference = Database.database().reference().child(userReminderTasksEntity).child(currentUserID).child(primaryReminderKey)
             reference.observeSingleEvent(of: .value, with: { (snapshot) in

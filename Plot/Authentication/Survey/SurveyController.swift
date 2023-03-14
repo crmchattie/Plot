@@ -31,12 +31,17 @@ class SurveyController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
-        extendedLayoutIncludesOpaqueBars = true
-        edgesForExtendedLayout = UIRectEdge.top
+        extendedLayoutIncludesOpaqueBars = false
+        edgesForExtendedLayout = []
         
         view.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         initializeForm()
+        updateButton()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
     }
     
     @objc func nextButtonDidTap() {

@@ -91,6 +91,7 @@ class HealthService {
     var dataIsSetup = false {
         didSet {
             if dataIsSetup {
+                print("healthDataIsSetup")
                 NotificationCenter.default.post(name: .healthDataIsSetup, object: nil)
             }
         }

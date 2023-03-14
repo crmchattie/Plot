@@ -64,7 +64,7 @@ class SetupFooter: UICollectionReusableView {
             button.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: spacingConstant),
             button.rightAnchor.constraint(equalTo: rightAnchor, constant: rightConstant),
             button.leftAnchor.constraint(equalTo: leftAnchor, constant: leftConstant),
-            nextView.heightAnchor.constraint(equalToConstant: heightConstant),
+            button.heightAnchor.constraint(equalToConstant: heightConstant),
             
             nextView.topAnchor.constraint(equalTo: button.bottomAnchor, constant: spacingConstant),
             nextView.rightAnchor.constraint(equalTo: button.rightAnchor),
