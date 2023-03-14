@@ -27,6 +27,7 @@ class UserProfileController: UIViewController {
     let userProfileDataDatabaseUpdater = UserProfileDataDatabaseUpdater()
     var newUser = true
     let phoneNumberKit = PhoneNumberKit()
+    var currentBirthday = Date()
     var surveyAnswers = [String: [String]]()
     
     // typealias allows you to rename a data type
@@ -105,6 +106,7 @@ class UserProfileController: UIViewController {
         userProfileContainerView.age.resignFirstResponder()
         let controller = ChangeBirthdayController()
         controller.delegate = self
+        controller.birthday = currentBirthday
         let destination = UINavigationController(rootViewController: controller)
         destination.navigationBar.shadowImage = UIImage()
         destination.navigationBar.setBackgroundImage(UIImage(), for: .default)
@@ -281,5 +283,6 @@ extension UserProfileController: ChangeBirthdayDelegate {
         let ageComponents = Calendar.current.dateComponents([.year], from: birthday, to: Date())
         let birthdayString = "\(ageComponents.year ?? 0) years old"
         self.userProfileContainerView.age.text = birthdayString
+        self.currentBirthday = birthday
     }
 }

@@ -48,7 +48,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         collectionView.fillSuperview()
         
         collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
-        collectionView.register(SetupFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: setupFooter)
+        collectionView.register(SetupFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: setupFooter)
         
     }
     
@@ -172,6 +172,5 @@ class SetupFooter: UICollectionReusableView {
         nextView.setTitle(footerTitle, for: .normal)
         addSubview(nextView)
         nextView.fillSuperview(padding: .init(top: 10, left: 15, bottom: 10, right: 15))
-        
     }
 }

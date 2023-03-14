@@ -37,11 +37,11 @@ class EnterPhoneNumberContainerView: UIView {
         let selectCountry = UIButton()
         selectCountry.translatesAutoresizingMaskIntoConstraints = false
         selectCountry.setTitle("United States", for: .normal)
-        selectCountry.setTitleColor(.label, for: .normal)
+        selectCountry.setTitleColor(.white, for: .normal)
         selectCountry.contentHorizontalAlignment = .center
         selectCountry.contentVerticalAlignment = .center
         selectCountry.titleLabel?.sizeToFit()
-        selectCountry.backgroundColor = .secondarySystemGroupedBackground
+        selectCountry.backgroundColor = .systemBlue
         selectCountry.layer.cornerRadius = 10
         selectCountry.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10.0, bottom: 0.0, right: 10.0)
         selectCountry.titleLabel?.font = UIFont.title3.with(weight: .medium)
