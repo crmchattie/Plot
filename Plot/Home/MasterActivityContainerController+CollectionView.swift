@@ -189,7 +189,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 return cell
             }
         }
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupHomeCell, for: indexPath) as! SetupHomeCell
         cell.backgroundColor = .secondarySystemGroupedBackground
         if let item = object as? CustomType {
             cell.customType = item
@@ -291,7 +291,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 height = estimatedSize.height
             }
         } else {
-            let dummyCell = SetupCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+            let dummyCell = SetupHomeCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
             dummyCell.backgroundColor = .secondarySystemGroupedBackground
             if let item = object as? CustomType {
                 dummyCell.customType = item
@@ -336,7 +336,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let _ = collectionView.cellForItem(at: indexPath) as? SetupCell, let section = groups[indexPath.section] as? CustomType {
+        if let _ = collectionView.cellForItem(at: indexPath) as? SetupHomeCell, let section = groups[indexPath.section] as? CustomType {
             if section == .time {
                 newCalendar()
             } else if section == .health {

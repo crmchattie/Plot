@@ -10,6 +10,8 @@ import UIKit
 import Firebase
 import GoogleSignIn
 
+let setupCell = "SetupCell"
+
 class SetupController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, ObjectDetailShowing {
     
     init(networkController: NetworkController) {
@@ -61,8 +63,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupCell
-        cell.backgroundColor = .secondarySystemGroupedBackground
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: setupCell, for: indexPath) as! SetupHomeCell
         cell.customType = customType
         return cell
     }

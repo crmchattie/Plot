@@ -1,14 +1,14 @@
 //
-//  SetupCell.swift
+//  SetupCollectionCell.swift
 //  Plot
 //
-//  Created by Cory McHattie on 3/14/23.
-//  Copyright © 2023 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 12/29/20.
+//  Copyright © 2020 Immature Creations. All rights reserved.
 //
 
 import Foundation
 
-class SetupCell: BaseContainerCollectionViewCell {
+class SetupHomeCell: BaseContainerCollectionViewCell {
     var colors : [UIColor] = [FalconPalette.defaultRed, FalconPalette.defaultBlue, FalconPalette.defaultOrange, FalconPalette.defaultDarkBlue, FalconPalette.defaultGreen]
     
     var customType: CustomType! {
@@ -90,7 +90,7 @@ class SetupCell: BaseContainerCollectionViewCell {
         button.isUserInteractionEnabled = false
         return button
     }()
-        
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.cornerRadius = 16
@@ -113,7 +113,8 @@ class SetupCell: BaseContainerCollectionViewCell {
         imageView.constrainWidth(50)
         imageView.constrainHeight(50)
         
-        button.constrainHeight(50)
+        button.constrainWidth(contentView.frame.width - 32)
+        button.constrainHeight(45)
         
         button.clipsToBounds = true
         button.layer.cornerRadius = 8
@@ -124,32 +125,12 @@ class SetupCell: BaseContainerCollectionViewCell {
             imageView.centerYAnchor.constraint(equalTo: containerImageView.centerYAnchor)
         ])
         
-        let stackView = VerticalStackView(arrangedSubviews: [containerImageView, typeLabel, descriptionLabel, subDescriptionLabel], spacing: 10)
-        stackView.backgroundColor = .secondarySystemGroupedBackground
+        let stackView = VerticalStackView(arrangedSubviews: [containerImageView, typeLabel, descriptionLabel, subDescriptionLabel, button], spacing: 10)
+        
         stackView.alignment = .center
-        stackView.constrainHeight(250)
         
         addSubview(stackView)
-        addSubview(button)
-        
-        let leftConstant: CGFloat = 15
-        let rightConstant: CGFloat = -15
-        let heightConstant: CGFloat = 50
-        let spacingConstant: CGFloat = 20
-        
-        NSLayoutConstraint.activate([
-            
-            stackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: spacingConstant),
-            stackView.rightAnchor.constraint(equalTo: rightAnchor, constant: rightConstant),
-            stackView.leftAnchor.constraint(equalTo: leftAnchor, constant: leftConstant),
-            
-            button.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: spacingConstant),
-            button.rightAnchor.constraint(equalTo: stackView.rightAnchor),
-            button.leftAnchor.constraint(equalTo: stackView.leftAnchor),
-            button.heightAnchor.constraint(equalToConstant: heightConstant),
-        ])
-        
-        
+        stackView.fillSuperview(padding: .init(top: 16, left: 16, bottom: 16, right: 16))
         
     }
     

@@ -210,6 +210,7 @@
 		10B123E229C0CBC30022CBB0 /* SetupTimeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E129C0CBC30022CBB0 /* SetupTimeController.swift */; };
 		10B123E429C0CBD60022CBB0 /* SetupHealthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */; };
 		10B123E629C0CBE80022CBB0 /* SetupFinanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */; };
+		10B123E829C0F6C80022CBB0 /* SetupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B123E729C0F6C80022CBB0 /* SetupCell.swift */; };
 		10B2BBAB257ACC7200E3A798 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAA257ACC7200E3A798 /* Scheduler.swift */; };
 		10B2BBAF257ACC9000E3A798 /* Mood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BBAE257ACC9000E3A798 /* Mood.swift */; };
 		10B2BC06257D38BA00E3A798 /* MoodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2BC05257D38BA00E3A798 /* MoodViewController.swift */; };
@@ -243,7 +244,7 @@
 		10B656CC24AF761F006686FA /* CompositionalHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CB24AF761F006686FA /* CompositionalHeader.swift */; };
 		10B656CE24AFB0E7006686FA /* SectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B656CD24AFB0E7006686FA /* SectionType.swift */; };
 		10B6B31625410D37008037AD /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B6B31525410D37008037AD /* TagsViewController.swift */; };
-		10BA3BCE259BEDF9005D98EC /* SetupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3BCD259BEDF9005D98EC /* SetupCell.swift */; };
+		10BA3BCE259BEDF9005D98EC /* SetupHomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3BCD259BEDF9005D98EC /* SetupHomeCell.swift */; };
 		10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */; };
 		10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */; };
 		10C0CC662885FED4007CC9F3 /* CustomRecurrenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */; };
@@ -823,6 +824,7 @@
 		10B123E129C0CBC30022CBB0 /* SetupTimeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupTimeController.swift; sourceTree = "<group>"; };
 		10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupHealthController.swift; sourceTree = "<group>"; };
 		10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupFinanceController.swift; sourceTree = "<group>"; };
+		10B123E729C0F6C80022CBB0 /* SetupCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupCell.swift; sourceTree = "<group>"; };
 		10B2BBAA257ACC7200E3A798 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		10B2BBAE257ACC9000E3A798 /* Mood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mood.swift; sourceTree = "<group>"; };
 		10B2BC05257D38BA00E3A798 /* MoodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodViewController.swift; sourceTree = "<group>"; };
@@ -856,7 +858,7 @@
 		10B656CB24AF761F006686FA /* CompositionalHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionalHeader.swift; sourceTree = "<group>"; };
 		10B656CD24AFB0E7006686FA /* SectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionType.swift; sourceTree = "<group>"; };
 		10B6B31525410D37008037AD /* TagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsViewController.swift; sourceTree = "<group>"; };
-		10BA3BCD259BEDF9005D98EC /* SetupCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupCell.swift; sourceTree = "<group>"; };
+		10BA3BCD259BEDF9005D98EC /* SetupHomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupHomeCell.swift; sourceTree = "<group>"; };
 		10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerViewController.swift; sourceTree = "<group>"; };
 		10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTransactionTableViewController.swift; sourceTree = "<group>"; };
 		10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRecurrenceViewController.swift; sourceTree = "<group>"; };
@@ -1350,6 +1352,7 @@
 				1051AC97244F8B3D0066761C /* MasterActivityContainerController.swift */,
 				103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */,
 				103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */,
+				10BA3BCD259BEDF9005D98EC /* SetupHomeCell.swift */,
 				10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */,
 				10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */,
 				10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */,
@@ -1732,7 +1735,7 @@
 				10B123E129C0CBC30022CBB0 /* SetupTimeController.swift */,
 				10B123E329C0CBD60022CBB0 /* SetupHealthController.swift */,
 				10B123E529C0CBE80022CBB0 /* SetupFinanceController.swift */,
-				10BA3BCD259BEDF9005D98EC /* SetupCell.swift */,
+				10B123E729C0F6C80022CBB0 /* SetupCell.swift */,
 			);
 			path = "Set-up";
 			sourceTree = "<group>";
@@ -3377,7 +3380,7 @@
 				26391FEC235EC3CE002BB4C0 /* Date+Extension.swift in Sources */,
 				108C37F7289C089500DC4998 /* HKCategorySampleViewController.swift in Sources */,
 				103038EE29197A21006F76DA /* AnalyticsPieChartCell.swift in Sources */,
-				10BA3BCE259BEDF9005D98EC /* SetupCell.swift in Sources */,
+				10BA3BCE259BEDF9005D98EC /* SetupHomeCell.swift in Sources */,
 				10DFAFCC2877775800D38016 /* HealthRow.swift in Sources */,
 				4BA1E77C2152511B00391BCB /* UploadProgress.swift in Sources */,
 				10E8E4FF25923B4F0076BE42 /* FinanceControllerCell.swift in Sources */,
@@ -3753,6 +3756,7 @@
 				10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */,
 				10737F8524912BDD00D146D6 /* Preview.swift in Sources */,
 				100FE70E2894407600D3124C /* ActivitySubcategory.swift in Sources */,
+				10B123E829C0F6C80022CBB0 /* SetupCell.swift in Sources */,
 				1092F23C2414580E00E8CE16 /* RecipeDetailCell.swift in Sources */,
 				10DC5C4025AF35C600D52722 /* FinancialMemberFetcher.swift in Sources */,
 				4BAEE51821272D890045AB10 /* TimestampView.swift in Sources */,

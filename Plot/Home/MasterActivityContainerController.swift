@@ -21,7 +21,7 @@ let kHeaderCell = "HeaderCell"
 let kFinanceCollectionViewCell = "FinanceCollectionViewCell"
 let kFinanceCollectionViewComparisonCell = "FinanceCollectionViewComparisonCell"
 let kFinanceCollectionViewMemberCell = "FinanceCollectionViewMemberCell"
-let setupCell = "SetupCell"
+let setupHomeCell = "SetupHomeCell"
 let headerContainerCell = "HeaderCellDelegate"
 
 
@@ -148,7 +148,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         collectionView.register(FinanceCollectionViewComparisonCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewComparisonCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         collectionView.register(InterSectionHeader.self, forCellWithReuseIdentifier: kHeaderCell)
-        collectionView.register(SetupCell.self, forCellWithReuseIdentifier: setupCell)
+        collectionView.register(SetupHomeCell.self, forCellWithReuseIdentifier: setupHomeCell)
         collectionView.register(HeaderContainerCell.self, forCellWithReuseIdentifier: headerContainerCell)
     }
     
