@@ -31,6 +31,10 @@ class NetworkController {
     
     var isOldUser = false
     
+    var timeGoalsSetup = false
+    var healthGoalsSetup = false
+    var financeGoalsSetup = false
+    
     var hasLoadedListGoalActivities = false {
         didSet {
             NotificationCenter.default.post(name: .hasLoadedListGoalActivities, object: nil)

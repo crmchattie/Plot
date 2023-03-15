@@ -11,8 +11,12 @@ import Foundation
 class SetupTimeController: SetupController {
     override func viewDidLoad() {
         customType = CustomType.time
-        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .timeDataIsSetup, object: nil)
         super.viewDidLoad()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .timeDataIsSetup, object: nil)
+        super.viewDidAppear(false)
     }
     
     override func nextButtonDidTap() {

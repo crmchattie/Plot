@@ -11,8 +11,12 @@ import Foundation
 class SetupHealthController: SetupController {
     override func viewDidLoad() {
         customType = CustomType.health
-        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .healthDataIsSetup, object: nil)
         super.viewDidLoad()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .healthDataIsSetup, object: nil)
+        super.viewDidAppear(false)
     }
     
     override func nextButtonDidTap() {

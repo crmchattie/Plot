@@ -622,7 +622,11 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             destination.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(destination, animated: true)
         } else if section == .time {
-            if !sortedTasks.isEmpty {
+            if !sortedGoals.isEmpty {
+                let destination = CalendarViewController(networkController: networkController)
+                destination.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(destination, animated: true)
+            } else if !sortedTasks.isEmpty {
                 let destination = ListsViewController(networkController: networkController)
                 destination.hidesBottomBarWhenPushed = true
                 navigationController?.pushViewController(destination, animated: true)

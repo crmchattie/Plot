@@ -536,7 +536,8 @@ extension NetworkController {
     }
     
     func setupInitialTimeGoals() {
-        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+        if !(timeGoalsSetup), let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+            timeGoalsSetup = true
             for g in prebuiltGoalsTime {
                 var goal = g
                 let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -649,7 +650,8 @@ extension NetworkController {
     }
     
     func setupInitialHealthGoals() {
-        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+        if !(healthGoalsSetup), let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+            healthGoalsSetup = true
             for g in prebuiltGoalsHealth {
                 var goal = g
                 let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
@@ -762,7 +764,8 @@ extension NetworkController {
     }
     
     func setupInitialFinanceGoals() {
-        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+        if !(financeGoalsSetup), let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+            financeGoalsSetup = true
             for g in prebuiltGoalsFinances {
                 var goal = g
                 let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""

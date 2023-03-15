@@ -39,18 +39,6 @@ class SetupFooter: UICollectionReusableView {
         return nextView
     }()
     
-    let fireObserverView: UIButton = {
-        let nextView = UIButton()
-        nextView.translatesAutoresizingMaskIntoConstraints = false
-        nextView.titleLabel?.backgroundColor = .clear
-        nextView.titleLabel?.font = UIFont.title3.with(weight: .semibold)
-        nextView.setTitle("Continue", for: .normal)
-        nextView.setTitleColor(.white, for: .normal)
-        nextView.backgroundColor = .systemBlue
-        nextView.layer.cornerRadius = 10
-        return nextView
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -65,7 +53,6 @@ class SetupFooter: UICollectionReusableView {
         nextView.setTitle(footerTitle, for: .normal)
         addSubview(button)
         addSubview(nextView)
-        addSubview(fireObserverView)
         
         let leftConstant: CGFloat = 15
         let rightConstant: CGFloat = -15
@@ -81,12 +68,7 @@ class SetupFooter: UICollectionReusableView {
             nextView.topAnchor.constraint(equalTo: button.bottomAnchor, constant: spacingConstant),
             nextView.rightAnchor.constraint(equalTo: button.rightAnchor),
             nextView.leftAnchor.constraint(equalTo: button.leftAnchor),
-            nextView.heightAnchor.constraint(equalToConstant: heightConstant),
-            
-            fireObserverView.topAnchor.constraint(equalTo: nextView.bottomAnchor, constant: spacingConstant),
-            fireObserverView.rightAnchor.constraint(equalTo: button.rightAnchor),
-            fireObserverView.leftAnchor.constraint(equalTo: button.leftAnchor),
-            fireObserverView.heightAnchor.constraint(equalToConstant: heightConstant),
+            nextView.heightAnchor.constraint(equalToConstant: heightConstant),            
         ])
     }
 }

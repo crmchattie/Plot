@@ -11,9 +11,13 @@ import Foundation
 class SetupFinanceController: SetupController {
     override func viewDidLoad() {
         customType = CustomType.finances
-        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .financeDataIsSetup, object: nil)
         footerTitle = "Finish"
         super.viewDidLoad()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        NotificationCenter.default.addObserver(self, selector: #selector(nextButtonDidTap), name: .financeDataIsSetup, object: nil)
+        super.viewDidAppear(false)
     }
     
     override func nextButtonDidTap() {

@@ -205,6 +205,7 @@ class SignInAppleGoogleViewController: UITableViewController {
 extension SignInAppleGoogleViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if (error == nil) {
+            self.networkController.activityService.dataIsSetup = true
             let grantedScopes = user?.grantedScopes as? [String]
             if let grantedScopes = grantedScopes {
                 if grantedScopes.contains(googleEmailScope) && grantedScopes.contains(googleTaskScope) {

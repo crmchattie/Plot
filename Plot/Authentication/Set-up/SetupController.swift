@@ -58,16 +58,6 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         
     }
     
-    @objc func fireObserver() {
-        if customType == .time {
-            networkController.activityService.dataIsSetup = true
-        } else if customType == .health {
-            networkController.healthService.dataIsSetup = true
-        } else {
-            networkController.financeService.dataIsSetup = true
-        }
-    }
-    
     @objc func new() {
         if customType == .time {
             newCalendar()
@@ -107,7 +97,6 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
             setupFooter.footerTitle = footerTitle
             setupFooter.button.addTarget(self, action: #selector(new), for: .touchUpInside)
             setupFooter.nextView.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
-            setupFooter.fireObserverView.addTarget(self, action: #selector(fireObserver), for: .touchUpInside)
             return setupFooter
         } else { //No footer in this case but can add option for that
             return UICollectionReusableView()

@@ -402,7 +402,6 @@ class ActivityService {
     
     func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
-            self?.dataIsSetup = true
             if self?.activities.isEmpty ?? true {
                 self?.activities = activitiesInitialAdd
             } else if !activitiesInitialAdd.isEmpty {
@@ -503,6 +502,7 @@ class ActivityService {
         self.eventKitManager.checkReminderAuthorizationStatus {
             if self.eventKitManager.reminderAuthorizationStatus != "restricted" {
                 self.eventKitManager.authorizeEventKitReminders({ askedforAuthorization in
+                    self.dataIsSetup = true
                     self.askedforReminderAuthorization = askedforAuthorization
                     self.eventKitManager.syncEventKitReminders(existingActivities: self.tasksNoRepeats, completion: {
                         self.eventKitManager.syncTasksToEventKit(activities: self.tasksNoRepeats, completion: {
