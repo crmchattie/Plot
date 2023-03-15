@@ -60,11 +60,11 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     
     @objc func fireObserver() {
         if customType == .time {
-            NotificationCenter.default.post(name: .timeDataIsSetup, object: nil)
+            networkController.activityService.dataIsSetup = true
         } else if customType == .health {
-            NotificationCenter.default.post(name: .healthDataIsSetup, object: nil)
+            networkController.healthService.dataIsSetup = true
         } else {
-            NotificationCenter.default.post(name: .financeDataIsSetup, object: nil)
+            networkController.financeService.dataIsSetup = true
         }
     }
     
