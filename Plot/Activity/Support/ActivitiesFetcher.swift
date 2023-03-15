@@ -60,7 +60,6 @@ class ActivitiesFetcher: NSObject {
                 var counter = 0
                 let activityIDs = snapshot.value as? [String: AnyObject] ?? [:]
                 for (ID, userActivityInfo) in activityIDs {
-                    print(ID)
                     var handle = UInt.max
                     if let dictionary = userActivityInfo as? [String: AnyObject] {
                         let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])

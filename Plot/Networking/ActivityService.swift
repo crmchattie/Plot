@@ -358,27 +358,6 @@ class ActivityService {
         }
     }
     
-    func regrabLists(_ completion: @escaping () -> Void) {
-        hasLoadedListTaskActivities = false
-        if primaryList == ListSourceOptions.apple.name {
-            self.grabEKReminders {
-                self.grabLists()
-                self.hasLoadedListTaskActivities = true
-                completion()
-            }
-        } else if primaryList == ListSourceOptions.google.name {
-            self.grabGTasks {
-                self.grabLists()
-                self.hasLoadedListTaskActivities = true
-                completion()
-            }
-        } else {
-            self.grabLists()
-            self.hasLoadedListTaskActivities = true
-            completion()
-        }
-    }
-    
     func regrabEvents(_ completion: @escaping () -> Void) {
         hasLoadedCalendarEventActivities = false
         if primaryCalendar == CalendarSourceOptions.apple.name {
@@ -396,6 +375,27 @@ class ActivityService {
         } else {
             self.grabCalendars()
             self.hasLoadedCalendarEventActivities = true
+            completion()
+        }
+    }
+    
+    func regrabLists(_ completion: @escaping () -> Void) {
+        hasLoadedListTaskActivities = false
+        if primaryList == ListSourceOptions.apple.name {
+            self.grabEKReminders {
+                self.grabLists()
+                self.hasLoadedListTaskActivities = true
+                completion()
+            }
+        } else if primaryList == ListSourceOptions.google.name {
+            self.grabGTasks {
+                self.grabLists()
+                self.hasLoadedListTaskActivities = true
+                completion()
+            }
+        } else {
+            self.grabLists()
+            self.hasLoadedListTaskActivities = true
             completion()
         }
     }

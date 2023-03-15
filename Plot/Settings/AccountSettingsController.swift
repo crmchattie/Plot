@@ -327,8 +327,8 @@ class AccountSettingsController: UITableViewController {
             
                         
             user.delete { error in
-                print(error)
                 guard error == nil else {
+                    print(error as Any)
                     basicErrorAlertWithClose(title: "Error Deleting Account", message: error?.localizedDescription ?? "", controller: self)
                     return
                 }

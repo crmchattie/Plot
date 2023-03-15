@@ -172,8 +172,8 @@ class SignInAppleGoogleViewController: UITableViewController {
                 } else if title == "Calendars" {
                     self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
                 } else if title == "Providers" {
-                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
                     self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
                 }
                 if navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)
@@ -190,8 +190,8 @@ class SignInAppleGoogleViewController: UITableViewController {
                 } else if title == "Calendars" {
                     self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
                 } else if title == "Providers" {
-                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
                     self.networkController.activityService.updatePrimaryCalendar(value: CalendarSourceOptions.apple.name)
+                    self.networkController.activityService.updatePrimaryList(value: ListSourceOptions.apple.name)
                 }
                 if navigationItem.leftBarButtonItem != nil {
                     self.dismiss(animated: true, completion: nil)

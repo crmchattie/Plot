@@ -58,6 +58,16 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
         
     }
     
+    @objc func fireObserver() {
+        if customType == .time {
+            NotificationCenter.default.post(name: .timeDataIsSetup, object: nil)
+        } else if customType == .health {
+            NotificationCenter.default.post(name: .healthDataIsSetup, object: nil)
+        } else {
+            NotificationCenter.default.post(name: .financeDataIsSetup, object: nil)
+        }
+    }
+    
     @objc func new() {
         if customType == .time {
             newCalendar()
@@ -88,7 +98,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        return CGSize(width: self.collectionView.frame.size.width, height: 140)
+        return CGSize(width: self.collectionView.frame.size.width, height: 200)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -97,6 +107,7 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
             setupFooter.footerTitle = footerTitle
             setupFooter.button.addTarget(self, action: #selector(new), for: .touchUpInside)
             setupFooter.nextView.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
+            setupFooter.fireObserverView.addTarget(self, action: #selector(fireObserver), for: .touchUpInside)
             return setupFooter
         } else { //No footer in this case but can add option for that
             return UICollectionReusableView()
