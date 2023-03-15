@@ -417,6 +417,8 @@ class HealthDetailService: HealthDetailServiceInterface {
                     let stats = self?.perpareCustomStatsForQuantitySamples(from: samples, startDate: startDate, endDate: endDate, segmentType: segmentType, type: healthMetricType)
                     completion(stats, samples, nil)
                 }
+            } else {
+                completion(nil, nil, nil)
             }
         }
     }
@@ -531,6 +533,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 }
             }
             else if case .sleep = healthMetricType {
+                print(".sleep = healthMetricType")
                 HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self ] (samples, error) in
                     self?.perpareCustomStatsForSleepSamplesForGoal(from: samples, startDate: startDate, endDate: endDate, type: healthMetricType) { stat, samples in
                         completion(stat, samples, nil)
@@ -597,6 +600,8 @@ class HealthDetailService: HealthDetailServiceInterface {
                     let stats = self?.perpareCustomStatsForQuantitySamplesForGoal(from: samples, startDate: startDate, endDate: endDate, type: healthMetricType)
                     completion(stats, samples, nil)
                 }
+            } else {
+                completion(nil, nil, nil)
             }
         }
     }

@@ -91,12 +91,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         return storyboard.instantiateViewController(withIdentifier: "LaunchScreen")
     }()
     
-    let launchScreenView: UIView = {
-        let launchScreenView = UIView()
-        launchScreenView.translatesAutoresizingMaskIntoConstraints = false
-        return launchScreenView
-    }()
-    
     let plotLogoView: UIImageView = {
         let plotLogoView = UIImageView()
         plotLogoView.translatesAutoresizingMaskIntoConstraints = false
@@ -329,6 +323,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func hasLoadedListGoalActivities() {
+        print("hasLoadedListGoalActivities")
         self.updatingGoals = !networkController.hasLoadedListGoalActivities
         DispatchQueue.main.async {
             self.collectionView.reloadData()

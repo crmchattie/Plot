@@ -425,7 +425,6 @@ class HealthKitService {
                                          startDate: Date,
                                          endDate: Date,
                                          completion: @escaping ([HKCategorySample]?, Error?) -> Void) {
-        
         guard let type = HKObjectType.categoryType(forIdentifier: identifier) else {
             completion(nil, nil)
             return

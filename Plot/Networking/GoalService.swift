@@ -47,16 +47,16 @@ extension NetworkController {
                 continue
             }
             
-//            print("metricCheck check")
-//            print(task.name)
-//            print(task.activityID)
-//            print(metric)
-//            print(task.startDate)
-//            print(range.startDate)
-//            print(task.endDate)
-//            print(range.endDate)
-//            print(past)
-//            print(current)
+            print("metricCheck check")
+            print(task.name)
+            print(task.activityID)
+            print(metric)
+            print(task.startDate)
+            print(range.startDate)
+            print(task.endDate)
+            print(range.endDate)
+            print(past)
+            print(current)
                                         
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
@@ -64,16 +64,16 @@ extension NetworkController {
                     finalStat = stat
                 }
                 
-//                print("metricCheck done")
-//                print(task.name)
-//                print(task.activityID)
-//                print(metric)
-//                print(task.startDate)
-//                print(range.startDate)
-//                print(task.endDate)
-//                print(range.endDate)
-//                print(finalStat.date)
-//                print(finalStat.value)
+                print("metricCheck done")
+                print(task.name)
+                print(task.activityID)
+                print(metric)
+                print(task.startDate)
+                print(range.startDate)
+                print(task.endDate)
+                print(range.endDate)
+                print(finalStat.date)
+                print(finalStat.value)
 
                 if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
                     self.checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { statSecond in
@@ -82,16 +82,16 @@ extension NetworkController {
                             finalStatSecond = statSecond
                         }
                         
-//                        print("metricCheckSecond done")
-//                        print(task.name)
-//                        print(task.activityID)
-//                        print(metric)
-//                        print(task.startDate)
-//                        print(range.startDate)
-//                        print(task.endDate)
-//                        print(range.endDate)
-//                        print(finalStatSecond.date)
-//                        print(finalStatSecond.value)
+                        print("metricCheckSecond done")
+                        print(task.name)
+                        print(task.activityID)
+                        print(metric)
+                        print(task.startDate)
+                        print(range.startDate)
+                        print(task.endDate)
+                        print(range.endDate)
+                        print(finalStatSecond.date)
+                        print(finalStatSecond.value)
                         
                         switch metricsRelationshipType {
                         case .or:
@@ -501,6 +501,7 @@ extension NetworkController {
             }
         case .sleep:
             guard let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) else {
+                print(".sleep completion(nil)")
                 completion(nil)
                 return
             }

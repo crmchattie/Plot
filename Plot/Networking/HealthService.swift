@@ -107,8 +107,8 @@ class HealthService {
         HealthKitService.authorizeHealthKit { [weak self] _ in
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
                 self?.dataIsSetup = true
+                HealthKitService.authorized = true
                 self?.authorized = successfullyGrabbedHealthMetrics
-                HealthKitService.authorized = successfullyGrabbedHealthMetrics
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
                 if self?.isRunning ?? true {
