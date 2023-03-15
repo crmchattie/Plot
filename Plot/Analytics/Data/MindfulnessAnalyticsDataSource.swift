@@ -90,15 +90,27 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                         var chartDataSets = [LineChartDataSet]()
                         var categories: [CategorySummaryViewModel] = []
                         var dataEntriesCurrent: [ChartDataEntry] = []
-                        let sumCurrent = statsPast.reduce(0, { $0 + $1.value })
+                        let sumCurrent = statsCurrent.reduce(0, { $0 + $1.value * 60 })
+                        print("creating data entries mindfulness")
+                        print(sumCurrent)
+                        print(startDateCurrent)
+                        for current in statsCurrent {
+                            print(current.date)
+                            print(current.value)
+                        }
                         for index in 0...daysInRange {
                             let date = startDateCurrent.addDays(index)
-                            if let stat = statsCurrent.first(where: { $0.date == date }) {
+                            if let stat = statsCurrent.first(where: { $0.date.startOfDay == date.startOfDay }) {
+                                print("found stat")
+                                print(stat.date)
+                                print(stat.value)
                                 if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
-                                    let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
+                                    let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value * 60, data: date)
                                     dataEntriesCurrent.append(entry)
                                 }
                             } else {
+                                print("did not find stat")
+                                print(date)
                                 let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
                                 dataEntriesCurrent.append(entry)
                             }
@@ -124,13 +136,12 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                         var sumPast: Double = 0
                         if !statsPast.isEmpty {
                             var dataEntriesPast: [ChartDataEntry] = []
-                            sumPast = statsPast.reduce(0, { $0 + $1.value })
+                            sumPast = statsPast.reduce(0, { $0 + $1.value * 60 })
                             for index in 0...daysInRange {
                                 let date = startDatePast.addDays(index)
-                                
-                                if let stat = statsPast.first(where: { $0.date == date }) {
+                                if let stat = statsPast.first(where: { $0.date.startOfDay == date.startOfDay }) {
                                     if !dataEntriesPast.contains(where: {$0.data as? Date == stat.date }) {
-                                        let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value, data: date)
+                                        let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value * 60, data: date)
                                         dataEntriesPast.append(entry)
                                     }
                                 } else {

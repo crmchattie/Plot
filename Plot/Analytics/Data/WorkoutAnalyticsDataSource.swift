@@ -90,7 +90,6 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
                         var chartDataSets = [LineChartDataSet]()
                         var categories: [CategorySummaryViewModel] = []
                         let keysCurrent = categoryStatsCurrent.keys.sorted(by: <)
-                        
                         var cumulativeCurrent: Double = 0
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
