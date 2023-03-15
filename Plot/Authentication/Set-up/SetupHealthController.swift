@@ -21,6 +21,7 @@ class SetupHealthController: SetupController {
             print("nextButtonDidTap health")
             let destination = SetupFinanceController(networkController: self.networkController)
             self.navigationController?.pushViewController(destination, animated: true)
+            self.networkController.setupInitialHealthGoals()
         }
     }
 }

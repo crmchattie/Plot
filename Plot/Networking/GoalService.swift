@@ -534,6 +534,345 @@ extension NetworkController {
         }
     }
     
+    func setupInitialTimeGoals() {
+        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+            for g in prebuiltGoalsTime {
+                var goal = g
+                let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                let category = goal.category
+                let subcategory = goal.subcategory
+                
+                var list: ListType?
+                if category == .finances, let newList = lists.first(where: { $0.financeList ?? false }) {
+                    list = newList
+                } else if category == .health, let newList = lists.first(where: { $0.healthList ?? false }) {
+                    list = newList
+                } else if let newList = lists.first(where: { $0.defaultList ?? false }) {
+                    list = newList
+                }
+                
+                if let list = list {
+                    var date = Date().dayBefore
+                    let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
+                    task.name = goal.name
+                    task.isGoal = true
+                    
+                    let group = DispatchGroup()
+                    if goal.targetNumber == nil {
+                        group.enter()
+                        if goal.name == "Save Emergency Fund" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round(stat?.value ?? 0)
+                                group.leave()
+                            }
+                        } else if goal.name == "Monthly Savings" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.2) / 3)
+                                group.leave()
+                            }
+                        } else if goal.name == "Daily Spending" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            let daysBetween = Double(Calendar.current.numberOfDaysBetween(startOfThreeMonthsAgo, and: endOfLastMonth))
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.8) / daysBetween)
+                                group.leave()
+                            }
+                        }
+                    }
+                    
+                    group.notify(queue: .global()) {
+                        task.goal = goal
+                        task.category = category.rawValue
+                        task.subcategory = subcategory.rawValue
+                        if let frequency = goal.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
+                            var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
+                            let calendar = Calendar.current
+
+                            switch recurrenceRule.frequency {
+                            case .yearly:
+                                date = date.startOfYear.UTCTime
+                                let month = calendar.component(.month, from: date)
+                                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+                                task.endDateTime = NSNumber(value: Int((date.endOfYear.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .monthly:
+                                // monthly needs UTCTime in order for recurrence to calc the correct dates
+                                date = date.startOfMonth.UTCTime
+                                let monthday = calendar.component(.day, from: date)
+                                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                                recurrenceRule.bymonthday = [1]
+                            case .weekly:
+                                date = date.startOfWeek.UTCTime
+                                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: date))!
+                                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+                                task.endDateTime = NSNumber(value: Int((date.endOfWeek.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .daily:
+                                date = date.startOfDay.UTCTime
+                                recurrenceRule = RecurrenceRule.dailyRecurrence()
+                                task.endDateTime = NSNumber(value: Int((date.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .hourly, .minutely, .secondly:
+                                break
+                            }
+                            
+                            task.hasStartTime = false
+                            task.hasDeadlineTime = false
+                            task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                            
+                            recurrenceRule.startDate = date
+                            recurrenceRule.interval = goal.name != "Bi-Annual Dental Cleaning" ? 1 : 2
+                            task.recurrences = [recurrenceRule.toRRuleString()]
+                            
+                            if goal.name == "Daily Mood" {
+                                task.reminder = TaskAlert.SixPMOnDeadlineDate.description
+                            } else if frequency == .monthly {
+                                task.reminder = TaskAlert.NineAMOneWeekBeforeDeadlineDate.description
+                            } else if frequency == .yearly {
+                                task.reminder = TaskAlert.NineAMOneMonthBeforeDeadlineDate.description
+                            } else if goal.name != "Daily Sleep" {
+                                task.reminder = TaskAlert.NineAMOnDeadlineDate.description
+                            }
+                        }
+                        
+                        let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
+                        activityAction.createNewActivity(updateDirectAssociation: false)
+
+                    }
+                }
+            }
+        }
+    }
+    
+    func setupInitialHealthGoals() {
+        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+            for g in prebuiltGoalsHealth {
+                var goal = g
+                let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                let category = goal.category
+                let subcategory = goal.subcategory
+                
+                var list: ListType?
+                if category == .finances, let newList = lists.first(where: { $0.financeList ?? false }) {
+                    list = newList
+                } else if category == .health, let newList = lists.first(where: { $0.healthList ?? false }) {
+                    list = newList
+                } else if let newList = lists.first(where: { $0.defaultList ?? false }) {
+                    list = newList
+                }
+                
+                if let list = list {
+                    var date = Date().dayBefore
+                    let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
+                    task.name = goal.name
+                    task.isGoal = true
+                    
+                    let group = DispatchGroup()
+                    if goal.targetNumber == nil {
+                        group.enter()
+                        if goal.name == "Save Emergency Fund" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round(stat?.value ?? 0)
+                                group.leave()
+                            }
+                        } else if goal.name == "Monthly Savings" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.2) / 3)
+                                group.leave()
+                            }
+                        } else if goal.name == "Daily Spending" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            let daysBetween = Double(Calendar.current.numberOfDaysBetween(startOfThreeMonthsAgo, and: endOfLastMonth))
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.8) / daysBetween)
+                                group.leave()
+                            }
+                        }
+                    }
+                    
+                    group.notify(queue: .global()) {
+                        task.goal = goal
+                        task.category = category.rawValue
+                        task.subcategory = subcategory.rawValue
+                        if let frequency = goal.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
+                            var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
+                            let calendar = Calendar.current
+
+                            switch recurrenceRule.frequency {
+                            case .yearly:
+                                date = date.startOfYear.UTCTime
+                                let month = calendar.component(.month, from: date)
+                                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+                                task.endDateTime = NSNumber(value: Int((date.endOfYear.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .monthly:
+                                // monthly needs UTCTime in order for recurrence to calc the correct dates
+                                date = date.startOfMonth.UTCTime
+                                let monthday = calendar.component(.day, from: date)
+                                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                                recurrenceRule.bymonthday = [1]
+                            case .weekly:
+                                date = date.startOfWeek.UTCTime
+                                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: date))!
+                                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+                                task.endDateTime = NSNumber(value: Int((date.endOfWeek.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .daily:
+                                date = date.startOfDay.UTCTime
+                                recurrenceRule = RecurrenceRule.dailyRecurrence()
+                                task.endDateTime = NSNumber(value: Int((date.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .hourly, .minutely, .secondly:
+                                break
+                            }
+                            
+                            task.hasStartTime = false
+                            task.hasDeadlineTime = false
+                            task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                            
+                            recurrenceRule.startDate = date
+                            recurrenceRule.interval = goal.name != "Bi-Annual Dental Cleaning" ? 1 : 2
+                            task.recurrences = [recurrenceRule.toRRuleString()]
+                            
+                            if goal.name == "Daily Mood" {
+                                task.reminder = TaskAlert.SixPMOnDeadlineDate.description
+                            } else if frequency == .monthly {
+                                task.reminder = TaskAlert.NineAMOneWeekBeforeDeadlineDate.description
+                            } else if frequency == .yearly {
+                                task.reminder = TaskAlert.NineAMOneMonthBeforeDeadlineDate.description
+                            } else if goal.name != "Daily Sleep" {
+                                task.reminder = TaskAlert.NineAMOnDeadlineDate.description
+                            }
+                        }
+                        
+                        let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
+                        activityAction.createNewActivity(updateDirectAssociation: false)
+
+                    }
+                }
+            }
+        }
+    }
+    
+    func setupInitialFinanceGoals() {
+        if let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {
+            for g in prebuiltGoalsFinances {
+                var goal = g
+                let activityID = Database.database().reference().child(userActivitiesEntity).child(currentUserID).childByAutoId().key ?? ""
+                let category = goal.category
+                let subcategory = goal.subcategory
+                
+                var list: ListType?
+                if category == .finances, let newList = lists.first(where: { $0.financeList ?? false }) {
+                    list = newList
+                } else if category == .health, let newList = lists.first(where: { $0.healthList ?? false }) {
+                    list = newList
+                } else if let newList = lists.first(where: { $0.defaultList ?? false }) {
+                    list = newList
+                }
+                
+                if let list = list {
+                    var date = Date().dayBefore
+                    let task = Activity(activityID: activityID, admin: currentUserID, listID: list.id ?? "", listName: list.name ?? "", listColor: list.color ?? CIColor(color: ChartColors.palette()[5]).stringRepresentation, listSource: list.source ?? "", isCompleted: false, createdDate: NSNumber(value: Int((date).timeIntervalSince1970)))
+                    task.name = goal.name
+                    task.isGoal = true
+                    
+                    let group = DispatchGroup()
+                    if goal.targetNumber == nil {
+                        group.enter()
+                        if goal.name == "Save Emergency Fund" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Expense"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round(stat?.value ?? 0)
+                                group.leave()
+                            }
+                        } else if goal.name == "Monthly Savings" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.2) / 3)
+                                group.leave()
+                            }
+                        } else if goal.name == "Daily Spending" {
+                            let startOfThreeMonthsAgo = Date().startOfMonth.monthBefore.monthBefore.monthBefore
+                            let endOfLastMonth = Date().endOfMonth.monthBefore
+                            let daysBetween = Double(Calendar.current.numberOfDaysBetween(startOfThreeMonthsAgo, and: endOfLastMonth))
+                            checkGoal(metric: GoalMetric.financialTransactions, submetric: GoalSubMetric.group, option: ["Income"], unit: GoalUnit.amount, range: DateRange(startDate: startOfThreeMonthsAgo, endDate: endOfLastMonth)) { stat in
+                                goal.targetNumber = round((stat?.value ?? 0 * 0.8) / daysBetween)
+                                group.leave()
+                            }
+                        }
+                    }
+                    
+                    group.notify(queue: .global()) {
+                        task.goal = goal
+                        task.category = category.rawValue
+                        task.subcategory = subcategory.rawValue
+                        if let frequency = goal.frequency, let recurrenceFrequency = frequency.recurrenceFrequency {
+                            var recurrenceRule = RecurrenceRule(frequency: recurrenceFrequency)
+                            let calendar = Calendar.current
+
+                            switch recurrenceRule.frequency {
+                            case .yearly:
+                                date = date.startOfYear.UTCTime
+                                let month = calendar.component(.month, from: date)
+                                recurrenceRule = RecurrenceRule.yearlyRecurrence(withMonth: month)
+                                task.endDateTime = NSNumber(value: Int((date.endOfYear.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .monthly:
+                                // monthly needs UTCTime in order for recurrence to calc the correct dates
+                                date = date.startOfMonth.UTCTime
+                                let monthday = calendar.component(.day, from: date)
+                                recurrenceRule = RecurrenceRule.monthlyRecurrence(withMonthday: monthday)
+                                task.endDateTime = NSNumber(value: Int((date.endOfMonth.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                                recurrenceRule.bymonthday = [1]
+                            case .weekly:
+                                date = date.startOfWeek.UTCTime
+                                let weekday = EKWeekday(rawValue: calendar.component(.weekday, from: date))!
+                                recurrenceRule = RecurrenceRule.weeklyRecurrence(withWeekday: weekday)
+                                task.endDateTime = NSNumber(value: Int((date.endOfWeek.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .daily:
+                                date = date.startOfDay.UTCTime
+                                recurrenceRule = RecurrenceRule.dailyRecurrence()
+                                task.endDateTime = NSNumber(value: Int((date.endOfDay.advanced(by: -1).UTCTime).timeIntervalSince1970))
+                            case .hourly, .minutely, .secondly:
+                                break
+                            }
+                            
+                            task.hasStartTime = false
+                            task.hasDeadlineTime = false
+                            task.startDateTime = NSNumber(value: Int((date).timeIntervalSince1970))
+                            
+                            recurrenceRule.startDate = date
+                            recurrenceRule.interval = goal.name != "Bi-Annual Dental Cleaning" ? 1 : 2
+                            task.recurrences = [recurrenceRule.toRRuleString()]
+                            
+                            if goal.name == "Daily Mood" {
+                                task.reminder = TaskAlert.SixPMOnDeadlineDate.description
+                            } else if frequency == .monthly {
+                                task.reminder = TaskAlert.NineAMOneWeekBeforeDeadlineDate.description
+                            } else if frequency == .yearly {
+                                task.reminder = TaskAlert.NineAMOneMonthBeforeDeadlineDate.description
+                            } else if goal.name != "Daily Sleep" {
+                                task.reminder = TaskAlert.NineAMOnDeadlineDate.description
+                            }
+                        }
+                        
+                        let activityAction = ActivityActions(activity: task, active: false, selectedFalconUsers: [])
+                        activityAction.createNewActivity(updateDirectAssociation: false)
+
+                    }
+                }
+            }
+        }
+    }
+    
     func setupInitialGoals() {
         print("setupInitialGoals")
         if activityService.goals.isEmpty, let currentUserID = Auth.auth().currentUser?.uid, let lists = activityService.lists[ListSourceOptions.plot.name] {

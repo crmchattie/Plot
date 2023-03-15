@@ -29,7 +29,6 @@ class SetupController: UIViewController, UICollectionViewDelegate, UICollectionV
     var customType: CustomType!
     let networkController: NetworkController
     var participants: [String : [User]] = [:]
-    var dataIsSetup = false
     var footerTitle = "Continue"
     
     override func viewDidLoad() {

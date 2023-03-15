@@ -21,6 +21,7 @@ class SetupTimeController: SetupController {
             print("nextButtonDidTap time")
             let destination = SetupHealthController(networkController: self.networkController)
             self.navigationController?.pushViewController(destination, animated: true)
+            self.networkController.setupInitialTimeGoals()
         }
     }
 }

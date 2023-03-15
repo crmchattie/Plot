@@ -144,7 +144,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         imageView.constrainHeight(275)
         
         imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 280 / 2
+        imageView.layer.cornerRadius = 275 / 2
 
     }
     
