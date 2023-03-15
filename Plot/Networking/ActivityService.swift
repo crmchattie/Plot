@@ -42,6 +42,7 @@ class ActivityService {
             print("timeDataIsSetup")
             print(dataIsSetup)
             if dataIsSetup {
+                print("post timeDataIsSetup")
                 NotificationCenter.default.post(name: .timeDataIsSetup, object: nil)
             }
         }

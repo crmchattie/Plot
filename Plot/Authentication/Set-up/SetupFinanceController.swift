@@ -18,6 +18,7 @@ class SetupFinanceController: SetupController {
     
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
+        NotificationCenter.default.removeObserver(self)
         DispatchQueue.main.async {
             self.dismiss(animated: true) {
                 self.dismiss(animated: true)

@@ -17,6 +17,7 @@ class SetupTimeController: SetupController {
     
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
+        NotificationCenter.default.removeObserver(self)
         DispatchQueue.main.async {
             print("nextButtonDidTap time")
             let destination = SetupHealthController(networkController: self.networkController)

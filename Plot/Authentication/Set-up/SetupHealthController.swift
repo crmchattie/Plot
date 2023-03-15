@@ -17,6 +17,7 @@ class SetupHealthController: SetupController {
     
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
+        NotificationCenter.default.removeObserver(self)
         DispatchQueue.main.async {
             print("nextButtonDidTap health")
             let destination = SetupFinanceController(networkController: self.networkController)
