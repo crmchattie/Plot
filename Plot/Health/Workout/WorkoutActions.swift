@@ -189,12 +189,7 @@ class WorkoutActions: NSObject {
         guard let _ = workout, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs.sorted(), membersIDsDictionary)
         }
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
-        
-        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-        membersIDs.append(currentUserID)
-        
+                
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
@@ -205,6 +200,11 @@ class WorkoutActions: NSObject {
     }
     
     func connectMembersToGroupWorkout(memberIDs: [String], ID: String) {
+        guard let workout = workout else {
+            self.dispatchGroup.leave()
+            return
+        }
+        
         let connectingMembersGroup = DispatchGroup()
         for _ in memberIDs {
             connectingMembersGroup.enter()
@@ -214,7 +214,14 @@ class WorkoutActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userWorkoutsEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["isGroupWorkout": true]
+            var values = [String : Any]()
+            do {
+                let value = try FirebaseEncoder().encode(workout.startDateTime)
+                values = ["startDateTime": value]
+            } catch let error {
+                print(error)
+                values = ["isGroupWorkout": true]
+            }
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })

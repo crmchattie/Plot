@@ -47,17 +47,6 @@ extension NetworkController {
                 continue
             }
             
-//            print("metricCheck check")
-//            print(task.name)
-//            print(task.activityID)
-//            print(metric)
-//            print(task.startDate)
-//            print(range.startDate)
-//            print(task.endDate)
-//            print(range.endDate)
-//            print(past)
-//            print(current)
-                                        
             checkGoal(metric: metric, submetric: goal.submetric, option: goal.option, unit: unit, range: range) { stat in
                 var finalStat = Statistic(date: range.startDate, value: 0)
                 if let stat = stat {
@@ -468,6 +457,12 @@ extension NetworkController {
             
         case .mindfulness:
             healthDetailService.getSamples(for: healthService.mindfulnesses, range: range) {stat, mindfulnesses,_ in
+                print("mindfulness check")
+                print(metric)
+                print(range.startDate)
+                print(range.endDate)
+                print(stat?.date)
+                print(stat?.value)
                 guard let stat = stat, let mindfulnesses = mindfulnesses else {
                     completion(nil)
                     return
@@ -501,7 +496,6 @@ extension NetworkController {
             }
         case .sleep:
             guard let generalMetrics = healthService.healthMetrics[.general], let healthMetric = generalMetrics.first(where: {$0.type == .sleep}) else {
-                print(".sleep completion(nil)")
                 completion(nil)
                 return
             }

@@ -515,8 +515,6 @@ class HealthDetailService: HealthDetailServiceInterface {
 //        print(healthMetricType)
 //        print(startDate)
 //        print(endDate)
-//        print(startDate.localTime)
-//        print(endDate.localTime)
         
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {

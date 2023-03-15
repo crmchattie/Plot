@@ -46,7 +46,9 @@ class GCalendarEventOp: AsyncOperation {
                                                           "calendarName": self?.calendar.summary as Any,
                                                           "calendarSource": CalendarSourceOptions.google.name as Any,
                                                           "externalActivityID": id as Any,
-                                                          "showExtras": activity.showExtras as Any]
+                                                          "showExtras": activity.showExtras as Any,
+                                                          "startDateTime": activity.startDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any]
                             if let value = self?.calendar.backgroundColor {
                                 values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
                             }
@@ -75,7 +77,9 @@ class GCalendarEventOp: AsyncOperation {
                                                           "calendarName": self?.calendar.summary as Any,
                                                           "calendarSource": CalendarSourceOptions.google.name as Any,
                                                           "externalActivityID": id as Any,
-                                                          "showExtras": activity.showExtras as Any]
+                                                          "showExtras": activity.showExtras as Any,
+                                                          "startDateTime": activity.startDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any]
                             if let value = self?.calendar.backgroundColor {
                                 values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
                             }

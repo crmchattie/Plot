@@ -145,10 +145,22 @@ func mindfulnessListStats(
             continue
         }
         
+//        print("testing dates mindfulness")
+//        print(chunkStart)
+//        print(chunkEnd)
+//        print(startDate)
+//        print(endDate)
+        
         // Skipping activities that are outside of the interest range.
         if startDate >= chunkEnd || endDate <= chunkStart {
             continue
         }
+        
+//        print("passed dates mindfulness")
+//        print(chunkStart)
+//        print(chunkEnd)
+//        print(startDate)
+//        print(endDate)
                 
         // Truncate events that out of the [chunkStart, chunkEnd] range.
         // Multi-day events, chunked into single day `Statistic`s are the best example.

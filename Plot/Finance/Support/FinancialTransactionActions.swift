@@ -130,7 +130,7 @@ class TransactionActions: NSObject {
             groupTransactionReference.updateChildValues(["updated_at": date as AnyObject])
             for memberID in membersIDs.0.filter({$0 != transaction.admin}) {
                 let userReference = Database.database().reference().child(userFinancialTransactionsEntity).child(memberID).child(ID)
-                let values:[String : Any] = ["description": transaction.description]
+                let values:[String : Any] = ["description": transaction.description, "transacted_at": transaction.transacted_at]
                 userReference.setValue(values)
             }
         }
@@ -143,12 +143,7 @@ class TransactionActions: NSObject {
         guard let _ = transaction, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs.sorted(), membersIDsDictionary)
         }
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
-        
-        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-        membersIDs.append(currentUserID)
-        
+                
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
@@ -170,9 +165,9 @@ class TransactionActions: NSObject {
             let userReference = Database.database().reference().child(userFinancialTransactionsEntity).child(memberID).child(ID)
             var values = [String : Any]()
             if transaction.plot_created ?? false {
-                values = ["description": transaction.description]
+                values = ["description": transaction.description, "transacted_at": transaction.transacted_at]
             } else {
-                values = ["description": transaction.description, "should_link": false]
+                values = ["description": transaction.description, "transacted_at": transaction.transacted_at, "should_link": false]
             }
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()

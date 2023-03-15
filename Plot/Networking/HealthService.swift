@@ -158,7 +158,7 @@ class HealthService {
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
                 self?.dataIsSetup = true
                 self?.authorized = successfullyGrabbedHealthMetrics
-                HealthKitService.authorized = successfullyGrabbedHealthMetrics
+                HealthKitService.authorized = true
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
                 self?.hasLoadedHealth = true
@@ -172,6 +172,7 @@ class HealthService {
             if !workoutsInitialAdd.isEmpty {
                 if self!.workouts.isEmpty {
                     self?.workouts = workoutsInitialAdd
+                    completion()
                 }
                 for workout in workoutsInitialAdd {
                     if let index = self?.workouts.firstIndex(where: {$0.id == workout.id}) {
@@ -180,7 +181,6 @@ class HealthService {
                         self?.workouts.append(workout)
                     }
                 }
-                completion()
             } else {
                 completion()
             }
@@ -214,6 +214,7 @@ class HealthService {
             if !mindfulnessInitialAdd.isEmpty {
                 if self!.mindfulnesses.isEmpty {
                     self?.mindfulnesses = mindfulnessInitialAdd
+                    completion()
                 }
                 for mindfulness in mindfulnessInitialAdd {
                     if let index = self?.mindfulnesses.firstIndex(where: {$0.id == mindfulness.id}) {
@@ -222,7 +223,6 @@ class HealthService {
                         self?.mindfulnesses.append(mindfulness)
                     }
                 }
-                completion()
             } else {
                 completion()
             }
@@ -256,6 +256,7 @@ class HealthService {
             if !moodInitialAdd.isEmpty {
                 if self!.moods.isEmpty {
                     self?.moods = moodInitialAdd
+                    completion()
                 }
                 for mood in moodInitialAdd {
                     if let index = self?.moods.firstIndex(where: {$0.id == mood.id}) {
@@ -264,7 +265,6 @@ class HealthService {
                         self?.moods.append(mood)
                     }
                 }
-                completion()
             } else {
                 completion()
             }

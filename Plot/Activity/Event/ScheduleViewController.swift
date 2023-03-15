@@ -880,12 +880,7 @@ class ScheduleViewController: FormViewController {
     func fetchMembersIDs() -> ([String], [String:AnyObject]) {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
-        
-        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-        membersIDs.append(currentUserID)
-        
+                
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)

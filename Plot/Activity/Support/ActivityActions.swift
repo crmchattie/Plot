@@ -176,6 +176,13 @@ class ActivityActions: NSObject {
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
         groupActivityReference.updateChildValues(firebaseDictionary)
         
+        let membersIDs = fetchMembersIDs()
+        
+        for memberID in membersIDs.0 {
+            Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).child("startDateTime").setValue(activity.startDateTime)
+            Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).child("recurrences").setValue(activity.recurrences)
+        }
+        
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
@@ -333,6 +340,12 @@ class ActivityActions: NSObject {
         }
         let groupActivityReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder).child("recurrences")
         groupActivityReference.setValue(recurrences)
+        
+        let membersIDs = fetchMembersIDs()
+        
+        for memberID in membersIDs.0 {
+            Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).child("recurrences").setValue(recurrences)
+        }
     }
     
     func deleteRecurrences() {
@@ -347,6 +360,7 @@ class ActivityActions: NSObject {
         
         for memberID in membersIDs.0 {
             Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).child("badgeDate").removeValue()
+            Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder).child("recurrences").removeValue()
         }
     }
     
@@ -476,13 +490,10 @@ class ActivityActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers, let currentUserID = Auth.auth().currentUser?.uid else {
+        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 
-        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-        membersIDs.append(currentUserID)
-        
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
@@ -522,7 +533,9 @@ class ActivityActions: NSObject {
                 let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(activityID).child(messageMetaDataFirebaseFolder)
                 let values: [String : Any] = ["isGroupActivity": true,
                                               "badge": 0,
-                                              "showExtras": activity.showExtras as Any]
+                                              "showExtras": activity.showExtras as Any,
+                                              "startDateTime": activity.startDateTime as Any,
+                                              "recurrences": activity.recurrences as Any]
                 userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                     connectingMembersGroup.leave()
                 })
@@ -535,7 +548,9 @@ class ActivityActions: NSObject {
                                                   "calendarName": activity.calendarName as Any,
                                                   "calendarSource": activity.calendarSource as Any,
                                                   "calendarColor": activity.calendarColor as Any,
-                                                  "showExtras": activity.showExtras as Any]
+                                                  "showExtras": activity.showExtras as Any,
+                                                  "startDateTime": activity.startDateTime as Any,
+                                                  "recurrences": activity.recurrences as Any]
                     userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                         if let source = activity.calendarSource, source == CalendarSourceOptions.plot.name {
                             let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
@@ -553,7 +568,9 @@ class ActivityActions: NSObject {
                                                           "calendarName": calendar.name as Any,
                                                           "calendarSource": calendar.source as Any,
                                                           "calendarColor": calendar.color as Any,
-                                                          "showExtras": activity.showExtras as Any]
+                                                          "showExtras": activity.showExtras as Any,
+                                                          "startDateTime": activity.startDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any]
                             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                                 if let source = calendar.source, source == CalendarSourceOptions.plot.name {
                                     let calendarReference = Database.database().reference().child(calendarEntity).child(calendar.id ?? "").child(calendarEventsEntity)

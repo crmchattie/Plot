@@ -40,7 +40,9 @@ class EKCalendarEventOp: AsyncOperation {
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                             var values: [String : Any] = ["calendarExport": true,
                                                           "calendarSource": CalendarSourceOptions.apple.name as Any,
-                                                          "externalActivityID": self?.event.calendarItemExternalIdentifierClean.removeCharacters() as Any]
+                                                          "externalActivityID": self?.event.calendarItemExternalIdentifierClean.removeCharacters() as Any,
+                                                          "startDateTime": activity.startDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any]
                             if let calendar = self?.event.calendar {
                                 values["calendarID"] = calendar.calendarIdentifier as Any
                                 values["calendarName"] = calendar.title as Any
@@ -74,7 +76,9 @@ class EKCalendarEventOp: AsyncOperation {
                                     let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                                     var values: [String : Any] = ["calendarExport": true,
                                                                   "calendarSource": CalendarSourceOptions.apple.name as Any,
-                                                                  "externalActivityID": self?.event.calendarItemExternalIdentifierClean.removeCharacters() as Any]
+                                                                  "externalActivityID": self?.event.calendarItemExternalIdentifierClean.removeCharacters() as Any,
+                                                                  "startDateTime": activity.startDateTime as Any,
+                                                                  "recurrences": activity.recurrences as Any]
                                     if let calendar = self?.event.calendar {
                                         values["calendarID"] = calendar.calendarIdentifier as Any
                                         values["calendarName"] = calendar.title as Any
@@ -102,7 +106,9 @@ class EKCalendarEventOp: AsyncOperation {
                                     let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                                     var values: [String : Any] = ["calendarExport": true,
                                                                   "calendarSource": CalendarSourceOptions.apple.name as Any,
-                                                                  "externalActivityID": self?.event.calendarItemIdentifier as Any]
+                                                                  "externalActivityID": self?.event.calendarItemIdentifier as Any,
+                                                                  "startDateTime": activity.startDateTime as Any,
+                                                                  "recurrences": activity.recurrences as Any]
                                     if let calendar = self?.event.calendar {
                                         values["calendarID"] = calendar.calendarIdentifier as Any
                                         values["calendarName"] = calendar.title as Any

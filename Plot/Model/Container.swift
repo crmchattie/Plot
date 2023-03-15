@@ -212,7 +212,7 @@ class ContainerFunctions {
             }
             transactions.sort { (transaction1, transaction2) -> Bool in
                 if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                    if let date1 = isodateFormatter.date(from: transaction1.transacted_at), let date2 = isodateFormatter.date(from: transaction2.transacted_at) {
+                    if let date1 = transaction1.transactionDate, let date2 = transaction2.transactionDate {
                         return date1 > date2
                     }
                     return transaction1.description < transaction2.description

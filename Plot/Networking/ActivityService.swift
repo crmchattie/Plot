@@ -402,31 +402,35 @@ class ActivityService {
     
     func observeActivitiesForCurrentUser(_ completion: @escaping () -> Void) {
         activitiesFetcher.observeActivityForCurrentUser(activitiesInitialAdd: { [weak self] activitiesInitialAdd in
-            if self?.activities.isEmpty ?? true {
-                self?.activities = activitiesInitialAdd
-            } else if !activitiesInitialAdd.isEmpty {
-                for activity in activitiesInitialAdd {
-                    if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
-                        self?.activities[index] = activity
-                    } else {
-                        self?.activities.append(activity)
+            if !activitiesInitialAdd.isEmpty {
+                if self?.activities.isEmpty ?? true {
+                    self?.activities = activitiesInitialAdd
+                } else {
+                    for activity in activitiesInitialAdd {
+                        if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
+                            self?.activities[index] = activity
+                        } else {
+                            self?.activities.append(activity)
+                        }
                     }
                 }
             }
         }, activitiesWithRepeatsInitialAdd: { [weak self] activitiesWithRepeatsInitialAdd in
-            if self?.activitiesWithRepeats.isEmpty ?? true {
-                self?.activitiesWithRepeats = activitiesWithRepeatsInitialAdd
-                completion()
-            } else if !activitiesWithRepeatsInitialAdd.isEmpty {
-                if activitiesWithRepeatsInitialAdd.count == 1, let activity = activitiesWithRepeatsInitialAdd.first, let instanceID = activity.instanceID {
-                    self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
-                    self?.activitiesWithRepeats.append(activity)
+            if !activitiesWithRepeatsInitialAdd.isEmpty {
+                if self?.activitiesWithRepeats.isEmpty ?? true {
+                    self?.activitiesWithRepeats = activitiesWithRepeatsInitialAdd
+                    completion()
                 } else {
-                    let activityIDs = Array(Set(activitiesWithRepeatsInitialAdd.compactMap({ $0.activityID })))
-                    for activityID in activityIDs {
-                        self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activityID })
+                    if activitiesWithRepeatsInitialAdd.count == 1, let activity = activitiesWithRepeatsInitialAdd.first, let instanceID = activity.instanceID {
+                        self?.activitiesWithRepeats.removeAll(where: { $0.instanceID == instanceID })
+                        self?.activitiesWithRepeats.append(activity)
+                    } else {
+                        let activityIDs = Array(Set(activitiesWithRepeatsInitialAdd.compactMap({ $0.activityID })))
+                        for activityID in activityIDs {
+                            self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activityID })
+                        }
+                        self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsInitialAdd)
                     }
-                    self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsInitialAdd)
                 }
             } else {
                 completion()

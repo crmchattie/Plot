@@ -265,7 +265,7 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 if let amount = numberFormatter.string(from: transaction.amount as NSNumber) {
                     middleLabel.text = "Amount: \(amount)"
                 }
-                if let date = isodateFormatter.date(from: transaction.transacted_at) {
+                if let date = transaction.transactionDate {
                     bottomLabel.text = "Transacted On: \(dateFormatterPrint.string(from: date))"
                 }
                 imageView.isHidden = !(transaction.should_link ?? true)

@@ -124,12 +124,7 @@ class ListActions: NSObject {
         guard let _ = list, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs.sorted(), membersIDsDictionary)
         }
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
-        
-        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-        membersIDs.append(currentUserID)
-        
+                
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)

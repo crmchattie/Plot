@@ -190,12 +190,7 @@ class MindfulnessActions: NSObject {
         guard let _ = mindfulness, let selectedFalconUsers = selectedFalconUsers else {
             return (membersIDs.sorted(), membersIDsDictionary)
         }
-        
-        guard let currentUserID = Auth.auth().currentUser?.uid else { return (membersIDs.sorted(), membersIDsDictionary) }
-        
-        membersIDsDictionary.updateValue(currentUserID as AnyObject, forKey: currentUserID)
-        membersIDs.append(currentUserID)
-        
+                
         for selectedUser in selectedFalconUsers {
             guard let id = selectedUser.id else { continue }
             membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
@@ -206,6 +201,11 @@ class MindfulnessActions: NSObject {
     }
     
     func connectMembersToGroupMindfulness(memberIDs: [String], ID: String) {
+        guard let mindfulness = mindfulness else {
+            self.dispatchGroup.leave()
+            return
+        }
+        
         let connectingMembersGroup = DispatchGroup()
         for _ in memberIDs {
             connectingMembersGroup.enter()
@@ -215,7 +215,14 @@ class MindfulnessActions: NSObject {
         })
         for memberID in memberIDs {
             let userReference = Database.database().reference().child(userMindfulnessEntity).child(memberID).child(ID)
-            let values:[String : Any] = ["isGroupMindfulness": true]
+            var values = [String : Any]()
+            do {
+                let value = try FirebaseEncoder().encode(mindfulness.startDateTime)
+                values = ["startDateTime": value]
+            } catch let error {
+                print(error)
+                values = ["isGroupMindfulness": true]
+            }
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()
             })

@@ -208,21 +208,21 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                 let endDate = range.endDate.dayBefore
                 let filteredTransactions = transactions
                     .filter { transaction -> Bool in
-                        guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        guard let date = transaction.transactionDate else { return false }
                         return startDate <= date && date <= endDate
                     }
                 completion(filteredTransactions.map { .transaction($0) })
             case .horizontalBar:
                 let filteredTransactions = transactions
                     .filter { transaction -> Bool in
-                        guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        guard let date = transaction.transactionDate else { return false }
                         return range.startDate <= date && date <= range.endDate
                     }
                 completion(filteredTransactions.map { .transaction($0) })
             case .verticalBar:
                 let filteredTransactions = transactions
                     .filter { transaction -> Bool in
-                        guard let date = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        guard let date = transaction.transactionDate else { return false }
                         return range.startDate <= date && date <= range.endDate
                     }
                 completion(filteredTransactions.map { .transaction($0) })

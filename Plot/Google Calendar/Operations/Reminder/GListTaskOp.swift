@@ -42,7 +42,9 @@ class GListTaskOp: AsyncOperation {
                             let userActivityReference = Database.database().reference().child(userActivitiesEntity).child(currentUserID).child(activityID).child(messageMetaDataFirebaseFolder)
                             let values: [String : Any] = ["calendarExport": true,
                                                           "externalActivityID": id as Any,
-                                                          "showExtras": activity.showExtras as Any]
+                                                          "showExtras": activity.showExtras as Any,
+                                                          "startDateTime": activity.startDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })
@@ -66,7 +68,9 @@ class GListTaskOp: AsyncOperation {
                                                           "badge": 0,
                                                           "calendarExport": true,
                                                           "externalActivityID": id as Any,
-                                                          "showExtras": activity.showExtras as Any]
+                                                          "showExtras": activity.showExtras as Any,
+                                                          "startDateTime": activity.startDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })

@@ -252,9 +252,6 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                     let daysInRange = self.range.daysInRange
                     let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
                         let current = self.range.startDate.addDays(index)
-                        print("chart data entry task")
-                        print(current)
-                        print(current.localTime)
                         let yValues = categories.map {
                             (categoryStats[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value })
                         }

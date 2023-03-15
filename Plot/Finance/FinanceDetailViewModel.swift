@@ -194,25 +194,25 @@ class FinanceDetailViewModel: FinanceDetailViewModelInterface {
                 switch segmentType {
                 case .day:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
-                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        guard let transactionDate = transaction.transactionDate else { return false }
                         return date.UTCTime.hourBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()
                 case .week:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
-                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        guard let transactionDate = transaction.transactionDate else { return false }
                         return date.UTCTime.dayBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()
                 case .month:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
-                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        guard let transactionDate = transaction.transactionDate else { return false }
                         return date.UTCTime.dayBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()
                 case .year:
                     self.transactions = self.transactions!.filter { transaction -> Bool in
-                        guard let transactionDate = dateFormatter.date(from: transaction.transacted_at) else { return false }
+                        guard let transactionDate = transaction.transactionDate else { return false }
                         return date.UTCTime.monthBefore < transactionDate && transactionDate < date.UTCTime
                     }
                     completion()

@@ -65,12 +65,6 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
         switch chartViewModel.value.chartType {
         case .line:
             
-            print("load data goals")
-            print(range.startDate)
-            print(range.endDate)
-            print(range.startDate.localTime)
-            print(range.endDate.localTime)
-            
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { categoryStatsCurrent, goalListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
@@ -99,8 +93,6 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                         var cumulative: Double = 0
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
-                            print("chart data entry goal")
-                            print(date)
                             let yValues = keysCurrent.map {
                                 (categoryStatsCurrent[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                             }.reduce(0, +)
