@@ -202,6 +202,7 @@ struct UserTransaction: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var transacted_at: String?
     
     init(transaction: Transaction) {
         self.description = transaction.description

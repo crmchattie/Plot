@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import CodableFirebase
 
 extension NSNotification.Name {
     static let variablesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".variablesUpdated")
@@ -15,7 +16,7 @@ extension NSNotification.Name {
 }
 
 class NetworkController {
-    private var isRunning: Bool
+    var isRunning: Bool
     
     let activityService = ActivityService()
     let financeService = FinanceService()
@@ -81,6 +82,11 @@ class NetworkController {
                 print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
                 self.isRunning = false
+//                self.updateUserActivities()
+//                self.updateUserWorkouts()
+//                self.updateUserMindfulness()
+//                self.updateUserMood()
+//                self.updateUserTransaction()
             }
         }
     }
@@ -179,7 +185,137 @@ class NetworkController {
     }
 }
 
-extension NetworkController {    
+extension NetworkController {
+    func updateUserActivities() {
+        print("updateUserActivities")
+        let ref = Database.database().reference()
+        ref.child(activitiesEntity).observeSingleEvent(of: .value, with: { snapshot in
+            let IDs = snapshot.value as? [String: AnyObject] ?? [:]
+            for (ID, info) in IDs {
+                let values = info as? [String: [String: AnyObject]] ?? [:]
+                for (_, value) in values {
+                    let activity = Activity(dictionary: value)
+                    if let participants = activity.participantsIDs {
+                        for memberID in participants {
+                            let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(ID).child(messageMetaDataFirebaseFolder)
+                            userReference.observeSingleEvent(of: .value) { snapshot in
+                                if snapshot.exists() {
+                                    print(activity.name)
+                                    print(memberID)
+                                    print(activity.startDateTime)
+                                    let values: [String : Any] = ["startDateTime": activity.startDateTime as Any,
+                                                                  "recurrences": activity.recurrences as Any]
+                                    userReference.updateChildValues(values)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+    func updateUserWorkouts() {
+        print("updateUserWorkouts")
+        let ref = Database.database().reference()
+        ref.child(workoutsEntity).observeSingleEvent(of: .value, with: { snapshot in
+            let IDs = snapshot.value as? [String: AnyObject] ?? [:]
+            for (_, info) in IDs {
+                let value = info as? [String: AnyObject] ?? [:]
+                if let workout = try? FirebaseDecoder().decode(Workout.self, from: value), let participants = workout.participantsIDs {
+                    for memberID in participants {
+                        let userReference = Database.database().reference().child(userWorkoutsEntity).child(memberID).child(workout.id)
+                        userReference.observeSingleEvent(of: .value) { snapshot in
+                            if snapshot.exists() {
+                                do {
+                                    let value = try FirebaseEncoder().encode(workout.startDateTime)
+                                    let values: [String : Any] = ["startDateTime": value]
+                                    userReference.updateChildValues(values)
+                                } catch let error {
+                                    print(error)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+    func updateUserMindfulness() {
+        print("updateUserMindfulness")
+        let ref = Database.database().reference()
+        ref.child(mindfulnessEntity).observeSingleEvent(of: .value, with: { snapshot in
+            let IDs = snapshot.value as? [String: AnyObject] ?? [:]
+            for (_, info) in IDs {
+                let value = info as? [String: AnyObject] ?? [:]
+                if let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: value), let participants = mindfulness.participantsIDs {
+                    for memberID in participants {
+                        let userReference = Database.database().reference().child(userMindfulnessEntity).child(memberID).child(mindfulness.id)
+                        userReference.observeSingleEvent(of: .value) { snapshot in
+                            if snapshot.exists() {
+                                do {
+                                    let value = try FirebaseEncoder().encode(mindfulness.startDateTime)
+                                    let values: [String : Any] = ["startDateTime": value]
+                                    userReference.updateChildValues(values)
+                                } catch let error {
+                                    print(error)
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        })
+    }
+    func updateUserMood() {
+        print("updateUserMood")
+        let ref = Database.database().reference()
+        ref.child(moodEntity).observeSingleEvent(of: .value, with: { snapshot in
+            let IDs = snapshot.value as? [String: AnyObject] ?? [:]
+            for (_, info) in IDs {
+                let value = info as? [String: AnyObject] ?? [:]
+                if let mood = try? FirebaseDecoder().decode(Mood.self, from: value), let participants = mood.participantsIDs {
+                    for memberID in participants {
+                        let userReference = Database.database().reference().child(userMoodEntity).child(memberID).child(mood.id)
+                        userReference.observeSingleEvent(of: .value) { snapshot in
+                            if snapshot.exists() {
+                                do {
+                                    let value = try FirebaseEncoder().encode(mood.moodDate)
+                                    let values: [String : Any] = ["moodDate": value as Any]
+                                    userReference.updateChildValues(values)
+                                } catch let error {
+                                    print(error)
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        })
+    }
+    func updateUserTransaction() {
+        print("updateUserTransaction")
+        let ref = Database.database().reference()
+        ref.child(financialTransactionsEntity).observeSingleEvent(of: .value, with: { snapshot in
+            let IDs = snapshot.value as? [String: AnyObject] ?? [:]
+            for (_, info) in IDs {
+                let value = info as? [String: AnyObject] ?? [:]
+                if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: value), let participants = transaction.participantsIDs {
+                    for memberID in participants {
+                        let userReference = Database.database().reference().child(userFinancialTransactionsEntity).child(memberID).child(transaction.guid)
+                        userReference.observeSingleEvent(of: .value) { snapshot in
+                            if snapshot.exists() {
+                                let values: [String : Any] = ["transacted_at": transaction.transacted_at as Any]
+                                userReference.updateChildValues(values)
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+    
     func createNewUserActivities() {
         let currentUserID = Auth.auth().currentUser?.uid
         

@@ -686,12 +686,12 @@ func timestampOfLastMessage(_ date: Date) -> String {
     
 }
 
-func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZone: String?, endTimeZone: String?) -> (String, String) {
+func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZone: String?, endTimeZone: String?, now: Date?) -> (String, String) {
     var startString: String
     var endString: String
     let calendar = NSCalendar.current
     let unitFlags: Set<Calendar.Component> = [ .day, .weekOfYear, .weekday]
-    let now = Date()
+    let now = now ?? Date()
     let startEarliest = now < startDate ? now : startDate
     let startLatest = (startEarliest == now) ? startDate : now
     let startComponents =  calendar.dateComponents(unitFlags, from: startEarliest,  to: startLatest)
@@ -781,10 +781,10 @@ func timestampOfEvent(startDate: Date, endDate: Date, allDay: Bool, startTimeZon
     
 }
 
-func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, hasStartTime: Bool?) -> (Int, String, String) {
+func timestampOfTask(endDate: Date, hasDeadlineTime: Bool, startDate: Date?, hasStartTime: Bool?, now: Date?) -> (Int, String, String) {
     var numberOfLines = 1
     var endString: String = "Due: "
-    let now = Date()
+    let now = now ?? Date()
     if let startDate = startDate, false {
         numberOfLines = 2
         var startString: String = "Starts: "
@@ -1006,7 +1006,7 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
         }
         
     }
-    else if let date = task.goalEndDateUTC {
+    else if task.isGoal ?? false, let date = task.goalEndDateUTC {
         value += "Due: "
         let allDay = !(task.hasDeadlineTime ?? false)
         let dateFormatter = DateFormatter()

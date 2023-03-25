@@ -121,7 +121,11 @@ class CalendarActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let _ = calendar, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = calendar, let selectedFalconUsers = selectedFalconUsers, !selectedFalconUsers.isEmpty else {
+            if let id = calendar.admin {
+                membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+                membersIDs.append(id)
+            }
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 

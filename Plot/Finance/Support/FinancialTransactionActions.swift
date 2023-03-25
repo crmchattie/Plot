@@ -71,7 +71,7 @@ class TransactionActions: NSObject {
             return
         }
         
-        guard let active = active, let _ = transaction, let ID = ID, let selectedFalconUsers = selectedFalconUsers else {
+        guard let active = active, let _ = transaction, let ID = ID, let _ = selectedFalconUsers else {
             return
         }
         
@@ -140,7 +140,11 @@ class TransactionActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let _ = transaction, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = transaction, let selectedFalconUsers = selectedFalconUsers, !selectedFalconUsers.isEmpty else {
+            if let id = transaction.admin {
+                membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+                membersIDs.append(id)
+            }
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 

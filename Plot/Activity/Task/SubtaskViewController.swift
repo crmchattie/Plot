@@ -1112,6 +1112,11 @@ class SubtaskViewController: FormViewController {
             membersIDs.append(id)
         }
         
+        if selectedFalconUsers.isEmpty, let id = subtask.admin {
+            membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+            membersIDs.append(id)
+        }
+        
         return (membersIDs.sorted(), membersIDsDictionary)
     }
 

@@ -120,7 +120,11 @@ class MealActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let _ = meal, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = meal, let selectedFalconUsers = selectedFalconUsers, !selectedFalconUsers.isEmpty else {
+            if let id = meal.admin {
+                membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+                membersIDs.append(id)
+            }
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 

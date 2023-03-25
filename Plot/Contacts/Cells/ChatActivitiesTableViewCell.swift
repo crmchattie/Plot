@@ -89,7 +89,7 @@ class ChatActivitiesTableViewCell: UITableViewCell {
             let endTimeZone = activity.endTimeZone ?? "UTC"
             let startDate = Date(timeIntervalSince1970: startDate)
             let endDate = Date(timeIntervalSince1970: endDate)
-            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone, now: nil)
         }
         
         

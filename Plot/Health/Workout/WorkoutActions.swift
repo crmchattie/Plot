@@ -186,7 +186,11 @@ class WorkoutActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let _ = workout, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = workout, let selectedFalconUsers = selectedFalconUsers, !selectedFalconUsers.isEmpty else {
+            if let id = workout.admin {
+                membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+                membersIDs.append(id)
+            }
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 

@@ -119,7 +119,7 @@ final class SubtaskCell: Cell<Activity>, CellType {
         if let endDate = subtask.endDate {
             if let parentTask = parentTask, let currentEndDate = subtask.getSubEndDate(parent: parentTask) {
                 dateTimeLabel.isHidden = false
-                formattedDate = timestampOfTask(endDate: currentEndDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.getSubStartDate(parent: parentTask), hasStartTime: subtask.hasStartTime)
+                formattedDate = timestampOfTask(endDate: currentEndDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.getSubStartDate(parent: parentTask), hasStartTime: subtask.hasStartTime, now: nil)
                 dateTimeLabel.numberOfLines = formattedDate.0
                 if formattedDate.0 == 2 {
                     dateTimeLabel.text = formattedDate.1 + "\n" + formattedDate.2
@@ -128,7 +128,7 @@ final class SubtaskCell: Cell<Activity>, CellType {
                 }
             } else {
                 dateTimeLabel.isHidden = false
-                formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime)
+                formattedDate = timestampOfTask(endDate: endDate, hasDeadlineTime: subtask.hasDeadlineTime ?? false, startDate: subtask.startDate, hasStartTime: subtask.hasStartTime, now: nil)
                 dateTimeLabel.numberOfLines = formattedDate.0
                 if formattedDate.0 == 2 {
                     dateTimeLabel.text = formattedDate.1 + "\n" + formattedDate.2

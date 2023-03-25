@@ -490,7 +490,11 @@ class ActivityActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers else {
+        guard let activity = activity, let selectedFalconUsers = selectedFalconUsers, !selectedFalconUsers.isEmpty else {
+            if let activity = activity, let id = activity.admin {
+                membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+                membersIDs.append(id)
+            }
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 

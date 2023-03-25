@@ -272,6 +272,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
             case .line:
                 let startDate = range.startDate.dayBefore
                 let endDate = range.endDate.dayBefore
+                
                 let filteredGoals = goals
                     .filter { goal -> Bool in
                         guard let date = goal.completedDateDate?.localTime else { return false }

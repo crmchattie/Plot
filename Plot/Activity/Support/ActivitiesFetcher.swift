@@ -34,7 +34,7 @@ class ActivitiesFetcher: NSObject {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
         }
-                
+                        
         let ref = Database.database().reference()
         userActivitiesDatabaseRef = ref.child(userActivitiesEntity).child(currentUserID)
         
@@ -125,6 +125,7 @@ class ActivitiesFetcher: NSObject {
                         }
                     }
                 }
+                
                 group.notify(queue: .main) {
                     completion(activities)
                     completionRepeats(activitiesWithRepeats)
@@ -446,27 +447,13 @@ class ActivitiesFetcher: NSObject {
                     group.leave()
                     counter -= 1
                 }
-            } else {
+            } else if counter > 0 {
                 group.leave()
                 counter -= 1
             }
         }
+                
         group.notify(queue: .main) {
-//            if activity.isGoal ?? false {
-//                print("found goal")
-//                print(activity.name)
-//                print(activity.activityID)
-//                print(activity.startDate)
-//                print(activity.endDate)
-//                print(activity.startDateTime)
-//                print(activity.endDateTime)
-//                for newActivity in newActivities {
-//                    print("instance")
-//                    print(newActivity.name)
-//                    print(newActivity.startDate)
-//                    print(newActivity.endDate)
-//                }
-//            }
             completion(newActivities)
         }
     }
@@ -505,11 +492,9 @@ class ActivitiesFetcher: NSObject {
                         }
                         completion(activitiesDate, activitiesParent)
                     }
-                } else {
-                    if counter > 0 {
-                        group.leave()
-                        counter -= 1
-                    }
+                } else if counter > 0 {
+                    group.leave()
+                    counter -= 1
                 }
             })
         }

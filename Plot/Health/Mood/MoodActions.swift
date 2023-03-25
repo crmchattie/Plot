@@ -121,7 +121,11 @@ class MoodActions: NSObject {
         var membersIDs = [String]()
         var membersIDsDictionary = [String:AnyObject]()
         
-        guard let _ = mood, let selectedFalconUsers = selectedFalconUsers else {
+        guard let _ = mood, let selectedFalconUsers = selectedFalconUsers, !selectedFalconUsers.isEmpty else {
+            if let id = mood.admin {
+                membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+                membersIDs.append(id)
+            }
             return (membersIDs.sorted(), membersIDsDictionary)
         }
                 
@@ -152,7 +156,7 @@ class MoodActions: NSObject {
             var values = [String : Any]()
             do {
                 let value = try FirebaseEncoder().encode(mood.moodDate)
-                values = ["startDateTime": value]
+                values = ["moodDate": value]
             } catch let error {
                 print(error)
                 values = ["isGroupMood": true]

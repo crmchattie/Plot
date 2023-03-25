@@ -98,11 +98,11 @@ final class ScheduleCell: Cell<Activity>, CellType {
         if let parentEvent = parentEvent, let startDate = schedule.getSubStartDate(parent: parentEvent), let endDate = schedule.getSubEndDate(parent: parentEvent), let allDay = schedule.allDay {
             let startTimeZone = schedule.startTimeZone ?? "UTC"
             let endTimeZone = schedule.endTimeZone ?? "UTC"
-            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone, now: nil)
         } else if let startDate = schedule.startDate, let endDate = schedule.endDate, let allDay = schedule.allDay {
             let startTimeZone = schedule.startTimeZone ?? "UTC"
             let endTimeZone = schedule.endTimeZone ?? "UTC"
-            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone)
+            formattedDate = timestampOfEvent(startDate: startDate, endDate: endDate, allDay: allDay, startTimeZone: startTimeZone, endTimeZone: endTimeZone, now: nil)
         }
         // set the texts to the labels
         dateTimeLabel.text = formattedDate.0 + formattedDate.1

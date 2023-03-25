@@ -51,6 +51,7 @@ struct UserMood: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?
     var muted: Bool?
+    var moodDate: Date?
     
     init(mood: Mood) {
         self.badge = mood.badge
@@ -65,20 +66,20 @@ enum MoodType: String, CaseIterable, Codable {
     case frustrated = "Frustrated"
     case happy = "Happy"
 //    case lazy = "Lazy"
-//    case optimistic = "Optimistic"
+    case productive = "Productive"
 //    case proud = "Proud"
     case sad = "Sad"
     case stressed = "Stressed"
-//    case tired = "Tired"
+    case tired = "Tired"
     
     var image: String {
         switch self {
         case .happy: return "faceHappy" //smiling
         case .sad: return "faceSad" //crying
-//        case .tired: return "faceTired" //tired
+        case .tired: return "faceTired" //tired
         case .stressed: return "faceStressed" //anxious
 //        case .proud: return "faceProud" //smirking
-//        case .optimistic: return "faceOptimistic"  //smiling with sunglasses
+        case .productive: return "faceOptimistic"  //smiling with sunglasses
         case .excited: return "faceEnergized" //grinning
 //        case .lazy: return "faceLazy" //slightly frowning
         case .content: return "faceContent" //slightly smiling
@@ -90,10 +91,10 @@ enum MoodType: String, CaseIterable, Codable {
         switch self {
         case .happy: return ChartColors.palette()[0]
         case .sad: return ChartColors.palette()[5]
-//        case .tired: return ChartColors.palette()[3]
+        case .tired: return ChartColors.palette()[3]
         case .stressed: return ChartColors.palette()[2]
 //        case .proud: return ChartColors.palette()[5]
-//        case .optimistic: return ChartColors.palette()[6]
+        case .productive: return ChartColors.palette()[6]
         case .excited: return ChartColors.palette()[7]
 //        case .lazy: return ChartColors.palette()[8]
         case .content: return ChartColors.palette()[8]

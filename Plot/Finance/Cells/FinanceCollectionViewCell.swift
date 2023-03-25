@@ -253,7 +253,6 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                 numberFormatter.numberStyle = .currency
                 numberFormatter.maximumFractionDigits = 0
                 
-                let isodateFormatter = ISO8601DateFormatter()
                 let dateFormatterPrint = DateFormatter()
                 dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
                 

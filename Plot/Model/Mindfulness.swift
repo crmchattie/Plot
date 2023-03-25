@@ -78,6 +78,7 @@ struct UserMindfulness: Codable, Equatable, Hashable {
     var healthExport: Bool?
     var hkSampleID: String?
     var identifier: String?
+    var startDateTime: Date?
     
     init(mindfulness: Mindfulness) {
         self.badge = mindfulness.badge

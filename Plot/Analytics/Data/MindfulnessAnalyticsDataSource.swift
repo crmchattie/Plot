@@ -91,26 +91,26 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                         var categories: [CategorySummaryViewModel] = []
                         var dataEntriesCurrent: [ChartDataEntry] = []
                         let sumCurrent = statsCurrent.reduce(0, { $0 + $1.value * 60 })
-                        print("creating data entries mindfulness")
-                        print(sumCurrent)
-                        print(startDateCurrent)
-                        for current in statsCurrent {
-                            print(current.date)
-                            print(current.value)
-                        }
+//                        print("creating data entries mindfulness")
+//                        print(sumCurrent)
+//                        print(startDateCurrent)
+//                        for current in statsCurrent {
+//                            print(current.date)
+//                            print(current.value)
+//                        }
                         for index in 0...daysInRange {
                             let date = startDateCurrent.addDays(index)
                             if let stat = statsCurrent.first(where: { $0.date.startOfDay == date.startOfDay }) {
-                                print("found stat")
-                                print(stat.date)
-                                print(stat.value)
+//                                print("found stat")
+//                                print(stat.date)
+//                                print(stat.value)
                                 if !dataEntriesCurrent.contains(where: {$0.data as? Date == stat.date }) {
                                     let entry = ChartDataEntry(x: Double(index) + 1, y: stat.value * 60, data: date)
                                     dataEntriesCurrent.append(entry)
                                 }
                             } else {
-                                print("did not find stat")
-                                print(date)
+//                                print("did not find stat")
+//                                print(date)
                                 let entry = ChartDataEntry(x: Double(index) + 1, y: 0, data: date)
                                 dataEntriesCurrent.append(entry)
                             }
@@ -220,8 +220,10 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
         } else {
             switch chartViewModel.value.chartType {
             case .line:
-                let startDate = range.startDate.dayBefore
-                let endDate = range.endDate.dayBefore
+                let startDate = range.startDate
+                let endDate = range.endDate
+                print(startDate)
+                print(endDate)
                 let filteredMindfulnesss = mindfulness
                     .filter { mindfulness -> Bool in
                         guard let date = mindfulness.startDateTime?.localTime else { return false }

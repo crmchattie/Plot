@@ -887,6 +887,11 @@ class ScheduleViewController: FormViewController {
             membersIDs.append(id)
         }
         
+        if selectedFalconUsers.isEmpty, let id = schedule.admin {
+            membersIDsDictionary.updateValue(id as AnyObject, forKey: id)
+            membersIDs.append(id)
+        }
+        
         return (membersIDs.sorted(), membersIDsDictionary)
     }
     

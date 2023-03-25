@@ -99,6 +99,7 @@ struct UserWorkout: Codable, Equatable, Hashable {
     var muted: Bool?
     var healthExport: Bool?
     var hkSampleID: String?
+    var startDateTime: Date?
     
     init(workout: Workout) {
         self.totalEnergyBurned = workout.totalEnergyBurned
@@ -231,11 +232,11 @@ func workoutListStats(
             continue
         }
         
-        print(chunkStart)
-        print(chunkEnd)
-        print("passed dates workouts")
-        print(startDate)
-        print(endDate)
+//        print(chunkStart)
+//        print(chunkEnd)
+//        print("passed dates workouts")
+//        print(startDate)
+//        print(endDate)
 //                
         // Truncate events that out of the [chunkStart, chunkEnd] range.
         // Multi-day events, chunked into single day `Statistic`s are the best example.
