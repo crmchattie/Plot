@@ -312,12 +312,12 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
             for goal in networkGoals {
                 if !goals.contains(where: {$0.activityID == goal.activityID}) {
                     if goal.goalEndDateUTC ?? selectedDate >= selectedDate, goal.goalStartDateUTC ?? selectedDate <= selectedDate {
-                        print(goal.name)
-                        print(selectedDate)
-                        print(goal.startDate)
-                        print(goal.endDate)
-                        print(goal.startDate?.localTime)
-                        print(goal.endDate?.localTime)
+//                        print(goal.name)
+//                        print(selectedDate)
+//                        print(goal.startDate)
+//                        print(goal.endDate)
+//                        print(goal.startDate?.localTime)
+//                        print(goal.endDate?.localTime)
                         goals.append(goal)
                     }
                 }

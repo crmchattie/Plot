@@ -13,10 +13,12 @@ import RRuleSwift
 
 extension NetworkController {    
     func checkGoalsForCompletion(_ completion: @escaping () -> Void) {
-        guard !isRunning else {
+        guard !isGoalRunning else {
             completion()
             return
         }
+        
+        isGoalRunning = true
         //create loop of existing goals
         //check if goal is complete
         //check if goal has end date

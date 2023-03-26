@@ -126,7 +126,6 @@ class ContainerFunctions {
     }
     
     class func grabContainerAndStuffInside(id: String, completion: @escaping (Container, [Activity]?, [Activity]?, [HealthContainer]?, [Transaction]?) -> Void) {
-        let isodateFormatter = ISO8601DateFormatter()
         var container = Container(id: id, activityIDs: nil, taskIDs: nil, workoutIDs: nil, mindfulnessIDs: nil, mealIDs: nil, transactionIDs: nil, participantsIDs: nil)
         var activities = [Activity]()
         var tasks = [Activity]()

@@ -16,7 +16,8 @@ extension NSNotification.Name {
 }
 
 class NetworkController {
-    var isRunning: Bool
+    private var isRunning: Bool
+    var isGoalRunning: Bool
     
     let activityService = ActivityService()
     let financeService = FinanceService()
@@ -44,6 +45,7 @@ class NetworkController {
     
     init() {
         isRunning = false
+        isGoalRunning = false
         addObservers()
     }
     
@@ -82,11 +84,7 @@ class NetworkController {
                 print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
                 self.isRunning = false
-//                self.updateUserActivities()
-//                self.updateUserWorkouts()
-//                self.updateUserMindfulness()
-//                self.updateUserMood()
-//                self.updateUserTransaction()
+                self.isGoalRunning = false
             }
         }
     }
@@ -139,6 +137,7 @@ class NetworkController {
                 print("done checkGoalsForCompletion")
                 self.hasLoadedListGoalActivities = true
                 self.isRunning = false
+                self.isGoalRunning = false
             }
         }
     }
@@ -158,6 +157,7 @@ class NetworkController {
             print("done checkGoalsForCompletion")
             self.hasLoadedListGoalActivities = true
             self.isRunning = false
+            self.isGoalRunning = false
             completion()
         }
     }
