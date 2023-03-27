@@ -311,12 +311,14 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func listsUpdated() {
+        print("listsUpdated")
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func calendarsUpdated() {
+        print("calendarsUpdated")
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }

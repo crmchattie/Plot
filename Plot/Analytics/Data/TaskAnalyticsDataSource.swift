@@ -95,7 +95,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
                             let yValues = keysCurrent.map {
-                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.dayAfter.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                             }.reduce(0, +)
                             cumulative += yValues
                             return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -123,7 +123,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                             dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                                 let date = startDatePast.addDays(index)
                                 let yValues = keysPast.map {
-                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.dayAfter.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                                 }.reduce(0, +)
                                 cumulative += yValues
                                 return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -189,11 +189,11 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
             break
         case .verticalBar:
             
-            print("load data tasks")
-            print(range.startDate)
-            print(range.endDate)
-            print(range.startDate.localTime)
-            print(range.endDate.localTime)
+//            print("load data tasks")
+//            print(range.startDate)
+//            print(range.endDate)
+//            print(range.startDate.localTime)
+//            print(range.endDate.localTime)
             
             activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.tasks, isEvent: false) { categoryStats, taskList in
                             

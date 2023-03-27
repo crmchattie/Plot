@@ -463,12 +463,6 @@ extension NetworkController {
             
         case .mindfulness:
             healthDetailService.getSamples(for: healthService.mindfulnesses, range: range) {stat, mindfulnesses,_ in
-                print("mindfulness check")
-                print(metric)
-                print(range.startDate)
-                print(range.endDate)
-                print(stat?.date)
-                print(stat?.value)
                 guard let stat = stat, let mindfulnesses = mindfulnesses else {
                     completion(nil)
                     return

@@ -196,15 +196,15 @@ extension NetworkController {
                 for (_, value) in values {
                     let activity = Activity(dictionary: value)
                     if let participants = activity.participantsIDs {
+                        print(activity.name ?? "")
                         for memberID in participants {
                             let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(ID).child(messageMetaDataFirebaseFolder)
                             userReference.observeSingleEvent(of: .value) { snapshot in
                                 if snapshot.exists() {
-                                    print(activity.name)
-                                    print(memberID)
-                                    print(activity.startDateTime)
                                     let values: [String : Any] = ["startDateTime": activity.startDateTime as Any,
-                                                                  "recurrences": activity.recurrences as Any]
+                                                                  "recurrences": activity.recurrences as Any,
+                                                                  "isTask": activity.isTask as Any,
+                                                                  "completedDate": activity.completedDate as Any]
                                     userReference.updateChildValues(values)
                                 }
                             }

@@ -95,7 +95,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
                             let yValues = keysCurrent.map {
-                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
+                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.dayAfter.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
                             }.reduce(0, +)
                             cumulative += yValues
                             return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -123,7 +123,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                             dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                                 let date = startDatePast.addDays(index)
                                 let yValues = keysPast.map {
-                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
+                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.dayAfter.isSameDay(as: date) }).reduce(0, { $0 + $1.value * 60 })
                                 }.reduce(0, +)
                                 cumulative += yValues
                                 return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)

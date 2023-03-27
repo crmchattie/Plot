@@ -90,8 +90,6 @@ class HealthService {
     
     var dataIsSetup = false {
         didSet {
-            print("healthDataIsSetup")
-            print(dataIsSetup)
             if dataIsSetup {
                 NotificationCenter.default.post(name: .healthDataIsSetup, object: nil)
             }
@@ -101,25 +99,35 @@ class HealthService {
     var authorized: Bool = false
     
     var isRunning: Bool = true
-    
+        
     func grabHealth(_ completion: @escaping () -> Void) {
         healhKitManager.checkHealthAuthorizationStatus {}
+        let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
         HealthKitService.authorizeHealthKit { [weak self] _ in
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
-                self?.dataIsSetup = true
                 HealthKitService.authorized = true
                 self?.authorized = successfullyGrabbedHealthMetrics
                 self?.healthMetricSections = Array(metrics.keys)
                 self?.healthMetrics = metrics
-                if self?.isRunning ?? true {
-                    self?.grabFirebase {
-                        self?.addObservers()
-                        self?.isRunning = false
-                        self?.hasLoadedHealth = true
-                        completion()
-                    }
-                }
+                dispatchGroup.leave()
             }
+        }
+        
+        if self.isRunning {
+            dispatchGroup.enter()
+            self.grabFirebase {
+                self.isRunning = false
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            completion()
+            self.addObservers()
+            self.dataIsSetup = true
+            self.hasLoadedHealth = true
         }
     }
     

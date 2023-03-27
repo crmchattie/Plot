@@ -94,7 +94,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                         var dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                             let date = startDateCurrent.addDays(index)
                             let yValues = keysCurrent.map {
-                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                                (categoryStatsCurrent[$0] ?? []).filter({ $0.date.dayAfter.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                             }.reduce(0, +)
                             cumulative += yValues
                             return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -122,7 +122,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                             dataEntries = (0...daysInRange).map { index -> ChartDataEntry in
                                 let date = startDatePast.addDays(index)
                                 let yValues = keysPast.map {
-                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
+                                    (categoryStatsPast[$0] ?? []).filter({ $0.date.dayAfter.isSameDay(as: date) }).reduce(0, { $0 + $1.value })
                                 }.reduce(0, +)
                                 cumulative += yValues
                                 return ChartDataEntry(x: Double(index) + 1, y: cumulative, data: date)
@@ -244,7 +244,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                     let dataEntries = (0...daysInRange).map { index -> BarChartDataEntry in
                         let current = self.range.startDate.addDays(index)
                         let yValues = categories.map {
-                            (categoryStats[$0.title] ?? []).filter({ $0.date.isSameDay(as: current) }).reduce(0, { $0 + $1.value })
+                            (categoryStats[$0.title] ?? []).filter({ $0.date.dayAfter.isSameDay(as: current) }).reduce(0, { $0 + $1.value })
                         }
                         return BarChartDataEntry(x: Double(index) + 0.5, yValues: yValues, data: current)
                     }
