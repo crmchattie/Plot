@@ -26,12 +26,13 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     var participants = [String : [User]]()
     
-    var sections: [SectionType] = [.time, .health, .finances]
+    var sections: [SectionType] = [.custom, .prompt]
     var groups = [SectionType: [AnyHashable]]()
-    var customTypes: [CustomType] = [.goal, .task, .event, .mood, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
-    var timeCustomTypes: [CustomType] = [.goal, .task, .event]
-    var healthCustomTypes: [CustomType] = [.mood, .workout, .mindfulness]
-    var financeCustomTypes: [CustomType] = [.transaction, .financialAccount, .transactionRule]
+    var customCustomTypes: [CustomType] = [.goal, .task, .event, .mood, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
+    var promptCustomTypes: [CustomType] = [.timeSummary, .healthSummary, .financialSummary]
+    var timeCustomTypes: [CustomType] = [.goal, .task, .event, .timeSummary]
+    var healthCustomTypes: [CustomType] = [.mood, .workout, .mindfulness, .healthSummary]
+    var financeCustomTypes: [CustomType] = [.transaction, .financialAccount, .transactionRule, .financialSummary]
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()
     var templates = [Template]()
@@ -198,9 +199,8 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
         
-        groups[.time] = timeCustomTypes
-        groups[.health] = healthCustomTypes
-        groups[.finances] = financeCustomTypes
+        groups[.custom] = customCustomTypes
+        groups[.prompt] = promptCustomTypes
         
         setupData()
 
@@ -286,11 +286,11 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         if let object = object as? CustomType, let section = snapshot.sectionIdentifier(containingItem: object) {
             let totalItems = (self.groups[section]?.count ?? 1) - 1
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
-            if indexPath.section == 0 {
+            if self.timeCustomTypes.contains(object) {
                 cell.intColor = 5
-            } else if indexPath.section == 1 {
+            } else if self.healthCustomTypes.contains(object) {
                 cell.intColor = 0
-            } else if indexPath.section == 2 {
+            } else if self.financeCustomTypes.contains(object) {
                 cell.intColor = 3
             }
             if indexPath.item == 0 {
@@ -352,16 +352,20 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
             case .transactionRule:
                 showTransactionRuleDetailPresent(transactionRule: nil, transaction: nil, updateDiscoverDelegate: self)
             default:
-                let destination = SubLibraryViewController()
-                destination.networkController = networkController
-                destination.sections = [.templates]
-                if let cat = ActivityCategory(rawValue: customType.name), let templates = templatesDict[cat] {
-                    destination.title = cat.rawValue
-                    destination.templates = templates
-                    destination.groups = [.templates: templates]
-                    destination.updateDiscoverDelegate = self
-                    destination.hidesBottomBarWhenPushed = true
-                    self.navigationController?.pushViewController(destination, animated: true)
+                if customType.categoryText == promptString {
+                    askPrompt(prompt: customType.subcategoryText)
+                } else {
+                    let destination = SubLibraryViewController()
+                    destination.networkController = networkController
+                    destination.sections = [.templates]
+                    if let cat = ActivityCategory(rawValue: customType.name), let templates = templatesDict[cat] {
+                        destination.title = cat.rawValue
+                        destination.templates = templates
+                        destination.groups = [.templates: templates]
+                        destination.updateDiscoverDelegate = self
+                        destination.hidesBottomBarWhenPushed = true
+                        self.navigationController?.pushViewController(destination, animated: true)
+                    }
                 }
             }
         } else if let template = object as? Template {
@@ -408,6 +412,14 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
+    }
+    
+    func askPrompt(prompt: String) {
+        print("askPrompt")
+        print(prompt)
+        Service.shared.askPrompt(prompt: prompt) { json, err in
+            print(json)
+        }
     }
     
     func fetchFavAct() {

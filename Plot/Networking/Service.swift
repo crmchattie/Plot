@@ -1074,7 +1074,7 @@ class Service {
         
     }
     
-    func triggerUpdateMXUser(completion: @escaping (([String: String]?), Error?) -> ()) {
+    func triggerUpdateMXUser(completion: @escaping ((([String: String])?), Error?) -> ()) {
         let baseURL: URL = {
             return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/triggerUpdateMXUser")!
         }()
@@ -1236,7 +1236,7 @@ class Service {
 //                print("objects \(objects)")
                 completion(objects, nil)
             } catch {
-                print("error \(error)")
+//                print(data)
                 completion(nil, error)
             }
         }.resume()

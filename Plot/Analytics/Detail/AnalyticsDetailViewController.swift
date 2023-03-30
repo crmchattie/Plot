@@ -155,7 +155,8 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(goalsUpdated), name: .goalsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(transactionsUpdated), name: .transactionsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(accountsUpdated), name: .accountsUpdated, object: nil)
     }
     
     @objc fileprivate func goalsUpdated() {
@@ -176,8 +177,14 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
         }
     }
     
-    @objc fileprivate func financeUpdated() {
-        if navigationItem.title == "Spending" || navigationItem.title == "Net Worth" {
+    @objc fileprivate func transactionsUpdated() {
+        if navigationItem.title == "Spending" {
+            rangeChanged(rangeControlView)
+        }
+    }
+    
+    @objc fileprivate func accountsUpdated() {
+        if navigationItem.title == "Net Worth" {
             rangeChanged(rangeControlView)
         }
     }

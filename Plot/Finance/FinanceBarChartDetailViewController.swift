@@ -146,7 +146,7 @@ class FinanceBarChartDetailViewController: UIViewController, ObjectDetailShowing
     }
         
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeGroupsUpdated, object: nil)
 
     }
     

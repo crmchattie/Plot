@@ -11,8 +11,12 @@ import Firebase
 import CodableFirebase
 
 extension NSNotification.Name {
-    static let financeUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeUpdated")
+    static let transactionsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".transactionsUpdated")
+    static let accountsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".accountsUpdated")
+    static let membersUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".membersUpdated")
+    static let holdingsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".holdingsUpdated")
     static let transactionRulesUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".transactionRulesUpdated")
+    static let financeGroupsUpdated = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeGroupsUpdated")
     static let hasLoadedFinancials = NSNotification.Name(Bundle.main.bundleIdentifier! + ".hasLoadedFinancials")
     static let financeDataIsSetup = NSNotification.Name(Bundle.main.bundleIdentifier! + ".financeDataIsSetup")
 }
@@ -36,7 +40,8 @@ class FinanceService {
                     }
                     return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
                 }
-                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+                self.grabFinancialItems()
+                NotificationCenter.default.post(name: .transactionsUpdated, object: nil)
             }
         }
     }
@@ -49,8 +54,9 @@ class FinanceService {
                     }
                     return account1.should_link ?? true && !(account2.should_link ?? true)
                 }
+                self.grabFinancialItems()
                 setupMembersAccountsDict()
-                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+                NotificationCenter.default.post(name: .accountsUpdated, object: nil)
             }
         }
     }
@@ -60,8 +66,9 @@ class FinanceService {
                 members.sort { (member1, member2) -> Bool in
                     return member1.name < member2.name
                 }
+                self.grabFinancialItems()
                 setupMembersAccountsDict()
-                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+                NotificationCenter.default.post(name: .membersUpdated, object: nil)
             }
         }
     }
@@ -74,7 +81,16 @@ class FinanceService {
                     }
                     return holding1.should_link ?? true && !(holding2.should_link ?? true)
                 }
-                NotificationCenter.default.post(name: .financeUpdated, object: nil)
+                self.grabFinancialItems()
+                NotificationCenter.default.post(name: .holdingsUpdated, object: nil)
+            }
+        }
+    }
+    var financeSections = [SectionType]()
+    var financeGroups = [SectionType: [AnyHashable]]() {
+        didSet {
+            if oldValue != financeGroups {
+                NotificationCenter.default.post(name: .financeGroupsUpdated, object: nil)
             }
         }
     }
@@ -103,6 +119,9 @@ class FinanceService {
     var memberAccountsDict = [MXMember: [MXAccount]]()
     var institutionDict = [String: String]()
     var mxUser: MXUser!
+    
+    var transactionsDictionary = [TransactionDetails: [Transaction]]()
+    var accountsDictionary = [AccountDetails: [MXAccount]]()
     
     var transactionGroups = financialTransactionsGroupsStatic
     
@@ -458,6 +477,96 @@ class FinanceService {
         })
     }
     
+    func grabFinancialItems() {
+        var accountLevel: AccountCatLevel!
+        var transactionLevel: TransactionCatLevel!
+        accountLevel = .none
+        transactionLevel = .none
+        
+        let setSections: [SectionType] = [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
+        
+        var sections: [SectionType] = []
+        var groups = [SectionType: [AnyHashable]]()
+                                
+        for section in setSections {
+            if section.type == "Issues" {
+                var challengedMembers = [MXMember]()
+                for member in members {
+                    if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending {
+                        challengedMembers.append(member)
+                    }
+                }
+                if !challengedMembers.isEmpty {
+                    sections.append(section)
+                    groups[section] = challengedMembers
+                }
+            } else if section.type == "Accounts" {
+                if section.subType == "Balance Sheet" {
+                    categorizeAccounts(accounts: accounts, timeSegment: .month, level: accountLevel, accountDetails: nil, date: nil) { (accountsList, accountsDict) in
+                        if !accountsList.isEmpty {
+                            if accountsList.first?.lastPeriodBalance != nil {
+                                sections.append(.balancesFinances)
+                                groups[.balancesFinances] = accountsList.filter {$0.level == .bs_type}
+                            }
+                            sections.append(section)
+                            groups[section] = accountsList
+                            self.accountsDictionary = accountsDict
+                        }
+                    }
+                } else if section.subType == "Accounts" {
+                    if !accounts.isEmpty {
+                        sections.append(section)
+                        groups[section] = accounts
+                    }
+                }
+            } else if section.type == "Transactions" {
+                if section.subType == "Income Statement" {
+                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.dayAfter, level: transactionLevel, transactionDetails: nil, accounts: nil) { (transactionsList, transactionsDict) in
+                        if !transactionsList.isEmpty {
+                            categorizeTransactions(transactions: self.transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.dayAfter.monthBefore, level: .group, transactionDetails: nil, accounts: nil) { (transactionsListPrior, _) in
+                                if !transactionsListPrior.isEmpty {
+                                    addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
+                                        sections.append(.cashFlow)
+                                        groups[.cashFlow] = finalTransactionList.filter {$0.level == .group}
+                                        
+                                        sections.append(section)
+                                        groups[section] = finalTransactionList
+                                        self.transactionsDictionary = finalTransactionsDict
+                                    }
+                                } else {
+                                    sections.append(section)
+                                    groups[section] = transactionsList
+                                    self.transactionsDictionary = transactionsDict
+                                }
+                            }
+                        }
+                    }
+                } else if section.subType == "Transactions" {
+                    let filteredTransactions = transactions.filter({$0.should_link ?? true && !($0.plot_created ?? false)})
+                    if !filteredTransactions.isEmpty {
+                        sections.append(section)
+                        groups[section] = filteredTransactions
+                    }
+                }
+            } else if section.type == "Investments" {
+                let filteredHoldings = holdings.filter({$0.should_link ?? true})
+                if !filteredHoldings.isEmpty {
+                    sections.append(section)
+                    groups[section] = filteredHoldings
+                }
+            }
+        }
+        
+        financeSections = sections
+        financeGroups = groups
+    }
+    
+    func grabAccountTransactions() {
+        transactionFetcher.grabTransactionsViaAccounts(accounts: accounts) { [weak self] transactions in
+            self?.transactions.append(contentsOf: transactions)
+        }
+    }
+    
     func grabTransactionAttributes() {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -485,12 +594,6 @@ class FinanceService {
                 self.transactionGroups.append(contentsOf: array)
             }
         })
-    }
-    
-    func grabAccountTransactions() {
-        transactionFetcher.grabTransactionsViaAccounts(accounts: accounts) { [weak self] transactions in
-            self?.transactions.append(contentsOf: transactions)
-        }
     }
     
     private func updateExistingTransactionsFB(transactions: [Transaction]) {

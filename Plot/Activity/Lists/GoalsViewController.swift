@@ -124,7 +124,8 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
         NotificationCenter.default.addObserver(self, selector: #selector(metricsUpdated), name: .workoutsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(metricsUpdated), name: .mindfulnessUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(metricsUpdated), name: .moodsUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(metricsUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(metricsUpdated), name: .transactionsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(metricsUpdated), name: .accountsUpdated, object: nil)
 
     }
     

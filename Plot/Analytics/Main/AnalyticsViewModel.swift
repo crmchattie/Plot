@@ -405,28 +405,6 @@ class AnalyticsViewModel {
         }
     }
     
-    func financeUpdate(completion: @escaping () -> Void) {
-        guard !isRunning else {
-            completion()
-            return
-        }
-        
-        let group = DispatchGroup()
-        
-        group.enter()
-        spendingUpdate {
-            group.leave()
-        }
-        group.enter()
-        netWorthUpdate {
-            group.leave()
-        }
-        
-        group.notify(queue: .main) {
-            completion()
-        }
-    }
-    
     func spendingUpdate(completion: @escaping () -> Void) {
         guard !isRunning else {
             completion()

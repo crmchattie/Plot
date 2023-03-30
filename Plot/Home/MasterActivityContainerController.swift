@@ -158,7 +158,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .workoutsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .mindfulnessUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .moodsUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeGroupsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(listsUpdated), name: .listsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(calendarsUpdated), name: .calendarsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hasLoadedCalendarEventActivities), name: .hasLoadedCalendarEventActivities, object: nil)
@@ -298,14 +298,10 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func financeUpdated() {
-        self.grabFinancialItems { (sections, groups) in
-            if self.financeSections != sections || self.financeGroups != groups {
-                self.financeSections = sections
-                self.financeGroups = groups
-                DispatchQueue.main.async {
-                    self.setupData()
-                    self.networkController.checkGoals {}
-                }
+        self.grabFinancialItems() {
+            DispatchQueue.main.async {
+                self.setupData()
+                self.networkController.checkGoals {}
             }
         }
     }
@@ -530,88 +526,50 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         completion()
     }
     
-    func grabFinancialItems(_ completion: @escaping ([SectionType], [SectionType: [AnyHashable]]) -> Void) {
-        var accountLevel: AccountCatLevel!
-        var transactionLevel: TransactionCatLevel!
-        accountLevel = .bs_type
-        transactionLevel = .group
-        
+    func grabFinancialItems(_ completion: @escaping () -> Void) {
+        print("grabFinancialItems")
         let setSections: [SectionType] = [.financialIssues, .cashFlow, .balancesFinances, .investments, .transactions]
+        let accountLevel: AccountCatLevel = .bs_type
+        let transactionLevel: TransactionCatLevel = .group
         
-        let members = networkController.financeService.members
-        let accounts = networkController.financeService.accounts
-        let transactions = networkController.financeService.transactions
-        let holdings = networkController.financeService.holdings
-                
-        var sections: [SectionType] = []
-        var groups = [SectionType: [AnyHashable]]()
-                                
+        let groups = networkController.financeService.financeGroups
+        
+        financeSections = []
+        financeGroups = [:]
+                                        
         for section in setSections {
-            if section.type == "Issues" {
-                var challengedMembers = [MXMember]()
-                for member in members {
-                    if member.connection_status != .connected && member.connection_status != .created && member.connection_status != .updated && member.connection_status != .delayed && member.connection_status != .resumed && member.connection_status != .pending {
-                        challengedMembers.append(member)
-                    }
-                }
-                if !challengedMembers.isEmpty {
-                    sections.append(section)
-                    groups[section] = challengedMembers
-                }
-            } else if section.type == "Accounts" {
-                if section.subType == "Balances" {
-                    categorizeAccounts(accounts: accounts, timeSegment: .month, level: accountLevel, accountDetails: nil, date: nil) { (accountsList, accountsDict) in
-                        if !accountsList.isEmpty {
-                            sections.append(section)
-                            groups[section] = accountsList
-                            self.accountsDictionary = accountsDict
+            if let objects = groups[section], !objects.isEmpty {
+                self.financeSections.append(section)
+                if section == .cashFlow {
+                    print("section == .cashFlow")
+                    if var details = objects as? [TransactionDetails] {
+                        for detail in details {
+                            print(detail.name)
                         }
+                        details = details.filter({ $0.level == transactionLevel && ($0.name == "Income" || $0.name == "Expense" || $0.name == "Net Spending" || $0.name == "Net Savings") })
+                        self.financeGroups[section] = details
                     }
-                }
-            } else if section.type == "Transactions" {
-                if section.subType == "Cash Flow" {
-                    categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.dayAfter, level: transactionLevel, transactionDetails: nil, accounts: nil) { (transactionsList, transactionsDict) in
-                        if !transactionsList.isEmpty {
-                            let finalCurrentTransactionList = transactionsList.filter({ $0.name == "Income" || $0.name == "Expense" || $0.name == "Net Spending" || $0.name == "Net Savings"})
-                            categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.dayAfter.monthBefore, level: .group, transactionDetails: nil, accounts: nil) { (transactionsListPrior, _) in
-                                if !transactionsListPrior.isEmpty {
-                                    addPriorTransactionDetails(currentDetailsList: finalCurrentTransactionList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
-                                        sections.append(section)
-                                        groups[section] = finalTransactionList
-                                        self.transactionsDictionary = finalTransactionsDict
-                                    }
-                                } else {
-                                    sections.append(section)
-                                    groups[section] = transactionsList
-                                    self.transactionsDictionary = transactionsDict
-                                }
-                            }
+                } else if section == .balancesFinances {
+                    if var details = objects as? [AccountDetails] {
+                        details = details.filter({ $0.level == accountLevel })
+                        self.financeGroups[section] = details
+                    }
+                } else if section == .transactions {
+                    if objects.count < 3 {
+                        financeGroups[section] = objects
+                    } else {
+                        var finalTransactions = [AnyHashable]()
+                        for index in 0...2 {
+                            finalTransactions.append(objects[index])
                         }
+                        financeGroups[section] = finalTransactions
                     }
-                } else if section.subType == "Transactions" {
-                    let filteredTransactions = transactions.filter({$0.should_link ?? true && !($0.plot_created ?? false)})
-                    if !filteredTransactions.isEmpty {
-                        sections.append(section)
-                        if filteredTransactions.count < 3 {
-                            groups[section] = filteredTransactions
-                        } else {
-                            var finalTransactions = [Transaction]()
-                            for index in 0...2 {
-                                finalTransactions.append(filteredTransactions[index])
-                            }
-                            groups[section] = finalTransactions
-                        }
-                    }
-                }
-            } else if section.type == "Investments" {
-                let filteredHoldings = holdings.filter({$0.should_link ?? true})
-                if !filteredHoldings.isEmpty {
-                    sections.append(section)
-                    groups[section] = filteredHoldings
+                } else {
+                    self.financeGroups[section] = groups[section]
                 }
             }
         }
-        completion(sections, groups)
+        completion()
     }
     
     func goToVC(section: SectionType) {

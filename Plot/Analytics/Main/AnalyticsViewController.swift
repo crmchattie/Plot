@@ -94,7 +94,8 @@ class AnalyticsViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(tasksUpdated), name: .tasksUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(eventsUpdated), name: .calendarActivitiesUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(healthUpdated), name: .healthUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(transactionsUpdated), name: .transactionsUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(accountsUpdated), name: .accountsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(workoutsUpdated), name: .workoutsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(moodsUpdated), name: .moodsUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(mindfulnessUpdated), name: .mindfulnessUpdated, object: nil)
@@ -144,8 +145,14 @@ class AnalyticsViewController: UITableViewController {
         }
     }
     
-    @objc fileprivate func financeUpdated() {
-        viewModel?.financeUpdate {
+    @objc fileprivate func transactionsUpdated() {
+        viewModel?.spendingUpdate {
+            self.tableView.reloadData()
+        }
+    }
+    
+    @objc fileprivate func accountsUpdated() {
+        viewModel?.netWorthUpdate {
             self.tableView.reloadData()
         }
     }

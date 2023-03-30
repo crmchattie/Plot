@@ -46,10 +46,10 @@ class FinancialAccountsViewController: UITableViewController, ObjectDetailShowin
     }
     
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(financeUpdated), name: .financeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(membersUpdated), name: .membersUpdated, object: nil)
     }
     
-    @objc fileprivate func financeUpdated() {
+    @objc fileprivate func membersUpdated() {
         DispatchQueue.main.async {
             self.members = self.networkController.financeService.members.sorted(by: {$0.name < $1.name})
             self.tableView.reloadData()
