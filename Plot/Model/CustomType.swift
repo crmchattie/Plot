@@ -139,9 +139,9 @@ enum CustomType: String, Equatable, Hashable {
         case .tutorialThree: return "Improve your health by tracking your workouts, sleep, steps and more"
         case .tutorialFour: return "Understand your spending and achieve your financial goals"
         case .tutorialFive: return "We will never share or sell your data"
-        case .timeSummary: return summaryTime
-        case .healthSummary: return summaryHealth
-        case .financialSummary: return summaryFinances
+        case .timeSummary: return PromptQuestion.summaryTime.rawValue
+        case .healthSummary: return PromptQuestion.summaryHealth.rawValue
+        case .financialSummary: return PromptQuestion.summaryFinances.rawValue
         }
     }
     

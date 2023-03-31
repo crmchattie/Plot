@@ -213,10 +213,9 @@ extension Transaction {
         context += ", Category: \(top_level_category)"
         context += ", Subcategory: \(category)"
         if let value = account_name {
-            context += ", Account: \(value)"
+            context += ", Associated Financial Account: \(value)"
         } else if account_name == nil, let value = account_guid, let account = accounts.first(where: { $0.guid == value }) {
-            context += ", Account: \(account.name)"
-
+            context += ", Associated Financial Account: \(account.name)"
         }
         context += "; "
         return context
@@ -317,10 +316,34 @@ extension TransactionDetails {
                     context += ", Last Year to Date's Amount: \(lastPeriodAmount)"
                 }
                 context += ", Difference Amount: \(difference)"
+            } else if let lastPeriodAmount = numberFormatter.string(from: 0 as NSNumber), let difference = numberFormatter.string(from: self.amount - 0 as NSNumber) {
+                switch selectedIndex {
+                case .day:
+                    context += ", Yesterday's Amount: \(lastPeriodAmount)"
+                case .week:
+                    context += ", Last Week to Date's Amount: \(lastPeriodAmount)"
+                case .month:
+                    context += ", Last Month to Date's Amount: \(lastPeriodAmount)"
+                case .year:
+                    context += ", Last Year to Date's Amount: \(lastPeriodAmount)"
+                }
+                context += ", Difference Amount: \(difference)"
             }
         } else if let amount = numberFormatter.string(from: amount * -1 as NSNumber) {
             context += ", Amount: \(amount)"
             if let balance = lastPeriodAmount, let lastPeriodAmount = numberFormatter.string(from: balance * -1 as NSNumber), let difference = numberFormatter.string(from: balance - self.amount as NSNumber) {
+                switch selectedIndex {
+                case .day:
+                    context += ", Yesterday's Amount: \(lastPeriodAmount)"
+                case .week:
+                    context += ", Last Week to Date's Amount: \(lastPeriodAmount)"
+                case .month:
+                    context += ", Last Month to Date's Amount: \(lastPeriodAmount)"
+                case .year:
+                    context += ", Last Year to Date's Amount: \(lastPeriodAmount)"
+                }
+                context += ", Difference Amount: \(difference)"
+            } else if let lastPeriodAmount = numberFormatter.string(from: 0 as NSNumber), let difference = numberFormatter.string(from: 0 - self.amount as NSNumber) {
                 switch selectedIndex {
                 case .day:
                     context += ", Yesterday's Amount: \(lastPeriodAmount)"

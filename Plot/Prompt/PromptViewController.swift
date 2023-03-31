@@ -41,15 +41,18 @@ class PromptViewController: FormViewController {
     }
     
     func askPrompt() {
-        Service.shared.askPrompt(prompt: prompt) { json, err in
-            if let json = json, let answer = json["res"] {
-                self.answer = answer
-            } else {
-                self.answer = "An error ocurred. Please try again later"
-            }
-            DispatchQueue.main.async {
-                activityIndicatorView.stopAnimating()
-                self.initializeForm()
+        if let question = PromptQuestion(rawValue: prompt) {
+            let prompt = Prompt(question: question, networkController: networkController)
+            Service.shared.askPrompt(prompt: prompt.prompt) { json, err in
+                if let json = json, let answer = json["res"] {
+                    self.answer = answer
+                } else {
+                    self.answer = "An error ocurred. Please try again later"
+                }
+                DispatchQueue.main.async {
+                    activityIndicatorView.stopAnimating()
+                    self.initializeForm()
+                }
             }
         }
     }

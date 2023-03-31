@@ -204,8 +204,19 @@ extension AccountDetails {
         
         if let amount = numberFormatter.string(from: balance as NSNumber) {
             context += ", Amount: \(amount)"
-            if let balance = lastPeriodBalance, let lastPeriodAmount = numberFormatter.string(from: balance as NSNumber), let difference = numberFormatter.string(from: balance - balance as NSNumber) {
-
+            if let balance = lastPeriodBalance, let lastPeriodAmount = numberFormatter.string(from: balance as NSNumber), let difference = numberFormatter.string(from: self.balance - balance as NSNumber) {
+                switch selectedIndex {
+                case .day:
+                    context += ", Yesterday's Amount: \(lastPeriodAmount)"
+                case .week:
+                    context += ", Last Week to Date's Amount: \(lastPeriodAmount)"
+                case .month:
+                    context += ", Last Month to Date's Amount: \(lastPeriodAmount)"
+                case .year:
+                    context += ", Last Year to Date's Amount: \(lastPeriodAmount)"
+                }
+                context += ", Difference Amount: \(difference)"
+            } else if let lastPeriodAmount = numberFormatter.string(from: 0 as NSNumber), let difference = numberFormatter.string(from: self.balance - 0 as NSNumber) {
                 switch selectedIndex {
                 case .day:
                     context += ", Yesterday's Amount: \(lastPeriodAmount)"
@@ -791,7 +802,29 @@ func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, lev
         } else {
             switch level {
             case .account:
-                let accountDetail = AccountDetails(name: account.name, balance: balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                var accountDetail = AccountDetails(name: account.name, balance: balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                switch timeSegment {
+                case .day:
+                    let oldDate = finalDate.dayBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .week:
+                    let oldDate = finalDate.weekBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .month:
+                    let oldDate = finalDate.monthBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .year:
+                    let oldDate = finalDate.lastYear
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                }
                 accountsDict[accountDetail] = [account]
             case .subtype:
                 if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype?.name ?? MXAccountSubType.none.name && $0.level == .subtype && $0.subtype == account.subtype ?? MXAccountSubType.none && $0.type == account.type && $0.bs_type == account.bs_type}) {
@@ -801,11 +834,71 @@ func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, lev
                     accountsDict[accountDetail] = nil
                     
                     accountDetail.balance += balance
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    }
                     accounts!.append(account)
                     
                     accountsDict[accountDetail] = accounts
                 } else {
-                    let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    var accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
                     accountsDict[accountDetail] = [account]
                 }
             case .type:
@@ -816,11 +909,73 @@ func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, lev
                     accountsDict[accountDetail] = nil
                     
                     accountDetail.balance += balance
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    }
+                    
                     accounts!.append(account)
                     
                     accountsDict[accountDetail] = accounts
                 } else {
-                    let accountDetail = AccountDetails(name: account.type.name, balance: balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    var accountDetail = AccountDetails(name: account.type.name, balance: balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
+                    
                     accountsDict[accountDetail] = [account]
                 }
             case .bs_type:
@@ -899,8 +1054,31 @@ func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, lev
                     accountsDict[accountDetail] = [account]
                 }
             case .none:
-                let accountDetail = AccountDetails(name: account.name, balance: balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                var accountDetail = AccountDetails(name: account.name, balance: balance, level: .account, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
                 accountsDict[accountDetail] = [account]
+                
+                switch timeSegment {
+                case .day:
+                    let oldDate = finalDate.dayBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .week:
+                    let oldDate = finalDate.weekBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .month:
+                    let oldDate = finalDate.monthBefore
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                case .year:
+                    let oldDate = finalDate.lastYear
+                    if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                        accountDetail.lastPeriodBalance = oldBalance
+                    }
+                }
                 
                 if let index = accountsDict.keys.firstIndex(where: {$0.name == account.subtype?.name ?? MXAccountSubType.none.name && $0.level == .subtype && $0.subtype == account.subtype ?? MXAccountSubType.none && $0.type == account.type && $0.bs_type == account.bs_type}) {
                     var accountDetail = accountsDict.keys[index]
@@ -909,11 +1087,71 @@ func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, lev
                     accountsDict[accountDetail] = nil
                     
                     accountDetail.balance += balance
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    }
                     accounts!.append(account)
                     
                     accountsDict[accountDetail] = accounts
                 } else {
-                    let accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    var accountDetail = AccountDetails(name: account.subtype?.name ?? MXAccountSubType.none.name, balance: balance, level: .subtype, subtype: account.subtype ?? MXAccountSubType.none, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
                     accountsDict[accountDetail] = [account]
                 }
                 
@@ -924,11 +1162,71 @@ func categorizeAccounts(accounts: [MXAccount], timeSegment: TimeSegmentType, lev
                     accountsDict[accountDetail] = nil
                     
                     accountDetail.balance += balance
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            if accountDetail.lastPeriodBalance != nil {
+                                accountDetail.lastPeriodBalance! += oldBalance
+                            } else {
+                                accountDetail.lastPeriodBalance = oldBalance
+                            }
+                        }
+                    }
                     accounts!.append(account)
                     
                     accountsDict[accountDetail] = accounts
                 } else {
-                    let accountDetail = AccountDetails(name: account.type.name, balance: balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    var accountDetail = AccountDetails(name: account.type.name, balance: balance, level: .type, subtype: nil, type: account.type, bs_type: account.bs_type, currencyCode: account.currency_code ?? "USD")
+                    switch timeSegment {
+                    case .day:
+                        let oldDate = finalDate.dayBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .week:
+                        let oldDate = finalDate.weekBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .month:
+                        let oldDate = finalDate.monthBefore
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    case .year:
+                        let oldDate = finalDate.lastYear
+                        if let oldBalance = account.balanceGivenDate(date: oldDate) {
+                            accountDetail.lastPeriodBalance = oldBalance
+                        }
+                    }
                     accountsDict[accountDetail] = [account]
                 }
                 

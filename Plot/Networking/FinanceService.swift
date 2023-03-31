@@ -506,7 +506,7 @@ class FinanceService {
                         if !accountsList.isEmpty {
                             if accountsList.first?.lastPeriodBalance != nil {
                                 sections.append(.balancesFinances)
-                                groups[.balancesFinances] = accountsList.filter {$0.level == .bs_type}
+                                groups[.balancesFinances] = accountsList
                             }
                             sections.append(section)
                             groups[section] = accountsList
@@ -523,11 +523,11 @@ class FinanceService {
                 if section.subType == "Income Statement" {
                     categorizeTransactions(transactions: transactions, start: Date().localTime.startOfMonth, end: Date().localTime.dayAfter, level: transactionLevel, transactionDetails: nil, accounts: nil) { (transactionsList, transactionsDict) in
                         if !transactionsList.isEmpty {
-                            categorizeTransactions(transactions: self.transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.dayAfter.monthBefore, level: .group, transactionDetails: nil, accounts: nil) { (transactionsListPrior, _) in
+                            categorizeTransactions(transactions: self.transactions, start: Date().localTime.startOfMonth.monthBefore, end: Date().localTime.dayAfter.monthBefore, level: nil, transactionDetails: nil, accounts: nil) { (transactionsListPrior, _) in
                                 if !transactionsListPrior.isEmpty {
                                     addPriorTransactionDetails(currentDetailsList: transactionsList, currentDetailsDict: transactionsDict, priorDetailsList: transactionsListPrior) { (finalTransactionList, finalTransactionsDict) in
                                         sections.append(.cashFlow)
-                                        groups[.cashFlow] = finalTransactionList.filter {$0.level == .group}
+                                        groups[.cashFlow] = finalTransactionList
                                         
                                         sections.append(section)
                                         groups[section] = finalTransactionList

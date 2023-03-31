@@ -86,14 +86,14 @@ extension MXHolding {
             
             let percent = marketValue / costBasis - 1
             if let percentText = percentFormatter.string(from: NSNumber(value: percent)) {
-                context += "Market Value: \(amount) (\(percentText))"
+                context += ", Market Value: \(amount) (\(percentText))"
                 
             }
         } else if let marketValue = market_value, let amount = numberFormatter.string(from: marketValue as NSNumber) {
-            context += "Market Value: \(amount)"
+            context += ", Market Value: \(amount)"
         }
         if let date = isodateFormatter.date(from: updated_at) {
-            context += "Last Updated: \(dateFormatterPrint.string(from: date))"
+            context += ", Last Updated: \(dateFormatterPrint.string(from: date))"
         }
         context += "; "
         return context

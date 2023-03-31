@@ -319,7 +319,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func hasLoadedListGoalActivities() {
-        print("hasLoadedListGoalActivities")
         self.updatingGoals = !networkController.hasLoadedListGoalActivities
         DispatchQueue.main.async {
             self.collectionView.reloadData()
@@ -525,7 +524,6 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     func grabFinancialItems(_ completion: @escaping () -> Void) {
-        print("grabFinancialItems")
         let setSections: [SectionType] = [.financialIssues, .cashFlow, .balancesFinances, .investments, .transactions]
         let accountLevel: AccountCatLevel = .bs_type
         let transactionLevel: TransactionCatLevel = .group
