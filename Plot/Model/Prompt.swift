@@ -10,6 +10,41 @@ import Foundation
 
 let promptString = "prompt"
 
+struct Prompt {
+    var prompt: String {
+        return question + context
+    }
+    var question: String
+    var context: String {
+        var context = String()
+        for object in contextObjects {
+            if let item = object as? Activity {
+                
+            } else if let item = object as? HealthMetric {
+                
+            } else if let item = object as? Workout {
+                
+            } else if let item = object as? Mood {
+                
+            } else if let item = object as? Mindfulness {
+                
+            } else if let item = object as? TransactionDetails {
+                
+            } else if let item = object as? AccountDetails {
+                
+            } else if let item = object as? MXHolding {
+                
+            } else if let item = object as? Transaction {
+                
+            } else if let item = object as? MXAccount {
+                
+            }
+        }
+        return context
+    }
+    var contextObjects: [AnyHashable]
+}
+
 //time prompts
 let summaryTime = "Act as a time advisor. Could you give me a summary of my time given the following:"
 //"Schedule a meeting with [person's name] next week for [date and time]."
@@ -48,3 +83,5 @@ let summaryFinances = "Act as a financial advisor. Could you give me a summary o
 //"Act as a financial advisor. How can I make sure I have enough money in case of an emergency?"
 //"Act as a financial advisor. What should I consider when deciding whether to rent or buy a home?"
 //"Act as a financial advisor. How can I balance saving for the future with enjoying my money in the present?"
+
+

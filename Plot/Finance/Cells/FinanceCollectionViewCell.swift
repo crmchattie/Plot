@@ -178,25 +178,6 @@ class FinanceCollectionViewCell: UICollectionViewCell {
                     if let marketValue = holding.market_value, let amount = numberFormatter.string(from: marketValue as NSNumber) {
                         categoryLabel.text = amount
                     }
-                    
-//                    if let marketValue = holding.market_value, let costBasis = holding.cost_basis, costBasis != 0 {
-//                        let percentFormatter = NumberFormatter()
-//                        percentFormatter.numberStyle = .percent
-//                        percentFormatter.positivePrefix = percentFormatter.plusSign
-//                        percentFormatter.maximumFractionDigits = 0
-//                        percentFormatter.minimumFractionDigits = 0
-//
-//                        let percent = marketValue / costBasis - 1
-//                        if percent < 0 {
-//                            subcategoryLabel.textColor = .systemRed
-//                        } else {
-//                            subcategoryLabel.textColor = .systemGreen
-//                        }
-//                        if let percentText = percentFormatter.string(from: NSNumber(value: percent)) {
-//                            subcategoryLabel.isHidden = false
-//                            subcategoryLabel.text = percentText
-//                        }
-//                    }
                 } else {
                     let isodateFormatter = ISO8601DateFormatter()
                     let dateFormatterPrint = DateFormatter()

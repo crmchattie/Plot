@@ -249,6 +249,7 @@
 		10BA3BCE259BEDF9005D98EC /* SetupHomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3BCD259BEDF9005D98EC /* SetupHomeCell.swift */; };
 		10BA3D64257D6F7D00A81227 /* SchedulerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */; };
 		10BB4F1D2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */; };
+		10C039F729D62BCF00967383 /* PromptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C039F629D62BCF00967383 /* PromptViewController.swift */; };
 		10C0CC662885FED4007CC9F3 /* CustomRecurrenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */; };
 		10C23A01247D807100E3518D /* ListsViewController+SearchHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */; };
 		10C23A03247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */; };
@@ -865,6 +866,7 @@
 		10BA3BCD259BEDF9005D98EC /* SetupHomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupHomeCell.swift; sourceTree = "<group>"; };
 		10BA3D63257D6F7D00A81227 /* SchedulerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerViewController.swift; sourceTree = "<group>"; };
 		10BB4F1C2544CD3C004E4E7D /* ChooseTransactionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTransactionTableViewController.swift; sourceTree = "<group>"; };
+		10C039F629D62BCF00967383 /* PromptViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptViewController.swift; sourceTree = "<group>"; };
 		10C0CC652885FED4007CC9F3 /* CustomRecurrenceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRecurrenceViewController.swift; sourceTree = "<group>"; };
 		10C23A00247D807100E3518D /* ListsViewController+SearchHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+SearchHandlers.swift"; sourceTree = "<group>"; };
 		10C23A02247D80E900E3518D /* ListsViewController+TableRowActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListsViewController+TableRowActionHandlers.swift"; sourceTree = "<group>"; };
@@ -1801,6 +1803,14 @@
 			path = Tags;
 			sourceTree = "<group>";
 		};
+		10C039F529D62BAC00967383 /* Prompt */ = {
+			isa = PBXGroup;
+			children = (
+				10C039F629D62BCF00967383 /* PromptViewController.swift */,
+			);
+			path = Prompt;
+			sourceTree = "<group>";
+		};
 		10C50F932273818D00111033 /* Activity */ = {
 			isa = PBXGroup;
 			children = (
@@ -2154,6 +2164,7 @@
 				F9B82C8125FAB0B80072BE74 /* Analytics */,
 				1051AC94244F8AF80066761C /* Home */,
 				1024ABA523C1255900A5875D /* Discover */,
+				10C039F529D62BAC00967383 /* Prompt */,
 				4BAEE44D21272B380045AB10 /* Settings */,
 				10C50F932273818D00111033 /* Activity */,
 				1082C89324F0A8C800CF6491 /* Health */,
@@ -2659,6 +2670,7 @@
 			children = (
 				F983298F2602AB3200EB51F7 /* Activity */,
 				1061BF71292D3BA50037CED0 /* Goal.swift */,
+				109AF18F29D0970800A382B3 /* Prompt.swift */,
 				10F7241128E3598D003C13A0 /* Template.swift */,
 				109FEB3C22A7003000621D2F /* CalendarType.swift */,
 				10B3E4FC28AE9F7000E1713D /* Event.swift */,
@@ -2702,7 +2714,6 @@
 				100A53F223E3BDAC004AA952 /* Filter.swift */,
 				10B123D129BF8C390022CBB0 /* Survey.swift */,
 				10737F8424912BDD00D146D6 /* Preview.swift */,
-				109AF18F29D0970800A382B3 /* Prompt.swift */,
 				10B656CD24AFB0E7006686FA /* SectionType.swift */,
 				1092E26C28B7D91F0018FCAA /* CustomType.swift */,
 				F916C763260E66170062F952 /* DateRange.swift */,
@@ -3801,6 +3812,7 @@
 				F9C05FAE25F7D720009E892A /* RuleConstants.swift in Sources */,
 				2680A0342360C0BD00C4C287 /* Invitation.swift in Sources */,
 				10A1865C291C9014009AB7F4 /* SleepAnalyticsDataSource.swift in Sources */,
+				10C039F729D62BCF00967383 /* PromptViewController.swift in Sources */,
 				10B123E229C0CBC30022CBB0 /* SetupTimeController.swift in Sources */,
 				4BAEE5D3212735E50045AB10 /* RoundProgressView.swift in Sources */,
 				26036762256CC4DA00FE9142 /* EventKitSetupAssistant.swift in Sources */,

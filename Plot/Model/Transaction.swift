@@ -189,6 +189,38 @@ extension Transaction {
         }
         return nil
     }
+    func promptContext(accounts: [MXAccount]) -> String {
+        var context = String()
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = currency_code
+        numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
+        
+        let dateFormatterPrint = DateFormatter()
+        dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
+        
+        context += "Name: \(description)"
+        if let amount = numberFormatter.string(from: amount as NSNumber) {
+            context += ", Amount: \(amount)"
+            if let cash_flow_type = cash_flow_type {
+                context += ", Type: Cash \(cash_flow_type)"
+            }
+        }
+        if let date = transactionDate {
+            context += ", Transacted On: \(dateFormatterPrint.string(from: date))"
+        }
+        context += ", Group: \(top_level_category)"
+        context += ", Category: \(top_level_category)"
+        context += ", Subcategory: \(category)"
+        if let value = account_name {
+            context += ", Account: \(value)"
+        } else if account_name == nil, let value = account_guid, let account = accounts.first(where: { $0.guid == value }) {
+            context += ", Account: \(account.name)"
+
+        }
+        context += "; "
+        return context
+    }
 }
 
 struct UserTransaction: Codable, Equatable, Hashable {
@@ -258,6 +290,55 @@ struct TransactionDetails: Codable, Equatable, Hashable {
     var topLevelCategory: String?
     var group: String?
     var currencyCode: String?
+}
+
+extension TransactionDetails {
+    func promptContext(selectedIndex: TimeSegmentType) -> String {
+        var context = String()
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = currencyCode ?? "USD"
+        numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
+        
+        context += "Name: \(name)"
+        
+        if (group == "Income" || group == "Net Spending" || group == "Net Savings"), let amount = numberFormatter.string(from: amount as NSNumber) {
+            context += ", Amount: \(amount)"
+            if let balance = lastPeriodAmount, let lastPeriodAmount = numberFormatter.string(from: balance as NSNumber), let difference = numberFormatter.string(from: self.amount - balance as NSNumber) {
+                switch selectedIndex {
+                case .day:
+                    context += ", Yesterday's Amount: \(lastPeriodAmount)"
+                case .week:
+                    context += ", Last Week to Date's Amount: \(lastPeriodAmount)"
+                case .month:
+                    context += ", Last Month to Date's Amount: \(lastPeriodAmount)"
+                case .year:
+                    context += ", Last Year to Date's Amount: \(lastPeriodAmount)"
+                }
+                context += ", Difference Amount: \(difference)"
+            }
+        } else if let amount = numberFormatter.string(from: amount * -1 as NSNumber) {
+            context += ", Amount: \(amount)"
+            if let balance = lastPeriodAmount, let lastPeriodAmount = numberFormatter.string(from: balance * -1 as NSNumber), let difference = numberFormatter.string(from: balance - self.amount as NSNumber) {
+                switch selectedIndex {
+                case .day:
+                    context += ", Yesterday's Amount: \(lastPeriodAmount)"
+                case .week:
+                    context += ", Last Week to Date's Amount: \(lastPeriodAmount)"
+                case .month:
+                    context += ", Last Month to Date's Amount: \(lastPeriodAmount)"
+                case .year:
+                    context += ", Last Year to Date's Amount: \(lastPeriodAmount)"
+                }
+                context += ", Difference Amount: \(difference)"
+            }
+        }
+
+        
+        context += "; "
+        return context
+    }
 }
 
 struct MXTransactionRuleResult: Codable {

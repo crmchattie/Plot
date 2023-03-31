@@ -47,6 +47,16 @@ func ==(lhs: Mood, rhs: Mood) -> Bool {
     return lhs.id == rhs.id
 }
 
+extension Mood {
+    var promptContext: String {
+        var context = String()
+        context += "Mood: \(mood?.rawValue ?? "mood")"
+        let timeAgo = NSCalendar.current.isDateInToday(moodDate ?? Date()) ? "today" : timeAgoSinceDate(moodDate ?? Date())
+        context += ", \(timeAgo); "
+        return context
+    }
+}
+
 struct UserMood: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?

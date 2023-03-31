@@ -307,14 +307,12 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func listsUpdated() {
-        print("listsUpdated")
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
     }
     
     @objc fileprivate func calendarsUpdated() {
-        print("calendarsUpdated")
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -541,11 +539,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
             if let objects = groups[section], !objects.isEmpty {
                 self.financeSections.append(section)
                 if section == .cashFlow {
-                    print("section == .cashFlow")
                     if var details = objects as? [TransactionDetails] {
-                        for detail in details {
-                            print(detail.name)
-                        }
                         details = details.filter({ $0.level == transactionLevel && ($0.name == "Income" || $0.name == "Expense" || $0.name == "Net Spending" || $0.name == "Net Savings") })
                         self.financeGroups[section] = details
                     }

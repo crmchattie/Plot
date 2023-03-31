@@ -659,6 +659,15 @@ extension ObjectDetailShowing {
         self.present(navigationViewController, animated: true, completion: nil)
     }
     
+    func openPrompt(prompt: String, promptDescription: String?) {
+        let destination = PromptViewController(networkController: networkController, prompt: prompt)
+        destination.promptDescription = promptDescription
+        destination.hidesBottomBarWhenPushed = true
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        navigationViewController.modalPresentationStyle = .fullScreen
+        self.present(navigationViewController, animated: true, completion: nil)
+    }
+    
     func newMetric(task: Activity, metric: GoalMetric, unit: GoalUnit, target: Double, submetric: GoalSubMetric?, option: String?) {
         guard let template = TemplateBuilder.createActivity(from: task, metric: metric, unit: unit, target: target, submetric: submetric, option: option) else {
             return

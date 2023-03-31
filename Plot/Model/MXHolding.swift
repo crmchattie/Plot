@@ -63,6 +63,43 @@ struct MXHolding: Codable, Equatable, Hashable {
     }
 }
 
+extension MXHolding {
+    var promptContext: String {
+        var context = String()
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = currency_code ?? "USD"
+        numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
+        
+        context += "Name: \(symbol ?? description)"
+                              
+        let isodateFormatter = ISO8601DateFormatter()
+        let dateFormatterPrint = DateFormatter()
+        dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
+        
+        if let marketValue = market_value, let amount = numberFormatter.string(from: marketValue as NSNumber), let costBasis = cost_basis, costBasis != 0 {
+            let percentFormatter = NumberFormatter()
+            percentFormatter.numberStyle = .percent
+            percentFormatter.positivePrefix = percentFormatter.plusSign
+            percentFormatter.maximumFractionDigits = 0
+            percentFormatter.minimumFractionDigits = 0
+            
+            let percent = marketValue / costBasis - 1
+            if let percentText = percentFormatter.string(from: NSNumber(value: percent)) {
+                context += "Market Value: \(amount) (\(percentText))"
+                
+            }
+        } else if let marketValue = market_value, let amount = numberFormatter.string(from: marketValue as NSNumber) {
+            context += "Market Value: \(amount)"
+        }
+        if let date = isodateFormatter.date(from: updated_at) {
+            context += "Last Updated: \(dateFormatterPrint.string(from: date))"
+        }
+        context += "; "
+        return context
+    }
+}
+
 struct UserHolding: Codable, Equatable, Hashable {
     var description: String?
     var tags: [String]?

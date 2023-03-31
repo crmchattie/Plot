@@ -29,6 +29,7 @@ class FinanceAccountViewController: FormViewController {
     weak var updateDiscoverDelegate : UpdateDiscover?
     
     let numberFormatter = NumberFormatter()
+    let percentFormatter = NumberFormatter()
     
     // create dateFormatter with UTC time format
     let isodateFormatter = ISO8601DateFormatter()
@@ -56,6 +57,8 @@ class FinanceAccountViewController: FormViewController {
         
         numberFormatter.numberStyle = .currency
         numberFormatter.maximumFractionDigits = 0
+        percentFormatter.numberStyle = .percent
+        percentFormatter.maximumFractionDigits = 2
         dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
         
         setupVariables()
@@ -440,6 +443,45 @@ class FinanceAccountViewController: FormViewController {
                     if let value = row.value {
                         self.updateTheDate()
                         self.account.minimum_payment = value
+                    }
+                }
+        }
+        
+        if (account.apr != nil) || (account.user_created ?? false) {
+            form.last!
+                <<< DecimalRow("APR") {
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textField?.textColor = .secondaryLabel
+                    $0.title = $0.tag
+                    $0.formatter = percentFormatter
+                    print((account.apr ?? 0) / 100)
+                    $0.value = (account.apr ?? 0) / 100
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textField?.textColor = .secondaryLabel
+                }.onChange { row in
+                    if let value = row.value {
+                        self.updateTheDate()
+                        self.account.apr = value
+                    }
+                }
+        }
+        
+        if (account.apy != nil) || (account.user_created ?? false) {
+            form.last!
+                <<< DecimalRow("APY") {
+                    $0.cell.backgroundColor = .secondarySystemGroupedBackground
+                    $0.cell.textField?.textColor = .secondaryLabel
+                    $0.title = $0.tag
+                    $0.formatter = percentFormatter
+                    $0.value = account.apy ?? 0 / 100
+                }.cellUpdate { cell, row in
+                    cell.backgroundColor = .secondarySystemGroupedBackground
+                    cell.textField?.textColor = .secondaryLabel
+                }.onChange { row in
+                    if let value = row.value {
+                        self.updateTheDate()
+                        self.account.apy = value
                     }
                 }
         }

@@ -71,6 +71,21 @@ func ==(lhs: Mindfulness, rhs: Mindfulness) -> Bool {
     return lhs.id == rhs.id
 }
 
+extension Mindfulness {
+    var promptContext: String {
+        var context = String()
+        context += "Name: \(name)"
+        let timeAgo = NSCalendar.current.isDateInToday(endDateTime ?? Date()) ? "today" : timeAgoSinceDate(endDateTime ?? Date())
+        context += ", \(timeAgo)"
+        if let length = length {
+            let total = TimeInterval(length).stringTimeShort
+            context += ", Time: \(total)"
+        }        
+        context += "; "
+        return context
+    }
+}
+
 struct UserMindfulness: Codable, Equatable, Hashable {
     var badge: Int?
     var pinned: Bool?

@@ -2276,6 +2276,44 @@ extension Activity {
             return startTimeZone
         }
     }
+    
+    var promptContext: String {
+        var context = String()
+        if let description = self.name {
+            context += "Name: \(description)"
+        }
+        if isGoal ?? false {
+            if self.isCompleted ?? false, let date = completedDateDate {
+                context += ", Completed on \(date)"
+            } else {
+                let dateTimeValueArray = dateTimeValue(forTask: self)
+                context += ", Not completed and due: \(dateTimeValueArray.1)"
+            }
+            if let goal = goal, let description = goal.cellDescription {
+                context += ", \(description)"
+            }
+            
+        } else if isTask ?? false {
+            if self.isCompleted ?? false, let date = completedDateDate {
+                context += ", Completed on \(date)"
+            } else {
+                let dateTimeValueArray = dateTimeValue(forTask: self)
+                context += ", Not completed and due: \(dateTimeValueArray.1)"
+            }
+        } else {
+            let dateTimeValueArray = dateTimeValue(forActivity: self)
+            context += ", \(dateTimeValueArray.1)"
+        }
+        if let description = self.category {
+            context += ", Category: \(description)"
+        }
+        if let description = self.subcategory {
+            context += ", Subcategory: \(description)"
+        }
+        context += "; "
+        return context
+    }
+    
     func getSubStartDateTime(parent: Activity) -> NSNumber? {
         guard let originalParentDateTime = parent.recurrenceStartDateTime, let originalChildDateTime = startDateTime, let currentParentDateTime = parent.startDateTime else {
             return startDateTime ?? nil
@@ -2325,6 +2363,7 @@ extension Activity {
         let duration = currentRowDateTime - currentChildDateTime.intValue
         return NSNumber(value: originalChildDateTime.intValue + duration)
     }
+    
 }
 
 extension Activity {

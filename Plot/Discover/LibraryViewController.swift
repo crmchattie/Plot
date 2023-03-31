@@ -353,7 +353,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
                 showTransactionRuleDetailPresent(transactionRule: nil, transaction: nil, updateDiscoverDelegate: self)
             default:
                 if customType.categoryText == promptString {
-                    askPrompt(prompt: customType.subcategoryText)
+                    openPrompt(prompt: customType.subcategoryText, promptDescription: customType.name)
                 } else {
                     let destination = SubLibraryViewController()
                     destination.networkController = networkController
@@ -412,14 +412,6 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-    }
-    
-    func askPrompt(prompt: String) {
-        print("askPrompt")
-        print(prompt)
-        Service.shared.askPrompt(prompt: prompt) { json, err in
-            print(json)
-        }
     }
     
     func fetchFavAct() {

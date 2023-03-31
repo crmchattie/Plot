@@ -92,6 +92,31 @@ func ==(lhs: Workout, rhs: Workout) -> Bool {
     return lhs.id == rhs.id
 }
 
+extension Workout {
+    var promptContext: String {
+        var context = String()
+        context += "Name: \(name)"
+        let workoutActivityType = hkWorkoutActivityType
+        context += ", Workout Type: \(workoutActivityType.name)"
+        let timeAgo = NSCalendar.current.isDateInToday(endDateTime ?? Date()) ? "today" : timeAgoSinceDate(endDateTime ?? Date())
+        context += ", \(timeAgo)"
+        if let totalEnergyBurned = totalEnergyBurned {
+            let total = totalEnergyBurned.clean
+            context += ", Calories: \(total)"
+        }
+        if let length = length {
+            let total = TimeInterval(length).stringTimeShort
+            context += ", Time: \(total)"
+        }
+        if let totalDistance = totalDistance {
+            context += ", Distance: \(totalDistance) mile"
+        }
+        
+        context += "; "
+        return context
+    }
+}
+
 struct UserWorkout: Codable, Equatable, Hashable {
     var totalEnergyBurned: Double?
     var badge: Int?

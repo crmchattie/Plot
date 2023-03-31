@@ -124,6 +124,45 @@ struct MXAccount: Codable, Equatable, Hashable {
     }
 }
 
+extension MXAccount {
+    var promptContext: String {
+        var context = String()
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = currency_code
+        numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
+        let percentFormatter = NumberFormatter()
+        percentFormatter.numberStyle = .percent
+        percentFormatter.maximumFractionDigits = 2
+        
+        let isodateFormatter = ISO8601DateFormatter()
+        let dateFormatterPrint = DateFormatter()
+        dateFormatterPrint.dateFormat = "E, MMM d, yyyy"
+        
+        context += "Name: \(name)"
+        
+        let currentBalance = finalBalance
+        if let balance = numberFormatter.string(from: currentBalance as NSNumber) {
+            context += ", Balance: \(balance)"
+        }
+        if let date = isodateFormatter.date(from: updated_at) {
+            context += ", Last Updated: \(dateFormatterPrint.string(from: date))"
+        }
+        context += ", Type: \(type)"
+        if let subtype = subtype, subtype != .none {
+            context += ", Subtype: \(subtype)"
+        }
+        if let apr = apr, let value = percentFormatter.string(from: apr / 100 as NSNumber) {
+            context += ", Annual Percentage Rate: \(value)"
+        }
+        if let apy = apy, let value = percentFormatter.string(from: apy / 100 as NSNumber) {
+            context += ", Annual Percentage Yield: \(value)"
+        }
+        context += "; "
+        return context
+    }
+}
+
 struct UserAccount: Codable, Equatable, Hashable {
     var name: String?
     var tags: [String]?
@@ -151,6 +190,38 @@ struct AccountDetails: Codable, Equatable, Hashable {
     var type: MXAccountType?
     var bs_type: BalanceSheetType?
     var currencyCode: String?
+}
+
+extension AccountDetails {
+    func promptContext(selectedIndex: TimeSegmentType) -> String {
+        var context = String()
+        let numberFormatter = NumberFormatter()
+        numberFormatter.currencyCode = currencyCode
+        numberFormatter.numberStyle = .currency
+        numberFormatter.maximumFractionDigits = 0
+        
+        context += "Name: \(name)"
+        
+        if let amount = numberFormatter.string(from: balance as NSNumber) {
+            context += ", Amount: \(amount)"
+            if let balance = lastPeriodBalance, let lastPeriodAmount = numberFormatter.string(from: balance as NSNumber), let difference = numberFormatter.string(from: balance - balance as NSNumber) {
+
+                switch selectedIndex {
+                case .day:
+                    context += ", Yesterday's Amount: \(lastPeriodAmount)"
+                case .week:
+                    context += ", Last Week to Date's Amount: \(lastPeriodAmount)"
+                case .month:
+                    context += ", Last Month to Date's Amount: \(lastPeriodAmount)"
+                case .year:
+                    context += ", Last Year to Date's Amount: \(lastPeriodAmount)"
+                }
+                context += ", Difference Amount: \(difference)"
+            }
+        }
+        context += "; "
+        return context
+    }
 }
 
 enum AccountCatLevel: String, Codable {

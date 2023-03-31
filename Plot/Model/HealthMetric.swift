@@ -40,6 +40,77 @@ struct HealthMetric: Equatable, Hashable {
     }
 }
 
+extension HealthMetric {
+    var promptContext: String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumFractionDigits = 0
+        
+        var context = String()
+        let isToday = NSCalendar.current.isDateInToday(date)
+        var timeAgo = isToday ? "today" : timeAgoSinceDate(date)
+        var title = type.name
+        if case HealthMetricType.workout = type, let hkWorkout = hkSample as? HKWorkout {
+            title = hkWorkout.workoutActivityType.name
+            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
+        }
+        else if case HealthMetricType.nutrition(let value) = type {
+            title = value
+        }
+        
+        context += "Name: \(title)"
+        
+        let totalValue = numberFormatter.string(from: total as NSNumber) ?? ""
+        var total = "\(totalValue)"
+        var subtitleLabelText = "\(total) \(unitName) \(timeAgo)"
+        
+        if case HealthMetricType.weight = type {
+            total = self.total.clean
+            subtitleLabelText = "\(total) \(unitName) \(timeAgo)"
+        }
+        else if case HealthMetricType.sleep = type {
+            total = TimeInterval(self.total).stringTimeShort
+            subtitleLabelText = "\(total) \(timeAgo)"
+        }
+        else if case HealthMetricType.mindfulness = type, let hkCategorySample = hkSample as? HKCategorySample {
+            total = hkCategorySample.endDate.timeIntervalSince(hkCategorySample.startDate).stringTimeShort
+            timeAgo = NSCalendar.current.isDateInToday(hkCategorySample.endDate) ? "today" : timeAgoSinceDate(hkCategorySample.endDate)
+            subtitleLabelText = "\(total) \(timeAgo)"
+        }
+        else if case HealthMetricType.workoutMinutes = type, let hkWorkout = hkSample as? HKWorkout {
+            total = hkWorkout.endDate.timeIntervalSince(hkWorkout.startDate).stringTimeShort
+            timeAgo = NSCalendar.current.isDateInToday(hkWorkout.endDate) ? "today" : timeAgoSinceDate(hkWorkout.endDate)
+            subtitleLabelText = "\(total) \(timeAgo)"
+        }
+        
+        context += ", Description: \(subtitleLabelText)"
+        
+        if let averageValue = average {
+            let value = numberFormatter.string(from: averageValue as NSNumber) ?? ""
+            var averageText = "\(value) \(unitName)"
+            if case HealthMetricType.weight = type {
+                averageText = "\(averageValue.clean) \(unitName)"
+            }
+            else if case HealthMetricType.sleep = type {
+                let shortTime = TimeInterval(averageValue).stringTimeShort
+                averageText = "\(shortTime)"
+            }
+            else if case HealthMetricType.mindfulness = type {
+                let shortTime = TimeInterval(averageValue).stringTimeShort
+                averageText = "\(shortTime)"
+            }
+            else if case HealthMetricType.workoutMinutes = type {
+                let shortTime = TimeInterval(averageValue).stringTimeShort
+                averageText = "\(shortTime)"
+            }
+            
+            context += ", Annual average: \(averageText)"
+        }
+        context += "; "
+        return context
+    }
+}
+
 enum HealthMetricType: Hashable {
     case steps
     case nutrition(String)

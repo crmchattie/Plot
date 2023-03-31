@@ -466,10 +466,8 @@ class FinanceTransactionViewController: FormViewController, ObjectDetailShowing 
                 row.title = row.tag
                 if let value = transaction.account_name {
                     row.value = value
-                } else if transaction.account_name == nil, let value = transaction.account_guid {
-                    if let account = accounts.first(where: { $0.guid == value }) {
-                        row.value = account.name
-                    }
+                } else if transaction.account_name == nil, let value = transaction.account_guid, let account = accounts.first(where: { $0.guid == value }) {
+                    row.value = account.name
                 }
                 row.options = []
                 accounts.forEach {
