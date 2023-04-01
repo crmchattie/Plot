@@ -109,7 +109,7 @@ extension Workout {
             context += ", Time: \(total)"
         }
         if let totalDistance = totalDistance {
-            context += ", Distance: \(totalDistance) mile"
+            context += ", Distance: \(totalDistance.clean) mile"
         }
         
         context += "; "

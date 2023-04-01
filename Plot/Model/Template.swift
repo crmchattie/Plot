@@ -230,7 +230,7 @@ class TemplateBuilder {
                     template.category = ActivitySubcategory(rawValue: option)?.category ?? .uncategorized
                     template.subcategory = ActivitySubcategory(rawValue: option)
                 }
-            case .some(.none), .some(.group):
+            case .some(.none), .some(.group), .specific:
                 break
             case nil:
                 break
@@ -247,7 +247,7 @@ class TemplateBuilder {
                     template.category = ActivitySubcategory(rawValue: option)?.category ?? .uncategorized
                     template.subcategory = ActivitySubcategory(rawValue: option)
                 }
-            case .some(.none), .some(.group):
+            case .some(.none), .some(.group), .specific:
                 break
             case nil:
                 break
@@ -258,7 +258,7 @@ class TemplateBuilder {
                 if let option = option {
                     template.name = option
                 }
-            case .subcategory, .some(.none), .some(.group):
+            case .subcategory, .some(.none), .some(.group), .specific:
                 template.name = "Running"
             case nil:
                 template.name = "Running"
@@ -269,7 +269,7 @@ class TemplateBuilder {
                 if let option = option {
                     template.mood = MoodType(rawValue: option)
                 }
-            case .subcategory, .some(.none), .some(.group):
+            case .subcategory, .some(.none), .some(.group), .specific:
                 break
             case nil:
                 break

@@ -33,6 +33,8 @@ class PromptViewController: FormViewController {
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.isHidden = false
         navigationItem.largeTitleDisplayMode = .never
+        
+        print("adding activityIndicatorView")
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
         
@@ -42,8 +44,14 @@ class PromptViewController: FormViewController {
     
     func askPrompt() {
         if let question = PromptQuestion(rawValue: prompt) {
+            activityIndicatorView.startAnimating()
             let prompt = Prompt(question: question, networkController: networkController)
+            print("prompt")
+            print(prompt.prompt)
             Service.shared.askPrompt(prompt: prompt.prompt) { json, err in
+                print("received answer")
+                print(json)
+                print(err)
                 if let json = json, let answer = json["res"] {
                     self.answer = answer
                 } else {

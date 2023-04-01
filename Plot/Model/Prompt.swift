@@ -116,9 +116,9 @@ struct Prompt {
 }
 
 enum PromptQuestion: String {
-    case summaryTime = "Act as a time advisor. Could you give me a summary of my time given the following: "
-    case summaryHealth = "Act as a health advisor. Could you give me a summary of my health given the following: "
-    case summaryFinances = "Act as a financial advisor. Could you give me a summary of my finances given the following: "
+    case summaryTime = "Act as a time advisor. Could you give me insights into my time given the following: "
+    case summaryHealth = "Act as a health advisor. Could you give me insights into my health given the following: "
+    case summaryFinances = "Act as a financial advisor. Could you give me insights into my finances given the following: "
     
     var question: String {
         return rawValue
@@ -135,6 +135,11 @@ enum PromptQuestion: String {
         }
     }
 }
+
+let timeAdvisorString = "Act as a time advisor. "
+let healthAdvisorString = "Act as a health advisor. "
+let financeAdvisorString = "Act as a finance advisor. "
+let insights = "Could you give me insights "
 
 
 

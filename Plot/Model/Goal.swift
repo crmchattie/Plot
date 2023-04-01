@@ -89,7 +89,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
             case .subcategory:
                 return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
-            case .some(.none):
+            case .some(.none), .specific:
                 return .uncategorized
             case nil:
                 return .uncategorized
@@ -102,7 +102,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
             case .subcategory:
                 return ActivityCategory.categorize(ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
-            case .some(.none):
+            case .some(.none), .specific:
                 return .uncategorized
             case nil:
                 return .uncategorized
@@ -126,7 +126,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
             case .subcategory:
                 return ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
-            case .some(.none):
+            case .some(.none), .specific:
                 return .uncategorized
             case nil:
                 return .uncategorized
@@ -139,7 +139,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivitySubcategory.categorize(ActivityCategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized)
             case .subcategory:
                 return ActivitySubcategory(rawValue: self.option?.first ?? "Uncategorized") ?? .uncategorized
-            case .some(.none):
+            case .some(.none), .specific:
                 return .uncategorized
             case nil:
                 return .uncategorized
@@ -171,7 +171,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -184,7 +184,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -197,7 +197,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return financialTransactionsTopLevelCategoriesStaticWOUncategorized.sorted()
             case .subcategory:
                 return financialTransactionsCategoriesStaticWOUncategorized.sorted()
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -210,7 +210,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return MXAccountType.allValues
             case .subcategory:
                 return MXAccountSubType.allValues
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -237,7 +237,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return array
             case .subcategory:
                 return nil
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -250,7 +250,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return MoodType.allValues
             case .subcategory:
                 return nil
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -272,7 +272,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -285,7 +285,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -298,7 +298,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return financialTransactionsTopLevelCategoriesStaticWOUncategorized.sorted()
             case .subcategory:
                 return financialTransactionsCategoriesStaticWOUncategorized.sorted()
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -311,7 +311,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return MXAccountType.allValues
             case .subcategory:
                 return MXAccountSubType.allValues
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -338,7 +338,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return array
             case .subcategory:
                 return nil
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -351,7 +351,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return MoodType.allValues
             case .subcategory:
                 return nil
-            case .some(.none):
+            case .some(.none), .specific:
                 return nil
             case nil:
                 return nil
@@ -373,7 +373,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .none:
+            case .none, .specific:
                 return nil
             }
         case .tasks:
@@ -384,7 +384,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return ActivityCategory.allValues
             case .subcategory:
                 return ActivitySubcategory.allValues
-            case .none:
+            case .none, .specific:
                 return nil
             }
         case .financialTransactions:
@@ -395,7 +395,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return financialTransactionsTopLevelCategoriesStaticWOUncategorized.sorted()
             case .subcategory:
                 return financialTransactionsCategoriesStaticWOUncategorized.sorted()
-            case .none:
+            case .none, .specific:
                 return nil
             }
         case .financialAccounts:
@@ -406,7 +406,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return MXAccountType.allValues
             case .subcategory:
                 return MXAccountSubType.allValues
-            case .none:
+            case .none, .specific:
                 return nil
             }
         case .workout:
@@ -431,7 +431,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return array
             case .subcategory:
                 return nil
-            case .none:
+            case .none, .specific:
                 return nil
             }
         case .mood:
@@ -442,7 +442,7 @@ struct Goal: Codable, Equatable, Hashable {
                 return MoodType.allValues
             case .subcategory:
                 return nil
-            case .none:
+            case .none, .specific:
                 return nil
             }
         case .mindfulness, .sleep, .steps, .flightsClimbed, .activeCalories:
@@ -604,7 +604,7 @@ struct Goal: Codable, Equatable, Hashable {
                     numberFormatter.numberStyle = .decimal
                 case .hours:
                     numberFormatter.numberStyle = .decimal
-                    numberFormatter.maximumFractionDigits = 1
+                    numberFormatter.maximumFractionDigits = 2
                 case .days:
                     numberFormatter.numberStyle = .decimal
                     numberFormatter.maximumFractionDigits = 1
@@ -1612,6 +1612,7 @@ enum GoalSubMetric: String, Codable, CaseIterable {
     case group = "Group"
     case category = "Category"
     case subcategory = "Subcategory"
+    case specific = "Specific"
     //    case account = "Account"
     //    case workout = "Workout"
     //    case mindfulness = "Mindfulness"
@@ -1626,7 +1627,7 @@ enum GoalSubMetric: String, Codable, CaseIterable {
     
     var pluralName: String {
         switch self {
-        case .none:
+        case .none, .specific:
             return self.rawValue
         case .group:
             return "Groups"
@@ -1641,7 +1642,7 @@ enum GoalSubMetric: String, Codable, CaseIterable {
         switch self {
         case .none:
             return ActivityLevel.none
-        case .group:
+        case .group, .specific:
             return nil
         case .category:
             return ActivityLevel.category
@@ -1652,7 +1653,7 @@ enum GoalSubMetric: String, Codable, CaseIterable {
     
     var transcationCatLevel: TransactionCatLevel? {
         switch self {
-        case .none:
+        case .none, .specific:
             return nil
         case .group:
             return .group
@@ -1673,6 +1674,8 @@ enum GoalSubMetric: String, Codable, CaseIterable {
             return .type
         case .subcategory:
             return .subtype
+        case .specific:
+            return .account
         }
     }
 }

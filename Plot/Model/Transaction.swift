@@ -189,6 +189,7 @@ extension Transaction {
         }
         return nil
     }
+    
     func promptContext(accounts: [MXAccount]) -> String {
         var context = String()
         let numberFormatter = NumberFormatter()

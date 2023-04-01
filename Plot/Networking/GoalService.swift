@@ -339,7 +339,7 @@ extension NetworkController {
         case .financialTransactions:
             var transactionDetails = [TransactionDetails]()
             switch submetric {
-            case nil, .some(.none):
+            case nil, .some(.none), .specific:
                 break
             case .some(.group):
                 for opt in option ?? [] {
@@ -418,7 +418,10 @@ extension NetworkController {
                         let accountDetail = AccountDetails(name: opt, balance: 0, level: submetric?.accountCatLevel ?? .bs_type, subtype: MXAccountSubType(rawValue: opt))
                         accountDetails.append(accountDetail)
                     }
+                case .some(.specific):
+                    print("specific")
                 }
+                                
                 
                 financeDetailService.getSamples(for: range, accountDetails: accountDetails, transactionDetails: nil, accounts: financeService.accounts, transactions: nil, filterAccounts: nil, ignore_plot_created: nil, ignore_transfer_between_accounts: nil) { stat, accounts, _, err in
                     guard let stat = stat, let accounts = accounts else {

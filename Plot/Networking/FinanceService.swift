@@ -40,7 +40,7 @@ class FinanceService {
                     }
                     return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
                 }
-                self.grabFinancialItems()
+                grabFinancialItems()
                 NotificationCenter.default.post(name: .transactionsUpdated, object: nil)
             }
         }
@@ -54,19 +54,21 @@ class FinanceService {
                     }
                     return account1.should_link ?? true && !(account2.should_link ?? true)
                 }
-                self.grabFinancialItems()
+                grabFinancialItems()
                 setupMembersAccountsDict()
+                accountNamesDictionary = Dictionary(uniqueKeysWithValues: accounts.map{ ($0.guid, $0.name) })
                 NotificationCenter.default.post(name: .accountsUpdated, object: nil)
             }
         }
     }
+    var accountNamesDictionary = [String: String]()
     var members = [MXMember]() {
         didSet {
             if oldValue != members {
                 members.sort { (member1, member2) -> Bool in
                     return member1.name < member2.name
                 }
-                self.grabFinancialItems()
+                grabFinancialItems()
                 setupMembersAccountsDict()
                 NotificationCenter.default.post(name: .membersUpdated, object: nil)
             }
@@ -81,7 +83,7 @@ class FinanceService {
                     }
                     return holding1.should_link ?? true && !(holding2.should_link ?? true)
                 }
-                self.grabFinancialItems()
+                grabFinancialItems()
                 NotificationCenter.default.post(name: .holdingsUpdated, object: nil)
             }
         }

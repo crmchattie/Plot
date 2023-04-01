@@ -735,6 +735,7 @@ extension GoalViewController {
                 numberFormatter.maximumFractionDigits = 1
             case .days:
                 numberFormatter.numberStyle = .decimal
+                numberFormatter.maximumFractionDigits = 1
             case .level:
                 numberFormatter.numberStyle = .decimal
             }

@@ -368,8 +368,9 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                                                             style: .plain,
                                                             target: self,
                                                             action: #selector(goToNotifications))
-        navigationItem.leftBarButtonItem = settingsBarButton
-        navigationItem.rightBarButtonItem = notificationsBarButton
+        let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
+        navigationItem.leftBarButtonItems = [notificationsBarButton, settingsBarButton]
+        navigationItem.rightBarButtonItem = newItemBarButton
 
         if !isNewUser {
             refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
@@ -619,6 +620,17 @@ extension MasterActivityContainerController {
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
     }
+    
+    @objc func newItem() {
+        let destination = LibraryViewController(networkController: networkController)
+        destination.titleString = "Create"
+        destination.sections = [.custom]
+        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
+        destination.navigationItem.leftBarButtonItem = cancelBarButton
+        destination.updateDiscoverDelegate = self
+        let navigationViewController = UINavigationController(rootViewController: destination)
+        self.present(navigationViewController, animated: true, completion: nil)
+    }
 }
 
 extension MasterActivityContainerController: GIDSignInDelegate {
@@ -710,6 +722,12 @@ extension MasterActivityContainerController: EndedWebViewDelegate {
             self.collectionView.reloadData()
         }
         networkController.financeService.regrabFinances {}
+    }
+}
+
+extension MasterActivityContainerController: UpdateDiscover {
+    func itemCreated(title: String) {
+        basicAlert(title: title, message: nil, controller: self)
     }
 }
 

@@ -25,8 +25,8 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     var favAct = [String: [String]]()
     
     var participants = [String : [User]]()
-    
-    var sections: [SectionType] = [.custom, .prompt]
+    var titleString = "Discover"
+    var sections: [SectionType] = [.prompt]
     var groups = [SectionType: [AnyHashable]]()
     var customCustomTypes: [CustomType] = [.goal, .task, .event, .mood, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
     var promptCustomTypes: [CustomType] = [.timeSummary, .healthSummary, .financialSummary]
@@ -183,7 +183,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Discover"
+        navigationItem.title = titleString
         navigationController?.navigationBar.layoutIfNeeded()        
         navigationItem.largeTitleDisplayMode = .always
                 
@@ -192,15 +192,16 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = .systemGroupedBackground
         
+        if navigationItem.leftBarButtonItem != nil {
+            navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
+        
         collectionView.indicatorStyle = .default
         collectionView.backgroundColor = .systemGroupedBackground
         
         collectionView.register(CompositionalHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: kCompositionalHeader)
         collectionView.register(LibraryCell.self, forCellWithReuseIdentifier: kLibraryCell)
         collectionView.register(SubLibraryCell.self, forCellWithReuseIdentifier: kSubLibraryCell)
-        
-        groups[.custom] = customCustomTypes
-        groups[.prompt] = promptCustomTypes
         
         setupData()
 
@@ -273,9 +274,13 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         })
                                 
         for section in sections {
-            if let object = groups[section] {
+            if section == .custom {
                 snapshot.appendSections([section])
-                snapshot.appendItems(object, toSection: section)
+                snapshot.appendItems(customCustomTypes, toSection: section)
+                self.diffableDataSource.apply(snapshot)
+            } else if section == .prompt {
+                snapshot.appendSections([section])
+                snapshot.appendItems(promptCustomTypes, toSection: section)
                 self.diffableDataSource.apply(snapshot)
             }
         }
@@ -562,8 +567,9 @@ extension LibraryViewController { /* hiding keyboard */
 extension LibraryViewController: UpdateDiscover {
     func itemCreated(title: String) {
         self.navigationItem.searchController?.isActive = false
-        self.dismiss(animated: true)
-        self.tabBarController?.selectedIndex = 1
-        basicAlert(title: title, message: nil, controller: self.tabBarController)
+        self.dismiss(animated: true) {
+            self.dismiss(animated: true)
+            self.updateDiscoverDelegate?.itemCreated(title: title)
+        }
     }
 }
