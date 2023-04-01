@@ -11,6 +11,9 @@ import Firebase
 import CodableFirebase
 import GoogleSignIn
 
+let discoverTitleString = "Discover"
+let addTitleString = "Add"
+
 protocol UpdateDiscover: AnyObject {
     func itemCreated(title: String)
 }
@@ -25,18 +28,30 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     var favAct = [String: [String]]()
     
     var participants = [String : [User]]()
-    var titleString = "Discover"
-    var sections: [SectionType] = [.prompt]
+    var titleString = discoverTitleString
+    var sections: [SectionType] = [.time, .health, .finances]
     var groups = [SectionType: [AnyHashable]]()
+    
     var customCustomTypes: [CustomType] = [.goal, .task, .event, .mood, .workout, .mindfulness, .transaction, .financialAccount, .transactionRule]
-    var promptCustomTypes: [CustomType] = [.timeSummary, .healthSummary, .financialSummary]
-    var timeCustomTypes: [CustomType] = [.goal, .task, .event, .timeSummary]
-    var healthCustomTypes: [CustomType] = [.mood, .workout, .mindfulness, .healthSummary]
-    var financeCustomTypes: [CustomType] = [.transaction, .financialAccount, .transactionRule, .financialSummary]
+    var promptCustomTypes: [CustomType] = [.timeInsights, .healthInsights, .financialInsights]
+    
+    var timeCustomTypesAdd: [CustomType] = [.goal, .task, .event]
+    var healthCustomTypesAdd: [CustomType] = [.workout, .mood, .mindfulness]
+    var financeCustomTypesAdd: [CustomType] = [.transaction, .financialAccount, .transactionRule]
+    
+    var timeCustomTypesPrompt: [CustomType] = [.timeInsights, .timeRecs, .timePlan]
+    var healthCustomTypesPrompt: [CustomType] = [.healthInsights, .healthRecs, .healthPlan]
+    var financeCustomTypesPrompt: [CustomType] = [.financialInsights, .financialRecs, .financialPlan]
+    
+    var timeCustomTypesAll: [CustomType] = [.goal, .task, .event, .timeInsights, .timeRecs, .timePlan]
+    var healthCustomTypesAll: [CustomType] = [.mood, .workout, .mindfulness, .healthInsights, .healthRecs, .healthPlan]
+    var financeCustomTypesAll: [CustomType] = [.transaction, .financialAccount, .transactionRule, .financialInsights, .financialRecs, .financialPlan]
+    
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()
     var templates = [Template]()
     var filteredTemplates = [Template]()
+    
     
     var intColor: Int = 0
     
@@ -272,16 +287,54 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
             
             return header
         })
-                                
-        for section in sections {
-            if section == .custom {
-                snapshot.appendSections([section])
-                snapshot.appendItems(customCustomTypes, toSection: section)
-                self.diffableDataSource.apply(snapshot)
-            } else if section == .prompt {
-                snapshot.appendSections([section])
-                snapshot.appendItems(promptCustomTypes, toSection: section)
-                self.diffableDataSource.apply(snapshot)
+        
+        if titleString == discoverTitleString {
+            for section in sections {
+                if section == .summaryPrompt {
+                    self.groups[section] = promptCustomTypes
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(promptCustomTypes, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                } else if section == .time {
+                    self.groups[section] = timeCustomTypesPrompt
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(timeCustomTypesPrompt, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                } else if section == .health {
+                    self.groups[section] = healthCustomTypesPrompt
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(healthCustomTypesPrompt, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                } else if section == .finances {
+                    self.groups[section] = financeCustomTypesPrompt
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(financeCustomTypesPrompt, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                }
+            }
+        } else if titleString == addTitleString {
+            for section in sections {
+                if section == .custom {
+                    self.groups[section] = customCustomTypes
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(customCustomTypes, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                } else if section == .time {
+                    self.groups[section] = timeCustomTypesAdd
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(timeCustomTypesAdd, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                } else if section == .health {
+                    self.groups[section] = healthCustomTypesAdd
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(healthCustomTypesAdd, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                } else if section == .finances {
+                    self.groups[section] = financeCustomTypesAdd
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(financeCustomTypesAdd, toSection: section)
+                    self.diffableDataSource.apply(snapshot)
+                }
             }
         }
     }
@@ -291,11 +344,11 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         if let object = object as? CustomType, let section = snapshot.sectionIdentifier(containingItem: object) {
             let totalItems = (self.groups[section]?.count ?? 1) - 1
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.kSubLibraryCell, for: indexPath) as! SubLibraryCell
-            if self.timeCustomTypes.contains(object) {
+            if self.timeCustomTypesAll.contains(object) {
                 cell.intColor = 5
-            } else if self.healthCustomTypes.contains(object) {
+            } else if self.healthCustomTypesAll.contains(object) {
                 cell.intColor = 0
-            } else if self.financeCustomTypes.contains(object) {
+            } else if self.financeCustomTypesAll.contains(object) {
                 cell.intColor = 3
             }
             if indexPath.item == 0 {

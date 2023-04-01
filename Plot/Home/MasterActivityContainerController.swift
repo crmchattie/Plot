@@ -369,8 +369,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                                                             target: self,
                                                             action: #selector(goToNotifications))
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        navigationItem.leftBarButtonItems = [notificationsBarButton, settingsBarButton]
-        navigationItem.rightBarButtonItem = newItemBarButton
+        navigationItem.rightBarButtonItems = [newItemBarButton, notificationsBarButton, settingsBarButton]
 
         if !isNewUser {
             refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)
@@ -623,8 +622,8 @@ extension MasterActivityContainerController {
     
     @objc func newItem() {
         let destination = LibraryViewController(networkController: networkController)
-        destination.titleString = "Create"
-        destination.sections = [.custom]
+        destination.titleString = addTitleString
+        destination.sections = [.time, .health, .finances]
         let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
         destination.navigationItem.leftBarButtonItem = cancelBarButton
         destination.updateDiscoverDelegate = self

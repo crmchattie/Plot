@@ -213,8 +213,6 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
         
         activityView.tableView.dataSource = self
         activityView.tableView.delegate = self
-        activityView.tableView.register(TableViewHeader.self,
-                           forHeaderFooterViewReuseIdentifier: headerCellID)
         activityView.tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
         activityView.tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
         activityView.tableView.allowsMultipleSelectionDuringEditing = false

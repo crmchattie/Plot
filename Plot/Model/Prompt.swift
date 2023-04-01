@@ -64,13 +64,13 @@ struct Prompt {
             startDate = startDate.startOfDay.lastYear
         }
         switch question {
-        case .summaryTime:
+        case .timeInsights, .timeRecs, .timePlan:
             contextObjects = networkController.activityService.activitiesWithRepeats
                 .filter { activity -> Bool in
                     guard let date = activity.finalDateForDisplay?.localTime else { return false }
                     return startDate <= date && date <= endDate
                 }
-        case .summaryHealth:
+        case .healthInsights, .healthRecs, .healthPlan:
             let filteredSamples = Array(networkController.healthService.healthMetrics.values.flatMap { $0 })
             .filter { metric -> Bool in
                     return startDate <= metric.date && metric.date <= endDate
@@ -94,9 +94,7 @@ struct Prompt {
                     return startDate <= date && date <= endDate
                 }.prefix(10)
             contextObjects.append(contentsOf: Array(filteredMoods))
-        case .summaryFinances:
-//            [.financialIssues, .incomeStatement, .balanceSheet, .transactions, .investments, .financialAccounts]
-//                .values.flatMap({ $0 })
+        case .financialInsights, .financialRecs, .financialPlan:
             let filteredObjects = networkController.financeService.financeGroups.filter({ $0.key == .incomeStatement || $0.key == .balanceSheet }).values.flatMap({ $0 })
             for object in filteredObjects {
                 if let details = object as? TransactionDetails, details.level == TransactionCatLevel.group {
@@ -116,9 +114,15 @@ struct Prompt {
 }
 
 enum PromptQuestion: String {
-    case summaryTime = "Act as a time advisor. Could you give me insights into my time given the following: "
-    case summaryHealth = "Act as a health advisor. Could you give me insights into my health given the following: "
-    case summaryFinances = "Act as a financial advisor. Could you give me insights into my finances given the following: "
+    case timeInsights = "Act as a time advisor. Could you give me insights into my time given the following: "
+    case healthInsights = "Act as a health advisor. Could you give me insights into my health given the following: "
+    case financialInsights = "Act as a financial advisor. Could you give me insights into my finances given the following: "
+    case timeRecs = "Act as a time advisor. Could give me some recommendations to better manage my time given the following: "
+    case healthRecs = "Act as a health advisor. Could give me some recommendations to better manage my health given the following: "
+    case financialRecs = "Act as a financial advisor. Could give me some recommendations to better manage my finances given the following: "
+    case timePlan = "Act as a time advisor. Could give me a plan to better manage my time given the following: "
+    case healthPlan = "Act as a health advisor. Could give me a plan to better manage my health given the following: "
+    case financialPlan = "Act as a financial advisor. Could give me a plan to better manage my finances given the following: "
     
     var question: String {
         return rawValue
@@ -126,11 +130,23 @@ enum PromptQuestion: String {
     
     var timeSegment: TimeSegmentType {
         switch self {
-        case .summaryTime:
+        case .timeInsights:
             return TimeSegmentType.week
-        case .summaryHealth:
+        case .healthInsights:
             return TimeSegmentType.week
-        case .summaryFinances:
+        case .financialInsights:
+            return TimeSegmentType.month
+        case .timeRecs:
+            return TimeSegmentType.week
+        case .healthRecs:
+            return TimeSegmentType.week
+        case .financialRecs:
+            return TimeSegmentType.month
+        case .timePlan:
+            return TimeSegmentType.week
+        case .healthPlan:
+            return TimeSegmentType.week
+        case .financialPlan:
             return TimeSegmentType.month
         }
     }
@@ -140,6 +156,8 @@ let timeAdvisorString = "Act as a time advisor. "
 let healthAdvisorString = "Act as a health advisor. "
 let financeAdvisorString = "Act as a finance advisor. "
 let insights = "Could you give me insights "
+let recommendations = "Could give me some recommendations "
+let plan = "Could give me a plan "
 
 
 
