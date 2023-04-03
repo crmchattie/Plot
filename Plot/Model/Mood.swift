@@ -25,6 +25,7 @@ struct Mood: Codable, Equatable, Hashable {
     var pinned: Bool?
     var muted: Bool?
     var admin: String?
+    var current: Bool?
     
     init(id: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, moodDate: Date?, applicableTo: ApplicableTo?) {
         self.id = id
@@ -62,6 +63,7 @@ struct UserMood: Codable, Equatable, Hashable {
     var pinned: Bool?
     var muted: Bool?
     var moodDate: Date?
+    var current: Bool?
     
     init(mood: Mood) {
         self.badge = mood.badge

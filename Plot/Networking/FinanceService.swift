@@ -144,11 +144,11 @@ class FinanceService {
         self.transactionRuleFetcher.fetchTransactionRules(completion: { transactionRules in
             self.transactionRules = transactionRules
             self.observeTransactionsForCurrentUser {
-                self.grabAccountTransactions()
-                self.removePendingTransactions()
-                self.flagTransfersBetweenAccounts()
                 if self.isRunning {
                     self.isRunning = false
+                    self.grabAccountTransactions()
+                    self.removePendingTransactions()
+                    self.flagTransfersBetweenAccounts()
                     self.createFutureTasksFromRecurringTransactions()
                     completion()
                 }
@@ -362,8 +362,10 @@ class FinanceService {
                         }
                     }
                 }
+                print("!transactionsInitialAdd.isEmpty completion")
                 completion()
             } else {
+                print("else completion transactions")
                 completion()
             }
             self?.createEventsFromTransactions(transactions: transactionsInitialAdd)

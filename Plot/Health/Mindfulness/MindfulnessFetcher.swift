@@ -37,7 +37,10 @@ class MindfulnessFetcher: NSObject {
         
         var userMindfulnesses: [String: UserMindfulness] = [:]
         
-        userMindfulnessDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+        let endDateTimeFilter = Date().monthAfter // Replace with your desired filter value
+        let startDateTimeFilter = Date().monthBefore // Replace with your desired filter value
+        
+        userMindfulnessDatabaseRef.queryOrdered(byChild: "startDateTime").observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 mindfulnessInitialAdd([])
                 return
@@ -47,26 +50,40 @@ class MindfulnessFetcher: NSObject {
                 var mindfulnesses: [Mindfulness] = []
                 let group = DispatchGroup()
                 var counter = 0
-                let mindfulnessIDs = snapshot.value as? [String: AnyObject] ?? [:]
-                for (ID, userMindfulnessInfo) in mindfulnessIDs {
+                
+                for child in snapshot.children.allObjects.reversed() {
+                    let snapshot = child as! DataSnapshot
+                    guard let userMindfulnessInfo = snapshot.value as? [String : AnyObject] else { return }
                     var handle = UInt.max
-                    if let userMindfulness = try? FirebaseDecoder().decode(UserMindfulness.self, from: userMindfulnessInfo) {
-                        userMindfulnesses[ID] = userMindfulness
+                    if var userMindfulness = try? FirebaseDecoder().decode(UserMindfulness.self, from: userMindfulnessInfo) {
+                        
+//                        if (userMindfulness.startDateTime != nil && startDateTimeFilter <= userMindfulness.startDateTime! && userMindfulness.startDateTime! <= endDateTimeFilter) {
+//                            userMindfulness.current = true
+//                            group.enter()
+//                            counter += 1
+//                        }
+                        
+                        userMindfulness.current = true
                         group.enter()
                         counter += 1
-                        handle = ref.child(mindfulnessEntity).child(ID).observe(.value) { snapshot in
+                        
+                        userMindfulnesses[snapshot.key] = userMindfulness
+                        
+                        handle = ref.child(mindfulnessEntity).child(snapshot.key).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
                             if snapshot.exists(), let snapshotValue = snapshot.value {
-                                if let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: snapshotValue), let userMindfulness = userMindfulnesses[ID] {
+                                if let mindfulness = try? FirebaseDecoder().decode(Mindfulness.self, from: snapshotValue), let userMindfulness = userMindfulnesses[snapshot.key] {
                                     var _mindfulness = mindfulness
                                     _mindfulness.hkSampleID = userMindfulness.hkSampleID
                                     _mindfulness.badge = userMindfulness.badge
                                     _mindfulness.muted = userMindfulness.muted
                                     _mindfulness.pinned = userMindfulness.pinned
-                                    if counter > 0 {
+                                    if counter > 0, userMindfulness.current ?? false {
                                         mindfulnesses.append(_mindfulness)
                                         group.leave()
                                         counter -= 1
+                                    } else if counter > 0 {
+                                        mindfulnesses.append(_mindfulness)
                                     } else {
                                         mindfulnesses = [_mindfulness]
                                         completion(mindfulnesses)
@@ -74,7 +91,7 @@ class MindfulnessFetcher: NSObject {
                                     }
                                 }
                             } else {
-                                if counter > 0 {
+                                if counter > 0, userMindfulness.current ?? false {
                                     group.leave()
                                     counter -= 1
                                 }
@@ -85,6 +102,7 @@ class MindfulnessFetcher: NSObject {
                 group.notify(queue: .main) {
                     completion(mindfulnesses)
                 }
+
             }
         })
         

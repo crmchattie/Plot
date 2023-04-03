@@ -110,6 +110,7 @@ struct Transaction: Codable, Equatable, Hashable {
     var plot_recurrence_frequency: String?
     var plot_created: Bool?
     var transfer_between_accounts: Bool?
+    var current: Bool?
     var cash_flow_type: String? {
         if type == .credit {
             return "Inflow"
@@ -235,6 +236,7 @@ struct UserTransaction: Codable, Equatable, Hashable {
     var pinned: Bool?
     var muted: Bool?
     var transacted_at: String?
+    var current: Bool?
     
     init(transaction: Transaction) {
         self.description = transaction.description
@@ -247,6 +249,15 @@ struct UserTransaction: Codable, Equatable, Hashable {
         self.badge = transaction.badge
         self.pinned = transaction.pinned
         self.muted = transaction.muted
+    }
+}
+
+extension UserTransaction {
+    var transactionDate: Date? {
+        if let transacted_at = transacted_at, let transactionDate = isodateFormatter.date(from: transacted_at) {
+            return transactionDate
+        }
+        return nil
     }
 }
 

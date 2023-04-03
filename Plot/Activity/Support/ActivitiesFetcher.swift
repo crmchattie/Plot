@@ -45,6 +45,9 @@ class ActivitiesFetcher: NSObject {
         self.activitiesWithRepeatsInitialAdd = activitiesWithRepeatsInitialAdd
         self.activitiesWithRepeatsAdded = activitiesWithRepeatsAdded
         self.activitiesWithRepeatsChanged = activitiesWithRepeatsChanged
+        
+        let endDateTimeFilter = Date().monthAfter.timeIntervalSince1970 // Replace with your desired filter value
+        let startDateTimeFilter = Date().monthBefore.timeIntervalSince1970 // Replace with your desired filter value
                                 
         userActivitiesDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
@@ -59,13 +62,23 @@ class ActivitiesFetcher: NSObject {
                 let group = DispatchGroup()
                 var counter = 0
                 let activityIDs = snapshot.value as? [String: AnyObject] ?? [:]
+                
                 for (ID, userActivityInfo) in activityIDs {
                     var handle = UInt.max
                     if let dictionary = userActivityInfo as? [String: AnyObject] {
                         let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
+                        
+                        if userActivity.recurrences != nil ||
+                            userActivity.isTask ?? false ||
+                            (userActivity.endDateTime != nil && startDateTimeFilter <= TimeInterval(truncating: userActivity.endDateTime!) && TimeInterval(truncating: userActivity.endDateTime!) <= endDateTimeFilter) ||
+                            (userActivity.completedDate != nil && startDateTimeFilter <= TimeInterval(truncating: userActivity.completedDate!) && TimeInterval(truncating: userActivity.completedDate!) <= endDateTimeFilter) {
+                            userActivity.current = true
+                            group.enter()
+                            counter += 1
+                        }
+                        
                         self.userActivities[ID] = userActivity
-                        group.enter()
-                        counter += 1
+                        
                         handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
                             if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = self.userActivities[ID] {
@@ -91,11 +104,14 @@ class ActivitiesFetcher: NSObject {
                                         completion(activities)
                                     }
                                     self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
-                                        if counter > 0 {
+                                        if counter > 0, userActivity.current ?? false {
                                             activities.append(activity)
                                             activitiesWithRepeats.append(contentsOf: newActivitiesWithRepeats)
                                             group.leave()
                                             counter -= 1
+                                        } else if counter > 0 {
+                                            activities.append(activity)
+                                            activitiesWithRepeats.append(contentsOf: newActivitiesWithRepeats)
                                         } else {
                                             activitiesWithRepeats = newActivitiesWithRepeats
                                             completionRepeats(activitiesWithRepeats)
@@ -103,11 +119,14 @@ class ActivitiesFetcher: NSObject {
                                         }
                                     }
                                 } else {
-                                    if counter > 0 {
+                                    if counter > 0, userActivity.current ?? false {
                                         activities.append(activity)
                                         activitiesWithRepeats.append(activity)
                                         group.leave()
                                         counter -= 1
+                                    } else if counter > 0 {
+                                        activities.append(activity)
+                                        activitiesWithRepeats.append(activity)
                                     } else {
                                         activities = [activity]
                                         completion(activities)
@@ -117,7 +136,7 @@ class ActivitiesFetcher: NSObject {
                                     }
                                 }
                             } else {
-                                if counter > 0 {
+                                if counter > 0, userActivity.current ?? false {
                                     group.leave()
                                     counter -= 1
                                 }

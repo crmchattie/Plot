@@ -33,6 +33,7 @@ struct Mindfulness: Codable, Equatable, Hashable {
     var directAssociation: Bool?
     var directAssociationObjectID: String?
     var directAssociationType: ObjectType?
+    var current: Bool?
     
     init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, startDateTime: Date?, endDateTime: Date?, user_created: Bool?, directAssociation: Bool?, directAssociationType: ObjectType?) {
         self.id = id
@@ -94,6 +95,7 @@ struct UserMindfulness: Codable, Equatable, Hashable {
     var hkSampleID: String?
     var identifier: String?
     var startDateTime: Date?
+    var current: Bool?
     
     init(mindfulness: Mindfulness) {
         self.badge = mindfulness.badge

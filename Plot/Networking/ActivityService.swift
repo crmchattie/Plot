@@ -284,14 +284,16 @@ class ActivityService {
     
     func grabActivities(_ completion: @escaping () -> Void) {
         self.observeActivitiesForCurrentUser({
-            self.observeCalendarsForCurrentUser()
-            self.observeListsForCurrentUser()
             if self.isRunning {
                 self.grabOtherActivities()
                 self.isRunning = false
                 completion()
             }
         })
+        
+        self.observeCalendarsForCurrentUser()
+        self.observeListsForCurrentUser()
+
     }
     
     func grabOtherActivities() {
@@ -434,6 +436,7 @@ class ActivityService {
                 completion()
             }
         }, activitiesAdded: { [weak self] activitiesAdded in
+            print("activitiesAdded completion")
             for activity in activitiesAdded {
                 //remove activities from repeatActivities in case recurrences is updated
                 if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
@@ -454,10 +457,12 @@ class ActivityService {
                 self?.activitiesWithRepeats.append(contentsOf: activitiesWithRepeatsAdded)
             }
         }, activitiesRemoved: { [weak self] activitiesRemoved in
+            print("activitiesRemoved completion")
             self?.activities.removeAll(where: { $0.activityID == activitiesRemoved.first?.activityID })
             self?.activitiesWithRepeats.removeAll(where: { $0.activityID == activitiesRemoved.first?.activityID })
             self?.deleteReminder(activities: activitiesRemoved)
         }, activitiesChanged: { [weak self] activitiesChanged in
+            print("activitiesChanged completion")
             for activity in activitiesChanged {
                 if let index = self?.activities.firstIndex(where: {$0.activityID == activity.activityID}) {
                     self?.activities[index] = activity

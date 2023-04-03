@@ -36,6 +36,7 @@ struct Workout: Codable, Equatable, Hashable {
     var directAssociation: Bool?
     var directAssociationObjectID: String?
     var directAssociationType: ObjectType?
+    var current: Bool?
     
     init(id: String, name: String, admin: String?, lastModifiedDate: Date?, createdDate: Date?, type: String?, startDateTime: Date?, endDateTime: Date?, length: Double?, totalEnergyBurned: Double?, totalDistance: Double?, user_created: Bool?, directAssociation: Bool?, directAssociationType: ObjectType?) {
         self.id = id
@@ -125,6 +126,7 @@ struct UserWorkout: Codable, Equatable, Hashable {
     var healthExport: Bool?
     var hkSampleID: String?
     var startDateTime: Date?
+    var current: Bool?
     
     init(workout: Workout) {
         self.totalEnergyBurned = workout.totalEnergyBurned

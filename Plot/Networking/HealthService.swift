@@ -176,9 +176,10 @@ class HealthService {
     }
     
     func observeWorkoutsForCurrentUser(_ completion: @escaping () -> Void) {
-        workoutFetcher.observeWorkoutForCurrentUser(workoutsInitialAdd: { [weak self] workoutsInitialAdd  in
+        workoutFetcher.observeWorkoutForCurrentUser(workoutsInitialAdd: { [weak self] workoutsInitialAdd in
             if !workoutsInitialAdd.isEmpty {
                 if self!.workouts.isEmpty {
+                    print("completion() self!.workouts.isEmpty")
                     self?.workouts = workoutsInitialAdd
                     completion()
                 }
@@ -190,6 +191,7 @@ class HealthService {
                     }
                 }
             } else {
+                print("completion() else workouts")
                 completion()
             }
         }, workoutsAdded: { [weak self] workoutsAdded in
@@ -222,6 +224,7 @@ class HealthService {
             if !mindfulnessInitialAdd.isEmpty {
                 if self!.mindfulnesses.isEmpty {
                     self?.mindfulnesses = mindfulnessInitialAdd
+                    print("completion() self!.mindfulnesses.isEmpty")
                     completion()
                 }
                 for mindfulness in mindfulnessInitialAdd {
@@ -232,6 +235,7 @@ class HealthService {
                     }
                 }
             } else {
+                print("completion() else mindfulness")
                 completion()
             }
         }, mindfulnessAdded: { [weak self] mindfulnessAdded in
@@ -264,6 +268,7 @@ class HealthService {
             if !moodInitialAdd.isEmpty {
                 if self!.moods.isEmpty {
                     self?.moods = moodInitialAdd
+                    print("completion() self!.moods.isEmpty")
                     completion()
                 }
                 for mood in moodInitialAdd {
@@ -274,6 +279,7 @@ class HealthService {
                     }
                 }
             } else {
+                print("completion() else moods")
                 completion()
             }
         }, moodAdded: { [weak self] moodAdded in

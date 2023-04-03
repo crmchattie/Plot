@@ -36,8 +36,11 @@ class FinancialTransactionFetcher: NSObject {
         self.transactionsAdded = transactionsAdded
         self.transactionsChanged = transactionsChanged
         self.transactionsRemoved = transactionsRemoved
+        
+        let endDateTimeFilter = Date().monthAfter // Replace with your desired filter value
+        let startDateTimeFilter = Date().monthBefore // Replace with your desired filter value
                 
-        userTransactionsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+        userTransactionsDatabaseRef.queryOrdered(byChild: "transacted_at").observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 transactionsInitialAdd([])
                 return
@@ -47,17 +50,27 @@ class FinancialTransactionFetcher: NSObject {
                 var transactions: [Transaction] = []
                 let group = DispatchGroup()
                 var counter = 0
-                let transactionIDs = snapshot.value as? [String: AnyObject] ?? [:]
-                for (ID, userTransactionInfo) in transactionIDs {
+                for child in snapshot.children.allObjects.reversed() {
+                    let snapshot = child as! DataSnapshot
+                    guard let userTransactionInfo = snapshot.value as? [String : AnyObject] else { return }
                     var handle = UInt.max
-                    if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
-                        self.userTransactions[ID] = userTransaction
+                    if var userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
+//                        if (userTransaction.transactionDate != nil && startDateTimeFilter <= userTransaction.transactionDate! && userTransaction.transactionDate! <= endDateTimeFilter) {
+//                            userTransaction.current = true
+//                            group.enter()
+//                            counter += 1
+//                        }
+                        
+                        userTransaction.current = true
                         group.enter()
                         counter += 1
-                        handle = ref.child(financialTransactionsEntity).child(ID).observe(.value) { snapshot in
+                        
+                        self.userTransactions[snapshot.key] = userTransaction
+                        
+                        handle = ref.child(financialTransactionsEntity).child(snapshot.key).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
                             if snapshot.exists(), let snapshotValue = snapshot.value {
-                                if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue), let userTransaction = self.userTransactions[ID] {
+                                if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue), let userTransaction = self.userTransactions[snapshot.key] {
                                     var _transaction = transaction
                                     if let value = userTransaction.description {
                                         _transaction.description = value
@@ -83,10 +96,12 @@ class FinancialTransactionFetcher: NSObject {
                                     _transaction.badge = userTransaction.badge
                                     _transaction.muted = userTransaction.muted
                                     _transaction.pinned = userTransaction.pinned
-                                    if counter > 0 {
+                                    if counter > 0, userTransaction.current ?? false {
                                         transactions.append(_transaction)
                                         group.leave()
                                         counter -= 1
+                                    } else if counter > 0 {
+                                        transactions.append(_transaction)
                                     } else {
                                         transactions = [_transaction]
                                         completion(transactions)
@@ -94,7 +109,7 @@ class FinancialTransactionFetcher: NSObject {
                                     }
                                 }
                             } else {
-                                if counter > 0 {
+                                if counter > 0, userTransaction.current ?? false {
                                     group.leave()
                                     counter -= 1
                                 }

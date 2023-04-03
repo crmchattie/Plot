@@ -118,6 +118,7 @@ class Activity: NSObject, NSCopying, Codable {
     var goalCurrentNumberSecond: NSNumber?
     var goalMetricRelationshipSecond: String?
     var goalMetricsRelationshipType: String?
+    var current: Bool?
     private var _goal: Goal?
     var goal: Goal? {
         get {

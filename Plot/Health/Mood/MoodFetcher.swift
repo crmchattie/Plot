@@ -37,7 +37,10 @@ class MoodFetcher: NSObject {
         
         var userMoods: [String: UserMood] = [:]
         
-        userMoodDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+        let endDateTimeFilter = Date().monthAfter // Replace with your desired filter value
+        let startDateTimeFilter = Date().monthBefore // Replace with your desired filter value
+        
+        userMoodDatabaseRef.queryOrdered(byChild: "moodDate").observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 moodInitialAdd([])
                 return
@@ -47,25 +50,38 @@ class MoodFetcher: NSObject {
                 var moods: [Mood] = []
                 let group = DispatchGroup()
                 var counter = 0
-                let moodIDs = snapshot.value as? [String: AnyObject] ?? [:]
-                for (ID, userMoodInfo) in moodIDs {
+                for child in snapshot.children.allObjects.reversed() {
+                    let snapshot = child as! DataSnapshot
+                    guard let userMoodInfo = snapshot.value as? [String : AnyObject] else { return }
                     var handle = UInt.max
-                    if let userMood = try? FirebaseDecoder().decode(UserMood.self, from: userMoodInfo) {
-                        userMoods[ID] = userMood
+                    if var userMood = try? FirebaseDecoder().decode(UserMood.self, from: userMoodInfo) {
+                        
+//                        if (userMood.moodDate != nil && startDateTimeFilter <= userMood.moodDate! && userMood.moodDate! <= endDateTimeFilter) {
+//                            userMood.current = true
+//                            group.enter()
+//                            counter += 1
+//                        }
+                        
+                        userMood.current = true
                         group.enter()
                         counter += 1
-                        handle = ref.child(moodEntity).child(ID).observe(.value) { snapshot in
+                        
+                        userMoods[snapshot.key] = userMood
+                        
+                        handle = ref.child(moodEntity).child(snapshot.key).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
                             if snapshot.exists(), let snapshotValue = snapshot.value {
-                                if let mood = try? FirebaseDecoder().decode(Mood.self, from: snapshotValue), let userMood = userMoods[ID] {
+                                if let mood = try? FirebaseDecoder().decode(Mood.self, from: snapshotValue), let userMood = userMoods[snapshot.key] {
                                     var _mood = mood
                                     _mood.badge = userMood.badge
                                     _mood.muted = userMood.muted
                                     _mood.pinned = userMood.pinned
-                                    if counter > 0 {
+                                    if counter > 0, userMood.current ?? false {
                                         moods.append(_mood)
                                         group.leave()
                                         counter -= 1
+                                    } else if counter > 0 {
+                                        moods.append(_mood)
                                     } else {
                                         moods = [_mood]
                                         completion(moods)
@@ -73,7 +89,7 @@ class MoodFetcher: NSObject {
                                     }
                                 }
                             } else {
-                                if counter > 0 {
+                                if counter > 0, userMood.current ?? false {
                                     group.leave()
                                     counter -= 1
                                 }

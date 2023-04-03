@@ -37,7 +37,10 @@ class WorkoutFetcher: NSObject {
         
         var userWorkouts: [String: UserWorkout] = [:]
         
-        userWorkoutsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+        let endDateTimeFilter = Date().monthAfter // Replace with your desired filter value
+        let startDateTimeFilter = Date().monthBefore // Replace with your desired filter value
+        
+        userWorkoutsDatabaseRef.queryOrdered(byChild: "startDateTime").observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 workoutsInitialAdd([])
                 return
@@ -47,27 +50,42 @@ class WorkoutFetcher: NSObject {
                 var workouts: [Workout] = []
                 let group = DispatchGroup()
                 var counter = 0
-                let workoutIDs = snapshot.value as? [String: AnyObject] ?? [:]
-                for (ID, userWorkoutInfo) in workoutIDs {
+                for child in snapshot.children.allObjects.reversed() {
+                    let snapshot = child as! DataSnapshot
+                    guard let userWorkoutInfo = snapshot.value as? [String : AnyObject] else { return }
                     var handle = UInt.max
-                    if let userWorkout = try? FirebaseDecoder().decode(UserWorkout.self, from: userWorkoutInfo) {
-                        userWorkouts[ID] = userWorkout
+                    
+                    if var userWorkout = try? FirebaseDecoder().decode(UserWorkout.self, from: userWorkoutInfo) {
+                        
+//                        if (userWorkout.startDateTime != nil && startDateTimeFilter <= userWorkout.startDateTime! && userWorkout.startDateTime! <= endDateTimeFilter) {
+//                            userWorkout.current = true
+//                            group.enter()
+//                            counter += 1
+//                        }
+                        
+                        userWorkout.current = true
                         group.enter()
                         counter += 1
-                        handle = ref.child(workoutsEntity).child(ID).observe(.value) { snapshot in
+                        
+                        userWorkouts[snapshot.key] = userWorkout
+                                                
+                        handle = ref.child(workoutsEntity).child(snapshot.key).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
                             if snapshot.exists(), let snapshotValue = snapshot.value {
-                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: snapshotValue), let userWorkout = userWorkouts[ID] {
+                                if let workout = try? FirebaseDecoder().decode(Workout.self, from: snapshotValue), let userWorkout = userWorkouts[snapshot.key] {
                                     var _workout = workout
                                     _workout.hkSampleID = userWorkout.hkSampleID
                                     _workout.totalEnergyBurned = userWorkout.totalEnergyBurned
                                     _workout.badge = userWorkout.badge
                                     _workout.muted = userWorkout.muted
                                     _workout.pinned = userWorkout.pinned
-                                    if counter > 0 {
+                                    
+                                    if counter > 0, userWorkout.current ?? false {
                                         workouts.append(_workout)
                                         group.leave()
                                         counter -= 1
+                                    } else if counter > 0 {
+                                        workouts.append(_workout)
                                     } else {
                                         workouts = [_workout]
                                         completion(workouts)
@@ -75,7 +93,7 @@ class WorkoutFetcher: NSObject {
                                     }
                                 }
                             } else {
-                                if counter > 0 {
+                                if counter > 0, userWorkout.current ?? false {
                                     group.leave()
                                     counter -= 1
                                 }
@@ -83,6 +101,7 @@ class WorkoutFetcher: NSObject {
                         }
                     }
                 }
+                
                 group.notify(queue: .main) {
                     completion(workouts)
                 }
