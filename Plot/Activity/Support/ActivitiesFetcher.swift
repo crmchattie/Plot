@@ -61,85 +61,85 @@ class ActivitiesFetcher: NSObject {
                 var activitiesWithRepeats: [Activity] = []
                 let group = DispatchGroup()
                 var counter = 0
-                let activityIDs = snapshot.value as? [String: AnyObject] ?? [:]
                 
-                for (ID, userActivityInfo) in activityIDs {
+                for child in snapshot.children.allObjects.reversed() {
+                    let snapshot = child as! DataSnapshot
+                    guard let dictionary = snapshot.value as? [String: [String : AnyObject]] else { return }
+                    let ID = snapshot.key
                     var handle = UInt.max
-                    if let dictionary = userActivityInfo as? [String: AnyObject] {
-                        let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
-                        
-                        if userActivity.recurrences != nil ||
-                            userActivity.isTask ?? false ||
-                            (userActivity.endDateTime != nil && startDateTimeFilter <= TimeInterval(truncating: userActivity.endDateTime!) && TimeInterval(truncating: userActivity.endDateTime!) <= endDateTimeFilter) ||
-                            (userActivity.completedDate != nil && startDateTimeFilter <= TimeInterval(truncating: userActivity.completedDate!) && TimeInterval(truncating: userActivity.completedDate!) <= endDateTimeFilter) {
-                            userActivity.current = true
-                            group.enter()
-                            counter += 1
-                        }
-                        
-                        self.userActivities[ID] = userActivity
-                        
-                        handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
-                            ref.removeObserver(withHandle: handle)
-                            if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = self.userActivities[ID] {
-                                let activity = Activity(dictionary: snapshotValue)
-                                activity.showExtras = userActivity.showExtras
-                                activity.calendarID = userActivity.calendarID
-                                activity.calendarName = userActivity.calendarName
-                                activity.calendarColor = userActivity.calendarColor
-                                activity.calendarSource = userActivity.calendarSource
-                                activity.calendarExport = userActivity.calendarExport
-                                activity.externalActivityID = userActivity.externalActivityID
-                                activity.userCompleted = userActivity.userCompleted
-                                activity.userCompletedDate = userActivity.userCompletedDate
-                                activity.reminder = userActivity.reminder
-                                activity.badge = userActivity.badge
-                                activity.badgeDate = userActivity.badgeDate
-                                activity.muted = userActivity.muted
-                                activity.pinned = userActivity.pinned
-                                
-                                if let rules = activity.recurrences, !rules.isEmpty {
-                                    if counter == 0 {
-                                        activities = [activity]
-                                        completion(activities)
-                                    }
-                                    self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
-                                        if counter > 0, userActivity.current ?? false {
-                                            activities.append(activity)
-                                            activitiesWithRepeats.append(contentsOf: newActivitiesWithRepeats)
-                                            group.leave()
-                                            counter -= 1
-                                        } else if counter > 0 {
-                                            activities.append(activity)
-                                            activitiesWithRepeats.append(contentsOf: newActivitiesWithRepeats)
-                                        } else {
-                                            activitiesWithRepeats = newActivitiesWithRepeats
-                                            completionRepeats(activitiesWithRepeats)
-                                            return
-                                        }
-                                    }
-                                } else {
+                    let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder])
+                    
+                    if userActivity.recurrences != nil ||
+                        userActivity.isTask ?? false ||
+                        (userActivity.endDateTime != nil && startDateTimeFilter <= TimeInterval(truncating: userActivity.endDateTime!) && TimeInterval(truncating: userActivity.endDateTime!) <= endDateTimeFilter) ||
+                        (userActivity.completedDate != nil && startDateTimeFilter <= TimeInterval(truncating: userActivity.completedDate!) && TimeInterval(truncating: userActivity.completedDate!) <= endDateTimeFilter) {
+                        userActivity.current = true
+                        group.enter()
+                        counter += 1
+                    }
+                    
+                    self.userActivities[ID] = userActivity
+                    
+                    handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
+                        ref.removeObserver(withHandle: handle)
+                        if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = self.userActivities[ID] {
+                            let activity = Activity(dictionary: snapshotValue)
+                            activity.showExtras = userActivity.showExtras
+                            activity.calendarID = userActivity.calendarID
+                            activity.calendarName = userActivity.calendarName
+                            activity.calendarColor = userActivity.calendarColor
+                            activity.calendarSource = userActivity.calendarSource
+                            activity.calendarExport = userActivity.calendarExport
+                            activity.externalActivityID = userActivity.externalActivityID
+                            activity.userCompleted = userActivity.userCompleted
+                            activity.userCompletedDate = userActivity.userCompletedDate
+                            activity.reminder = userActivity.reminder
+                            activity.badge = userActivity.badge
+                            activity.badgeDate = userActivity.badgeDate
+                            activity.muted = userActivity.muted
+                            activity.pinned = userActivity.pinned
+                            
+                            if let rules = activity.recurrences, !rules.isEmpty {
+                                if counter == 0 {
+                                    activities = [activity]
+                                    completion(activities)
+                                }
+                                self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
                                     if counter > 0, userActivity.current ?? false {
                                         activities.append(activity)
-                                        activitiesWithRepeats.append(activity)
+                                        activitiesWithRepeats.append(contentsOf: newActivitiesWithRepeats)
                                         group.leave()
                                         counter -= 1
                                     } else if counter > 0 {
                                         activities.append(activity)
-                                        activitiesWithRepeats.append(activity)
+                                        activitiesWithRepeats.append(contentsOf: newActivitiesWithRepeats)
                                     } else {
-                                        activities = [activity]
-                                        completion(activities)
-                                        activitiesWithRepeats = [activity]
+                                        activitiesWithRepeats = newActivitiesWithRepeats
                                         completionRepeats(activitiesWithRepeats)
                                         return
                                     }
                                 }
                             } else {
                                 if counter > 0, userActivity.current ?? false {
+                                    activities.append(activity)
+                                    activitiesWithRepeats.append(activity)
                                     group.leave()
                                     counter -= 1
+                                } else if counter > 0 {
+                                    activities.append(activity)
+                                    activitiesWithRepeats.append(activity)
+                                } else {
+                                    activities = [activity]
+                                    completion(activities)
+                                    activitiesWithRepeats = [activity]
+                                    completionRepeats(activitiesWithRepeats)
+                                    return
                                 }
+                            }
+                        } else {
+                            if counter > 0, userActivity.current ?? false {
+                                group.leave()
+                                counter -= 1
                             }
                         }
                     }
