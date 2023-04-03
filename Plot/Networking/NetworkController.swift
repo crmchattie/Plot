@@ -143,7 +143,6 @@ class NetworkController {
     }
     
     func checkGoals(_ completion: @escaping () -> Void) {
-        print("checkGoals")
         guard !isRunning else {
             completion()
             return
@@ -202,6 +201,7 @@ extension NetworkController {
                             userReference.observeSingleEvent(of: .value) { snapshot in
                                 if snapshot.exists() {
                                     let values: [String : Any] = ["startDateTime": activity.startDateTime as Any,
+                                                                  "endDateTime": activity.endDateTime as Any,
                                                                   "recurrences": activity.recurrences as Any,
                                                                   "isTask": activity.isTask as Any,
                                                                   "completedDate": activity.completedDate as Any]

@@ -113,7 +113,20 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        let offset = UIOffset(horizontal: -CGFloat.greatestFiniteMagnitude, vertical: 0)
+        navigationController?.navigationBar.standardAppearance.titlePositionAdjustment = offset
+        navigationController?.navigationBar.scrollEdgeAppearance?.titlePositionAdjustment = offset
+        navigationController?.navigationBar.compactAppearance?.titlePositionAdjustment = offset
+        
         managePresense()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let offset = UIOffset(horizontal: 0, vertical: 0)
+        navigationController?.navigationBar.standardAppearance.titlePositionAdjustment = offset
+        navigationController?.navigationBar.scrollEdgeAppearance?.titlePositionAdjustment = offset
+        navigationController?.navigationBar.compactAppearance?.titlePositionAdjustment = offset
     }
     
     func setupViews() {
@@ -540,11 +553,13 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                     if var details = objects as? [TransactionDetails] {
                         details = details.filter({ $0.level == transactionLevel && ($0.name == "Income" || $0.name == "Expense" || $0.name == "Net Spending" || $0.name == "Net Savings") })
                         self.financeGroups[section] = details
+                        self.transactionsDictionary = networkController.financeService.transactionsDictionary
                     }
                 } else if section == .balancesFinances {
                     if var details = objects as? [AccountDetails] {
                         details = details.filter({ $0.level == accountLevel })
                         self.financeGroups[section] = details
+                        self.accountsDictionary = networkController.financeService.accountsDictionary
                     }
                 } else if section == .transactions {
                     if objects.count < 3 {
