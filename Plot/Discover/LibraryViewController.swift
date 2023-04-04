@@ -41,11 +41,11 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     var timeCustomTypesPrompt: [CustomType] = [.timeInsights, .timeRecs, .timePlan]
     var healthCustomTypesPrompt: [CustomType] = [.healthInsights, .healthRecs, .healthPlan]
-    var financeCustomTypesPrompt: [CustomType] = [.financialInsights, .financialRecs, .financialPlan]
+    var financeCustomTypesPrompt: [CustomType] = [.financialInsights, .financialRecs, .financialPlan, .transactionsInsights]
     
     var timeCustomTypesAll: [CustomType] = [.goal, .task, .event, .timeInsights, .timeRecs, .timePlan]
     var healthCustomTypesAll: [CustomType] = [.mood, .workout, .mindfulness, .healthInsights, .healthRecs, .healthPlan]
-    var financeCustomTypesAll: [CustomType] = [.transaction, .financialAccount, .transactionRule, .financialInsights, .financialRecs, .financialPlan]
+    var financeCustomTypesAll: [CustomType] = [.transaction, .financialAccount, .transactionRule, .financialInsights, .financialRecs, .financialPlan, .transactionsInsights]
     
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()
@@ -207,8 +207,12 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
         edgesForExtendedLayout = UIRectEdge.top
         view.backgroundColor = .systemGroupedBackground
         
-        if navigationItem.leftBarButtonItem != nil {
+        if navigationItem.leftBarButtonItem != nil  {
             navigationItem.leftBarButtonItem?.action = #selector(cancel)
+        }
+        
+        if navigationItem.rightBarButtonItem != nil  {
+            navigationItem.rightBarButtonItem?.action = #selector(cancel)
         }
         
         collectionView.indicatorStyle = .default

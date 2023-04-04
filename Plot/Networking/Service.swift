@@ -1189,14 +1189,15 @@ class Service {
         }
     }
     
-    func askPrompt(prompt: String, completion: @escaping (([String: String]?), Error?) -> ()) {
+    func askPrompt(prompt: String, temperature: Double, completion: @escaping (([String: String]?), Error?) -> ()) {
         let baseURL: URL = {
             return URL(string: "https://us-central1-messenging-app-94621.cloudfunctions.net/askPrompt")!
         }()
         
         //newUser
         //oldUser
-        let parameters = ["prompt":"\(prompt)"]
+        let parameters = ["prompt":"\(prompt)",
+                          "temperature":"\(temperature)"]
         
         let currentUser = Auth.auth().currentUser
         currentUser?.getIDTokenForcingRefresh(true) { [weak self] token, error in

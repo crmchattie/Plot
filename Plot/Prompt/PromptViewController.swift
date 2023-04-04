@@ -48,7 +48,7 @@ class PromptViewController: FormViewController {
             let prompt = Prompt(question: question, networkController: networkController)
             print("prompt")
             print(prompt.prompt)
-            Service.shared.askPrompt(prompt: prompt.prompt) { json, err in
+            Service.shared.askPrompt(prompt: prompt.prompt, temperature: 0.5) { json, err in
                 print("received answer")
                 print(json)
                 print(err)

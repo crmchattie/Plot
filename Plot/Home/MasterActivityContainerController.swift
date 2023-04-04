@@ -639,8 +639,8 @@ extension MasterActivityContainerController {
         let destination = LibraryViewController(networkController: networkController)
         destination.titleString = addTitleString
         destination.sections = [.time, .health, .finances]
-        let cancelBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: destination, action: nil)
-        destination.navigationItem.leftBarButtonItem = cancelBarButton
+        let doneBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: destination, action: nil)
+        destination.navigationItem.rightBarButtonItem = doneBarButton
         destination.updateDiscoverDelegate = self
         let navigationViewController = UINavigationController(rootViewController: destination)
         self.present(navigationViewController, animated: true, completion: nil)
