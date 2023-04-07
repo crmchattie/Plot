@@ -190,6 +190,10 @@ struct AccountDetails: Codable, Equatable, Hashable {
     var type: MXAccountType?
     var bs_type: BalanceSheetType?
     var currencyCode: String?
+    var date: Date?
+    var timeSegment: TimeSegmentType?
+    var admin: String?
+    var participantsIDs: [String]?
 }
 
 extension AccountDetails {
@@ -343,10 +347,10 @@ enum MXAccountType: String, CaseIterable, Codable {
         case .cash: return .Asset
         case .insurance: return .Asset
         case .prepaid: return .Asset
-        case .loan: return .Asset
-        case .creditCard: return .Asset
-        case .lineOfCredit: return .Asset
-        case .mortgage: return .Asset
+        case .loan: return .Liability
+        case .creditCard: return .Liability
+        case .lineOfCredit: return .Liability
+        case .mortgage: return .Liability
         case .any: return .None
         }
     }

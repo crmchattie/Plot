@@ -15,7 +15,10 @@ struct Prompt {
     var networkController: NetworkController
     var timeSegment: TimeSegmentType
     var contextObjects = [AnyHashable]()
-    var prompt: String {
+    var fullPrompt: String {
+        return question.system + question.question + context
+    }
+    var partialPrompt: String {
         return question.question + context
     }
     var context: String {
@@ -117,25 +120,59 @@ struct Prompt {
                     return startDate <= date && date <= endDate
                 }.prefix(10)
             contextObjects.append(contentsOf: Array(filteredTransactions))
+        case .budgetPlan:
+            let filteredObjects = networkController.financeService.financeGroups.filter({ $0.key == .incomeStatement }).values.flatMap({ $0 })
+            for object in filteredObjects {
+                if let details = object as? TransactionDetails {
+                    contextObjects.append(details)
+                }
+            }
         }
     }
 }
 
 enum PromptQuestion: String {
-    case timeInsights = "Act as a time advisor. Could you give me insights into my time given the following: "
-    case healthInsights = "Act as a health advisor. Could you give me insights into my health given the following: "
-    case financialInsights = "Act as a financial advisor. Could you give me insights into my finances given the following: "
-    case timeRecs = "Act as a time advisor. Could give me some recommendations to better manage my time given the following: "
-    case healthRecs = "Act as a health advisor. Could give me some recommendations to better manage my health given the following: "
-    case financialRecs = "Act as a financial advisor. Could give me some recommendations to better manage my finances given the following: "
-    case timePlan = "Act as a time advisor. Could give me a plan to better manage my time given the following: "
-    case healthPlan = "Act as a health advisor. Could give me a plan to better manage my health given the following: "
-    case financialPlan = "Act as a financial advisor. Could give me a plan to better manage my finances given the following: "
-    case transactionsInsights = "Act as a financial advisor. Could you give me insights into my spending given the following: "
-    
+    case timeInsights = "Could you give me insights into my time given the following: "
+    case healthInsights = "Could you give me insights into my health given the following: "
+    case financialInsights = "Could you give me insights into my finances given the following: "
+    case timeRecs = "Could give me some recommendations to better manage my time given the following: "
+    case healthRecs = "Could give me some recommendations to better manage my health given the following: "
+    case financialRecs = "Could give me some recommendations to better manage my finances given the following: "
+    case timePlan = "Could give me a plan to better manage my time given the following: "
+    case healthPlan = "Could give me a plan to better manage my health given the following: "
+    case financialPlan = "Could give me a plan to better manage my finances given the following: "
+    case transactionsInsights = "Could you give me insights into my spending given the following: "
+    case budgetPlan = "Could you build me a budget given the following: "
     
     var question: String {
-        return rawValue
+        return self.rawValue
+    }
+    
+    var system: String {
+        switch self {
+        case .timeInsights:
+            return timeAdvisorString
+        case .healthInsights:
+            return healthAdvisorString
+        case .financialInsights:
+            return financeAdvisorString
+        case .timeRecs:
+            return timeAdvisorString
+        case .healthRecs:
+            return healthAdvisorString
+        case .financialRecs:
+            return financeAdvisorString
+        case .timePlan:
+            return timeAdvisorString
+        case .healthPlan:
+            return healthAdvisorString
+        case .financialPlan:
+            return financeAdvisorString
+        case .transactionsInsights:
+            return financeAdvisorString
+        case .budgetPlan:
+            return financeAdvisorString
+        }
     }
     
     var timeSegment: TimeSegmentType {
@@ -160,8 +197,14 @@ enum PromptQuestion: String {
             return TimeSegmentType.month
         case .transactionsInsights:
             return TimeSegmentType.month
+        case .budgetPlan:
+            return TimeSegmentType.month
         }
     }
+}
+
+enum PromptContext {
+    case events, tasks, goals, steps, sleep, heartrate, activeEnergy, workouts, mindfulness, moods, transactionDetails, accountDetails, transactions, accounts, holdings
 }
 
 let timeAdvisorString = "Act as a time advisor. "

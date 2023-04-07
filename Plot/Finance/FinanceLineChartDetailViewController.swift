@@ -342,7 +342,7 @@ extension FinanceLineChartDetailViewController: UITableViewDelegate, UITableView
     }
 }
 
-enum TimeSegmentType: Int {
+enum TimeSegmentType: Int, Codable {
     case day = 0
     case week
     case month

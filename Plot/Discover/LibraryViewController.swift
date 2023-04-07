@@ -41,11 +41,11 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     
     var timeCustomTypesPrompt: [CustomType] = [.timeInsights, .timeRecs, .timePlan]
     var healthCustomTypesPrompt: [CustomType] = [.healthInsights, .healthRecs, .healthPlan]
-    var financeCustomTypesPrompt: [CustomType] = [.financialInsights, .financialRecs, .financialPlan, .transactionsInsights]
+    var financeCustomTypesPrompt: [CustomType] = [.financialInsights, .financialRecs, .financialPlan, .transactionsInsights, .budgetPlan]
     
     var timeCustomTypesAll: [CustomType] = [.goal, .task, .event, .timeInsights, .timeRecs, .timePlan]
     var healthCustomTypesAll: [CustomType] = [.mood, .workout, .mindfulness, .healthInsights, .healthRecs, .healthPlan]
-    var financeCustomTypesAll: [CustomType] = [.transaction, .financialAccount, .transactionRule, .financialInsights, .financialRecs, .financialPlan, .transactionsInsights]
+    var financeCustomTypesAll: [CustomType] = [.transaction, .financialAccount, .transactionRule, .financialInsights, .financialRecs, .financialPlan, .transactionsInsights, .budgetPlan]
     
     var templateTypes: [CustomType] = [.healthTemplate, .mealTemplate, .workTemplate, .schoolTemplate, .socialTemplate, .leisureTemplate, .familyTemplate, .personalTemplate, .todoTemplate, .financesTemplate]
     var templatesDict = [ActivityCategory: [Template]]()

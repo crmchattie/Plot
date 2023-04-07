@@ -82,24 +82,27 @@ class MoodActions: NSObject {
         mood.participantsIDs = membersIDs.0
         mood.lastModifiedDate = Date()
                         
-        let groupMoodReference = Database.database().reference().child(moodEntity).child(ID)
-
-        do {
-            let value = try FirebaseEncoder().encode(mood)
-            groupMoodReference.setValue(value)
-        } catch let error {
-            print(error)
-        }
+//        let groupMoodReference = Database.database().reference().child(moodEntity).child(ID)
+//
+//        do {
+//            let value = try FirebaseEncoder().encode(mood)
+//            groupMoodReference.setValue(value)
+//        } catch let error {
+//            print(error)
+//        }
         
         incrementBadgeForReciever(ID: ID, participantsIDs: membersIDs.0)
         
-        if !active {
-            Analytics.logEvent("new_mood", parameters: [String: Any]())
-            dispatchGroup.enter()
-            connectMembersToGroupMood(memberIDs: membersIDs.0, ID: ID)
-        } else {
-            Analytics.logEvent("update_mood", parameters: [String: Any]())
-        }
+        dispatchGroup.enter()
+        connectMembersToGroupMood(memberIDs: membersIDs.0, ID: ID)
+        
+//        if !active {
+//            Analytics.logEvent("new_mood", parameters: [String: Any]())
+//            dispatchGroup.enter()
+//            connectMembersToGroupMood(memberIDs: membersIDs.0, ID: ID)
+//        } else {
+//            Analytics.logEvent("update_mood", parameters: [String: Any]())
+//        }
     }
     
     func updateMoodParticipants() {
@@ -155,11 +158,11 @@ class MoodActions: NSObject {
             let userReference = Database.database().reference().child(userMoodEntity).child(memberID).child(ID)
             var values = [String : Any]()
             do {
-                let value = try FirebaseEncoder().encode(mood.moodDate)
-                values = ["moodDate": value]
+                if let value = try FirebaseEncoder().encode(mood) as? [String: Any] {
+                    values = value
+                }
             } catch let error {
                 print(error)
-                values = ["isGroupMood": true]
             }
             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                 connectingMembersGroup.leave()

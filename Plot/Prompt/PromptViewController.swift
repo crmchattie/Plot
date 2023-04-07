@@ -47,12 +47,13 @@ class PromptViewController: FormViewController {
             activityIndicatorView.startAnimating()
             let prompt = Prompt(question: question, networkController: networkController)
             print("prompt")
-            print(prompt.prompt)
-            Service.shared.askPrompt(prompt: prompt.prompt, temperature: 0.5) { json, err in
+            print(question.system)
+            print(prompt.partialPrompt)
+            Service.shared.chatPrompt(systemPrompt: question.system, humanPrompt: prompt.partialPrompt, temperature: 0.5){ json, err in
                 print("received answer")
                 print(json)
                 print(err)
-                if let json = json, let answer = json["res"] {
+                if let json = json, let answer = json["text"] {
                     self.answer = answer
                 } else {
                     self.answer = "An error ocurred. Please try again later"
@@ -62,6 +63,20 @@ class PromptViewController: FormViewController {
                     self.initializeForm()
                 }
             }
+//            Service.shared.askPrompt(prompt: prompt.prompt, temperature: 0.5) { json, err in
+//                print("received answer")
+//                print(json)
+//                print(err)
+//                if let json = json, let answer = json["res"] {
+//                    self.answer = answer
+//                } else {
+//                    self.answer = "An error ocurred. Please try again later"
+//                }
+//                DispatchQueue.main.async {
+//                    activityIndicatorView.stopAnimating()
+//                    self.initializeForm()
+//                }
+//            }
         }
     }
 

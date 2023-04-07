@@ -268,7 +268,6 @@ extension NetworkController {
         })
     }
     func updateUserMood() {
-        print("updateUserMood")
         let ref = Database.database().reference()
         ref.child(moodEntity).observeSingleEvent(of: .value, with: { snapshot in
             let IDs = snapshot.value as? [String: AnyObject] ?? [:]
@@ -280,9 +279,9 @@ extension NetworkController {
                         userReference.observeSingleEvent(of: .value) { snapshot in
                             if snapshot.exists() {
                                 do {
-                                    let value = try FirebaseEncoder().encode(mood.moodDate)
-                                    let values: [String : Any] = ["moodDate": value as Any]
-                                    userReference.updateChildValues(values)
+                                    if let values = try FirebaseEncoder().encode(mood) as? [String : Any] {
+                                        userReference.updateChildValues(values)
+                                    }
                                 } catch let error {
                                     print(error)
                                 }

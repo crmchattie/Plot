@@ -290,6 +290,10 @@ struct TransactionDetails: Codable, Equatable, Hashable {
     var topLevelCategory: String?
     var group: String?
     var currencyCode: String?
+    var date: Date?
+    var timeSegment: TimeSegmentType?
+    var admin: String?
+    var participantsIDs: [String]?
 }
 
 extension TransactionDetails {

@@ -9,7 +9,7 @@
 import Foundation
 
 enum CustomType: String, Equatable, Hashable {
-    case event, task, goal, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, timeIsSetup, healthIsSetup, financesIsSetup, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour, tutorialFive, timeInsights, healthInsights, financialInsights, timeRecs, healthRecs, financialRecs, timePlan, healthPlan, financialPlan, transactionsInsights
+    case event, task, goal, lists, meal, workout, flight, transaction, financialAccount, transactionRule, sleep, work, mood, mindfulness, calendar, iOSCalendarEvent, googleCalendarEvent, iOSReminder, googleTask, investment, time, health, finances, timeIsSetup, healthIsSetup, financesIsSetup, healthTemplate, mealTemplate, workTemplate, schoolTemplate, socialTemplate, leisureTemplate, familyTemplate, personalTemplate, todoTemplate, financesTemplate, tutorialOne, tutorialTwo, tutorialThree, tutorialFour, tutorialFive, timeInsights, healthInsights, financialInsights, timeRecs, healthRecs, financialRecs, timePlan, healthPlan, financialPlan, transactionsInsights, budgetPlan
     
     var name: String {
         switch self {
@@ -61,6 +61,7 @@ enum CustomType: String, Equatable, Hashable {
         case .healthPlan: return "Plan"
         case .financialPlan: return "Plan"
         case .transactionsInsights: return "Insights"
+        case .budgetPlan: return "Budget"
         }
     }
     
@@ -107,7 +108,7 @@ enum CustomType: String, Equatable, Hashable {
         case .tutorialThree: return "Take Control of Your Health"
         case .tutorialFour: return "See Your Complete Financial Picture"
         case .tutorialFive: return "We Take Security and Your Privacy Seriously"
-        case .timeInsights, .timeRecs, .timePlan, .healthInsights, .healthRecs, .healthPlan, .financialInsights, .financialRecs, .financialPlan, .transactionsInsights: return promptString
+        case .timeInsights, .timeRecs, .timePlan, .healthInsights, .healthRecs, .healthPlan, .financialInsights, .financialRecs, .financialPlan, .transactionsInsights, .budgetPlan: return promptString
         }
     }
     
@@ -154,6 +155,7 @@ enum CustomType: String, Equatable, Hashable {
         case .healthPlan: return PromptQuestion.healthPlan.rawValue
         case .financialPlan: return PromptQuestion.financialPlan.rawValue
         case .transactionsInsights: return PromptQuestion.transactionsInsights.rawValue
+        case .budgetPlan: return PromptQuestion.budgetPlan.rawValue
         }
     }
     
@@ -200,6 +202,7 @@ enum CustomType: String, Equatable, Hashable {
         case .healthPlan: return "Plan"
         case .financialPlan: return "Plan"
         case .transactionsInsights: return "Insights"
+        case .budgetPlan: return "Plan"
         }
     }
     
@@ -250,6 +253,7 @@ enum CustomType: String, Equatable, Hashable {
         case .healthPlan: return "plan"
         case .financialPlan: return "plan"
         case .transactionsInsights: return "summary"
+        case .budgetPlan: return "plan"
         }
     }
 }
