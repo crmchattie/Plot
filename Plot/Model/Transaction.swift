@@ -250,6 +250,15 @@ struct UserTransaction: Codable, Equatable, Hashable {
     }
 }
 
+extension UserTransaction {
+    var transactionDate: Date? {
+        if let transacted_at = transacted_at, let transactionDate = isodateFormatter.date(from: transacted_at) {
+            return transactionDate
+        }
+        return nil
+    }
+}
+
 enum TransactionCatLevel: String, Codable {
     case category
     case top

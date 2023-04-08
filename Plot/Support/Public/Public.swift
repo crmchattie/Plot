@@ -254,6 +254,12 @@ let eventsDeletedMessage = "Events Deleted"
 let basicSorryTitleForAlert = "Sorry"
 let goalCannotBeUpdatedByUserMessage = "This cannot be updated since the underlying metric is from an external source"
 
+func findKeyDifference<T, U>(_ dict1: [T: U], _ dict2: [T: U]) -> Set<T> {
+    let keys1 = Set(dict1.keys)
+    let keys2 = Set(dict2.keys)
+    return keys1.symmetricDifference(keys2)
+}
+
 extension String {
     
     var digits: String {

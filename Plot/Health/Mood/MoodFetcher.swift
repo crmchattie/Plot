@@ -36,7 +36,7 @@ class MoodFetcher: NSObject {
         self.moodChanged = moodChanged
         
         var moods: [String: Mood] = [:]
-        
+                
         userMoodDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 moodInitialAdd([])
@@ -67,36 +67,6 @@ class MoodFetcher: NSObject {
                             counter -= 1
                         }
                     }
-//                    if let userMood = try? FirebaseDecoder().decode(UserMood.self, from: userMoodInfo) {
-//                        moods[ID] = userMood
-//                        group.enter()
-//                        counter += 1
-//                        handle = ref.child(moodEntity).child(ID).observe(.value) { snapshot in
-//                            ref.removeObserver(withHandle: handle)
-//                            if snapshot.exists(), let snapshotValue = snapshot.value {
-//                                if let mood = try? FirebaseDecoder().decode(Mood.self, from: snapshotValue), let userMood = moods[ID] {
-//                                    var _mood = mood
-//                                    _mood.badge = userMood.badge
-//                                    _mood.muted = userMood.muted
-//                                    _mood.pinned = userMood.pinned
-//                                    if counter > 0 {
-//                                        moods.append(_mood)
-//                                        group.leave()
-//                                        counter -= 1
-//                                    } else {
-//                                        moods = [_mood]
-//                                        completion(moods)
-//                                        return
-//                                    }
-//                                }
-//                            } else {
-//                                if counter > 0 {
-//                                    group.leave()
-//                                    counter -= 1
-//                                }
-//                            }
-//                        }
-//                    }
                 }
                 group.notify(queue: .main) {
                     completion(moodList)
@@ -135,7 +105,6 @@ class MoodFetcher: NSObject {
                 MoodFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
-        
     }
     
     class func getDataFromSnapshot(ID: String, completion: @escaping ([Mood])->()) {

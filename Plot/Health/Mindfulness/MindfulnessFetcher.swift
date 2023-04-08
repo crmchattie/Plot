@@ -22,6 +22,8 @@ class MindfulnessFetcher: NSObject {
     var mindfulnessRemoved: (([Mindfulness])->())?
     var mindfulnessChanged: (([Mindfulness])->())?
     
+    var unloadedMindfulnesses: [String: UserMindfulness] = [:]
+    
     func observeMindfulnessForCurrentUser(mindfulnessInitialAdd: @escaping ([Mindfulness])->(), mindfulnessAdded: @escaping ([Mindfulness])->(), mindfulnessRemoved: @escaping ([Mindfulness])->(), mindfulnessChanged: @escaping ([Mindfulness])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -52,6 +54,12 @@ class MindfulnessFetcher: NSObject {
                     var handle = UInt.max
                     if let userMindfulness = try? FirebaseDecoder().decode(UserMindfulness.self, from: userMindfulnessInfo) {
                         userMindfulnesses[ID] = userMindfulness
+                        
+                        guard let startDateTime = userMindfulness.startDateTime, startDateTime > Date().monthBefore.monthBefore else {
+                            self.unloadedMindfulnesses[ID] = userMindfulness
+                            continue
+                        }
+                        
                         group.enter()
                         counter += 1
                         handle = ref.child(mindfulnessEntity).child(ID).observe(.value) { snapshot in
@@ -129,6 +137,7 @@ class MindfulnessFetcher: NSObject {
         currentUserMindfulnessRemoveHandle = userMindfulnessDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.mindfulnessRemoved {
                 userMindfulnesses[snapshot.key] = nil
+                self.unloadedMindfulnesses[snapshot.key] = nil
                 MindfulnessFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
@@ -195,6 +204,28 @@ class MindfulnessFetcher: NSObject {
         })
         group.notify(queue: .main) {
             completion(mindfulness)
+        }
+    }
+    
+    func loadUnloadedMindfulness(date: Date?, completion: @escaping ([Mindfulness])->()) {
+        var mindfulnesses: [Mindfulness] = []
+        if let date = date {
+            let IDs = unloadedMindfulnesses.filter {
+                $0.value.startDateTime ?? Date.distantPast > date
+            }
+            for (ID, _) in IDs {
+                MindfulnessFetcher.getDataFromSnapshot(ID: ID) { mindfulnessList in
+                    mindfulnesses.append(contentsOf: mindfulnessList)
+                }
+            }
+            completion(mindfulnesses)
+        } else {
+            for (ID, _) in unloadedMindfulnesses {
+                MindfulnessFetcher.getDataFromSnapshot(ID: ID) { mindfulnessList in
+                    mindfulnesses.append(contentsOf: mindfulnessList)
+                }
+            }
+            completion(mindfulnesses)
         }
     }
 }

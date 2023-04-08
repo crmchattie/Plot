@@ -92,6 +92,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var selectedDate = Date().localTime
     
+    var manualScroll = false
+    
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
@@ -559,6 +561,15 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             canTransitionToSmall = false
         }
         activityView.layoutIfNeeded()
+        
+        guard !manualScroll, let visibleIndexPaths = activityView.tableView.indexPathsForVisibleRows, let indexPath = visibleIndexPaths.first else {
+            return
+        }
+
+        let activity = filteredActivities[indexPath.row]
+        if let _ = activity.startDate {
+            
+        }
     }
     
     // MARK: - FSCalendarDelegate

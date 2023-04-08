@@ -27,6 +27,8 @@ class ActivitiesFetcher: NSObject {
     var activitiesWithRepeatsChanged: (([Activity])->())?
     //activityID:Activity
     var userActivities: [String: Activity] = [:]
+    //activityID:Activity
+    var unloadedActivities: [String: Activity] = [:]
     //instanceID:Activity
     var instanceActivities: [String: Activity] = [:]
             
@@ -64,8 +66,19 @@ class ActivitiesFetcher: NSObject {
                     if let dictionary = userActivityInfo as? [String: AnyObject] {
                         let userActivity = Activity(dictionary: dictionary[messageMetaDataFirebaseFolder] as? [String : AnyObject])
                         self.userActivities[ID] = userActivity
+                        
+                        guard userActivity.recurrences != nil ||
+                            userActivity.isTask ?? false ||
+                                (userActivity.endDate ?? Date.distantPast > Date().monthBefore.monthBefore && userActivity.endDate ?? Date.distantPast < Date().monthAfter.monthAfter) ||
+                                (userActivity.completedDateDate ?? Date.distantPast > Date().monthBefore.monthBefore)
+                        else {
+                            self.unloadedActivities[ID] = userActivity
+                            continue
+                        }
+                        
                         group.enter()
                         counter += 1
+                                                
                         handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { snapshot in
                             ref.removeObserver(withHandle: handle)
                             if snapshot.exists(), let snapshotValue = snapshot.value as? [String: AnyObject], let userActivity = self.userActivities[ID] {
@@ -84,7 +97,7 @@ class ActivitiesFetcher: NSObject {
                                 activity.badgeDate = userActivity.badgeDate
                                 activity.muted = userActivity.muted
                                 activity.pinned = userActivity.pinned
-                                
+                                                                
                                 if let rules = activity.recurrences, !rules.isEmpty {
                                     if counter == 0 {
                                         activities = [activity]
@@ -159,6 +172,7 @@ class ActivitiesFetcher: NSObject {
                                     activity.badgeDate = userActivity.badgeDate
                                     activity.muted = userActivity.muted
                                     activity.pinned = userActivity.pinned
+                                    
                                     if let rules = activity.recurrences, !rules.isEmpty {
                                         completion([activity])
                                         self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
@@ -175,9 +189,11 @@ class ActivitiesFetcher: NSObject {
                 }
             }
         })
+        
         currentUserActivitiesRemoveHandle = userActivitiesDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.activitiesRemoved {
                 self.userActivities[snapshot.key] = nil
+                self.unloadedActivities[snapshot.key] = nil
                 ActivitiesFetcher.getDataFromSnapshot(ID: snapshot.key, parentID: nil, completion: completion)
             }
         })
@@ -501,6 +517,43 @@ class ActivitiesFetcher: NSObject {
         
         group.notify(queue: .main) {
             completion(activitiesDate, activitiesParent)
+        }
+    }
+    
+    func loadUnloadedActivities(date: Date?, future: Bool?, completion: @escaping ([Activity])->()) {
+        var activities: [Activity] = []
+        
+        if let date = date, let future = future {
+            if future {
+                let IDs = unloadedActivities.filter {
+                    $0.value.endDate ?? Date.distantPast > date
+                    && $0.value.endDate ?? Date.distantPast < date.monthAfter.monthAfter
+                }
+                for (ID, _) in IDs {
+                    ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activityList in
+                        activities.append(contentsOf: activityList)
+                    }
+                }
+                completion(activities)
+            } else {
+                let IDs = unloadedActivities.filter {
+                    $0.value.endDate ?? Date.distantPast > date.monthBefore.monthBefore &&
+                    $0.value.endDate ?? Date.distantPast < date
+                }
+                for (ID, _) in IDs {
+                    ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activityList in
+                        activities.append(contentsOf: activityList)
+                    }
+                }
+                completion(activities)
+            }
+        } else {
+            for (ID, _) in unloadedActivities {
+                ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activityList in
+                    activities.append(contentsOf: activityList)
+                }
+            }
+            completion(activities)
         }
     }
     

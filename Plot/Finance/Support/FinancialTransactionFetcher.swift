@@ -23,6 +23,7 @@ class FinancialTransactionFetcher: NSObject {
     var transactionsRemoved: (([Transaction])->())?
     
     var userTransactions: [String: UserTransaction] = [:]
+    var unloadedTransactions: [String: UserTransaction] = [:]
         
     func observeTransactionForCurrentUser(transactionsInitialAdd: @escaping ([Transaction])->(), transactionsAdded: @escaping ([Transaction])->(), transactionsRemoved: @escaping ([Transaction])->(), transactionsChanged: @escaping ([Transaction])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -52,6 +53,12 @@ class FinancialTransactionFetcher: NSObject {
                     var handle = UInt.max
                     if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
                         self.userTransactions[ID] = userTransaction
+                        
+                        guard let transacted_at = userTransaction.transactionDate, transacted_at > Date().monthBefore.monthBefore else {
+                            self.unloadedTransactions[ID] = userTransaction
+                            continue
+                        }
+                        
                         group.enter()
                         counter += 1
                         handle = ref.child(financialTransactionsEntity).child(ID).observe(.value) { snapshot in
@@ -158,6 +165,7 @@ class FinancialTransactionFetcher: NSObject {
         currentUserTransactionsRemoveHandle = userTransactionsDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.transactionsRemoved {
                 self.userTransactions[snapshot.key] = nil
+                self.unloadedTransactions[snapshot.key] = nil
                 FinancialTransactionFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
@@ -265,7 +273,6 @@ class FinancialTransactionFetcher: NSObject {
         let group = DispatchGroup()
         let filteredAccounts = accounts.filter({ $0.admin != currentUserID })
         for account in filteredAccounts {
-            print(account.name)
             group.enter()
             let reference = Database.database().reference()
             reference.child(financialTransactionsEntity).queryOrdered(byChild: "account_guid").queryEqual(toValue: account.guid).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -327,6 +334,28 @@ class FinancialTransactionFetcher: NSObject {
             }
         })
         group.notify(queue: .main) {
+            completion(transactions)
+        }
+    }
+    
+    func loadUnloadedTransaction(date: Date?, completion: @escaping ([Transaction])->()) {
+        var transactions: [Transaction] = []
+        if let date = date {
+            let IDs = unloadedTransactions.filter {
+                $0.value.transactionDate ?? Date.distantPast > date
+            }
+            for (ID, _) in IDs {
+                FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { transactionList in
+                    transactions.append(contentsOf: transactionList)
+                }
+            }
+            completion(transactions)
+        } else {
+            for (ID, _) in unloadedTransactions {
+                FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { transactionList in
+                    transactions.append(contentsOf: transactionList)
+                }
+            }
             completion(transactions)
         }
     }

@@ -21,6 +21,8 @@ class WorkoutFetcher: NSObject {
     var workoutsAdded: (([Workout])->())?
     var workoutsRemoved: (([Workout])->())?
     var workoutsChanged: (([Workout])->())?
+    
+    var unloadedWorkouts: [String: UserWorkout] = [:]
         
     func observeWorkoutForCurrentUser(workoutsInitialAdd: @escaping ([Workout])->(), workoutsAdded: @escaping ([Workout])->(), workoutsRemoved: @escaping ([Workout])->(), workoutsChanged: @escaping ([Workout])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -52,6 +54,12 @@ class WorkoutFetcher: NSObject {
                     var handle = UInt.max
                     if let userWorkout = try? FirebaseDecoder().decode(UserWorkout.self, from: userWorkoutInfo) {
                         userWorkouts[ID] = userWorkout
+                        
+                        guard let startDateTime = userWorkout.startDateTime, startDateTime > Date().monthBefore.monthBefore else {
+                            self.unloadedWorkouts[ID] = userWorkout
+                            continue
+                        }
+                        
                         group.enter()
                         counter += 1
                         handle = ref.child(workoutsEntity).child(ID).observe(.value) { snapshot in
@@ -131,6 +139,7 @@ class WorkoutFetcher: NSObject {
         currentUserWorkoutsRemoveHandle = userWorkoutsDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.workoutsRemoved {
                 userWorkouts[snapshot.key] = nil
+                self.unloadedWorkouts[snapshot.key] = nil
                 WorkoutFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
@@ -199,6 +208,28 @@ class WorkoutFetcher: NSObject {
             }
         })
         group.notify(queue: .main) {
+            completion(workouts)
+        }
+    }
+    
+    func loadUnloadedWorkouts(date: Date?, completion: @escaping ([Workout])->()) {
+        var workouts: [Workout] = []
+        if let date = date {
+            let IDs = unloadedWorkouts.filter {
+                $0.value.startDateTime ?? Date.distantPast > date
+            }
+            for (ID, _) in IDs {
+                WorkoutFetcher.getDataFromSnapshot(ID: ID) { workoutList in
+                    workouts.append(contentsOf: workoutList)
+                }
+            }
+            completion(workouts)
+        } else {
+            for (ID, _) in unloadedWorkouts {
+                WorkoutFetcher.getDataFromSnapshot(ID: ID) { workoutList in
+                    workouts.append(contentsOf: workoutList)
+                }
+            }
             completion(workouts)
         }
     }
