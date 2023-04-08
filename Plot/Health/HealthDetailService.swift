@@ -1126,6 +1126,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             return
         }
         
+        let maxDuration = quantityType.maximumAllowedDuration
         var customStats: [Statistic] = []
         var customSamples: [HKQuantitySample] = []
         for statistics in statsCollection {
@@ -1145,9 +1146,10 @@ class HealthDetailService: HealthDetailServiceInterface {
                 let date = statistics.startDate
                 let statistic = Statistic(date: date, value: value)
                 customStats.append(statistic)
-                
-                let customSample = HKQuantitySample(type: quantityType, quantity: HKQuantity(unit: unit, doubleValue: value), start: statistics.startDate, end: statistics.endDate)
+                let end = statistics.endDate.timeIntervalSince1970 - statistics.startDate.timeIntervalSince1970 > maxDuration ? maxDuration : statistics.endDate.timeIntervalSince1970 - statistics.startDate.timeIntervalSince1970
+                let customSample = HKQuantitySample(type: quantityType, quantity: HKQuantity(unit: unit, doubleValue: value), start: statistics.startDate, end: statistics.startDate.addingTimeInterval(end))
                 customSamples.append(customSample)
+
             }
         }
         
@@ -1160,6 +1162,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             return
         }
         
+        let maxDuration = quantityType.maximumAllowedDuration
         var stat = Statistic(date: startDate, value: 0)
         var customSamples: [HKQuantitySample] = []
         for statistics in statsCollection {
@@ -1177,8 +1180,8 @@ class HealthDetailService: HealthDetailServiceInterface {
             
             if let value = value {
                 stat.value += value
-                let customSample = HKQuantitySample(type: quantityType, quantity: HKQuantity(unit: unit, doubleValue: value), start: statistics.startDate, end: statistics.endDate)
-                customSamples.append(customSample)
+                let end = statistics.endDate.timeIntervalSince1970 - statistics.startDate.timeIntervalSince1970 > maxDuration ? maxDuration : statistics.endDate.timeIntervalSince1970 - statistics.startDate.timeIntervalSince1970
+                let customSample = HKQuantitySample(type: quantityType, quantity: HKQuantity(unit: unit, doubleValue: value), start: statistics.startDate, end: statistics.startDate.addingTimeInterval(end))
             }
         }
         
