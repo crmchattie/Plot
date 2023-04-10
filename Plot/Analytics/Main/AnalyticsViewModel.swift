@@ -199,7 +199,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.tasks, items: [self.taskDataSource.chartViewModel.value], dataSources: [self.taskDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.goals} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.tasks, items: [self.taskDataSource.chartViewModel.value], dataSources: [self.taskDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.events} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.events} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.tasks, items: [self.taskDataSource.chartViewModel.value], dataSources: [self.taskDataSource]), at: index - 1)
                 } else {
                     self.sections.insert(Section(title: AnalyticsSections.tasks, items: [self.taskDataSource.chartViewModel.value], dataSources: [self.taskDataSource]), at: 0)
@@ -223,7 +223,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.events, items: [self.eventDataSource.chartViewModel.value], dataSources: [self.eventDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.tasks} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.events, items: [self.eventDataSource.chartViewModel.value], dataSources: [self.eventDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.steps} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.steps} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.events, items: [self.eventDataSource.chartViewModel.value], dataSources: [self.eventDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.events, items: [self.eventDataSource.chartViewModel.value], dataSources: [self.eventDataSource]))
@@ -273,7 +273,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.steps, items: [self.stepsDataSource.chartViewModel.value], dataSources: [self.stepsDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.events} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.steps, items: [self.stepsDataSource.chartViewModel.value], dataSources: [self.stepsDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.sleep} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.sleep} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.steps, items: [self.stepsDataSource.chartViewModel.value], dataSources: [self.stepsDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.steps, items: [self.stepsDataSource.chartViewModel.value], dataSources: [self.stepsDataSource]))
@@ -297,7 +297,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.sleep, items: [self.sleepDataSource.chartViewModel.value], dataSources: [self.sleepDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.steps} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.sleep, items: [self.sleepDataSource.chartViewModel.value], dataSources: [self.sleepDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.activeEnergy} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.activeEnergy} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.sleep, items: [self.sleepDataSource.chartViewModel.value], dataSources: [self.sleepDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.sleep, items: [self.sleepDataSource.chartViewModel.value], dataSources: [self.sleepDataSource]))
@@ -321,7 +321,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.activeEnergy, items: [self.activeEnergyDataSource.chartViewModel.value], dataSources: [self.activeEnergyDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.sleep} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.activeEnergy, items: [self.activeEnergyDataSource.chartViewModel.value], dataSources: [self.activeEnergyDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.workouts} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.workouts} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.activeEnergy, items: [self.activeEnergyDataSource.chartViewModel.value], dataSources: [self.activeEnergyDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.activeEnergy, items: [self.activeEnergyDataSource.chartViewModel.value], dataSources: [self.activeEnergyDataSource]))
@@ -345,7 +345,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.workouts, items: [self.workoutDataSource.chartViewModel.value], dataSources: [self.workoutDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.activeEnergy} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.workouts, items: [self.workoutDataSource.chartViewModel.value], dataSources: [self.workoutDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.mood} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.mood} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.workouts, items: [self.workoutDataSource.chartViewModel.value], dataSources: [self.workoutDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.workouts, items: [self.workoutDataSource.chartViewModel.value], dataSources: [self.workoutDataSource]))
@@ -369,7 +369,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.mood, items: [self.moodsDataSource.chartViewModel.value], dataSources: [self.moodsDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.workouts} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.mood, items: [self.moodsDataSource.chartViewModel.value], dataSources: [self.moodsDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.mindfulness} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.mindfulness} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.mood, items: [self.moodsDataSource.chartViewModel.value], dataSources: [self.moodsDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.mood, items: [self.moodsDataSource.chartViewModel.value], dataSources: [self.moodsDataSource]))
@@ -393,7 +393,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.mindfulness, items: [self.mindfulnessDataSource.chartViewModel.value], dataSources: [self.mindfulnessDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.mood} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.mindfulness, items: [self.mindfulnessDataSource.chartViewModel.value], dataSources: [self.mindfulnessDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.spending} ), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.spending} ), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.mindfulness, items: [self.mindfulnessDataSource.chartViewModel.value], dataSources: [self.mindfulnessDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.mindfulness, items: [self.mindfulnessDataSource.chartViewModel.value], dataSources: [self.mindfulnessDataSource]))
@@ -417,7 +417,7 @@ class AnalyticsViewModel {
                     self.sections[index] = Section(title: AnalyticsSections.spending, items: [self.spendingDataSource.chartViewModel.value], dataSources: [self.spendingDataSource])
                 } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.mindfulness} ), self.sections.count > index {
                     self.sections.insert(Section(title: AnalyticsSections.spending, items: [self.spendingDataSource.chartViewModel.value], dataSources: [self.spendingDataSource]), at: index + 1)
-                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.netWorth}), self.sections.count > index {
+                } else if let index = self.sections.firstIndex(where: {$0.title == AnalyticsSections.netWorth}), self.sections.count > index, index > 0 {
                     self.sections.insert(Section(title: AnalyticsSections.spending, items: [self.spendingDataSource.chartViewModel.value], dataSources: [self.spendingDataSource]), at: index - 1)
                 } else {
                     self.sections.append(Section(title: AnalyticsSections.spending, items: [self.spendingDataSource.chartViewModel.value], dataSources: [self.spendingDataSource]))

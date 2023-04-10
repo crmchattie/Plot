@@ -47,7 +47,7 @@ class MoodFetcher: NSObject {
                     let group = DispatchGroup()
                     let moodIDs = snapshot.value as? [String: AnyObject] ?? [:]
                     var counter = 0
-                    var maxCounter = 8
+                    let maxCounter = 8
                     for (ID, userMoodInfo) in moodIDs.reversed() {
                         if counter < maxCounter {
                             group.enter()

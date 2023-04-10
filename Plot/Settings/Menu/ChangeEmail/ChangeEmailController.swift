@@ -19,6 +19,7 @@ class ChangeEmailController: UIViewController {
         extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = .systemGroupedBackground
         configureChangeEmailView()
+        hideKeyboardWhenTappedAround()
     }
     
     func configureChangeEmailView() {
@@ -52,7 +53,7 @@ class ChangeEmailController: UIViewController {
 }
 
 extension ChangeEmailController {
-    @objc func didTapSendSignInLink(_ sender: AnyObject) {
+    @objc func didTapSendSignInLink() {
         guard let email = changeEmailView.email.text else { return }
 
         let actionCodeSettings = ActionCodeSettings()
@@ -85,5 +86,10 @@ extension ChangeEmailController: UITextFieldDelegate {
             changeEmailView.nextView.setTitleColor(.white, for: .normal)
             changeEmailView.nextView.backgroundColor = .systemBlue
         }
+    }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        didTapSendSignInLink()
+        return false
     }
 }
