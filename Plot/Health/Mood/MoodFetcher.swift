@@ -37,41 +37,34 @@ class MoodFetcher: NSObject {
         
         var moods: [String: Mood] = [:]
                 
-        userMoodDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
+        userMoodDatabaseRef.queryOrdered(byChild: "moodDate").observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 moodInitialAdd([])
                 return
             }
             if let completion = self.moodInitialAdd {
-                var moodList: [Mood] = []
-                let group = DispatchGroup()
-                var counter = 0
-                let moodIDs = snapshot.value as? [String: AnyObject] ?? [:]
-                for (ID, userMoodInfo) in moodIDs {
-                    group.enter()
-                    counter += 1
-                    if let mood = try? FirebaseDecoder().decode(Mood.self, from: userMoodInfo) {
-                        moods[ID] = mood
-                        if counter > 0 {
-                            moodList.append(mood)
-                            group.leave()
-                            counter -= 1
-                        } else {
-                            moodList = [mood]
-                            completion(moodList)
-                            return
+                    var moodList: [Mood] = []
+                    let group = DispatchGroup()
+                    let moodIDs = snapshot.value as? [String: AnyObject] ?? [:]
+                    var counter = 0
+                    var maxCounter = 8
+                    for (ID, userMoodInfo) in moodIDs.reversed() {
+                        if counter < maxCounter {
+                            group.enter()
                         }
-                    } else {
-                        if counter > 0 {
-                            group.leave()
-                            counter -= 1
+                        if let mood = try? FirebaseDecoder().decode(Mood.self, from: userMoodInfo) {
+                            moods[ID] = mood
+                            moodList.append(mood)
+                            if counter < maxCounter {
+                                group.leave()
+                                counter += 1
+                            }
                         }
                     }
+                    group.notify(queue: .main) {
+                        completion(moodList)
+                    }
                 }
-                group.notify(queue: .main) {
-                    completion(moodList)
-                }
-            }
         })
         
         currentUserMoodAddHandle = userMoodDatabaseRef.observe(.childAdded, with: { snapshot in
