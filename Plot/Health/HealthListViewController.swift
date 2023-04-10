@@ -60,6 +60,14 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     }
     
     deinit {
+        if let _ = healthMetrics[.workoutsList] {
+            networkController.healthService.workoutFetcher.removeObservers()
+        }
+
+        // Handle mindfulness
+        if let _ = healthMetrics[.mindfulnessList] {
+            networkController.healthService.mindfulnessFetcher.removeObservers()
+        }
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -77,7 +85,13 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
             let workouts = networkController.healthService.workouts
             self.workouts.append(contentsOf: workouts)
             networkController.healthService.workoutFetcher.loadUnloadedWorkouts(date: nil) { workoutList in
-                self.workouts.append(contentsOf: workoutList)
+                for workout in workoutList {
+                    if let index = self.workouts.firstIndex(where: { $0.id == workout.id }) {
+                        self.workouts[index] = workout
+                    } else {
+                        self.workouts.append(workout)
+                    }
+                }
                 self.filteredHealthMetrics[.workoutsList] = self.workouts
                 self.filters = [.search, .workoutCategory]
                 DispatchQueue.main.async {
@@ -92,7 +106,13 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
             let mindfulnesses = networkController.healthService.mindfulnesses
             self.mindfulness.append(contentsOf: mindfulnesses)
             networkController.healthService.mindfulnessFetcher.loadUnloadedMindfulness(date: nil) { mindfulnessList in
-                self.mindfulness.append(contentsOf: mindfulnessList)
+                for mindfulness in mindfulnessList {
+                    if let index = self.mindfulness.firstIndex(where: { $0.id == mindfulness.id }) {
+                        self.mindfulness[index] = mindfulness
+                    } else {
+                        self.mindfulness.append(mindfulness)
+                    }
+                }
                 self.filteredHealthMetrics[.mindfulnessList] = self.mindfulness
                 self.filters = [.search]
                 DispatchQueue.main.async {

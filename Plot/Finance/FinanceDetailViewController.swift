@@ -82,8 +82,8 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         
-        setupData()
         setupMainView()
+        setupData()
         addObservers()
         
         if selectedIndex == 0 {
@@ -102,6 +102,10 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
     }
     
     deinit {
+        print("deinit")
+        if setSections.contains(.transactions) {
+            networkController.financeService.transactionFetcher.removeObservers()
+        }
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -135,10 +139,17 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func setupData() {
+        activityIndicatorView.startAnimating()
         if setSections.contains(.transactions) {
             transactions.append(contentsOf: networkController.financeService.transactions)
             networkController.financeService.transactionFetcher.loadUnloadedTransaction(date: nil) { transactionsList in
-                self.transactions.append(contentsOf: transactionsList)
+                for transaction in transactionsList {
+                    if let index = self.transactions.firstIndex(where: { $0.guid == transaction.guid }) {
+                        self.transactions[index] = transaction
+                    } else {
+                        self.transactions.append(transaction)
+                    }
+                }
                 let filteredTransactions = self.transactions.filter { (transaction) -> Bool in
                     if let transactionDate = transaction.transactionDate {
                         if transactionDate.localTime > self.startDate && self.endDate > transactionDate.localTime {
@@ -285,6 +296,16 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
                     filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
                         if let transactionDate = transaction.transactionDate {
                             if endDate > transactionDate {
+                                return true
+                            }
+                        }
+                        return false
+                    }
+                }
+                else {
+                    filteredTransactions = filteredTransactions.filter { (transaction) -> Bool in
+                        if let transactionDate = transaction.transactionDate {
+                            if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
                                 return true
                             }
                         }

@@ -24,6 +24,8 @@ class FinancialTransactionFetcher: NSObject {
     
     var userTransactions: [String: UserTransaction] = [:]
     var unloadedTransactions: [String: UserTransaction] = [:]
+    
+    var handles = [String: UInt]()
         
     func observeTransactionForCurrentUser(transactionsInitialAdd: @escaping ([Transaction])->(), transactionsAdded: @escaping ([Transaction])->(), transactionsRemoved: @escaping ([Transaction])->(), transactionsChanged: @escaping ([Transaction])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -264,6 +266,55 @@ class FinancialTransactionFetcher: NSObject {
         }
     }
     
+    func getDataFromSnapshotWObserver(ID: String, completion: @escaping ([Transaction])->()) {
+        let ref = Database.database().reference()
+        var handle = UInt.max
+        handle = ref.child(financialTransactionsEntity).child(ID).observe(.value) { snapshot in
+            self.handles[ID] = handle
+            if snapshot.exists(), let snapshotValue = snapshot.value {
+                if let transaction = try? FirebaseDecoder().decode(Transaction.self, from: snapshotValue), let userTransaction = self.userTransactions[ID] {
+                    var _transaction = transaction
+                    if let value = userTransaction.description {
+                        _transaction.description = value
+                    }
+                    if let value = userTransaction.group {
+                        _transaction.group = value
+                    }
+                    if let value = userTransaction.top_level_category {
+                        _transaction.top_level_category = value
+                    }
+                    if let value = userTransaction.category {
+                        _transaction.category = value
+                    }
+                    if let value = userTransaction.tags {
+                        _transaction.tags = value
+                    }
+                    if let value = userTransaction.should_link {
+                        _transaction.should_link = value
+                    }
+                    if let value = userTransaction.date_for_reports, value != "" {
+                        _transaction.date_for_reports = value
+                    }
+                    _transaction.badge = userTransaction.badge
+                    _transaction.muted = userTransaction.muted
+                    _transaction.pinned = userTransaction.pinned
+                    completion([_transaction])
+                } else {
+                    completion([])
+                }
+            } else {
+                completion([])
+            }
+        }
+    }
+    
+    func removeObservers() {
+        let ref = Database.database().reference()
+        for (ID, handle) in handles {
+            ref.child(financialTransactionsEntity).child(ID).removeObserver(withHandle: handle)
+        }
+    }
+    
     func grabTransactionsViaAccounts(accounts: [MXAccount], completion: @escaping ([Transaction])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
@@ -340,6 +391,7 @@ class FinancialTransactionFetcher: NSObject {
     
     func loadUnloadedTransaction(date: Date?, completion: @escaping ([Transaction])->()) {
         let group = DispatchGroup()
+        var counter = 0
         var transactions: [Transaction] = []
         if let date = date {
             let IDs = unloadedTransactions.filter {
@@ -347,41 +399,53 @@ class FinancialTransactionFetcher: NSObject {
             }
             for (ID, _) in IDs {
                 group.enter()
-                FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { transactionList in
-                    transactions.append(contentsOf: transactionList)
-                    group.leave()
-                }
-            }
-            transactions.sort { (transaction1, transaction2) -> Bool in
-                if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                    if let date1 = transaction1.transactionDate, let date2 = transaction2.transactionDate {
-                        return date1 > date2
+                counter += 1
+                self.getDataFromSnapshotWObserver(ID: ID) { transactionList in
+                    if counter > 0 {
+                        transactions.append(contentsOf: transactionList)
+                        group.leave()
+                        counter -= 1
+                    } else {
+                        completion(transactionList)
                     }
-                    return transaction1.description < transaction2.description
                 }
-                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
             }
             group.notify(queue: .main) {
+                transactions.sort { (transaction1, transaction2) -> Bool in
+                    if transaction1.should_link ?? true == transaction2.should_link ?? true {
+                        if let date1 = transaction1.transactionDate, let date2 = transaction2.transactionDate {
+                            return date1 > date2
+                        }
+                        return transaction1.description < transaction2.description
+                    }
+                    return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
+                }
                 completion(transactions)
             }
         } else {
             for (ID, _) in unloadedTransactions {
                 group.enter()
-                FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { transactionList in
-                    transactions.append(contentsOf: transactionList)
-                    group.leave()
-                }
-            }
-            transactions.sort { (transaction1, transaction2) -> Bool in
-                if transaction1.should_link ?? true == transaction2.should_link ?? true {
-                    if let date1 = transaction1.transactionDate, let date2 = transaction2.transactionDate {
-                        return date1 > date2
+                counter += 1
+                self.getDataFromSnapshotWObserver(ID: ID) { transactionList in
+                    if counter > 0 {
+                        transactions.append(contentsOf: transactionList)
+                        group.leave()
+                        counter -= 1
+                    } else {
+                        completion(transactionList)
                     }
-                    return transaction1.description < transaction2.description
                 }
-                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
             }
             group.notify(queue: .main) {
+                transactions.sort { (transaction1, transaction2) -> Bool in
+                    if transaction1.should_link ?? true == transaction2.should_link ?? true {
+                        if let date1 = transaction1.transactionDate, let date2 = transaction2.transactionDate {
+                            return date1 > date2
+                        }
+                        return transaction1.description < transaction2.description
+                    }
+                    return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
+                }
                 completion(transactions)
             }
         }

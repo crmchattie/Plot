@@ -61,6 +61,7 @@ class NetworkController {
         dispatchGroup.enter()
         print("grabActivities")
         activityService.grabActivities {
+            completion()
             print("done grabActivities")
             dispatchGroup.leave()
         }
@@ -78,7 +79,6 @@ class NetworkController {
         }
         
         dispatchGroup.notify(queue: .main) {
-            completion()
             print("checkGoalsForCompletion")
             self.checkGoalsForCompletion() {
                 print("done checkGoalsForCompletion")

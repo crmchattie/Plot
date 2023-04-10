@@ -135,6 +135,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     deinit {
+        networkController.activityService.activitiesFetcher.removeObservers()
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -568,27 +569,32 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             return
         }
         
-        
         let activity = filteredActivities[indexPath.row]
         if let startDate = activity.startDate {
-            print("startDate")
-            print(startDate)
             if startDate < dateLoadedPast.monthAfter {
-                print("dateLoadedPast")
-                print(dateLoadedPast)
                 dateLoadedPast = dateLoadedPast.monthBefore.monthBefore
                 networkController.activityService.activitiesFetcher.loadUnloadedActivities(date: dateLoadedPast, future: false) { activityList in
-                    self.filteredActivities.append(contentsOf: activityList)
+                    for activity in activityList {
+                        if let index = self.filteredActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
+                            self.filteredActivities[index] = activity
+                        } else {
+                            self.filteredActivities.append(activity)
+                        }
+                    }
                     DispatchQueue.main.async {
                         self.handleReloadTableAfterSearch()
                     }
                 }
             } else if startDate > dateLoadedFuture.monthBefore {
-                print("dateLoadedFuture")
-                print(dateLoadedFuture)
                 dateLoadedFuture = dateLoadedFuture.monthAfter.monthAfter
                 networkController.activityService.activitiesFetcher.loadUnloadedActivities(date: dateLoadedFuture, future: true) { activityList in
-                    self.filteredActivities.append(contentsOf: activityList)
+                    for activity in activityList {
+                        if let index = self.filteredActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
+                            self.filteredActivities[index] = activity
+                        } else {
+                            self.filteredActivities.append(activity)
+                        }
+                    }
                     DispatchQueue.main.async {
                         self.handleReloadTableAfterSearch()
                     }

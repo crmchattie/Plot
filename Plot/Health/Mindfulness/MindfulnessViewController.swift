@@ -106,6 +106,8 @@ class MindfulnessViewController: FormViewController, ObjectDetailShowing {
                         row.baseCell.isUserInteractionEnabled = false
                     }
                 }
+            } else if let section = form.first {
+                section.footer?.title = "Details of mindfulness sessions created outside of Plot cannot be edited nor deleted"
             }
             if mindfulness.hkSampleID == nil, let section = form.first  {
                 section.footer?.title = "Hit the done button in the upper right corner to add to the health app if connected"

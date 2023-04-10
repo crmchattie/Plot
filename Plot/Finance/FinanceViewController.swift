@@ -148,6 +148,9 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
         customSegmented.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
         collectionView.anchor(top: customSegmented.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 10, left: 0, bottom: 0, right: 0))
         
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
+        
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
         let filterBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(filter))
         navigationItem.rightBarButtonItems = [newItemBarButton, filterBarButton]
@@ -242,6 +245,8 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
     private func updateCollectionView() {
         var accountLevel: AccountCatLevel!
         var transactionLevel: TransactionCatLevel!
+        
+        activityIndicatorView.startAnimating()
         
         if let level = filterDictionary["financeLevel"], level[0] == "Top" {
             accountLevel = .bs_type
@@ -430,6 +435,7 @@ class FinanceViewController: UIViewController, ObjectDetailShowing {
         }
         
         DispatchQueue.main.async {
+            activityIndicatorView.stopAnimating()
             self.collectionView.reloadData()
         }
     }

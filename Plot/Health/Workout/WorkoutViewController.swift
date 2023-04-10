@@ -106,6 +106,8 @@ class WorkoutViewController: FormViewController, ObjectDetailShowing {
                         row.baseCell.isUserInteractionEnabled = true
                     }
                 }
+            } else if let section = form.first {
+                section.footer?.title = "Details of workouts created outside of Plot cannot be edited nor deleted"
             }
             if workout.hkSampleID == nil, let section = form.first  {
                 section.footer?.title = "Hit the done button in the upper right corner to add to the health app if connected"

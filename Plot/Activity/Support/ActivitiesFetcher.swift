@@ -31,6 +31,8 @@ class ActivitiesFetcher: NSObject {
     var unloadedActivities: [String: Activity] = [:]
     //instanceID:Activity
     var instanceActivities: [String: Activity] = [:]
+    
+    var handles = [String: UInt]()
             
     func observeActivityForCurrentUser(activitiesInitialAdd: @escaping ([Activity])->(), activitiesWithRepeatsInitialAdd: @escaping ([Activity])->(), activitiesAdded: @escaping ([Activity])->(), activitiesWithRepeatsAdded: @escaping ([Activity])->(), activitiesRemoved: @escaping ([Activity])->(), activitiesChanged: @escaping ([Activity])->(), activitiesWithRepeatsChanged: @escaping ([Activity])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
@@ -172,7 +174,6 @@ class ActivitiesFetcher: NSObject {
                                     activity.badgeDate = userActivity.badgeDate
                                     activity.muted = userActivity.muted
                                     activity.pinned = userActivity.pinned
-                                    
                                     if let rules = activity.recurrences, !rules.isEmpty {
                                         completion([activity])
                                         self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
@@ -291,6 +292,48 @@ class ActivitiesFetcher: NSObject {
         })
         group.notify(queue: .main) {
             completion(activities)
+        }
+    }
+    
+    func getDataFromSnapshotWObserver(ID: String, completion: @escaping ([Activity])->()) {
+        let ref = Database.database().reference()
+        
+        var handle = UInt.max
+        handle = ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).observe(.value) { activitySnapshot in
+            self.handles[ID] = handle
+            if activitySnapshot.exists(), let activitySnapshotValue = activitySnapshot.value as? [String: AnyObject], let userActivity = self.userActivities[ID] {
+                let activity = Activity(dictionary: activitySnapshotValue)
+                activity.showExtras = userActivity.showExtras
+                activity.calendarID = userActivity.calendarID
+                activity.calendarName = userActivity.calendarName
+                activity.calendarColor = userActivity.calendarColor
+                activity.calendarSource = userActivity.calendarSource
+                activity.calendarExport = userActivity.calendarExport
+                activity.externalActivityID = userActivity.externalActivityID
+                activity.userCompleted = userActivity.userCompleted
+                activity.userCompletedDate = userActivity.userCompletedDate
+                activity.reminder = userActivity.reminder
+                activity.badge = userActivity.badge
+                activity.badgeDate = userActivity.badgeDate
+                activity.muted = userActivity.muted
+                activity.pinned = userActivity.pinned
+                if let rules = activity.recurrences, !rules.isEmpty {
+                    self.addRepeatingActivities(activity: activity) { newActivitiesWithRepeats in
+                        completion(newActivitiesWithRepeats)
+                    }
+                } else {
+                    completion([activity])
+                }
+            } else {
+                completion([])
+            }
+        }
+    }
+    
+    func removeObservers() {
+        let ref = Database.database().reference()
+        for (ID, handle) in handles {
+            ref.child(activitiesEntity).child(ID).child(messageMetaDataFirebaseFolder).removeObserver(withHandle: handle)
         }
     }
     
@@ -522,6 +565,7 @@ class ActivitiesFetcher: NSObject {
     
     func loadUnloadedActivities(date: Date?, future: Bool?, completion: @escaping ([Activity])->()) {
         let group = DispatchGroup()
+        var counter = 0
         var activities: [Activity] = []
         
         if let date = date, let future = future {
@@ -532,9 +576,15 @@ class ActivitiesFetcher: NSObject {
                 }
                 for (ID, _) in IDs {
                     group.enter()
-                    ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activityList in
-                        activities.append(contentsOf: activityList)
-                        group.leave()
+                    counter += 1
+                    self.getDataFromSnapshotWObserver(ID: ID) { activityList in
+                        if counter > 0 {
+                            activities.append(contentsOf: activityList)
+                            group.leave()
+                            counter -= 1
+                        } else {
+                            completion(activityList)
+                        }
                     }
                 }
                 group.notify(queue: .main) {
@@ -547,9 +597,15 @@ class ActivitiesFetcher: NSObject {
                 }
                 for (ID, _) in IDs {
                     group.enter()
-                    ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activityList in
-                        activities.append(contentsOf: activityList)
-                        group.leave()
+                    counter += 1
+                    self.getDataFromSnapshotWObserver(ID: ID) { activityList in
+                        if counter > 0 {
+                            activities.append(contentsOf: activityList)
+                            group.leave()
+                            counter -= 1
+                        } else {
+                            completion(activityList)
+                        }
                     }
                 }
                 group.notify(queue: .main) {
@@ -559,7 +615,7 @@ class ActivitiesFetcher: NSObject {
         } else {
             for (ID, _) in unloadedActivities {
                 group.enter()
-                ActivitiesFetcher.getDataFromSnapshot(ID: ID, parentID: nil) { activityList in
+                self.getDataFromSnapshotWObserver(ID: ID) { activityList in
                     activities.append(contentsOf: activityList)
                     group.leave()
                 }
