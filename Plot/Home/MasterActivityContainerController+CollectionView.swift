@@ -167,19 +167,21 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 } else if item == .balancesFinances {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
-                } else if item == .transactions, networkController.financeService.transactions.count > 3 {
+                } else if item == .transactions, networkController.financeService.transactionFetcher.unloadedTransactions.count + networkController.financeService.transactions.count > 3 {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
                 } else if item == .generalHealth {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
-                } else if item == .workout, networkController.healthService.workouts.count > 1 {
+                } else if item == .workout, networkController.healthService.workoutFetcher.unloadedWorkouts.count +
+                    networkController.healthService.workouts.count > 1 {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
                 } else if item == .mood, networkController.healthService.moods.count > 1 {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
-                } else if item == .mindfulness, networkController.healthService.mindfulnesses.count > 1 {
+                } else if item == .mindfulness, networkController.healthService.mindfulnessFetcher.unloadedMindfulnesses.count
+                    + networkController.healthService.mindfulnesses.count > 1 {
                     cell.view.isUserInteractionEnabled = true
                     cell.subTitleLabel.isHidden = false
                 } else {
@@ -400,7 +402,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         destination.setSections = [.balanceSheet, .financialAccounts]
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
-                    } else if section == .transactions, networkController.financeService.transactions.count > 3 {
+                    } else if section == .transactions, networkController.financeService.transactionFetcher.unloadedTransactions.count + networkController.financeService.transactions.count > 3 {
                         let destination = FinanceDetailViewController(networkController: networkController)
                         destination.title = section.name
                         destination.setSections = [.transactions]
@@ -410,7 +412,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         let destination = HealthViewController(networkController: networkController)
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
-                    } else if section == .workout, networkController.healthService.workouts.count > 1 {
+                    } else if section == .workout, networkController.healthService.workoutFetcher.unloadedWorkouts.count +
+                        networkController.healthService.workouts.count > 1 {
                         let destination = HealthListViewController(networkController: networkController)
                         destination.title = HealthMetricCategory.workoutsList.name
                         destination.healthMetricSections = [HealthMetricCategory.workoutsList]
@@ -424,7 +427,8 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                         destination.healthMetrics = [HealthMetricCategory.moodList: networkController.healthService.moods]
                         destination.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(destination, animated: true)
-                    } else if section == .mindfulness, networkController.healthService.mindfulnesses.count > 1 {
+                    } else if section == .mindfulness, networkController.healthService.mindfulnessFetcher.unloadedMindfulnesses.count
+                        + networkController.healthService.mindfulnesses.count > 1 {
                         let destination = HealthListViewController(networkController: networkController)
                         destination.title = HealthMetricCategory.mindfulnessList.name
                         destination.healthMetricSections = [HealthMetricCategory.mindfulnessList]

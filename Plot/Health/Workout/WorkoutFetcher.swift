@@ -213,24 +213,39 @@ class WorkoutFetcher: NSObject {
     }
     
     func loadUnloadedWorkouts(date: Date?, completion: @escaping ([Workout])->()) {
+        let group = DispatchGroup()
         var workouts: [Workout] = []
         if let date = date {
             let IDs = unloadedWorkouts.filter {
                 $0.value.startDateTime ?? Date.distantPast > date
             }
             for (ID, _) in IDs {
+                group.enter()
                 WorkoutFetcher.getDataFromSnapshot(ID: ID) { workoutList in
                     workouts.append(contentsOf: workoutList)
+                    group.leave()
                 }
             }
-            completion(workouts)
+            workouts.sort(by: {
+                $0.startDateTime ?? Date.distantPast > $1.startDateTime ?? Date.distantPast
+            })
+            group.notify(queue: .main) {
+                completion(workouts)
+            }
         } else {
             for (ID, _) in unloadedWorkouts {
+                group.enter()
                 WorkoutFetcher.getDataFromSnapshot(ID: ID) { workoutList in
                     workouts.append(contentsOf: workoutList)
+                    group.leave()
                 }
             }
-            completion(workouts)
+            workouts.sort(by: {
+                $0.startDateTime ?? Date.distantPast > $1.startDateTime ?? Date.distantPast
+            })
+            group.notify(queue: .main) {
+                completion(workouts)
+            }
         }
     }
 }

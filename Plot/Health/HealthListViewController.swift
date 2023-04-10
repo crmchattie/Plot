@@ -22,12 +22,8 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     
     let healhKitManager = HealthKitManager()
     
-    var workouts: [Workout] {
-        return networkController.healthService.workouts
-    }
-    var mindfulness: [Mindfulness] {
-        return networkController.healthService.mindfulnesses
-    }
+    var workouts = [Workout]()
+    var mindfulness = [Mindfulness]()
     var moods: [Mood] {
         return networkController.healthService.moods
     }
@@ -57,7 +53,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
         navigationItem.largeTitleDisplayMode = .never
         collectionView.dataSource = self
         collectionView.delegate = self
-             
+        
         setupData()
         configureView()
         addObservers()
@@ -76,22 +72,43 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func setupData() {
         filteredHealthMetricSections = healthMetricSections
-        if healthMetrics[.workoutsList] != nil {
-            filteredHealthMetrics[.workoutsList] = workouts
-        } else if healthMetrics[.mindfulnessList] != nil {
-            filteredHealthMetrics[.mindfulnessList] = mindfulness
-        } else if healthMetrics[.moodList] != nil {
+        // Handle workouts
+        if let _ = healthMetrics[.workoutsList] {
+            let workouts = networkController.healthService.workouts
+            self.workouts.append(contentsOf: workouts)
+            networkController.healthService.workoutFetcher.loadUnloadedWorkouts(date: nil) { workoutList in
+                self.workouts.append(contentsOf: workoutList)
+                self.filteredHealthMetrics[.workoutsList] = self.workouts
+                self.filters = [.search, .workoutCategory]
+                DispatchQueue.main.async {
+                    activityIndicatorView.stopAnimating()
+                    self.collectionView.reloadData()
+                }
+            }
+        }
+
+        // Handle mindfulness
+        if let _ = healthMetrics[.mindfulnessList] {
+            let mindfulnesses = networkController.healthService.mindfulnesses
+            self.mindfulness.append(contentsOf: mindfulnesses)
+            networkController.healthService.mindfulnessFetcher.loadUnloadedMindfulness(date: nil) { mindfulnessList in
+                self.mindfulness.append(contentsOf: mindfulnessList)
+                self.filteredHealthMetrics[.mindfulnessList] = self.mindfulness
+                self.filters = [.search]
+                DispatchQueue.main.async {
+                    activityIndicatorView.stopAnimating()
+                    self.collectionView.reloadData()
+                }
+            }
+        }
+
+        // Handle moods
+        if let _ = healthMetrics[.moodList] {
             filteredHealthMetrics[.moodList] = moods
-        }
-        
-        if filteredHealthMetrics[.workoutsList] != nil {
-            filters = [.search, .workoutCategory]
-        } else if filteredHealthMetrics[.mindfulnessList] != nil {
-            filters = [.search]
-        }
-        
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
+            DispatchQueue.main.async {
+                activityIndicatorView.stopAnimating()
+                self.collectionView.reloadData()
+            }
         }
     }
     
@@ -116,6 +133,9 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
         ])
+        
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
         
         collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.indicatorStyle = .default

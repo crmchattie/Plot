@@ -37,9 +37,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
     var user: MXUser {
         return networkController.financeService.mxUser
     }
-    var transactions: [Transaction] {
-        return networkController.financeService.transactions
-    }
+    var transactions = [Transaction]()
     var accounts: [MXAccount] {
         return networkController.financeService.accounts
     }
@@ -60,9 +58,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
     
     let isodateFormatter = ISO8601DateFormatter()
     let dateFormatterPrint = DateFormatter()
-    
-    var hasViewAppeared = false
-    
+        
     var participants: [String: [User]] = [:]
     
     var filters: [filter] = []
@@ -86,6 +82,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)
         collectionView.register(FinanceCollectionViewMemberCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewMemberCell)
         
+        setupData()
         setupMainView()
         addObservers()
         
@@ -101,29 +98,6 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
         } else {
             startDate = Date().localTime.startOfYear
             endDate = Date().localTime.nextYear
-        }
-        
-        if setSections.contains(.transactions) {
-            let filteredTransactions = transactions.filter { (transaction) -> Bool in
-                if let transactionDate = transaction.transactionDate {
-                    if transactionDate.localTime > startDate && endDate > transactionDate.localTime {
-                        return true
-                    }
-                }
-                return false
-            }
-            self.sections.append(.transactions)
-            self.groups[.transactions] = filteredTransactions
-            filters = [.search, .financeAccount, .showPendingTransactions, .startDate, .endDate]
-            
-        } else if setSections.contains(.financialAccounts) {
-            self.sections.append(.financialAccounts)
-            self.groups[.financialAccounts] = accounts
-            filters = [.search]
-        } else if setSections.contains(.investments) {
-            self.sections.append(.investments)
-            self.groups[.investments] = holdings
-            filters = [.search, .financeAccount]
         }
     }
     
@@ -155,6 +129,49 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
 
         view.addSubview(collectionView)
         collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 0, bottom: 0, right: 0))
+        
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.centerInSuperview()
+    }
+    
+    @objc fileprivate func setupData() {
+        if setSections.contains(.transactions) {
+            transactions.append(contentsOf: networkController.financeService.transactions)
+            networkController.financeService.transactionFetcher.loadUnloadedTransaction(date: nil) { transactionsList in
+                self.transactions.append(contentsOf: transactionsList)
+                let filteredTransactions = self.transactions.filter { (transaction) -> Bool in
+                    if let transactionDate = transaction.transactionDate {
+                        if transactionDate.localTime > self.startDate && self.endDate > transactionDate.localTime {
+                            return true
+                        }
+                    }
+                    return false
+                }
+                self.sections.append(.transactions)
+                self.groups[.transactions] = filteredTransactions
+                self.filters = [.search, .financeAccount, .showPendingTransactions, .startDate, .endDate]
+                DispatchQueue.main.async {
+                    activityIndicatorView.stopAnimating()
+                    self.collectionView.reloadData()
+                }
+            }
+        } else if setSections.contains(.financialAccounts) {
+            self.sections.append(.financialAccounts)
+            self.groups[.financialAccounts] = accounts
+            filters = [.search]
+            DispatchQueue.main.async {
+                activityIndicatorView.stopAnimating()
+                self.collectionView.reloadData()
+            }
+        } else if setSections.contains(.investments) {
+            self.sections.append(.investments)
+            self.groups[.investments] = holdings
+            filters = [.search, .financeAccount]
+            DispatchQueue.main.async {
+                activityIndicatorView.stopAnimating()
+                self.collectionView.reloadData()
+            }
+        }
     }
     
     @objc fileprivate func newItem() {
@@ -199,6 +216,11 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
     private func updateCollectionView() {
         self.sections = []
         self.groups = [SectionType: [AnyHashable]]()
+        
+        DispatchQueue.main.async {
+            activityIndicatorView.startAnimating()
+            self.collectionView.reloadData()
+        }
                 
         for section in setSections {
             if section.type == "Accounts" {
@@ -293,6 +315,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
             }
         }
         DispatchQueue.main.async {
+            activityIndicatorView.stopAnimating()
             self.collectionView.reloadData()
         }
     }
@@ -300,7 +323,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
 
 extension FinanceDetailViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if sections.count == 0 {
+        if sections.count == 0, !filterDictionary.isEmpty {
             viewPlaceholder.add(for: collectionView, title: .emptySearch, subtitle: .emptySearch, priority: .medium, position: .fill)
         } else {
             viewPlaceholder.remove(from: collectionView, priority: .medium)

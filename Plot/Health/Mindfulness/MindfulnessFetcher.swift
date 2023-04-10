@@ -208,24 +208,39 @@ class MindfulnessFetcher: NSObject {
     }
     
     func loadUnloadedMindfulness(date: Date?, completion: @escaping ([Mindfulness])->()) {
+        let group = DispatchGroup()
         var mindfulnesses: [Mindfulness] = []
         if let date = date {
             let IDs = unloadedMindfulnesses.filter {
                 $0.value.startDateTime ?? Date.distantPast > date
             }
             for (ID, _) in IDs {
+                group.enter()
                 MindfulnessFetcher.getDataFromSnapshot(ID: ID) { mindfulnessList in
                     mindfulnesses.append(contentsOf: mindfulnessList)
+                    group.leave()
                 }
             }
-            completion(mindfulnesses)
+            mindfulnesses.sort(by: {
+                $0.startDateTime ?? Date.distantPast > $1.startDateTime ?? Date.distantPast
+            })
+            group.notify(queue: .main) {
+                completion(mindfulnesses)
+            }
         } else {
             for (ID, _) in unloadedMindfulnesses {
+                group.enter()
                 MindfulnessFetcher.getDataFromSnapshot(ID: ID) { mindfulnessList in
                     mindfulnesses.append(contentsOf: mindfulnessList)
+                    group.leave()
                 }
             }
-            completion(mindfulnesses)
+            mindfulnesses.sort(by: {
+                $0.startDateTime ?? Date.distantPast > $1.startDateTime ?? Date.distantPast
+            })
+            group.notify(queue: .main) {
+                completion(mindfulnesses)
+            }
         }
     }
 }

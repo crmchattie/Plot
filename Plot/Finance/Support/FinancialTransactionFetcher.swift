@@ -339,24 +339,51 @@ class FinancialTransactionFetcher: NSObject {
     }
     
     func loadUnloadedTransaction(date: Date?, completion: @escaping ([Transaction])->()) {
+        let group = DispatchGroup()
         var transactions: [Transaction] = []
         if let date = date {
             let IDs = unloadedTransactions.filter {
                 $0.value.transactionDate ?? Date.distantPast > date
             }
             for (ID, _) in IDs {
+                group.enter()
                 FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { transactionList in
                     transactions.append(contentsOf: transactionList)
+                    group.leave()
                 }
             }
-            completion(transactions)
+            transactions.sort { (transaction1, transaction2) -> Bool in
+                if transaction1.should_link ?? true == transaction2.should_link ?? true {
+                    if let date1 = transaction1.transactionDate, let date2 = transaction2.transactionDate {
+                        return date1 > date2
+                    }
+                    return transaction1.description < transaction2.description
+                }
+                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
+            }
+            group.notify(queue: .main) {
+                completion(transactions)
+            }
         } else {
             for (ID, _) in unloadedTransactions {
+                group.enter()
                 FinancialTransactionFetcher.getDataFromSnapshot(ID: ID) { transactionList in
                     transactions.append(contentsOf: transactionList)
+                    group.leave()
                 }
             }
-            completion(transactions)
+            transactions.sort { (transaction1, transaction2) -> Bool in
+                if transaction1.should_link ?? true == transaction2.should_link ?? true {
+                    if let date1 = transaction1.transactionDate, let date2 = transaction2.transactionDate {
+                        return date1 > date2
+                    }
+                    return transaction1.description < transaction2.description
+                }
+                return transaction1.should_link ?? true && !(transaction2.should_link ?? true)
+            }
+            group.notify(queue: .main) {
+                completion(transactions)
+            }
         }
     }
 }

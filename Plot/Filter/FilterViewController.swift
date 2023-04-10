@@ -254,9 +254,6 @@ class FilterViewController: FormViewController {
                     if filterDictionary["\(filter.rawValue)"] != nil, let value = filterDictionary["\(filter.rawValue)"], let date = value[0].toDate() {
                         $0.value = date
                         $0.updateCell()
-                    } else {
-                        $0.value = Date()
-                        $0.updateCell()
                     }
                 }.onExpandInlineRow { cell, row, inlineRow in
                     inlineRow.cellUpdate { (cell, row) in
