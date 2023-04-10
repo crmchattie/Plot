@@ -93,6 +93,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     var selectedDate = Date().localTime
     
     var manualScroll = false
+    var dateLoadedPast = Date().monthBefore.monthBefore
+    var dateLoadedFuture = Date().monthAfter.monthAfter
     
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -562,13 +564,36 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         activityView.layoutIfNeeded()
         
-        guard !manualScroll, let visibleIndexPaths = activityView.tableView.indexPathsForVisibleRows, let indexPath = visibleIndexPaths.first else {
+        guard let visibleIndexPaths = activityView.tableView.indexPathsForVisibleRows, let indexPath = visibleIndexPaths.first else {
             return
         }
-
+        
+        
         let activity = filteredActivities[indexPath.row]
-        if let _ = activity.startDate {
-            
+        if let startDate = activity.startDate {
+            print("startDate")
+            print(startDate)
+            if startDate < dateLoadedPast.monthAfter {
+                print("dateLoadedPast")
+                print(dateLoadedPast)
+                dateLoadedPast = dateLoadedPast.monthBefore.monthBefore
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(date: dateLoadedPast, future: false) { activityList in
+                    self.filteredActivities.append(contentsOf: activityList)
+                    DispatchQueue.main.async {
+                        self.handleReloadTableAfterSearch()
+                    }
+                }
+            } else if startDate > dateLoadedFuture.monthBefore {
+                print("dateLoadedFuture")
+                print(dateLoadedFuture)
+                dateLoadedFuture = dateLoadedFuture.monthAfter.monthAfter
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(date: dateLoadedFuture, future: true) { activityList in
+                    self.filteredActivities.append(contentsOf: activityList)
+                    DispatchQueue.main.async {
+                        self.handleReloadTableAfterSearch()
+                    }
+                }
+            }
         }
     }
     

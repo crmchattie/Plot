@@ -537,32 +537,6 @@ class ActivitiesFetcher: NSObject {
                         group.leave()
                     }
                 }
-                let currentDate = Date().localTime
-                activities.sort { (activity1, activity2) -> Bool in
-                    if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity1.isGoal ?? false), !(activity2.isGoal ?? false) {
-                        if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
-                            return startDate1 < startDate2
-                        } else if currentDate.isBetween(startDate1, and: endDate1) {
-                            return currentDate < startDate2
-                        } else if currentDate.isBetween(startDate2, and: endDate2) {
-                            return startDate1 < currentDate
-                        }
-                    } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, !(activity1.isGoal ?? false), let finalDate2 = activity2.finalDateForDisplay {
-                        if currentDate.isBetween(startDate1, and: endDate1) {
-                            return currentDate < finalDate2
-                        }
-                        return startDate1 < finalDate2
-                    } else if let finalDate1 = activity1.finalDateForDisplay, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity2.isGoal ?? false) {
-                        if currentDate.isBetween(startDate2, and: endDate2) {
-                            return finalDate1 < currentDate
-                        }
-                        return finalDate1 < startDate2
-                    }
-                    if activity1.finalDateForDisplay == activity2.finalDateForDisplay {
-                        return activity1.name ?? "" < activity2.name ?? ""
-                    }
-                    return activity1.finalDateForDisplay ?? Date.distantPast < activity2.finalDateForDisplay ?? Date.distantPast
-                }
                 group.notify(queue: .main) {
                     completion(activities)
                 }
@@ -578,32 +552,6 @@ class ActivitiesFetcher: NSObject {
                         group.leave()
                     }
                 }
-                let currentDate = Date().localTime
-                activities.sort { (activity1, activity2) -> Bool in
-                    if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity1.isGoal ?? false), !(activity2.isGoal ?? false) {
-                        if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
-                            return startDate1 < startDate2
-                        } else if currentDate.isBetween(startDate1, and: endDate1) {
-                            return currentDate < startDate2
-                        } else if currentDate.isBetween(startDate2, and: endDate2) {
-                            return startDate1 < currentDate
-                        }
-                    } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, !(activity1.isGoal ?? false), let finalDate2 = activity2.finalDateForDisplay {
-                        if currentDate.isBetween(startDate1, and: endDate1) {
-                            return currentDate < finalDate2
-                        }
-                        return startDate1 < finalDate2
-                    } else if let finalDate1 = activity1.finalDateForDisplay, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity2.isGoal ?? false) {
-                        if currentDate.isBetween(startDate2, and: endDate2) {
-                            return finalDate1 < currentDate
-                        }
-                        return finalDate1 < startDate2
-                    }
-                    if activity1.finalDateForDisplay == activity2.finalDateForDisplay {
-                        return activity1.name ?? "" < activity2.name ?? ""
-                    }
-                    return activity1.finalDateForDisplay ?? Date.distantPast < activity2.finalDateForDisplay ?? Date.distantPast
-                }
                 group.notify(queue: .main) {
                     completion(activities)
                 }
@@ -615,32 +563,6 @@ class ActivitiesFetcher: NSObject {
                     activities.append(contentsOf: activityList)
                     group.leave()
                 }
-            }
-            let currentDate = Date().localTime
-            activities.sort { (activity1, activity2) -> Bool in
-                if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity1.isGoal ?? false), !(activity2.isGoal ?? false) {
-                    if currentDate.isBetween(startDate1, and: endDate1) && currentDate.isBetween(startDate2, and: endDate2) {
-                        return startDate1 < startDate2
-                    } else if currentDate.isBetween(startDate1, and: endDate1) {
-                        return currentDate < startDate2
-                    } else if currentDate.isBetween(startDate2, and: endDate2) {
-                        return startDate1 < currentDate
-                    }
-                } else if let startDate1 = activity1.startDate, let endDate1 = activity1.endDate, !(activity1.isGoal ?? false), let finalDate2 = activity2.finalDateForDisplay {
-                    if currentDate.isBetween(startDate1, and: endDate1) {
-                        return currentDate < finalDate2
-                    }
-                    return startDate1 < finalDate2
-                } else if let finalDate1 = activity1.finalDateForDisplay, let startDate2 = activity2.startDate, let endDate2 = activity2.endDate, !(activity2.isGoal ?? false) {
-                    if currentDate.isBetween(startDate2, and: endDate2) {
-                        return finalDate1 < currentDate
-                    }
-                    return finalDate1 < startDate2
-                }
-                if activity1.finalDateForDisplay == activity2.finalDateForDisplay {
-                    return activity1.name ?? "" < activity2.name ?? ""
-                }
-                return activity1.finalDateForDisplay ?? Date.distantPast < activity2.finalDateForDisplay ?? Date.distantPast
             }
             group.notify(queue: .main) {
                 completion(activities)
