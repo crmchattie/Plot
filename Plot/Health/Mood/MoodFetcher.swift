@@ -71,7 +71,7 @@ class MoodFetcher: NSObject {
             if moods[snapshot.key] == nil {
                 if let completion = self.moodAdded {
                     let ID = snapshot.key
-                    self.getUserDataFromSnapshot(ID: ID) { moodList in
+                    MoodFetcher.getDataFromSnapshot(ID: ID) { moodList in
                         for mood in moodList {
                             moods[ID] = mood
                             completion([mood])
@@ -94,8 +94,10 @@ class MoodFetcher: NSObject {
         
         currentUserMoodRemoveHandle = userMoodDatabaseRef.observe(.childRemoved, with: { snapshot in
             if let completion = self.moodRemoved {
-                moods[snapshot.key] = nil
-                MoodFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
+                if let mood = moods[snapshot.key] {
+                    moods[snapshot.key] = nil
+                    completion([mood])
+                }
             }
         })
     }
@@ -110,56 +112,15 @@ class MoodFetcher: NSObject {
         group.enter()
         ref.child(userMoodEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists(), let userMoodInfo = snapshot.value {
-                if let userMood = try? FirebaseDecoder().decode(UserMood.self, from: userMoodInfo) {
-                    ref.child(moodEntity).child(ID).observeSingleEvent(of: .value, with: { moodSnapshot in
-                        if moodSnapshot.exists(), let moodSnapshotValue = moodSnapshot.value {
-                            if let mood = try? FirebaseDecoder().decode(Mood.self, from: moodSnapshotValue) {
-                                var _mood = mood
-                                _mood.badge = userMood.badge
-                                _mood.muted = userMood.muted
-                                _mood.pinned = userMood.pinned
-                                moodList.append(_mood)
-                            }
-                        }
-                        group.leave()
-                    })
+                if let mood = try? FirebaseDecoder().decode(Mood.self, from: userMoodInfo) {
+                    moodList.append(mood)
                 }
-            } else {
-                ref.child(moodEntity).child(ID).observeSingleEvent(of: .value, with: { moodSnapshot in
-                    if moodSnapshot.exists(), let moodSnapshotValue = moodSnapshot.value {
-                        if let mood = try? FirebaseDecoder().decode(Mood.self, from: moodSnapshotValue) {
-                            moodList.append(mood)
-                        }
-                    }
-                    group.leave()
-                })
+                group.leave()
             }
         })
         
         group.notify(queue: .main) {
             completion(moodList)
-        }
-    }
-    
-    func getUserDataFromSnapshot(ID: String, completion: @escaping ([Mood])->()) {
-        guard let currentUserID = Auth.auth().currentUser?.uid else {
-            return
-        }
-        let ref = Database.database().reference()
-        var mood: [Mood] = []
-        let group = DispatchGroup()
-        group.enter()
-        ref.child(userMoodEntity).child(currentUserID).child(ID).observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.exists(), let userMoodInfo = snapshot.value {
-                if let userMood = try? FirebaseDecoder().decode(Mood.self, from: userMoodInfo) {
-                    mood.append(userMood)
-                    group.leave()
-                }
-            }
-        })
-        
-        group.notify(queue: .main) {
-            completion(mood)
         }
     }
 }

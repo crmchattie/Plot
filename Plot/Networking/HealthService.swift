@@ -74,6 +74,7 @@ class HealthService {
     var moods: [Mood] = [] {
         didSet {
             if oldValue != moods {
+                print("oldValue != moods")
                 moods.sort(by: {
                     $0.moodDate ?? Date.distantPast > $1.moodDate ?? Date.distantPast
                 })

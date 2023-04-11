@@ -138,6 +138,7 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
         filterOff = true
         viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
+        reloadViewModel()
     }
     
     private func reloadViewModel() {

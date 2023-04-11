@@ -40,7 +40,6 @@ class WorkoutFetcher: NSObject {
         self.workoutsRemoved = workoutsRemoved
         self.workoutsChanged = workoutsChanged
         
-        
         userWorkoutsDatabaseRef.observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.exists() else {
                 workoutsInitialAdd([])
@@ -145,11 +144,9 @@ class WorkoutFetcher: NSObject {
                 WorkoutFetcher.getDataFromSnapshot(ID: snapshot.key, completion: completion)
             }
         })
-        
     }
     
 
-    
     class func getDataFromSnapshot(ID: String, completion: @escaping ([Workout])->()) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             return
