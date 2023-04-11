@@ -33,8 +33,10 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
     let titleStringPlural = "workouts"
     
     private var workouts: [Workout] = []
+    lazy var loadedWorkouts: [Workout] = networkController.healthService.workouts
     
     var dataExists: Bool?
+    var dateLoadedPast = Date().addMonths(-2)
     
     private lazy var dateFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
@@ -58,6 +60,25 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
+        let startDate = range.pastStartDate ?? range.startDate
+        if startDate < dateLoadedPast {
+            networkController.healthService.workoutFetcher.loadUnloadedWorkouts(startDate: startDate, endDate: range.endDate) { workoutList in
+                self.dateLoadedPast = startDate
+                for workout in workoutList {
+                    if let index = self.loadedWorkouts.firstIndex(where: { $0.id == workout.id }) {
+                        self.loadedWorkouts[index] = workout
+                    } else {
+                        self.loadedWorkouts.append(workout)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        }  else {
+            self.setupChart(completion: completion)
+        }
+    }
+    
+    func setupChart(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
@@ -65,7 +86,7 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
         switch chartViewModel.value.chartType {
         case .line:
             
-            healthDetailService.getSamples(for: range, segment: range.timeSegment, workouts: networkController.healthService.workouts, measure: .duration) { categoryStatsCurrent, workoutListCurrent in
+            healthDetailService.getSamples(for: range, segment: range.timeSegment, workouts: self.loadedWorkouts, measure: .duration) { categoryStatsCurrent, workoutListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
@@ -76,7 +97,7 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
-                self.healthDetailService.getSamples(for: previousRange, segment: self.range.timeSegment, workouts: self.networkController.healthService.workouts, measure: .duration) { categoryStatsPast, workoutListPast in
+                self.healthDetailService.getSamples(for: previousRange, segment: self.range.timeSegment, workouts: self.loadedWorkouts, measure: .duration) { categoryStatsPast, workoutListPast in
                     
                     self.dataExists = true
 
@@ -184,7 +205,7 @@ class WorkoutAnalyticsDataSource: AnalyticsDataSource {
         case .horizontalBar:
             break
         case .verticalBar:
-            healthDetailService.getSamples(for: range, segment: range.timeSegment, workouts: networkController.healthService.workouts, measure: .duration) { categoryStats, workoutList in
+            healthDetailService.getSamples(for: range, segment: range.timeSegment, workouts: self.loadedWorkouts, measure: .duration) { categoryStats, workoutList in
                 guard !workoutList.isEmpty else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []

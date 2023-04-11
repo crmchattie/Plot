@@ -31,6 +31,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
     let chartViewModel: CurrentValueSubject<StackedBarChartViewModel, Never>
     
     private var transactions: [Transaction] = []
+    private var loadedTransactions: [Transaction] = []
     
     var currencyFormatter: NumberFormatter = {
         let numberFormatter = NumberFormatter()
@@ -41,6 +42,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
     }()
     
     var dataExists: Bool?
+    var dateLoadedPast = Date()
     
     init(
         range: DateRange,
@@ -48,7 +50,8 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
     ) {
         self.range = range
         self.networkController = networkController
-        
+        self.loadedTransactions = networkController.financeService.transactions
+        self.dateLoadedPast = self.loadedTransactions.last?.transactionDate ?? Date().addMonths(-2)
         chartViewModel = .init(StackedBarChartViewModel(chartType: .line,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: DefaultAxisValueFormatter(formatter: currencyFormatter),
@@ -58,19 +61,36 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
+        let startDate = range.pastStartDate ?? range.startDate
+        if startDate < dateLoadedPast {
+            networkController.financeService.transactionFetcher.loadUnloadedTransaction(startDate: startDate, endDate: range.endDate) { transactionList in
+                self.dateLoadedPast = startDate
+                for transaction in transactionList {
+                    if let index = self.loadedTransactions.firstIndex(where: { $0.guid == transaction.guid }) {
+                        self.loadedTransactions[index] = transaction
+                    } else {
+                        self.loadedTransactions.append(transaction)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        }  else {
+            self.setupChart(completion: completion)
+        }
+    }
+    
+    func setupChart(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
-        
-        let networkTransactions = networkController.financeService.transactions
-                
+                        
         switch chartViewModel.value.chartType {
         case .line:
             var transactionDetails = [TransactionDetails]()
             for cat in financialTransactionsGroupsStaticSpending {
                 transactionDetails.append(TransactionDetails(name: cat, amount: 0, level: .group, group: cat))
             }
-            financeService.getSamples(financialType: .transactions, segmentType: range.timeSegment, range: range, accounts: nil, accountLevel: nil, accountDetails: nil, transactions: networkTransactions, transactionLevel: TransactionCatLevel.group, transactionDetails: transactionDetails, filterAccounts: nil) { _, _, _, transDetailsStatsCurrent, _, transactionValuesCurrent, _ in
+            financeService.getSamples(financialType: .transactions, segmentType: range.timeSegment, range: range, accounts: nil, accountLevel: nil, accountDetails: nil, transactions: loadedTransactions, transactionLevel: TransactionCatLevel.group, transactionDetails: transactionDetails, filterAccounts: nil) { _, _, _, transDetailsStatsCurrent, _, transactionValuesCurrent, _ in
                 guard let transDetailsStatsCurrent = transDetailsStatsCurrent, let transactionValuesCurrent = transactionValuesCurrent, let expenseDetailsCurrent = transDetailsStatsCurrent.keys.first(where: {$0.name == "Expense"}), let statsCurrent = transDetailsStatsCurrent[expenseDetailsCurrent], !transDetailsStatsCurrent.keys.filter( {$0.name != "Expense"}).isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
@@ -81,7 +101,7 @@ class SpendingAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
-                self.financeService.getSamples(financialType: .transactions, segmentType: self.range.timeSegment, range: previousRange, accounts: nil, accountLevel: nil, accountDetails: nil, transactions: networkTransactions, transactionLevel: TransactionCatLevel.group, transactionDetails: transactionDetails, filterAccounts: nil) { _, _, _, transDetailsStatsPast, _, transactionValuesPast, _ in
+                self.financeService.getSamples(financialType: .transactions, segmentType: self.range.timeSegment, range: previousRange, accounts: nil, accountLevel: nil, accountDetails: nil, transactions: self.loadedTransactions, transactionLevel: TransactionCatLevel.group, transactionDetails: transactionDetails, filterAccounts: nil) { _, _, _, transDetailsStatsPast, _, transactionValuesPast, _ in
                     
                     self.dataExists = true
                     

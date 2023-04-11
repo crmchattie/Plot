@@ -32,6 +32,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     let titleStringPlural = "events"
     
     private var activities: [Activity] = []
+    lazy var loadedActivities: [Activity] = networkController.activityService.events
         
     private lazy var dateFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
@@ -41,6 +42,8 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     }()
     
     var dataExists: Bool?
+    var dateLoadedPast = Date().addMonths(-2)
+    var dateLoadedFuture = Date().addMonths(2)
     
     init(
         range: DateRange,
@@ -48,7 +51,6 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     ) {
         self.networkController = networkController
         self.range = range
-        
         chartViewModel = .init(StackedBarChartViewModel(chartType: .verticalBar,
                                                         rangeDescription: getTitle(range: range),
                                                         verticalAxisValueFormatter: HourAxisValueFormatter(),
@@ -58,14 +60,47 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
+        print("loadData")
+        print(range.startDate)
+        print(range.endDate)
+        let startDate = range.pastStartDate ?? range.startDate
+        if startDate < dateLoadedPast {
+            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: dateLoadedPast) { activityList in
+                self.dateLoadedPast = startDate
+                for activity in activityList {
+                    if let index = self.loadedActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
+                        self.loadedActivities[index] = activity
+                    } else {
+                        self.loadedActivities.append(activity)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        } else if range.endDate > dateLoadedFuture {
+            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: range.endDate) { activityList in
+                self.dateLoadedFuture = self.range.endDate
+                for activity in activityList {
+                    if let index = self.loadedActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
+                        self.loadedActivities[index] = activity
+                    } else {
+                        self.loadedActivities.append(activity)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        } else {
+            self.setupChart(completion: completion)
+        }
+    }
+    
+    func setupChart(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
-        
+
         switch chartViewModel.value.chartType {
         case .line:
-            
-            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events, isEvent: true) { categoryStatsCurrent, activityListCurrent in
+            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: loadedActivities, isEvent: true) { categoryStatsCurrent, activityListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
@@ -76,13 +111,13 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
-                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.events, isEvent: true) { categoryStatsPast, activityListPast in
+                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.loadedActivities, isEvent: true) { categoryStatsPast, activityListPast in
                     
                     self.dataExists = true
                     
                     let daysInRange = self.range.daysInRange + 1
                     let startDateCurrent = self.range.startDate.startOfDay
-                    let startDatePast = self.range.pastStartDate?.startOfDay ?? startDateCurrent        
+                    let startDatePast = self.range.pastStartDate?.startOfDay ?? startDateCurrent
                     
                     self.activities = Array(Set(activityListCurrent + activityListPast))
                     
@@ -188,7 +223,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
         case .horizontalBar:
             break
         case .verticalBar:
-            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.events, isEvent: true) { categoryStats, activityList in
+            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: loadedActivities, isEvent: true) { categoryStats, activityList in
                 guard !activityList.isEmpty else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []

@@ -142,7 +142,7 @@ class FinanceDetailViewController: UIViewController, ObjectDetailShowing {
         activityIndicatorView.startAnimating()
         if setSections.contains(.transactions) {
             transactions.append(contentsOf: networkController.financeService.transactions)
-            networkController.financeService.transactionFetcher.loadUnloadedTransaction(date: nil) { transactionsList in
+            networkController.financeService.transactionFetcher.loadUnloadedTransaction(startDate: nil, endDate: nil) { transactionsList in
                 for transaction in transactionsList {
                     if let index = self.transactions.firstIndex(where: { $0.guid == transaction.guid }) {
                         self.transactions[index] = transaction

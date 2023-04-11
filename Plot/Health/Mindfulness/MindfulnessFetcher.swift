@@ -57,7 +57,7 @@ class MindfulnessFetcher: NSObject {
                     if let userMindfulness = try? FirebaseDecoder().decode(UserMindfulness.self, from: userMindfulnessInfo) {
                         self.userMindfulnesses[ID] = userMindfulness
                         
-                        guard let startDateTime = userMindfulness.startDateTime, startDateTime > Date().monthBefore.monthBefore else {
+                        guard let startDateTime = userMindfulness.startDateTime, startDateTime > Date().addMonths(-2) else {
                             self.unloadedMindfulnesses[ID] = userMindfulness
                             continue
                         }
@@ -238,13 +238,14 @@ class MindfulnessFetcher: NSObject {
         }
     }
     
-    func loadUnloadedMindfulness(date: Date?, completion: @escaping ([Mindfulness])->()) {
+    func loadUnloadedMindfulness(startDate: Date?, endDate: Date?, completion: @escaping ([Mindfulness])->()) {
         let group = DispatchGroup()
         var counter = 0
         var mindfulnesses: [Mindfulness] = []
-        if let date = date {
+        if let startDate = startDate, let endDate = endDate {
             let IDs = unloadedMindfulnesses.filter {
-                $0.value.startDateTime ?? Date.distantPast > date
+                $0.value.startDateTime ?? Date.distantPast > startDate &&
+                $0.value.startDateTime ?? Date.distantFuture < endDate
             }
             for (ID, _) in IDs {
                 group.enter()

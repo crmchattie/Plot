@@ -33,8 +33,10 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
     let titleStringPlural = "mindfulness"
     
     private var mindfulness: [Mindfulness] = []
+    lazy var loadedMindfulness: [Mindfulness] = networkController.healthService.mindfulnesses
     
     var dataExists: Bool?
+    var dateLoadedPast = Date().addMonths(-2)
     
     private lazy var dateFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
@@ -58,6 +60,25 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
+        let startDate = range.pastStartDate ?? range.startDate
+        if startDate < dateLoadedPast {
+            networkController.healthService.mindfulnessFetcher.loadUnloadedMindfulness(startDate: startDate, endDate: range.endDate) { mindfulnessList in
+                self.dateLoadedPast = startDate
+                for mindfulness in mindfulnessList {
+                    if let index = self.loadedMindfulness.firstIndex(where: { $0.id == mindfulness.id }) {
+                        self.loadedMindfulness[index] = mindfulness
+                    } else {
+                        self.loadedMindfulness.append(mindfulness)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        }  else {
+            self.setupChart(completion: completion)
+        }
+    }
+    
+    func setupChart(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
@@ -65,7 +86,7 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
         switch chartViewModel.value.chartType {
         case .line:
             
-            healthDetailService.getSamples(for: range, segment: range.timeSegment, mindfulness: networkController.healthService.mindfulnesses) { statsCurrent, mindfulnessListCurrent in
+            healthDetailService.getSamples(for: range, segment: range.timeSegment, mindfulness: loadedMindfulness) { statsCurrent, mindfulnessListCurrent in
                 guard !statsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
@@ -76,7 +97,7 @@ class MindfulnessAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
-                self.healthDetailService.getSamples(for: previousRange, segment: self.range.timeSegment, mindfulness: self.networkController.healthService.mindfulnesses) { statsPast, mindfulnessListPast in
+                self.healthDetailService.getSamples(for: previousRange, segment: self.range.timeSegment, mindfulness: self.loadedMindfulness) { statsPast, mindfulnessListPast in
                     
                     self.dataExists = true
 

@@ -71,8 +71,7 @@ class ActivitiesFetcher: NSObject {
                         
                         guard userActivity.recurrences != nil ||
                             userActivity.isTask ?? false ||
-                                (userActivity.endDate ?? Date.distantPast > Date().monthBefore.monthBefore && userActivity.endDate ?? Date.distantPast < Date().monthAfter.monthAfter) ||
-                                (userActivity.completedDateDate ?? Date.distantPast > Date().monthBefore.monthBefore)
+                                (userActivity.endDate ?? Date.distantPast > Date().addMonths(-2) && userActivity.endDate ?? Date.distantPast < Date().monthAfter.monthAfter)
                         else {
                             self.unloadedActivities[ID] = userActivity
                             continue
@@ -563,54 +562,31 @@ class ActivitiesFetcher: NSObject {
         }
     }
     
-    func loadUnloadedActivities(date: Date?, future: Bool?, completion: @escaping ([Activity])->()) {
+    func loadUnloadedActivities(startDate: Date?, endDate: Date?, completion: @escaping ([Activity])->()) {
         let group = DispatchGroup()
         var counter = 0
         var activities: [Activity] = []
         
-        if let date = date, let future = future {
-            if future {
-                let IDs = unloadedActivities.filter {
-                    $0.value.endDate ?? Date.distantPast > date
-                    && $0.value.endDate ?? Date.distantPast < date.monthAfter.monthAfter
-                }
-                for (ID, _) in IDs {
-                    group.enter()
-                    counter += 1
-                    self.getDataFromSnapshotWObserver(ID: ID) { activityList in
-                        if counter > 0 {
-                            activities.append(contentsOf: activityList)
-                            group.leave()
-                            counter -= 1
-                        } else {
-                            completion(activityList)
-                        }
+        if let startDate = startDate, let endDate = endDate {
+            let IDs = unloadedActivities.filter {
+                $0.value.endDate ?? Date.distantPast > startDate
+                && $0.value.endDate ?? Date.distantPast < endDate
+            }
+            for (ID, _) in IDs {
+                group.enter()
+                counter += 1
+                self.getDataFromSnapshotWObserver(ID: ID) { activityList in
+                    if counter > 0 {
+                        activities.append(contentsOf: activityList)
+                        group.leave()
+                        counter -= 1
+                    } else {
+                        completion(activityList)
                     }
                 }
-                group.notify(queue: .main) {
-                    completion(activities)
-                }
-            } else {
-                let IDs = unloadedActivities.filter {
-                    $0.value.endDate ?? Date.distantPast > date.monthBefore.monthBefore &&
-                    $0.value.endDate ?? Date.distantPast < date
-                }
-                for (ID, _) in IDs {
-                    group.enter()
-                    counter += 1
-                    self.getDataFromSnapshotWObserver(ID: ID) { activityList in
-                        if counter > 0 {
-                            activities.append(contentsOf: activityList)
-                            group.leave()
-                            counter -= 1
-                        } else {
-                            completion(activityList)
-                        }
-                    }
-                }
-                group.notify(queue: .main) {
-                    completion(activities)
-                }
+            }
+            group.notify(queue: .main) {
+                completion(activities)
             }
         } else {
             for (ID, _) in unloadedActivities {

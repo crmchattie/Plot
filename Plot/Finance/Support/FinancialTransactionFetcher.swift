@@ -56,7 +56,7 @@ class FinancialTransactionFetcher: NSObject {
                     if let userTransaction = try? FirebaseDecoder().decode(UserTransaction.self, from: userTransactionInfo) {
                         self.userTransactions[ID] = userTransaction
                         
-                        guard let transacted_at = userTransaction.transactionDate, transacted_at > Date().monthBefore.monthBefore else {
+                        guard let transacted_at = userTransaction.transactionDate, transacted_at > Date().addMonths(-2) else {
                             self.unloadedTransactions[ID] = userTransaction
                             continue
                         }
@@ -389,13 +389,14 @@ class FinancialTransactionFetcher: NSObject {
         }
     }
     
-    func loadUnloadedTransaction(date: Date?, completion: @escaping ([Transaction])->()) {
+    func loadUnloadedTransaction(startDate: Date?, endDate: Date?, completion: @escaping ([Transaction])->()) {
         let group = DispatchGroup()
         var counter = 0
         var transactions: [Transaction] = []
-        if let date = date {
+        if let startDate = startDate, let endDate = endDate {
             let IDs = unloadedTransactions.filter {
-                $0.value.transactionDate ?? Date.distantPast > date
+                $0.value.transactionDate ?? Date.distantPast > startDate &&
+                $0.value.transactionDate ?? Date.distantFuture < endDate
             }
             for (ID, _) in IDs {
                 group.enter()

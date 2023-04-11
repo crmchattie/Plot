@@ -93,8 +93,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     var selectedDate = Date().localTime
     
     var manualScroll = false
-    var dateLoadedPast = Date().monthBefore.monthBefore
-    var dateLoadedFuture = Date().monthAfter.monthAfter
+    var dateLoadedPast = Date().addMonths(-2)
+    var dateLoadedFuture = Date().addMonths(2)
     
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -572,8 +572,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let activity = filteredActivities[indexPath.row]
         if let startDate = activity.startDate {
             if startDate < dateLoadedPast.monthAfter {
-                dateLoadedPast = dateLoadedPast.monthBefore.monthBefore
-                networkController.activityService.activitiesFetcher.loadUnloadedActivities(date: dateLoadedPast, future: false) { activityList in
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedPast.addMonths(-2), endDate: dateLoadedPast) { activityList in
                     for activity in activityList {
                         if let index = self.filteredActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
                             self.filteredActivities[index] = activity
@@ -583,11 +582,11 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                     }
                     DispatchQueue.main.async {
                         self.handleReloadTableAfterSearch()
+                        self.dateLoadedPast = self.dateLoadedPast.addMonths(-2)
                     }
                 }
             } else if startDate > dateLoadedFuture.monthBefore {
-                dateLoadedFuture = dateLoadedFuture.monthAfter.monthAfter
-                networkController.activityService.activitiesFetcher.loadUnloadedActivities(date: dateLoadedFuture, future: true) { activityList in
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedFuture, endDate: dateLoadedFuture.addMonths(2)) { activityList in
                     for activity in activityList {
                         if let index = self.filteredActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
                             self.filteredActivities[index] = activity
@@ -597,6 +596,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                     }
                     DispatchQueue.main.async {
                         self.handleReloadTableAfterSearch()
+                        self.dateLoadedFuture = self.dateLoadedFuture.addMonths(2)
+
                     }
                 }
             }

@@ -57,7 +57,7 @@ class WorkoutFetcher: NSObject {
                     if let userWorkout = try? FirebaseDecoder().decode(UserWorkout.self, from: userWorkoutInfo) {
                         self.userWorkouts[ID] = userWorkout
                         
-                        guard let startDateTime = userWorkout.startDateTime, startDateTime > Date().monthBefore.monthBefore else {
+                        guard let startDateTime = userWorkout.startDateTime, startDateTime > Date().addMonths(-2) else {
                             self.unloadedWorkouts[ID] = userWorkout
                             continue
                         }
@@ -244,13 +244,14 @@ class WorkoutFetcher: NSObject {
         }
     }
     
-    func loadUnloadedWorkouts(date: Date?, completion: @escaping ([Workout])->()) {
+    func loadUnloadedWorkouts(startDate: Date?, endDate: Date?, completion: @escaping ([Workout])->()) {
         let group = DispatchGroup()
         var counter = 0
         var workouts: [Workout] = []
-        if let date = date {
+        if let startDate = startDate, let endDate = endDate {
             let IDs = unloadedWorkouts.filter {
-                $0.value.startDateTime ?? Date.distantPast > date
+                $0.value.startDateTime ?? Date.distantPast > startDate &&
+                $0.value.startDateTime ?? Date.distantFuture < endDate
             }
             for (ID, _) in IDs {
                 group.enter()

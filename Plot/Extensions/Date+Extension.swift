@@ -193,6 +193,10 @@ extension Date {
         return Calendar.current.date(byAdding: .day, value: days, to: self)!
     }
     
+    func addMonths(_ months: Int) -> Date {
+        return Calendar.current.date(byAdding: .month, value: months, to: self)!
+    }
+    
     func isSameDay(as date: Date) -> Bool {
         var calendar = Calendar(identifier: .gregorian)
         if let utcTimeZone = TimeZone(identifier: "UTC") {

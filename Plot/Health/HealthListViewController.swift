@@ -84,7 +84,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
         if let _ = healthMetrics[.workoutsList] {
             let workouts = networkController.healthService.workouts
             self.workouts.append(contentsOf: workouts)
-            networkController.healthService.workoutFetcher.loadUnloadedWorkouts(date: nil) { workoutList in
+            networkController.healthService.workoutFetcher.loadUnloadedWorkouts(startDate: nil, endDate: nil) { workoutList in
                 for workout in workoutList {
                     if let index = self.workouts.firstIndex(where: { $0.id == workout.id }) {
                         self.workouts[index] = workout
@@ -105,7 +105,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
         if let _ = healthMetrics[.mindfulnessList] {
             let mindfulnesses = networkController.healthService.mindfulnesses
             self.mindfulness.append(contentsOf: mindfulnesses)
-            networkController.healthService.mindfulnessFetcher.loadUnloadedMindfulness(date: nil) { mindfulnessList in
+            networkController.healthService.mindfulnessFetcher.loadUnloadedMindfulness(startDate: nil, endDate: nil) { mindfulnessList in
                 for mindfulness in mindfulnessList {
                     if let index = self.mindfulness.firstIndex(where: { $0.id == mindfulness.id }) {
                         self.mindfulness[index] = mindfulness

@@ -136,11 +136,14 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc private func rangeChanged(_ sender: UISegmentedControl) {
+        filterOff = true
+        viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
+    }
+    
+    private func reloadViewModel() {
         activityIndicator.startAnimating()
         tableView.isHidden = true
         tableView.reloadData()
-        filterOff = true
-        viewModel.range.type = DateRangeType.allCases[sender.selectedSegmentIndex]
         viewModel.updateType {
             self.activityIndicator.stopAnimating()
             self.tableView.isHidden = false
@@ -148,6 +151,10 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     }
     
     deinit {
+        networkController.activityService.activitiesFetcher.removeObservers()
+        networkController.healthService.workoutFetcher.removeObservers()
+        networkController.healthService.mindfulnessFetcher.removeObservers()
+        networkController.financeService.transactionFetcher.removeObservers()
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -161,31 +168,31 @@ class AnalyticsDetailViewController: UIViewController, ObjectDetailShowing {
     
     @objc fileprivate func goalsUpdated() {
         if navigationItem.title == "Goals" {
-            rangeChanged(rangeControlView)
+            reloadViewModel()
         }
     }
     
     @objc fileprivate func tasksUpdated() {
         if navigationItem.title == "Tasks" {
-            rangeChanged(rangeControlView)
+            reloadViewModel()
         }
     }
     
     @objc fileprivate func eventsUpdated() {
         if navigationItem.title == "Events" {
-            rangeChanged(rangeControlView)
+            reloadViewModel()
         }
     }
     
     @objc fileprivate func transactionsUpdated() {
         if navigationItem.title == "Spending" {
-            rangeChanged(rangeControlView)
+            reloadViewModel()
         }
     }
     
     @objc fileprivate func accountsUpdated() {
         if navigationItem.title == "Net Worth" {
-            rangeChanged(rangeControlView)
+            reloadViewModel()
         }
     }
 }

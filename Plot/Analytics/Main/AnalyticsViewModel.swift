@@ -17,6 +17,10 @@ class AnalyticsViewModel {
         let title: AnalyticsSections
         let items: [StackedBarChartViewModel]
         fileprivate let dataSources: [AnalyticsDataSource]
+        
+        var order: Int {
+            return title.order
+        }
     }
     
     let networkController: NetworkController
@@ -32,7 +36,11 @@ class AnalyticsViewModel {
     var spendingDataSource: AnalyticsDataSource
     var netWorthDataSource: AnalyticsDataSource
     
-    private(set) var sections: [Section] = []
+    private(set) var sections: [Section] = [] {
+        didSet {
+            return sections.sort { $0.order < $1.order }
+        }
+    }
     private let range = DateRange(type: .week)
     private var isRunning = false
     
@@ -467,4 +475,31 @@ enum AnalyticsSections: String {
     case mindfulness = "Mindfulness"
     case spending = "Spending"
     case netWorth = "Net Worth"
+    
+    var order: Int {
+        switch self {
+        case .goals:
+            return 0
+        case .tasks:
+            return 1
+        case .events:
+            return 2
+        case .steps:
+            return 3
+        case .sleep:
+            return 4
+        case .activeEnergy:
+            return 5
+        case .mood:
+            return 6
+        case .workouts:
+            return 7
+        case .mindfulness:
+            return 8
+        case .spending:
+            return 9
+        case .netWorth:
+            return 10
+        }
+    }
 }
