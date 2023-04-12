@@ -539,7 +539,10 @@ class ActivityActions: NSObject {
                                               "badge": 0,
                                               "showExtras": activity.showExtras as Any,
                                               "startDateTime": activity.startDateTime as Any,
-                                              "recurrences": activity.recurrences as Any]
+                                              "recurrences": activity.recurrences as Any,
+                                              "isTask": activity.isTask as Any,
+                                              "isGoal": activity.isGoal as Any,
+                                              "completedDate": activity.completedDate as Any]
                 userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                     connectingMembersGroup.leave()
                 })
@@ -553,8 +556,11 @@ class ActivityActions: NSObject {
                                                   "calendarSource": activity.calendarSource as Any,
                                                   "calendarColor": activity.calendarColor as Any,
                                                   "showExtras": activity.showExtras as Any,
-                                                  "startDateTime": activity.startDateTime as Any,
-                                                  "recurrences": activity.recurrences as Any]
+                                                  "endDateTime": activity.endDateTime as Any,
+                                                  "recurrences": activity.recurrences as Any,
+                                                  "isTask": activity.isTask as Any,
+                                                  "isGoal": activity.isGoal as Any,
+                                                  "completedDate": activity.completedDate as Any]
                     userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                         if let source = activity.calendarSource, source == CalendarSourceOptions.plot.name {
                             let calendarReference = Database.database().reference().child(calendarEntity).child(calendarID).child(calendarEventsEntity)
@@ -573,8 +579,11 @@ class ActivityActions: NSObject {
                                                           "calendarSource": calendar.source as Any,
                                                           "calendarColor": calendar.color as Any,
                                                           "showExtras": activity.showExtras as Any,
-                                                          "startDateTime": activity.startDateTime as Any,
-                                                          "recurrences": activity.recurrences as Any]
+                                                          "endDateTime": activity.endDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any,
+                                                          "isTask": activity.isTask as Any,
+                                                          "isGoal": activity.isGoal as Any,
+                                                          "completedDate": activity.completedDate as Any]
                             userReference.updateChildValues(values, withCompletionBlock: { (error, reference) in
                                 if let source = calendar.source, source == CalendarSourceOptions.plot.name {
                                     let calendarReference = Database.database().reference().child(calendarEntity).child(calendar.id ?? "").child(calendarEventsEntity)

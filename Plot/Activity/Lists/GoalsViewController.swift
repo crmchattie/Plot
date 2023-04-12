@@ -69,6 +69,9 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
     
     var activityDates = [String: Int]()
     
+    var dateLoadedPast = Date().addMonths(-2)
+    var dateLoadedFuture = Date().addMonths(2)
+    
     fileprivate lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
@@ -445,6 +448,43 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
             canTransitionToSmall = false
         }
         activityView.layoutIfNeeded()
+        
+        guard let visibleIndexPaths = activityView.tableView.indexPathsForVisibleRows, let indexPath = visibleIndexPaths.first else {
+            return
+        }
+        
+        let activity = filteredGoals[indexPath.row]
+        if let startDate = activity.startDate {
+            if startDate < dateLoadedPast.monthAfter {
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedPast.addMonths(-2), endDate: dateLoadedPast, isCalendar: true, isEvent: nil, isTask: nil, isGoal: nil) { activityList in
+                    for activity in activityList {
+                        if let index = self.filteredGoals.firstIndex(where: { $0.activityID == activity.activityID }) {
+                            self.filteredGoals[index] = activity
+                        } else {
+                            self.filteredGoals.append(activity)
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        self.sortandreload()
+                        self.dateLoadedPast = self.dateLoadedPast.addMonths(-2)
+                    }
+                }
+            } else if startDate > dateLoadedFuture.monthBefore {
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedFuture, endDate: dateLoadedFuture.addMonths(2), isCalendar: true, isEvent: nil, isTask: nil, isGoal: nil) { activityList in
+                    for activity in activityList {
+                        if let index = self.filteredGoals.firstIndex(where: { $0.activityID == activity.activityID }) {
+                            self.filteredGoals[index] = activity
+                        } else {
+                            self.filteredGoals.append(activity)
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        self.sortandreload()
+                        self.dateLoadedFuture = self.dateLoadedFuture.addMonths(2)
+                    }
+                }
+            }
+        }
     }
     
     // MARK: - FSCalendarDelegate

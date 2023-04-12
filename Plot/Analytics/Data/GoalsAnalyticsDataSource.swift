@@ -33,8 +33,11 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
     let titleStringPlural = "goals"
     
     private var goals: [Activity] = []
+    lazy var loadedGoals: [Activity] = networkController.activityService.goals
     
     var dataExists: Bool?
+    var dateLoadedPast = Date().addMonths(-2)
+    var dateLoadedFuture = Date().addMonths(2)
     
     private var numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -58,6 +61,37 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
+        let startDate = range.pastStartDate ?? range.startDate
+        if startDate < dateLoadedPast {
+            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: dateLoadedPast, isCalendar: nil, isEvent: nil, isTask: nil, isGoal: true) { activityList in
+                self.dateLoadedPast = startDate
+                for activity in activityList {
+                    if let index = self.loadedGoals.firstIndex(where: { $0.activityID == activity.activityID }) {
+                        self.loadedGoals[index] = activity
+                    } else {
+                        self.loadedGoals.append(activity)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        } else if range.endDate > dateLoadedFuture {
+            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: range.endDate, isCalendar: nil, isEvent: true, isTask: nil, isGoal: nil) { activityList in
+                self.dateLoadedFuture = self.range.endDate
+                for activity in activityList {
+                    if let index = self.loadedGoals.firstIndex(where: { $0.activityID == activity.activityID }) {
+                        self.loadedGoals[index] = activity
+                    } else {
+                        self.loadedGoals.append(activity)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        } else {
+            self.setupChart(completion: completion)
+        }
+    }
+    
+    func setupChart(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
@@ -65,7 +99,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
         switch chartViewModel.value.chartType {
         case .line:
             
-            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { categoryStatsCurrent, goalListCurrent in
+            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: loadedGoals, isEvent: false) { categoryStatsCurrent, goalListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
@@ -77,7 +111,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
                 }
                 
                 
-                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.goals, isEvent: false) { categoryStatsPast, goalListPast in
+                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.loadedGoals, isEvent: false) { categoryStatsPast, goalListPast in
                     
                     let daysInRange = self.range.daysInRange + 1
                     let startDateCurrent = self.range.startDate.startOfDay
@@ -188,7 +222,7 @@ class GoalAnalyticsDataSource: AnalyticsDataSource {
         case .horizontalBar:
             break
         case .verticalBar:
-            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.goals, isEvent: false) { categoryStats, goalList in
+            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: loadedGoals, isEvent: false) { categoryStats, goalList in
                 guard !goalList.isEmpty else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []

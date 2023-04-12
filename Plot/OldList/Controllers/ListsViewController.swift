@@ -174,98 +174,102 @@ class ListsViewController: UIViewController, ObjectDetailShowing {
     }
     
     func sortandreload() {
-        tasks = []
-        sections = []
-        lists = [:]
-        taskList = [:]
-        
-        if showRecurringTasks {
-            tasks = networkTasks
-        } else {
-            tasks = []
-            for task in networkTasks {
-                if !tasks.contains(where: {$0.activityID == task.activityID}) {
-                    tasks.append(task)
+        networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: nil, endDate: nil, isCalendar: nil, isEvent: nil, isTask: true, isGoal: nil) { loadedTaskList in
+            self.tasks = []
+            self.sections = []
+            self.lists = [:]
+            self.taskList = [:]
+            if self.showRecurringTasks {
+                self.tasks = self.networkTasks + loadedTaskList
+            } else {
+                for task in self.networkTasks + loadedTaskList {
+                    if !self.tasks.contains(where: {$0.activityID == task.activityID}) {
+                        self.tasks.append(task)
+                    }
                 }
             }
-        }
-        
-        var listOfLists = [ListType]()
-        
-        let flaggedTasks = tasks.filter {
-            if $0.flagged ?? false {
-                return true
+            
+            var listOfLists = [ListType]()
+            
+            let flaggedTasks = self.tasks.filter {
+                if $0.flagged ?? false {
+                    return true
+                }
+                return false
             }
-            return false
-        }
-        if !flaggedTasks.isEmpty {
-            let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
-            taskList[flaggedList] = flaggedTasks
-            listOfLists.insert(flaggedList, at: 0)
-        }
-        
-        let scheduledTasks = tasks.filter {
-            if let _ = $0.endDate {
-                return true
+            if !flaggedTasks.isEmpty {
+                let flaggedList = ListType(id: "", name: ListOptions.flaggedList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
+                self.taskList[flaggedList] = flaggedTasks
+                listOfLists.insert(flaggedList, at: 0)
             }
-            return false
-        }
-        if !scheduledTasks.isEmpty {
-            let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
-            taskList[scheduledList] = scheduledTasks
-            listOfLists.insert(scheduledList, at: 0)
-        }
-        
-        let dailyTasks = tasks.filter {
-            if let endDate = $0.endDate {
-                return NSCalendar.current.isDateInToday(endDate)
+            
+            let scheduledTasks = self.tasks.filter {
+                if let _ = $0.endDate {
+                    return true
+                }
+                return false
             }
-            return false
-        }
-        if !dailyTasks.isEmpty {
-            let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
-            taskList[dailyList] = dailyTasks
-            listOfLists.insert(dailyList, at: 0)
-        }
-        
-        if !listOfLists.isEmpty {
-            sections.append(.presetLists)
-            lists[.presetLists, default: []].append(contentsOf: listOfLists)
-        }
-        
-        listOfLists = []
-        
-        for (id, list) in networkController.activityService.listIDs {
-            let currentTaskList = tasks.filter { $0.listID == id }
-            if !currentTaskList.isEmpty {
-                listOfLists.append(list)
-                taskList[list] = currentTaskList
+            if !scheduledTasks.isEmpty {
+                let scheduledList = ListType(id: "", name: ListOptions.scheduledList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
+                self.taskList[scheduledList] = scheduledTasks
+                listOfLists.insert(scheduledList, at: 0)
             }
-        }
-        
-        if !listOfLists.isEmpty {
-            if sections.count > 0 {
-                sections.insert(.myLists, at: 1)
+            
+            let dailyTasks = self.tasks.filter {
+                if let endDate = $0.endDate {
+                    return NSCalendar.current.isDateInToday(endDate)
+                }
+                return false
+            }
+            if !dailyTasks.isEmpty {
+                let dailyList = ListType(id: "", name: ListOptions.todayList.rawValue, color: "", source: "", admin: nil, defaultList: false, financeList: false, healthList: false, goalList: false)
+                self.taskList[dailyList] = dailyTasks
+                listOfLists.insert(dailyList, at: 0)
+            }
+            
+            if !listOfLists.isEmpty {
+                self.sections.append(.presetLists)
+                self.lists[.presetLists, default: []].append(contentsOf: listOfLists)
+            }
+            
+            listOfLists = []
+            
+            for (id, list) in self.networkController.activityService.listIDs {
+                let currentTaskList = self.tasks.filter { $0.listID == id }
+                if !currentTaskList.isEmpty {
+                    listOfLists.append(list)
+                    self.taskList[list] = currentTaskList
+                }
+            }
+            
+            if !listOfLists.isEmpty {
+                if self.sections.count > 0 {
+                    self.sections.insert(.myLists, at: 1)
+                } else {
+                    self.sections.append(.myLists)
+                }
+                self.lists[.myLists, default: []].append(contentsOf: listOfLists.sorted(by: {$0.name ?? "" < $1.name ?? "" }))
+            }
+            
+            if !self.showCompletedTasks {
+                self.filteredTasks = self.tasks.filter({ !($0.isCompleted ?? false) })
             } else {
-                sections.append(.myLists)
+                self.filteredTasks = self.tasks
             }
-            lists[.myLists, default: []].append(contentsOf: listOfLists.sorted(by: {$0.name ?? "" < $1.name ?? "" }))
+            
+            self.sortTasks()
+            
+            if !self.filteredTasks.isEmpty {
+                self.sections.append(.tasks)
+            }
+                    
+            self.filteredLists = self.lists
+            
+            DispatchQueue.main.async {
+                activityIndicatorView.stopAnimating()
+                self.tableView.reloadData()
+            }
         }
-        
-        if !showCompletedTasks {
-            filteredTasks = tasks.filter({ !($0.isCompleted ?? false) })
-        } else {
-            filteredTasks = tasks
-        }
-        
-        sortTasks()
-        
-        if !filteredTasks.isEmpty {
-            sections.append(.tasks)
-        }
-                
-        filteredLists = lists
-        tableView.reloadData()
     }
     
     func openList(list: ListType) {

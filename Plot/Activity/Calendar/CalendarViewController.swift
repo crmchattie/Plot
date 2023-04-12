@@ -572,7 +572,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         let activity = filteredActivities[indexPath.row]
         if let startDate = activity.startDate {
             if startDate < dateLoadedPast.monthAfter {
-                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedPast.addMonths(-2), endDate: dateLoadedPast) { activityList in
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedPast.addMonths(-2), endDate: dateLoadedPast, isCalendar: true, isEvent: nil, isTask: nil, isGoal: nil) { activityList in
                     for activity in activityList {
                         if let index = self.filteredActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
                             self.filteredActivities[index] = activity
@@ -586,7 +586,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
                     }
                 }
             } else if startDate > dateLoadedFuture.monthBefore {
-                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedFuture, endDate: dateLoadedFuture.addMonths(2)) { activityList in
+                networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: dateLoadedFuture, endDate: dateLoadedFuture.addMonths(2), isCalendar: true, isEvent: nil, isTask: nil, isGoal: nil) { activityList in
                     for activity in activityList {
                         if let index = self.filteredActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
                             self.filteredActivities[index] = activity

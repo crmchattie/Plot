@@ -70,7 +70,7 @@ class ActivitiesFetcher: NSObject {
                         self.userActivities[ID] = userActivity
                         
                         guard userActivity.recurrences != nil ||
-                            userActivity.isTask ?? false ||
+                                (userActivity.isTask ?? false && userActivity.endDate == nil) ||
                                 (userActivity.endDate ?? Date.distantPast > Date().addMonths(-2) && userActivity.endDate ?? Date.distantPast < Date().monthAfter.monthAfter)
                         else {
                             self.unloadedActivities[ID] = userActivity
@@ -562,15 +562,30 @@ class ActivitiesFetcher: NSObject {
         }
     }
     
-    func loadUnloadedActivities(startDate: Date?, endDate: Date?, completion: @escaping ([Activity])->()) {
+    func loadUnloadedActivities(startDate: Date?, endDate: Date?, isCalendar: Bool?, isEvent: Bool?, isTask: Bool?, isGoal: Bool?, completion: @escaping ([Activity])->()) {
         let group = DispatchGroup()
         var counter = 0
         var activities: [Activity] = []
         
         if let startDate = startDate, let endDate = endDate {
             let IDs = unloadedActivities.filter {
-                $0.value.endDate ?? Date.distantPast > startDate
-                && $0.value.endDate ?? Date.distantPast < endDate
+                // Filter by end date
+                let activityEndDate = $0.value.endDate ?? Date.distantPast
+                let isEndDateInRange = activityEndDate > startDate && endDate < activityEndDate
+                
+                // Filter by isCalendar
+                let isCalendarMatch = isCalendar == nil || isCalendar == !($0.value.isGoal ?? false)
+                
+                // Filter by isEvent
+                let isEvent = isEvent == nil || isEvent == (!($0.value.isTask ?? false) && !($0.value.isGoal ?? false))
+                
+                // Filter by isTask
+                let isTaskMatch = isTask == nil || isTask == $0.value.isTask
+                
+                // Filter by isGoal
+                let isGoalMatch = isGoal == nil || isGoal == $0.value.isGoal
+                
+                return isEndDateInRange && isCalendarMatch && isTaskMatch && isGoalMatch
             }
             for (ID, _) in IDs {
                 group.enter()
@@ -589,7 +604,22 @@ class ActivitiesFetcher: NSObject {
                 completion(activities)
             }
         } else {
-            for (ID, _) in unloadedActivities {
+            let IDs = unloadedActivities.filter {
+                // Filter by isCalendar
+                let isCalendarMatch = isCalendar == nil || isCalendar == !($0.value.isGoal ?? false)
+                
+                // Filter by isEvent
+                let isEvent = isEvent == nil || isEvent == (!($0.value.isTask ?? false) && !($0.value.isGoal ?? false))
+                
+                // Filter by isTask
+                let isTaskMatch = isTask == nil || isTask == $0.value.isTask
+                
+                // Filter by isGoal
+                let isGoalMatch = isGoal == nil || isGoal == $0.value.isGoal
+                
+                return isCalendarMatch && isTaskMatch && isGoalMatch
+            }
+            for (ID, _) in IDs {
                 group.enter()
                 self.getDataFromSnapshotWObserver(ID: ID) { activityList in
                     activities.append(contentsOf: activityList)

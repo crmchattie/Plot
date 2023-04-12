@@ -200,10 +200,11 @@ extension NetworkController {
                             let userReference = Database.database().reference().child(userActivitiesEntity).child(memberID).child(ID).child(messageMetaDataFirebaseFolder)
                             userReference.observeSingleEvent(of: .value) { snapshot in
                                 if snapshot.exists() {
-                                    let values: [String : Any] = ["startDateTime": activity.startDateTime as Any,
-                                                                  "endDateTime": activity.endDateTime as Any,
+                                    print("adding values")
+                                    let values: [String : Any] = ["endDateTime": activity.endDateTime as Any,
                                                                   "recurrences": activity.recurrences as Any,
                                                                   "isTask": activity.isTask as Any,
+                                                                  "isGoal": activity.isGoal as Any,
                                                                   "completedDate": activity.completedDate as Any]
                                     userReference.updateChildValues(values)
                                 }

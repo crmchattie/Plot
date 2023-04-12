@@ -60,12 +60,9 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
-        print("loadData")
-        print(range.startDate)
-        print(range.endDate)
         let startDate = range.pastStartDate ?? range.startDate
         if startDate < dateLoadedPast {
-            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: dateLoadedPast) { activityList in
+            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: dateLoadedPast, isCalendar: nil, isEvent: true, isTask: nil, isGoal: nil) { activityList in
                 self.dateLoadedPast = startDate
                 for activity in activityList {
                     if let index = self.loadedActivities.firstIndex(where: { $0.activityID == activity.activityID }) {
@@ -77,7 +74,7 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
                 self.setupChart(completion: completion)
             }
         } else if range.endDate > dateLoadedFuture {
-            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: range.endDate) { activityList in
+            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: range.endDate, isCalendar: nil, isEvent: true, isTask: nil, isGoal: nil) { activityList in
                 self.dateLoadedFuture = self.range.endDate
                 for activity in activityList {
                     if let index = self.loadedActivities.firstIndex(where: { $0.activityID == activity.activityID }) {

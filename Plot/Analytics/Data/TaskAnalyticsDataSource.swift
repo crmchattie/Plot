@@ -32,8 +32,10 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
     let titleStringPlural = "tasks"
     
     private var tasks: [Activity] = []
+    lazy var loadedTasks: [Activity] = networkController.activityService.tasks
     
     var dataExists: Bool?
+    var dateLoadedPast = Date().addMonths(-2)
     
     private var numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -57,6 +59,25 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
+        let startDate = range.pastStartDate ?? range.startDate
+        if startDate < dateLoadedPast {
+            networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: dateLoadedPast, isCalendar: nil, isEvent: nil, isTask: true, isGoal: nil) { activityList in
+                self.dateLoadedPast = startDate
+                for activity in activityList {
+                    if let index = self.loadedTasks.firstIndex(where: { $0.activityID == activity.activityID }) {
+                        self.loadedTasks[index] = activity
+                    } else {
+                        self.loadedTasks.append(activity)
+                    }
+                }
+                self.setupChart(completion: completion)
+            }
+        } else {
+            self.setupChart(completion: completion)
+        }
+    }
+    
+    func setupChart(completion: (() -> Void)?) {
         var newChartViewModel = chartViewModel.value
         newChartViewModel.rangeDescription = getTitle(range: range)
         newChartViewModel.formatType = range.timeSegment
@@ -64,7 +85,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
         switch chartViewModel.value.chartType {
         case .line:
             
-            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.tasks, isEvent: false) { categoryStatsCurrent, taskListCurrent in
+            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: loadedTasks, isEvent: false) { categoryStatsCurrent, taskListCurrent in
                 guard !categoryStatsCurrent.isEmpty, let previousRange = self.range.previousDatesForComparison() else {
                     newChartViewModel.chartData = nil
                     newChartViewModel.categories = []
@@ -75,7 +96,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
                     return
                 }
                 
-                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.networkController.activityService.tasks, isEvent: false) { categoryStatsPast, taskListPast in
+                self.activityDetailService.getActivityCategoriesSamples(for: previousRange, segment: self.range.timeSegment, activities: self.loadedTasks, isEvent: false) { categoryStatsPast, taskListPast in
                     
                     self.dataExists = true
 
@@ -195,7 +216,7 @@ class TaskAnalyticsDataSource: AnalyticsDataSource {
 //            print(range.startDate.localTime)
 //            print(range.endDate.localTime)
             
-            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: networkController.activityService.tasks, isEvent: false) { categoryStats, taskList in
+            activityDetailService.getActivityCategoriesSamples(for: range, segment: range.timeSegment, activities: loadedTasks, isEvent: false) { categoryStats, taskList in
                             
                 guard !taskList.isEmpty else {
                     newChartViewModel.chartData = nil
