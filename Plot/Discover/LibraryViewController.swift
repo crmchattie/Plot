@@ -28,7 +28,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     var favAct = [String: [String]]()
     
     var participants = [String : [User]]()
-    var titleString = discoverTitleString
+    var titleString = addTitleString
     var sections: [SectionType] = [.time, .health, .finances]
     var groups = [SectionType: [AnyHashable]]()
     
