@@ -28,7 +28,7 @@ class LibraryViewController: UICollectionViewController, UICollectionViewDelegat
     var favAct = [String: [String]]()
     
     var participants = [String : [User]]()
-    var titleString = addTitleString
+    var titleString = discoverTitleString
     var sections: [SectionType] = [.time, .health, .finances]
     var groups = [SectionType: [AnyHashable]]()
     
@@ -623,15 +623,15 @@ extension LibraryViewController { /* hiding keyboard */
 
 extension LibraryViewController: UpdateDiscover {
     func itemCreated(title: String) {
-//        self.navigationItem.searchController?.isActive = false
-//        self.dismiss(animated: true) {
-//            self.dismiss(animated: true)
-//            self.updateDiscoverDelegate?.itemCreated(title: title)
-//        }
-        
         self.navigationItem.searchController?.isActive = false
-        self.dismiss(animated: true)
-        self.tabBarController?.selectedIndex = 1
-        basicAlert(title: title, message: nil, controller: self.tabBarController)
+        self.dismiss(animated: true) {
+            self.dismiss(animated: true)
+            self.updateDiscoverDelegate?.itemCreated(title: title)
+        }
+        
+//        self.navigationItem.searchController?.isActive = false
+//        self.dismiss(animated: true)
+//        self.tabBarController?.selectedIndex = 1
+//        basicAlert(title: title, message: nil, controller: self.tabBarController)
     }
 }
