@@ -47,7 +47,6 @@ class GeneralTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         homeController.delegate = self
-        loadVariables()
         configureTabBar()
         setTabs()
         addObservers()
@@ -73,7 +72,8 @@ class GeneralTabBarController: UITabBarController {
         isOldUser = true
     }
     
-    fileprivate func loadVariables() {
+    func loadVariables() {
+        print("loadVariables")
         isNewUser = Auth.auth().currentUser == nil
         homeController.isNewUser = isNewUser
         homeController.addObservers()

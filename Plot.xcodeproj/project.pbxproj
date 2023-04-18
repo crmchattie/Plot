@@ -41,6 +41,12 @@
 		101B90902457999600EDDB90 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B908F2457999600EDDB90 /* Weather.swift */; };
 		101B90932458809000EDDB90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101B90922458809000EDDB90 /* Assets.xcassets */; };
 		101B90972458DA2D00EDDB90 /* WeatherRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B90962458DA2D00EDDB90 /* WeatherRow.swift */; };
+		10202FE629EEDD7100773B20 /* StepsStorageOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10202FE529EEDD7100773B20 /* StepsStorageOperation.swift */; };
+		10202FE829EEEA0400773B20 /* FlightsClimbedStorageOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10202FE729EEEA0400773B20 /* FlightsClimbedStorageOperation.swift */; };
+		10202FEA29EEEA4800773B20 /* HeartRateStorageOperating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10202FE929EEEA4800773B20 /* HeartRateStorageOperating.swift */; };
+		10202FEC29EEEA5900773B20 /* WeightStorageOperating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10202FEB29EEEA5900773B20 /* WeightStorageOperating.swift */; };
+		10202FEE29EEEA7100773B20 /* SleepStorageOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10202FED29EEEA7100773B20 /* SleepStorageOperation.swift */; };
+		10202FF029EEEA8200773B20 /* ActiveEnergyStorageOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10202FEF29EEEA8200773B20 /* ActiveEnergyStorageOperation.swift */; };
 		102076CC23C2D3B5009AEAA4 /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102076CB23C2D3B5009AEAA4 /* Service.swift */; };
 		102076CE23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */; };
 		10217A7723102CA4004CBA9E /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10217A7623102CA4004CBA9E /* CalendarView.swift */; };
@@ -648,6 +654,12 @@
 		101B908F2457999600EDDB90 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		101B90922458809000EDDB90 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		101B90962458DA2D00EDDB90 /* WeatherRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherRow.swift; sourceTree = "<group>"; };
+		10202FE529EEDD7100773B20 /* StepsStorageOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsStorageOperation.swift; sourceTree = "<group>"; };
+		10202FE729EEEA0400773B20 /* FlightsClimbedStorageOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightsClimbedStorageOperation.swift; sourceTree = "<group>"; };
+		10202FE929EEEA4800773B20 /* HeartRateStorageOperating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateStorageOperating.swift; sourceTree = "<group>"; };
+		10202FEB29EEEA5900773B20 /* WeightStorageOperating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightStorageOperating.swift; sourceTree = "<group>"; };
+		10202FED29EEEA7100773B20 /* SleepStorageOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepStorageOperation.swift; sourceTree = "<group>"; };
+		10202FEF29EEEA8200773B20 /* ActiveEnergyStorageOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveEnergyStorageOperation.swift; sourceTree = "<group>"; };
 		102076CB23C2D3B5009AEAA4 /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		102076CD23CA7E5D009AEAA4 /* TicketMasterSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketMasterSearchResult.swift; sourceTree = "<group>"; };
 		10217A7623102CA4004CBA9E /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
@@ -2048,6 +2060,12 @@
 				26BDCDCB2582097700E850CF /* SleepOperation.swift */,
 				10A18655291C635A009AB7F4 /* AnnualAverageActiveEnergyOperation.swift */,
 				10C7F92425A520ED004E9277 /* ActiveEnergyOperation.swift */,
+				10202FE529EEDD7100773B20 /* StepsStorageOperation.swift */,
+				10202FE729EEEA0400773B20 /* FlightsClimbedStorageOperation.swift */,
+				10202FE929EEEA4800773B20 /* HeartRateStorageOperating.swift */,
+				10202FEB29EEEA5900773B20 /* WeightStorageOperating.swift */,
+				10202FED29EEEA7100773B20 /* SleepStorageOperation.swift */,
+				10202FEF29EEEA8200773B20 /* ActiveEnergyStorageOperation.swift */,
 				260C87CB24FF600900715A64 /* AsyncOperation.swift */,
 			);
 			path = Operations;
@@ -3310,6 +3328,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10202FE829EEEA0400773B20 /* FlightsClimbedStorageOperation.swift in Sources */,
 				26036774256DBBAD00FE9142 /* EKFetchCalendarEventsOp.swift in Sources */,
 				4BAEE5C1212735E50045AB10 /* FalconTextView.swift in Sources */,
 				4BAEE49521272C5E0045AB10 /* ContactsTableViewCell.swift in Sources */,
@@ -3453,10 +3472,12 @@
 				1092E27128B7E4440018FCAA /* TimeInfoViewController.swift in Sources */,
 				1051AC9D244FBF0A0066761C /* CustomSegmentedControl.swift in Sources */,
 				26BDCDCC2582097700E850CF /* SleepOperation.swift in Sources */,
+				10202FE629EEDD7100773B20 /* StepsStorageOperation.swift in Sources */,
 				10B541E225479D3100CC9023 /* MealViewController.swift in Sources */,
 				4BAEE48721272C4F0045AB10 /* OnboardingContainerView.swift in Sources */,
 				100FE70C28931D2100D3124C /* CalendarActions.swift in Sources */,
 				103038EC2919794B006F76DA /* AnalyticsHorizontalBarChartCell.swift in Sources */,
+				10202FEE29EEEA7100773B20 /* SleepStorageOperation.swift in Sources */,
 				10ED65F4298EF6CF00CBCCA5 /* GoalService.swift in Sources */,
 				10F7241828E39C7A003C13A0 /* SubLibraryViewController.swift in Sources */,
 				4BAEE5CE212735E50045AB10 /* SelectParticipantsViewController+SearchHandlers.swift in Sources */,
@@ -3545,6 +3566,7 @@
 				10FBC8BD24BFF01200D0E6B5 /* ActivitylistFetcher.swift in Sources */,
 				100A53F023E0E839004AA952 /* HorizontalSnappingController.swift in Sources */,
 				10C9C0482913EB74008010B6 /* ActivityDetailService.swift in Sources */,
+				10202FEC29EEEA5900773B20 /* WeightStorageOperating.swift in Sources */,
 				10F5D00225CB7E670078C821 /* GPlotEventOp.swift in Sources */,
 				10DFC3F5255CC63000565DAD /* WorkoutFetcher.swift in Sources */,
 				10B541DE25479D0700CC9023 /* MealProductSearchViewController.swift in Sources */,
@@ -3711,6 +3733,7 @@
 				105CB18C25129F130000D3D8 /* FinanceTransactionViewController.swift in Sources */,
 				26E3179B2379FB72007D1F21 /* ActivityTypeViewController.swift in Sources */,
 				10F819FD2470945800BFE5C9 /* IngredientSearchViewController.swift in Sources */,
+				10202FF029EEEA8200773B20 /* ActiveEnergyStorageOperation.swift in Sources */,
 				4BAEE46F21272B380045AB10 /* NotificationsTableViewController.swift in Sources */,
 				4BAEE50421272D890045AB10 /* AutoSizingCollectionViewFlowLayout.swift in Sources */,
 				10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */,
@@ -3835,6 +3858,7 @@
 				4BAEE50321272D890045AB10 /* ChatInputContainerView.swift in Sources */,
 				4BAEE5E9212735E50045AB10 /* EnterPhoneNumberContainerView.swift in Sources */,
 				4BAEE4F821272D890045AB10 /* MessagesFetcher.swift in Sources */,
+				10202FEA29EEEA4800773B20 /* HeartRateStorageOperating.swift in Sources */,
 				105F66F924171A8400F6EDB6 /* WorkoutDetailCell.swift in Sources */,
 				269105E6253D464300A02C5F /* HealthDetailViewController.swift in Sources */,
 				4BAEE48321272C4F0045AB10 /* UserProfileAvatarOpenerDelegate.swift in Sources */,

@@ -8,6 +8,15 @@
 
 import HealthKit
 
+let userStepsEntity = "user-steps"
+let userFlightsClimbedEntity = "user-flights-climbed"
+let userHeartRateEntity = "user-heart-rate"
+let userActiveEnergyEntity = "user-active-energy"
+let userBodyMassEntity = "user-body-mass"
+let userDistanceWalkingRunningEntity = "user-distance-walking-running"
+let userDistanceCyclingEntity = "user-distance-cycling"
+let userSleepEntity = "user-sleep"
+
 // Completion closures might not be on the main thread when executed.
 class HealthKitService {
     static var authorized = false
@@ -160,7 +169,6 @@ class HealthKitService {
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: date)
         let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
-        
         getCumulativeSumSampleAverageAndRecent(forIdentifier: identifier, unit: unit, startDate: startDate, endDate: endDate, completion: completion)
     }
     
@@ -216,6 +224,18 @@ class HealthKitService {
         let calendar = Calendar.current
         let endDate = Date()
         let startDate = calendar.date(byAdding: .year, value: -1, to: endDate)!
+        var interval = DateComponents()
+        interval.day = 1
+        getDiscreteAverageSample(forIdentifier: identifier, unit: unit, startDate: startDate, endDate: endDate, interval: interval, completion: completion)
+    }
+    
+    class func getLatestDiscreteDailyAverageSampleForDay(forIdentifier identifier: HKQuantityTypeIdentifier,
+                                                   unit: HKUnit,
+                                                   date: Date,
+                                                   completion: @escaping (Double?, Date?) -> Void) {
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: date)
+        let endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date)!
         var interval = DateComponents()
         interval.day = 1
         getDiscreteAverageSample(forIdentifier: identifier, unit: unit, startDate: startDate, endDate: endDate, interval: interval, completion: completion)
@@ -564,4 +584,112 @@ class HealthKitService {
             }
         }
     }
+    
+    class func storeAnchor(kUserDefaultsAnchorKey: String, anchor: HKQueryAnchor?) {
+        guard let anchor = anchor else { return }
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: anchor, requiringSecureCoding: true)
+            UserDefaults.standard.set(data, forKey: kUserDefaultsAnchorKey)
+        } catch {
+            print("Unable to store new anchor")
+        }
+    }
+
+    class func retrieveAnchor(kUserDefaultsAnchorKey: String) -> HKQueryAnchor? {
+        guard let data = UserDefaults.standard.data(forKey: kUserDefaultsAnchorKey) else { return nil }
+        do {
+            return try NSKeyedUnarchiver.unarchivedObject(ofClass: HKQueryAnchor.self, from: data)
+        } catch {
+            print("Unable to retrieve an anchor")
+            return nil
+        }
+    }
+    
+    class func retrieveAnchorGivenType(type: HKObjectType) -> HKQueryAnchor? {
+        switch type {
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kStepsQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kHeartRateQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.flightsClimbed):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kFlightsClimbedQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kActiveEnergyQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kBodyMassQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMassIndex):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kBodyMassIndexQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.distanceWalkingRunning):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kDistanceWalkingRunningQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.distanceCycling):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kDistanceCyclingQueryAnchor)
+        case HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kSleepQueryAnchor)
+        case HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.mindfulSession):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kMindfulnessQueryAnchor)
+        case is HKWorkoutType:
+            return retrieveAnchor(kUserDefaultsAnchorKey: kWorkoutsQueryAnchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.height):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kHeightQueryAnchor)
+        case HKObjectType.characteristicType(forIdentifier: HKCharacteristicTypeIdentifier.dateOfBirth):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kBirthdayQueryAnchor)
+        case HKObjectType.characteristicType(forIdentifier: HKCharacteristicTypeIdentifier.biologicalSex):
+            return retrieveAnchor(kUserDefaultsAnchorKey: kBiologicalSexQueryAnchor)
+        default:
+            return nil
+        }
+    }
+    
+    class func storeAnchorGivenType(type: HKObjectType, anchor: HKQueryAnchor?) {
+        switch type {
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount):
+            storeAnchor(kUserDefaultsAnchorKey: kStepsQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate):
+            storeAnchor(kUserDefaultsAnchorKey: kHeartRateQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.flightsClimbed):
+            storeAnchor(kUserDefaultsAnchorKey: kFlightsClimbedQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned):
+            storeAnchor(kUserDefaultsAnchorKey: kActiveEnergyQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass):
+            storeAnchor(kUserDefaultsAnchorKey: kBodyMassQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMassIndex):
+            storeAnchor(kUserDefaultsAnchorKey: kBodyMassIndexQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.distanceWalkingRunning):
+            storeAnchor(kUserDefaultsAnchorKey: kDistanceWalkingRunningQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.distanceCycling):
+            storeAnchor(kUserDefaultsAnchorKey: kDistanceCyclingQueryAnchor, anchor: anchor)
+        case HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis):
+            storeAnchor(kUserDefaultsAnchorKey: kSleepQueryAnchor, anchor: anchor)
+        case HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.mindfulSession):
+            storeAnchor(kUserDefaultsAnchorKey: kMindfulnessQueryAnchor, anchor: anchor)
+        case is HKWorkoutType:
+            storeAnchor(kUserDefaultsAnchorKey: kWorkoutsQueryAnchor, anchor: anchor)
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.height):
+            storeAnchor(kUserDefaultsAnchorKey: kHeightQueryAnchor, anchor: anchor)
+        case HKObjectType.characteristicType(forIdentifier: HKCharacteristicTypeIdentifier.dateOfBirth):
+            storeAnchor(kUserDefaultsAnchorKey: kBirthdayQueryAnchor, anchor: anchor)
+        case HKObjectType.characteristicType(forIdentifier: HKCharacteristicTypeIdentifier.biologicalSex):
+            storeAnchor(kUserDefaultsAnchorKey: kBiologicalSexQueryAnchor, anchor: anchor)
+        default:
+            print("ERROR: \(type) is not a valid HKObjectType")
+            break
+        }
+    }
 }
+
+let kStepsQueryAnchor = "StepsQueryAnchor"
+let kHeartRateQueryAnchor = "HeartRateQueryAnchor"
+let kFlightsClimbedQueryAnchor = "FlightsClimbedQueryAnchor"
+let kActiveEnergyQueryAnchor = "ActiveEnergyQueryAnchor"
+let kBodyMassQueryAnchor = "BodyMassQueryAnchor"
+let kBodyMassIndexQueryAnchor = "BodyMassIndexQueryAnchor"
+let kDistanceWalkingRunningQueryAnchor = "DistanceWalkingRunningQueryAnchor"
+let kDistanceCyclingQueryAnchor = "DistanceCyclingQueryAnchor"
+let kSleepQueryAnchor = "SleepQueryAnchor"
+let kMindfulnessQueryAnchor = "MindfulnessQueryAnchor"
+let kWorkoutsQueryAnchor = "WorkoutsQueryAnchor"
+let kHeightQueryAnchor = "HeightQueryAnchor"
+let kBirthdayQueryAnchor = "BirthdayQueryAnchor"
+let kBiologicalSexQueryAnchor = "BiologicalSexQueryAnchor"
+
+

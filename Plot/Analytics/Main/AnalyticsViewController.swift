@@ -105,55 +105,73 @@ class AnalyticsViewController: UITableViewController {
     
     @objc fileprivate func goalsUpdated() {
         viewModel?.goalsUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func tasksUpdated() {
         viewModel?.tasksUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func eventsUpdated() {
         viewModel?.eventsUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func healthUpdated() {
         viewModel?.healthUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func workoutsUpdated() {
         viewModel?.workoutUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func moodsUpdated() {
         viewModel?.moodUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func mindfulnessUpdated() {
         viewModel?.mindfulnessUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func transactionsUpdated() {
         viewModel?.spendingUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
     
     @objc fileprivate func accountsUpdated() {
         viewModel?.netWorthUpdate {
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
 }

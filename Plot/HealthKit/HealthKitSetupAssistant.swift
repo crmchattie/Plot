@@ -18,7 +18,6 @@ class HealthKitSetupAssistant {
     }
     
     class func authorizeHealthKit(completion: @escaping (Bool, Error?) -> Swift.Void) {
-        
         // Check to see if HealthKit Is Available on this device
         guard HKHealthStore.isHealthDataAvailable() else {
             completion(false, HealthkitSetupError.notAvailableOnDevice)
@@ -26,8 +25,19 @@ class HealthKitSetupAssistant {
         }
         
         // Prepare the data types that will interact with HealthKit
-        guard let bodyMassIndex = HKObjectType.quantityType(forIdentifier: .bodyMassIndex),
-              let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass),
+        guard let healthKitTypesToRead = dataTypesToRead(),
+              let healthKitTypesToWrite = dataTypesToWrite() else {
+            completion(false, HealthkitSetupError.dataTypeNotAvailable)
+            return
+        }
+        healthStore.requestAuthorization(toShare: healthKitTypesToWrite,
+                                         read: healthKitTypesToRead) { (success, error) in
+            completion(success, error)
+        }
+    }
+    
+    class func dataTypesToRead() -> Set<HKObjectType>? {
+        guard let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass),
               let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate),
               let stepCount = HKObjectType.quantityType(forIdentifier: .stepCount),
               let flightCount = HKObjectType.quantityType(forIdentifier: .flightsClimbed),
@@ -36,8 +46,7 @@ class HealthKitSetupAssistant {
               let sleepAnalysis = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
               let mindfulSession = HKObjectType.categoryType(forIdentifier: .mindfulSession),
               let activeEnergy = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
-            completion(false, HealthkitSetupError.dataTypeNotAvailable)
-            return
+            return nil
         }
         let summaryType = HKObjectType.activitySummaryType()
         
@@ -50,21 +59,25 @@ class HealthKitSetupAssistant {
                                                        mindfulSession,
                                                        heartRate,
                                                        bodyMass,
-                                                       bodyMassIndex,
                                                        distanceWalkingRunning,
                                                        distanceCycling,
                                                        HKObjectType.workoutType()]
+        return healthKitTypesToRead
+    }
+    
+    class func dataTypesToWrite() -> Set<HKSampleType>? {
+        guard let distanceWalkingRunning = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
+              let distanceCycling = HKObjectType.quantityType(forIdentifier: .distanceCycling),
+              let mindfulSession = HKObjectType.categoryType(forIdentifier: .mindfulSession) else {
+            return nil
+        }
         
         let healthKitTypesToWrite: Set<HKSampleType> = [
             distanceWalkingRunning,
             distanceCycling,
             mindfulSession,
             HKObjectType.workoutType()]
-        // Request Authorization
-        healthStore.requestAuthorization(toShare: healthKitTypesToWrite,
-                                         read: healthKitTypesToRead) { (success, error) in
-            completion(success, error)
-        }
+        return healthKitTypesToWrite
     }
 }
 

@@ -32,17 +32,14 @@ class HealthKitManager {
             completion([:], false)
             return
         }
-        
+                
         // Start clean
         metrics = [:]
         containers = []
         isRunning = true
-
         self.getUserHealthLastSyncDate { [weak self] lastSyncDate in
             let today = Date()
-            
-            // Steps
-            
+                        
             // Operation to fetch annual average steps
             let annualAverageStepsOperation = AnnualAverageStepsOperation(date: today)
             
@@ -150,6 +147,35 @@ class HealthKitManager {
                 }
             }
             
+            var dateComponents = DateComponents()
+            dateComponents.day = 1
+            
+            var syncDate = lastSyncDate?.addDays(-1) ?? today.addDays(-1)
+            
+            while syncDate <= today {
+                // Perform operations with syncDate here
+                let stepsOp = StepsStorageOperation(date: syncDate)
+                self?.queue.addOperations([stepsOp], waitUntilFinished: false)
+                
+                let flightsOp = FlightsClimbedStorageOperation(date: syncDate)
+                self?.queue.addOperations([flightsOp], waitUntilFinished: false)
+                
+                let heartOp = HeartRateStorageOperation(date: syncDate)
+                self?.queue.addOperations([heartOp], waitUntilFinished: false)
+                
+                let weightOp = WeightStorageOperation(date: syncDate)
+                self?.queue.addOperations([weightOp], waitUntilFinished: false)
+                
+                let sleepOp = SleepStorageOperation(date: syncDate)
+                self?.queue.addOperations([sleepOp], waitUntilFinished: false)
+                
+                let activeEnergyOp = ActiveEnergyStorageOperation(date: syncDate)
+                self?.queue.addOperations([activeEnergyOp], waitUntilFinished: false)
+                
+                // Increment syncDate by one day
+                syncDate = Calendar.current.date(byAdding: dateComponents, to: syncDate) ?? today
+            }
+            
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in
                 guard let _self = self else {
@@ -163,13 +189,8 @@ class HealthKitManager {
                 }
                 
                 // if we properly fetched the items then save
-                if _self.containers.count > 0 {
-                    _self.saveFirebase{
-                        completion(_self.metrics, true)
-                    }
-                }
-                else {
-                    completion(_self.metrics, false)
+                _self.saveFirebase {
+                    completion(_self.metrics, true)
                 }
                 
                 self?.isRunning = false
@@ -186,8 +207,7 @@ class HealthKitManager {
         let reference = Database.database().reference().child(userHealthEntity).child(currentUser)
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
             
-            if snapshot.exists(),
-               let value = snapshot.value as? [String: Any], let lastSyncDateTimeInterval = value[lastSyncDateKey] as? Double {
+            if snapshot.exists(), let value = snapshot.value as? [String: Any], let lastSyncDateTimeInterval = value[lastSyncDateKey] as? Double {
                 let lastSyncDate = Date(timeIntervalSince1970: lastSyncDateTimeInterval)
                 completion(lastSyncDate)
             } else {
@@ -203,7 +223,7 @@ class HealthKitManager {
             completion()
             return
         }
-        
+                
         dispatchGroup = DispatchGroup()
         
         dispatchGroup.notify(queue: DispatchQueue.global(), execute: {
@@ -229,6 +249,56 @@ class HealthKitManager {
     
     func checkHealthAuthorizationStatus(_ completion: @escaping () -> Void) {
         HealthKitService.checkHealthAuthorizationStatus()
+    }
+    
+    func setUpBackgroundDeliveryForDataTypes() {
+        guard let dataTypesToRead = HealthKitSetupAssistant.dataTypesToRead() else {
+            return
+        }
+        print("setUpBackgroundDeliveryForDataTypes")
+        self.getUserHealthLastSyncDate { [weak self] lastSyncDate in
+            for type in dataTypesToRead {
+                guard let sampleType = type as? HKSampleType else { print("ERROR: \(type) is not an HKSampleType"); continue }
+                let query = HKObserverQuery(sampleType: sampleType, predicate: nil) { query, completionHandler, error in
+                    debugPrint("observer query update handler called for type \(type), error: \(String(describing: error))")
+                    self?.queryForUpdates(type: type)
+                    completionHandler()
+                }
+                HealthKitService.healthStore.execute(query)
+                HealthKitService.healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { success, error in
+                    debugPrint("enableBackgroundDeliveryForType handler called for \(type) - success: \(success), error: \(String(describing: error))")
+                }
+            }
+        }
+    }
+
+        /// Initiates HK queries for new data based on the given type
+        ///
+        /// - parameter type: `HKObjectType` which has new data avilable.
+    func queryForUpdates(type: HKObjectType) {
+        switch type {
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount):
+            debugPrint("HKQuantityTypeIdentifierSteps")
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate):
+            debugPrint("HKQuantityTypeIdentifierHeartRate")
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.flightsClimbed):
+            debugPrint("HKQuantityTypeIdentifierFlightsClimbed")
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned):
+            debugPrint("HKQuantityTypeIdentifierActiveEnergy")
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass):
+            debugPrint("HKQuantityTypeIdentifierBodyMass")
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.distanceWalkingRunning):
+            debugPrint("HKQuantityTypeIdentifierDistanceWalkinRunning")
+        case HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.distanceCycling):
+            debugPrint("HKQuantityTypeIdentifierCycling")
+        case HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis):
+            debugPrint("HKQuantityTypeIdentifierSleepAnalysis")
+        case HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.mindfulSession):
+            debugPrint("HKQuantityTypeIdentifierMindfulness")
+        case is HKWorkoutType:
+            debugPrint("HKWorkoutType")
+        default: debugPrint("Unhandled HKObjectType: \(type)")
+        }
     }
 }
 

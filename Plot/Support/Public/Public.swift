@@ -2327,7 +2327,7 @@ class TapGesture: UITapGestureRecognizer {
     var item = Int()
 }
 
-extension Date {
+extension Date {    
     var localTime: Date {
         let timezoneOffset = TimeZone.current.secondsFromGMT(for: self)
         let epochDate = self.timeIntervalSince1970

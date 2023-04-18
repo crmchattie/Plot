@@ -281,7 +281,7 @@ class HealthDetailService: HealthDetailServiceInterface {
         }
         
         if case .sleep = healthMetricType {
-            startDate = startDate.startOfDay.localTime
+            startDate = startDate.localTime.startOfDay.addHours(18).addingTimeInterval(-Double(TimeZone.current.secondsFromGMT(for: Date()))).addDays(-1)
             if segmentType == .day {
                 endDate = startDate.addDays(1)
             } else {
@@ -508,13 +508,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         var endDate = range.endDate.UTCTime
         
         if case .sleep = healthMetricType {
-            startDate = startDate.startOfDay.localTime
+            startDate = startDate.localTime.startOfDay.addHours(18).addingTimeInterval(-Double(TimeZone.current.secondsFromGMT(for: Date())))
             endDate = endDate.advanced(by: 1).startOfDay.localTime.advanced(by: -1)
         }
-        
-//        print(healthMetricType)
-//        print(startDate)
-//        print(endDate)
         
         if HealthKitService.authorized {
             if case .workout = healthMetricType, let hkWorkout = healthMetric.hkSample as? HKWorkout {
@@ -819,7 +815,7 @@ class HealthDetailService: HealthDetailServiceInterface {
             
         }
         else {
-            var midDay = startDate.dayBefore.startOfDay.addHours(18)
+            var midDay = startDate.dayBefore.startOfDay.addHours(18).addingTimeInterval(-Double(TimeZone.current.secondsFromGMT(for: Date())))
             var interval = NSDateInterval(start: midDay, duration: 86400)
             var map: [Date: Double] = [:]
             var sum: Double = 0

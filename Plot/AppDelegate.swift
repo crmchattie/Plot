@@ -50,6 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         GIDSignIn.sharedInstance()?.restorePreviousSignIn()
         //manually create window or default controller, thus ridding of Storyboard
         let tabController = GeneralTabBarController()
+        tabController.loadVariables()
         // set-up window
         window = UIWindow(frame: UIScreen.main.bounds)
         //set window = tabBarController
