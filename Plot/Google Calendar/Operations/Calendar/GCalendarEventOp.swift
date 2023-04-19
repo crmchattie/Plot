@@ -48,7 +48,10 @@ class GCalendarEventOp: AsyncOperation {
                                                           "externalActivityID": id as Any,
                                                           "showExtras": activity.showExtras as Any,
                                                           "startDateTime": activity.startDateTime as Any,
-                                                          "recurrences": activity.recurrences as Any]
+                                                          "endDateTime": activity.endDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any,
+                                                          "isTask": activity.isTask as Any,
+                                                          "completedDate": activity.completedDate as Any]
                             if let value = self?.calendar.backgroundColor {
                                 values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
                             }
@@ -79,7 +82,10 @@ class GCalendarEventOp: AsyncOperation {
                                                           "externalActivityID": id as Any,
                                                           "showExtras": activity.showExtras as Any,
                                                           "startDateTime": activity.startDateTime as Any,
-                                                          "recurrences": activity.recurrences as Any]
+                                                          "endDateTime": activity.endDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any,
+                                                          "isTask": activity.isTask as Any,
+                                                          "completedDate": activity.completedDate as Any]
                             if let value = self?.calendar.backgroundColor {
                                 values["calendarColor"] = CIColor(color: UIColor(value)).stringRepresentation as Any
                             }

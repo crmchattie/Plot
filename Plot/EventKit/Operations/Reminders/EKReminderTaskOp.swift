@@ -42,7 +42,10 @@ class EKReminderTaskOp: AsyncOperation {
                                                           "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
                                                           "showExtras": activity.showExtras as Any,
                                                           "startDateTime": activity.startDateTime as Any,
-                                                          "recurrences": activity.recurrences as Any]
+                                                          "endDateTime": activity.endDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any,
+                                                          "isTask": activity.isTask as Any,
+                                                          "completedDate": activity.completedDate as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })
@@ -67,7 +70,10 @@ class EKReminderTaskOp: AsyncOperation {
                                                           "externalActivityID": self?.reminder.calendarItemIdentifier as Any,
                                                           "showExtras": activity.showExtras as Any,
                                                           "startDateTime": activity.startDateTime as Any,
-                                                          "recurrences": activity.recurrences as Any]
+                                                          "endDateTime": activity.endDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any,
+                                                          "isTask": activity.isTask as Any,
+                                                          "completedDate": activity.completedDate as Any]
                             userActivityReference.updateChildValues(values, withCompletionBlock: { [weak self] (error, reference) in
                                 self?.finish()
                             })

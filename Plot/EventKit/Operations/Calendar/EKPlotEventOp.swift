@@ -28,7 +28,6 @@ class EKPlotEventOp: AsyncOperation {
             self.finish()
             return
         }
-        // @FIX-ME remove in four months from 2/6/21 since we can check for calendar export property on activities
         let reference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey)
         let dispatchGroup = DispatchGroup()
         for activity in activities {
