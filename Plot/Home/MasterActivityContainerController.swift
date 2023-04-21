@@ -382,7 +382,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
                                                             target: self,
                                                             action: #selector(goToNotifications))
         let newItemBarButton =  UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(newItem))
-        navigationItem.rightBarButtonItems = [newItemBarButton, notificationsBarButton, settingsBarButton]
+        navigationItem.rightBarButtonItems = [notificationsBarButton, settingsBarButton]
 
         if !isNewUser {
             refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControl.Event.valueChanged)

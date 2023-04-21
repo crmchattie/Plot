@@ -286,7 +286,7 @@ class HealthDetailService: HealthDetailServiceInterface {
                 endDate = startDate.addDays(1)
             } else {
                 endDate = endDate.localTime
-            }
+            }            
         }
         
         if segmentType != .day, !(extraDataPoint ?? false) {
@@ -508,8 +508,9 @@ class HealthDetailService: HealthDetailServiceInterface {
         var endDate = range.endDate.UTCTime
         
         if case .sleep = healthMetricType {
-            startDate = startDate.localTime.startOfDay.addHours(18).addingTimeInterval(-Double(TimeZone.current.secondsFromGMT(for: Date())))
-            endDate = endDate.advanced(by: 1).startOfDay.localTime.advanced(by: -1)
+            endDate = startDate.localTime.startOfDay.addHours(18).addingTimeInterval(-Double(TimeZone.current.secondsFromGMT(for: Date())))
+            startDate = endDate.addDays(-1)
+            
         }
         
         if HealthKitService.authorized {

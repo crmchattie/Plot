@@ -59,16 +59,16 @@ extension NetworkController {
                     finalStat = stat
                 }
                 
-//                print("metricCheck done")
-//                print(task.name)
-//                print(task.activityID)
-//                print(metric)
-//                print(task.startDate)
-//                print(range.startDate)
-//                print(task.endDate)
-//                print(range.endDate)
-//                print(finalStat.date)
-//                print(finalStat.value)
+                print("metricCheck done")
+                print(task.name)
+                print(task.activityID)
+                print(metric)
+                print(task.startDate)
+                print(range.startDate)
+                print(task.endDate)
+                print(range.endDate)
+                print(finalStat.date)
+                print(finalStat.value)
 
                 if let metricsRelationshipType = goal.metricsRelationshipType, let metricSecond = goal.metricSecond, let unitSecond = goal.unitSecond, let targetSecond = goal.targetNumberSecond {
                     self.checkGoal(metric: metricSecond, submetric: goal.submetricSecond, option: goal.optionSecond, unit: unitSecond, range: range) { statSecond in
@@ -503,6 +503,12 @@ extension NetworkController {
                 return
             }
             healthDetailService.getSamples(for: healthMetric, range: range) { stat, samples, _ in
+                print("getSamples sleep")
+                print(range.startDate)
+                print(range.endDate)
+                print(stat?.date)
+                print(stat?.value)
+                print(stat?.value.totalHours)
                 completion(stat)
             }
         case .steps:
