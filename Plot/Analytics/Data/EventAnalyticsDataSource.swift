@@ -60,9 +60,6 @@ class EventAnalyticsDataSource: AnalyticsDataSource {
     }
     
     func loadData(completion: (() -> Void)?) {
-        print("loadData")
-        print(range.startDate)
-        print(range.endDate)
         let startDate = range.pastStartDate ?? range.startDate
         if startDate < dateLoadedPast {
             networkController.activityService.activitiesFetcher.loadUnloadedActivities(startDate: startDate, endDate: dateLoadedPast) { activityList in

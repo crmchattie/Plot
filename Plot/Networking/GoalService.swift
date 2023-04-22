@@ -348,7 +348,7 @@ extension NetworkController {
                 }
             case .some(.category):
                 for opt in option ?? [] {
-                    let transactionDetail = TransactionDetails(name: opt, amount: 0, level: submetric?.transcationCatLevel ?? .group, topLevelCategory: opt)
+                    let transactionDetail = TransactionDetails(name: opt, amount: 0, level: submetric?.transcationCatLevel ?? .group, top_level_category: opt)
                     transactionDetails.append(transactionDetail)
                 }
             case .some(.subcategory):

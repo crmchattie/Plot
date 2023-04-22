@@ -42,7 +42,10 @@ class EKCalendarEventOp: AsyncOperation {
                                                           "calendarSource": CalendarSourceOptions.apple.name as Any,
                                                           "externalActivityID": self?.event.calendarItemExternalIdentifierClean.removeCharacters() as Any,
                                                           "startDateTime": activity.startDateTime as Any,
-                                                          "recurrences": activity.recurrences as Any]
+                                                          "endDateTime": activity.endDateTime as Any,
+                                                          "recurrences": activity.recurrences as Any,
+                                                          "isTask": activity.isTask as Any,
+                                                          "completedDate": activity.completedDate as Any]
                             if let calendar = self?.event.calendar {
                                 values["calendarID"] = calendar.calendarIdentifier as Any
                                 values["calendarName"] = calendar.title as Any
@@ -61,7 +64,6 @@ class EKCalendarEventOp: AsyncOperation {
                 let otherReference = Database.database().reference().child(userCalendarEventsEntity).child(currentUserID).child(calendarEventsKey).child(weakSelf.event.calendarItemIdentifier)
                 otherReference.observeSingleEvent(of: .value, with: { [weak self] (snapshot) in
                     if snapshot.exists(), let value = snapshot.value as? [String : String], let activityID = value["activityID"], !weakSelf.event.isDetached {
-                        
                         let calendarEventActivityValue: [String : Any] = ["activityID": activityID as AnyObject]
                         reference.updateChildValues(calendarEventActivityValue)
                         
@@ -78,7 +80,10 @@ class EKCalendarEventOp: AsyncOperation {
                                                                   "calendarSource": CalendarSourceOptions.apple.name as Any,
                                                                   "externalActivityID": self?.event.calendarItemExternalIdentifierClean.removeCharacters() as Any,
                                                                   "startDateTime": activity.startDateTime as Any,
-                                                                  "recurrences": activity.recurrences as Any]
+                                                                  "endDateTime": activity.endDateTime as Any,
+                                                                  "recurrences": activity.recurrences as Any,
+                                                                  "isTask": activity.isTask as Any,
+                                                                  "completedDate": activity.completedDate as Any]
                                     if let calendar = self?.event.calendar {
                                         values["calendarID"] = calendar.calendarIdentifier as Any
                                         values["calendarName"] = calendar.title as Any
@@ -108,7 +113,10 @@ class EKCalendarEventOp: AsyncOperation {
                                                                   "calendarSource": CalendarSourceOptions.apple.name as Any,
                                                                   "externalActivityID": self?.event.calendarItemIdentifier as Any,
                                                                   "startDateTime": activity.startDateTime as Any,
-                                                                  "recurrences": activity.recurrences as Any]
+                                                                  "endDateTime": activity.endDateTime as Any,
+                                                                  "recurrences": activity.recurrences as Any,
+                                                                  "isTask": activity.isTask as Any,
+                                                                  "completedDate": activity.completedDate as Any]
                                     if let calendar = self?.event.calendar {
                                         values["calendarID"] = calendar.calendarIdentifier as Any
                                         values["calendarName"] = calendar.title as Any

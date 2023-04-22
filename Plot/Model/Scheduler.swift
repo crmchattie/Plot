@@ -11,7 +11,6 @@ import Foundation
 let userWorkEntity = "user-work"
 let workEntity = "work"
 
-let userSleepEntity = "user-sleep"
 let sleepEntity = "sleep"
 
 struct Scheduler: Codable, Equatable, Hashable {
