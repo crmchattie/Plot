@@ -860,7 +860,7 @@ class GoalViewController: FormViewController, ObjectDetailShowing {
                 row.value = self.task.listName
             } else {
                 list = lists[ListSourceOptions.plot.name]?.first { $0.defaultList ?? false }
-                row.value = list?.name ?? "Default"
+                row.value = list?.name ?? ListOptions.defaultList.rawValue
             }
         }.onCellSelection({ _, row in
             self.openTaskList()

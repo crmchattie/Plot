@@ -324,7 +324,7 @@ class ActivityService {
             }
             self.grabLists()
         })
-        self.saveDataToSharedContainer(activities: self.activities)
+//        self.saveDataToSharedContainer(activities: self.activities)
     }
     
     func setupFirebase(_ completion: @escaping () -> Void) {

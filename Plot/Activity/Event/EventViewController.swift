@@ -703,7 +703,7 @@ class EventViewController: FormViewController, ObjectDetailShowing {
                 row.value = calendarName
             } else {
                 calendar = calendars[CalendarSourceOptions.plot.name]?.first { $0.defaultCalendar ?? false }
-                row.value = calendar?.name ?? "Default"
+                row.value = calendar?.name ?? CalendarOptions.defaultCal.rawValue
             }
         }.onCellSelection({ _, row in
             self.openCalendar()

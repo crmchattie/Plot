@@ -86,7 +86,7 @@ enum ListSourceOptions: String, CaseIterable {
 }
 
 enum ListOptions: String, CaseIterable {
-    case defaultList = "Default"
+    case defaultList = "Time"
     case todayList = "Today"
     case scheduledList = "Scheduled"
     case flaggedList = "Flagged"
