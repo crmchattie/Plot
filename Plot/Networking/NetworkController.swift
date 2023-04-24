@@ -85,6 +85,9 @@ class NetworkController {
                 self.hasLoadedListGoalActivities = true
                 self.isRunning = false
                 self.isGoalRunning = false
+//                self.createInitialTransactionAndAccountDetails {
+//                    print("createInitialTransactionAndAccountDetails")
+//                }
             }
         }
     }
@@ -179,6 +182,12 @@ class NetworkController {
     
     func sendUserTextMessage(type_of_user: String, completion: @escaping () -> Void) {
         Service.shared.sendUserTextMessage(type_of_user: type_of_user) { (json, err) in
+            completion()
+        }
+    }
+    
+    func createInitialTransactionAndAccountDetails(completion: @escaping () -> Void) {
+        Service.shared.createInitialTransactionAndAccountDetails() { (json, err) in
             completion()
         }
     }
