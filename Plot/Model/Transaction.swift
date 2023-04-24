@@ -16,6 +16,7 @@ let userFinancialTransactionsGroupsEntity = "user-financial-transactions-groups"
 let userFinancialTransactionRulesEntity = "user-financial-transaction-rules"
 let userFinancialTransactionsEventsEntity = "user-financial-transactions-events"
 let userFinancialTransactionsTasksEntity = "user-financial-transactions-tasks"
+let userFinancialTransactionDetailsEntity = "user-financial-transaction-details"
 let isodateFormatter = ISO8601DateFormatter()
 
 var financialTransactionsGroupsStatic = ["Income", "Bills", "Discretionary", "Kids", "Living", "Transfer", "Work", "Uncategorized"]

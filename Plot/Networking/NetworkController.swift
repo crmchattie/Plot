@@ -85,9 +85,9 @@ class NetworkController {
                 self.hasLoadedListGoalActivities = true
                 self.isRunning = false
                 self.isGoalRunning = false
-//                self.createInitialTransactionAndAccountDetails {
-//                    print("createInitialTransactionAndAccountDetails")
-//                }
+                self.createInitialTransactionAndAccountDetails {
+                    print("createInitialTransactionAndAccountDetails")
+                }
             }
         }
     }
@@ -187,8 +187,15 @@ class NetworkController {
     }
     
     func createInitialTransactionAndAccountDetails(completion: @escaping () -> Void) {
-        Service.shared.createInitialTransactionAndAccountDetails() { (json, err) in
-            completion()
+        if let currentUserID = Auth.auth().currentUser?.uid {
+            let ref = Database.database().reference()
+            ref.child(userFinancialTransactionsEntity).child(currentUserID).observeSingleEvent(of: .value, with: { snapshot in
+                if !snapshot.exists() {
+                    Service.shared.createInitialTransactionAndAccountDetails() { (json, err) in
+                        completion()
+                    }
+                }
+            })
         }
     }
 }

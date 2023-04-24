@@ -9,6 +9,7 @@
 let userFinancialAccountsEntity = "user-financial-accounts"
 let financialAccountsEntity = "financial-accounts"
 let userFinancialAccountsTasksEntity = "user-financial-accounts-tasks"
+let userFinancialAccountDetailsEntity = "user-financial-account-details"
 
 struct MXAccountResult: Codable {
     let account: MXAccount?
