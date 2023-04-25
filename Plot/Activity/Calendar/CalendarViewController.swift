@@ -90,7 +90,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     var filters: [filter] = [.search, .calendarView, .calendarCategory]
     var filterDictionary = [String: [String]]()
     
-    var selectedDate = Date().localTime
+    var selectedDate = Date()
     
     var manualScroll = false
     var dateLoadedPast = Date().addMonths(-2)
@@ -412,7 +412,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
         var activityFound = false
         for activity in self.filteredActivities {
             if let scrollDate = activity.scrollDate?.localTime {
-                if selectedDate <= scrollDate {
+                if selectedDate.localTime <= scrollDate {
                     activityFound = true
                     break
                 }
@@ -442,8 +442,8 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func filterEvents() {
-        let startDate = selectedDate.startOfDay
-        let endDate = selectedDate.endOfDay
+        let startDate = selectedDate.localTime.startOfDay
+        let endDate = selectedDate.localTime.endOfDay
         filteredPinnedActivities = pinnedActivities.filter({ (activity) -> Bool in
             if let activityStartDate = activity.startDate?.localTime, activityStartDate > startDate, endDate > activityStartDate {
                 return true
@@ -613,7 +613,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.selectedDate = date.localTime
+        self.selectedDate = date
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
@@ -621,7 +621,7 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         calendar.select(calendar.currentPage)
-        self.selectedDate = calendar.currentPage.localTime
+        self.selectedDate = calendar.currentPage
         let dateString = selectedDateFormatter.string(from: self.selectedDate)
         title = dateString
         handleReloadActivities(animated: true)
