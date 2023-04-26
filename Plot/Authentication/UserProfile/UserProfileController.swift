@@ -221,7 +221,7 @@ extension UserProfileController {
                 Analytics.logEvent(AnalyticsEventSignUp, parameters: [
                     AnalyticsParameterMethod: self.method
                 ])
-                let destination = FirstSurveyController(survey: Survey.hearAboutPlot, surveyAnswers: self.surveyAnswers, networkController: self.networkController)
+                let destination = FirstSurveyController(survey: Survey.downloadPlot, surveyAnswers: self.surveyAnswers, networkController: self.networkController)
                 self.navigationController?.pushViewController(destination, animated: true)
             }
         }

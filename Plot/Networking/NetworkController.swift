@@ -189,7 +189,7 @@ class NetworkController {
     func createInitialTransactionAndAccountDetails(completion: @escaping () -> Void) {
         if let currentUserID = Auth.auth().currentUser?.uid {
             let ref = Database.database().reference()
-            ref.child(userFinancialTransactionsEntity).child(currentUserID).observeSingleEvent(of: .value, with: { snapshot in
+            ref.child(userFinancialTransactionDetailsEntity).child(currentUserID).observeSingleEvent(of: .value, with: { snapshot in
                 if !snapshot.exists() {
                     Service.shared.createInitialTransactionAndAccountDetails() { (json, err) in
                         completion()

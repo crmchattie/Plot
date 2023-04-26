@@ -11,11 +11,7 @@ import Foundation
 class FourthSurveyController: SurveyController {
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
-        if networkController.isOldUser {
-            self.dismiss(animated: true)
-        } else {
-            let destination = SetupTimeController(networkController: networkController)
-            navigationController?.pushViewController(destination, animated: true)
-        }
+        let destination = FourthSurveyController(survey: Survey.goalsFinance, surveyAnswers: surveyAnswers, networkController: networkController)
+        navigationController?.pushViewController(destination, animated: true)
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 
 enum Survey: String {
-    case age, hearAboutPlot, goalsTime, goalsHealth, goalsFinance
+    case age, downloadPlot, hearAboutPlot, goalsTime, goalsHealth, goalsFinance
     
     var question: String {
         switch self {
@@ -27,6 +27,8 @@ enum Survey: String {
             return "What are your health goals?"
         case .goalsFinance:
             return "What are your financial goals?"
+        case .downloadPlot:
+            return "Why are you interested in Plot?"
         }
     }
     
@@ -46,6 +48,8 @@ enum Survey: String {
             return "We are asking so we can give you better goals and insights in the future"
         case .goalsFinance:
             return "We are asking so we can give you better goals and insights in the future"
+        case .downloadPlot:
+            return "We are asking to better understand why people are interested in Plot"
         }
     }
     
@@ -65,6 +69,8 @@ enum Survey: String {
             return ["Maintain healthy weight", "Eat a more balanced and nutritious diet", "Stay physically active", "Get more sleep", "Reduce stress"]
         case .goalsFinance:
             return ["Build and stick to a budget", "Save an emergency fund", "Pay off debt", "Save for retirement", "Save for a big purchase", "Improve credit score"]
+        case .downloadPlot:
+            return ["Be productive", "Improve Health", "Improve Finances"]
         }
     }
     
@@ -79,6 +85,8 @@ enum Survey: String {
         case .goalsHealth:
             return .multiple
         case .goalsFinance:
+            return .multiple
+        case .downloadPlot:
             return .multiple
         }
     }
