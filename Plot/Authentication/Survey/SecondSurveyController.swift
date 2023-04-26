@@ -11,7 +11,7 @@ import Foundation
 class SecondSurveyController: SurveyController {
     override func nextButtonDidTap() {
         super.nextButtonDidTap()
-        let destination = SecondSurveyController(survey: Survey.goalsTime, surveyAnswers: surveyAnswers, networkController: networkController)
+        let destination = ThirdSurveyController(survey: Survey.goalsTime, surveyAnswers: surveyAnswers, networkController: networkController)
         navigationController?.pushViewController(destination, animated: true)
     }
 }

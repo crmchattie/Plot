@@ -70,7 +70,7 @@ enum Survey: String {
         case .goalsFinance:
             return ["Build and stick to a budget", "Save an emergency fund", "Pay off debt", "Save for retirement", "Save for a big purchase", "Improve credit score"]
         case .downloadPlot:
-            return ["Be productive", "Improve Health", "Improve Finances"]
+            return ["Improve productivity", "Improve Health", "Improve Finances"]
         }
     }
     
