@@ -26,11 +26,13 @@ class AnnualAverageWeightOperation: AsyncOperation {
         interval.year = 1
         HealthKitService.getDiscreteAverageSample(forIdentifier: .bodyMass, unit: beatsPerMinuteUnit, startDate: date.lastYear, endDate: date, interval: interval) { [weak self] weight, date in
             guard let weight = weight, let _self = self else {
+                print("finish AnnualAverageWeightOperation")
                 self?.finish()
                 return
             }
             
             _self.weight = weight
+            print("finish AnnualAverageWeightOperation")
             self?.finish()
         }
     }

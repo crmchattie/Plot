@@ -366,7 +366,7 @@ class SearchPanelViewController: UIViewController, UITableViewDataSource, UITabl
                if let activityID = activity.activityID, let value = invitations[activityID] {
                    invitation = value
                }
-               eventCell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+             eventCell.configureCell(for: indexPath, activity: activity, calendar: nil, withInvitation: invitation)
            }
         return cell
             

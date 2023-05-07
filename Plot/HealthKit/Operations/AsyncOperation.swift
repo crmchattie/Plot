@@ -11,7 +11,6 @@ import Foundation
 class AsyncOperation: Operation {
     
     // MARK: - Internal State
-    
     private var _isExecuting: Bool = false
     private var _isFinished: Bool = false
     

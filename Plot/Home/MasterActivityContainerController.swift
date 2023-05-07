@@ -14,6 +14,7 @@ import HealthKit
 import GoogleSignIn
 
 let taskCellID = "taskCellID"
+let goalCellID = "goalCellID"
 let eventCellID = "eventCellID"
 let healthMetricCellID = "HealthMetricCollectionCellID"
 let healthMetricSectionHeaderID = "HealthMetricSectionHeaderID"
@@ -148,6 +149,7 @@ class MasterActivityContainerController: UIViewController, ObjectDetailShowing {
         view.addSubview(collectionView)
         collectionView.fillSuperview()
         collectionView.register(TaskCollectionCell.self, forCellWithReuseIdentifier: taskCellID)
+        collectionView.register(GoalCollectionCell.self, forCellWithReuseIdentifier: goalCellID)
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
         collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(FinanceCollectionViewCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewCell)

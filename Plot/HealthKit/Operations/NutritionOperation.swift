@@ -34,6 +34,7 @@ class NutritionOperation: AsyncOperation {
         let startDate = endDate.lastYear
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: nutritionTypeIdentifier, unit: unit, startDate: startDate, endDate: endDate) { [weak self] annualAverage, dailyTotal, recentStatDate in
             guard let annualAverage = annualAverage, let dailyTotal = dailyTotal, let recentStatDate = recentStatDate, let _self = self else {
+                print("finish NutritionOperation")
                 self?.finish()
                 return
             }
@@ -45,6 +46,7 @@ class NutritionOperation: AsyncOperation {
             metric.average = annualAverage
             
             _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.nutrition)
+            print("finish NutritionOperation")
             self?.finish()
         }
     }

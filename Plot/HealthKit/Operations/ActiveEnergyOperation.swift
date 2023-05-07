@@ -25,6 +25,7 @@ class ActiveEnergyOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .activeEnergyBurned, unit: .kilocalorie(), date: self.startDate) { [weak self] caloriesResult, _, _ in
             guard let caloriesResult = caloriesResult, caloriesResult > 0, let _self = self else {
+                print("finish ActiveEnergyOperation")
                 self?.finish()
                 return
             }
@@ -34,6 +35,7 @@ class ActiveEnergyOperation: AsyncOperation {
             metric.unit = .kilocalorie()
             
             _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.workouts)
+            print("finish ActiveEnergyOperation")
             self?.finish()
             
         }

@@ -26,6 +26,7 @@ class SleepOperation: AsyncOperation {
         let startDate = endDate.lastYear
         HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self] sleepSamples, error  in
             guard let sleepSamples = sleepSamples, sleepSamples.count > 0, error == nil, let _self = self else {
+                print("finish SleepOperation")
                 self?.finish()
                 return
             }
@@ -80,6 +81,7 @@ class SleepOperation: AsyncOperation {
                 _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
             }
 
+            print("finish SleepOperation")
             self?.finish()
         }
     }

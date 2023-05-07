@@ -21,28 +21,41 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let object = groups[indexPath.section]
         if let item = object as? Activity {
-            if item.isTask ?? false {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: taskCellID, for: indexPath) as? TaskCollectionCell ?? TaskCollectionCell()
-                if let listID = item.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+            if item.isGoal ?? false {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: goalCellID, for: indexPath) as? GoalCollectionCell ?? GoalCollectionCell()
+                var list: ListType?
+                if let listID = item.listID, let listList = networkController.activityService.listIDs[listID] {
+                    list = listList
+                } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                    list = listList
                 }
-                cell.configureCell(for: indexPath, task: item)
+                cell.configureCell(for: indexPath, task: item, list: list)
+                cell.updateCompletionDelegate = self
+                return cell
+            } else if item.isTask ?? false {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: taskCellID, for: indexPath) as? TaskCollectionCell ?? TaskCollectionCell()
+                var list: ListType?
+                if let listID = item.listID, let listList = networkController.activityService.listIDs[listID] {
+                    list = listList
+                } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                    list = listList
+                }
+                cell.configureCell(for: indexPath, task: item, list: list)
                 cell.updateCompletionDelegate = self
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: eventCellID, for: indexPath) as? EventCollectionCell ?? EventCollectionCell()
-                if let calendarID = item.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                var calendar: CalendarType?
+                if let calendarID = item.calendarID, let calendarCalendar = networkController.activityService.calendarIDs[calendarID] {
+                    calendar = calendarCalendar
+                } else if let calendarCalendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }) {
+                    calendar = calendarCalendar
                 }
                 var invitation: Invitation? = nil
                 if let activityID = item.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
-                cell.configureCell(for: indexPath, activity: item, withInvitation: invitation)
+                cell.configureCell(for: indexPath, activity: item, calendar: calendar, withInvitation: invitation)
                 cell.updateInvitationDelegate = self
                 return cell
             }
@@ -203,9 +216,15 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
         var height: CGFloat = 300
         let object = groups[indexPath.section]
         if let item = object as? Activity {
-            if item.isTask ?? false {
+            if item.isGoal ?? false {
                 let dummyCell = TaskCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-                dummyCell.configureCell(for: indexPath, task: item)
+                dummyCell.configureCell(for: indexPath, task: item, list: nil)
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+                height = estimatedSize.height
+            } else if item.isTask ?? false {
+                let dummyCell = TaskCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+                dummyCell.configureCell(for: indexPath, task: item, list: nil)
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
                 height = estimatedSize.height
@@ -215,7 +234,7 @@ extension MasterActivityContainerController: UICollectionViewDelegate, UICollect
                 if let activityID = item.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
-                dummyCell.configureCell(for: indexPath, activity: item, withInvitation: invitation)
+                dummyCell.configureCell(for: indexPath, activity: item, calendar: nil, withInvitation: invitation)
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
                 height = estimatedSize.height

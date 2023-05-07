@@ -453,12 +453,13 @@ extension ListsViewController: UITableViewDataSource, UITableViewDelegate {
         } else if !filteredTasks.isEmpty {
             let task = filteredTasks[indexPath.row]
             let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-            if let listID = task.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-            } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+            var list: ListType?
+            if let listID = task.listID, let listList = networkController.activityService.listIDs[listID] {
+                list = listList
+            } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                list = listList
             }
-            cell.configureCell(for: indexPath, task: task)
+            cell.configureCell(for: indexPath, task: task, list: list)
             return cell
         }
         return cell

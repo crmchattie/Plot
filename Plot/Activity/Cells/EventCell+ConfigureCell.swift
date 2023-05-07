@@ -12,7 +12,7 @@ import SDWebImage
 
 extension EventCell {
     
-    func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {
+    func configureCell(for indexPath: IndexPath, activity: Activity, calendar: CalendarType?, withInvitation invitation: Invitation?) {
         self.invitation = invitation
         self.activity = activity
                 
@@ -56,7 +56,9 @@ extension EventCell {
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
         
-        if let color = activity.calendarColor {
+        if let calendar = calendar, let color = calendar.color {
+            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+        } else if let color = activity.calendarColor {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
         
@@ -124,7 +126,7 @@ extension EventCell {
 
 extension EventCollectionCell {
     
-    func configureCell(for indexPath: IndexPath, activity: Activity, withInvitation invitation: Invitation?) {
+    func configureCell(for indexPath: IndexPath, activity: Activity, calendar: CalendarType?, withInvitation invitation: Invitation?) {
         self.invitation = invitation
         self.activity = activity
                 
@@ -171,7 +173,9 @@ extension EventCollectionCell {
             activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
         }
         
-        if let color = activity.calendarColor {
+        if let calendar = calendar, let color = calendar.color {
+            activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+        } else if let color = activity.calendarColor {
             activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
         }
         

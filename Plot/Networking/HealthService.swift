@@ -107,7 +107,9 @@ class HealthService {
         
         dispatchGroup.enter()
         HealthKitService.authorizeHealthKit { [weak self] _ in
+            print("grabHealthkit")
             self?.healhKitManager.loadHealthKitActivities { metrics, successfullyGrabbedHealthMetrics in
+                print("done grabHealthkit")
                 HealthKitService.authorized = true
                 self?.authorized = successfullyGrabbedHealthMetrics
                 self?.healthMetricSections = Array(metrics.keys)
@@ -118,7 +120,9 @@ class HealthService {
         
         if self.isRunning {
             dispatchGroup.enter()
+            print("grabFirebase")
             self.grabFirebase {
+                print("done grabFirebase")
                 self.isRunning = false
                 dispatchGroup.leave()
             }
@@ -135,15 +139,21 @@ class HealthService {
     func grabFirebase(_ completion: @escaping () -> Void) {
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
+        print("grabWorkouts")
         self.observeWorkoutsForCurrentUser {
+            print("done grabWorkouts")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
+        print("grabMindfulness")
         self.observeMindfulnesssForCurrentUser {
+            print("done grabMindfulness")
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
+        print("grabMoods")
         self.observeMoodForCurrentUser {
+            print("done grabMoods")
             dispatchGroup.leave()
         }
         

@@ -922,6 +922,9 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
     var numberOfLines = 1
     if task.isCompleted ?? false, let date = task.completedDateDate {
         value += "Completed: "
+        print("completed")
+        print(date)
+        print(date.localTime)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d"
         
@@ -1012,7 +1015,7 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
         }
         
     }
-    else if task.isGoal ?? false, let date = task.goalEndDateUTC {
+    else if let date = task.endDate {
         value += "Due: "
         let allDay = !(task.hasDeadlineTime ?? false)
         let dateFormatter = DateFormatter()
@@ -1035,7 +1038,110 @@ func dateTimeValue(forTask task: Activity) -> (Int, String) {
             dateFormatter.dateFormat = "h:mm a"
             value += " \(dateFormatter.string(from: date))"
         }
-    } else if let date = task.endDate {
+    }
+    
+    return (numberOfLines, value)
+}
+
+func dateTimeValue(forGoal task: Activity) -> (Int, String) {
+    var value = ""
+    var numberOfLines = 1
+    if task.isCompleted ?? false, let date = task.completedDateDateUTCTime {
+        value += "Completed: "
+        print("completed")
+        print(date)
+        print(date.localTime)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d"
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var day = ""
+        let dayString = dateFormatter.string(from: date)
+        if let integer = Int(dayString) {
+            let number = NSNumber(value: integer)
+            day = numberFormatter.string(from: number) ?? ""
+        }
+        
+        dateFormatter.dateFormat = "E, MMM"
+        value += "\(dateFormatter.string(from: date)) \(day)"
+        
+    }
+    else if let startDate = task.startDate, let endDate = task.endDate, false {
+        value += "Starts: "
+        numberOfLines = 2
+        let startAllDay = !(task.hasStartTime ?? false)
+        let startDateFormatter = DateFormatter()
+        startDateFormatter.dateFormat = "d"
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var startDay = ""
+        var day = startDateFormatter.string(from: startDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            startDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        startDateFormatter.dateFormat = "E, MMM"
+        value += "\(startDateFormatter.string(from: startDate)) \(startDay)"
+        
+        if !startAllDay {
+            startDateFormatter.dateFormat = "h:mm a"
+            value += " \(startDateFormatter.string(from: startDate))"
+        }
+        
+        value += "\n"
+        value += "Due: "
+        
+        let endAllDay = !(task.hasDeadlineTime ?? false)
+        let endDateFormatter = DateFormatter()
+        endDateFormatter.dateFormat = "d"
+        
+        var endDay = ""
+        day = endDateFormatter.string(from: endDate)
+        if let integer = Int(day) {
+            let number = NSNumber(value: integer)
+            endDay = numberFormatter.string(from: number) ?? ""
+        }
+        
+        endDateFormatter.dateFormat = "E, MMM"
+        value += "\(endDateFormatter.string(from: endDate)) \(endDay)"
+        
+        if !endAllDay {
+            endDateFormatter.dateFormat = "h:mm a"
+            value += " \(endDateFormatter.string(from: endDate))"
+        }
+        
+    }
+    else if let date = task.startDate, false {
+        value += "Starts: "
+        let allDay = !(task.hasStartTime ?? false)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d"
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .ordinal
+        
+        var day = ""
+        let dayString = dateFormatter.string(from: date)
+        if let integer = Int(dayString) {
+            let number = NSNumber(value: integer)
+            day = numberFormatter.string(from: number) ?? ""
+        }
+        
+        dateFormatter.dateFormat = "E, MMM"
+        value += "\(dateFormatter.string(from: date)) \(day)"
+        
+        if !allDay {
+            dateFormatter.dateFormat = "h:mm a"
+            value += " \(dateFormatter.string(from: date))"
+        }
+        
+    }
+    else if let date = task.goalEndDateUTC {
         value += "Due: "
         let allDay = !(task.hasDeadlineTime ?? false)
         let dateFormatter = DateFormatter()

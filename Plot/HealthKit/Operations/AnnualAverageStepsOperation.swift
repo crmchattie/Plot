@@ -23,11 +23,13 @@ class AnnualAverageStepsOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .stepCount, unit: .count(), startDate: startDate.lastYear, endDate: startDate) { [weak self] annualSteps, _, _ in
             guard let annualSteps = annualSteps, let _self = self else {
+                print("finish AnnualAverageStepsOperation")
                 self?.finish()
                 return
             }
             
             _self.steps = annualSteps
+            print("finish AnnualAverageStepsOperation")
             self?.finish()
         }
     }

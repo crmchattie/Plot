@@ -27,6 +27,7 @@ class SleepStorageOperation: AsyncOperation {
         let endDate = startDate.addDays(1)
         HealthKitService.getAllCategoryTypeSamples(forIdentifier:.sleepAnalysis, startDate: startDate, endDate: endDate) { [weak self] sleepSamples, error  in
             guard let sleepSamples = sleepSamples, sleepSamples.count > 0, error == nil, let currentUserID = Auth.auth().currentUser?.uid, let _self = self else {
+                print("finish SleepStorageOperation")
                 self?.finish()
                 return
             }
@@ -69,7 +70,8 @@ class SleepStorageOperation: AsyncOperation {
             let ref = Database.database().reference()
             ref.child(userSleepEntity).child(currentUserID).child(dateString).setValue(values)
             
-            self?.finish()
+            print("finish SleepStorageOperation")
+                self?.finish()
         }
     }
 }

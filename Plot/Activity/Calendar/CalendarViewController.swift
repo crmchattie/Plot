@@ -716,52 +716,56 @@ class CalendarViewController: UIViewController, UITableViewDataSource, UITableVi
             let activity = filteredPinnedActivities[indexPath.row]
             if activity.isTask ?? false {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-                if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                var list: ListType?
+                if let listID = activity.listID, let listList = networkController.activityService.listIDs[listID] {
+                    list = listList
+                } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                    list = listList
                 }
-                cell.configureCell(for: indexPath, task: activity)
+                cell.configureCell(for: indexPath, task: activity, list: list)
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
                 cell.updateInvitationDelegate = self
                 var invitation: Invitation? = nil
-                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                var calendar: CalendarType?
+                if let calendarID = activity.calendarID, let calendarCalendar = networkController.activityService.calendarIDs[calendarID] {
+                    calendar = calendarCalendar
+                } else if let calendarCalendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }) {
+                    calendar = calendarCalendar
                 }
                 if let activityID = activity.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
-                cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+                cell.configureCell(for: indexPath, activity: activity, calendar: calendar, withInvitation: invitation)
                 return cell
             }
         } else {
             let activity = filteredActivities[indexPath.row]
             if activity.isTask ?? false {
                 let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-                if let listID = activity.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                var list: ListType?
+                if let listID = activity.listID, let listList = networkController.activityService.listIDs[listID] {
+                    list = listList
+                } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                    list = listList
                 }
-                cell.configureCell(for: indexPath, task: activity)
+                cell.configureCell(for: indexPath, task: activity, list: list)
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
                 cell.updateInvitationDelegate = self
                 var invitation: Invitation? = nil
-                if let calendarID = activity.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                var calendar: CalendarType?
+                if let calendarID = activity.calendarID, let calendarCalendar = networkController.activityService.calendarIDs[calendarID] {
+                    calendar = calendarCalendar
+                } else if let calendarCalendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }) {
+                    calendar = calendarCalendar
                 }
                 if let activityID = activity.activityID, let value = invitations[activityID] {
                     invitation = value
                 }
-                cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+                cell.configureCell(for: indexPath, activity: activity, calendar: calendar, withInvitation: invitation)
                 return cell
             }
         }

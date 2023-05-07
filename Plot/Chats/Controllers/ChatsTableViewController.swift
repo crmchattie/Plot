@@ -384,49 +384,49 @@ extension ChatsTableViewController: ChatCellDelegate {
         //
         //        }
         //        else {
-        if let convoActivities = conversation.activities {
-            var activities = [Activity]()
-            let destination = SelectActivityTableViewController()
-            destination.hidesBottomBarWhenPushed = true
-            destination.conversation = conversation
-            destination.users = users
-            destination.filteredUsers = filteredUsers
-            var selectedFalconUsers = [User]()
-            for ID in conversation.chatParticipantsIDs! {
-                guard let currentUserID = Auth.auth().currentUser?.uid, currentUserID != ID else { continue }
-                let newMemberReference = Database.database().reference().child("users").child(ID)
-                
-                newMemberReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    
-                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
-                    
-                    let user = User(dictionary: dictionary)
-                    
-                    selectedFalconUsers.append(user)
-                    destination.selectedFalconUsers = selectedFalconUsers
-                })
-            }
-            for activityID in convoActivities {
-                let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
-                activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
-                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
-                    
-                    dictionary.updateValue(activityID as AnyObject, forKey: "id")
-                    
-                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
-                        dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "participantsIDs")
-                    }
-                    
-                    let activity = Activity(dictionary: dictionary)
-                    
-                    activities.append(activity)
-                    destination.activities = activities
-                    
-                })
-            }
-            navigationController?.pushViewController(destination, animated: true)
-        }
+//        if let convoActivities = conversation.activities {
+//            var activities = [Activity]()
+//            let destination = SelectActivityTableViewController()
+//            destination.hidesBottomBarWhenPushed = true
+//            destination.conversation = conversation
+//            destination.users = users
+//            destination.filteredUsers = filteredUsers
+//            var selectedFalconUsers = [User]()
+//            for ID in conversation.chatParticipantsIDs! {
+//                guard let currentUserID = Auth.auth().currentUser?.uid, currentUserID != ID else { continue }
+//                let newMemberReference = Database.database().reference().child("users").child(ID)
+//                
+//                newMemberReference.observeSingleEvent(of: .value, with: { (snapshot) in
+//                    
+//                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+//                    dictionary.updateValue(snapshot.key as AnyObject, forKey: "id")
+//                    
+//                    let user = User(dictionary: dictionary)
+//                    
+//                    selectedFalconUsers.append(user)
+//                    destination.selectedFalconUsers = selectedFalconUsers
+//                })
+//            }
+//            for activityID in convoActivities {
+//                let activityDataReference = Database.database().reference().child(activitiesEntity).child(activityID).child(messageMetaDataFirebaseFolder)
+//                activityDataReference.observeSingleEvent(of: .value, with: { (snapshot) in
+//                    guard var dictionary = snapshot.value as? [String: AnyObject] else { return }
+//                    
+//                    dictionary.updateValue(activityID as AnyObject, forKey: "id")
+//                    
+//                    if let membersIDs = dictionary["participantsIDs"] as? [String:AnyObject] {
+//                        dictionary.updateValue(Array(membersIDs.values) as AnyObject, forKey: "participantsIDs")
+//                    }
+//                    
+//                    let activity = Activity(dictionary: dictionary)
+//                    
+//                    activities.append(activity)
+//                    destination.activities = activities
+//                    
+//                })
+//            }
+//            navigationController?.pushViewController(destination, animated: true)
+//        }
         
         //        }
         

@@ -112,6 +112,9 @@
 		10623B9628CF7C4500E05AF0 /* HealthListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */; };
 		10623B9828CF7D5F00E05AF0 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */; };
 		1063C69629F85E6100C8F667 /* FifthSurveyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1063C69529F85E6100C8F667 /* FifthSurveyController.swift */; };
+		1063C6982A06A41800C8F667 /* GoalCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1063C6972A06A41800C8F667 /* GoalCell.swift */; };
+		1063C69A2A06A42500C8F667 /* GoalCell+ConfigureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1063C6992A06A42500C8F667 /* GoalCell+ConfigureCell.swift */; };
+		1063C69C2A06AA6700C8F667 /* NewGoalCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1063C69B2A06AA6700C8F667 /* NewGoalCell.swift */; };
 		106431D5258C10FE00D02658 /* ChartValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106431D4258C10FE00D02658 /* ChartValueFormatter.swift */; };
 		106618B124BA3C59003C3F36 /* PlaceDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */; };
 		106618B324BB655E003C3F36 /* PlaceExpandedDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */; };
@@ -191,7 +194,6 @@
 		1093D2BE299D3860003D77C5 /* GoalListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BD299D3860003D77C5 /* GoalListViewController.swift */; };
 		1093D2C0299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2BF299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift */; };
 		1093D2C229A54B16003D77C5 /* MoodAnalyticsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1093D2C129A54B16003D77C5 /* MoodAnalyticsDataSource.swift */; };
-		1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */; };
 		10970B0E25803F450027A9EF /* Mindfulness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B0D25803F450027A9EF /* Mindfulness.swift */; };
 		10970B14258060860027A9EF /* MindfulnessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10970B13258060860027A9EF /* MindfulnessViewController.swift */; };
 		109AF19029D0970800A382B3 /* Prompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109AF18F29D0970800A382B3 /* Prompt.swift */; };
@@ -313,9 +315,6 @@
 		10E4DB08251FD3DD00898D6E /* FinanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */; };
 		10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E4DB0925217C3200898D6E /* HeaderCell.swift */; };
 		10E82BA5252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */; };
-		10E8E4F725923B320076BE42 /* ActivitiesControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */; };
-		10E8E4FB25923B3F0076BE42 /* HealthControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */; };
-		10E8E4FF25923B4F0076BE42 /* FinanceControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */; };
 		10E8E50325923C070076BE42 /* BaseContainerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E50225923C070076BE42 /* BaseContainerCell.swift */; };
 		10E8E507259295260076BE42 /* HeaderContainerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E506259295260076BE42 /* HeaderContainerCell.swift */; };
 		10E8E5312592C7D30076BE42 /* BackEnabledNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */; };
@@ -736,6 +735,9 @@
 		10623B9528CF7C4500E05AF0 /* HealthListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthListViewController.swift; sourceTree = "<group>"; };
 		10623B9728CF7D5E00E05AF0 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		1063C69529F85E6100C8F667 /* FifthSurveyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FifthSurveyController.swift; sourceTree = "<group>"; };
+		1063C6972A06A41800C8F667 /* GoalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalCell.swift; sourceTree = "<group>"; };
+		1063C6992A06A42500C8F667 /* GoalCell+ConfigureCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoalCell+ConfigureCell.swift"; sourceTree = "<group>"; };
+		1063C69B2A06AA6700C8F667 /* NewGoalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGoalCell.swift; sourceTree = "<group>"; };
 		106431D4258C10FE00D02658 /* ChartValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartValueFormatter.swift; sourceTree = "<group>"; };
 		106618B024BA3C59003C3F36 /* PlaceDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailCell.swift; sourceTree = "<group>"; };
 		106618B224BB655E003C3F36 /* PlaceExpandedDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceExpandedDetailCell.swift; sourceTree = "<group>"; };
@@ -815,7 +817,6 @@
 		1093D2BD299D3860003D77C5 /* GoalListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListViewController.swift; sourceTree = "<group>"; };
 		1093D2BF299D8D4B003D77C5 /* GoalsAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsAnalyticsDataSource.swift; sourceTree = "<group>"; };
 		1093D2C129A54B16003D77C5 /* MoodAnalyticsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodAnalyticsDataSource.swift; sourceTree = "<group>"; };
-		1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectActivityTableViewController.swift; sourceTree = "<group>"; };
 		10970B0D25803F450027A9EF /* Mindfulness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mindfulness.swift; sourceTree = "<group>"; };
 		10970B13258060860027A9EF /* MindfulnessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessViewController.swift; sourceTree = "<group>"; };
 		109AF18F29D0970800A382B3 /* Prompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prompt.swift; sourceTree = "<group>"; };
@@ -937,9 +938,6 @@
 		10E4DB07251FD3DD00898D6E /* FinanceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTableViewCell.swift; sourceTree = "<group>"; };
 		10E4DB0925217C3200898D6E /* HeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCell.swift; sourceTree = "<group>"; };
 		10E82BA4252B5CEF00D18DFD /* FinanceCollectionViewMemberCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCollectionViewMemberCell.swift; sourceTree = "<group>"; };
-		10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiesControllerCell.swift; sourceTree = "<group>"; };
-		10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthControllerCell.swift; sourceTree = "<group>"; };
-		10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceControllerCell.swift; sourceTree = "<group>"; };
 		10E8E50225923C070076BE42 /* BaseContainerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseContainerCell.swift; sourceTree = "<group>"; };
 		10E8E506259295260076BE42 /* HeaderContainerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderContainerCell.swift; sourceTree = "<group>"; };
 		10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackEnabledNavigationController.swift; sourceTree = "<group>"; };
@@ -1373,9 +1371,6 @@
 				103F492B286F627C009E4242 /* MasterActivityContainerController+CollectionView.swift */,
 				103F492D286F7F1B009E4242 /* MasterActivityContainerController+StartupMethods.swift */,
 				10BA3BCD259BEDF9005D98EC /* SetupHomeCell.swift */,
-				10E8E4F625923B320076BE42 /* ActivitiesControllerCell.swift */,
-				10E8E4FA25923B3F0076BE42 /* HealthControllerCell.swift */,
-				10E8E4FE25923B4F0076BE42 /* FinanceControllerCell.swift */,
 				10E8E50225923C070076BE42 /* BaseContainerCell.swift */,
 				10E8E506259295260076BE42 /* HeaderContainerCell.swift */,
 				10E8E5302592C7D20076BE42 /* BackEnabledNavigationController.swift */,
@@ -1486,10 +1481,10 @@
 				108C37F4289C085D00DC4998 /* HKWorkoutViewController.swift */,
 				108C37F6289C089500DC4998 /* HKCategorySampleViewController.swift */,
 				10B2BC04257D389A00E3A798 /* Mood */,
-				10B2BC03257D386E00E3A798 /* Scheduler */,
-				1037E4322550CD7400F4EE42 /* Food */,
 				10970B122580605D0027A9EF /* Mindfulness */,
 				10DFC3B0255A142000565DAD /* Workout */,
+				10B2BC03257D386E00E3A798 /* Scheduler */,
+				1037E4322550CD7400F4EE42 /* Food */,
 			);
 			path = Health;
 			sourceTree = "<group>";
@@ -1849,7 +1844,6 @@
 				10C50F962274E21900111033 /* CalendarViewController+SearchHandlers.swift */,
 				10C50FA12274ED9200111033 /* CalendarViewController+TableRowActionHandlers.swift */,
 				265AA95D23A362CD00DBB10A /* CalendarViewController+Migration.swift */,
-				1095AEAD22D64E8500B544E4 /* SelectActivityTableViewController.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -1861,7 +1855,10 @@
 				10C50FA52276345500111033 /* EventCell+ConfigureCell.swift */,
 				10B3E51428B3F56000E1713D /* TaskCell.swift */,
 				10B3E51628B3F57500E1713D /* TaskCell+ConfigureCell.swift */,
+				1063C6972A06A41800C8F667 /* GoalCell.swift */,
+				1063C6992A06A42500C8F667 /* GoalCell+ConfigureCell.swift */,
 				1092E28428BD3B150018FCAA /* NewTaskCell.swift */,
+				1063C69B2A06AA6700C8F667 /* NewGoalCell.swift */,
 				10DE97342475737500D4A7E8 /* ListCell.swift */,
 				10DE97362475801400D4A7E8 /* ListCell+ConfigureCell.swift */,
 				109FEB3A22A1ACE300621D2F /* ScheduleRow.swift */,
@@ -3363,7 +3360,6 @@
 				10A18658291C637C009AB7F4 /* AverageAnnualFlightsClimbedOperation.swift in Sources */,
 				102618C925771FE300CF6F0A /* ActivityLevelViewController.swift in Sources */,
 				F990815D26161DE4000D5EC4 /* EventKit+Utility.swift in Sources */,
-				10E8E4FB25923B3F0076BE42 /* HealthControllerCell.swift in Sources */,
 				261FAF79251C69C0008636DF /* WeightOperation.swift in Sources */,
 				4BAEE4F421272D890045AB10 /* SelectGroupMembersController.swift in Sources */,
 				26E8EFE7237F393900B9067E /* MapActivitiesViewController.swift in Sources */,
@@ -3399,6 +3395,7 @@
 				26E3179F2379FEBA007D1F21 /* ActivityTypeCell.swift in Sources */,
 				10E93D5A24BE43B700F6EE18 /* UIView+Layout.swift in Sources */,
 				1092E28528BD3B150018FCAA /* NewTaskCell.swift in Sources */,
+				1063C6982A06A41800C8F667 /* GoalCell.swift in Sources */,
 				10DFAFCA287776BE00D38016 /* HealthContainer.swift in Sources */,
 				10DFAFC82877753D00D38016 /* EventViewController+Extensions.swift in Sources */,
 				4BAEE50621272D890045AB10 /* SelectedMediaCollectionCell.swift in Sources */,
@@ -3423,7 +3420,6 @@
 				10BA3BCE259BEDF9005D98EC /* SetupHomeCell.swift in Sources */,
 				10DFAFCC2877775800D38016 /* HealthRow.swift in Sources */,
 				4BA1E77C2152511B00391BCB /* UploadProgress.swift in Sources */,
-				10E8E4FF25923B4F0076BE42 /* FinanceControllerCell.swift in Sources */,
 				4BAEE5D7212735E50045AB10 /* AnnouncementFactory.swift in Sources */,
 				10F5CFFA25CB7E490078C821 /* GSyncCalendarEventsOp.swift in Sources */,
 				26836B51251338E800AFC2D7 /* HeartRateOperation.swift in Sources */,
@@ -3489,6 +3485,7 @@
 				4BAEE4FF21272D890045AB10 /* VoiceRecordingContainerView.swift in Sources */,
 				10F7241A28E39D2C003C13A0 /* SubLibraryCell.swift in Sources */,
 				10868D6D246314C700D6BB4F /* Grocerylist.swift in Sources */,
+				1063C69C2A06AA6700C8F667 /* NewGoalCell.swift in Sources */,
 				10DFC3F9255CC64000565DAD /* MealFetcher.swift in Sources */,
 				10B3E51528B3F56000E1713D /* TaskCell.swift in Sources */,
 				108C380728AC487400DC4998 /* TaskViewController+Extensions.swift in Sources */,
@@ -3747,7 +3744,6 @@
 				4BAEE5B8212735E50045AB10 /* INSPhotosInteractionAnimator.swift in Sources */,
 				1093D2BE299D3860003D77C5 /* GoalListViewController.swift in Sources */,
 				1092F240241482C600E8CE16 /* RecipeDetailViewCell.swift in Sources */,
-				10E8E4F725923B320076BE42 /* ActivitiesControllerCell.swift in Sources */,
 				4BAEE5EA212735E50045AB10 /* Country.swift in Sources */,
 				2623AA9024FA2D9B0020A316 /* HealthKitSetupAssistant.swift in Sources */,
 				4BAEE4FE21272D890045AB10 /* OutgoingVoiceMessageCell.swift in Sources */,
@@ -3823,8 +3819,8 @@
 				1092E28128BA7C3D0018FCAA /* WorkoutMinutesOperation.swift in Sources */,
 				F9DD17032613E67300B8374D /* AnalyticsBarChartCell.swift in Sources */,
 				10FBC8BB24BFEF7E00D0E6B5 /* ActivitylistActions.swift in Sources */,
-				1095AEAE22D64E8600B544E4 /* SelectActivityTableViewController.swift in Sources */,
 				10E4DB0A25217C3200898D6E /* HeaderCell.swift in Sources */,
+				1063C69A2A06A42500C8F667 /* GoalCell+ConfigureCell.swift in Sources */,
 				4BAEE47F21272C4F0045AB10 /* UserProfileContainerView.swift in Sources */,
 				105F34AE2885EF7A007531EB /* SelectorItemCell.swift in Sources */,
 				1069B2CE2430D74F0048244C /* BaseActivityMessageCell.swift in Sources */,

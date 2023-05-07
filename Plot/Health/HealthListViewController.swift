@@ -79,6 +79,7 @@ class HealthListViewController: UIViewController, ObjectDetailShowing {
     }
     
     @objc fileprivate func setupData() {
+        activityIndicatorView.startAnimating()
         filteredHealthMetricSections = healthMetricSections
         // Handle workouts
         if let _ = healthMetrics[.workoutsList] {

@@ -101,6 +101,7 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         collectionView.isScrollEnabled = false
                 
         collectionView.register(TaskCollectionCell.self, forCellWithReuseIdentifier: taskCellID)
+        collectionView.register(GoalCollectionCell.self, forCellWithReuseIdentifier: goalCellID)
         collectionView.register(EventCollectionCell.self, forCellWithReuseIdentifier: eventCellID)
         collectionView.register(HealthMetricCollectionCell.self, forCellWithReuseIdentifier: healthMetricCellID)
         collectionView.register(FinanceCollectionViewComparisonCell.self, forCellWithReuseIdentifier: kFinanceCollectionViewComparisonCell)
@@ -167,13 +168,17 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let activities = activities {
             let item = activities[indexPath.item]
-            if item.isTask ?? false {
+            if item.isGoal ?? false {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: goalCellID, for: indexPath) as? GoalCollectionCell ?? GoalCollectionCell()
+                cell.configureCell(for: indexPath, task: item, list: nil)
+                return cell
+            } else if item.isTask ?? false {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: taskCellID, for: indexPath) as? TaskCollectionCell ?? TaskCollectionCell()
-                cell.configureCell(for: indexPath, task: item)
+                cell.configureCell(for: indexPath, task: item, list: nil)
                 return cell
             } else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: eventCellID, for: indexPath) as? EventCollectionCell ?? EventCollectionCell()
-                cell.configureCell(for: indexPath, activity: item, withInvitation: nil)
+                cell.configureCell(for: indexPath, activity: item, calendar: nil, withInvitation: nil)
                 return cell
             }
         } else if let healthMetrics = healthMetrics {
@@ -198,15 +203,21 @@ class OnboardingCollectionViewCell: UICollectionViewCell, UICollectionViewDelega
         var height: CGFloat = 328
         if let activities = activities {
             let item = activities[indexPath.item]
-            if item.isTask ?? false {
+            if item.isGoal ?? false {
+                let dummyCell = GoalCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
+                dummyCell.configureCell(for: indexPath, task: item, list: nil)
+                dummyCell.layoutIfNeeded()
+                let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
+                height = estimatedSize.height
+            } else if item.isTask ?? false {
                 let dummyCell = TaskCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-                dummyCell.configureCell(for: indexPath, task: item)
+                dummyCell.configureCell(for: indexPath, task: item, list: nil)
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
                 height = estimatedSize.height
             } else {
                 let dummyCell = EventCollectionCell(frame: .init(x: 0, y: 0, width: self.collectionView.frame.size.width, height: 1000))
-                dummyCell.configureCell(for: indexPath, activity: item, withInvitation: nil)
+                dummyCell.configureCell(for: indexPath, activity: item, calendar: nil, withInvitation: nil)
                 dummyCell.layoutIfNeeded()
                 let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: self.collectionView.frame.size.width, height: 1000))
                 height = estimatedSize.height

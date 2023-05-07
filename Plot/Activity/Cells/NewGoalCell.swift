@@ -1,14 +1,14 @@
 //
-//  NewTaskCell.swift
+//  NewGoalCell.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/29/22.
-//  Copyright © 2022 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 5/6/23.
+//  Copyright © 2023 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-class NewTaskCell: UITableViewCell {
+class NewGoalCell: UITableViewCell {
     let activityImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -22,7 +22,7 @@ class NewTaskCell: UITableViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.text = "New Task"
+        label.text = "New Goal"
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false

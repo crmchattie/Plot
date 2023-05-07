@@ -2178,6 +2178,13 @@ extension Activity {
         return nil
     }
     
+    var completedDateDateUTCTime: Date? {
+        if let completedDateDate = completedDateDate {
+            return completedDateDate.UTCTime
+        }
+        return nil
+    }
+    
     var goalStartDate: Date? {
         if let startDateTime = startDateTime?.doubleValue {
             return Date(timeIntervalSince1970: startDateTime).startOfDay

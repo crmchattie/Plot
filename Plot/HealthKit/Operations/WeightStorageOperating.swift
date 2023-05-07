@@ -26,6 +26,7 @@ class WeightStorageOperation: AsyncOperation {
         let unit = HKUnit.pound()
         HealthKitService.getLatestDiscreteDailyAverageSampleForDay(forIdentifier: .bodyMass, unit: unit, date: self.startDate) { [weak self] weight, _ in
             guard let weight = weight, let currentUserID = Auth.auth().currentUser?.uid, let _self = self else {
+                print("finish WeightStorageOperation")
                 self?.finish()
                 return
             }
@@ -34,7 +35,8 @@ class WeightStorageOperation: AsyncOperation {
             let ref = Database.database().reference()
             let values: [String : Any] = ["weight": weight, "unit": unit.unitString]
             ref.child(userBodyMassEntity).child(currentUserID).child(dateString).updateChildValues(values)
-            self?.finish()
+            print("finish WeightStorageOperation")
+                self?.finish()
         }
     }
 }

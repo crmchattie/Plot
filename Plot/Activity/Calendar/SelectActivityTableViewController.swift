@@ -287,7 +287,7 @@ class SelectActivityTableViewController: UITableViewController {
                 invitation = value
             }
             
-            cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+            cell.configureCell(for: indexPath, activity: activity, calendar: nil, withInvitation: invitation)
 
         } else {
             let activity = filteredActivities[indexPath.row]
@@ -296,7 +296,7 @@ class SelectActivityTableViewController: UITableViewController {
                 invitation = value
             }
             
-            cell.configureCell(for: indexPath, activity: activity, withInvitation: invitation)
+            cell.configureCell(for: indexPath, activity: activity, calendar: nil, withInvitation: invitation)
         }
         
         return cell

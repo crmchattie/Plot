@@ -1,18 +1,14 @@
 //
-//  TaskCell.swift
+//  GoalCell.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/22/22.
-//  Copyright © 2022 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 5/6/23.
+//  Copyright © 2023 Immature Creations. All rights reserved.
 //
 
 import UIKit
 
-protocol UpdateCompletionDelegate: AnyObject {
-    func updateCompletion(task: Activity)
-}
-
-class TaskCell: UITableViewCell {
+class GoalCell: UITableViewCell {
     var iconViewHeightConstraint: NSLayoutConstraint!
     var iconViewTopAnchor: NSLayoutConstraint!
     var iconViewTopAnchorRegular: CGFloat = 8
@@ -193,7 +189,7 @@ class TaskCell: UITableViewCell {
         badgeLabel.widthAnchor.constraint(equalToConstant: 25).isActive = true
         badgeLabel.heightAnchor.constraint(equalToConstant: 25).isActive = true
         
-        let checkViewTap = UITapGestureRecognizer(target: self, action: #selector(TaskCell.checkViewChanged(_:)))
+        let checkViewTap = UITapGestureRecognizer(target: self, action: #selector(GoalCell.checkViewChanged(_:)))
         checkView.addGestureRecognizer(checkViewTap)
         
     }
@@ -227,15 +223,13 @@ class TaskCell: UITableViewCell {
             return
         }
         
-        let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
-        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
-        
-        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: 0, goalCurrentNumberSecond: 0)
+        if !(task.isCompleted ?? false) {
+            self.updateCompletionDelegate?.updateCompletion(task: task)
+        }
     }
 }
 
-class TaskCollectionCell: UICollectionViewCell {
+class GoalCollectionCell: UICollectionViewCell {
     var iconViewHeightConstraint: NSLayoutConstraint!
     var iconViewTopAnchor: NSLayoutConstraint!
     var iconViewTopAnchorRegular: CGFloat = 8
@@ -421,7 +415,7 @@ class TaskCollectionCell: UICollectionViewCell {
         badgeLabel.widthAnchor.constraint(equalToConstant: 25).isActive = true
         badgeLabel.heightAnchor.constraint(equalToConstant: 25).isActive = true
         
-        let checkViewTap = UITapGestureRecognizer(target: self, action: #selector(TaskCell.checkViewChanged(_:)))
+        let checkViewTap = UITapGestureRecognizer(target: self, action: #selector(GoalCell.checkViewChanged(_:)))
         checkView.addGestureRecognizer(checkViewTap)
         
     }
@@ -462,10 +456,8 @@ class TaskCollectionCell: UICollectionViewCell {
             return
         }
 
-        let image = !(task.isCompleted ?? false) ? "checkmark.circle" : "circle"
-        checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
-        
-        let updateTask = ActivityActions(activity: task, active: true, selectedFalconUsers: [])
-        updateTask.updateCompletion(isComplete: !(task.isCompleted ?? false), completeUpdatedByUser: !(task.isCompleted ?? false), goalCurrentNumber: 0, goalCurrentNumberSecond: 0)
+        if !(task.isCompleted ?? false) {
+            self.updateCompletionDelegate?.updateCompletion(task: task)
+        }
     }
 }

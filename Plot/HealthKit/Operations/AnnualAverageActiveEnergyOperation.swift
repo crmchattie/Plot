@@ -23,11 +23,13 @@ class AnnualAverageActiveEnergyOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .activeEnergyBurned, unit: .kilocalorie(), startDate: startDate.lastYear, endDate: startDate) { [weak self] annualCalories, _, _ in
             guard let annualCalories = annualCalories, let _self = self else {
+                print("finish AnnualAverageActiveEnergyOperation")
                 self?.finish()
                 return
             }
             
             _self.calories = annualCalories
+            print("finish AnnualAverageActiveEnergyOperation")
             self?.finish()
         }
     }

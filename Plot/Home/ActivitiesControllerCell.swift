@@ -43,6 +43,7 @@ class ActivitiesControllerCell: UICollectionViewCell, UITableViewDataSource, UIT
         tableView.register(TableViewHeader.self,
                            forHeaderFooterViewReuseIdentifier: headerCellID)
         tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
+        tableView.register(GoalCell.self, forCellReuseIdentifier: goalCellID)
         tableView.register(EventCell.self, forCellReuseIdentifier: eventCellID)
         tableView.isScrollEnabled = false
         tableView.separatorStyle = .none

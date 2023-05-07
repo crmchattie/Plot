@@ -415,6 +415,7 @@ struct TransactionCategoryFull: Codable, Equatable, Hashable {
 func categorizeTransactions(transactions: [Transaction], start: Date?, end: Date?, level: TransactionCatLevel?, transactionDetails: [TransactionDetails]?, accounts: [String]?, completion: @escaping ([TransactionDetails], [TransactionDetails: [Transaction]]) -> ()) {
     var transactionsList = [TransactionDetails]()
     var transactionsDict = [TransactionDetails: [Transaction]]()
+    
     // create dateFormatter with UTC time format
     for transaction in transactions {
         guard transaction.should_link ?? true && !(transaction.plot_created ?? false) && !(transaction.transfer_between_accounts ?? false) && transaction.top_level_category != "Investments" && transaction.category != "Investments" else { continue }

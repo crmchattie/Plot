@@ -32,6 +32,7 @@ class HeartRateOperation: AsyncOperation {
         // Get average day heart rate for the most recent heart rate sample endDate
         HealthKitService.getLatestDiscreteDailyAverageSample(forIdentifier: .heartRate, unit: beatsPerMinuteUnit) { [weak self] heartRate, date in
             guard let heartRate = heartRate, heartRate > 0, let date = date, let _self = self else {
+                print("finish HeartRateOperation")
                 self?.finish()
                 return
             }
@@ -40,6 +41,7 @@ class HeartRateOperation: AsyncOperation {
             metric.average = _self.annualAverageHeartRate
             
             _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
+            print("finish HeartRateOperation")
             self?.finish()
         }
     }

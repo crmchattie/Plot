@@ -28,6 +28,7 @@ class MindfulnessOperation: AsyncOperation {
         let startDate = endDate.lastYear
         HealthKitService.getAllCategoryTypeSamples(forIdentifier: .mindfulSession, startDate: startDate, endDate: endDate) { [weak self] samples, error  in
             guard let samples = samples, samples.count > 0, error == nil, let _self = self, let currentUserID = Auth.auth().currentUser?.uid else {
+                print("finish MindfulnessOperation")
                 self?.finish()
                 return
             }
@@ -83,6 +84,7 @@ class MindfulnessOperation: AsyncOperation {
                     
                 }
                 
+                print("finish MindfulnessOperation")
                 self?.finish()
 
             }

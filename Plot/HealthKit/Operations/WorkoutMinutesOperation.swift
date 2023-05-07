@@ -24,6 +24,7 @@ class WorkoutMinutesOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getAllWorkouts(startDate: startDate.lastYear, endDate: startDate) { [weak self] workouts, errorList  in
             guard let workouts = workouts, !workouts.isEmpty, let errorList = errorList, errorList.isEmpty, let _self = self else {
+                print("finish WorkoutMinutesOperation")
                 self?.finish()
                 return
             }
@@ -51,6 +52,7 @@ class WorkoutMinutesOperation: AsyncOperation {
 
             _self.delegate?.insertMetric(_self, metricMinutes, HealthMetricCategory.workouts)
             
+            print("finish WorkoutMinutesOperation")
             self?.finish()
         }
     }

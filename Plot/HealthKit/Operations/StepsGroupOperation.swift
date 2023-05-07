@@ -38,6 +38,7 @@ class StepsGroupOperation: AsyncOperation {
         }
         
         queue.addBarrierBlock { [weak self] in
+            print("finish StepsGroupOperation")
             self?.finish()
         }
     }

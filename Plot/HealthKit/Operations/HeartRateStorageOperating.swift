@@ -31,6 +31,7 @@ class HeartRateStorageOperation: AsyncOperation {
         let beatsPerMinuteUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
         HealthKitService.getLatestDiscreteDailyAverageSampleForDay(forIdentifier: .heartRate, unit: beatsPerMinuteUnit, date: self.startDate) { [weak self] heartRate, _ in
             guard let heartRate = heartRate, heartRate > 0, let currentUserID = Auth.auth().currentUser?.uid, let _self = self else {
+                print("finish HeartRateStorageOperation")
                 self?.finish()
                 return
             }
@@ -39,7 +40,8 @@ class HeartRateStorageOperation: AsyncOperation {
             let ref = Database.database().reference()
             ref.child(userHeartRateEntity).child(currentUserID).child(dateString).setValue(heartRate)
 
-            self?.finish()
+            print("finish HeartRateStorageOperation")
+                self?.finish()
         }
     }
 }

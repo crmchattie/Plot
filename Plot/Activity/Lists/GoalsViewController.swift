@@ -214,7 +214,7 @@ class GoalsViewController: UIViewController, ObjectDetailShowing, UIGestureRecog
         activityView.tableView.dataSource = self
         activityView.tableView.delegate = self
         activityView.tableView.register(ListCell.self, forCellReuseIdentifier: listCellID)
-        activityView.tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
+        activityView.tableView.register(GoalCell.self, forCellReuseIdentifier: goalCellID)
         activityView.tableView.allowsMultipleSelectionDuringEditing = false
         activityView.tableView.indicatorStyle = .default
         activityView.tableView.backgroundColor = view.backgroundColor
@@ -513,12 +513,12 @@ extension GoalsViewController: FSCalendarDataSource, FSCalendarDelegate, FSCalen
             dispatchGroup.enter()
             dateFormatter.timeZone = TimeZone(identifier: activity.startTimeZone ?? "UTC")
             if activity.isCompleted ?? false {
-                if let startDate = activity.goalStartDateUTC, let endDate = activity.goalEndDateUTC {
+                if let startDate = activity.goalStartDate, let endDate = activity.goalEndDate {
                     for activityDate in stride(from: startDate, to: endDate, by: 86400) {
                         activityDates[dateFormatter.string(from: activityDate), default: 0] += 1
                     }
                     dispatchGroup.leave()
-                } else if let endDate = activity.goalEndDateUTC {
+                } else if let endDate = activity.goalEndDate {
                     activityDates[dateFormatter.string(from: endDate), default: 0] += 1
                     dispatchGroup.leave()
                 }
@@ -578,13 +578,14 @@ extension GoalsViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else if !filteredGoals.isEmpty {
             let goal = filteredGoals[indexPath.row]
-            let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
-            if let listID = goal.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-            } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+            let cell = tableView.dequeueReusableCell(withIdentifier: goalCellID, for: indexPath) as? GoalCell ?? GoalCell()
+            var list: ListType?
+            if let listID = goal.listID, let listList = networkController.activityService.listIDs[listID] {
+                list = listList
+            } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                list = listList
             }
-            cell.configureCell(for: indexPath, task: goal)
+            cell.configureCell(for: indexPath, task: goal, list: list)
             cell.updateCompletionDelegate = self
             return cell
         }

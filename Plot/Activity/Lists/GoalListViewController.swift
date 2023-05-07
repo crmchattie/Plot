@@ -23,7 +23,7 @@ class GoalListViewController: UIViewController, ObjectDetailShowing {
             
     let tableView = UITableView(frame: .zero, style: .insetGrouped)
     
-    let newTaskCellID = "newTaskCellID"
+    let newGoalCellID = "newGoalCellID"
     
     var list: ListType!
     var networkGoals: [Activity] {
@@ -181,8 +181,8 @@ class GoalListViewController: UIViewController, ObjectDetailShowing {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.indicatorStyle = .default
-        tableView.register(TaskCell.self, forCellReuseIdentifier: taskCellID)
-        tableView.register(NewTaskCell.self, forCellReuseIdentifier: newTaskCellID)
+        tableView.register(GoalCell.self, forCellReuseIdentifier: goalCellID)
+        tableView.register(NewGoalCell.self, forCellReuseIdentifier: newGoalCellID)
         
         tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
@@ -392,38 +392,40 @@ extension GoalListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if filteredGoals.count > 9 {
             if indexPath.row == 0 {
-                let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
+                let cell = tableView.dequeueReusableCell(withIdentifier: newGoalCellID, for: indexPath) as? NewGoalCell ?? NewGoalCell()
                 return cell
             }
             if filteredGoals.indices.contains(indexPath.row - 1) {
-                let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+                let cell = tableView.dequeueReusableCell(withIdentifier: goalCellID, for: indexPath) as? GoalCell ?? GoalCell()
                 let goal = filteredGoals[indexPath.row - 1]
-                if let listID = goal.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                var list: ListType?
+                if let listID = goal.listID, let listList = networkController.activityService.listIDs[listID] {
+                    list = listList
+                } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                    list = listList
                 }
-                cell.configureCell(for: indexPath, task: goal)
                 cell.updateCompletionDelegate = self
+                cell.configureCell(for: indexPath, task: goal, list: list)
                 return cell
             } else {
-                let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
+                let cell = tableView.dequeueReusableCell(withIdentifier: newGoalCellID, for: indexPath) as? NewGoalCell ?? NewGoalCell()
                 return cell
             }
         } else {
             if filteredGoals.indices.contains(indexPath.row) {
-                let cell = tableView.dequeueReusableCell(withIdentifier: taskCellID, for: indexPath) as? TaskCell ?? TaskCell()
+                let cell = tableView.dequeueReusableCell(withIdentifier: goalCellID, for: indexPath) as? GoalCell ?? GoalCell()
                 let goal = filteredGoals[indexPath.row]
-                if let listID = goal.listID, let list = networkController.activityService.listIDs[listID], let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
-                } else if let list = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }), let color = list.color {
-                    cell.activityTypeButton.tintColor = UIColor(ciColor: CIColor(string: color))
+                var list: ListType?
+                if let listID = goal.listID, let listList = networkController.activityService.listIDs[listID] {
+                    list = listList
+                } else if let listList = networkController.activityService.lists[ListSourceOptions.plot.name]?.first(where: { $0.defaultList ?? false }) {
+                    list = listList
                 }
                 cell.updateCompletionDelegate = self
-                cell.configureCell(for: indexPath, task: goal)
+                cell.configureCell(for: indexPath, task: goal, list: list)
                 return cell
             } else {
-                let cell = tableView.dequeueReusableCell(withIdentifier: newTaskCellID, for: indexPath) as? NewTaskCell ?? NewTaskCell()
+                let cell = tableView.dequeueReusableCell(withIdentifier: newGoalCellID, for: indexPath) as? NewGoalCell ?? NewGoalCell()
                 return cell
             }
         }

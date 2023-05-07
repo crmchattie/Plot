@@ -1,16 +1,16 @@
 //
-//  TaskCell+ConfigureCell.swift
+//  GoalCell+ConfigureCell.swift
 //  Plot
 //
-//  Created by Cory McHattie on 8/22/22.
-//  Copyright © 2022 Immature Creations. All rights reserved.
+//  Created by Cory McHattie on 5/6/23.
+//  Copyright © 2023 Immature Creations. All rights reserved.
 //
 
 import UIKit
 import Firebase
 import SDWebImage
 
-extension TaskCell {
+extension GoalCell {
     
     func configureCell(for indexPath: IndexPath, task: Activity, list: ListType?) {
         self.task = task
@@ -21,26 +21,41 @@ extension TaskCell {
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
-        let dateTimeValueArray = dateTimeValue(forTask: task)
+        let dateTimeValueArray = dateTimeValue(forGoal: task)
         endLabel.numberOfLines = dateTimeValueArray.0
         endLabel.text = dateTimeValueArray.1
         
         if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
-            activityTypeLabel.text = subcategory.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = subcategory.rawValue
+            }
         } else if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             }
-            activityTypeLabel.text = category.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = category.rawValue
+            }
         } else {
             activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
-            activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            }
         }
 
         
         var image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
+        if !(task.isCompleted ?? false), let endDate = task.endDate, endDate < Date().localTime {
+            image = "x.circle"
+        }
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         if let list = list, let color = list.color {
@@ -108,7 +123,7 @@ extension TaskCell {
     }
 }
 
-extension TaskCollectionCell {
+extension GoalCollectionCell {
     
     func configureCell(for indexPath: IndexPath, task: Activity, list: ListType?) {
         self.task = task
@@ -119,25 +134,40 @@ extension TaskCollectionCell {
         nameLabel.text = activityName
         muteIndicator.isHidden = !isActivityMuted
                 
-        let dateTimeValueArray = dateTimeValue(forTask: task)
+        let dateTimeValueArray = dateTimeValue(forGoal: task)
         endLabel.numberOfLines = dateTimeValueArray.0
         endLabel.text = dateTimeValueArray.1
         
         if let subcategoryValue = task.subcategory, let subcategory = ActivitySubcategory(rawValue: subcategoryValue), subcategory != .uncategorized {
             activityTypeButton.setImage(subcategory.icon, for: .normal)
-            activityTypeLabel.text = subcategory.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = subcategory.rawValue
+            }
         } else if let categoryValue = task.category, let category = ActivityCategory(rawValue: categoryValue) {
             activityTypeButton.setImage(category.icon, for: .normal)
             if category == .uncategorized {
                 activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
             }
-            activityTypeLabel.text = category.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = category.rawValue
+            }
         } else {
             activityTypeButton.setImage(UIImage(named: "task"), for: .normal)
-            activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            if let goal = task.goal, let description = goal.cellDescription {
+                activityTypeLabel.text = description
+            } else {
+                activityTypeLabel.text = ActivityCategory.uncategorized.rawValue
+            }
         }
                 
         var image = task.isCompleted ?? false ? "checkmark.circle" : "circle"
+        if !(task.isCompleted ?? false), let endDate = task.endDate, endDate < Date().localTime {
+            image = "x.circle"
+        }
         checkImage.image = UIImage(systemName: image, withConfiguration: checkConfiguration)
         
         if let list = list, let color = list.color {

@@ -25,6 +25,7 @@ class StepsStorageOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .stepCount, unit: .count(), date: self.startDate) { [weak self] stepsResult, _, _ in
             guard let stepsResult = stepsResult, stepsResult > 0, let currentUserID = Auth.auth().currentUser?.uid, let _self = self else {
+                print("finish StepsStorageOperation")
                 self?.finish()
                 return
             }
@@ -33,6 +34,7 @@ class StepsStorageOperation: AsyncOperation {
             let ref = Database.database().reference()
             ref.child(userStepsEntity).child(currentUserID).child(dateString).setValue(stepsResult)
 
+            print("finish StepsStorageOperation")
             self?.finish()
         }
     }

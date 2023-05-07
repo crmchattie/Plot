@@ -23,11 +23,13 @@ class AverageAnnualFlightsClimbedOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .flightsClimbed, unit: .count(), startDate: startDate.lastYear, endDate: startDate) { [weak self] annualFloors, _, _ in
             guard let annualFloors = annualFloors, let _self = self else {
+                print("finish AverageAnnualFlightsClimbedOperation")
                 self?.finish()
                 return
             }
             
             _self.floors = annualFloors
+            print("finish AverageAnnualFlightsClimbedOperation")
             self?.finish()
         }
     }

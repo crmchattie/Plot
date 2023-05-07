@@ -29,6 +29,7 @@ class WorkoutOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getWorkouts(forWorkoutActivityType: workoutActivityType, startDate: startDate.lastYear, endDate: startDate) { [weak self] workouts, error  in
             guard let workouts = workouts, error == nil, let _self = self, let currentUserID = Auth.auth().currentUser?.uid else {
+                print("finish WorkoutOperation")
                 self?.finish()
                 return
             }
@@ -49,30 +50,29 @@ class WorkoutOperation: AsyncOperation {
                     metricCalories.hkSample = workout
                                         
                     var averageEnergyBurned: Double = 0
-                    
-                        workouts.forEach { workout in
-                            let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
-                            averageEnergyBurned += totalEnergyBurned
+                    workouts.forEach { workout in
+                        let totalEnergyBurned = workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0
+                        averageEnergyBurned += totalEnergyBurned
+                        
+                        // Only create activities that past lastSync date time
+                        if (_self.lastSyncDate == nil || (workout.startDate >= _self.lastSyncDate!)) && existingWorkoutKeys[workout.uuid.uuidString] == nil {
+                            let ref = Database.database().reference()
+                            var workoutID = UUID().uuidString
                             
-                            // Only create activities that past lastSync date time
-                            if (_self.lastSyncDate == nil || (workout.startDate >= _self.lastSyncDate!)) && existingWorkoutKeys[workout.uuid.uuidString] == nil {
-                                let ref = Database.database().reference()
-                                var workoutID = UUID().uuidString
-                                
-                                if let newWorkoutId = ref.child(userWorkoutsEntity).child(currentUserID).childByAutoId().key {
-                                    workoutID = newWorkoutId
-                                }
-                                
-                                ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(workout.uuid.uuidString).child(identifierKey).setValue(workoutID)
-                                
-                                ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(hkSampleIDKey).setValue(workout.uuid.uuidString)
-                                ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child("totalEnergyBurned").setValue(totalEnergyBurned)
-                                                                                                
-                                let workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
-                                let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
-                                workoutActions.createNewWorkout(updateDirectAssociation: false)
+                            if let newWorkoutId = ref.child(userWorkoutsEntity).child(currentUserID).childByAutoId().key {
+                                workoutID = newWorkoutId
                             }
+                            
+                            ref.child(userHealthEntity).child(currentUserID).child(healthkitWorkoutsKey).child(workout.uuid.uuidString).child(identifierKey).setValue(workoutID)
+                            
+                            ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child(hkSampleIDKey).setValue(workout.uuid.uuidString)
+                            ref.child(userWorkoutsEntity).child(currentUserID).child(workoutID).child("totalEnergyBurned").setValue(totalEnergyBurned)
+                                                                                            
+                            let workoutFB = Workout(forInitialSave: workoutID, hkWorkout: workout)
+                            let workoutActions = WorkoutActions(workout: workoutFB, active: false, selectedFalconUsers: [])
+                            workoutActions.createNewWorkout(updateDirectAssociation: false)
                         }
+                    }
                     
                     if averageEnergyBurned != 0 {
                         averageEnergyBurned /= Double(workouts.count)
@@ -82,6 +82,7 @@ class WorkoutOperation: AsyncOperation {
                     _self.delegate?.insertMetric(_self, metricCalories, HealthMetricCategory.workouts)
                 }
                 
+                print("finish WorkoutOperation \(self?.workoutActivityType.name)")
                 self?.finish()
             }
         }

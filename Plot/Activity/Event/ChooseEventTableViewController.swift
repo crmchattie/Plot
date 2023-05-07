@@ -239,12 +239,13 @@ class ChooseEventTableViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: eventCellID, for: indexPath) as? EventCell ?? EventCell()
         let event = filteredEvents[indexPath.row]
-        if let calendarID = event.calendarID, let calendar = networkController.activityService.calendarIDs[calendarID], let color = calendar.color {
-            event.calendarColor = color
-        } else if let calendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }), let color = calendar.color {
-            event.calendarColor = color
+        var calendar: CalendarType?
+        if let calendarID = event.calendarID, let calendarCalendar = networkController.activityService.calendarIDs[calendarID] {
+            calendar = calendarCalendar
+        } else if let calendarCalendar = networkController.activityService.calendars[CalendarSourceOptions.plot.name]?.first(where: { $0.defaultCalendar ?? false }) {
+            calendar = calendarCalendar
         }
-        cell.configureCell(for: indexPath, activity: event, withInvitation: nil)
+        cell.configureCell(for: indexPath, activity: event, calendar: calendar, withInvitation: nil)
         return cell
     }
     

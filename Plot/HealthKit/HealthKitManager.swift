@@ -37,6 +37,7 @@ class HealthKitManager {
         metrics = [:]
         containers = []
         isRunning = true
+        
         self.getUserHealthLastSyncDate { [weak self] lastSyncDate in
             let today = Date()
                         
@@ -125,6 +126,7 @@ class HealthKitManager {
             
             if #available(iOS 16.0, *) {
                 for index in 0...HKWorkoutActivityType.allCases.count - 1 {
+                    print("HKWorkoutActivityType.allCases.count \(HKWorkoutActivityType.allCases[index].name)")
                     let op = WorkoutOperation(date: futureDay, workoutActivityType: HKWorkoutActivityType.allCases[index], rank: index + 1)
                     op.delegate = self
                     op.lastSyncDate = lastSyncDate
@@ -132,6 +134,7 @@ class HealthKitManager {
                 }
             } else if #available(iOS 14.0, *) {
                 for index in 0...HKWorkoutActivityType.oldAllCases.count - 1 {
+                    print("HKWorkoutActivityType.allCases.count \(HKWorkoutActivityType.oldAllCases[index].name)")
                     let op = WorkoutOperation(date: futureDay, workoutActivityType: HKWorkoutActivityType.oldAllCases[index], rank: index + 1)
                     op.delegate = self
                     op.lastSyncDate = lastSyncDate
@@ -140,44 +143,47 @@ class HealthKitManager {
             } else {
                 // Fallback on earlier versions
                 for index in 0...HKWorkoutActivityType.oldOldAllCases.count - 1 {
+                    print("HKWorkoutActivityType.allCases.count \(HKWorkoutActivityType.oldOldAllCases[index].name)")
                     let op = WorkoutOperation(date: futureDay, workoutActivityType: HKWorkoutActivityType.oldOldAllCases[index], rank: index + 1)
                     op.delegate = self
                     op.lastSyncDate = lastSyncDate
                     self?.queue.addOperations([op], waitUntilFinished: false)
                 }
             }
-            
-            var dateComponents = DateComponents()
-            dateComponents.day = 1
-            
-            var syncDate = lastSyncDate?.addDays(-1) ?? today.addDays(-1)
-            
-            while syncDate <= today {
-                // Perform operations with syncDate here
-                let stepsOp = StepsStorageOperation(date: syncDate)
+
+            let dateComponents = DateComponents(day: 1)
+            let dateStride = Double(dateComponents.day ?? 0) * 24 * 60 * 60
+            let syncDate = lastSyncDate?.addDays(-1) ?? today.addDays(-1)
+
+            for date in stride(from: syncDate, through: today, by: dateStride) {
+                let stepsOp = StepsStorageOperation(date: date)
                 self?.queue.addOperations([stepsOp], waitUntilFinished: false)
-                
-                let flightsOp = FlightsClimbedStorageOperation(date: syncDate)
+
+                let flightsOp = FlightsClimbedStorageOperation(date: date)
                 self?.queue.addOperations([flightsOp], waitUntilFinished: false)
-                
-                let heartOp = HeartRateStorageOperation(date: syncDate)
+
+                let heartOp = HeartRateStorageOperation(date: date)
                 self?.queue.addOperations([heartOp], waitUntilFinished: false)
-                
-                let weightOp = WeightStorageOperation(date: syncDate)
+
+                let weightOp = WeightStorageOperation(date: date)
                 self?.queue.addOperations([weightOp], waitUntilFinished: false)
-                
-                let sleepOp = SleepStorageOperation(date: syncDate)
+
+                let sleepOp = SleepStorageOperation(date: date)
                 self?.queue.addOperations([sleepOp], waitUntilFinished: false)
-                
-                let activeEnergyOp = ActiveEnergyStorageOperation(date: syncDate)
+
+                let activeEnergyOp = ActiveEnergyStorageOperation(date: date)
                 self?.queue.addOperations([activeEnergyOp], waitUntilFinished: false)
-                
-                // Increment syncDate by one day
-                syncDate = Calendar.current.date(byAdding: dateComponents, to: syncDate) ?? today
             }
+                        
+            for index in 0...(self?.queue.operationCount ?? 1) - 1 {
+                print("self?.queue.operationCount")
+                print(index)
+            }
+            
             
             // Once everything is fetched return the activities
             self?.queue.addBarrierBlock { [weak self] in
+                print("self?.queue.addBarrierBlock")
                 guard let _self = self else {
                     completion([:], false)
                     return
@@ -206,7 +212,6 @@ class HealthKitManager {
             
         let reference = Database.database().reference().child(userHealthEntity).child(currentUser)
         reference.observeSingleEvent(of: .value, with: { (snapshot) in
-            
             if snapshot.exists(), let value = snapshot.value as? [String: Any], let lastSyncDateTimeInterval = value[lastSyncDateKey] as? Double {
                 let lastSyncDate = Date(timeIntervalSince1970: lastSyncDateTimeInterval)
                 completion(lastSyncDate)
@@ -219,6 +224,7 @@ class HealthKitManager {
     }
     
     func saveFirebase(completion: @escaping () -> Void) {
+        print("saveFirebase")
         guard let currentUserID = Auth.auth().currentUser?.uid else {
             completion()
             return
@@ -227,6 +233,7 @@ class HealthKitManager {
         dispatchGroup = DispatchGroup()
         
         dispatchGroup.notify(queue: DispatchQueue.global(), execute: {
+            print("done saveFirebase")
             completion()
         })
 

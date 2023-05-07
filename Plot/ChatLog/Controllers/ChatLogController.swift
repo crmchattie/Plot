@@ -341,8 +341,7 @@ class ChatLogController: UICollectionViewController {
         if self.navigationController?.visibleViewController is UserInfoTableViewController ||
             self.navigationController?.visibleViewController is  GroupAdminControlsTableViewController ||
             topViewController(rootViewController: self) is CropViewController ||
-            self.navigationController?.visibleViewController is  EventViewController ||
-            self.navigationController?.visibleViewController is  SelectActivityTableViewController {
+            self.navigationController?.visibleViewController is  EventViewController {
             return
         }
         

@@ -25,6 +25,7 @@ class StepsOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .stepCount, unit: .count(), date: self.startDate) { [weak self] stepsResult, _, _ in
             guard let stepsResult = stepsResult, stepsResult > 0, let _self = self else {
+                print("finish StepsOperation")
                 self?.finish()
                 return
             }
@@ -33,6 +34,7 @@ class StepsOperation: AsyncOperation {
             var metric = HealthMetric(type: HealthMetricType.steps, total: steps, date: _self.startDate, unitName: "steps", rank: HealthMetricType.steps.rank)
             metric.average = _self.annualAverageSteps
             _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
+            print("finish StepsOperation")
             self?.finish()
         }
     }

@@ -26,6 +26,7 @@ class WeightOperation: AsyncOperation {
         HealthKitService.getLatestDiscreteDailyAverageSample(forIdentifier: .bodyMass, unit: unit) { [weak self] weight, date in
             
             guard let weight = weight, let date = date, let _self = self else {
+                print("finish WeightOperation")
                 self?.finish()
                 return
             }
@@ -34,6 +35,7 @@ class WeightOperation: AsyncOperation {
             metric.average = _self.annualAverageWeight
             
             _self.delegate?.insertMetric(_self, metric, HealthMetricCategory.general)
+            print("finish WeightOperation")
             self?.finish()
         }
     }

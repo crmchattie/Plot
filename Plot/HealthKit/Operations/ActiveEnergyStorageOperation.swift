@@ -25,6 +25,7 @@ class ActiveEnergyStorageOperation: AsyncOperation {
     private func startFetchRequest() {
         HealthKitService.getCumulativeSumSampleAverageAndRecent(forIdentifier: .activeEnergyBurned, unit: .kilocalorie(), date: self.startDate) { [weak self] caloriesResult, _, _ in
             guard let caloriesResult = caloriesResult, caloriesResult > 0, let currentUserID = Auth.auth().currentUser?.uid, let _self = self else {
+                print("finish ActiveEnergyStorageOperation")
                 self?.finish()
                 return
             }
@@ -33,7 +34,8 @@ class ActiveEnergyStorageOperation: AsyncOperation {
             let ref = Database.database().reference()            
             ref.child(userActiveEnergyEntity).child(currentUserID).child(dateString).setValue(caloriesResult)
 
-            self?.finish()
+            print("finish ActiveEnergyStorageOperation")
+                self?.finish()
             
         }
     }
