@@ -1329,13 +1329,6 @@ struct SygicAPI {
 }
 
 struct MXAPI {
-    //production environment
-//    static let baseURL = "https://atrium.mx.com/"
-    
-    //production environment keys
-//    static fileprivate let apiKey = "d14242458ddd419ac3e40238537070a6ccf29c2f"
-//    static fileprivate let clientID = "cc3f22cd-7431-4bd9-955c-2624dcbb0e26"
-    
     //development environment URL
     static let baseURL = "https://vestibule.mx.com/"
     
