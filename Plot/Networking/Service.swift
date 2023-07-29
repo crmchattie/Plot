@@ -1283,23 +1283,23 @@ struct SpoonacularAPI {
     static let ingredientsString = "https://api.spoonacular.com/food/ingredients/"
     static let groceryString = "https://api.spoonacular.com/food/products/"
     static let menuString = "https://api.spoonacular.com/food/menuItems/"
-    static fileprivate let apiKey = "7c1e8c9cd7fc48718c4d903c53aa99d9"
+    static fileprivate let apiKey = ""
 }
 
 struct TicketMasterAPI {
     static let eventsUrlString = "https://app.ticketmaster.com/discovery/v2/events"
     static let suggestUrlString = "https://app.ticketmaster.com/discovery/v2/suggest"
     static let attractionsUrlString = "https://app.ticketmaster.com/discovery/v2/attractions"
-    static fileprivate let apiKey = "Tgi7g8YEZC5tFpMTPUd9IfrxzXLxJnK0"
+    static fileprivate let apiKey = ""
 }
 
 struct StubHubAPI {
     static let baseUrlString = "https://api.stubhub.com/sellers/search/events/v3"
-    static fileprivate let apiKey = "xVBMj11niDRbEux46AZ5piTO7305GkPY"
+    static fileprivate let apiKey = ""
 }
 
 struct ClimaCellAPI {
-    static fileprivate let apiKey = "pEDT4UvIaMtu2agpiPZZh0Hl1QLhxyTL"
+    static fileprivate let apiKey = ""
     static let realTimeUrlString = "https://api.climacell.co/v3/weather/realtime"
     static let nowCastUrlString = "https://api.climacell.co/v3/weather/nowcast"
     static let hourlyUrlString = "https://api.climacell.co/v3/weather/forecast/hourly"
@@ -1308,15 +1308,15 @@ struct ClimaCellAPI {
 
 struct AviationAPI {
     static let flightsUrlString = "https://api.aviationstack.com/v1/flights"
-    static fileprivate let apiKey = "0688f6631e1872f04adea3f86b67e6c1"
+    static fileprivate let apiKey = ""
 }
 
 struct FoursquareAPI {
     static let exploreUrlString = "https://api.foursquare.com/v2/venues/explore"
     static let searchUrlString = "https://api.foursquare.com/v2/venues/search"
     static let detailUrlString = "https://api.foursquare.com/v2/venues"
-    static fileprivate let clientID = "DZCYSAUK2HVJECX4AIKHLUWBPOYDAEK5PDVTLEKWJVB1HT4F"
-    static fileprivate let clientSecret = "2KYITTACKGXAJZ3COBVRRCVTTLVGVF1UPWD2RLUJWRMGB2IA"
+    static fileprivate let clientID = ""
+    static fileprivate let clientSecret = ""
 }
 
 struct SygicAPI {
@@ -1325,7 +1325,7 @@ struct SygicAPI {
     static let collectionsUrlString = "https://api.sygictravelapi.com/1.1/en/collections"
     static let tripTemplatesUrlString = "https://api.sygictravelapi.com/1.1/en/trips/templates"
     static let tripDetailsUrlString = "https://api.sygictravelapi.com/1.1/en/trips"
-    static fileprivate let apiKey = "gLr9XJrFQB3picSrsJoC1nSCUyIsMQQ8rr4meHN1"
+    static fileprivate let apiKey = ""
 }
 
 struct MXAPI {
